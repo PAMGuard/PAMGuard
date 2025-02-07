@@ -4,11 +4,9 @@ import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import IshmaelDetector.IshDetFnDataUnit;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
-import PamUtils.Coordinate3d;
 import PamUtils.PamUtils;
 import PamView.GeneralProjector;
 import PamView.HoverData;
@@ -104,23 +102,25 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		}
 		else {
 			return super.drawDataUnit(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
-			
 		}
 	}
+	
+	
 
 	/**
-	 * Base class draws a simple frequency box. Easily overridden to draw something else, e.g. a contour. 
-	 * @param plotNumber
-	 * @param pamDataUnit
-	 * @param g
-	 * @param scrollStart
-	 * @param tdProjector
-	 * @param type
-	 * @return
+	 * Draw a data unit as a box. 
+	 * @param plotNumber - the pot number 
+	 * @param pamDataUnit - the data unit that will be plotted
+	 * @param f - the y axis max and min values
+	 * @param g - the graphics context. 
+	 * @param scrollStart - the scroll start in millis.
+	 * @param tdProjector - the graph projector. 
+	 * @param type - the plot type. 
+	 * @return a polygon of the data unit. 
 	 */
-	public Polygon drawFrequencyData(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
+	public Polygon drawBoxData(int plotNumber, PamDataUnit pamDataUnit, double[] f, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
-						
+				
 		g.setLineDashes(null);
 		g.setLineWidth(2);
 		TDSymbolChooserFX symbolChooser = getSymbolChooser();
@@ -129,13 +129,13 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 			symbol = symbolChooser.getPamSymbol(pamDataUnit, type);
 		}
 		
-		double[] f = pamDataUnit.getFrequency();
 		if (f == null) {
 			return null;
 		}
 		if (f.length == 1) {
 			System.out.println("GenericDataPlotInfo: Single frequency measure in data unit " + pamDataUnit.toString());
 		}
+		
 		// draw a frequency box. 
 		double y0 = tdProjector.getYPix(f[0]);
 		double y1 = tdProjector.getYPix(f[1]);
@@ -185,6 +185,22 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		
 		
 		return null;
+	}
+
+	/**
+	 * Base class draws a simple frequency box. Easily overridden to draw something else, e.g. a contour. 
+	 * @param plotNumber
+	 * @param pamDataUnit
+	 * @param g
+	 * @param scrollStart
+	 * @param tdProjector
+	 * @param type
+	 * @return
+	 */
+	public Polygon drawFrequencyData(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
+			TDProjectorFX tdProjector, int type) {
+		double[] f = pamDataUnit.getFrequency();		
+		return drawBoxData( plotNumber,  pamDataUnit,f,  g,  scrollStart, tdProjector,  type);
 	}
 	
 

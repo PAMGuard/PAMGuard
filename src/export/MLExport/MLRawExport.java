@@ -5,6 +5,7 @@ import org.jamdev.jdl4pam.utils.DLMatFile;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
+import pamMaths.PamVector;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
@@ -20,11 +21,11 @@ public class MLRawExport extends MLDataUnitExport<PamDataUnit<?,?>>{
 	public Struct addDetectionSpecificFields(Struct mlStruct, int index, PamDataUnit dataUnit) {
 
 		RawDataHolder rawDataHolder = (RawDataHolder) dataUnit; 
-		
+
 		//the waveform
 		Matrix wave = DLMatFile.array2Matrix(rawDataHolder.getWaveData()); 
 
-		
+
 		//the number of channels
 		Matrix nChan = Mat5.newScalar(PamUtils.getNumChannels(dataUnit.getChannelBitmap())); 
 
@@ -66,5 +67,6 @@ public class MLRawExport extends MLDataUnitExport<PamDataUnit<?,?>>{
 	public String getName() {
 		return "raw_data_units";
 	}
+
 
 }

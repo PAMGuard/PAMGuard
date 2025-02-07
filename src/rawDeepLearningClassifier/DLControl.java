@@ -25,13 +25,14 @@ import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
 import ai.djl.engine.Engine;
 import annotation.handler.AnnotationHandler;
+import clickTrainDetector.layout.ClickTrainSymbolManager;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
-import dataPlotsFX.data.generic.GenericDataPlotProvider;
 import detectionPlotFX.data.DDPlotRegister;
-import generalDatabase.DBControlUnit;
 import generalDatabase.SQLLoggingAddon;
+import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
+import rawDeepLearningClassifier.dataPlotFX.DLGroupSymbolManager;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
 import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
 import rawDeepLearningClassifier.defaultModels.DLDefaultModelManager;
@@ -59,6 +60,7 @@ import rawDeepLearningClassifier.logging.DLDetectionDatagram;
 import rawDeepLearningClassifier.logging.DLGroupDetectionLogging;
 import rawDeepLearningClassifier.logging.DLGroupSubLogging;
 import rawDeepLearningClassifier.logging.DLResultBinarySource;
+import rawDeepLearningClassifier.logging.DLResultLogging;
 import rawDeepLearningClassifier.offline.DLOfflineProcess;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess;
 
@@ -184,6 +186,18 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * The binary data source for detection data
 	 */
 	private DLDetectionBinarySource dlDetectionBinarySource;
+	
+	/**
+	 * DL Group detection logging to database
+	 */
+	private DLGroupDetectionLogging dlGroupDetLogging;
+	
+	
+	/**
+	 * Logging for raw predictions to database
+	 */
+	private DLResultLogging dlResultLogging;
+
 
 	/**
 	 * The DL offline process.
@@ -213,10 +227,13 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	private DLDefaultModelManager defaultModelManager;
 	
+
 	/**
-	 * DL Group detection logging. 
+	 * If true then detections are saved to a group and all detections within a segment are then
+	 * passed to the deep learning classifier.
 	 */
-	private DLGroupDetectionLogging dlGroupDetLogging; 
+	private boolean groupDetections = false;
+
 
 	
 	
@@ -245,7 +262,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		// classify the raw data segments.
 		addPamProcess(dlClassifyProcess = new DLClassifyProcess(this, segmenterProcess.getSegmenterDataBlock()));
-		dlClassifyProcess.addMultiPlexDataBlock(segmenterProcess.getSegmenteGrouprDataBlock());
+		//also add group data - rare to have to into datablocks  but this will work.  
+		dlClassifyProcess.addMultiPlexDataBlock(segmenterProcess.getSegmenteGroupDataBlock());
 
 		//manages the names assigned to different output classes. 
 		dlClassNameManager = new DLClassNameManager(this);
@@ -260,6 +278,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// add storage options etc.
 		dlBinaryDataSource = new DLResultBinarySource(dlClassifyProcess);
 		dlClassifyProcess.getDLPredictionDataBlock().setBinaryDataSource(dlBinaryDataSource);
+		dlClassifyProcess.getDLPredictionDataBlock().SetLogging(dlResultLogging = new DLResultLogging(this, dlClassifyProcess.getDLPredictionDataBlock()));
 		dlClassifyProcess.getDLPredictionDataBlock().setDatagramProvider(new DLDataUnitDatagram(this));
 
 		dlDetectionBinarySource = new DLDetectionBinarySource(this, dlClassifyProcess.getDLDetectionDatablock());
@@ -269,6 +288,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 //		//set database logging for group detections
 		dlClassifyProcess.getDLGroupDetectionDataBlock().SetLogging(dlGroupDetLogging = new DLGroupDetectionLogging(this, dlClassifyProcess.getDLGroupDetectionDataBlock()));
 		dlGroupDetLogging.setSubLogging(new DLGroupSubLogging(dlGroupDetLogging, dlClassifyProcess.getDLGroupDetectionDataBlock()));
+//		int maxndays = 1; //maximum days to load. 
+//		AbstractScrollManager.getScrollManager().addToSpecialDatablock(dlClassifyProcess.getDLGroupDetectionDataBlock(), maxndays*24*60*60*1000L , maxndays*24*60*60*1000L);
+
 		
 		//a little strange this is not automatic but seems you have to add SQL add ons explicitly. 
 		AnnotationHandler annotationHandler = dlClassifyProcess.getDLGroupDetectionDataBlock().getAnnotationHandler();
@@ -290,12 +312,14 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		overlayGraphics = new DLDetectionGraphics(dlClassifyProcess.getDLGroupDetectionDataBlock());
 		overlayGraphics.setDetectionData(true);
 		dlClassifyProcess.getDLGroupDetectionDataBlock().setOverlayDraw(overlayGraphics);
+
 		
 		//set the symbol managers. 
 		dlClassifyProcess.getDLDetectionDatablock()
 				.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
-		dlClassifyProcess.getDLGroupDetectionDataBlock()
-			.setPamSymbolManager(new StandardSymbolManager(	dlClassifyProcess.getDLGroupDetectionDataBlock(),  new SymbolData()));
+		
+		dlClassifyProcess.getDLGroupDetectionDataBlock().setPamSymbolManager(new DLGroupSymbolManager(dlClassifyProcess.getDLGroupDetectionDataBlock()));
+
 		dlClassifyProcess.getDLPredictionDataBlock()
 				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
 		
@@ -664,7 +688,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 			//create the data selector
 			//System.out.println("Data selector: " + dataSelector); 
 			if (source!=null) {
-				dataSelector=source.getDataSelectCreator().getDataSelector(this.getUnitName() +"_clicks", false, null);
+				dataSelector=source.getDataSelectCreator().getDataSelector(this.getUnitName() +"_" + source.getDataName(), false, null);
 				//System.out.println("Data selector: " + dataSelector); 
 			}
 			else {
@@ -697,6 +721,28 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	public DLDefaultModelManager getDefaultModelManager() {
 		return this.defaultModelManager;
 	}
+
+	/**
+	 * Check whether group detections are being used. 
+	 * If true then detections are saved to a group and all detections within a segment are then
+	 * passed to the deep learning classifier.
+	 */
+	public boolean isGroupDetections() {
+		return groupDetections;
+	}
+	
+	/**
+	 * Set whether to use group detections. 
+	 * If true then detections are saved to a group and all detections within a segment are then
+	 * passed to the deep learning classifier.
+	 * @param groupDetections - true to use group detections. 
+	 */
+	public void setGroupDetections(boolean groupDetections) {
+		this. groupDetections=groupDetections;
+	}
+
+
+
 
 
 

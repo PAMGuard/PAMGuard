@@ -77,7 +77,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		
 		//sourcePane.setStyle("-fx-background-color: green");
 
-		Label titleLabel = new Label(getBorderTitle());
+		titleLabel = new Label(getBorderTitle());
 		PamGuiManagerFX.titleFont2style(titleLabel);
 //		titleLabel.setFont(PamGuiManagerFX.titleFontSize2);
 		sourcePane.add(titleLabel,0,0);
@@ -430,5 +430,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	public Pane getChannelPane() {
 		return channelPanel;
 	}
+
+	
 	
 }

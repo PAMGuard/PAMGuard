@@ -184,7 +184,7 @@ public class ModelResultBinaryFactory {
 			break; 
 		default:
 			//ideally should never be used. 
-			result = new StandardPrediction(data, isBinary); 
+			result = new StandardPrediction(data, classID, isBinary); 
 			break; 
 		}
 		return result;

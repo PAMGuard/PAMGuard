@@ -364,6 +364,12 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 		return null;
 	}
 
+	@Override
+	public ArrayList<Class> getAllowedDataTypes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 }

@@ -10,6 +10,8 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -21,6 +23,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelPane;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDParams.DelphinIDDataType;
 
 /**
  * Settings pane for delphin ID. 
@@ -47,6 +50,14 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 	private DelphinIDParams currentParams;
 
 	private File currentSelectedFile;
+
+	private Label detectionDensity;
+
+	private DoubleSpinnerValueFactory whislteValueFactory;
+
+	private DoubleSpinnerValueFactory clickValueFactory;
+
+	private Label minDensityLabel;
 
 	public DelphinIDPane(DelphinIDClassifier delphinUIClassifier) {
 		super(null);
@@ -75,13 +86,17 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5.);
+		
+		clickValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(1., Double.MAX_VALUE, 5., 1.);
+		whislteValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.3, 0.1);
 
 		/**Classification thresholds etc to set.**/
-		Label detectionDensity = new Label("Detection Density"); 
+		detectionDensity = new Label("Detection Density"); 
 		detectionDensity.setFont(font);
 		String tooltip = "Set the minimum detection density to attempt to classify.";
 		detectionDensity.setTooltip(new Tooltip(tooltip));
-		detectionDensitySpinner = new PamSpinner<Double>(0.0, 1.0, 0.3, 0.1);
+		detectionDensitySpinner = new PamSpinner<Double>();
+		detectionDensitySpinner.setValueFactory(whislteValueFactory);
 		detectionDensitySpinner.setPrefWidth(70);
 		detectionDensitySpinner.setEditable(true);
 		detectionDensitySpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
@@ -89,8 +104,8 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 		PamHBox minDensityHolder = new PamHBox();
 		minDensityHolder.setAlignment(Pos.CENTER_RIGHT);
 		minDensityHolder.setSpacing(5);
-		Label minDensity = new Label("Min. detectection density");
-		minDensityHolder.getChildren().addAll(minDensity, detectionDensitySpinner);
+		minDensityLabel = new Label("Min. detectection density");
+		minDensityHolder.getChildren().addAll(minDensityLabel, detectionDensitySpinner);
 
 		/**Classification thresholds etc to set.**/
 		Label classiferInfoLabel2 = new Label("Decision Threshold"); 
@@ -117,7 +132,7 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 	@Override
 	public DelphinIDParams getParams(DelphinIDParams currParams) {
 		currParams.threshold = decisionSlider.getValue();
-		currParams.minDetectionDensity = detectionDensitySpinner.getValue();
+		currParams.minDetectionValue = detectionDensitySpinner.getValue();
 		return currParams;
 	}
 
@@ -125,7 +140,28 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 	public void setParams(DelphinIDParams input) {
 		this.currentParams = input;
 		decisionSlider.setValue(input.threshold);
-		detectionDensitySpinner.getValueFactory().setValue(input.minDetectionDensity);
+		detectionDensitySpinner.getValueFactory().setValue(input.minDetectionValue);
+				
+		if (input.getDataType()==null) {
+			input.dataType = DelphinIDDataType.WHISTLES;
+		}
+		
+		//set the correct label and minimum detection value
+		switch (input.getDataType()) {
+		case CLICKS:
+			this.minDensityLabel.setText("Minimum no. clicks");
+			minDensityLabel.setTooltip(new Tooltip("Set the minimum number of clicks before a segment is classified"));
+			detectionDensitySpinner.setValueFactory(clickValueFactory);
+			break;
+		case WHISTLES:
+			minDensityLabel.setTooltip(new Tooltip("Set the minimum  whistle density before a segment is classified"));
+			this.minDensityLabel.setText("Minimum whistle density");
+			detectionDensitySpinner.setValueFactory(whislteValueFactory);
+			break;
+		default:
+			break;
+		
+		}
 
 		if (input.modelPath!=null) {
 			//this might 

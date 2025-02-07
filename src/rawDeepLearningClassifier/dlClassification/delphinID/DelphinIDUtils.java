@@ -34,6 +34,7 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
 /**
  * A bunch of utility functions that a re useful for testing and running
  * DelphinID models
+ * 
  */
 public class DelphinIDUtils {
 
@@ -42,7 +43,7 @@ public class DelphinIDUtils {
 		//create the delphinID worker. 
 		DelphinIDWorkerTest delphinIDWorker = new DelphinIDWorkerTest();
 
-		StandardModelParams params = new StandardModelParams();
+		StandardModelParams params = new DelphinIDParams();
 		params.modelPath = modelPath;
 
 		//prepare the model
@@ -51,12 +52,8 @@ public class DelphinIDUtils {
 		return delphinIDWorker;
 	}
 	
-	
-	
 	//record WhistleGroup(ArrayList<AbstractWhistleDataUnit> whistle, double sampleRate, double fftLen, double fftHop, long fileDataStart) { }
 
-	
-	
 	/**
 	 * Holds a whistle group and some extra information on sample rate, fft length and hop and the start of the processed file. 
 	 * Keep Java 11 compliant so do not use record. 
@@ -166,7 +163,7 @@ public class DelphinIDUtils {
 	
 
 	/**
-	 * Load whistle contours from a MAT file. ()
+	 * Load whistle contours from a MAT file.
 	 * 
 	 * @param filePath - the file path. 
 	 * 
@@ -199,7 +196,7 @@ public class DelphinIDUtils {
 	
 	
 	/**
-	 * Load clicks from a MATLAB struct
+	 * Load clicks from a MATLAB struct.
 
 	 * @param clicksStruct - a struct containing a list of whistle contours
 	 * @param fftLen- the fft length in samples
@@ -229,7 +226,7 @@ public class DelphinIDUtils {
 
 
 	/**
-	 * Load whistle contours from a MAT file. ()
+	 * Load whistle contours from a MAT file.
 	 * 
 	 * @param filePath - the file path. 
 	 * 
@@ -268,8 +265,8 @@ public class DelphinIDUtils {
 	 * Load whistle contours from a MATLAB struct
 
 	 * @param whistlesStruct - a struct containing a list of whistle contours
-	 * @param fftLen- the fft length in samples
-	 * @param fftHop - the fft hop in samples. 
+	 * @param fftLen- the FFT length in samples
+	 * @param fftHop - the FFT hop in samples. 
 	 * @param sampleRate - the sample rate in samples per second. 
 	 * @return a list of whistle contour objects from the struct. 
 	 */
@@ -316,14 +313,14 @@ public class DelphinIDUtils {
 
 	/**
 	 * Segment the detections into groups. Note that segments are overlaps so each whistle may belong to  multiple segments. 
-	 * @param whistles - a list of whistles - not necessarily sorted by time. 
+	 * @param detections - a list of whistles - not necessarily sorted by time. 
 	 * @param dataStartMillis - the start time of the data in millis i.e. where the first segment starts. 
 	 * @param segLen - the segment size in milliseconds. 
 	 * @param segHop - the segment hop in milliseconds. 
 	 * @param sampleRate - the sample rate to set. 
 	 * @return groups of data units within each segment. 
 	 */
-	public static ArrayList<SegmenterDetectionGroup> segmentDetectionData(ArrayList<? extends PamDataUnit> whistles, long dataStartMillis, 
+	public static ArrayList<SegmenterDetectionGroup> segmentDetectionData(ArrayList<? extends PamDataUnit> detections, long dataStartMillis, 
 			double segLen, double segHop, Float sampleRate){
 
 		ArrayList<SegmenterDetectionGroup> group = new ArrayList<SegmenterDetectionGroup>(); 
@@ -331,32 +328,36 @@ public class DelphinIDUtils {
 		//find the maximum whistle time
 		long maxTime = Long.MIN_VALUE;
 		long endTime = 0; 
-		for (PamDataUnit whislte: whistles) {
-			endTime = (long) (whislte.getTimeMilliseconds()+whislte.getDurationInMilliseconds()); 
+		for (PamDataUnit det: detections) {
+			endTime = (long) (det.getTimeMilliseconds()+det.getDurationInMilliseconds()); 
 			if (endTime>maxTime) maxTime=endTime;
 		}
 
 		long segStart = dataStartMillis;
 		long segEnd = (long) (segStart+segLen);
 
-		long whistleStart; 
-		long whistleEnd;
+		long detStart; 
+		long detEnd;
 		AcousticDetectionGroup whistleGroup;
 		while (segStart<endTime){
 
 			whistleGroup = new AcousticDetectionGroup(segStart, 1, segEnd, segLen);
 			whistleGroup.setHardSampleRate(sampleRate);
+			whistleGroup.setStartSecond((segStart-dataStartMillis)/1000.);
 
-			for (PamDataUnit whislte: whistles) {
-				whistleStart = whislte.getTimeMilliseconds();
-				whistleEnd = (long) (whislte.getTimeMilliseconds() + whislte.getDurationInMilliseconds());
+			for (PamDataUnit aDet: detections) {
+				detStart = aDet.getTimeMilliseconds();
+				detEnd = (long) (aDet.getTimeMilliseconds() + aDet.getDurationInMilliseconds());
 
-				if ((whistleStart>=segStart && whistleStart<segEnd) || ((whistleEnd>=segStart && whistleEnd<segEnd))){
+				if ((detStart>=segStart && detStart<segEnd) || ((detEnd>=segStart && detEnd<segEnd))){
 					//some part of the whistle is in the segment. 
-					whistleGroup.addSubDetection(whislte);
+					whistleGroup.addSubDetection(aDet);
+					//System.out.println("segStart: " + segStart + " Click UID: " + aDet.getUID() + "  " + PamCalendar.formatDateTime2(aDet.getTimeMilliseconds(), "dd MMM yyyy HH:mm:ss.SSS", false) + " "  + aDet.getDurationInMilliseconds());
 				}
-
+				
 			}
+
+			//System.out.println("New click group: ----------------- " + whistleGroup.getSubDetectionsCount() + "  " + (segStart-dataStartMillis)/1000. + "s" + "  " + segEnd);
 
 			group.add(whistleGroup);
 
@@ -367,7 +368,6 @@ public class DelphinIDUtils {
 		}
 
 		return group;
-
 	}
 	
 	
@@ -384,7 +384,7 @@ public class DelphinIDUtils {
 		@Override
 		public float getSampleRate() {
 			if (super.getParentDataBlock()==null) {
-			return hardSampleRate;
+				return hardSampleRate;
 			}
 			else {
 				return super.getSampleRate();
@@ -574,10 +574,7 @@ public class DelphinIDUtils {
 				if (listOfFiles[i].isDirectory()) {
 					//get a list of csv files
 					//					ArrayList<File> csvFiles = filelist.getFileList(listOfFiles[i].getAbsolutePath(), ".mat" , true);
-
 					System.out.println("Directory " + listOfFiles[i].getName());
-
-
 
 					try {
 

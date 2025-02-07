@@ -3115,7 +3115,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-	 * Gt the main PAMGuard configuration (list of connected modules).
+	 * Get the main PAMGuard configuration (list of connected modules).
 	 * 
 	 * @return the pamConfiguration
 	 */

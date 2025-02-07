@@ -69,7 +69,7 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 
 		String predictionsString = (String) predictionsItem.getValue();
-		Integer predicitonType = (Integer) predictionsItem.getValue();
+		Integer predicitonType = (Integer) typeTableItem.getValue();
 
 		if (predictionsString!=null) {
 
@@ -95,7 +95,7 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	 * @param predicitonType - the prediction object type e.g.ModelResultBinaryFactory.GENERIC
 	 * @return a list of prediction objects. 
 	 */
-	private ArrayList<PredictionResult> string2Predictions(String predictionsString, int predicitonType) {
+	public static ArrayList<PredictionResult> string2Predictions(String predictionsString, int predicitonType) {
 		ArrayList<PredictionResult> modelResults = new ArrayList<PredictionResult>(); 
 
 	    JSONObject jsonObject = new JSONObject(predictionsString);
@@ -116,12 +116,14 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	    	predictions= new float[array.getJSONArray(i).length()];
 	    	
 	    	for(int j=0; j< array.getJSONArray(i).length(); j++) {
-	    		predictions[j] =  array.getJSONArray(i).getFloat(j);
+	    		predictions[j] =  array.getJSONArray(i).getBigDecimal(j).floatValue();
 	    	}
 	    	
 	    	predicitonResult= ModelResultBinaryFactory.makePredictionResult(predicitonType, predictions, classIDs,  true); 
 	    	modelResults.add(predicitonResult); 
 	    }
+	    
+	    
 	    
 	    return modelResults;
 	}
@@ -132,7 +134,7 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	 * @param predictions - the spectrum. 
 	 * @return string representation for the predictions in JSON format
 	 */
-	private String prediction2String(ArrayList<PredictionResult> arrayList) {
+	public static String prediction2String(ArrayList<PredictionResult> arrayList) {
 
 		if (arrayList == null) {
 			return "null";
@@ -145,7 +147,13 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 		for (PredictionResult result : arrayList) {
 			JSONArray rowArray = new JSONArray();
 			for (float element : result.getPrediction()) {
-				rowArray.put(element);
+				//JSON does not allow non finite numbers
+				if (Float.isFinite(element)) {
+					rowArray.put(element);
+				}
+				else {
+					rowArray.put(-1.0);
+				}
 			}
 			matrixArray.put(rowArray);
 		}

@@ -833,6 +833,21 @@ public class PamArrayUtils {
 		}
 		return sum;
 	}
+	
+
+	/**
+	 * Sum the elements in an array 
+	 * @param  array - the array to sum.
+	 * @return the summation of all the elements in the array.
+	 */
+	public static double sum(float[] array) {
+		double sum=0; 
+		for (double val:array) {
+			sum+=val;
+		}
+		return sum;
+	}
+
 
 
 	/**
@@ -920,14 +935,23 @@ public class PamArrayUtils {
 	/**
 	 * Print an array to the console. 
 	 * @param array to print
+	 * @param row - if true then prints all results in a single row
 	 */
-	public static void printArray(float[] array) {
+	public static void printArray(float[] array, boolean row) {
 		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
-			System.out.println(i + ": " + array[i]);
+			if (row) System.out.print(array[i] + "  ");
+			else System.out.println(i + ": " + array[i]);
 		}
 	}
 	
+	/**
+	 * Print an array to the console. 
+	 * @param array to print
+	 */
+	public static void printArray(float[] array) {
+		printArray(array, false);  
+	}
 	
 	/**
 	 * Print an array to the console with no index numbers

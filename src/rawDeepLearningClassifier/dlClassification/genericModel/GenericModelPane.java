@@ -2,6 +2,7 @@ package rawDeepLearningClassifier.dlClassification.genericModel;
 
 import java.io.File;
 import pamViewFX.fxNodes.PamButton;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelPane;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 
@@ -84,7 +85,7 @@ public class GenericModelPane extends StandardModelPane  {
 	}
 
 	@Override
-	public void newModelSelected(File file) {
+	public DLStatus newModelSelected(File file) {
 		this.setCurrentSelectedFile(file);
 		
 		//this.setParamsClone(new GenericModelParams()); 
@@ -93,11 +94,14 @@ public class GenericModelPane extends StandardModelPane  {
 		
 //		genericDLClassifier.getGenericDLWorker().prepModel(getParams(getParamsClone()), genericDLClassifier.getDLControl());
 		//do not have getParam here as it resets some of the setting before set params has been called.
-		genericDLClassifier.getGenericDLWorker().prepModel(getParamsClone(), genericDLClassifier.getDLControl());
+		DLStatus status = genericDLClassifier.getGenericDLWorker().prepModel(getParamsClone(), genericDLClassifier.getDLControl());
 
 
 		//now new parameters have been set in the prepModel functions so need to set new params now. 
 		getAdvSettingsPane().setParams(getParamsClone());
+		
+		
+		return status;
 	}
 
 

@@ -374,12 +374,18 @@ public class DLModelSelectPane extends PamBorderPane {
 		if (currentClassifierModel!=null) {
 			
 			try {
-				//we are loading model from a file - anything can happen so put in a try catch. 
-				DLStatus status = currentClassifierModel.setModel(file);
 			
+				File fileChck = new File(file);
+
+	            if (!fileChck.exists()) {
+					return DLStatus.MODEL_LOAD_FAIL;
+	            }
+				
+				//we are loading model from a file - anything can happen so put in a try catch. 				
+				DLStatus status = currentClassifierModel.setModel(file);
 
 				if (status.isError()) {
-					System.err.println("Model load failed: " + currentClassifierModel.getModelStatus());
+					System.err.println("Model load failed: " + status);
 					currentClassifierModel=null;
 					return status;
 				}
@@ -389,17 +395,17 @@ public class DLModelSelectPane extends PamBorderPane {
 			catch (Exception e) {
 				e.printStackTrace();
 				currentClassifierModel=null;
-				return DLStatus.MODEL_LOAD_FAILED;
+				return DLStatus.MODEL_LOAD_FAIL;
 			}
 		}
 		else {
 			currentClassifierModel=null;
-			return DLStatus.MODEL_LOAD_FAILED;
+			return DLStatus.MODEL_LOAD_FAIL;
 		}
 	}
 	
 	private void showWarningDialog(DLStatus status) {
-		this.rawDLSettingsPane.showWarning(status);
+		this.rawDLSettingsPane.showWarningDialog(status);
 //		 PamDialogFX.showError(status.getName(), status.getDescription()); 
 	}
 
@@ -568,16 +574,17 @@ public class DLModelSelectPane extends PamBorderPane {
 				return result;
 				
 			} catch (Exception e) {
-				System.out.println("UNABLE TO LOAD MODEL");
+				System.out.println("-----UNABLE TO LOAD MODEL-----");
 				currentClassifierModel=null; //this will reset the pane
 				e.printStackTrace();
-				return DLStatus.MODEL_LOAD_FAILED;
+				return DLStatus.MODEL_LOAD_FAIL;
 			}
 		}
 
 		private void finishedLoading() {
 						
 			if (this.getValue().isError()) {
+				//show a warnign dialog
 				showWarningDialog(this.getValue()); 
 			}
 			

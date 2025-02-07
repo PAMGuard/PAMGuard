@@ -485,19 +485,21 @@ public class ClickSelectPaneFX extends DynamicSettingsPane<Boolean>  {
 			});
 			
 			
-			lutList = LookUpTables.getLookUpTables().getLookupList(ClicksOffline.ClickTypeLookupName);
-			if (lutList == null) {
-				return;
-			}
-			useType = new CheckBox[lutList.getList().size()];
-			for (int i = 0; i < useType.length; i++) {
-				this.getChildren().add(useType[i] = new CheckBox(lutList.getList().get(i).getText()));
-				useType[i].setSelected(clickAlarmParameters.isUseEventType(lutList.getList().get(i).getCode()));
-				useType[i].setOnAction((action)->{
-					 setUseAllCheckBox();
-					notifySettingsListeners();
-				});
-			}
+			//2024-12-18 This is causing an excpetion because lookup tabel does not exist. 
+//			lutList = LookUpTables.getLookUpTables().getLookupList(ClicksOffline.ClickTypeLookupName);
+//			if (lutList == null) {
+//				return;
+//			}
+//			useType = new CheckBox[lutList.getList().size()];
+//			for (int i = 0; i < useType.length; i++) {
+//				this.getChildren().add(useType[i] = new CheckBox(lutList.getList().get(i).getText()));
+//				useType[i].setSelected(clickAlarmParameters.isUseEventType(lutList.getList().get(i).getCode()));
+//				useType[i].setOnAction((action)->{
+//					 setUseAllCheckBox();
+//					notifySettingsListeners();
+//				});
+//			}
+
 			 setUseAllCheckBox();
 		}
 		

@@ -11,7 +11,9 @@ import org.jamdev.jpamutils.JamArr;
 import PamModel.PamModel;
 import PamModel.PamModel.PluginClassloader;
 import PamUtils.PamArrayUtils;
+import ai.djl.engine.EngineException;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 
 /**
@@ -47,7 +49,7 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 				waveStack[i] = transformedDataStack[i][0];
 			}
 			
-//			System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
+//			System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0] + "  " + PamArrayUtils.max( waveStack[0]));
 //			PamArrayUtils.printArray(waveStack[0]);
 			results =  getModel().runModel(waveStack);
 		}
@@ -64,10 +66,10 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 	}
 
 	@Override
-	public void prepModel(StandardModelParams genericParams, DLControl dlControl) {
+	public DLStatus prepModel(StandardModelParams genericParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
-			if (genericParams.modelPath==null) return; 
+			if (genericParams.modelPath==null) return DLStatus.NO_MODEL_LOADED; 
 			
 			// get the plugin class loader and set it as the context class loader
 			// NOTE THAT THIS IS REQUIRED TO MAKE THIS MODULE RUN AS A PLUGIN WHEN THE CLASS FILES
@@ -108,6 +110,9 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			
 			//use softmax or not?
 			String extension = FilenameUtils.getExtension(genericParams.modelPath);
+			
+			
+			//TODO - need to add output transforms to models
 			if (extension.equals("pb")) {
 				//TensorFlow models don't need softmax?? Need to look into this more. 
 				this.setEnableSoftMax(false);
@@ -123,11 +128,20 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 					
 
 		}
+		catch (EngineException e) {
+			return DLStatus.MODEL_ENGINE_FAIL;
+		}
 		catch (Exception e) {
 			genericModel=null; 
 			e.printStackTrace();
+			
+			
+			return DLStatus.MODEL_LOAD_FAIL;
+
 			//WarnOnce.showWarning(null, "Model Load Error", "There was an error loading the model file.", WarnOnce.OK_OPTION); 
 		}
+		
+		return DLStatus.MODEL_LOAD_SUCCESS;
 		
 		//Thread.currentThread().setContextClassLoader(origCL);
 	}

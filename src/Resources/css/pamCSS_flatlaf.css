@@ -1,0 +1,237 @@
+/* General Styling for PAMGuard JavaFX controls which trys to replicate the Swing Flatlaf theme */
+.root {
+    -fx-font-family: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    -fx-font-size: 13px;
+    -fx-base: #f5f5f5;
+    -fx-background: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-control-inner-background-alt: #f0f0f0;
+    -fx-focus-color: #3895EC;
+    -fx-faint-focus-color: rgba(56, 149, 236, 0.2);
+    -fx-accent: #3895EC;
+    -fx-default-button: -fx-accent;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #333333;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-padding: 6px 12px;
+    -fx-text-fill: #333333;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+.button:hover {
+    -fx-background-color: #f0f0f0;
+}
+
+.button:pressed {
+    -fx-background-color: #e6e6e6;
+}
+
+.button:default {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+.button:default:hover {
+    -fx-background-color: #2f7dbe;
+}
+
+.button:default:pressed {
+    -fx-background-color: #266591;
+}
+
+/* Text Fields and Text Areas */
+.text-field,
+.text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+    -fx-prompt-text-fill: #999999;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+.text-field:focused,
+.text-area:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-effect: null;
+}
+
+/* Checkboxes */
+.check-box {
+    -fx-padding: 2px;
+}
+
+/* Combo Boxes */
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+.combo-box:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-effect: null;
+}
+
+/* Toggle Switches (using a custom approach) */
+.toggle-switch {
+    -fx-cursor: hand;
+}
+
+.toggle-switch .track {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 40px; /* Adjust as needed */
+    -fx-pref-height: 20px;
+}
+
+.toggle-switch:selected .track {
+    -fx-background-color: -fx-accent;
+}
+
+.toggle-switch .thumb {
+    -fx-background-color: white;
+    -fx-background-radius: 50%;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-translate-x: -10px; /* Initial position */
+}
+
+.toggle-switch:selected .thumb {
+    -fx-translate-x: 10px; /* Shifted position */
+}
+
+
+/****************************************************************
+ 
+  Spinner  
+ 
+****************************************************************/
+
+.spinner {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+.spinner:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-effect: null;
+}
+
+
+.spinner .text-field {
+    -fx-background-color: inherit; /* Inherit from spinner background */
+    -fx-border-color: inherit; /* Inherit from spinner border */
+    -fx-border-width: 0; /* No separate border for the text field */
+    -fx-padding: 5px 0; /* Consistent vertical padding */
+    -fx-alignment: center; /* Center text */
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: #d2d2d2; /* Light gray background for buttons */
+    -fx-border-color: inherit; /* Inherit border from spinner */
+    -fx-border-width: 0; /* No separate border for buttons */
+    -fx-padding: 5px 5px;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: #3895EC; /* FlatLaf blue highlight on hover */
+    -fx-text-fill: white; /* White arrow on hover */
+}
+
+/* Split Arrows (Horizontal) */
+.spinner.split-arrows-horizontal {
+    -fx-border-radius: 3px; /* Ensure rounded corners for the overall spinner */
+}
+
+.spinner.split-arrows-horizontal .text-field {
+    -fx-border-width: 0;
+    -fx-border-color: inherit;
+}
+
+.spinner.split-arrows-horizontal .increment-arrow-button {
+    -fx-background-radius: 0 3px 3px 0; /* Right rounded corners */
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+    -fx-background-radius: 3px 0 0 3px; /* Left rounded corners */
+}
+
+/* Fix for borders between elements*/
+.spinner.split-arrows-horizontal .increment-arrow-button {
+    -fx-border-width: 0 1px 0 0;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+    -fx-border-width: 0 0 0 1px;
+}
+
+
+/* Scroll Bars */
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button,
+.scroll-bar:horizontal .increment-button,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-background-radius: 5px;
+}
+
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Tables */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f0f0f0;
+}
+
+.table-view .column-header {
+    -fx-border-color: #cccccc;
+    -fx-padding: 6px;
+}
+
+.table-row-cell:even {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -fx-control-inner-background-alt;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(56, 149, 236, 0.3);
+}

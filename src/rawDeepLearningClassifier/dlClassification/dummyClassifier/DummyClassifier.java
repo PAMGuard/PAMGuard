@@ -98,4 +98,10 @@ public class DummyClassifier implements DLClassiferModel{
 		return null;
 	}
 
+	@Override
+	public ArrayList<Class> getAllowedDataTypes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

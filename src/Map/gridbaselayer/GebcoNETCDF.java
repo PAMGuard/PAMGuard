@@ -7,11 +7,11 @@ import java.io.IOException;
 import PamView.ColourArray;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
-import ucar.netcdf.Dimension;
-import ucar.netcdf.DimensionSet;
-import ucar.netcdf.NetcdfFile;
-import ucar.netcdf.Variable;
-import ucar.netcdf.VariableIterator;
+import ucar.ma2.Array;
+import ucar.ma2.Index;
+import ucar.nc2.Dimension;
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 
 public class GebcoNETCDF {
 
@@ -37,18 +37,19 @@ public class GebcoNETCDF {
 			return;
 		}
 
-		DimensionSet dim = ncf.getDimensions();
-		Dimension latDim = dim.get(latName);
+
+		ncf.findDimension(eleName);
+		Dimension latDim = ncf.findDimension(latName);
 		nLat = latDim.getLength();
-		Dimension lonDim = dim.get(lonName);
+		Dimension lonDim = ncf.findDimension(lonName);
 		nLon = lonDim.getLength();
 
 		latRange = getRange(latName);
 		lonRange = getRange(lonName);
 		elevationRange = extractElevationRange();
-		
+
 	}
-	
+
 	public MapRasterImage getImage(double[] latRange, double[] lonRange, boolean forceRecreate) {
 		if (mapImage == null || forceRecreate) {
 			int[] latRangeBins = {0, nLat};
@@ -65,46 +66,57 @@ public class GebcoNETCDF {
 
 	private double[] getRange(String varName) {
 		Variable var = findVariable(varName);
-		Dimension dim = netcdfFile.getDimensions().get(varName);
+		Dimension dim = netcdfFile.findDimension(varName);
 		int n = dim.getLength();
 		if (var == null) {
 			return null;
 		}
+		
+
 		double[] range = new double[2];
+		
 		int[] pos = new int[2];
 		try {
-			range[0] = var.getDouble(pos);
+			Array varA = var.read();
+			Index index = varA.getIndex();
+			
+			range[0] = varA.getDouble(index.set(pos[0], pos[1]));
 			pos[0] = n-1;
-			range[1] = var.getDouble(pos);
+			range[1] = varA.getDouble(index.set(pos[0], pos[1]));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return range;
 	}
-	
+
 	private double[] extractElevationRange() {
-		Variable ele = findVariable(eleName);
-		double[] range = new double[2];
-		double val;
-		int iVal;
-		int[] pos = new int[2];
+		Variable eleV  = findVariable(eleName);
+
 		try {
+			Array ele = eleV.read();
+			double[] range = new double[2];
+			double val;
+//			int iVal;
+//			int[] pos = new int[2];
+
+			Index index = ele.getIndex();
 			for (int i = 0; i < nLat; i++) {
-				pos[0] = i;
+//				pos[0] = i;
 				for (int j = 0; j < nLon; j++) {
-					pos[1] = j;
-					val = ele.getDouble(pos);
+//					pos[1] = j;
+					val = ele.getDouble(index.set(i,j));
 					range[0] = Math.min(range[0], val);
 					range[1] = Math.max(range[1], val);
 				}
 			}
-		} catch (IOException e) {
+			return range;
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-		return range;
 	}
-	
+
 	/**
 	 * work out a value from an evenly spaced range based on a bin number
 	 * @param valueRange
@@ -114,11 +126,11 @@ public class GebcoNETCDF {
 	double binToValue(double[] valueRange, int nBin, double bin) {
 		return valueRange[0] + (valueRange[1]-valueRange[0])*(double) bin / (double) (nBin);
 	}
-	
+
 	double latBinToValue(double latBin) {
 		return binToValue(latRange, nLat, latBin);
 	}
-	
+
 	double lonBinToValue(double lonBin) {
 		return binToValue(lonRange, nLon, lonBin);
 	}
@@ -128,7 +140,7 @@ public class GebcoNETCDF {
 		ColourArray depthArray = ColourArray.createMultiColouredArray(100, Color.WHITE, PamColors.getInstance().getColor(PamColor.MAP));
 		return createImage(latRangeBins, lonRangeBins, heightArray, depthArray, hop);
 	}
-	
+
 	public MapRasterImage createImage(int[] latRangeBins, int[] lonRangeBins, ColourArray heightColours, ColourArray depthColours, int hop) {
 		latRangeBins[0] = Math.max(latRangeBins[0], 0);
 		latRangeBins[1] = Math.min(latRangeBins[1], nLat);
@@ -144,12 +156,14 @@ public class GebcoNETCDF {
 		/*
 		 *  need to get the maxima and minima of the elevation data for scaling.  
 		 */
-		Variable ele = findVariable(eleName);
+		Variable eleV = findVariable(eleName);
 		double maxDepth = -elevationRange[0], maxHeight = elevationRange[1];
 		double val;
 		int iVal;
 		int[] pos = new int[2];
 		try {
+			Array ele = eleV.read();
+			Index index = ele.getIndex();
 			double hRat = 300;
 			int nH = heightColours.getNumbColours();
 			int nD = depthColours.getNumbColours();
@@ -161,15 +175,15 @@ public class GebcoNETCDF {
 				pos[0] = i;
 				for (int j = lonRangeBins[0], ji = 0; j < lonRangeBins[1] && ji < image.getWidth(); j+= hop, ji++) {
 					pos[1] = j;
-					val = ele.getDouble(pos);
+					val = ele.getDouble(index.set(i,j));
 					ColourArray colours;
 					if (val >= 0) {
-//						iVal = (int) (99*Math.log10(val+1)/Math.log10(maxHeight));
+						//						iVal = (int) (99*Math.log10(val+1)/Math.log10(maxHeight));
 						iVal = (int) (ah*Math.log(val+1) + bh);
 						colours = heightColours;
 					}
 					else {
-//						iVal = (int) (99*Math.log10(-val)/Math.log10(maxDepth));
+						//						iVal = (int) (99*Math.log10(-val)/Math.log10(maxDepth));
 						iVal = (int) (ad*Math.log(-val) + bd);
 						colours = depthColours;
 					}
@@ -181,7 +195,7 @@ public class GebcoNETCDF {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		double[] latRange = new double[2];
 		double[] lonRange = new double[2];
 		double[] edges = {-.5, +.5};
@@ -199,21 +213,23 @@ public class GebcoNETCDF {
 	 * @return Variable or null
 	 */
 	private Variable findVariable(String varName) {
-		VariableIterator varIter = netcdfFile.iterator();
-		while (varIter.hasNext() ) {
-			Variable var = varIter.next();
-			if (var.getName().equalsIgnoreCase(varName)) {
-				return var;
-			}
-		}
-		return null;
+		return  netcdfFile.findVariable(varName);
+		//		VariableIterator varIter = netcdfFile.findVariable(varName);
+		//		while (varIter.hasNext() ) {
+		//			Variable var = varIter.next();
+		//			if (var.getName().equalsIgnoreCase(varName)) {
+		//				return var;
+		//			}
+		//		}
+		//		return null;
 	}
 
 	private boolean hasField(String fieldName) {
-		if (netcdfFile.contains(fieldName)) {
+
+		if (netcdfFile.findVariable(fieldName)!=null) {
 			return true;
 		}
-		System.out.printf("Map file %s has no field \"%s\"\n", netcdfFile.getName(), fieldName);
+		System.out.printf("Map file %s has no field \"%s\"\n", netcdfFile.getTitle(), fieldName);
 		return false;
 	}
 
@@ -238,9 +254,10 @@ public class GebcoNETCDF {
 		}
 		NetcdfFile ncf;
 		try {
-			ncf = new NetcdfFile(ncFile, true);
+			ncf = NetcdfFile.open(ncFile.getPath());
+			
 			GebcoNETCDF gebcoRaster = new GebcoNETCDF(ncf);
-//			ncf.close();
+			//			ncf.close();
 			return gebcoRaster;
 		} catch (IOException e) {
 			e.printStackTrace();

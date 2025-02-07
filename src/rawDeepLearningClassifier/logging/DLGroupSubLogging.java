@@ -19,7 +19,7 @@ public class DLGroupSubLogging extends SQLLogging {
 	public DLGroupSubLogging(DLGroupDetectionLogging dlGroupDetLogging, PamDataBlock pamDataBlock) {
 		super(pamDataBlock);		
 		this.dlGroupLogging = dlGroupDetLogging;
-		setTableDefinition(new PamSubtableDefinition(dlGroupDetLogging.getDLControl().getUnitName()+"_Children"));
+		setTableDefinition(new PamSubtableDefinition(dlGroupDetLogging.getDLControl().getUnitName()+"Group_Detections_Children"));
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javafx.stage.FileChooser.ExtensionFilter;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelPane;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 
@@ -29,7 +30,7 @@ public class KetosModelPane extends StandardModelPane {
 
 
 	@Override
-	public void newModelSelected(File file) {
+	public DLStatus newModelSelected(File file) {
 			
 		//A ketos model contains information on the transforms, duration and the class names. 
 		this.setCurrentSelectedFile(file);
@@ -55,7 +56,7 @@ public class KetosModelPane extends StandardModelPane {
 		 * Note that the model prep will determine whether new transforms need to be loaded from the 
 		 * model or to use the existing transforms in the settings. 
 		 */
-		ketosClassifier.getKetosWorker().prepModel(params, ketosClassifier.getDLControl());
+		DLStatus status = ketosClassifier.getKetosWorker().prepModel(params, ketosClassifier.getDLControl());
 		//get the model transforms calculated from the model by SoundSpoyWorker and apply them to our temporary params clone. 
 //		System.out.println("Ketos transforms 1: " +  this.ketosClassifier.getKetosWorker().getModelTransforms());
 		getParamsClone().dlTransfroms = this.ketosClassifier.getKetosWorker().getModelTransforms(); 
@@ -69,6 +70,8 @@ public class KetosModelPane extends StandardModelPane {
 				
 		///set the advanced pane parameters. 
 		getAdvSettingsPane().setParams(getParamsClone());
+		
+		return status; 
 		
 	}
 

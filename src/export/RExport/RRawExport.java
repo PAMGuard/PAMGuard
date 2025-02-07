@@ -9,6 +9,8 @@ import PamguardMVC.RawDataHolder;
 import org.renjin.sexp.ListVector.NamedBuilder;
 
 import clickDetector.ClickDetection;
+import export.MLExport.MLDataUnitExport;
+import pamMaths.PamVector;
 
 public class RRawExport extends RDataUnitExport<PamDataUnit<?,?>> {
 
@@ -39,7 +41,18 @@ public class RRawExport extends RDataUnitExport<PamDataUnit<?,?>> {
 		//time delay stuff.
 		if (dataUnit.getLocalisation()!=null) {
 			//bearing angles 
-			rData.add("angles", dataUnit.getLocalisation().getAngles() == null ? new DoubleArrayVector(0.) :  new DoubleArrayVector(dataUnit.getLocalisation().getAngles())); 
+			if (dataUnit.getLocalisation().getRealWorldVectors() != null) {
+				
+				double[] angles = MLDataUnitExport.realWordlVec2Angles(dataUnit);
+							
+				rData.add("angles", new DoubleArrayVector(angles));
+				
+			}
+			else {
+				rData.add("angles", new DoubleArrayVector(0.));
+			}
+			//bearing angles 
+			rData.add("angles", dataUnit.getLocalisation().getRealWorldVectors() == null ? new DoubleArrayVector(0.) :  new DoubleArrayVector(dataUnit.getLocalisation().getAngles())); 
 			//angle errors 
 			rData.add("angleErrors", dataUnit.getLocalisation().getAngleErrors() == null? new DoubleArrayVector(0.) : new DoubleArrayVector(dataUnit.getLocalisation().getAngleErrors())); 
 		}

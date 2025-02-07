@@ -1,0 +1,26 @@
+{
+ "framework_info": {"framework": "Bespoke"},
+ "model_info": {
+  "output_shape": [
+   -1,
+   -1
+  ],
+  "input_shape": [
+   -1,
+   -1,
+   -1,
+   1
+  ]
+ },
+ "class_info": {
+  "name_class": ["Humbackwhale"],
+  "num_class": 1
+ },
+ "transforms": [{
+  "name": "load_audio",
+  "params": {"sr": 10000}
+ }],
+ "description": "Metadata for acoustic deep learning",
+ "version_info": {"version": 1},
+ "seg_size": {"size_ms": 3920}
+}

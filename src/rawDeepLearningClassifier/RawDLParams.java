@@ -68,7 +68,7 @@ public class RawDLParams implements Serializable, Cloneable {
 	 * contain a raw data chunk e.g. raw data, clicks, clips etc. By default the
 	 * classifier saves new data units if the source is raw data. However, if the
 	 * data unit is an already processed data unit, e.g. a click detection, then the
-	 * results are saved as an annotation to that unit. If forceSave is st true then
+	 * results are saved as an annotation to that unit. If forceSave is set true then
 	 * new data units are created no matter what the source data is.
 	 */
 	public boolean forceSave = false;
@@ -95,7 +95,7 @@ public class RawDLParams implements Serializable, Cloneable {
 	 * data without messing up all the other classified detections which have used
 	 * that module. So store the data in binary files? That is super inefficient as
 	 * the same string is stored many times. So instead store a short which
-	 * identifies the string that sits in this table. Everytime a new model is added
+	 * identifies the string that sits in this table. Every time a new model is added
 	 * add new classnames. Note that this means we have a maximum of 32k names - we
 	 * will come to that issue when it arises...
 	 */

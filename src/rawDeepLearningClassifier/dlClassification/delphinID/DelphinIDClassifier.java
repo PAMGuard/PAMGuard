@@ -10,16 +10,19 @@ import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamguardMVC.PamDataUnit;
+import clickDetector.ClickDetection;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDParams.DelphinIDDataType;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import whistlesAndMoans.ConnectedRegionDataBlock;
+import whistlesAndMoans.ConnectedRegionDataUnit;
 
 /**
  * A classifier based on the delphinID method which uses whistle contours to predict
@@ -39,10 +42,12 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 	private DelphinIDWorker delphinIDWorker;
 
+	private  ArrayList<Class> allowedDataTypes; 
 
 	public DelphinIDClassifier(DLControl dlControl) {
 		super(dlControl);
 
+		allowedDataTypes = new ArrayList<Class>(); 
 		//load the previous settings
 		PamSettingManager.getInstance().registerSettings(this);
 	}
@@ -50,6 +55,13 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	@Override
 	public boolean isModelType(URI model) {
 		return false;
+	}
+
+	@Override
+	public void prepModel() {
+		super.prepModel();
+		//set group detections to true. 
+		getDLControl().setGroupDetections(true);
 	}
 
 	@Override
@@ -99,6 +111,8 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
 
 		//add an extra test to see if the detection pre count has passed. 
+		
+		//System.out.println("Run delphinID model: " + (((SegmenterDetectionGroup) groupedRawData.get(0)).getSubDetectionsCount()) + " min clicks: " + delphinIDParams.minDetectionValue);
 
 		if (detectionPreFilter(groupedRawData)) {
 			return super.runModel(groupedRawData);
@@ -122,38 +136,41 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 
 	private boolean clickPreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
-		//TODO
-//		System.out.println("Check CLICK fragment density"); 
-		return true;
+
+		if (((SegmenterDetectionGroup) groupedRawData.get(0)).getSubDetectionsCount()>=delphinIDParams.minDetectionValue) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean whistlePreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
 		//TODO
-//		System.out.println("Check WHISTLE fragment density"); 
-//		
-//		3.	Within each time frame, the density of detection is calculated and used as a filter.
-//		-	Density 2
-//		-	where the length of frame = frame duration / mean time step across contour
-//		(time steps between time-frequency points in contour saved by ROCCA depend on FFT resolution but can vary slightly within contour)
-//
-//		4.	If a detection frame has less than 0.30 detection density, it is not used for classification
-//		double density = DelphinIDUtils.getDensity(null); 
-		
+		//		System.out.println("Check WHISTLE fragment density"); 
+		//		
+		//		3.	Within each time frame, the density of detection is calculated and used as a filter.
+		//		-	Density 2
+		//		-	where the length of frame = frame duration / mean time step across contour
+		//		(time steps between time-frequency points in contour saved by ROCCA depend on FFT resolution but can vary slightly within contour)
+		//
+		//		4.	If a detection frame has less than 0.30 detection density, it is not used for classification
+		//		double density = DelphinIDUtils.getDensity(null); 
+
 
 		if (groupedRawData==null || groupedRawData.size()<1) {
 			System.err.println("DelphinIDClassifier: + the grouped raw data is null or zero size:"); 
 			return false;
 		}
-		
-		System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionDensity); 
-		
+
+		//System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionValue); 
+
 		double density = DelphinIDUtils.getDensity((SegmenterDetectionGroup) groupedRawData.get(0)); 
-		
-		if (density>=delphinIDParams.minDetectionDensity) {
+
+		if (density>=delphinIDParams.minDetectionValue) {
 			return true;
 		}
-		
-		return true;
+
+		return false;
 	}
 
 	@Override
@@ -205,5 +222,22 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		this.delphinIDParams=params;
 
 	}
+
+
+	@Override
+	public ArrayList<Class> getAllowedDataTypes(){
+		allowedDataTypes.clear();
+
+		if (delphinIDParams.getDataType()==DelphinIDDataType.CLICKS) {
+			allowedDataTypes.add(ClickDetection.class);
+		}
+
+		if (delphinIDParams.getDataType()==DelphinIDDataType.WHISTLES) {
+			allowedDataTypes.add(ConnectedRegionDataUnit.class);
+		}
+
+		return allowedDataTypes;
+	}
+
 
 }

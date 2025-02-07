@@ -3,8 +3,6 @@ package rawDeepLearningClassifier.layoutFX;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.ToggleSwitch;
-
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
@@ -37,11 +35,12 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
+import pamViewFX.validator.PamValidator;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
+import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import warnings.PamWarning;
-import whistlesAndMoans.ConnectedRegionDataUnit;
 
 /**
  * The settings pane. 
@@ -123,6 +122,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	private PamGridPane segmenterGridPane;
 
 
+	private ArrayList<Class> currentAllowedDataTypes;
+
+	private DLWarningDialog dlWarningDialog ;
+
 
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
@@ -147,7 +150,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			mainPane.setPrefWidth(MAX_WIDTH);
 		}
 		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
-
+		dlWarningDialog = new DLWarningDialog(this); 
 
 		//mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS()); 
 
@@ -163,11 +166,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		PamVBox vBox=new PamVBox();
 		vBox.setSpacing(5);
 
-		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", RawDataUnit.class, true, false, true);
-		sourcePane.addSourceType(ClickDetection.class, false);
-		sourcePane.addSourceType(ClipDataUnit.class, false);
-		sourcePane.addSourceType(ConnectedRegionDataUnit.class, false);
-
+		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", null, true, false, true);
+		setDefaultSourceList();
+		
+//		sourcePane.addSourceType(ClickDetection.class, false);
+//		sourcePane.addSourceType(ClipDataUnit.class, false);
+//		sourcePane.addSourceType(ConnectedRegionDataUnit.class, false);
+		
 
 		vBox.getChildren().add(sourcePane);
 		sourcePane.prefWidthProperty().bind(vBox.widthProperty());
@@ -396,24 +401,91 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * Set the classifier pane. 
 	 */
 	protected void setClassifierPane() {
-
-
 		//set the classifier Pane.class 
+		
+		//System.out.println("SET CLASSIFIER PANE"); 
+		
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
 
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
 
 			if (modelSelectPane.currentClassifierModel!=null) {
 				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+				setSourceList(modelSelectPane.currentClassifierModel);
 			}
 			else {
 				classifierPane.setCenter(null); 
+				setDefaultSourceList();
 			}
 
 		}
 		else {
 			classifierPane.setCenter(null); 
+			setDefaultSourceList();
 		}
+	}
+
+
+	/**
+	 * Set the allowed sources for this type of model. 
+	 * @param currentClassifierModel - the allowed sources. 
+	 */
+	private void setSourceList(DLClassiferModel currentClassifierModel) {
+		
+		//we don't want to set the source list again and gain if the model has changed. 
+		if (currentClassifierModel==null) {
+			setDefaultSourceList();
+			currentAllowedDataTypes=null;
+			return;
+		}
+		
+		//System.out.println("SET SOURCE LIST: " + currentClassifierModel.getAllowedDataTypes()); 
+		
+		if (isNewDataType(currentAllowedDataTypes, currentClassifierModel.getAllowedDataTypes()))  {
+		//set the source list for a given classifier model. 
+		if (currentClassifierModel.getAllowedDataTypes()==null) {
+			//default is for models to require raw sound data
+			setDefaultSourceList() ;
+		}
+		else {
+			sourcePane.setTitleText("Detection data");
+			sourcePane.clearSourceTypeList();
+			sourcePane.setSourceIndex(-1);
+			for (@SuppressWarnings("rawtypes") Class type: currentClassifierModel.getAllowedDataTypes()) {
+				sourcePane.addSourceType(type, false);
+			}
+		}
+			currentAllowedDataTypes = currentClassifierModel.getAllowedDataTypes();
+		}
+		//System.out.println("SET SOURCE LIST: " + sourcePane.getSourceCount()); 
+
+		//something has gone wrong but at least have sound acquisition for  sample rate.  
+		if  (sourcePane.getSourceCount()<=0) {
+			setDefaultSourceList();
+		}
+	}
+	
+	private boolean isNewDataType(ArrayList<Class> currentAllowedDataTypes1, ArrayList<Class> currentAllowedDataTypes2) {
+		
+		if (currentAllowedDataTypes1==null && currentAllowedDataTypes2!=null) return true;
+		if (currentAllowedDataTypes2==null && currentAllowedDataTypes1!=null) return true;
+		if (currentAllowedDataTypes2==null && currentAllowedDataTypes1==null) return false;
+		if (!currentAllowedDataTypes2.equals(currentAllowedDataTypes2)) return true;
+		
+		return false;
+
+	}
+
+
+	/**
+	 * Set the default data sources which are anything that contains raw acoustic data. 
+	 */
+	private void setDefaultSourceList() {
+		sourcePane.setTitleText("Raw Sound Data");
+		sourcePane.clearSourceTypeList();
+		sourcePane.addSourceType(RawDataUnit.class, false);
+		sourcePane.addSourceType(ClickDetection.class, false);
+		sourcePane.addSourceType(ClipDataUnit.class, false);
 	}
 
 
@@ -426,7 +498,15 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		PamDataBlock rawDataBlock = sourcePane.getSource();
 		if (rawDataBlock == null){
 			Platform.runLater(()->{
-				PamDialogFX.showWarning("There is no datablock set. The segmenter must have a datablock set."); 
+				dlWarningDialog.showWarning("There is no datablock set. The segmenter must have a datablock set."); 
+			}); 
+			return null;
+		}
+		
+		if (sourcePane.getChannelValidator().containsErrors()) {
+			Platform.runLater(()->{
+				String content = PamValidator.list2String(sourcePane.getChannelValidator().getValidationResult().getMessages()); 
+				dlWarningDialog.showWarning(content); 
 			}); 
 			return null;
 		}
@@ -437,7 +517,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		if (windowLength.getValue() == 0 || hopLength.getValue()==0){
 			Platform.runLater(()->{
-				PamDialogFX.showWarning("Neither the hop nor window length can be zero"); 
+				dlWarningDialog.showWarning("Neither the hop nor window length can be zero"); 
 			});
 			return null;
 		}
@@ -498,55 +578,6 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		return pamWarning;
 	}
 
-	/**
-	 * Show a warning dialog for the status
-	 * @param the status to show
-	 */
-	public void showWarning(DLStatus dlWarning) {
-		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
-		dlWarnings.add(statusToWarnings(dlWarning)); 
-		showWarning(dlWarnings); 
-	}
-
-	/**
-	 * Show a warning dialog. 
-	 * @param the warning to show.
-	 */
-	public void showWarning(PamWarning dlWarning) {
-		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
-		dlWarnings.add(dlWarning); 
-		showWarning(dlWarnings); 
-	}
-
-
-	/**
-	 * Show a warning dialog. 
-	 * @param dlWarnings - list of warnings - the most important will be shown. 
-	 */
-	public void showWarning(ArrayList<PamWarning> dlWarnings) {
-
-		if (dlWarnings==null || dlWarnings.size()<1) return; 
-
-		String warnings ="";
-
-
-		boolean error = false; 
-		for (int i=0; i<dlWarnings.size(); i++) {
-			warnings += dlWarnings.get(i).getWarningMessage() + "\n\n";
-			if (dlWarnings.get(i).getWarnignLevel()>1) {
-				error=true; 
-			}
-		}
-
-		final String warningsF = warnings; 
-		final boolean errorF = error; 
-		Platform.runLater(()->{
-			WarnOnce.showWarningFX(null,  "Deep Learning Settings Warning",  warningsF , errorF ? AlertType.ERROR : AlertType.WARNING);
-			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
-		});
-
-		//user presses OK - these warnings are just a message - they do not prevent running the module.
-	}
 
 	@Override
 	public void setParams(RawDLParams currParams) {
@@ -577,12 +608,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		segEnableSwitch.setSelected(currParams.enableSegmentation);
 
-		enableControls(); 
-
 		//		//set up the model and the custom pane if necessary.  
 		this.modelSelectPane.loadNewModel(currParams.modelURI); 
 		//this.modelSelectPane.updatePathLabel(); 
 		this.setClassifierPane();
+		
+		
+		enableControls(); 
 
 		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
 		Platform.runLater(()->{
@@ -655,6 +687,12 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 		//automatically set the default segment length. 
 		getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) (sR*hopLength/1000.));
+	}
+
+
+	public void showWarningDialog(DLStatus status) {
+		dlWarningDialog.showWarningDialog(status);
+		
 	}
 
 

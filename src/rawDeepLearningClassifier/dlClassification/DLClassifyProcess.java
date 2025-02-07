@@ -14,6 +14,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
 import binaryFileStorage.DataUnitFileInformation;
+import pamScrollSystem.AbstractScrollManager;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.RawDLParams;
 import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
@@ -127,6 +128,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 		dlGroupDetectionDataBlock.setNaturalLifetimeMillis(600*1000); //keep this data for a while.
 		dlGroupDetectionDataBlock.addDataAnnotationType(dlAnnotationType);
 		dlGroupDetectionDataBlock.setCanClipGenerate(true); 
+		
 
 		classificationBuffer =  new ArrayList<PamDataUnit>(); 
 
@@ -206,8 +208,9 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 */
 	@Override
 	public void newData(PamObservable obs, PamDataUnit pamRawData) {
-//		System.out.println("NEW SEGMENTER DATA: " +  PamCalendar.formatDateTime2(pamRawData.getTimeMilliseconds(), "dd MMM yyyy HH:mm:ss.SSS", false) + "  " + pamRawData.getUID() + "  " + pamRawData.getChannelBitmap() + " " + pamRawData);
+	//System.out.println("NEW SEGMENTER DATA: " +  PamCalendar.formatDateTime2(pamRawData.getTimeMilliseconds(), "dd MMM yyyy HH:mm:ss.SSS", false) + "  " + pamRawData.getUID() + "  " + pamRawData.getChannelBitmap() + " " + pamRawData);
 
+		//if grouped data then just run the classifier on the group - do not try and create a buffer. 
 		if (pamRawData instanceof SegmenterDetectionGroup) {
 			if (classificationBuffer.size()>=1) {
 				runDetectionGroupModel(); 
@@ -218,6 +221,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 			}
 		}
 
+		//if raw segmented data then add to a buffer so that we can pass chunks of data to a model which 
+		//is more computationally efficient
 		if (pamRawData instanceof GroupedRawData) {
 			//the raw data units should appear in sequential channel order  
 			GroupedRawData rawDataUnit = (GroupedRawData) pamRawData;
@@ -235,6 +240,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 			}
 		}
+		
+		
 		//				System.out.println("New raw data in: chan: " + PamUtils.getSingleChannel(pamRawData.getChannelBitmap()) + 
 		//						" Size: " +  pamRawData.getSampleDuration() + " first sample: " + rawDataUnit.getRawData()[0][0] 
 		//								+ "Parent UID: " + rawDataUnit.getParentDataUnit().getUID());
@@ -249,6 +256,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 		ArrayList<PamDataUnit> classificationBufferTemp = (ArrayList<PamDataUnit>) classificationBuffer.clone(); 
 
 		ArrayList<? extends PredictionResult> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
+		
+		//System.out.println("MODEL RESULTS: " + modelResults); 
 
 		for (int i=0; i<classificationBufferTemp.size(); i++) {
 
@@ -271,10 +280,11 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		DLDataUnit dlDataUnit =  predictionToDataUnit(detectionGroup, modelResult);
 
-		this.dlModelResultDataBlock.addPamData(dlDataUnit); //here
-
+		//System.out.println("Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
+		//add to the model result. 
+		this.dlModelResultDataBlock.addPamData(dlDataUnit);
+		
 //		System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
-
 //		//Now generate a detection of a decision threshold is reacheed. 
 //		if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
 //			System.out.println("DELPHINID - we have a positive detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
@@ -600,10 +610,13 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 * run the deep learning algorithm and save the detections as annotation to a
 	 * data unit.
 	 * 
-	 * @param dataUnit - the data unit to add prediction annotations to
+	 * @param dataUnit - the data unit to add prediction annotations to. NOT the data unit to be classified - this is is defined by adding
+	 * new data to the process. 
 	 * 
 	 */
 	public void forceRunClassifier(PamDataUnit dataUnit) {
+		
+//		System.out.println("CLASSIFICATION BUFFER: " + classificationBuffer.size());
 
 		if (this.classificationBuffer.size()>0) {
 			if (classificationBuffer.get(0) instanceof GroupedRawData) {
@@ -743,7 +756,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	private void addDLAnnotation(PamDataUnit parentDataUnit,
 			ArrayList<PredictionResult> modelResult) {
 
-		//System.out.println("DLClassifyProces: Add annnotation to  " + parentDataUnit); 
+		System.out.println("DLClassifyProces: Add annnotation to  " + parentDataUnit); 
 		parentDataUnit.addDataAnnotation(new DLAnnotation(dlAnnotationType, modelResult)); 
 		//parentDataUnit.updateDataUnit(System.currentTimeMillis());
 

@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rawDeepLearningClassifier.dlClassification.delphinID.Clicks2Spectrum.Clks2SpectrumParams;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDParams.DelphinIDDataType;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whsitle2Spectrum.Whistle2spectrumParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
@@ -49,6 +50,11 @@ public class DelphinIDTransform {
 	 */
 	public Object transformParams = null;
 
+	/**
+	 * The data type. 
+	 */
+	private DelphinIDDataType dataType;
+
 
 	public DelphinIDTransform( ) {
 
@@ -76,6 +82,7 @@ public class DelphinIDTransform {
 				transformParams = readWhistleImageTransform( jsonObjectParams);
 				
 				delphinIDTransformType = WHISTLE_IMAGE;
+				dataType= DelphinIDDataType.WHISTLES;
 
 				return true;
 			}
@@ -86,6 +93,7 @@ public class DelphinIDTransform {
 				transformParams = readWhistleSpectrumTransform( jsonObjectParams);
 				
 				delphinIDTransformType = WHISTLE_SPECTRUM;
+				dataType= DelphinIDDataType.WHISTLES;
 
 				return true;
 			}
@@ -96,7 +104,8 @@ public class DelphinIDTransform {
 
 				transformParams = readClickSpectrumTransform( jsonObjectParams);
 				
-				delphinIDTransformType = WHISTLE_SPECTRUM;
+				delphinIDTransformType = CLICK_SPECTRUM;
+				dataType= DelphinIDDataType.CLICKS;
 
 				return true;
 			}
@@ -110,14 +119,23 @@ public class DelphinIDTransform {
 	private Clks2SpectrumParams readClickSpectrumTransform(JSONObject jsonObjectParams ) {
 		Clks2SpectrumParams params = new Clks2SpectrumParams();
 
-		double[] freqLimits = new double[2]; 
-		freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
-		freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
+//		double[] freqLimits = new double[2]; 
+//		freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
+//		freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
 		
 		double minfragmillis = jsonObjectParams.getDouble("minclks"); 
-		
-		params.freqLimits = freqLimits;
+		int fftLen = jsonObjectParams.getInt("fft_len"); 
+		boolean spectrumdB = jsonObjectParams.getInt("spectrum_dB") == 1 ? true : false; 
+		boolean hann = false;
+		if (jsonObjectParams.has("hann")) {
+			hann = jsonObjectParams.getInt("hann") == 1 ? true : false;
+		}
+
+//		params.freqLimits = freqLimits;
 		params.minFragSize = minfragmillis;
+		params.spectrumdB = spectrumdB; 
+		params.hann = hann;
+		params.setFftLength(fftLen);
 		
 		return params; 
 	}
@@ -215,6 +233,10 @@ public class DelphinIDTransform {
 	public Object getTransformParams() {
 		return transformParams;
 		
+	}
+
+	public DelphinIDDataType getDataType() {
+		return this.dataType;
 	}
 
 
