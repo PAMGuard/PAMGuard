@@ -13,6 +13,10 @@
 #ignore target directory
 /target/
 
+#ignore quarto built website files
+/src/quartohelp/_site/
+/src/quartohelp/.Rproj.user/
+
 # Package Files remove jar from this since there is one we want. Most are in target which is excluded anyway.#
 *.notjar
 *.war
@@ -134,11 +138,4 @@ settings.xml
 PAMGuard.app
 dependency-reduced-pom.xml
 .classpath
-dependency-reduced-pom.xml
-.classpath
-dependency-reduced-pom.xml
-.classpath
-.classpath
-.classpath
-dependency-reduced-pom.xml
-.classpath
+.Rproj.user
