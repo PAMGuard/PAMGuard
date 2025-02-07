@@ -435,25 +435,29 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 			double fullScale = daqProcess.rawAmplitude2dB(1, channelIndex, false);
 			calibration.setSensitivityDBFS(fullScale);
 		}
-		FrequencyResponse frs = calibration.getFrequencyResponse();
-		if (frs == null) {
-			frs = new FrequencyResponse();		
-			try {
-				Helper.createRequiredElements(frs);
-			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-				e.printStackTrace();
-			}
-			calibration.setFrequencyResponse(frs);
-		}
-		List<Double> hz = frs.getHz();
-		List<Double> db = frs.getDB();
-		//		if (hz == null) {
-		//			
-		//		}
-		if (hz != null && db != null) {
-			hz.add(Double.valueOf(0));
-			db.add(Double.valueOf(hSens+preampGain));
-		}
+		
+		/*
+		 * Frequency response has stopped working with update in Jan 2025. Remove !
+		 */
+//		FrequencyResponse frs = calibration.getFrequencyResponse();
+//		if (frs == null) {
+//			frs = new FrequencyResponse();		
+//			try {
+//				Helper.createRequiredElements(frs);
+//			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//				e.printStackTrace();
+//			}
+//			calibration.setFrequencyResponse(frs);
+//		}
+//		List<Double> hz = frs.getHz();
+//		List<Double> db = frs.getDB();
+//		//		if (hz == null) {
+//		//			
+//		//		}
+//		if (hz != null && db != null) {
+//			hz.add(Double.valueOf(0));
+//			db.add(Double.valueOf(hSens+preampGain));
+//		}
 
 		if (NilusChecker.isEmpty(calibration.getResponsibleParty())) {
 			calibration.setResponsibleParty(null);

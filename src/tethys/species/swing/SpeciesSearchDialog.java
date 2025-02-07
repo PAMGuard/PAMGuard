@@ -196,18 +196,11 @@ public class SpeciesSearchDialog extends PamDialog {
 		@Override
 		protected void process(List<PamWorkProgressMessage> chunks) {
 			// then open the dialog to block this thread. 
-//			System.out.println("Proc chunks: " + chunks.size());
 			for (PamWorkProgressMessage msg : chunks) {
 				synchronized (synch) {
-				// if this opens here, it blocks the AWT thread until it closes. 
 					if (workDialog != null) {
 						workDialog.update(msg);
 					}
-//					if (workDialog != null && msg.progress != null) {
-//						workDialog.setVisible(false);
-//						workDialog.dispose();
-//						workDialog = null;
-//					}
 				}				
 			}
 		}

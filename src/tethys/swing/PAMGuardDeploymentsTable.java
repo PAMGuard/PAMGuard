@@ -51,21 +51,21 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	private JPanel mainPanel;
 
 	private DeploymentOverview deploymentOverview;
-	
-//	private boolean[] selection = new boolean[0];
-	
+
+	//	private boolean[] selection = new boolean[0];
+
 	private ArrayList<DeploymentTableObserver> observers = new ArrayList<>();
 
-private RecordingList masterList;
+	private RecordingList masterList;
 
 	public PAMGuardDeploymentsTable(TethysControl tethysControl) {
 		super(tethysControl);
-//		deploymentHandler = new DeploymentHandler(getTethysControl());
+		//		deploymentHandler = new DeploymentHandler(getTethysControl());
 		mainPanel = new PamPanel(new BorderLayout());
-//		mainPanel.setBorder(new TitledBorder("PAMGuard recording periods"));
+		//		mainPanel.setBorder(new TitledBorder("PAMGuard recording periods"));
 		tableModel = new TableModel();
 		table = new JTable(tableModel);
-//		table.setRowSelectionAllowed(true);
+		//		table.setRowSelectionAllowed(true);
 		table.addMouseListener(new TableMouse());
 		JScrollPane scrollPane = new JScrollPane(table);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
@@ -77,7 +77,7 @@ private RecordingList masterList;
 	public JComponent getComponent() {
 		return mainPanel;
 	}
-	
+
 	public RecordingList getMasterList() {
 		return masterList;
 	}
@@ -110,7 +110,7 @@ private RecordingList masterList;
 		}
 
 	}
-	
+
 	public void showPopup(MouseEvent e) {
 		int aRow = table.getSelectedRow();
 		int[] selRows = table.getSelectedRows();
@@ -126,7 +126,7 @@ private RecordingList masterList;
 		// make a list of RecordingPeriods which don't currently have a Deployment document
 		ArrayList<RecordingPeriod> newPeriods = new ArrayList<>();
 		ArrayList<RecordingPeriod> allPeriods = getMasterList().getEffortPeriods();
-//		ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
+		//		ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
 		ArrayList<PDeployment> matchedDeployments = new ArrayList<>();
 		for (int i = 0; i < selRows.length; i++) {
 			PDeployment tethysDeployment = allPeriods.get(selRows[i]).getMatchedTethysDeployment();
@@ -140,7 +140,7 @@ private RecordingList masterList;
 			}
 		}
 		JPopupMenu popMenu = new JPopupMenu();
-		
+
 		JMenuItem menuItem = new JMenuItem("Select all");
 		menuItem.addActionListener(new ActionListener() {
 			@Override
@@ -157,11 +157,11 @@ private RecordingList masterList;
 			}
 		});
 		popMenu.add(menuItem);
-		
+
 		if (matchedDeployments.size() > 0) {
 			popMenu.addSeparator();
 		}
-		
+
 		if (matchedDeployments.size() == 1) {
 			menuItem = new JMenuItem("Display deployment document " + matchedDeployments.get(0));
 			menuItem.addActionListener(new ActionListener() {
@@ -181,7 +181,7 @@ private RecordingList masterList;
 			popMenu.add(menuItem);
 
 			popMenu.addSeparator();
-			
+
 			menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
 			menuItem.addActionListener(new ActionListener() {
 				@Override
@@ -190,12 +190,12 @@ private RecordingList masterList;
 				}
 			});
 			popMenu.add(menuItem);
-			
+
 		}
 		else if (matchedDeployments.size() > 1){
 			menuItem = new JMenuItem(String.format("Delete %d deployment documents", matchedDeployments.size()));
 			menuItem.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					deleteMultipleDeployments(matchedDeployments);
@@ -205,21 +205,21 @@ private RecordingList masterList;
 		}
 
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
-				
-		
+
+
 	}
-	
+
 	protected void selectAll(boolean select) {
 		ArrayList<RecordingPeriod> recordingPeriods = getMasterList().getEffortPeriods();
-//		ArrayList<RecordingPeriod> recordingPeriods = deploymentOverview.getRecordingPeriods();
+		//		ArrayList<RecordingPeriod> recordingPeriods = deploymentOverview.getRecordingPeriods();
 		for (int i = 0; i < recordingPeriods.size(); i++) {
 			recordingPeriods.get(i).setSelected(select);
 		}
-		
+
 		tableModel.fireTableDataChanged();
 
 		notifyObservers();
-		
+
 	}
 
 	protected void deleteMultipleDeployments(ArrayList<PDeployment> matchedDeployments) {
@@ -380,11 +380,11 @@ private RecordingList masterList;
 		}
 		masterList = deploymentOverview.getMasterList(getTethysControl());
 		tableModel.fireTableDataChanged();
-//		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
-//		ArrayList<Deployment> projectDeployments = getTethysControl().getDbxmlQueries().getProjectDeployments(deplData.getProject());
-//		deploymentHandler.matchPamguard2Tethys(deploymentOverview, projectDeployments);
+		//		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
+		//		ArrayList<Deployment> projectDeployments = getTethysControl().getDbxmlQueries().getProjectDeployments(deplData.getProject());
+		//		deploymentHandler.matchPamguard2Tethys(deploymentOverview, projectDeployments);
 	}
-	
+
 	public void addObserver(DeploymentTableObserver observer) {
 		observers.add(observer);
 	}
@@ -392,7 +392,7 @@ private RecordingList masterList;
 	private class TableModel extends AbstractTableModel {
 
 		private String[] columnNames = {"Id", "Select", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment", "Deployment Effort"};
-		
+
 		private static final int SELECTCOLUMN = 1;
 
 		@Override
@@ -417,12 +417,12 @@ private RecordingList masterList;
 		public int getColumnCount() {
 			return columnNames.length;
 		}
-		
+
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			if (columnIndex == SELECTCOLUMN) {
 				return Boolean.class;
-//				return JCheckBox.class;
+				//				return JCheckBox.class;
 			}
 			return super.getColumnClass(columnIndex);
 		}
@@ -431,7 +431,7 @@ private RecordingList masterList;
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			RecordingList masterList = getMasterList();
 			RecordingPeriod period = masterList.getEffortPeriods().get(rowIndex);
-//			DeploymentRecoveryPair deplInfo = deploymentInfo.get(rowIndex);
+			//			DeploymentRecoveryPair deplInfo = deploymentInfo.get(rowIndex);
 			if (columnIndex == 6) {
 				return masterList.assessDutyCycle();
 			}
@@ -445,39 +445,39 @@ private RecordingList masterList;
 
 		private Object getValueAt(RecordingPeriod period, int rowIndex, int columnIndex) {
 			PDeployment deployment = period.getMatchedTethysDeployment();
-					switch (columnIndex) {
-					case 0:
-						return rowIndex;
-					case 2:
-						return PamCalendar.formatDBDateTime(period.getRecordStart());
-		//				return TethysTimeFuncs.formatGregorianTime(deplInfo.deploymentDetails.getAudioTimeStamp());
-					case 3:
-						return PamCalendar.formatDBDateTime(period.getRecordStop());
-		//				return TethysTimeFuncs.formatGregorianTime(deplInfo.recoveryDetails.getAudioTimeStamp());
-					case 5:
-		//				long t1 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.deploymentDetails.getAudioTimeStamp());
-		//				long t2 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.recoveryDetails.getAudioTimeStamp());
-						return PamCalendar.formatDuration(period.getRecordStop()-period.getRecordStart());
-					case 7:
-						if (deployment == null) {
-							return null;
-						}
-						return deployment.nilusObject.getId();
-//						return makeDeplString(period, deployment);
-					case 8:
-						if (deployment == null) {
-							return null;
-						}
-						return String.format("%s to %s", PamCalendar.formatDBDateTime(deployment.getAudioStart()), 
-								PamCalendar.formatDBDateTime(deployment.getAudioEnd()));
-						
-					case SELECTCOLUMN:
-		//				return selectBoxes[rowIndex];
-						return period.isSelected();
-					}
-		
+			switch (columnIndex) {
+			case 0:
+				return rowIndex;
+			case 2:
+				return PamCalendar.formatDBDateTime(period.getRecordStart());
+				//				return TethysTimeFuncs.formatGregorianTime(deplInfo.deploymentDetails.getAudioTimeStamp());
+			case 3:
+				return PamCalendar.formatDBDateTime(period.getRecordStop());
+				//				return TethysTimeFuncs.formatGregorianTime(deplInfo.recoveryDetails.getAudioTimeStamp());
+			case 5:
+				//				long t1 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.deploymentDetails.getAudioTimeStamp());
+				//				long t2 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.recoveryDetails.getAudioTimeStamp());
+				return PamCalendar.formatDuration(period.getRecordStop()-period.getRecordStart());
+			case 7:
+				if (deployment == null) {
 					return null;
 				}
+				return deployment.nilusObject.getId();
+				//						return makeDeplString(period, deployment);
+			case 8:
+				if (deployment == null) {
+					return null;
+				}
+				return String.format("%s to %s", PamCalendar.formatDBDateTime(deployment.getAudioStart()), 
+						PamCalendar.formatDBDateTime(deployment.getAudioEnd()));
+
+			case SELECTCOLUMN:
+				//				return selectBoxes[rowIndex];
+				return period.isSelected();
+			}
+
+			return null;
+		}
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -494,7 +494,7 @@ private RecordingList masterList;
 			long start = period.getRecordStart();
 			long stop = period.getRecordStop();
 			double percOverlap = (overlap*100.) / (stop-start);
-//			return String.format("%s : %3.1f%% overlap", deployment.toString(), percOverlap);
+			//			return String.format("%s : %3.1f%% overlap", deployment.toString(), percOverlap);
 			return deployment.toString();
 		}
 
