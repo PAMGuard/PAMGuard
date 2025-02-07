@@ -26,7 +26,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import PamView.dialog.PamButton;
 import PamView.dialog.PamDialog;
 import PamView.dialog.SettingsButton;
 import PamView.panel.PamPanel;

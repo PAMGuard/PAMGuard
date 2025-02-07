@@ -14,6 +14,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 import pamViewFX.fxNodes.PamHBox;
 
@@ -48,7 +50,7 @@ public class WarnOnceDialogFX {
 	 * The warning message
 	 */
 	private String message;
-	
+
 	/**
 	 * The opt out this session check box. 
 	 */
@@ -58,6 +60,8 @@ public class WarnOnceDialogFX {
 	 * The opt out forever check box. 
 	 */
 	private CheckBox dontShowAgain;
+
+	private HBox checkBoxPane;  
 
 	/**
 	 * Constructor the warn once dialog. 
@@ -74,12 +78,12 @@ public class WarnOnceDialogFX {
 		alert = createAlertWithOptOut(alertType, title, null, message, "Don't show this message again", ButtonType.YES, ButtonType.NO);
 		//  if (alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent()) {
 		//  }
-		
+
 		// for now, this is not implemented so just make sure it's not checked.  If we want to add it to the dialog, we'll need to rearrange everything
 		// because the opt-out checkbox is added to the buttons bar in a sneaky way, and you can't do that twice.  
 		dontShowAgainThisSess.setSelected(false);
 	}
-	
+
 	/**
 	 * Constructor the warn once dialog. 
 	 * @param parentStage - the parent window
@@ -92,20 +96,34 @@ public class WarnOnceDialogFX {
 	 * @param canceltext
 	 */
 	public WarnOnceDialogFX(Window parentStage, String title, String message, AlertType alertType , String helpPoint, Throwable error, String oktext, String canceltext) {
+		this(parentStage, title, message, alertType, helpPoint, error, oktext, canceltext, false);
+	}
+
+	public WarnOnceDialogFX(Window parentStage, String title, String message, AlertType alertType , String helpPoint,
+			Throwable error, String oktext, String canceltext, boolean disableCheckBoxes) {
+
 		this.error=error; 
 		this.message=message; 
-		
+
 		ButtonType okButton; 
 		if (oktext==null) okButton = ButtonType.OK; 
 		else okButton = new ButtonType(oktext); 
-		
+
 		ButtonType cancelButton; 
 		if (canceltext==null) cancelButton = ButtonType.OK; 
 		else cancelButton = new ButtonType(canceltext); 
-
 		
+		//TODO help point.
+
+
 		alert = createAlertWithOptOut(alertType, title, null, message, "Don't show this message again", okButton, cancelButton);
+		
+		//System.out.println("CREATE ALERT: " + disableCheckBoxes); 
+		this.disableCheckBoxes(disableCheckBoxes);
+
 	}
+	
+
 
 	/**
 	 * Show the warning dialog. 
@@ -142,7 +160,7 @@ public class WarnOnceDialogFX {
 			clpbrd.setContents(stringSelection, null);
 		}
 	}
-	
+
 	public boolean isShowAgain() {
 		return dontShowAgain.isSelected() == false;
 	}
@@ -164,7 +182,7 @@ public class WarnOnceDialogFX {
 	private Alert createAlertWithOptOut(AlertType type, String title, String headerText, 
 			String message, String optOutMessage,
 			ButtonType... buttonTypes) {
-		
+
 		Alert alert = new Alert(type);
 		// Need to force the alert to layout in order to grab the graphic,
 		// as we are replacing the dialog pane with a custom pane
@@ -174,22 +192,22 @@ public class WarnOnceDialogFX {
 		// Create a new dialog pane that has a checkbox instead of the hide/show details button
 		// Use the supplied callback for the action of the checkbox
 		alert.setDialogPane(new DialogPane() {
+
 			@Override
 			protected Node createDetailsButton() {
 
-				
 				dontShowAgain = new CheckBox();
 				dontShowAgain.setText(optOutMessage + " ever");
-				
+
 				dontShowAgainThisSess = new CheckBox();
 				dontShowAgainThisSess.setText(" this session ");
-				
-				PamHBox hBox = new PamHBox(); 
-				hBox.getChildren().addAll(dontShowAgain, dontShowAgainThisSess); 
-				hBox.setSpacing(5); 
-				hBox.setAlignment(Pos.CENTER_LEFT);
-				
-				return hBox;
+
+				checkBoxPane = new PamHBox(); 
+				checkBoxPane.getChildren().addAll(dontShowAgain, dontShowAgainThisSess); 
+				checkBoxPane.setSpacing(5); 
+				checkBoxPane.setAlignment(Pos.CENTER_LEFT);
+
+				return checkBoxPane;
 			}
 		});
 		alert.getDialogPane().getButtonTypes().addAll(buttonTypes[0]);
@@ -202,7 +220,7 @@ public class WarnOnceDialogFX {
 		alert.getDialogPane().setGraphic(graphic);
 		alert.setTitle(title);
 		alert.setHeaderText(headerText);
-		
+
 		return alert;
 	}
 
@@ -212,6 +230,13 @@ public class WarnOnceDialogFX {
 	 */
 	public int getAnswer() {
 		return answer;
+	}
+
+
+	public void disableCheckBoxes(boolean disable) {
+		checkBoxPane.setDisable(disable);
+		dontShowAgain.setDisable(disable);
+		dontShowAgainThisSess.setDisable(disable);
 	}
 
 

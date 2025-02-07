@@ -60,6 +60,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * Sound spot warning. 
 	 */
 	PamWarning dlClassifierWarning = new PamWarning(getName(), "",2);
+
+	private DLStatus status = DLStatus.NO_MODEL_LOADED;
 	
 	
 	@Override
@@ -171,8 +173,33 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	@Override
 	public DLStatus getModelStatus() {
-		if (getDLWorker().isModelNull()) {
-			return DLStatus.MODEL_LOAD_FAILED;
+		return status;
+	}
+	
+	@Override
+	public DLStatus setModel(URI uri) {
+		//will change the params if we do not clone. 
+		StandardModelParams.setModel(uri, this.getDLParams()); 
+		status = this.getDLWorker().prepModel(getDLParams(), dlControl);
+		
+//		System.out.println("----MODEL STATUS: " + status); 
+		
+		status  = checkDLStatus(status);
+		
+		return status; 
+	}
+	
+	/**
+	 * The model status is returned by the prep model function but there may be other issues which override the returned status. 
+	 * This function chekcs those issues and returns a different status if necessary.
+	 * @param status2 - the current model status. 
+	 * @return the current model status. 
+	 */
+	private DLStatus checkDLStatus(DLStatus status2) {
+	
+		
+		if (getDLWorker().isModelNull() && !status2.isError()) {
+			return DLStatus.MODEL_LOAD_FAIL;
 		}
 
 		File file = new File(getDLParams().modelPath);
@@ -192,18 +219,10 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				//					1));
 			}
 		}
-		return DLStatus.MODEL_LOAD_SUCCESS;
+		return status2;
 	}
-	
-	@Override
-	public DLStatus setModel(URI uri) {
-		//will change the params if we do not clone. 
-		StandardModelParams.setModel(uri, this.getDLParams()); 
-		this.getDLWorker().prepModel(getDLParams(), dlControl);
-		return getModelStatus();
-	}
-	
-	
+
+
 
 	/**
 	 * The task thread. 

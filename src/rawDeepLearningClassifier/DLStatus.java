@@ -8,7 +8,8 @@ public enum DLStatus {
 	FILE_NULL("The input file is null",
 			"The loaded file was null. If the file was download it may not have downloaded properly.", ErrorLevel.ERROR),
 
-	MODEL_LOAD_FAILED("The model failed to load",
+	//generic error when something has gone wrong.
+	MODEL_LOAD_FAIL("The model failed to load",
 			" The model failed to load - this could be because it is incompatible with PAMGuard or an uknown file format.",
 			ErrorLevel.ERROR),
 
@@ -38,7 +39,11 @@ public enum DLStatus {
 	
 	DECOMPRESSING_MODEL("Decompressing model", "Decompressing the model file", ErrorLevel.NO_ERROR), 
 
-	INCOMPATIBLE_ZIP("Incorrect Zip format", "The zip format is incorrect. The zip file should have a *.pgdl file in the parent directory along with either a Tensorflow or PyTorch model.", ErrorLevel.ERROR), ;
+	INCOMPATIBLE_ZIP("Incorrect Zip format", "The zip format is incorrect. The zip file should have a *.pgdl file in the parent directory along with either a Tensorflow or PyTorch model.", ErrorLevel.ERROR), 
+
+	MODEL_ENGINE_FAIL("Deep learning engine failure", "The deep learning engine was not able to load. It is likely PAMGuard could not download the relevent libraries. Visit www.pamguard.org/deeplearning for a work around.", ErrorLevel.ERROR),
+	
+	MODEL_META_FAIL("Model metadata failure", "PAMGuard could not locte the metadata within the model. if this is a custom model ensure the associated .pgdl file is present and JSON valid", ErrorLevel.ERROR); 
 
 
 	/**

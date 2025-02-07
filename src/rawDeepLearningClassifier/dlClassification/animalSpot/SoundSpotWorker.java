@@ -5,7 +5,9 @@ import java.nio.file.Paths;
 import org.jamdev.jdl4pam.animalSpot.AnimalSpotModel;
 import org.jamdev.jdl4pam.animalSpot.AnimalSpotParams;
 
+import ai.djl.engine.EngineException;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
@@ -41,7 +43,7 @@ public class SoundSpotWorker extends DLModelWorker<StandardPrediction> {
 	/**
 	 * Prepare the model 
 	 */
-	public void prepModel(StandardModelParams soundSpotParams, DLControl dlControl) {
+	public DLStatus prepModel(StandardModelParams soundSpotParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 
 		//System.out.println("prepModel: " + soundSpotParams.useDefaultTransfroms); 
@@ -64,8 +66,12 @@ public class SoundSpotWorker extends DLModelWorker<StandardPrediction> {
 
 			}
 		}
+		catch (EngineException e) {
+			return DLStatus.MODEL_ENGINE_FAIL;
+		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return DLStatus.MODEL_LOAD_FAIL;
 			//WarnOnce.showWarning(null, "Model Load Error", "There was an error loading the model file.", WarnOnce.OK_OPTION); 
 		}
 
@@ -114,8 +120,12 @@ public class SoundSpotWorker extends DLModelWorker<StandardPrediction> {
 		catch (Exception e) {
 			soundSpotModel=null; 
 			e.printStackTrace();
+			return DLStatus.MODEL_META_FAIL;
+
 			//WarnOnce.showWarning(null, "Model Metadata Error", "There was an error extracting the metadata from the model.", WarnOnce.OK_OPTION); 
 		}
+
+		return DLStatus.MODEL_LOAD_SUCCESS;
 
 		//Thread.currentThread().setContextClassLoader(origCL);
 	}

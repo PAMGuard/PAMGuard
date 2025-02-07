@@ -12,7 +12,9 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 
 import PamView.dialog.warn.WarnOnce;
+import ai.djl.engine.EngineException;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
@@ -48,8 +50,9 @@ public class KetosWorker extends DLModelWorker<StandardPrediction> {
 
 	/**
 	 * Prepare the model 
+	 * @return 
 	 */
-	public void prepModel(StandardModelParams ketosDLParams, DLControl dlControl) {
+	public DLStatus prepModel(StandardModelParams ketosDLParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
 
@@ -79,8 +82,13 @@ public class KetosWorker extends DLModelWorker<StandardPrediction> {
 				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
 			}
 		}
+		catch (EngineException e) {
+			e.printStackTrace();
+			return DLStatus.MODEL_ENGINE_FAIL;
+		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return DLStatus.MODEL_LOAD_FAIL;
 			//WarnOnce.showWarning(null, "Model Load Error", "There was an error loading the model file.", WarnOnce.OK_OPTION); 
 		}
 
@@ -176,9 +184,11 @@ public class KetosWorker extends DLModelWorker<StandardPrediction> {
 		catch (Exception e) {
 			ketosModel=null; 
 			e.printStackTrace();
+			return DLStatus.MODEL_META_FAIL;
 			//WarnOnce.showWarning(null, "Model Metadata Error", "There was an error extracting the metadata from the model.", WarnOnce.OK_OPTION); 
 		}
 		//Thread.currentThread().setContextClassLoader(origCL);
+		return DLStatus.MODEL_LOAD_SUCCESS;
 	}
 
 

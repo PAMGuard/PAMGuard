@@ -13,6 +13,7 @@ import org.jamdev.jpamutils.wavFiles.AudioData;
 
 import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
@@ -191,7 +192,7 @@ public abstract class DLModelWorker<T> {
 
 	public abstract T makeModelResult(float[] prob, double time);
 
-	public abstract void prepModel(StandardModelParams soundSpotParams, DLControl dlControl);
+	public abstract DLStatus prepModel(StandardModelParams soundSpotParams, DLControl dlControl);
 
 
 	/**

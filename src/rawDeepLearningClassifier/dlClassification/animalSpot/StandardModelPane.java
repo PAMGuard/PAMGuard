@@ -31,6 +31,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.validator.PamValidator;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 
@@ -292,8 +293,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	/**
 	 * Called whenever a new model has been selected
 	 * @param file - the file. 
+	 * @return 
 	 */
-	public abstract void newModelSelected(File file); 
+	public abstract DLStatus newModelSelected(File file); 
 
 	/**
 	 * Sho0w the advanced settings. 
@@ -406,7 +408,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			currentSelectedFile = new File(paramsClone.modelPath);
 			
 			//this might change the paramsClone values if the model contains pamguard compatible metadata
-			newModelSelected(currentSelectedFile); 
+			DLStatus status = newModelSelected(currentSelectedFile);
 		}
 		
 		setClassNames(paramsClone);

@@ -35,6 +35,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
+import pamViewFX.validator.PamValidator;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
@@ -120,9 +121,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private PamGridPane segmenterGridPane;
 
-	private boolean warningShow;
 
 	private ArrayList<Class> currentAllowedDataTypes;
+
+	private DLWarningDialog dlWarningDialog ;
 
 
 	public DLSettingsPane(DLControl dlControl){
@@ -148,7 +150,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			mainPane.setPrefWidth(MAX_WIDTH);
 		}
 		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
-
+		dlWarningDialog = new DLWarningDialog(this); 
 
 		//mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS()); 
 
@@ -496,7 +498,15 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		PamDataBlock rawDataBlock = sourcePane.getSource();
 		if (rawDataBlock == null){
 			Platform.runLater(()->{
-				PamDialogFX.showWarning("There is no datablock set. The segmenter must have a datablock set."); 
+				dlWarningDialog.showWarning("There is no datablock set. The segmenter must have a datablock set."); 
+			}); 
+			return null;
+		}
+		
+		if (sourcePane.getChannelValidator().containsErrors()) {
+			Platform.runLater(()->{
+				String content = PamValidator.list2String(sourcePane.getChannelValidator().getValidationResult().getMessages()); 
+				dlWarningDialog.showWarning(content); 
 			}); 
 			return null;
 		}
@@ -507,7 +517,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		if (windowLength.getValue() == 0 || hopLength.getValue()==0){
 			Platform.runLater(()->{
-				PamDialogFX.showWarning("Neither the hop nor window length can be zero"); 
+				dlWarningDialog.showWarning("Neither the hop nor window length can be zero"); 
 			});
 			return null;
 		}
@@ -568,62 +578,6 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		return pamWarning;
 	}
 
-	/**
-	 * Show a warning dialog for the status
-	 * @param the status to show
-	 */
-	public void showWarning(DLStatus dlWarning) {
-		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
-		
-		dlWarnings.add(statusToWarnings(dlWarning)); 
-		showWarning(dlWarnings); 
-	}
-
-	/**
-	 * Show a warning dialog. 
-	 * @param the warning to show.
-	 */
-	public void showWarning(PamWarning dlWarning) {
-		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
-		dlWarnings.add(dlWarning); 
-		showWarning(dlWarnings); 
-	}
-
-
-	/**
-	 * Show a warning dialog. 
-	 * @param dlWarnings - list of warnings - the most important will be shown. 
-	 */
-	public void showWarning(ArrayList<PamWarning> dlWarnings) {
-		
-		System.out.println("Show warning: " + dlWarnings);
-		
-		if (warningShow) return; //not the best but don't show multiple dialogs on top of each other. 
-
-		if (dlWarnings==null || dlWarnings.size()<1) return; 
-
-		String warnings ="";
-
-
-		boolean error = false; 
-		for (int i=0; i<dlWarnings.size(); i++) {
-			warnings += dlWarnings.get(i).getWarningMessage() + "\n\n";
-			if (dlWarnings.get(i).getWarnignLevel()>1) {
-				error=true; 
-			}
-		}
-
-		this.warningShow = true; 
-		final String warningsF = warnings; 
-		final boolean errorF = error;
-		Platform.runLater(()->{
-			WarnOnce.showWarningFX(null,  "Deep Learning Settings Warning",  warningsF , errorF ? AlertType.ERROR : AlertType.WARNING);
-			warningShow = false;
-			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
-		});
-
-		//user presses OK - these warnings are just a message - they do not prevent running the module.
-	}
 
 	@Override
 	public void setParams(RawDLParams currParams) {
@@ -733,6 +687,12 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 		//automatically set the default segment length. 
 		getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) (sR*hopLength/1000.));
+	}
+
+
+	public void showWarningDialog(DLStatus status) {
+		dlWarningDialog.showWarningDialog(status);
+		
 	}
 
 
