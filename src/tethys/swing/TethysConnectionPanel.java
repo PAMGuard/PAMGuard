@@ -32,6 +32,7 @@ import tethys.TethysState;
 import tethys.TethysState.StateType;
 import tethys.TethysTimeFuncs;
 import tethys.dbxml.ServerStatus;
+import tethys.dbxml.ServerVersion;
 import tethys.deployment.PInstrument;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
@@ -44,7 +45,7 @@ import tethys.output.TethysExportParams;
 public class TethysConnectionPanel extends TethysGUIPanel {
 	
 	private static final int SERVERNAMELENGTH = 30;
-	private static final int SERVERSTATUSLENGTH = 20;
+	private static final int SERVERSTATUSLENGTH = 50;
 	
 	private JPanel mainPanel;
 
@@ -263,7 +264,13 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		TethysExportParams exportParams = getTethysControl().getTethysExportParams();
 		serverName.setText(exportParams.getFullServerName());
 		ServerStatus status = getTethysControl().getDbxmlConnect().pingServer();
-		serverStatus.setText(status.toString());
+		if (status.ok) {
+			ServerVersion version = getTethysControl().getDbxmlConnect().getServerVersion();
+			serverStatus.setText(" " + status.toString() + ": Version " + version);
+		}
+		else {
+			serverStatus.setText(" " + status.toString());
+		}
 
 		colourBackground(status.ok ? 0 : 1);
 	}

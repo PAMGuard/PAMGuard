@@ -12,10 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.zip.GZIPOutputStream;
 
 import javax.xml.bind.JAXBException;
+
+import org.w3c.dom.Document;
 
 import dbxml.JerseyClient;
 import dbxml.Queries;
@@ -559,6 +563,9 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 
 		setCache(false);
 
+		ServerVersion sv = getServerVersion();
+		System.out.println("Tethys server version: " + sv);
+
 		return state.ok;
 	}
 
@@ -599,6 +606,63 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 			return new ServerStatus(false, ex);
 		}
 		return new ServerStatus(ok, null);
+	}
+	
+	public ServerVersion getServerVersion() {
+		/*
+		 * From Marie on 6 Feb 2025
+Server:  GET http://hostname/Tethys/version
+Returns something like this:
+<Tethys><version>3.2 beta 1</version></Tethys>  (Generally, we’ll have a number with optional text, e.g. beta, or 3.2 a for a minor fix)
+		 */
+		String vStr = null;
+		try {
+			TethysExportParams params = tethysControl.getTethysExportParams();
+			String host = params.getFullServerName();
+			String urlStr = String.format("%s/Tethys/version", host);
+			URL url = new URL(urlStr);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.connect();
+			InputStream is = url.openStream();
+			byte[] data = is.readAllBytes();
+			vStr = new String(data);
+//			System.out.println(vStr);
+			conn.disconnect();
+		}
+		catch (Exception e) {
+//			e.printStackTrace();
+			return null;
+		}
+		if (vStr == null) {
+			return null;
+		}
+		// pull the string from the XML. 
+		DBXMLQueries dbQs = tethysControl.getDbxmlQueries();
+		Document doc = dbQs.convertStringToXMLDocument(vStr);
+		if (doc == null) {
+			return null;
+		}
+		String vData = dbQs.getElementData(doc.getDocumentElement(), "version");
+//		System.out.println(vData);
+		if (vData == null) {
+			return null;
+		}
+		// now unpack it
+		int sp1 = vData.indexOf(' ');
+		if (sp1 < 0) {
+			return new ServerVersion(0.0F, vData);
+		}
+		String nNum = vData.substring(0, sp1);
+		Float vn = 0F;
+		try {
+			vn = Float.valueOf(nNum);
+		}
+		catch (NumberFormatException ne) {
+		}
+		String vS = vData.substring(sp1+1);
+		
+		return new ServerVersion(vn, vS);
 	}
 
 
