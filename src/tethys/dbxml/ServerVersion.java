@@ -2,7 +2,14 @@ package tethys.dbxml;
 
 public class ServerVersion {
 
+
+	/**
+	 * Minimum version that the current version of the Tethys PAMGuard interface can work with. 
+	 */
+	public static final float MINSERVERVERSION = 3.2F;
+
 	private float versionNo;
+
 	private String versionName;
 	
 	public ServerVersion(float versionNo, String versionName) {

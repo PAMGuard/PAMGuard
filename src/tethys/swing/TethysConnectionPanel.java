@@ -26,6 +26,7 @@ import PamView.panel.WestAlignedPanel;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
 import nilus.Deployment;
+import nilus.Helper;
 import pamViewFX.fxNodes.PamComboBox;
 import tethys.TethysControl;
 import tethys.TethysState;
@@ -45,7 +46,7 @@ import tethys.output.TethysExportParams;
 public class TethysConnectionPanel extends TethysGUIPanel {
 	
 	private static final int SERVERNAMELENGTH = 30;
-	private static final int SERVERSTATUSLENGTH = 50;
+	private static final int SERVERSTATUSLENGTH = 60;
 	
 	private JPanel mainPanel;
 
@@ -264,13 +265,14 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		TethysExportParams exportParams = getTethysControl().getTethysExportParams();
 		serverName.setText(exportParams.getFullServerName());
 		ServerStatus status = getTethysControl().getDbxmlConnect().pingServer();
+		String text = " " + status.toString();
 		if (status.ok) {
 			ServerVersion version = getTethysControl().getDbxmlConnect().getServerVersion();
-			serverStatus.setText(" " + status.toString() + ": Version " + version);
+			text += ": Version " + version;
 		}
-		else {
-			serverStatus.setText(" " + status.toString());
-		}
+		String nilusVer = Helper.getVersion();
+		text += "; nilus " + nilusVer;
+		serverStatus.setText(text);
 
 		colourBackground(status.ok ? 0 : 1);
 	}

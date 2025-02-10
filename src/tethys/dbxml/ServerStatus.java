@@ -5,7 +5,7 @@ public class ServerStatus {
 	public boolean ok;
 
 	public Exception error;
-
+	
 	public ServerStatus(boolean ok, Exception error) {
 		super();
 		this.ok = ok;

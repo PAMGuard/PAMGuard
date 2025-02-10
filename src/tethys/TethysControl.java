@@ -37,12 +37,14 @@ import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
 import nilus.Deployment;
+import nilus.Helper;
 import pamguard.GlobalArguments;
 import tethys.TethysState.StateType;
 import tethys.calibration.CalibrationHandler;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.DBXMLQueries;
 import tethys.dbxml.ServerStatus;
+import tethys.dbxml.ServerVersion;
 import tethys.dbxml.TethysException;
 import tethys.dbxml.TethysQueryException;
 import tethys.deployment.DeploymentHandler;
@@ -528,11 +530,46 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		ServerStatus serverState = dbxmlConnect.pingServer();
 		if (lastServerStatus == null || lastServerStatus.ok != serverState.ok) {
 			lastServerStatus = serverState; // set before sending notification!
+			if (serverState.ok) {
+				// check the version number. 
+				String versionErr = checkServerVersion();
+				if (versionErr != null) {
+					WarnOnce.showWarning(getGuiFrame(), "Tethys Server Warning", versionErr, WarnOnce.WARNING_MESSAGE);
+				}
+			}
 			sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 		}
 //		lastServerStatus = serverState;
 		return serverState;
 	}
+
+	/**
+	 * Check server version information. 
+	 * @return
+	 */
+	private String checkServerVersion() {
+		ServerVersion version = dbxmlConnect.getServerVersion();
+		if (version == null) {
+			Float minVer = ServerVersion.MINSERVERVERSION;
+			return String.format("You appear to be running an early version of the Tethys Sever. Please ensure you upgrade to version %s or above", minVer.toString());
+		}
+		if (version.getVersionNo() < ServerVersion.MINSERVERVERSION) {
+//			Float curVer = version.getVersionNo();
+			Float minVer = ServerVersion.MINSERVERVERSION;
+			return String.format("You appear to be running Tethys Sever V%s. Please ensure you upgrade to version %s or above", version.toString(), minVer.toString());
+		}
+		return null;
+	}
+	
+//	private String getServerErrorMessage(ServerStatus serverState) {
+//		if (serverState == null) {
+//			return "No Server State information";
+//		}
+//		if (serverState.ok == false) {
+//			return "Tethys Server not connected";
+//		}
+//		
+//	}
 
 	@Override
 	public Serializable getSettingsReference() {

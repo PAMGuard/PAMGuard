@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.15a</version>
+  <version>2.02.15b</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -1092,7 +1092,7 @@
 	<dependency>
 		<groupId>tethys.org</groupId>
 		<artifactId>nilus</artifactId>
-		<version>3.1</version>
+		<version>3.2</version>
 	</dependency>
 
 		<dependency>
