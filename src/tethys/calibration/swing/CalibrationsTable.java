@@ -111,7 +111,7 @@ public class CalibrationsTable extends TethysGUIPanel {
 		JPopupMenu popMenu = new JPopupMenu();
 		JMenuItem menuItem;
 		if (n == 1) {
-			menuItem = new JMenuItem("Show document " + doc.getDocumentName());
+			menuItem = new JMenuItem("Display document " + doc.getDocumentName());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {

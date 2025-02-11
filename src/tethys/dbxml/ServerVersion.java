@@ -33,7 +33,12 @@ public class ServerVersion {
 	@Override
 	public String toString() {
 		Float f = versionNo;
-		return String.format("%s %s", f.toString(), versionName);
+		if (versionName == null) { // not always set, so don't want to write it. 
+			return f.toString();
+		}
+		else {
+			return String.format("%s %s", f.toString(), versionName);
+		}
 	}
 
 

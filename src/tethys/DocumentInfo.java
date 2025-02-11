@@ -1,5 +1,7 @@
 package tethys;
 
+import PamUtils.PamUtils;
+
 /**
  * Basic information about a document that can be used to 
  * make document lists. 
@@ -19,8 +21,8 @@ public class DocumentInfo implements Comparable<DocumentInfo> {
 	 */
 	public DocumentInfo(Collection collection, String documentName, String documentId) {
 		this.collection = collection;
-		this.documentName = documentName;
-		this.documentId = documentId;
+		this.documentName = PamUtils.trimString(documentName);
+		this.documentId = PamUtils.trimString(documentId);
 	}
 	@Override
 	public int compareTo(DocumentInfo o) {

@@ -438,23 +438,34 @@ name="_2.02.15_December_2014"></a><a name="_Version_2.02.16_February"></a>Versio
 
 <h2>New Features</h2>
 
-<p class=MsoNormal>Updates to Tethys to make export of data (Calibrations,
-Deployments, Detections, and Localisations) available as ‘offline tasks’. This
-is not useful when running Tethys on a single dataset, since all tasks can be
-easily performed using ‘Export’ buttons on the main Tethys interface. However,
-this change means that these export tasks become available to the batch
-processor (Version ?? or above) which can be used to export data from multiple
-similar datasets without having to personally go into each one individually. See
-Tethys online help pages and help pages for the Batch processor for details.</p>
+<p class=MsoNormal><b>Updates to Tethys</b></p>
 
-<p class=MsoNormal>Similar addition of offline click event data integrity
-checking, so that this can be run prior to exporting data to Tethys. </p>
+<p class=MsoNormal>Updates to compatibility with Tethys Server 3.2 and Nilus
+3.2. No longer compatible with 3.1, the pre-release version. </p>
+
+<p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections,
+and Localisations) available as ‘offline tasks’. This is not useful when
+running Tethys on a single dataset, since all tasks can be easily performed
+using ‘Export’ buttons on the main Tethys interface. However, this change means
+that these export tasks become available to the batch processor (Version 2.0 or
+above) which can be used to export data from multiple similar datasets without
+having to personally go into each one individually. See Tethys online help
+pages and help pages for the Batch processor for details.</p>
+
+<p class=MsoNormal><b>Other</b></p>
+
+<p class=MsoNormal>Made click detector offline click event data integrity
+checking available as offline task, so that this can be run prior to exporting
+data to Tethys. </p>
+
+<p class=MsoNormal>Multiple management changes to support batch processing of
+offline tasks. Compatible with batch processor 2.0. </p>
 
 <h2>Bug Fixes</h2>
 
 <p class=MsoNormal>Issue 190. Array Files exported from array manager were not
-automatically getting the correct file end, making the exported files impossible
-to use. This is fixed and files will get the correct .paf end.</p>
+automatically getting the correct file end, making the exported files
+impossible to use. This is fixed and files will get the correct .paf end.</p>
 
 <p class=MsoNormal>Issue 167. File counter not resetting when restarting
 PAMGuard if it was paused during processing of folders of offline files. This
@@ -468,6 +479,9 @@ time, meaning you got an invalid file path. This has been fixed. </p>
 <p class=MsoNormal>At startup FFT Module checks channel list against incoming
 channel list from acquisition module and automatically removes channels that
 were selected in the FFT module, but are not available from the acquisition. </p>
+
+<p class=MsoNormal>Dealt with issue in Tethys module looking up IT IS species
+codes where the progress dialog would not close. </p>
 
 <p class=MsoNormal>Project Information abstract field was not saving /
 reloading correctly in the configuration file. Fixed.</p>
@@ -575,9 +589,9 @@ Visualiser, Audacity etc.)</p>
 <h2>Tethys Database</h2>
 
 <p class=MsoNormal>Many users will be aware that we're integrating an interface
-to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard. Some
-basic features are available for testing. If interested, please contact the
-PAMGuard support team. </p>
+to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard.
+Some basic features are available for testing. If interested, please contact
+the PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
@@ -871,8 +885,8 @@ audio files. </span></p>
 binary files even if DWV file doesn‚'t exist (which is correct behavior in
 quiet conditions when no clicks were detected). </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Spectrogram. Changes to stop occasional crashing
-when restarting processing of wav files. </span></p>
+<p class=MsoNormal><span lang=EN-US>Spectrogram. Changes to stop occasional
+crashing when restarting processing of wav files. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Sizing of dialogs on ultra high definition
 monitors so that data fields are sized correctly. </span></p>
@@ -1128,11 +1142,11 @@ understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
 Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
-<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13 (release
-13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should be
-compatible with this version, and vice-versa. PSF files generated in core
-releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
-files when PAMGuard exits.</p>
+<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
+should be compatible with this version, and vice-versa. PSF files generated in
+core releases (1.15.xx) can be loaded in this version, but will be converted to
+PSFX files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1235,11 +1249,11 @@ understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
 Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
-<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13 (release
-13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should be
-compatible with this version, and vice-versa. PSF files generated in core
-releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
-files when PAMGuard exits.</p>
+<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
+should be compatible with this version, and vice-versa. PSF files generated in
+core releases (1.15.xx) can be loaded in this version, but will be converted to
+PSFX files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1408,9 +1422,9 @@ correctly on each call rather then recycling old data. Makes the output more
 spectrally flat. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>14. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Changes to FX Display to make it more intuitive - menu options, button
-placement, etc.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Changes to FX Display to make it more intuitive - menu
+options, button placement, etc.</p>
 
 <!-- ************************************************************************************************************************** --><!-- ************************************************************************************************************************** -->
 
@@ -1507,8 +1521,9 @@ lang=EN-US> </span>Bug 448. Detection Group Localiser data units not being
 loaded in Viewer mode.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>17. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 449. Rocca Encounter Stats output file calculating incorrect values.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 449. Rocca Encounter Stats output file calculating
+incorrect values.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>18. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1611,8 +1626,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 Bug 428. Decimator crashing in viewer mode</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 429. Click Bearings at 180 degrees</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 429. Click Bearings at 180 degrees</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1902,9 +1917,9 @@ lang=EN-US> </span>Added decimal degrees option to latitude/longitude dialog.</p
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added option in the Click Delay parameters to restrict the
-number of initial samples used in the calculation. This can be useful for
-cleaning up delays in the presence of echoes and small time delays.</p>
+lang=EN-US> </span>Added option in the Click Delay parameters to restrict the number
+of initial samples used in the calculation. This can be useful for cleaning up
+delays in the presence of echoes and small time delays.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2017,10 +2032,10 @@ lang=EN-US> </span>Added ability to read differential GPS data.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added check for duplicate settings in the psf file when
-exiting PAMGuard. If duplicate settings are found, user is given the option to
-leave them in the psf or get rid of them. Duplicate settings are ignored by
-PAMGuard, but can cause the psf file to grow large over time.</p>
+lang=EN-US> </span>Added check for duplicate settings in the psf file when exiting
+PAMGuard. If duplicate settings are found, user is given the option to leave
+them in the psf or get rid of them. Duplicate settings are ignored by PAMGuard,
+but can cause the psf file to grow large over time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2434,8 +2449,8 @@ to colour them by the colour assigned to the group. </span></p>
 
 <h3><span lang=EN-US>Using Old PAMGuard Configurations</span></h3>
 
-<p class=MsoNormal><span lang=EN-US>Old PAMGuard configurations will work with
-the new version. However please note the following:</span></p>
+<p class=MsoNormal><span lang=EN-US>Old PAMGuard configurations will work with the
+new version. However please note the following:</span></p>
 
 <p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-36.0pt'><span
 lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2600,8 +2615,8 @@ dependencies)</span></p>
 <p class=MsoNormal><b><span lang=EN-US>Other Changes</span></b></p>
 
 <p class=MsoNormal><span lang=EN-US>The installer has been updated to handle
-both 64 bit and 32 bit installations. PAMGuard psf files are now registered in
-the Windows Registry, so double-clicking on a psf file should run PAMGuard in
+both 64 bit and 32 bit installations. PAMGuard psf files are now registered in the
+Windows Registry, so double-clicking on a psf file should run PAMGuard in
 normal mode (as opposed to Viewer or Mixed modes). Note that the Windows
 Registry can only hold a single executable reference for psf files; therefore,
 for users with multiple installations of PAMGuard, double-clicking on a psf
@@ -2886,10 +2901,10 @@ GUI instead. This has been Fixed.</p>
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>8.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Bug 280. Recorder control option to automatically restart recording were
-causing confusion. It was working in that the recorder would return to its previous
-state, but it was sometimes difficult for users to set it so that recording
-would always start as soon as PAMGuard started. More sensible and easy to
-understand options have been developed in a new options dialog.</p>
+causing confusion. It was working in that the recorder would return to its
+previous state, but it was sometimes difficult for users to set it so that
+recording would always start as soon as PAMGuard started. More sensible and
+easy to understand options have been developed in a new options dialog.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>9.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3060,9 +3075,9 @@ the PAMGuard help file for further details. </p>
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><span lang=EN-US>Feature Request 45.</span><span lang=EN-US
 style='font-size:7.0pt;font-family:"Times New Roman",serif'> </span><span
-lang=EN-US>Module settings import. Functions have been provided which enable users
-to import the settings for individual modules into new configurations. See the
-help file for details.</span></p>
+lang=EN-US>Module settings import. Functions have been provided which enable
+users to import the settings for individual modules into new configurations.
+See the help file for details.</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3679,9 +3694,9 @@ databases.</p>
 <p class=MsoNormal style='margin-left:36.0pt'>National Instruments cards: Added
 code in support of the new x-series devices. </p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>ASIO sound cards: Added support
-for a new open source ASIO driver system (jasiohost). The old system has been
-left in place for now while we assess users response to the newer system. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>ASIO sound cards: Added support for
+a new open source ASIO driver system (jasiohost). The old system has been left
+in place for now while we assess users response to the newer system. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>AIS</i></p>
 
@@ -3756,9 +3771,9 @@ have implemented database storage for output of these modules. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Radar Display: A bug which stopped the radar display from correctly
-displaying bearings to whistles from arrays containing more than two hydrophone
-elements has been fixed. </p>
+</span>Radar Display: A bug which stopped the radar display from correctly displaying
+bearings to whistles from arrays containing more than two hydrophone elements
+has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4101,9 +4116,9 @@ example channel 0 and 1 on two different devices, so to uniquely identify
 channels in the rest of PAMGuard, the only rational thing to do was to re-label
 those channels 0,1,2,3. </p>
 
-<p class=MsoNormal>There have been other annoyances with the ASIO channel numbering
-scheme. For instance, if you had a configuration which worked in real time
-using channels 7 and 8 of a sound card, you could not use that same
+<p class=MsoNormal>There have been other annoyances with the ASIO channel
+numbering scheme. For instance, if you had a configuration which worked in real
+time using channels 7 and 8 of a sound card, you could not use that same
 configuration to analyse wav files, which would always read their data as
 channels 0 and 1. Similarly if you switched sound cards, you may have to
 reconfigure every detector and several of the displays to handle the changes in
@@ -4468,11 +4483,11 @@ now been fixed. </p>
 
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
-<p class=MsoNormal>Decimator was calculating incorrect filter coefficients
-(coefficients were based on the output sample rate, not the input sample rate,
-so it's likely that actual filtering of data was minimal). This is now
-rectified. Ishmael matched filter. Would crash if template file not correctly
-loaded. Now issues a warning message to the terminal and does not crash. </p>
+<p class=MsoNormal>Decimator was calculating incorrect filter coefficients (coefficients
+were based on the output sample rate, not the input sample rate, so it's likely
+that actual filtering of data was minimal). This is now rectified. Ishmael
+matched filter. Would crash if template file not correctly loaded. Now issues a
+warning message to the terminal and does not crash. </p>
 
 <p class=MsoNormal>Spelling correction on user input form (Sumbit - Submit)</p>
 
@@ -4601,11 +4616,11 @@ Utilities. This will not affect how existing settings files are loaded. </p>
 
 <p class=MsoNormal><b>Multi-screen environments.</b></p>
 
-<p class=MsoNormal>In previous versions, if PAMGuard was configured in a multiscreen
-environment and is then run on a single screen, it was possible that the
-display would not appear. PAMGuard now checks screen dimensions at start up and
-ensures that the main display is visible. Consequently, program start-up takes
-slightly longer than previously. </p>
+<p class=MsoNormal>In previous versions, if PAMGuard was configured in a
+multiscreen environment and is then run on a single screen, it was possible
+that the display would not appear. PAMGuard now checks screen dimensions at
+start up and ensures that the main display is visible. Consequently, program
+start-up takes slightly longer than previously. </p>
 
 <p class=MsoNormal><b>Outstanding bugs</b></p>
 
@@ -4698,9 +4713,9 @@ a serial port </p>
 
 <p class=MsoNormal>New Likelihood detector. </p>
 
-<p class=MsoNormal>The likelihood detector module is an implementation of a
-likelihood ratio test with flexible algorithms and configuration to estimate
-likelihood. It is </p>
+<p class=MsoNormal>The likelihood detector module is an implementation of a likelihood
+ratio test with flexible algorithms and configuration to estimate likelihood.
+It is </p>
 
 <p class=MsoNormal>suitable for detecting both short duration Odontocete clicks
 (Sperm, Beaked, etc.) as well as moderate duration Mysticete calls (Humpback,
@@ -4825,8 +4840,8 @@ drawn in red on the marked panel and in green on other panels. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Spectrogram. Frequency information displayed in a 'hover' box when the mouse
-is moved over the display. Choice of colour maps for display. </p>
+</span>Spectrogram. Frequency information displayed in a 'hover' box when the
+mouse is moved over the display. Choice of colour maps for display. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -5026,8 +5041,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoNormal>&nbsp;</p>
 
 <p class=MsoNormal><a name="_Toc312065304"></a><a name="_Toc312063949"></a><span
-class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 -
-PAMGuard starts two releases, core and beta release</span></span>, </p>
+class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 - PAMGuard
+starts two releases, core and beta release</span></span>, </p>
 
 <p class=MsoNormal>this is the beta release</p>
 

@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,6 +20,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import PamController.settings.output.xml.PamguardXMLWriter;
+import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import dbxml.JerseyClient;
 import dbxml.Queries;
@@ -147,6 +149,7 @@ public class DBXMLQueries {
 
 		}
 		catch (Exception e) {
+			System.out.println(e.getMessage());
 			throw new TethysQueryException("Error running JSON query", jsonQueryString);
 
 		}
@@ -180,6 +183,7 @@ public class DBXMLQueries {
 	 * @return list of all documents in a collection, or null if no collection. 
 	 */
 	public ArrayList<DocumentInfo> getCollectionDocumentList(Collection collection) {
+
 		if (collection == null) {
 			return null;
 		}
@@ -229,25 +233,81 @@ public class DBXMLQueries {
 		int n = returns.getLength();
 		String toStrip = "dbxml:///"+collection.collectionName()+"/";
 		for (int i = 0; i < n; i++) {
+//			if (i == 24) {
+//				int b = 4-6;
+//			}
 			Node aNode = returns.item(i);
 			String nameStr = null;
 			String id = null;
 			NodeList kids = aNode.getChildNodes();
-			for (int k = 0; k < kids.getLength(); k++) {
+			int nKids = kids.getLength();
+//			System.out.printf("Node %d is type %d\n", i, aNode.getNodeType());
+//			String nodeName = aNode.getNodeName();
+//			nameStr = aNode.getTextContent();
+//			nameStr = nameStr.replaceFirst(toStrip, "");
+//			if (nameStr.length() > 60 && collection == Collection.Calibrations) {
+//				System.out.println("Long name: " + nameStr);
+//			}
+//			id = aNode.get
+			if (aNode instanceof Element) {
+				Element el = (Element) aNode;
+//				nameStr = el.getLocalName();
+//				nameStr = el.getNodeName(); // gets doc
+//				nameStr = el.getNodeValue(); // gets null
+//				nameStr = el.getTagName(); // gets doc
+//				nameStr = el.getTextContent(); // gets concatenation of everything
+//				nameStr = el.get
+				NodeList ids = el.getElementsByTagName("Id");
+				if (ids.getLength() > 0) {
+					Node idEl = ids.item(0);
+					id = idEl.getTextContent();
+				}
+				
+			}
+			/**
+			 * For some reason, this is now getting four kid nodes when 
+			 * really there should only be two and as a result it's getting 
+			 * the #text one twice, the second of which was empty, so 
+			 * was overwriting the correct data
+			 */
+			for (int k = 0; k < nKids; k++) {
 				Node kidNode = kids.item(k);
+//				kidNode.get
 				String name = kidNode.getNodeName();
 				String cont = kidNode.getTextContent();
+				cont = PamUtils.trimString(cont);
+				if (cont == null || cont.length() == 0) {
+					continue;
+				}
 				switch(name) {
 				case "#text":
-					nameStr = cont;
-					  nameStr = nameStr.replaceFirst(toStrip, "");
+					if (nameStr == null) {
+						nameStr = cont;
+					}
 					break;
 				case "Id":
-					id = kidNode.getTextContent();
+					if (id == null) {
+						id = cont;
+					}
 					break;
 				default:
 					System.out.printf("Uknonwn node in Collection list %s item %d, Node %d name %s content %s\n", 
 							collection, i, k, name, cont);
+				}
+			}
+			nameStr = nameStr.replaceFirst(toStrip, "");
+			id = PamUtils.trimString(id);
+			/**
+			 * Put in a bit fat bodge to see if the xml has concattenated 
+			 * the name and id values into a stupid long name ...
+			 * 
+			 */
+			nameStr = PamUtils.trimString(nameStr);
+			id = PamUtils.trimString(id);
+			if (nameStr.endsWith(id)) {
+				if (nameStr.length() - id.length() > id.length()-5) {
+					// seems to genuinely be that problem of concatenations
+					nameStr = nameStr.substring(0, nameStr.length()-id.length());
 				}
 			}
 //			if (i > 428) {
@@ -1077,6 +1137,13 @@ public class DBXMLQueries {
 
 	public Document convertStringToXMLDocument(String xmlString) {
 		//Parser that produces DOM object trees from XML content
+		if (xmlString == null) {
+			return null;
+		}
+		xmlString = xmlString.trim();
+		if (xmlString.length() == 0) {
+			return null;
+		}
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
 		//API to obtain DOM Document instance
@@ -1093,6 +1160,7 @@ public class DBXMLQueries {
 		}
 		return null;
 	}
+	
 
 	/**
 	 * Get the basic information about a Detections document. This is basically everything apart from
@@ -1103,6 +1171,12 @@ public class DBXMLQueries {
 	public Detections getDetectionsDocInfo(String detectionsDocName) {
 //		String oldqueryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		// updated May 23
+		// seems like this docName now may have a \n at the start, so it needs correclty trimming:
+//		detectionsDocName = detectionsDocName.replace((char) 10, ' ');
+//		detectionsDocName = detectionsDocName.trim();
+		detectionsDocName = PamUtils.trimString(detectionsDocName);
+		
+		
 		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\",\"Detections/QualityAssurance\",\"Detections/UserId\",\"Detections/MetadataInfo\",\"Detections/Effort\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query = queryBase.replace("DetectionsDocName", detectionsDocName);
 		DBQueryResult queryResult;
