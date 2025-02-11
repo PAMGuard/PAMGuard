@@ -241,22 +241,9 @@ public class DBXMLQueries {
 			String id = null;
 			NodeList kids = aNode.getChildNodes();
 			int nKids = kids.getLength();
-//			System.out.printf("Node %d is type %d\n", i, aNode.getNodeType());
-//			String nodeName = aNode.getNodeName();
-//			nameStr = aNode.getTextContent();
-//			nameStr = nameStr.replaceFirst(toStrip, "");
-//			if (nameStr.length() > 60 && collection == Collection.Calibrations) {
-//				System.out.println("Long name: " + nameStr);
-//			}
-//			id = aNode.get
 			if (aNode instanceof Element) {
 				Element el = (Element) aNode;
-//				nameStr = el.getLocalName();
-//				nameStr = el.getNodeName(); // gets doc
-//				nameStr = el.getNodeValue(); // gets null
-//				nameStr = el.getTagName(); // gets doc
-//				nameStr = el.getTextContent(); // gets concatenation of everything
-//				nameStr = el.get
+
 				NodeList ids = el.getElementsByTagName("Id");
 				if (ids.getLength() > 0) {
 					Node idEl = ids.item(0);
@@ -265,7 +252,7 @@ public class DBXMLQueries {
 				
 			}
 			/**
-			 * For some reason, this is now getting four kid nodes when 
+			 * For some reason, this is now getting 3 or 4  kid nodes when 
 			 * really there should only be two and as a result it's getting 
 			 * the #text one twice, the second of which was empty, so 
 			 * was overwriting the correct data
@@ -291,12 +278,11 @@ public class DBXMLQueries {
 					}
 					break;
 				default:
-					System.out.printf("Uknonwn node in Collection list %s item %d, Node %d name %s content %s\n", 
-							collection, i, k, name, cont);
+//					System.out.printf("Uknonwn node in Collection list %s item %d, Node %d name %s content %s\n", 
+//							collection, i, k, name, cont);
 				}
 			}
 			nameStr = nameStr.replaceFirst(toStrip, "");
-			id = PamUtils.trimString(id);
 			/**
 			 * Put in a bit fat bodge to see if the xml has concattenated 
 			 * the name and id values into a stupid long name ...
@@ -617,7 +603,18 @@ public class DBXMLQueries {
 		//		}
 		for (int i = 0; i < returns.getLength(); i++) {
 			Node aNode = returns.item(i);
-			String docName = aNode.getTextContent();
+			String docName = null;
+			if (aNode instanceof Element) {
+				Element el = (Element) aNode;
+				NodeList ids = el.getElementsByTagName("Id");
+				if (ids.getLength() > 0) {
+					Node idNode = ids.item(0);
+					docName = idNode.getTextContent();
+				}
+			}
+			if (docName == null) {
+				docName = PamUtils.trimString(aNode.getTextContent());
+			}
 			detectionsNames.add(docName);
 		}
 		return detectionsNames;
@@ -674,7 +671,7 @@ public class DBXMLQueries {
 		//		}
 		for (int i = 0; i < returns.getLength(); i++) {
 			Node aNode = returns.item(i);
-			String docName = aNode.getTextContent();
+			String docName = PamUtils.trimString(aNode.getTextContent());
 			detectionsNames.add(docName);
 		}
 		return detectionsNames;
