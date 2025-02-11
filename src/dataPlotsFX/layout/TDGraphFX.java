@@ -55,13 +55,16 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
@@ -69,6 +72,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import pamScrollSystem.coupling.ScrollerCoupling;
@@ -156,12 +160,11 @@ public class TDGraphFX extends PamBorderPane {
 	 * Class which holds information on settings for this particular graph.
 	 */
 	private TDGraphParametersFX graphParameters;
-
+	
 	/**
-	 * The hiding tab pane which contains settings panes for data blocks associated
-	 * with the graph.
+	 * Pane with controls to change TDGraphParameter general settings.
 	 */
-	private TDHidingTabPane settingsTabs;
+	private TDGraphSettingsPane tdSettingsPane;
 
 	/**
 	 * Pane which allows users to select which type of data to display on the axis
@@ -219,10 +222,18 @@ public class TDGraphFX extends PamBorderPane {
 	 */
 	private double[] lastLimitsZoom = null;
 
+
 	/**
-	 * Pane with controls to change TDGraphParameter general settings.
+	 * A scroll pane which holds the settings tabs
 	 */
-	private TDGraphSettingsPane tdSettingsPane;
+	private PamScrollPane dataSettingsScrollPane;
+	
+	/**
+	 * The hiding tab pane which contains settings panes for data blocks associated
+	 * with the graph.
+	 */
+	private TDHidingTabPane dataSettingsTabs;
+
 
 	/**
 	 * Create the graph.
@@ -289,7 +300,7 @@ public class TDGraphFX extends PamBorderPane {
 		 * pane contains a tabbed pane which holds settings panes for subscribed data
 		 * block to the graph.
 		 */
-		settingsTabs = new TDHidingTabPane(this);
+		dataSettingsTabs = new TDHidingTabPane(this);
 		// settingsTabs.setMinHeight(1000);
 		// settingsTabs.heightProperty().addListener((a,b,c)->{
 		// System.out.println("Height: " + settingsTabs.getHeight() + " " +
@@ -297,17 +308,17 @@ public class TDGraphFX extends PamBorderPane {
 		// });
 
 		// put inside a scroll pane so tht on low dpi displays can still access controls
-		PamScrollPane scrollPane2 = new PamScrollPane(settingsTabs);
+		dataSettingsScrollPane = new PamScrollPane(dataSettingsTabs);
 		// scrollPane2.setFitToWidth(true);
-		scrollPane2.setFitToHeight(true);
-		scrollPane2.setHbarPolicy(ScrollBarPolicy.NEVER);
-		scrollPane2.getStyleClass().clear();
+		dataSettingsScrollPane.setFitToHeight(true);
+		dataSettingsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+		dataSettingsScrollPane.getStyleClass().clear();
 
 		/**
 		 * Create a stack pane to hold everything- means we can add overlay controls and
 		 * buttons Note: icons are set later in setOverlayColour(LIGHT_TD_DISPLAY);
 		 */
-		stackPane = new PamHiddenSidePane(null, null, scrollPane, scrollPane2);
+		stackPane = new PamHiddenSidePane(null, null, scrollPane, dataSettingsScrollPane);
 
 		// stackPane.setMinHidePaneHeight(300);
 		stackPane.getChildren().add(plotPanels);
@@ -336,8 +347,8 @@ public class TDGraphFX extends PamBorderPane {
 		 * the hiding-tab-pane we must set the end spacing so the hiding pane does not
 		 * distort when resizing.
 		 */
-		settingsTabs.startSpacingProperty().bind(getSettingsPane().getHideButton().widthProperty());
-		settingsTabs.setHolderPane(getSettingsPane());
+		dataSettingsTabs.startSpacingProperty().bind(getSettingsPane().getHideButton().widthProperty());
+		dataSettingsTabs.setHolderPane(getSettingsPane());
 
 		// add settings panes if any.
 		layoutSettingsPanes();
@@ -562,14 +573,52 @@ public class TDGraphFX extends PamBorderPane {
 	/**
 	 * Sort out the settings pane. The settingsPane contains tabs of the different
 	 * the different settings panes for data blocks associated with this tdGraphFX.
+	 * 
+	 * If there are no settings pane then the settings tab pane shows nothing. If there is one settings panes 
+	 * then that is used to fill the whole hiding pane. if there is more than one pane then these are added to a tab pane. 
 	 */
 	private void layoutSettingsPanes() {
+		
+		
 		// first remove all tabs
-		settingsTabs.getTabs().removeAll(settingsTabs.getTabs());
+		dataSettingsTabs.getTabs().removeAll(dataSettingsTabs.getTabs());
+
+
+		//work out how many settings panes there are. 
+		int n=0;
+		TDSettingsPane settingsPane = null;
 		for (TDDataInfoFX dataInfo : dataList) {
-			if (dataInfo.getGraphSettingsPane() == null)
-				continue;
-			settingsTabs.addSettingsPane(dataInfo.getGraphSettingsPane());
+			if (dataInfo.getGraphSettingsPane() != null) {
+				settingsPane = dataInfo.getGraphSettingsPane();
+				n++; 
+			}
+		}
+		
+		if (n==0) {
+			dataSettingsScrollPane.setContent(null);
+			return; //nothing to do. 
+		}
+		
+		if (n>1) {
+			//if there are more than two data tabs then we use tabs to layout the data panes
+			for (TDDataInfoFX dataInfo : dataList) {
+				if (dataInfo.getGraphSettingsPane() == null)
+					continue;
+				dataSettingsTabs.addSettingsPane(dataInfo.getGraphSettingsPane());
+			}
+			dataSettingsScrollPane.setContent(dataSettingsTabs);
+		}
+		else {
+			PamBorderPane settingsHolder = new PamBorderPane(); 
+			Label label = new Label(settingsPane.getShowingName()); 
+			label.setTextAlignment(TextAlignment.CENTER);
+			PamBorderPane.setAlignment(label, Pos.CENTER);
+			
+			settingsHolder.setTop(label);
+			settingsHolder.setCenter(settingsPane.getPane());
+			settingsHolder.setPadding(new Insets(0,0,0,30));
+			
+			dataSettingsScrollPane.setContent(settingsHolder);
 		}
 	}
 
@@ -1871,8 +1920,8 @@ public class TDGraphFX extends PamBorderPane {
 		// open the hide pane.
 		this.getSettingsPane().showHidePane(show);
 		// expand all the hide tabs.
-		for (int i = 0; i < this.settingsTabs.getTabs().size(); i++) {
-			this.settingsTabs.getTabs().get(i).showTab(show);
+		for (int i = 0; i < this.dataSettingsTabs.getTabs().size(); i++) {
+			this.dataSettingsTabs.getTabs().get(i).showTab(show);
 		}
 	}
 
