@@ -128,6 +128,10 @@ public class BinaryStorageDialogPanel {
 			return false;
 		}
 		binaryStoreSettings.setStoreLocation(storageLocation.getFolderName(true));
+		if (binaryStoreSettings.getStoreLocation()==null) {
+			//cancel button pressed - return to dialog
+			return false;
+		}
 		binaryStoreSettings.autoNewFiles = autoNewFiles.isSelected();
 		binaryStoreSettings.datedSubFolders = dateSubFolders.isSelected();
 		binaryStoreSettings.limitFileSize = limitfileSize.isSelected();

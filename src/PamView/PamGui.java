@@ -172,7 +172,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-		String iconLoc = PamIcon.getPAMGuardIconPath(PamIcon.OLD);
+//<<<<<<< HEAD
+//		String iconLoc = PamIcon.getPAMGuardIconPath(PamIcon.OLD);
+//=======
+		String iconLoc = PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
+//>>>>>>> b88dbada951a64364503ec687b4babdc4df07183
 //		switch (PamController.getInstance().getRunMode()){
 //		case(PamController.RUN_NETWORKRECEIVER):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
 //		case(PamController.RUN_PAMVIEW):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;

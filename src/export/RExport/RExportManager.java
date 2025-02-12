@@ -94,6 +94,8 @@ public class RExportManager implements PamDataUnitExporter {
 	private void writeRFile() {
 		Context context = Context.newTopLevelContext();
 		try {
+			
+			if (allData!=null) {
 
 			FileOutputStream fos = new FileOutputStream(currentFileName);
 			GZIPOutputStream zos = new GZIPOutputStream(fos);
@@ -103,6 +105,8 @@ public class RExportManager implements PamDataUnitExporter {
 			writer.save(allData.build());
 			writer.close();
 			zos.close();
+			allData=null; //prevents writing the file again and again if offline end export is called. 
+			}
 		}
 		catch (IOException e1) {
 			e1.printStackTrace();
@@ -190,6 +194,8 @@ public class RExportManager implements PamDataUnitExporter {
 				//check whether the same. 
 				if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
 					dataList=rDataExport.get(i).detectionToStruct(dataUnits.get(j), n); 
+					
+					//System.out.println("Export data unit:  " + rDataExport.get(i).getName());
 					//dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
 					// format used in PAMBinaries
 					dataListArray.add(String.valueOf(dataUnits.get(j).getUID()), dataList);	

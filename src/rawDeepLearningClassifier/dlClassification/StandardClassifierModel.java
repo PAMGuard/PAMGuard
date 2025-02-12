@@ -60,6 +60,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * Sound spot warning. 
 	 */
 	PamWarning dlClassifierWarning = new PamWarning(getName(), "",2);
+
+	private DLStatus status = DLStatus.NO_MODEL_LOADED;
 	
 	
 	@Override
@@ -115,6 +117,9 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 //		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!: " +  getDLParams().modelPath);
 //		StandardModelParams oldParams = getDLParams().clone();
 		
+		//just incase group detections has been enabled
+		getDLControl().setGroupDetections(false);
+		
 		getDLWorker().prepModel(getDLParams(), dlControl);
 
 
@@ -168,37 +173,56 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	@Override
 	public DLStatus getModelStatus() {
-		if (getDLWorker().isModelNull()) {
-			return DLStatus.MODEL_LOAD_FAILED;
-		}
-		
-		File file = new File(getDLParams().modelPath);
-		if (getDLParams().modelPath == null || !file.isFile()) {
-			return DLStatus.NO_MODEL_LOADED;
-		}
-		
-		// if continuous data is selected and all classes are false then this is a
-		// potential mistake...
-		if (dlControl.getSettingsPane().getSelectedParentDataBlock().getUnitClass() == RawDataUnit.class
-				&& (getDLParams().binaryClassification==null || PamArrayUtils.isAllFalse(getDLParams().binaryClassification))){
-			return DLStatus.NO_BINARY_CLASSIFICATION;
-//			warnings.add(new PamWarning("Generic classifier",
-//					"There are no prediction classes selected for classification. "
-//							+ "Predicitons for each segment will be saved but there will be no detections generated",
-//					1));
-		}
-		return DLStatus.MODEL_LOAD_SUCCESS;
+		return status;
 	}
 	
 	@Override
 	public DLStatus setModel(URI uri) {
 		//will change the params if we do not clone. 
 		StandardModelParams.setModel(uri, this.getDLParams()); 
-		this.getDLWorker().prepModel(getDLParams(), dlControl);
-		return getModelStatus();
+		status = this.getDLWorker().prepModel(getDLParams(), dlControl);
+		
+//		System.out.println("----MODEL STATUS: " + status); 
+		
+		status  = checkDLStatus(status);
+		
+		return status; 
 	}
 	
+	/**
+	 * The model status is returned by the prep model function but there may be other issues which override the returned status. 
+	 * This function chekcs those issues and returns a different status if necessary.
+	 * @param status2 - the current model status. 
+	 * @return the current model status. 
+	 */
+	private DLStatus checkDLStatus(DLStatus status2) {
 	
+		
+		if (getDLWorker().isModelNull() && !status2.isError()) {
+			return DLStatus.MODEL_LOAD_FAIL;
+		}
+
+		File file = new File(getDLParams().modelPath);
+		if (getDLParams().modelPath == null || !file.isFile()) {
+			return DLStatus.NO_MODEL_LOADED;
+		}
+
+		// if continuous data is selected and all classes are false then this is a
+		// potential mistake...
+		if (dlControl.getSegmenter().getParentDataBlock()!=null) {
+			if (dlControl.getSegmenter().getParentDataBlock().getUnitClass() == RawDataUnit.class
+					&& (getDLParams().binaryClassification==null || PamArrayUtils.isAllFalse(getDLParams().binaryClassification))){
+				return DLStatus.NO_BINARY_CLASSIFICATION;
+				//			warnings.add(new PamWarning("Generic classifier",
+				//					"There are no prediction classes selected for classification. "
+				//							+ "Predicitons for each segment will be saved but there will be no detections generated",
+				//					1));
+			}
+		}
+		return status2;
+	}
+
+
 
 	/**
 	 * The task thread. 
@@ -365,6 +389,13 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		return warnings;
 
 	}
+	
+	@Override
+	public ArrayList<Class> getAllowedDataTypes(){
+		//null means default data types which is anything with raw data. 
+		return null;
+	}
+
 
 
 

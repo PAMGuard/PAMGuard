@@ -14,7 +14,6 @@
 	</organization>
 
 
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javafx.version>21</javafx.version>
@@ -54,7 +53,7 @@
 	<profiles>
 	
 		<!-- The MacOS profile creates a DMG package for installing PAMGuard on MacOS-->
-		<!--Note: Ther eis a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
+		<!--Note: There is a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
 		In PAMGuard it essential that the shade plugin is called before the macos plugin and so the phase of the 
 		macos bundling has been moved to deploy. To run the bundler we therefore need to put both the macossappbunlder 
 		and exec shell script into the deploy phase so they are never really called. We then explicatelyl call them after 
@@ -102,11 +101,11 @@
 							</dmg>
 							<!--Very important or deep learning does not work-->
 							 <app>
-					            <includeDependencies>false</includeDependencies>
+					            <includeDependencies>true</includeDependencies>
 					        </app>
 					        <jdk>
 								<include>true</include>
-								<!--<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>-->
+								<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
 							</jdk>
 							<codesign>
 								<enable>false</enable>
@@ -314,57 +313,6 @@
 						</executions>
 					</plugin>
 
-
-					<!--  Plugin which creates a .dmg file for MacOS. -->
-					<plugin>
-						<groupId>de.perdian.maven.plugins</groupId>
-						<artifactId>macosappbundler-maven-plugin</artifactId>
-						<version>1.21.1</version>
-						<configuration>
-							<plist>
-								<JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
-								<CFBundleIconFile>
-									src/Resources/PamguardIcon2.icns</CFBundleIconFile>
-								<CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
-								<CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-								<CFBundleURLTypes>
-									<string>msa</string>
-								</CFBundleURLTypes>
-								<JVMVersion>21+</JVMVersion>
-								<JVMArguments>
-									<string>-c</string>
-								</JVMArguments>
-								<NSAppSleepDisabled>true</NSAppSleepDisabled>
-							</plist>
-							<dmg>
-								<generate>true</generate>
-								<additionalResources>
-									<additionalResource>
-										<directory>
-											${project.basedir}/target/bundle/</directory>
-									</additionalResource>
-								</additionalResources>
-								<dmgFileName>${project.build.finalName}</dmgFileName>
-								<appendVersion>false</appendVersion>
-							</dmg>
-							<jdk>
-								<include>false</include>
-								<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
-							</jdk>
-							<codesign>
-								<enable>false</enable>
-								<identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
-							</codesign>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>deploy</phase>
-								<goals>
-									<goal>bundle</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
 				</plugins>
 
 		
@@ -494,13 +442,21 @@
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
 			<version>0.0.59e</version>
+								<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
+			<!--<exclusions>
+				<exclusion>
+					<groupId>org.junit.platform</groupId>
+					<artifactId>junit-platform-surefire-provider</artifactId>
+				</exclusion>
+			</exclusions>-->
+
 		</dependency>
 
 		<!--jpam project - Deep learning java library -->
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jdl4pam</artifactId>
-			<version>0.0.99e</version>
+			<version>0.0.99f</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
@@ -810,11 +766,11 @@
 			<version>2.12.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.18</version>
+		    <groupId>com.mysql</groupId>
+		    <artifactId>mysql-connector-j</artifactId>
+		    <version>9.1.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
@@ -825,7 +781,7 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.17.0</version>
+			<version>4.29.1</version>
 		</dependency>
 
 		<!-- https://docs.unidata.ucar.edu/netcdf-java/5.2/userguide/using_netcdf_java_artifacts.html -->
@@ -833,7 +789,7 @@
 		<dependency>
 			<groupId>edu.ucar</groupId>
 			<artifactId>netcdfAll</artifactId>
-			<version>4.6.14</version>
+			<version>5.4.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.protobuf</groupId>

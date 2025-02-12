@@ -22,7 +22,9 @@ import org.json.JSONObject;
 import PamUtils.PamArrayUtils;
 import PamView.dialog.warn.WarnOnce;
 import ai.djl.MalformedModelException;
+import ai.djl.engine.EngineException;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
@@ -62,7 +64,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	 * Note it is important to put a synchonized here or the model loading can fail. 
 	 */
 	@Override
-	public synchronized void prepModel(StandardModelParams dlParams, DLControl dlControl) {
+	public synchronized DLStatus prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
 
@@ -92,8 +94,13 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
 			}
 		}
+		catch (EngineException e) {
+			e.printStackTrace();
+			return DLStatus.MODEL_ENGINE_FAIL;
+		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return DLStatus.MODEL_LOAD_FAIL;
 			//WarnOnce.showWarning(null, "Model Load Error", "There was an error loading the model file.", WarnOnce.OK_OPTION); 
 		}
 
@@ -188,8 +195,11 @@ public class ArchiveModelWorker extends GenericModelWorker {
 		catch (Exception e) {
 			dlModel=null; 
 			e.printStackTrace();
+			return DLStatus.MODEL_META_FAIL;
 			//WarnOnce.showWarning(null, "Model Metadata Error", "There was an error extracting the metadata from the model.", WarnOnce.OK_OPTION); 
 		}
+		
+		return DLStatus.MODEL_LOAD_SUCCESS;
 		//Thread.currentThread().setContextClassLoader(origCL);
 	}
 
@@ -200,7 +210,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	 * @throws MalformedModelException
 	 * @throws IOException
 	 */
-	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException {
+	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException, EngineException {
 	
 		return new SimpleArchiveModel(new File(currentPath2)); 
 	}

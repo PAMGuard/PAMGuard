@@ -96,7 +96,7 @@ public class WarnOnce implements PamSettings {
 		}
 		else if (PamGUIManager.isFX()) {
 			return singleInstance.showWarningDialogFX(null, 
-					title, message, getAlertType(messageType), helpPoint, error, okButtonText, cancelButtonText);
+					title, message, getAlertType(messageType), helpPoint, error, okButtonText, cancelButtonText, false);
 		}
 		return -1; 
 	}
@@ -273,7 +273,21 @@ public class WarnOnce implements PamSettings {
 	 * otherwise OK_OPTION will always be returned. 
 	 */
 	public static int showWarningFX(javafx.stage.Window parent, String title, String message, AlertType messageType) {
-		 return singleInstance.showWarningDialogFX(parent, title, message, messageType, null, null, null, null);
+		 return singleInstance.showWarningDialogFX(parent, title, message, messageType, null, null, null, null, false);
+	}
+
+	
+	/**
+	 * Show a warning message in JavaFX dialog. 
+	 * @param parent parent frame
+	 * @param title title of warning
+	 * @param message warning message (use html for multiline messages)
+	 * @param messageType message type OK_CANCEL_OPTION or WARNING_MESSAGE 
+	 * @return if messageType is OK_CANCEN_OPTION this will return OK_OPTION or CANECL_OPTION, 
+	 * otherwise OK_OPTION will always be returned. 
+	 */
+	public static int showWarningFX(javafx.stage.Window parent, String title, String message, AlertType messageType, boolean disableCheckBoxes) {
+		 return singleInstance.showWarningDialogFX(parent, title, message, messageType, null, null, null, null, disableCheckBoxes);
 	}
 
 	/**
@@ -289,7 +303,7 @@ public class WarnOnce implements PamSettings {
 	 * otherwise OK_OPTION will always be returned. 
 	 */
 	public static int showWarningFX(javafx.stage.Window parent, String title, String message, AlertType messageType, String helpPoint) {
-		return singleInstance.showWarningDialogFX(parent, title, message, messageType, helpPoint, null, null, null);
+		return singleInstance.showWarningDialogFX(parent, title, message, messageType, helpPoint, null, null, null, false);
 	}
 	
 	/**
@@ -304,7 +318,7 @@ public class WarnOnce implements PamSettings {
 	 */
 	public static int showWarningFX(javafx.stage.Window parent, String title, String message, AlertType messageType, String helpPoint, Throwable error) {
 		if (! PamController.checkIfNetworkControlled()) {
-			return singleInstance.showWarningDialogFX(parent, title, message, messageType, helpPoint, error, null, null);
+			return singleInstance.showWarningDialogFX(parent, title, message, messageType, helpPoint, error, null, null, false);
 		} else {
 			System.out.println(" ");
 			System.out.println("*** Warning: " + title);
@@ -327,7 +341,7 @@ public class WarnOnce implements PamSettings {
 	 * @return if messageType is OK_CANCEL_OPTION this will return OK_OPTION or CANCEL_OPTION, otherwise OK_OPTION will always be returned. 
 	 */
 	public static int showWarningFX(javafx.stage.Window parent, String title, String message, AlertType messageType, String helpPoint, Throwable error, String okButtonText, String cancelButtonText) {
-		return singleInstance.showWarningDialogFX(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText);
+		return singleInstance.showWarningDialogFX(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText, false);
 	}
 
 	/**
@@ -407,7 +421,8 @@ public class WarnOnce implements PamSettings {
 	 * @return if messageType is OK_CANCEN_OPTION this will return OK_OPTION or CANECL_OPTION, 
 	 * otherwise OK_OPTION will always be returned. 
 	 */
-	private int showWarningDialogFX(javafx.stage.Window parent, String title, String message, AlertType messageType, String helpPoint, Throwable error, String okButtonText, String cancelButtonText) {
+	private int showWarningDialogFX(javafx.stage.Window parent, String title, String message, AlertType messageType, String helpPoint, 
+			Throwable error, String okButtonText, String cancelButtonText, boolean disableCheckBoxes) {
 
 		// check if we should show the warning again this session
 		Boolean showAgain = showThisSess.get(title+message);
@@ -424,7 +439,7 @@ public class WarnOnce implements PamSettings {
 		}
 		
 		// show the warning
-		WarnOnceDialogFX wo = new WarnOnceDialogFX(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText);
+		WarnOnceDialogFX wo = new WarnOnceDialogFX(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText, disableCheckBoxes);
 		wo.showDialog();
 		warnOnceList.setShowWarning(title+message, wo.isShowAgain());
 		showThisSess.put(title+message, wo.isShowThisSess());

@@ -206,11 +206,28 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 	 * @param symbolOptions - the symbol options
 	 */
 	private void setPredictionColParams(DLSymbolModifierParams symbolOptions) {
+		
+		if (symbolOptions.clims[0]==symbolOptions.clims[1]) {
+			
+			if (symbolOptions.clims[0]>0 && symbolOptions.clims[0]<1.) {
+				symbolOptions.clims[0]=symbolOptions.clims[0]-0.1;
+				symbolOptions.clims[0]=symbolOptions.clims[0]+0.1;
+			}
+			else {
+			symbolOptions.clims[0] = 0.1;
+			symbolOptions.clims[1] = 0.9;
+			}
+		}
+		
+		//System.out.println("Set upper value: " + symbolOptions.clims[0]  + " " + symbolOptions.clims[1]); 
 
 		//now set frequency parameters 
-		colorRangeSlider.setValue((int) symbolOptions.clims[0]*100);
-		colorRangeSlider.setUpperValue((int) symbolOptions.clims[1]*100);
+		colorRangeSlider.setValue((int) (symbolOptions.clims[0]*100));
+		colorRangeSlider.setUpperValue((int) (symbolOptions.clims[1]*100));
 		//		colorRangeSlider.setColourArrayType( symbolOptions.colArray);
+		
+		//System.out.println("Set upper value: " + colorRangeSlider.getValue() + " " + colorRangeSlider.getUpperValue()); 
+
 
 		colorRangeSlider.setColourMap(PamUtilsFX.fxColArray2Swing(symbolOptions.colArray));
 

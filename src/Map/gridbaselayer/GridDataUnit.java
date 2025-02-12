@@ -3,7 +3,6 @@ package Map.gridbaselayer;
 import java.awt.image.BufferedImage;
 
 import PamguardMVC.PamDataUnit;
-import ucar.multiarray.MultiArray;
 
 @Deprecated
 public class GridDataUnit extends PamDataUnit {
@@ -11,15 +10,14 @@ public class GridDataUnit extends PamDataUnit {
 	private double[] latArray;
 	private double[] lonArray;
 	private BufferedImage image;
-	private MultiArray data;
 
-	public GridDataUnit(double[] latArray, double[] lonArray, BufferedImage image, MultiArray elevation) {
+	public GridDataUnit(double[] latArray, double[] lonArray, BufferedImage image) {
 		super(0);
 		setDurationInMilliseconds(System.currentTimeMillis());
 		this.latArray = latArray;
 		this.lonArray = lonArray;
 		this.image = image;
-		this.data = elevation;
+		//this.data = elevation;
 	}
 
 	/**
@@ -64,19 +62,19 @@ public class GridDataUnit extends PamDataUnit {
 		this.image = image;
 	}
 
-	/**
-	 * @return the data
-	 */
-	public MultiArray getData() {
-		return data;
-	}
-
-	/**
-	 * @param data the data to set
-	 */
-	public void setData(MultiArray data) {
-		this.data = data;
-	}
+//	/**
+//	 * @return the data
+//	 */
+//	public MultiArray getData() {
+//		return data;
+//	}
+//
+//	/**
+//	 * @param data the data to set
+//	 */
+//	public void setData(MultiArray data) {
+//		this.data = data;
+//	}
 
 
 }

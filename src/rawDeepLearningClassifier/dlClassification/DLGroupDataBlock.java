@@ -25,6 +25,15 @@ public class DLGroupDataBlock extends SuperDetDataBlock<DLGroupDetection, PamDat
 		return super.getHoverText(generalProjector, dataUnit, iSide);
 	}
 
+	
+	@Override
+ 	public boolean shouldNotify() {
+		/**
+		 * Segments are not saved by PAMGuard as it's a waste of storage space but this means that reprocessing data requires the
+		 * segments are remad with detections in viewer mode. There is 
+		 */
+ 		return true; 
+ 	}
 
 
 }

@@ -313,6 +313,7 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 	
 	private int checkClassNamesBox(DLSymbolModifierParams symbolOptions, ComboBox<String> classNameBox) {
 		
+		if (dlSymbolModifier.getDLAnnotType().getDlControl().getDLModel()==null) return 0;
 		DLClassName[] classNames = dlSymbolModifier.getDLAnnotType().getDlControl().getDLModel().getClassNames(); 
 		
 //		for (int i =0; i<classNames.length; i++) {

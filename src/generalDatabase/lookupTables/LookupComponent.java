@@ -3,6 +3,9 @@ package generalDatabase.lookupTables;
 
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -22,6 +25,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import PamView.dialog.PamDialog;
+import PamView.dialog.SettingsButton;
+import PamView.panel.PamPanel;
 
 /**
  * Lookup component to go in dialogs, Logger forms, etc. 
@@ -86,12 +93,33 @@ public class LookupComponent {
 		
 		this.lookupTopic = lookupTopic;
 		
-		mainPanel = new JPanel();
+		mainPanel = new PamPanel();
 		mainPanel.setLayout(new BorderLayout());
+		
+		PamPanel eventPanel = new PamPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints(); 
+		c.gridy=0;
+		c.gridx=0;
+		c.insets = new Insets(0,0,0,5); 
+
+
 		westPanel = new JPanel(new BorderLayout());
 		westPanel.add(BorderLayout.CENTER, codeField = new JTextField(5));
-		mainPanel.add(BorderLayout.CENTER, comboBox = new JComboBox());
-		mainPanel.add(BorderLayout.WEST, westPanel);
+		c.gridx++;
+
+		PamDialog.addComponent(eventPanel, westPanel, c);
+		c.gridx++;
+		
+		PamDialog.addComponent(eventPanel, comboBox = new JComboBox(), c);
+		c.gridx++;
+		
+		SettingsButton editButton = new SettingsButton(); 
+		editButton.addActionListener(new EditList());
+		PamDialog.addComponent(eventPanel, editButton, c);
+		
+		
+
+		mainPanel.add(BorderLayout.CENTER, eventPanel);
 
 		
 		comboBox.addActionListener(new ListActionListener());

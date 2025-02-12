@@ -22,6 +22,7 @@ import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import ai.djl.Model;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
@@ -60,14 +61,17 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 
 
 	@Override
-	public void prepModel(StandardModelParams dlParams, DLControl dlControl) {
+	public DLStatus prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//most of the model prep is done in the perent class. 
-		super.prepModel(dlParams, dlControl);
+		DLStatus status = super.prepModel(dlParams, dlControl);
 				
 		//now have to read the whsitle2image transform to get correct parameters for that. 
 		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
 		
-		boolean transformOK = groupDataTransform.setJSONData(new JSONObject(jsonString)); 
+		JSONObject jsonObject = new JSONObject(jsonString); 
+		boolean transformOK = groupDataTransform.setJSONData(jsonObject); 
+		
+		((DelphinIDParams) dlParams).dataType = groupDataTransform.getDataType(); 
 
 		if (!transformOK) {
 			System.err.println("Error: could not find whsitle or click group transform in DelphinID JSON file. Model will not work.");
@@ -78,6 +82,8 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		for (int i=0; i<dlParams.numClasses; i++) {
 			dlParams.binaryClassification[i]=true;
 		}
+		
+		return status;
 	
 	}
 

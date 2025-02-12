@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javafx.stage.FileChooser.ExtensionFilter;
+import rawDeepLearningClassifier.DLStatus;
 
 public class SoundSpotModelPane extends StandardModelPane {
 
@@ -27,7 +28,7 @@ public class SoundSpotModelPane extends StandardModelPane {
 	 * @param file - the selected file. 
 	 */
 	@Override
-	public void newModelSelected(File file) {
+	public DLStatus newModelSelected(File file) {
 		
 		//System.out.println("New  file model selected:"); 
 		
@@ -52,7 +53,7 @@ public class SoundSpotModelPane extends StandardModelPane {
 		 * Note that the model prep will determine whether new transforms need to be loaded from the 
 		 * model or to use the existing transforms in the settings. 
 		 */
-		soundSpotClassifier.getDLWorker().prepModel(params, soundSpotClassifier.getDLControl());
+		DLStatus status = soundSpotClassifier.getDLWorker().prepModel(params, soundSpotClassifier.getDLControl());
 		//get the model tansforms calculated from the model by SoundSpoyWorker and apply them to our temporary params clone. 
 		getParamsClone().dlTransfroms = this.soundSpotClassifier.getDLWorker().getModelTransforms(); 
 		
@@ -63,6 +64,9 @@ public class SoundSpotModelPane extends StandardModelPane {
 		
 		///set the advanced pane parameters. 
 		getAdvSettingsPane().setParams(getParamsClone());
+		
+		return status;
+				
 
 	}
 

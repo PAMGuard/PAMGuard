@@ -1,10 +1,8 @@
 package rawDeepLearningClassifier.defaultModels;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
@@ -13,7 +11,6 @@ import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 
 import rawDeepLearningClassifier.dlClassification.DLClassName;
-import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParams;
 import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 

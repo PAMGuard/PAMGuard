@@ -20,7 +20,6 @@ public class ClickTrainDetSubLogging extends SQLLogging {
 		super(pamDataBlock);		
 		this.clickTrainLogging = clickTrainLogging;
 		setTableDefinition(new PamSubtableDefinition(clickTrainLogging.getClickTrainControl().getUnitName()+"_Children"));
-
 	}
 
 	@Override

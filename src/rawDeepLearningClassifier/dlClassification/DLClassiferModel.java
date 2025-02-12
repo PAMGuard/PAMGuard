@@ -36,14 +36,14 @@ public interface DLClassiferModel {
 	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnit);
 
 	/**
-	 * Prepare the model. This is called on PAMGuard start up.
-	 * @param file 
+	 * Prepare the model. This is called on PAMGuard start up and before processing in viewer mode. 
 	 */
 	public void prepModel();
 	
 	/**
-	 * Called whenever PAMGuard stops.
-	 * @return 
+	 * Set and load the model. 
+	 * @return the status of the model e.g. if there has been an error loading
+	 * 
 	 */
 	public DLStatus setModel(URI model);
 	
@@ -99,6 +99,14 @@ public interface DLClassiferModel {
 	 * @return reference to the DL control. 
 	 */
 	public DLControl getDLControl();
+	
+
+	/**
+	 * Get the allowed data types for the model.The can be null in which case only data units
+	 * with raw data are allowed. 
+	 * @return a list of the allowed data types. 
+	 */
+	public ArrayList<Class> getAllowedDataTypes();
 
 	/**
 	 * Check whether a model has been selected and can be loaded successfully. 

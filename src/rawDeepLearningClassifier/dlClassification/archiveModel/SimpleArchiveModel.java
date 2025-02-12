@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import org.jamdev.jdl4pam.ArchiveModel;
 
 import ai.djl.MalformedModelException;
+import ai.djl.engine.EngineException;
 
 /**
  * A Tensorflow model packaged with a jar file. 
@@ -21,7 +22,7 @@ import ai.djl.MalformedModelException;
 public class SimpleArchiveModel extends ArchiveModel {
 
 
-	public SimpleArchiveModel(File file) throws MalformedModelException, IOException {
+	public SimpleArchiveModel(File file) throws MalformedModelException, IOException, EngineException {
 		super(file);
 	}
 
