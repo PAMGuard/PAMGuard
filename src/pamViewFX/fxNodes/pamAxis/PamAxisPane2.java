@@ -203,12 +203,11 @@ public class PamAxisPane2 extends StackPane {
 		//the axis label. 
 		axis.labelProperty().bind(pamAxisFX.labelProperty());
 
-
 	}
 	
 	
 	/**
-	 * Formats number son the axis. Actually quite hard - for example we want dB not to have a decimal points for ICI. 
+	 * Formats numbers on the axis. Actually quite hard - for example we want dB not to have a decimal points for ICI. 
 	 * @author Jamie Macaulay
 	 *
 	 */
