@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<toc version="1.0">
+ <tocitem text="Overview ">
+  <tocitem text="PAMGuard Background " target="overview.PamMasterHelp.docs.pamguardBackground" image="topic"/>
+
+  <tocitem text="PAMGuard Architecture " target="overview.PamMasterHelp.docs.pamGuardArchitecture" image="topic"/>
+
+  <tocitem text="PAMGuard Modules " target="overview.PamMasterHelp.docs.modules" image="topic"/>
+
+  <tocitem text="Normal Operation " target="overview.PamMasterHelp.docs.normalMode" image="topic"/>
+
+  <tocitem text="PAMGuard Viewer " target="overview.PamMasterHelp.docs.viewerMode" image="topic"/>
+
+  <tocitem text="Mixed Mode operation " target="overview.PamMasterHelp.docs.mixedMode" image="topic"/>
+
+  <tocitem text="PAMGuard WatchDog " target="overview.PamMasterHelp.docs.PamdogHelp" image="topic"/>
+
+ </tocitem>
+ <tocitem text="Core Features ">
+  <tocitem text="Graphical User Interface " target="overview.PamMasterHelp.docs.guiOverview" image="topic"/>
+
+  <tocitem text="Copying and Printing " target="overview.PamMasterHelp.docs.CopyingPrinting" image="topic"/>
+
+  <tocitem text="Multiple Displays " target="overview.PamMasterHelp.docs.multipleDisplays" image="topic"/>
+
+  <tocitem text="Adding and Removing Modules " target="overview.PamMasterHelp.docs.addingRemovingPlugins" image="topic"/>
+
+  <tocitem text="Importing PAMGuard Modules " target="overview.PamMasterHelp.docs.ImportingModules" image="topic"/>
+
+  <tocitem text="Model Viewer " target="overview.PamMasterHelp.docs.modelViewer" image="topic"/>
+
+  <tocitem text="Project Information / Metadata " target="overview.PamMasterHelp.docs.projectmetadata" image="topic"/>
+
+  <tocitem text="Multithreading " target="overview.PamMasterHelp.docs.multithreading" image="topic"/>
+
+  <tocitem text="XML Configuration Output " target="overview.PamMasterHelp.docs.xmloutput" image="topic"/>
+
+  <tocitem text="Performance Tests " target="overview.PamMasterHelp.docs.performanceTests" image="topic"/>
+
+  <tocitem text="Data Storage " target="overview.PamMasterHelp.docs.datastorage2" image="topic"/>
+
+  <tocitem text="Uinique Data Identifiers " target="overview.uid.docs.uid" image="topic"/>
+
+  <tocitem text="Hydrophone Array Manager ">
+   <tocitem text="Overview " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Overview" image="topic"/>
+
+   <tocitem text="Array Configuration " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration" image="topic"/>
+
+   <tocitem text="Streamers " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewStreamer" image="topic"/>
+
+   <tocitem text="Hydrophones " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Data Map ">
+   <tocitem text="Overview " target="utilities.datamap.docs.datamap" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Data Annotation ">
+   <tocitem text="Overview " target="overview.annotations.docs.annotations" image="topic"/>
+
+   <tocitem text="Text Annotation " target="overview.annotations.docs.textannotation" image="topic"/>
+
+   <tocitem text="Logger Forms Annotation " target="overview.annotations.docs.loggerannotation" image="topic"/>
+
+   <tocitem text="Target Motion Annotation " target="overview.annotations.docs.targetmotionannotation" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Data Export ">
+   <tocitem text="Data Export " target="overview.dataexport.docs.dataexport" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Maps and Mapping ">
+  <tocitem text="NMEA and GPS ">
+   <tocitem text="Configuring the NMEA Data Source " target="mapping.NMEA.docs.configuringNMEADataSource" image="topic"/>
+
+   <tocitem text="GPS Processing " target="mapping.NMEA.docs.ConfiguringGPS" image="topic"/>
+
+   <tocitem text="Setting the PC Clock " target="mapping.NMEA.docs.ClockOptions" image="topic"/>
+
+   <tocitem text="NMEA / GPS Troubleshooting " target="mapping.NMEA.docs.Troubleshooting" image="topic"/>
+
+   <tocitem text="NMEA Connections " target="mapping.NMEA.docs.NMEAConnections" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Map Display ">
+   <tocitem text="Overview " target="mapping.mapHelp.docs.overview" image="topic"/>
+
+   <tocitem text="Display " target="mapping.mapHelp.docs.mapDisplay" image="topic"/>
+
+   <tocitem text="Map Overlays " target="mapping.mapHelp.docs.MapOverlays" image="topic"/>
+
+   <tocitem text="Map Information Display Panel " target="mapping.mapHelp.docs.mapInformationDisplayPanel" image="topic"/>
+
+   <tocitem text="Map Controls " target="mapping.mapHelp.docs.mapControlPanel" image="topic"/>
+
+   <tocitem text="Making Map Files " target="mapping.mapHelp.docs.mapMaking" image="topic"/>
+
+  </tocitem>
+  <tocitem text="AIS ">
+   <tocitem text="AIS Overview " target="mapping.AIS.docs.AISOverview" image="topic"/>
+
+   <tocitem text="AIS Configuration " target="mapping.AIS.docs.AISConfiguration" image="topic"/>
+
+   <tocitem text="AIS Display " target="mapping.AIS.docs.AISDisplay" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Airgun Display ">
+   <tocitem text="Airgun Display Overview " target="mapping.AirgunDisplay.docs.AirgunOverview" image="topic"/>
+
+   <tocitem text="Airgun Display Configuration " target="mapping.AirgunDisplay.docs.AirgunConfiguration" image="topic"/>
+
+   <tocitem text="Airgun Display " target="mapping.AirgunDisplay.docs.AirgunDisplay" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Utilities ">
+  <tocitem text="Database ">
+   <tocitem text="Overview " target="utilities.generalDatabaseHelp.docs.database_database" image="topic"/>
+
+   <tocitem text="SQLite Databases " target="utilities.generalDatabaseHelp.docs.database_sqlite" image="topic"/>
+
+   <tocitem text="MySQL Databases " target="utilities.generalDatabaseHelp.docs.database_MySQL" image="topic"/>
+
+   <tocitem text="Microsoft Access Databases " target="utilities.generalDatabaseHelp.docs.database_msAccess" image="topic"/>
+
+   <tocitem text="Importing and Exporting " target="utilities.generalDatabaseHelp.docs.import_export" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Binary Storage ">
+   <tocitem text="Binary Storage " target="utilities.BinaryStore.docs.binarystore_overview" image="topic"/>
+
+   <tocitem text="Matlab and R " target="utilities.BinaryStore.docs.matlabandr" image="topic"/>
+
+  </tocitem>
+  <tocitem text="User Input ">
+   <tocitem text="User Input Panel " target="utilities.userInputHelp.docs.userInput" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Aural Listening Form ">
+   <tocitem text="Overview " target="utilities.listening.docs.Listening_Overview" image="topic"/>
+
+   <tocitem text="Configuration " target="utilities.listening.docs.Listening_Configuration" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Alarms ">
+   <tocitem text="Overview " target="utilities.Alarms.docs.Alarms_Overview" image="topic"/>
+
+   <tocitem text="Configuration " target="utilities.Alarms.docs.Alarms_Configuration" image="topic"/>
+
+   <tocitem text="Actions " target="utilities.Alarms.docs.Alarms_Actions" image="topic"/>
+
+   <tocitem text="Displays " target="utilities.Alarms.docs.Alarms_Display" image="topic"/>
+
+  </tocitem>
+  <tocitem text="SIDE Module ">
+   <tocitem text="Overview " target="utilities.SIDEModule.docs.SIDE_Overview" image="topic"/>
+
+   <tocitem text="Creation and Configuration " target="utilities.SIDEModule.docs.SIDE_Configure" image="topic"/>
+
+   <tocitem text="Species Cluster Selection " target="utilities.SIDEModule.docs.SIDE_SpClust" image="topic"/>
+
+   <tocitem text="Test Parameters " target="utilities.SIDEModule.docs.SIDE_TestParams" image="topic"/>
+
+   <tocitem text="Operations Status " target="utilities.SIDEModule.docs.SIDE_OpStat" image="topic"/>
+
+   <tocitem text="Information Tables " target="utilities.SIDEModule.docs.SIDE_InfoTables" image="topic"/>
+
+   <tocitem text="Reporting Matrix " target="utilities.SIDEModule.docs.SIDE_ReportMatrix" image="topic"/>
+
+   <tocitem text="Sidebar " target="utilities.SIDEModule.docs.SIDE_Sidebar" image="topic"/>
+
+   <tocitem text="Workflow " target="utilities.SIDEModule.docs.SIDE_Process" image="topic"/>
+
+   <tocitem text="Output " target="utilities.SIDEModule.docs.SIDE_Output" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Spectrogram Annotations ">
+   <tocitem text="Overview " target="utilities.spectrogramannotations.docs.spectrogramannotations" image="topic"/>
+
+   <tocitem text="Adding and Configuring " target="utilities.spectrogramannotations.docs.adding" image="topic"/>
+
+   <tocitem text="Using Editing and Deleting " target="utilities.spectrogramannotations.docs.using" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Quick Annotations ">
+   <tocitem text="Overview " target="utilities.quickAnnotations.docs.quickAnnotations" image="topic"/>
+
+   <tocitem text="Adding and Configuring " target="utilities.quickAnnotations.docs.adding" image="topic"/>
+
+   <tocitem text="Using Editing and Deleting " target="utilities.quickAnnotations.docs.using" image="topic"/>
+
+   <tocitem text="Importing " target="utilities.quickAnnotations.docs.import" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Backup Manager " target="utilities.backupmanager.docs.backupmanager">
+   <tocitem text="Overview " target="utilities.backupmanager.docs.backupmanager" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Tethys Interface ">
+   <tocitem text="Tethys Overview " target="utilities.tethys.docs.tethys_overview" image="topic"/>
+
+   <tocitem text="Tethys Module " target="utilities.tethys.docs.tethys_module" image="topic"/>
+
+   <tocitem text="Connecting to Tethys " target="utilities.tethys.docs.connection" image="topic"/>
+
+   <tocitem text="Instrument Calibrations " target="utilities.tethys.docs.calibrations" image="topic"/>
+
+   <tocitem text="Instrument Deployments " target="utilities.tethys.docs.deployments" image="topic"/>
+
+   <tocitem text="Detections and Localizations " target="utilities.tethys.docs.detect_localize" image="topic"/>
+
+   <tocitem text="ITIS Species Codes " target="utilities.tethys.docs.tethys_speciescodes" image="topic"/>
+
+   <tocitem text="PAMGuard Mapping " target="utilities.tethys.docs.tethys_mappings" image="topic"/>
+
+   <tocitem text="Batch output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Sensors ">
+  <tocitem text="Analog Array Sensors ">
+   <tocitem text="Overview " target="sensors.analogarray.docs.analogarray" image="topic"/>
+
+   <tocitem text="Configuration " target="sensors.analogarray.docs.analogarrayconfig" image="topic"/>
+
+   <tocitem text="Calibration " target="sensors.analogarray.docs.analogarraycalibration" image="topic"/>
+
+   <tocitem text="Displays " target="sensors.analogarray.docs.analogarraydisplays" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Hydrophone Depth Readout ">
+   <tocitem text="Overview " target="utilities.depthreadout.docs.depth_overview" image="topic"/>
+
+   <tocitem text="Configuration " target="utilities.depthreadout.docs.depth_configuration" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Array Accelerometer ">
+   <tocitem text="Array Accelerometer Readout " target="sensors.arrayAccelerometer.docs.arrayAccelerometer" image="topic"/>
+
+   <tocitem text="Configuration " target="sensors.arrayAccelerometer.docs.accelerometer_configuration" image="topic"/>
+
+  </tocitem>
+  <tocitem text="CPOD ">
+   <tocitem text="CPOD Module " target="sensors.cpod.docs.cpod" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Displays ">
+  <tocitem text="Data Selection ">
+   <tocitem text="Overview " target="displays.dataselect.docs.selectandsymbol" image="topic"/>
+
+   <tocitem text="Data Selectors " target="displays.dataselect.docs.dataselection" image="topic"/>
+
+   <tocitem text="Symbol Choosers " target="displays.dataselect.docs.symbolchoice" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Display Marking ">
+   <tocitem text="Overview " target="displays.displaymarks.docs.displaymarks" image="topic"/>
+
+  </tocitem>
+  <tocitem text="User Display Panel ">
+   <tocitem text="Overview " target="displays.userDisplayHelp.docs.userDisplayPanel" image="topic"/>
+
+   <tocitem text="Spectrogram Display ">
+    <tocitem text="Overview " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram" image="topic"/>
+
+    <tocitem text="Creating a Spectrogram Display " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Creating" image="topic"/>
+
+    <tocitem text="Configuring a Spectrogram Display " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Configuring" image="topic"/>
+
+    <tocitem text="Spectrogram Display Overlays " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Overlays" image="topic"/>
+
+   </tocitem>
+   <tocitem text="Radar Display ">
+    <tocitem text="Overview " target="displays.radarDisplayHelp.docs.UserDisplay_Radar" image="topic"/>
+
+    <tocitem text="Creating  a Radar Display " target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Creating" image="topic"/>
+
+    <tocitem text="Configuring a Radar Display " target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Configuring" image="topic"/>
+
+   </tocitem>
+  </tocitem>
+  <tocitem text="Local Time ">
+   <tocitem text="Local Time " target="displays.LocalTime.Docs.LocalTime" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Level Meters ">
+   <tocitem text="Level Meters " target="displays.LevelMeters.Docs.LevelMeters" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Time Display FX ">
+   <tocitem text="Overview " target="displays.timedisplayfx.docs.timedisplayfx" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Sound Processing ">
+  <tocitem text="Sound Acquisition ">
+   <tocitem text="Overview " target="sound_processing.AcquisitionHelp.docs.AcquisitionOverview" image="topic"/>
+
+   <tocitem text="Configuration " target="sound_processing.AcquisitionHelp.docs.AcquisitionConfiguration" image="topic"/>
+
+   <tocitem text="Sound Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionSoundCard" image="topic"/>
+
+   <tocitem text="Asio Sound Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionAsioSoundCard" image="topic"/>
+
+   <tocitem text="Audio Files " target="sound_processing.AcquisitionHelp.docs.AcquisitionFile" image="topic">
+    <tocitem text="SUD Files " target="sound_processing.AcquisitionHelp.docs.sudfiles" image="topic"/>
+
+   </tocitem>
+   <tocitem text="Audio File Folders " target="sound_processing.AcquisitionHelp.docs.AcquisitionFileFolder" image="topic"/>
+
+   <tocitem text="File Dates " target="sound_processing.AcquisitionHelp.docs.FileTimeZone" image="topic"/>
+
+   <tocitem text="National Instruments DAQ Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionNIDAQ" image="topic"/>
+
+   <tocitem text="SAIL Daq Cards " target="sound_processing.AcquisitionHelp.docs.SAILDaqCard" image="topic"/>
+
+   <tocitem text="Simulated Sources " target="sound_processing.AcquisitionHelp.docs.AcquisitionSimulator" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Sound Output ">
+   <tocitem text="Sound Output Overview " target="sound_processing.soundPlaybackHelp.docs.soundPlayback_soundPlayback" image="topic"/>
+
+   <tocitem text="Sound Output Configuration " target="sound_processing.soundPlaybackHelp.docs.soundPlayback_Config" image="topic"/>
+
+   <tocitem text="Sound Output Control " target="sound_processing.soundPlaybackHelp.docs.soundPlayback_Control" image="topic"/>
+
+  </tocitem>
+  <tocitem text="FFT (Spectrogram) Engine ">
+   <tocitem text="Overview " target="sound_processing.fftManagerHelp.docs.FFTEngine_Overview" image="topic"/>
+
+   <tocitem text="Creating " target="sound_processing.fftManagerHelp.docs.FFTEngine_Creating" image="topic"/>
+
+   <tocitem text="Configuring " target="sound_processing.fftManagerHelp.docs.FFTEngine_Configuring" image="topic"/>
+
+   <tocitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Filters (IIR and FIR) ">
+   <tocitem text="Overview " target="sound_processing.FiltersHelp.Docs.Filters_filters" image="topic"/>
+
+   <tocitem text="Filter Design " target="sound_processing.FiltersHelp.Docs.Filters_panel" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Decimator ">
+   <tocitem text="Decimator " target="sound_processing.decimatorHelp.docs.decimator_decimator" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Sound Recorder ">
+   <tocitem text="Sound Recorder Overview " target="sound_processing.soundRecorderHelp.docs.RecorderOverview" image="topic"/>
+
+   <tocitem text="Sound Recorder Configuration " target="sound_processing.soundRecorderHelp.docs.RecorderConfiguration" image="topic"/>
+
+   <tocitem text="Sound Recorder Operation " target="sound_processing.soundRecorderHelp.docs.RecorderOperation" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Clip Generator ">
+   <tocitem text="Overview " target="sound_processing.ClipGenerator.docs.ClipGenerator" image="topic"/>
+
+   <tocitem text="Display " target="sound_processing.ClipGenerator.docs.ClipGeneratorDisplay" image="topic"/>
+
+   <tocitem text="Bearings " target="sound_processing.ClipGenerator.docs.ClipGeneratorBearings" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Signal Amplifier ">
+   <tocitem text="Overview " target="sound_processing.amplifier.docs.amplifier" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Patch Panel ">
+   <tocitem text="Patch Panel " target="sound_processing.patchPanelHelp.docs.patchpanel" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Spectrogram Smoothing ">
+   <tocitem text="Spectrogram Smoothing " target="sound_processing.SpectrogramSmoothing.docs.SpectrogramSmoothing" image="topic"/>
+
+   <tocitem text="Configuration " target="sound_processing.SpectrogramSmoothing.docs.AddingConfiguring" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Seismic Veto ">
+   <tocitem text="Overview " target="sound_processing.seismicveto.docs.veto_overview" image="topic"/>
+
+   <tocitem text="Configuration " target="sound_processing.seismicveto.docs.veto_configuration" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Noise Band Measurement ">
+   <tocitem text="Noise Band Measurement " target="sound_processing.NoiseBands.Docs.NoiseBands" image="topic"/>
+
+   <tocitem text="Noise Band Displays " target="sound_processing.NoiseBands.Docs.NoiseBandDisplays" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Filtered Noise Measurement ">
+   <tocitem text="Overview " target="sound_processing.NoiseOneBand.Docs.NoiseOneBand" image="topic"/>
+
+   <tocitem text="Displays and Output " target="sound_processing.NoiseOneBand.Docs.NoiseOneBandDisplays" image="topic"/>
+
+  </tocitem>
+  <tocitem text="LTSA (Long Term Spectral Averaging) ">
+   <tocitem text="LTSA (Long Term Spectral Averaging) " target="sound_processing.LTSA.Docs.LTSA" image="topic"/>
+
+   <tocitem text="LTSA Displays " target="sound_processing.LTSA.Docs.LTSADisplays" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Envelope Tracing ">
+   <tocitem text="Envelope Tracing " target="sound_processing.EnvelopeTrace.Docs.EnvelopeOverview" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Beamformer ">
+   <tocitem text="Beamformer Overview " target="sound_processing.beamformer.docs.Beamformer_Overview" image="topic"/>
+
+   <tocitem text="Beamformer Configuration " target="sound_processing.beamformer.docs.Beamformer_Settings" image="topic"/>
+
+   <tocitem text="Beamformer Algorithm Configuration " target="sound_processing.beamformer.docs.Beamformer_AlgoConfig" image="topic"/>
+
+   <tocitem text="Beamformer Output " target="sound_processing.beamformer.docs.Beamformer_Output" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Detectors ">
+  <tocitem text="Click Detector ">
+   <tocitem text="Overview " target="detectors.clickDetectorHelp.docs.ClickDetector_clickDetector" image="topic"/>
+
+   <tocitem text="Click Detector Displays " target="detectors.clickDetectorHelp.docs.ClickDetector_clickDetectorDisplays" image="topic">
+    <tocitem text="Tab Panel Displays " target="detectors.clickDetectorHelp.docs.ClickDetector_clickTabPanelDisplays" image="topic"/>
+
+    <tocitem text="Side Panel " target="detectors.clickDetectorHelp.docs.ClickDetector_clickSidePanel" image="topic"/>
+
+    <tocitem text="Graphic Overlays " target="detectors.clickDetectorHelp.docs.ClickDetector_MapOverlays" image="topic"/>
+
+   </tocitem>
+   <tocitem text="Click Classification " target="detectors.clickDetectorHelp.docs.ClickDetector_clickClassification" image="topic">
+    <tocitem text="Basic classifier " target="detectors.clickDetectorHelp.docs.ClickDetector_basicClassification" image="topic"/>
+
+    <tocitem text="Classifier with frequency sweep " target="detectors.clickDetectorHelp.docs.ClickDetector_betterClassification" image="topic"/>
+
+   </tocitem>
+   <tocitem text="Tracking and Click Train Identification " target="detectors.clickDetectorHelp.docs.ClickDetector_clickTrainLocalization" image="topic"/>
+
+   <tocitem text="Click Detector Alarm " target="detectors.clickDetectorHelp.docs.ClickDetector_clickAlarmOptions" image="topic"/>
+
+   <tocitem text="Viewer Functions ">
+    <tocitem text="Overview " target="detectors.clickDetectorHelp.docs.offline_Overview" image="topic"/>
+
+    <tocitem text="Importing RBC Files " target="detectors.clickDetectorHelp.docs.offline_ImportingRBC" image="topic"/>
+
+    <tocitem text="Navigating " target="detectors.clickDetectorHelp.docs.offline_Navigating" image="topic"/>
+
+    <tocitem text="Marking out Events " target="detectors.clickDetectorHelp.docs.offline_MarkingOutEvents" image="topic"/>
+
+    <tocitem text="Reclassify Clicks " target="detectors.clickDetectorHelp.docs.offline_Reclassify_clicks" image="topic"/>
+
+    <tocitem text="Offline Click Analysis Tools " target="detectors.clickDetectorHelp.docs.offline_Tools" image="topic"/>
+
+    <tocitem text="Create Binary Files Offline " target="utilities.BinaryStore.docs.CreateBinariesOffline" image="topic"/>
+
+   </tocitem>
+   <tocitem text="SoundTrap Click Detector " target="detectors.clickDetectorHelp.docs.SoundTrapClickDetector" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Whistle and Moan Detector ">
+   <tocitem text="Overview " target="detectors.whistleMoanHelp.docs.whistleMoan_Overview" image="topic"/>
+
+   <tocitem text="Configuration " target="detectors.whistleMoanHelp.docs.whistleMoan_Configure" image="topic"/>
+
+   <tocitem text="Data Source " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigSource" image="topic"/>
+
+   <tocitem text="Channel Grouping " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigGrouping" image="topic"/>
+
+   <tocitem text="Noise Removal and Thresholding " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise" image="topic"/>
+
+   <tocitem text="Connected Region Search " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigConnect" image="topic"/>
+
+   <tocitem text="Region Branching " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigBranching" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Whistle Detector ">
+   <tocitem text="Overview " target="detectors.whistleDetectorHelp.docs.whistleDetector_Overview" image="topic"/>
+
+   <tocitem text="Creating a Whistle Detector " target="detectors.whistleDetectorHelp.docs.whistleDetector_Creating" image="topic"/>
+
+   <tocitem text="Configuring a Whistle Detector " target="detectors.whistleDetectorHelp.docs.whistleDetector_Configuring" image="topic"/>
+
+   <tocitem text="Whistle Detector Display " target="detectors.whistleDetectorHelp.docs.whistleDetector_Display" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Likelihood Detector ">
+   <tocitem text="Likelihood Detector Introduction " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_Introduction" image="topic"/>
+
+   <tocitem text="Adding a new Likelihood Detector " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_NewModule" image="topic"/>
+
+   <tocitem text="Configuring the Likelihood Detector " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_Config" image="topic"/>
+
+   <tocitem text="Importing and Exporting Target Configurations " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_ImportExport" image="topic"/>
+
+   <tocitem text="Removing a Likelihood Detector " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_RemoveModule" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Generalised Power Law (GPL) Detector ">
+   <tocitem text="GPL Detector Overview " target="detectors.gpl.docs.gpldetector" image="topic"/>
+
+   <tocitem text="GPL Detector Configuration " target="detectors.gpl.docs.configure" image="topic">
+    <tocitem text="Detection " target="detectors.gpl.docs.detection" image="topic"/>
+
+    <tocitem text="Contours " target="detectors.gpl.docs.contours" image="topic"/>
+
+    <tocitem text="Notes " target="detectors.gpl.docs.notes" image="topic"/>
+
+    <tocitem text="Defaults " target="detectors.gpl.docs.defaults" image="topic"/>
+
+   </tocitem>
+   <tocitem text="Outputs " target="detectors.gpl.docs.gploutputs" image="topic"/>
+
+   <tocitem text="Displays " target="detectors.gpl.docs.gpldisplays" image="topic"/>
+
+   <tocitem text="Localisation " target="detectors.gpl.docs.localisation" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Click Train Detector " target="detectors.ClickTrainDetector.docs.ClickTrainDetector">
+   <tocitem text="Overview " target="detectors.ClickTrainDetector.docs.ClickTrainDetector" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Classifiers ">
+  <tocitem text="Whistle Classifier ">
+   <tocitem text="Overview " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Overview" image="topic"/>
+
+   <tocitem text="Configuration " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Configure" image="topic"/>
+
+   <tocitem text="Collecting Training Data " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_CollectTraining" image="topic"/>
+
+   <tocitem text="Training the classifier " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Training" image="topic"/>
+
+   <tocitem text="Running the classifier " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Running" image="topic"/>
+
+   <tocitem text="Classifier Output " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Output" image="topic"/>
+
+  </tocitem>
+  <tocitem text="ROCCA ">
+   <tocitem text="Overview " target="classifiers.roccaHelp.docs.rocca_Overview" image="topic"/>
+
+   <tocitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure" image="topic"/>
+
+   <tocitem text="Selecting a Whistle " target="classifiers.roccaHelp.docs.rocca_SelectingWhistle" image="topic"/>
+
+   <tocitem text="Rocca Spectrogram " target="classifiers.roccaHelp.docs.rocca_Spectrogram" image="topic"/>
+
+   <tocitem text="Contour Extraction " target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation" image="topic"/>
+
+   <tocitem text="Measurements and Classification " target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification" image="topic"/>
+
+   <tocitem text="Sidebar Controls " target="classifiers.roccaHelp.docs.rocca_Sidebar" image="topic"/>
+
+   <tocitem text="File Output " target="classifiers.roccaHelp.docs.rocca_SavedFiles" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Deep Learning Module ">
+   <tocitem text="Overview " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_overview" image="topic"/>
+
+   <tocitem text="Creation and Configuration " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_CreateAndConfig" image="topic"/>
+
+   <tocitem text="Running " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Running" image="topic"/>
+
+   <tocitem text="Results " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Results" image="topic"/>
+
+   <tocitem text="Common Mistakes and Bugs " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Bugs" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Matched Template Classifier ">
+   <tocitem text="Matched Template Classifier " target="classifiers.matchedtemplate.mathchedtemplate" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+ <tocitem text="Localisation ">
+  <tocitem text="Overview " target="localisation.docs.localisation_overview" image="topic"/>
+
+  <tocitem text="Localisation Techniques " target="localisation.docs.localisation_algorithms" image="topic"/>
+
+  <tocitem text="Types of Array " target="localisation.docs.localisation_arrays" image="topic"/>
+
+  <tocitem text="Generic Localisers " target="localisation.docs.localisation_generic" image="topic"/>
+
+  <tocitem text="Time Difference of Arrival " target="localisation.docs.localisation_tdoa" image="topic"/>
+
+  <tocitem text="Bearing Calculator ">
+   <tocitem text="Bearing Calculator Overview " target="localisation.bearingLocaliser.docs.BL_Overview" image="topic"/>
+
+   <tocitem text="Bearing Calculator Configuration " target="localisation.bearingLocaliser.docs.BL_Settings" image="topic"/>
+
+   <tocitem text="Bearing Calculator Algorithm Configuration " target="localisation.bearingLocaliser.docs.BL_AlgoConfig" image="topic"/>
+
+   <tocitem text="Bearing Calculator Output " target="localisation.bearingLocaliser.docs.BL_Output" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Group 3D Localiser " target="localisation.group3d.docs.3doverview">
+   <tocitem text="Overview " target="localisation.group3d.docs.3doverview" image="topic"/>
+
+   <tocitem text="Configuration " target="localisation.group3d.docs.3dconfig" image="topic"/>
+
+   <tocitem text="Algorithms " target="localisation.group3d.docs.3dalgorithms" image="topic">
+    <tocitem text="Crossed Bearing " target="localisation.group3d.docs.3dcrossedbearing" image="topic"/>
+
+    <tocitem text="Hyperbolic " target="localisation.group3d.docs.3dhyperbolic" image="topic"/>
+
+    <tocitem text="Simplex " target="localisation.group3d.docs.3dsimplex" image="topic"/>
+
+   </tocitem>
+   <tocitem text="Output " target="localisation.group3d.docs.3doutput" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Detection Grouper ">
+   <tocitem text="Detection Grouper " target="localisation.detectiongroup.docs.dglocaliser" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Target Motion Analysis ">
+   <tocitem text="Target Motion Analysis " target="localisation.targetmotion.docs.targetmotion_overview" image="topic"/>
+
+   <tocitem text="Localising an Event " target="localisation.targetmotion.docs.targetmotion_Localising" image="topic"/>
+
+   <tocitem text="Localisation Algorithms " target="localisation.targetmotion.docs.targetmotion_LocalisationAlgorithms" image="topic"/>
+
+   <tocitem text="Localisation Results " target="localisation.targetmotion.docs.targetmotion_LocalisationResults" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Multipath 3D Localiser ">
+   <tocitem text="Multipath 3D Localisation " target="detectors.Pam3DHelp.docs.guiOverview" image="topic"/>
+
+  </tocitem>
+  <tocitem text="DIFAR ">
+   <tocitem text="Azigram (DIFAR Azigram Engine) " target="localisation.difar.difarAzigram.docs.azigram" image="topic"/>
+
+   <tocitem text="DIFAR Directional Audio " target="localisation.difar.difarAudio.docs.directionalAudio" image="topic"/>
+
+   <tocitem text="DIFAR Localisation ">
+    <tocitem text="Overview " target="localisation.difar.difarLocalisation.docs.difar_Overview" image="topic"/>
+
+    <tocitem text="Configure the Module " target="localisation.difar.difarLocalisation.docs.difar_ConfigureModule" image="topic"/>
+
+    <tocitem text="Deploying Sonobuoys " target="localisation.difar.difarLocalisation.docs.difar_HydrophoneArray" image="topic"/>
+
+    <tocitem text="Configure User Display " target="localisation.difar.difarLocalisation.docs.difar_ConfigureUserDisplay" image="topic"/>
+
+    <tocitem text="Configure Processing " target="localisation.difar.difarLocalisation.docs.difar_ConfigureProcessing" image="topic"/>
+
+    <tocitem text="Running the System " target="localisation.difar.difarLocalisation.docs.difar_RunningSystem" image="topic">
+     <tocitem text="Using the Spectrogram " target="localisation.difar.difarLocalisation.docs.difar_UsingSpectrogram" image="topic"/>
+
+     <tocitem text="Managing the Queue " target="localisation.difar.difarLocalisation.docs.difar_ManagingQueue" image="topic"/>
+
+     <tocitem text="Using DIFARGram Display " target="localisation.difar.difarLocalisation.docs.difar_UsingDifarGramDisplay" image="topic"/>
+
+     <tocitem text="Advanced Localisation (Triangulation and Groups) " target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings" image="topic"/>
+
+     <tocitem text="Compass Calibration " target="localisation.difar.difarLocalisation.docs.difar_Calibration" image="topic"/>
+
+     <tocitem text="Graphics Output " target="localisation.difar.difarLocalisation.docs.difar_GraphicsOutput" image="topic"/>
+
+    </tocitem>
+    <tocitem text="DIFAR Output " target="localisation.difar.difarLocalisation.docs.difar_DifarOutput" image="topic"/>
+
+   </tocitem>
+  </tocitem>
+ </tocitem>
+ <tocitem text="Visual Methods ">
+  <tocitem text="Video Range ">
+   <tocitem text="Overview " target="visual_methods.videoRangeHelp.docs.videoRange_videoRange" image="topic"/>
+
+   <tocitem text="Side Panel " target="visual_methods.videoRangeHelp.docs.VideoRange_SidePanel" image="topic"/>
+
+   <tocitem text="Calibration " target="visual_methods.videoRangeHelp.docs.videoRange_Calibrating" image="topic"/>
+
+   <tocitem text="Setup " target="visual_methods.videoRangeHelp.docs.videoRange_videoRange" image="topic"/>
+
+   <tocitem text="Measuring to the horizon " target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_Plot" image="topic"/>
+
+   <tocitem text="Measuring to a shoreline " target="visual_methods.videoRangeHelp.docs.videoRange_MeasureToShoreline" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Logger forms ">
+   <tocitem text="Overview " target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview" image="topic"/>
+
+   <tocitem text="Designing Forms " target="visual_methods.loggerFormsHelp.docs.designingForms" image="topic"/>
+
+  </tocitem>
+ </tocitem>
+</toc>

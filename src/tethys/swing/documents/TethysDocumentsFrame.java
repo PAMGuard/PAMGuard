@@ -25,9 +25,9 @@ public class TethysDocumentsFrame extends PamDialog {
 	}
 	
 	public static void showTable(Window parentFrame, TethysControl tethysControl, Collection collection) {
-//		if (singleInstance == null) {
+		if (singleInstance == null) {
 			singleInstance = new TethysDocumentsFrame(parentFrame, tethysControl);
-//		}
+		}
 		singleInstance.documentsTable.setCollection(collection);
 //		singleInstance.setTitle(collection.collectionName() + " Documents");
 		singleInstance.setVisible(true);

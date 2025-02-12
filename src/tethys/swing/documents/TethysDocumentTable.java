@@ -175,7 +175,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 		DocumentInfo docInfo = documentInfos.get(row);
 		String docName = docInfo.getDocumentName();
 		JPopupMenu popMenu = new JPopupMenu();
-		JMenuItem menuItem = new JMenuItem("Show document " + docName);
+		JMenuItem menuItem = new JMenuItem("Display document " + docName);
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -968,7 +968,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			cog.setValue(PamUtils.constrainedAngle(gpsData.getCourseOverGround()));
 			cog.setNorth(HeadingTypes.TRUE.toString());
 			Double trueHead = gpsData.getTrueHeading();
-			if (trueHead != null && !trueHead.isInfinite()) {
+			if (trueHead != null && Double.isFinite(trueHead)) {
 				HeadingDegN th = new HeadingDegN();
 				th.setValue(PamUtils.constrainedAngle(trueHead));
 //				th.setNorth(HeadingTypes.TRUE.toString());
@@ -977,7 +977,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			else {
 				// else try magnetic, but corrected for deviation
 				Double magHead = gpsData.getMagneticHeading();
-				if (magHead != null && !magHead.isInfinite()) {
+				if (magHead != null && Double.isFinite(magHead)) {
 					magHead = gpsData.getHeading(); // corrected for deviation
 					if (magHead == null) magHead = gpsData.getMagneticHeading(); // go back!
 					HeadingDegN mh = new HeadingDegN();
