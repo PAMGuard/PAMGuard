@@ -13,6 +13,8 @@ import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.logging.DLAnnotation;
 import tethys.species.DataBlockSpeciesCodes;
 import tethys.species.DataBlockSpeciesManager;
+import tethys.species.DataBlockSpeciesMap;
+import tethys.species.SpeciesMapItem;
 
 public class DLSpeciesManager extends DataBlockSpeciesManager<DLDetection> {
 
@@ -23,6 +25,40 @@ public class DLSpeciesManager extends DataBlockSpeciesManager<DLDetection> {
 	public DLSpeciesManager(DLControl dlControl, PamDataBlock<DLDetection> dataBlock) {
 		super(dataBlock);
 		this.dlControl = dlControl;
+		
+		checkDefaultMap();
+	}
+
+	/**
+	 * DL Classifiers may have default ITIS codes set, in which case it's possible 
+	 * to make the species map immediately from the defaults, which will make 
+	 * users happy - especially for the multispecies!
+	 */
+	private void checkDefaultMap() {
+		DLClassName[] classNames = getClassNames();
+		if (classNames == null) {
+			return;
+		}
+		DataBlockSpeciesMap speciesMap = getDatablockSpeciesMap();
+		if (speciesMap == null) {
+			return;
+		}
+		String[] classStrings = getClassStrings(classNames);
+		for (int i = 0; i < classNames.length; i++) {
+			DLClassName className = classNames[i];
+			Integer itis = className.itisCode;
+			if (itis == null) {
+//				can't set the default;
+				continue;
+			}
+			// find the appropriate map item. 
+			SpeciesMapItem mapItem = speciesMap.getItem(className.className);
+			if (mapItem == null) {
+				mapItem = new SpeciesMapItem(itis, className.className, className.className);
+				speciesMap.putItem(className.className, mapItem);
+			}			
+		}
+		
 	}
 
 	@Override
@@ -73,12 +109,7 @@ public class DLSpeciesManager extends DataBlockSpeciesManager<DLDetection> {
 		if (nAnnot == 0) {
 			return unknown;
 		}
-//		DataAnnotation annot = dlDetection.getDataAnnotation(0);
-//		ArrayList<PredictionResult> results = null;
-//		if (annot instanceof DLAnnotation) {
-//			DLAnnotation dlAnnot = (DLAnnotation) annot;
-//			results = dlAnnot.getModelResults();
-//		}
+
 		PredictionResult result = dlControl.getDLClassifyProcess().getBestModelResult(dlDetection);
 		if (result == null) {
 			return unknown;

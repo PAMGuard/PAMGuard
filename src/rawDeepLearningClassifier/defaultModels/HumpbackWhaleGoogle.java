@@ -75,7 +75,7 @@ public class HumpbackWhaleGoogle implements DLModel {
 		
 		genericModelParams.defaultSegmentLen =  3.92*1000;
 		genericModelParams.binaryClassification = new boolean[] {true};
-		genericModelParams.classNames= new DLClassName[] {new DLClassName("Humpback whale", (short) 1)};
+		genericModelParams.classNames= new DLClassName[] {new DLClassName("Humpback whale", (short) 1, 180529)};
 		genericModelParams.numClasses = 1; 
 		
 		genericModelParams.defaultShape= new Long[] {-1L,-1L,-1L,1L};

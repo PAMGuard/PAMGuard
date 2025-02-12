@@ -582,7 +582,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 								}
 							}
 							else {
-								System.out.println("Save click annotation to " + lastParentDataUnit[i].getUID()); 
+//								System.out.println("Save click annotation to " + lastParentDataUnit[i].getUID()); 
 								addDLAnnotation(lastParentDataUnit[i],modelResultDataBuffer[i]); 
 								clearBuffer(i); 
 							}
@@ -756,7 +756,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	private void addDLAnnotation(PamDataUnit parentDataUnit,
 			ArrayList<PredictionResult> modelResult) {
 
-		System.out.println("DLClassifyProces: Add annnotation to  " + parentDataUnit); 
+//		System.out.println("DLClassifyProces: Add annnotation to  " + parentDataUnit); 
 		parentDataUnit.addDataAnnotation(new DLAnnotation(dlAnnotationType, modelResult)); 
 		//parentDataUnit.updateDataUnit(System.currentTimeMillis());
 

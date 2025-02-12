@@ -85,7 +85,7 @@ public class RightWhaleModel1 implements DLModel {
 		genericModelParams.defaultShape= new Long[] {-1L,40l,401L,1L};
 		genericModelParams.shape= new Long[] {-1L,40L,40L,1L};
 
-		genericModelParams.classNames= new DLClassName[] {new DLClassName("Noise", (short) 0), new DLClassName("Right Whale", (short) 1)};
+		genericModelParams.classNames= new DLClassName[] {new DLClassName("Noise", (short) 0), new DLClassName("Right Whale", (short) 1, 180537)};
 		genericModelParams.numClasses = 2; 
 		
 		//create the transforms. 

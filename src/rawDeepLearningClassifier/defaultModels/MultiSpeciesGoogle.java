@@ -77,19 +77,20 @@ public class MultiSpeciesGoogle implements DLModel {
 
 		genericModelParams.defaultSegmentLen =   5. * 1000.;
 		genericModelParams.binaryClassification = new boolean[] {true};
+		// see table at https://www.kaggle.com/models/google/multispecies-whale
 		genericModelParams.classNames= new DLClassName[] {
-				new DLClassName("Oo", (short) 0),
-				new DLClassName("Mn", (short) 1),
-				new DLClassName("Eg", (short) 2),
-				new DLClassName("Be", (short) 3),
-				new DLClassName("Upcall", (short) 4),
-				new DLClassName("Bp", (short) 5),
-				new DLClassName("Call", (short) 6),
-				new DLClassName("Gunshot", (short) 7),
-				new DLClassName("Echolocation", (short) 8),
-				new DLClassName("Bm", (short) 9),
-				new DLClassName("Whistle", (short) 10),
-				new DLClassName("Ba", (short) 12),
+				new DLClassName("Oo", (short) 0, 180469), // Orca
+				new DLClassName("Mn", (short) 1, 180529), // Humpback
+				new DLClassName("Eg", (short) 2, 180537), // Right Whale (Atlantic)
+				new DLClassName("Be", (short) 3, 180525), // Bryde's
+				new DLClassName("Upcall", (short) 4, 612591), // Right Whale (Pacific)
+				new DLClassName("Bp", (short) 5, 180527), // Fin Whale
+				new DLClassName("Call", (short) 6, 180469), // Orca Call
+				new DLClassName("Gunshot", (short) 7, 612591), // Right Whale Pacific
+				new DLClassName("Echolocation", (short) 8, 180469), // Orca Echolocation
+				new DLClassName("Bm", (short) 9, 180528), // Blue Whale
+				new DLClassName("Whistle", (short) 10, 180469), // Orca Whistle
+				new DLClassName("Ba", (short) 12, 180524), // Minke
 				};
 		genericModelParams.numClasses = genericModelParams.classNames.length; 
 

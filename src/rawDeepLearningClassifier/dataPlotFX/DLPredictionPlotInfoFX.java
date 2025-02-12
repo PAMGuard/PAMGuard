@@ -2,12 +2,14 @@ package rawDeepLearningClassifier.dataPlotFX;
 
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import PamController.PamController;
 import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.PamColors;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamConstants;
@@ -24,6 +26,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import pamViewFX.fxNodes.PamColorsFX;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLDataUnit;
@@ -96,13 +99,21 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 
 //			System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
 
-			if (classNames!=null) {
+			if (classNames!=null && dlPredParams != null) {
 
 				//make sure this is initialised otherwise the plot won't work when first created. 
-				if (dlPredParams.lineInfos==null ) dlPredParams.lineInfos = new LineInfo[classNames.length];
+				if (dlPredParams.lineInfos==null ) {
+					dlPredParams.lineInfos = new LineInfo[classNames.length];
+				}
+				if (dlPredParams.lineInfos.length < classNames.length) {
+					dlPredParams.lineInfos = Arrays.copyOf(dlPredParams.lineInfos, classNames.length);
+				}
 				for (int i=0; i<classNames.length; i++) {
 					if (dlPredParams.lineInfos[i]==null) {
-						dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
+//						dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
+						java.awt.Color wCol = PamColors.getInstance().getWhaleColor(i);
+						Color fxCol = PamColorsFX.awtColorToFx(wCol);
+						dlPredParams.lineInfos[i] = new LineInfo(true, fxCol);
 					}
 				}
 			}
