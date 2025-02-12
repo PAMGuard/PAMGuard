@@ -3,9 +3,15 @@ package PamView.dialog.warn;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Optional;
 
+import PamView.help.PamHelp;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -16,6 +22,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Window;
 import pamViewFX.fxNodes.PamHBox;
 
@@ -61,7 +68,11 @@ public class WarnOnceDialogFX {
 	 */
 	private CheckBox dontShowAgain;
 
-	private HBox checkBoxPane;  
+	private HBox checkBoxPane;
+
+	private ButtonType helpButton;
+
+	private String helpPoint;  
 
 	/**
 	 * Constructor the warn once dialog. 
@@ -73,15 +84,7 @@ public class WarnOnceDialogFX {
 	 * @param error
 	 */
 	public WarnOnceDialogFX(Window parentStage, String title, String message, AlertType alertType , String helpPoint, Throwable error) { 
-		this.error=error; 
-		this.message=message; 
-		alert = createAlertWithOptOut(alertType, title, null, message, "Don't show this message again", ButtonType.YES, ButtonType.NO);
-		//  if (alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent()) {
-		//  }
-
-		// for now, this is not implemented so just make sure it's not checked.  If we want to add it to the dialog, we'll need to rearrange everything
-		// because the opt-out checkbox is added to the buttons bar in a sneaky way, and you can't do that twice.  
-		dontShowAgainThisSess.setSelected(false);
+		this(parentStage, title, message, alertType, helpPoint, error, null, null, false);
 	}
 
 	/**
@@ -104,22 +107,59 @@ public class WarnOnceDialogFX {
 
 		this.error=error; 
 		this.message=message; 
-
-		ButtonType okButton; 
-		if (oktext==null) okButton = ButtonType.OK; 
-		else okButton = new ButtonType(oktext); 
-
-		ButtonType cancelButton; 
-		if (canceltext==null) cancelButton = ButtonType.OK; 
-		else cancelButton = new ButtonType(canceltext); 
+		this.helpPoint=helpPoint; 
 		
-		//TODO help point.
+		ButtonType okButton = ButtonType.OK; 
+		ButtonType cancelButton = ButtonType.CANCEL; 
+		
+		ArrayList<ButtonType> buttons = new ArrayList<ButtonType>(); 
+	
+		//figure out what the ok and cancel buttons should be
+		switch (alertType) {
+		case CONFIRMATION:
+			okButton = ButtonType.YES;
+			cancelButton = ButtonType.NO;
+			break;
+		case ERROR:
+			break;
+		case INFORMATION:
+			cancelButton = null;
+			break;
+		case NONE:
+			break;
+		case WARNING:
+			cancelButton = new ButtonType("Copy to clipboard"); 
+			break;
+		default:
+			break;
+		}
+		
+		//Override the cancel on OK buttons if set
+		if (oktext!=null) { 
+			okButton = new ButtonType(oktext); 
+		}
 
-
-		alert = createAlertWithOptOut(alertType, title, null, message, "Don't show this message again", okButton, cancelButton);
+		if (canceltext!=null) { 
+			cancelButton = new ButtonType(canceltext); 
+		}
+		
+		//add the buttons
+		buttons.add(okButton);
+		if (cancelButton!=null) buttons.add(cancelButton);
+		
+		//add additional buttons. 
+		if (helpPoint!=null) {
+			helpButton = new ButtonType("Help..."); 
+			buttons.add(helpButton);
+		}
+		
+//		System.out.println("Buttons: " + buttons.size());
+		
+		alert = createAlertWithOptOut(alertType, title, null, message, "Don't show this message again", buttons.toArray(new ButtonType[buttons.size()]));
 		
 		//System.out.println("CREATE ALERT: " + disableCheckBoxes); 
 		this.disableCheckBoxes(disableCheckBoxes);
+		dontShowAgainThisSess.setSelected(false);
 
 	}
 	
@@ -129,10 +169,21 @@ public class WarnOnceDialogFX {
 	 * Show the warning dialog. 
 	 */
 	public void showDialog() {
-		if (alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent()) {
+		//System.out.println("SHOW DIALOG: " +this); 
+		
+		Optional<ButtonType> type = alert.showAndWait();
+		
+		if (type.filter(t -> t == ButtonType.YES).isPresent()) {
+			//System.out.println("OK_OPTION: " +this); 
 			answer=WarnOnce.OK_OPTION; 
 		}
+		else if (type.filter(t -> t == helpButton).isPresent()) {
+			//System.out.println("HELP: " +this); 
+			answer = WarnOnce.OK_OPTION;
+			helpButtonPressed(); 
+		}
 		else {
+			//System.out.println("CANCEL_OPTION: " +this); 
 			answer = WarnOnce.CANCEL_OPTION;
 			cancelButtonPressed(); 
 		}
@@ -140,6 +191,34 @@ public class WarnOnceDialogFX {
 
 
 
+	/**
+	 * If the help button is pressed then we send the user to a help point or a website
+	 */
+	private void helpButtonPressed() {
+		
+		if (check_URL(helpPoint)) {
+			//go to a websitE
+			try {
+				java.awt.Desktop.getDesktop().browse( new URL(helpPoint).toURI());
+			} catch (IOException | URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else {
+			//GO TO pamgUARD HELP,POINT
+			PamHelp.getInstance().displayContextSensitiveHelp(helpPoint);
+		}
+	}
+	
+	  public static boolean check_URL(String str) {
+		    try {
+		      new URL(str).toURI();
+		      return true;
+		    } catch (Exception e) {
+		      return false;
+		    }
+		  }
 
 	/**
 	 * If the cancel button is pressed, check if this is a warning message.  If it is, then the cancel button is really
@@ -184,6 +263,7 @@ public class WarnOnceDialogFX {
 			ButtonType... buttonTypes) {
 
 		Alert alert = new Alert(type);
+		alert.initModality(Modality.WINDOW_MODAL);
 		// Need to force the alert to layout in order to grab the graphic,
 		// as we are replacing the dialog pane with a custom pane
 		alert.getDialogPane().applyCss();
@@ -210,7 +290,10 @@ public class WarnOnceDialogFX {
 				return checkBoxPane;
 			}
 		});
-		alert.getDialogPane().getButtonTypes().addAll(buttonTypes[0]);
+		
+		alert.getDialogPane().getButtonTypes().addAll(buttonTypes);
+		
+		
 		alert.getDialogPane().setContentText(message);
 		// Fool the dialog into thinking there is some expandable content
 		// a Group won't take up any space if it has no children
@@ -220,6 +303,7 @@ public class WarnOnceDialogFX {
 		alert.getDialogPane().setGraphic(graphic);
 		alert.setTitle(title);
 		alert.setHeaderText(headerText);
+		
 
 		return alert;
 	}

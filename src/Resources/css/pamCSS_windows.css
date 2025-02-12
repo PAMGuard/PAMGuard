@@ -1,0 +1,212 @@
+/* Mimic Windows 11 Swing Look in JavaFX */
+
+/* General Styling */
+.root {
+    -fx-font-family: "Segoe UI"; /* Windows 11 default font */
+    -fx-font-size: 13px; /* Adjust as needed */
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #f0f0f0; /* Light gray background */
+    -fx-border-color: #cccccc; /* Subtle gray border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-padding: 6px 12px; /* Adjust padding as needed */
+    -fx-text-fill: #000000; /* Black text */
+    -fx-alignment: center; /* Center text */
+}
+
+.button:hover {
+    -fx-background-color: #e0e0e0; /* Slightly darker on hover */
+}
+
+.button:pressed {
+    -fx-background-color: #d0d0d0; /* Even darker when pressed */
+}
+
+
+/* Labels */
+.label {
+    -fx-text-fill: #000000; /* Black text */
+}
+
+/* Text Fields */
+.text-field {
+    -fx-background-color: #ffffff; /* White background */
+    -fx-border-color: #cccccc; /* Gray border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-padding: 3px;
+}
+
+/* Checkboxes */
+.check-box .box {
+    -fx-background-color: #ffffff; /* White box */
+    -fx-border-color: #cccccc; /* Gray border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #0078D7; /* Blue checkmark (Windows 11 accent color - adjust if needed) */
+}
+
+/* Radio Buttons */
+.radio-button .radio {
+    -fx-background-color: #ffffff; /* White circle */
+    -fx-border-color: #cccccc; /* Gray border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%; /* Make it a circle */
+}
+
+.radio-button:selected .radio {
+     -fx-background-color: #0078D7; /* Blue dot (Windows 11 accent color - adjust if needed) */
+}
+
+/* Combo Boxes */
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 4px;
+}
+
+/* Scroll Bars (Adjust as needed) */
+.scroll-bar {
+    -fx-background-color: #f0f0f0;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cccccc;
+    -fx-border-radius: 4px;
+}
+
+/* Menus and Menu Items */
+.menu-bar {
+    -fx-background-color: #f0f0f0; /* Light gray menu bar */
+}
+.menu {
+    -fx-padding: 5px;
+}
+.menu-item {
+    -fx-padding: 5px;
+}
+.menu-item:focused {
+    -fx-background-color: #e0e0e0; /* Highlight on hover/focus */
+}
+
+/* Tooltips */
+.tooltip {
+    -fx-background-color: #ffffff; /* White tooltip background */
+    -fx-border-color: #cccccc; /* Gray border */
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+    -fx-text-fill: #000000; /* Black text */
+}
+
+/* List View */
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+}
+
+.list-view .list-cell {
+    -fx-padding: 4px;
+}
+
+.list-view:focused .list-cell:filled:selected {
+    -fx-background-color: #0078D7; /* Blue highlight on selection (Windows 11 accent color) */
+    -fx-text-fill: white;
+}
+
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #e0e0e0; /* Light gray on hover */
+}
+
+
+
+/* Titled Pane */
+.titled-pane > .title {
+    -fx-background-color: #f0f0f0; /* Light gray title bar */
+    -fx-padding: 5px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 0 0 1 0; /* Bottom border only */
+}
+
+.titled-pane > .content {
+    -fx-padding: 10px;
+}
+
+
+/* Progress Bar */
+.progress-bar {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+}
+
+.progress-bar .bar {
+    -fx-background-color: #0078D7; /* Windows 11 accent color */
+}
+
+/* Scroll Pane */
+.scroll-pane {
+    -fx-background-color: #ffffff;
+}
+
+
+/* Tree View */
+.tree-view {
+    -fx-background-color: #ffffff;
+}
+
+.tree-view .tree-cell {
+    -fx-padding: 3px;
+}
+
+.tree-view:focused .tree-cell:filled:selected {
+    -fx-background-color: #0078D7; /* Blue highlight on selection (Windows 11 accent color) */
+    -fx-text-fill: white;
+}
+
+.tree-view .tree-cell:filled:hover {
+    -fx-background-color: #e0e0e0; /* Light gray on hover */
+}
+
+
+
+/* Tab Pane */
+.tab-pane {
+    -fx-tab-min-width: 100; /* Adjust minimum tab width as needed */
+}
+
+.tab-pane .tab-header-area {
+    -fx-background-color: #f0f0f0; /* Light gray tab header */
+    -fx-padding: 0; /* Remove default padding */
+}
+
+.tab-pane .tab {
+    -fx-background-color: #e0e0e0; /* Slightly darker tabs */
+    -fx-padding: 8px 12px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px 1px 0 1px; /* Border on top, left, and right */
+    -fx-border-radius: 3px 3px 0 0; /* Rounded top corners */
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #ffffff; /* White selected tab */
+    -fx-border-color: #cccccc; /* Border on all sides */
+    -fx-border-width: 1px;
+}
+
+.tab-pane .tab-content-area {
+    -fx-padding: 10px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 0 1px 1px 1px; /* Border on bottom, left, and right */
+}
