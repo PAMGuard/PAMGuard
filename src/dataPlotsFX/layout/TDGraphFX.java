@@ -350,14 +350,15 @@ public class TDGraphFX extends PamBorderPane {
 		dataSettingsTabs.startSpacingProperty().bind(getSettingsPane().getHideButton().widthProperty());
 		dataSettingsTabs.setHolderPane(getSettingsPane());
 
-		// add settings panes if any.
-		layoutSettingsPanes();
 
 		// add plots to center of main pane
 		this.setCenter(stackPane);
 
 		// layout axis.
 		layoutTDGraph(tdDisplay.getTDParams().orientation);
+		
+		// add settings panes if any.
+		layoutSettingsPanes();
 
 		// set the default overlay style.
 		setOverlayColour(LIGHT_TD_DISPLAY);

@@ -399,25 +399,45 @@ public abstract class TDDataInfoFX {
 
 			//find a number close to the index start, 			
 			ListIterator<PamDataUnit> it = getUnitIterator( loopStart,  plotNumber);
-
-			clearDraw();
+			
+			clearDraw();			
+			
+			/**
+			 * Need to be careful here. If using line plots then we always want to have the
+			 * first unit outside the screen. This does not matter for scatter points is
+			 * critical for line plots - otherwise the lines do not draw between data units
+			 * outside the screen
+			 */
+			if (it.hasPrevious()) {
+				it.previous();
+			}
+			
+			//true to break after painting the next data unit
+			boolean breakNext = false;
 
 			while (it.hasNext()) {
 				dataUnit = it.next();
 				count++; 
 				if (dataUnit!=null && shouldDraw(plotNumber, dataUnit)) {
 					
-					if (dataUnit.getEndTimeInMilliseconds() < loopStart) {
-						continue;
-					}
+//					if (dataUnit.getEndTimeInMilliseconds() < loopStart) {
+//						continue;
+//					}
+					
+					//at some point we have to stop drawing off the end of the screen but again, for line plots
+					//we want to draw data units that are next if needed. So if past the end of the point that
+					//needs to be painted, set breakNext to true so the next data unit is painted for line plots 
+					//then exit. 
 					if (dataUnit.getTimeMilliseconds() > loopEnd) {
-						break;
+						breakNext = true;
 					}
 					
 					drawCalls++;
 					drawDataUnit(plotNumber, dataUnit, g,  scrollStart, 
 							tdProjector ,TDSymbolChooserFX.NORMAL_SYMBOL);
 				}
+				
+				if (breakNext) break;
 			}
 			
 //			System.out.println("Found: " + drawCalls + "  " + this.getDataName() + "  to draw"); 

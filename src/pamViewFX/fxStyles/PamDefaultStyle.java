@@ -48,7 +48,7 @@ public class PamDefaultStyle {
 	 * Relative location of the CSS style sheet to be used for the Pamguard GUI (but
 	 * not dialogs)
 	 */
-	protected String guiCSS = "/Resources/css/pamCSS.css";
+	protected String guiCSS = null;
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard GUI when
@@ -98,6 +98,7 @@ public class PamDefaultStyle {
 	 */
 	public ArrayList<String> getGUICSS() {
 		ArrayList<String> cssStyles = new ArrayList<String>();
+		if (guiCSS==null) return cssStyles;
 		if (PamColors.getInstance().getColourScheme().getName() == ColourScheme.NIGHTSCHEME
 				&& guiCSSNightMode != null) {
 			cssStyles.add(getClass().getResource(guiCSSNightMode).toExternalForm());
@@ -121,6 +122,7 @@ public class PamDefaultStyle {
 	 */
 	public ArrayList<String> getDialogCSS() {
 		ArrayList<String> cssStyles = new ArrayList<String>();
+		if (dialogCSS==null) return cssStyles;
 		if (PamColors.getInstance().getColourScheme().getName() == ColourScheme.NIGHTSCHEME
 				&& dialogCSSNightMode != null) {
 			cssStyles.add(getClass().getResource(dialogCSSNightMode).toExternalForm());
@@ -144,6 +146,7 @@ public class PamDefaultStyle {
 	 */
 	public ArrayList<String> getSlidingDialogCSS() {
 		ArrayList<String> cssStyles = new ArrayList<String>();
+		if (slidingDialogCSS==null) return cssStyles;
 		if (PamColors.getInstance().getColourScheme().getName() == ColourScheme.NIGHTSCHEME
 				&& slidingDialogCSSNightMode != null) {
 			cssStyles.add(getClass().getResource(slidingDialogCSSNightMode).toExternalForm());
