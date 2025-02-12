@@ -235,25 +235,28 @@ public class TDDisplayFX extends PamBorderPane {
 		controlPane=new TDControlPaneFX(tdControl,this);
 		controlPane.setParams(tdParametersFX);
 		controlPane.setPrefHeight(CONTROL_PANE_HEIGHT);
+		controlPane.setStyle("-fx-background-color: -fx-background;");
+
 
 		hidingControlPane=new HidingPane(Side.TOP, controlPane, this, false );
 		hidingControlPane.showHidePane(tdParametersFX.showControl);
-		hidingControlPane.getStylesheets().clear();
+//		hidingControlPane.getStylesheets().clear();
 //		hidingControlPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); //style as a settings pane. 
-		hidingControlPane.getHideButton().setStyle("-fx-border-color: none;");
+		hidingControlPane.getHideButton().setStyle("-fx-border-color: none; -fx-background-radius: 5 5 0 0;  -fx-border-radius: 5 5 0 0;");
 
 		hidingControlPane.showingProperty().addListener((valProp, oldVal, newVal)->{
 			//set correct showing property.
 			tdParametersFX.showControl=newVal; 
 		});
 		this.setTop(hidingControlPane);
+		hidingControlPane.showHidePane(true);
 
 		//create the button which shows the hiding panel. Although we get this button from the hiding pane, where to place
 		//it and what colour it is etc has to be set for whatever pane it is to be located in. 
 		showButton=hidingControlPane.getShowButton();
 		hidingControlPane.setShowButtonOpacity(1.0);
 //		showButton.getStyleClass().add("transparent-button-square");
-		showButton.setStyle("-fx-background-radius: 0 0 0 10; -fx-border-color: none;");
+		showButton.setStyle("-fx-background-radius: 0 0 0 5; -fx-border-color: none;");
 		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", PamGuiManagerFX.iconSize));
 		showButton.setPrefWidth(30);
 		showButton.setMaxHeight(timeAxisSize-20);

@@ -2,31 +2,21 @@ package rawDeepLearningClassifier.dlClassification.archiveModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
-
 import org.jamdev.jdl4pam.ArchiveModel;
 import org.jamdev.jdl4pam.genericmodel.GenericModelParams;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
-import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformParser2;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 import org.json.JSONObject;
 
-import PamUtils.PamArrayUtils;
-import PamView.dialog.warn.WarnOnce;
 import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
-import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
@@ -90,8 +80,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				//System.out.println(Paths.get(genericParams.modelPath)); 
 				this.currentPath = dlParams.modelPath; 
 				dlModel = loadModel(currentPath);
-				//System.out.println("LOAD A NEW MODEL: "); 
-				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
+				System.out.println("LOAD A NEW MODEL: " + currentPath); 
 			}
 		}
 		catch (EngineException e) {
