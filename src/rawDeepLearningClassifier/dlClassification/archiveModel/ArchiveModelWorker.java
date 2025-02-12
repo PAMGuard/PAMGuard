@@ -80,7 +80,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				//System.out.println(Paths.get(genericParams.modelPath)); 
 				this.currentPath = dlParams.modelPath; 
 				dlModel = loadModel(currentPath);
-				System.out.println("LOAD A NEW MODEL: " + currentPath); 
+				//System.out.println("LOAD A NEW MODEL: " + currentPath); 
 			}
 		}
 		catch (EngineException e) {

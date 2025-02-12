@@ -417,7 +417,9 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 			//System.out.println(" FFTPlotInfo: setSampleRate(float sampleRate, boolean notify)");
 			this.fftSampleRate = sampleRate;
 			// call function in outerclass which can be overridden...
-			Scrolling2DPlotInfo.this.setSampleRate(sampleRate, notify);
+			Platform.runLater(()->{
+				Scrolling2DPlotInfo.this.setSampleRate(sampleRate, notify);
+			});
 		}
 
 

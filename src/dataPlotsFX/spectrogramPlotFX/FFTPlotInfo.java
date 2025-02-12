@@ -148,6 +148,7 @@ public class FFTPlotInfo extends Scrolling2DPlotInfo {
 		boolean setNiquist = (currentMax == currentRange || currentMax > sampleRate/2.); 
 //		DoubleProperty[] frequencyLimits = new doublep
 		spectrogramControlPane.setMinFrequency(0);
+		
 		if (setNiquist) {
 			spectrogramControlPane.setMaxFrequency(sampleRate/2.);
 			//change so that the high limit covers the whole display. 

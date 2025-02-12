@@ -8,6 +8,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
+import PamUtils.FrequencyFormat;
 import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.layout.TDSettingsPane;
 import dataPlotsFX.scrollingPlot2D.Plot2DControPane;
@@ -29,16 +30,17 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 	 * Reference to the TDGraph for this pane. 
 	 */
 	private TDGraphFX tdGraph; 
+//
+//	/**
+//	 * Frequencies can be shown in kHz to stop very large numbers on axis. True if frequencies are to be represented in kHz rather than Hz. 
+//	 */
+//	double frequencyScale = 1;
 
-	/**
-	 * Frequencies can be shown in kHz to stop very large numbers on axis. True if frequencies are to be represented in kHz rather than Hz. 
-	 */
-	double frequencyScale = 1;
-
-	/**
-	 * Value at which the slider switches from Hz to kHz
-	 */
-	private static int convertTokHz=2000;
+//	/**
+//	 * Value at which the slider switches from Hz to kHz
+//	 */
+//	private static int convertTokHz=2000;
+	
 
 
 	private Canvas icon; 
@@ -79,7 +81,7 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 		//add listeners to repaint when frequency changes. 
 		addFrequencyListeners(frequencyLimits);
 	} 
-	
+
 
 	/**
 	 * Add listeners to min/max double property for frequency limits. Will change
@@ -117,21 +119,21 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 		icon.getGraphicsContext2D().fillRect(0, 0, 20, 20);
 	}
 
-//	/**
-//	 * Check whether the slider is displaying in units of Hz or kHz. 
-//	 * @return true if displaying in units of kHz. 
-//	 */
-//	public boolean isKhz(){
-//		return kHz; 
-//	}
+	//	/**
+	//	 * Check whether the slider is displaying in units of Hz or kHz. 
+	//	 * @return true if displaying in units of kHz. 
+	//	 */
+	//	public boolean isKhz(){
+	//		return kHz; 
+	//	}
 
-	/**
-	 * Frequency scale = 1 for Hz and 1000 for kHz. 
-	 * @return the frequencyScale
-	 */
-	public double getFrequencyScale() {
-		return frequencyScale;
-	}
+//	/**
+//	 * Frequency scale = 1 for Hz and 1000 for kHz. 
+//	 * @return the frequencyScale
+//	 */
+//	public double getFrequencyScale() {
+//		return frequencyScale;
+//	}
 
 	/**
 	 * Set the frequency range of the slider. 
@@ -154,18 +156,17 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 
 		if (minVal>=max) minVal=0;
 		if (maxVal>max) maxVal=max; 
+
 		//check to see if using kHz; 
-		if (max>convertTokHz) {
-			frequencyScale = 1000;
-			getFreqLabel().setText("Frequency (kHz)");; 
-		}
-		else {
-			frequencyScale = 1000;
-			getFreqLabel().setText("Frequency (Hz)"); 
-		}
-			max=max/frequencyScale;
-			minVal=minVal/frequencyScale;
-			maxVal=maxVal/frequencyScale;
+		
+		
+		FrequencyFormat format = FrequencyFormat.getFrequencyFormat(max);
+		getFreqLabel().setText("Frequency (" + format.getUnitText() + ")"); 
+		
+//		///scale the frequency by the correct value.
+//		max=max/frequencyScale;
+//		minVal=minVal/frequencyScale;
+//		maxVal=maxVal/frequencyScale;
 
 		getFrequencySlider() .setMin(min);
 		getFrequencySlider() .setMax(max);  //Nyquist
@@ -175,6 +176,8 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 		//set tick mark spacing
 		getFrequencySlider().majorTickUnitProperty().setValue((max-min)/4);
 		getFrequencySlider().majorTickUnitProperty().setValue((max-min)/(4*4));
+		
+		getFrequencySlider().setLabelFormatter(new FrequencyStringConverter(format));
 
 	}
 
@@ -186,19 +189,19 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 	 * frequencyLimits- the frequency limits to set bin to range slider. 
 	 */
 	private void setFrequencyBinding(DoubleProperty[] frequencyLimits){
-//		frequencyLimits[0].unbind();
-//		frequencyLimits[1].unbind();
-//			frequencyLimits[0].bind(getFrequencySlider() .lowValueProperty().multiply(frequencyScale));
-//			frequencyLimits[1].bind(getFrequencySlider() .highValueProperty().multiply(frequencyScale));
-		
+		//		frequencyLimits[0].unbind();
+		//		frequencyLimits[1].unbind();
+		//			frequencyLimits[0].bind(getFrequencySlider() .lowValueProperty().multiply(frequencyScale));
+		//			frequencyLimits[1].bind(getFrequencySlider() .highValueProperty().multiply(frequencyScale));
+
 		getFrequencySlider() .lowValueProperty().addListener((obsVal, oldVal, newVal)->{
-			frequencyLimits[0].setValue(newVal.doubleValue()*frequencyScale);
+			frequencyLimits[0].setValue(newVal.doubleValue());
 		});
-		
+
 		getFrequencySlider() .highValueProperty().addListener((obsVal, oldVal, newVal)->{
-			frequencyLimits[1].setValue(newVal.doubleValue()*frequencyScale);
+			frequencyLimits[1].setValue(newVal.doubleValue());
 		});
-		
+
 	}
 
 	/**
@@ -209,7 +212,6 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 	public void setMinFrequency(double frequency){
 		if (frequency<0) return;
 		double sliderVal=frequency;
-		sliderVal/=frequencyScale;
 		getFrequencySlider() .lowValueProperty().setValue(sliderVal);
 	}
 
@@ -220,16 +222,16 @@ public class TDSpectrogramControlPane extends Plot2DControPane implements TDSett
 	 */
 	public void setMaxFrequency(double frequency){
 		if (frequency<0) return;
-		double sliderVal=frequency/frequencyScale;
+		double sliderVal=frequency;
 		getFrequencySlider().highValueProperty().setValue(sliderVal);
 	}
-	
+
 	/**
 	 * Get the maximum allowable value from the frequency slider. 
 	 * @return maximum allowed value of the range. 
 	 */
 	public double getMaxFrequencyRange() {
-		return getFrequencySlider().getMax()*frequencyScale;
+		return getFrequencySlider().getMax();
 	}
 
 	/**
