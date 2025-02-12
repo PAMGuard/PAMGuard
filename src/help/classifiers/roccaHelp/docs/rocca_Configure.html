@@ -1,389 +1,461 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-<link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Rocca Configuration</title>
+<html>
+<head>
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Rocca Configuration</title>
 
 </head>
 <body>
-<h1>ROCCA</h1>
-<h2>Creation and Configuration</h2>
-<br>
-<h3>Creating a ROCCA module</h3>
-<p>From the <strong><em>File &gt; Add Modules
-&gt; Detectors</em></strong> menu, select "ROCCA".
-Enter a descriptive name for the new module and press OK.</p>
-<p>ROCCA requires an <a href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
-engine module</a>
-to operate. If no FFT engine module has been loaded, PAMGuard will warn
-the user and automatically load one.</p>
-<p>When the ROCCA module is created, it will automatically try to
-load a <a href="#rocca_ClassifierModel">classifier model</a>.
-ROCCA will also check to see if an <a href="#rocca_SchoolStatsFile">Enounter
-Stats file</a> exists. If it does, the user is given the
-option to load the contents of the file into memory.</p>
-<p> <strong>Note:</strong> the Encounter Stats file
-is
-continually overwritten while ROCCA is running. If, upon startup, the
-user
-does not load the data into memory, the information in the file will be
-lost. Thus if the user does not wish to load the data <em>but</em>
-still desires to keep it, the file should be renamed before continuing
-with PAMGuard.</p>
-<br>
-<br>
-<h3><a name="rocca_ParamsContour">Configuring a
-ROCCA module</a></h3>
-<p>Note: the <a href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound
-Acquisition</a> and <a href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
-Engine</a> modules must be configured before configuring ROCCA.</p>
-<p>From the Detection menu, select "ROCCA Parameters". A new
-dialog should appear containing five tabs: <a href="#rocca_SourceTab">Source Data</a>, <a href="#rocca_ParamsClassifier">Contours/Classifier</a>,
-<a href="#rocca_ParamsOutput">Output</a>, <a href="#rocca_ParamsFilename">Filename Template</a>,
-and <a href="#rocca_Notes">Notes.</a></p>
-<a href="#rocca_Notes"><br>
-<br>
-</a>
-<h3><a name="rocca_SourceTab">Source Data tab</a></h3>
-<img style="width: 527px; height: 691px;" alt="" src="images/rocca_params_source2.png">
-<br>
-<ol>
-<li>
-<p>Data Source: where ROCCA should get it's input data from.
-Options include an FFT module (select this if using the manual
-classifier), a <a href="../../clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click
-Detector</a>, and a <a href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
-and Moan Detector</a>. Multiple sources can be selected. The
-whistle and moan detector and/or click detector should be selected if
-using the automated classifier.</p>
-</li>
-<li>
-<p>FFT Data source: the fft data source to be used. The
-channels listed are those currently selected in the <a href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Configuring.html">FFT
-Parameters dialog</a>. ROCCA will save a wav file clip of each
-manually selected whistle contour whenever it is classified and added
-to the current encounter. Check the channel boxes corresponding to the
-channels you wish to save to this clip wav file. Note that this is
-different than the channels displayed in the spectrogram window, which
-are set in the <a href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Configuring.html">display
-options dialog</a>. Whistles can be selected and contours
-extracted from any channel displayed, but the saved whistle clips will
-only contain data from the channels selected in the FFT data source
-box. So it is possible (though not recommended) to extract and classify
-a whistle from Channel 0, but only save the data from Channels 1 and 2.</p>
-</li>
-<li>
-<p>Click Detector source: the Click Detector to be used. Both
-the click source and the noise source must be specified, along with the
-appropriate channels. There are two options for the click source: <em>Clicks</em>
-and <em>Tracked Clicks</em>. Selecting <em>Clicks</em>
-sends <span style="font-weight: bold;">all </span>auto-detected
-clicks to the ROCCA module. Selecting <em>Tracked
-Clicks</em> sends only those clicks which are assigned to click
-trains (see <a href="../../clickDetectorHelp/docs/ClickDetector_clickTrainIdentification.html">Click
-Train Identification</a> and <a href="../../clickDetectorHelp/docs/ClickDetector_clickDetectorDisplays.html">Click
-Detector displays</a>
-for more details) to ROCCA. &nbsp;The 'Select Click Types' button
-allows the
-user to select which types of clicks (as classified by the Click
-Detector module based on user-supplied settings) to send from the Click
-Detector to ROCCA for analysis. </p>
-<p><em>Noise Data
-Samples</em> should be selected for the Click Detector Noise
-Source. These noise data samples are automatically collected by the
-Click Detector module at intervals which can be set by the user in the
-Click Detector Settings dialog window. The noise samples are used to
-calculate the RMSNOISE and SNR click variables</p>
-<p><strong>Note:</strong>
-a <a href="../../clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click
-Detector Module</a> must first be configured and at least one
-Click Classifier defined, for appropriate options to be displayed in
-the Click Detector Data Source frame. See the PAMGuard help files for
-full details on creating and configuring the Click Detector module.</p>
-</li>
-<li>
-<p>Whistle
-and Moan source: the Whistle &amp; Moan Detector to be used. This
-drop-down box will list all currently configured Whistle &amp; Moan
-Detector modules. &nbsp;After
-performing its own analysis, the Whistle
-&amp; Moan Detector will
-send all detected whistles to the ROCCA module. ROCCA will then measure
-<a href="rocca_WhistleSchoolClassification.html">contour
-variables</a>, classify the whistles, add the results to the <a href="rocca_Sidebar.html">sidebar</a> and
-save the results to <a href="rocca_SavedFiles.html">output
-files</a>,
-but no popup Spectrogram window will appear.</p>
-<p><strong>Note:</strong> a <a href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
-&amp; Moan Detector Module</a> must first be added and
-configured for appropriate options to be displayed in the Whistle
-&amp; Moan Data Source frame. See the PAMGuard help files for full
-details on creating and configuring the Whistle &amp; Moan Detector
-module.</p>
-</li>
-<li>
-<p>GPS Source: the source for GPS signals. Some encounter
-classifiers use latitude and longitude
-as classification variables.</p>
-</li>
-</ol>
-<br>
-<br>
-<h3><a name="rocca_ParamsClassifier">Contour/Classifier
-tab</a></h3>
-<img alt="" src="images/rocca_params_contour-classifier6.png" border="0">&nbsp;<br>
-<ol>
-<li>
-<p><a name="rocca_ClassifierModel">Whistle
-Classifier</a>: select the classifier to be used for whistles.
-The available classifier models were created based on the <a href="http://www.cs.waikato.ac.nz/ml/weka/index.html">Weka</a>
-Random Forest model. A classifier model uses the file extension .model.
-To select a classifier model, click the <span style="font-style: italic;">Select Whistle Classifier</span>
-button. To not classify whistles at all, click the <span style="font-style: italic;">Clear Whistle Classifier</span>
-button. &nbsp;At
-the moment the ability to create new classifiers within PAMGuard is not
-available.</p>
-</li>
-<li>
-<p><a name="rocca_ClickClassifierModel">Click
-Classifier</a>: select the classifier to be used for clicks.
-The available classifier models were created based on the <a href="http://www.cs.waikato.ac.nz/ml/weka/index.html">Weka</a>
-Random Forest model. A classifier model uses the file extension .model.
-To select a classifier model, click the <span style="font-style: italic;">Select Click Classifier</span>
-button. To not classify clicks at all, click the <span style="font-style: italic;">Clear Click Classifier</span>
-button. &nbsp;At
-the moment the ability to create new classifiers within PAMGuard is not
-available.</p>
-</li>
-<li>
-<p><a name="rocca_SchoolClassifierModel">Encounter
-Classifier</a>: select the classifier to be used for acoustic
-encounters.
-Classifier models are created based on the <a href="http://www.cs.waikato.ac.nz/ml/weka/index.html">Weka</a>
-Random Forest model. A classifier model uses the file extension .model.
-To select a classifier model, click the <span style="font-style: italic;">Select Encounter Classifier</span>
-button. To not classify encounters at all, click the <span style="font-style: italic;">Clear Encounter Classifier</span>
-button. &nbsp;At
-the moment the ability to create new classifiers within PAMGuard is not
-available.</p>
-</li>
-<li>
-<p>Whistle/Click Threshold: the threshold value to use when <a href="rocca_WhistleSchoolClassification.html">classifying
-individual whistles or clicks</a>. If the percent of trees voting
-for the
-predicted species in the random forest falls below this threshold, the
-whistle or click is considered non-classifiable and is labelled as
-&#8216;ambiguous&#8217;.</p>
-</li>
-<li>
-<p>Encounter Threshold: the threshold value to use when <a href="rocca_WhistleSchoolClassification.html#SchoolClassification">classifying
-encounters</a>. If the percent of trees voting for the predicted
-species in the random forest falls below this threshold, the encounter
-is considered non-classifiable and is labelled as &#8216;ambiguous&#8217;.</p>
-</li>
-<li>
-<p>The whistle/click threshold can be used in one of two ways: as an absolute value, or as the 
-minimum difference between the highest vote and the second-highest vote.  If used as an absolute, whistles will only be classified
- if the percent of trees in the random forest voting for the predicted species is higher than the selected threshold.
-  If used as a difference, whistles will only be classified if the highest percentage of trees in the random forest voting for the
-   predicted species is greater than the second-highest percentage by the threshold value.</p>
-</li>
-<li>
-<p>Noise Sensitivity: specify the global noise sensitivity
-parameter to use when <a href="rocca_ContourExtractionManipulation.html">extracting a
-whistle
-contour</a>.</p>
-</li>
-<li>
-<p>Energy Bin Calc Size: specify the size of the frequency
-bin used to calculate the energy around each peak frequency.</p>
-</li>
-<li>
-<p><a name="SchoolStats"></a>Calculate
-Whistle Encounter Stats:select whether or not to calculate ancillary
-variables for the detected whistles, for use by the Encounter
-Classifier. Calculations may cause memory issues when there are many
-(&gt;1000) whistles.&nbsp; </p>
-</li>
-<li>
-<p>Calculate Click School Stats:select whether or not to
-calculate ancillary variables for the detected clicks, for use by the
-Encounter Classifier. Calculations may cause memory issues when there
-are many (&gt;1000) clicks.
-</p>
-</li>
-</ol>
-<p>Note that the Whistle, Click and Encounter classifiers
-selected
-by the
-user should all have been trained with the same species list in order
-to be compatible with each other.</p>
-<p>Note also
-that if either whistle or click encounter stats are not calculated, the
-encounter
-classification will be based on whistle or click classification results
-only. The number of
-trees that voted
-for each species will be tallied over all whistles and clicks in the
-encounter
-and the encounter will be classified as the species with
-the&nbsp;<a href="rocca_WhistleSchoolClassification.html">highest
-number of random forest tree votes</a>. Even if an encounter
-classifier has been loaded, it will be ignored.</p>
-<br>
-<h3><a name="rocca_ParamsOutput">Output tab</a></h3>
-<img alt="" src="images/rocca_params_output3.png" height="593" width="507">
-<br>
-<ol>
-<li>
-<p><a name="OutputDir">Output Directory</a>:
-specify which directory clip wav files, whistle contour points and
-whistle contour variable measurements are <a href="rocca_SavedFiles.html#individ">saved</a>
-to.
-Note that, with Microsoft Windows operating systems, it is a good idea
-to select a directory that does not require administrator privileges to
-save to.</p>
-</li>
-<li>
-<p><a href="rocca_SavedFiles.html#contour">Contour
-Stats Save File</a>:
-specify the name of the file that classified whistle contour variables
-are saved to. The file will be saved to the output directory, specified
-above. Each classified whistle is appended to the end of the file when
-one of the Save buttons in the Spectrogram Popup window is clicked.</p>
-</li>
-<li>
-<p><a name="rocca_SchoolStatsFile"></a><a href="rocca_SavedFiles.html#school">Encounter Stats Save File</a>:
-specify the name of the file that encounter classifications are saved
-to. The file will be saved to the output directory, specified above.
-Note that in order to use the latest encounter numbers, this file is
-overwritten during each save. While this is not a problem as long as
-PAMGuard is run continuously, if this file exists when PAMGuard is
-first loaded the contents will be lost. If the file exists during start
-up, the user is warned and given a chance to load/rename/backup the
-existing file.</p>
-</li>
-</ol>
-<br>
-<br>
-<h3><a name="rocca_ParamsFilename">Filename Template
-tab</a></h3>
-<img alt="" src="images/rocca_params_filename3.png" height="583" width="452">
-<p>In addition to the Contour Stats and Encounter Stats save
-files,
-ROCCA
-also saves a whistle clip (wav format) and a list of the contour points
-(time and frequency, csv format). These files will be named according
-to the template given in the text box on this tab. As part of the name,
-the user is able to use any of the following symbols. When the files
-are saved, ROCCA will substitute the actual values for the symbol names.</p>
-<p>
-<table class="roccaTable" align="center">
-<tbody>
-<tr>
-<th width="90">Symbol</th>
-<th width="150">Meaning</th>
-<th width="50">&nbsp;</th>
-<th width="90">Symbol</th>
-<th width="150">Meaning</th>
-</tr>
-<tr>
-<td>f</td>
-<td>name of source</td>
-<td>&nbsp;</td>
-<td>H</td>
-<td>hour, 24-hour clock</td>
-</tr>
-<tr>
-<td>n</td>
-<td>detection number</td>
-<td>&nbsp;</td>
-<td>h</td>
-<td>hour, 12-hour clock</td>
-</tr>
-<tr>
-<td>X</td>
-<td>detection tally/count</td>
-<td>&nbsp;</td>
-<td>a</td>
-<td><em>am</em> or <em>pm</em></td>
-</tr>
-<tr>
-<td>t</td>
-<td>channel/track number</td>
-<td>&nbsp;</td>
-<td>m</td>
-<td>minute</td>
-</tr>
-<tr>
-<td>Y</td>
-<td>year, 4 digits</td>
-<td>&nbsp;</td>
-<td>s</td>
-<td>second</td>
-</tr>
-<tr>
-<td>y</td>
-<td>year, 2 digits</td>
-<td>&nbsp;</td>
-<td>S</td>
-<td>second of the day, 5 digits</td>
-</tr>
-<tr>
-<td>M</td>
-<td>month</td>
-<td>&nbsp;</td>
-<td>d</td>
-<td>tenths of a second</td>
-</tr>
-<tr>
-<td>D</td>
-<td>day of the month</td>
-<td>&nbsp;</td>
-<td>c</td>
-<td>hundredths of a second</td>
-</tr>
-<tr>
-<td>J</td>
-<td>day of the year, 3 digits</td>
-<td>&nbsp;</td>
-<td>i</td>
-<td>thousandths of a second</td>
-</tr>
-</tbody>
-</table>
-</p>
-<p>Note that all date/time values are GMT.</p>
-<br>
-<br>
-<h3><a name="rocca_Notes">Notes tab</a></h3>
-<img style="width: 402px; height: 566px;" alt="" src="images/rocca_params_notes2.png" hspace="20">
-<p>This tab provides the user an opportunity to save additional
-information about the data. Any number of text boxes can be
-used. The information contained in the text boxes will be saved on
-every row of the <a href="rocca_SavedFiles.html">Contour
-Parameters</a>
-file. In addition, a text file containing standard notes can be loaded.
-The contents of the text file will then be available in a drop-down
-list for each text box. The format of the text file is one note per
-line.</p>
-<p>Note: commas cannot be used in the text boxes or the standard
-notes text file.</p>
-<br>
-<br>
-<h3>ROCCA&nbsp;Mark Observers</h3>
-<p>ROCCA&nbsp;must be added to the <a href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Configuring.html#MarkObservers">Mark
-Observers</a>
-list in the spectrogram in order to receive captured data. To do so,
-right click on the spectrogram and select Settings. Select the Mark
-Observers tab and check the box beside ROCCA. If ROCCA is not listed as
-a possible mark observer, it has not been added as a module.</p>
-<br>
-<br>
-<br>
-<p class="prevLink"><a href="rocca_Overview.html">Previous:
-ROCCA Overview</a></p>
-<p class="nextLink"><a href="rocca_SelectingWhistle.html">Next:
-Selecting a Whistle</a></p>
-<br>
-<br>
-<br>
-</body></html>
+	<h1>ROCCA</h1>
+	<h2>Creation and Configuration</h2>
+	<br>
+	<h3>Creating a ROCCA module</h3>
+	<p>
+		From the <strong><em>File &gt; Add Modules &gt;
+				Detectors</em></strong> menu, select "ROCCA". Enter a descriptive name for the new
+		module and press OK.
+	</p>
+	<p>
+		ROCCA requires an <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
+			engine module</a> to operate. If no FFT engine module has been loaded,
+		PAMGuard will warn the user and automatically load one.
+	</p>
+	<p>
+		When the ROCCA module is created, it will automatically try to load a
+		<a href="#rocca_ClassifierModel">classifier model</a>. ROCCA will also
+		check to see if an <a href="#rocca_SchoolStatsFile">Enounter Stats
+			file</a> exists. If it does, the user is given the option to load the
+		contents of the file into memory.
+	</p>
+	<p>
+		<strong>Note:</strong> the Encounter Stats file is continually
+		overwritten while ROCCA is running. If, upon startup, the user does
+		not load the data into memory, the information in the file will be
+		lost. Thus if the user does not wish to load the data <em>but</em>
+		still desires to keep it, the file should be renamed before continuing
+		with PAMGuard.
+	</p>
+	<br>
+	<br>
+	<h3>
+		<a name="rocca_ParamsContour">Configuring a ROCCA module</a>
+	</h3>
+	<p>
+		Note: the <a
+			href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound
+			Acquisition</a> and <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
+			Engine</a> modules must be configured before configuring ROCCA.
+	</p>
+	<p>
+		From the Detection menu, select "ROCCA Parameters". A new dialog
+		should appear containing five tabs: <a href="#rocca_SourceTab">Source
+			Data</a>, <a href="#rocca_ParamsClassifier">Contours/Classifier</a>, <a
+			href="#rocca_ParamsOutput">Output</a>, <a
+			href="#rocca_ParamsFilename">Filename Template</a>, and <a
+			href="#rocca_Notes">Notes.</a>
+	</p>
+	<a href="#rocca_Notes"><br> <br> </a>
+	<h3>
+		<a name="rocca_SourceTab">Source Data tab</a>
+	</h3>
+	<img style="width: 527px; height: 691px;" alt=""
+		src="images/rocca_params_source2.png">
+	<br>
+	<ol>
+		<li>
+			<p>
+				Data Source: where ROCCA should get it's input data from. Options
+				include an FFT module (select this if using the manual classifier),
+				a <a
+					href="../../clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click
+					Detector</a>, and a <a
+					href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
+					and Moan Detector</a>. Multiple sources can be selected. The whistle
+				and moan detector and/or click detector should be selected if using
+				the automated classifier.
+			</p>
+		</li>
+		<li>
+			<p>
+				FFT Data source: the fft data source to be used. The channels listed
+				are those currently selected in the <a
+					href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Configuring.html">FFT
+					Parameters dialog</a>. ROCCA will save a wav file clip of each manually
+				selected whistle contour whenever it is classified and added to the
+				current encounter. Check the channel boxes corresponding to the
+				channels you wish to save to this clip wav file. Note that this is
+				different than the channels displayed in the spectrogram window,
+				which are set in the <a
+					href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Configuring.html">display
+					options dialog</a>. Whistles can be selected and contours extracted
+				from any channel displayed, but the saved whistle clips will only
+				contain data from the channels selected in the FFT data source box.
+				So it is possible (though not recommended) to extract and classify a
+				whistle from Channel 0, but only save the data from Channels 1 and
+				2.
+			</p>
+		</li>
+		<li>
+			<p>
+				Click Detector source: the Click Detector to be used. Both the click
+				source and the noise source must be specified, along with the
+				appropriate channels. There are two options for the click source: <em>Clicks</em>
+				and <em>Tracked Clicks</em>. Selecting <em>Clicks</em> sends <span
+					style="font-weight: bold;">all </span>auto-detected clicks to the
+				ROCCA module. Selecting <em>Tracked Clicks</em> sends only those
+				clicks which are assigned to click trains (see <a
+					href="../../clickDetectorHelp/docs/ClickDetector_clickTrainIdentification.html">Click
+					Train Identification</a> and <a
+					href="../../clickDetectorHelp/docs/ClickDetector_clickDetectorDisplays.html">Click
+					Detector displays</a> for more details) to ROCCA. &nbsp;The 'Select
+				Click Types' button allows the user to select which types of clicks
+				(as classified by the Click Detector module based on user-supplied
+				settings) to send from the Click Detector to ROCCA for analysis.
+			</p>
+			<p>
+				<em>Noise Data Samples</em> should be selected for the Click
+				Detector Noise Source. These noise data samples are automatically
+				collected by the Click Detector module at intervals which can be set
+				by the user in the Click Detector Settings dialog window. The noise
+				samples are used to calculate the RMSNOISE and SNR click variables
+			</p>
+			<p>
+				<strong>Note:</strong> a <a
+					href="../../clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click
+					Detector Module</a> must first be configured and at least one Click
+				Classifier defined, for appropriate options to be displayed in the
+				Click Detector Data Source frame. See the PAMGuard help files for
+				full details on creating and configuring the Click Detector module.
+			</p>
+		</li>
+		<li>
+			<p>
+				Whistle and Moan source: the Whistle &amp; Moan Detector to be used.
+				This drop-down box will list all currently configured Whistle &amp;
+				Moan Detector modules. &nbsp;After performing its own analysis, the
+				Whistle &amp; Moan Detector will send all detected whistles to the
+				ROCCA module. ROCCA will then measure <a
+					href="rocca_WhistleSchoolClassification.html">contour variables</a>,
+				classify the whistles, add the results to the <a
+					href="rocca_Sidebar.html">sidebar</a> and save the results to <a
+					href="rocca_SavedFiles.html">output files</a>, but no popup
+				Spectrogram window will appear.
+			</p>
+			<p>
+				<strong>Note:</strong> a <a
+					href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
+					&amp; Moan Detector Module</a> must first be added and configured for
+				appropriate options to be displayed in the Whistle &amp; Moan Data
+				Source frame. See the PAMGuard help files for full details on
+				creating and configuring the Whistle &amp; Moan Detector module.
+			</p>
+		</li>
+		<li>
+			<p>GPS Source: the source for GPS signals. Some encounter
+				classifiers use latitude and longitude as classification variables.</p>
+		</li>
+	</ol>
+	<br>
+	<br>
+	<h3>
+		<a name="rocca_ParamsClassifier">Contour/Classifier tab</a>
+	</h3>
+	<img alt="" src="images/rocca_params_contour-classifier6.png"
+		border="0">&nbsp;
+	<br>
+	<ol>
+		<li>
+			<p>
+				<a name="rocca_ClassifierModel">Whistle Classifier</a>: select the
+				classifier to be used for whistles. The available classifier models
+				were created based on the <a
+					href="http://ml.cms.waikato.ac.nz/weka/index.html">Weka</a>
+				Random Forest model. A classifier model uses the file extension
+				.model. To select a classifier model, click the <span
+					style="font-style: italic;">Select Whistle Classifier</span>
+				button. To not classify whistles at all, click the <span
+					style="font-style: italic;">Clear Whistle Classifier</span> button.
+				&nbsp;At the moment the ability to create new classifiers within
+				PAMGuard is not available.
+			</p>
+		</li>
+		<li>
+			<p>
+				<a name="rocca_ClickClassifierModel">Click Classifier</a>: select
+				the classifier to be used for clicks. The available classifier
+				models were created based on the <a
+					href="http://ml.cms.waikato.ac.nz/weka/index.html">Weka</a>
+				Random Forest model. A classifier model uses the file extension
+				.model. To select a classifier model, click the <span
+					style="font-style: italic;">Select Click Classifier</span> button.
+				To not classify clicks at all, click the <span
+					style="font-style: italic;">Clear Click Classifier</span> button.
+				&nbsp;At the moment the ability to create new classifiers within
+				PAMGuard is not available.
+			</p>
+		</li>
+		<li>
+			<p>
+				<a name="rocca_SchoolClassifierModel">Encounter Classifier</a>:
+				select the classifier to be used for acoustic encounters. Classifier
+				models are created based on the <a
+					href="http://ml.cms.waikato.ac.nz/weka/index.html">Weka</a>
+				Random Forest model. A classifier model uses the file extension
+				.model. To select a classifier model, click the <span
+					style="font-style: italic;">Select Encounter Classifier</span>
+				button. To not classify encounters at all, click the <span
+					style="font-style: italic;">Clear Encounter Classifier</span>
+				button. &nbsp;At the moment the ability to create new classifiers
+				within PAMGuard is not available.
+			</p>
+		</li>
+		<li>
+			<p>
+				Whistle/Click Threshold: the threshold value to use when <a
+					href="rocca_WhistleSchoolClassification.html">classifying
+					individual whistles or clicks</a>. If the percent of trees voting for
+				the predicted species in the random forest falls below this
+				threshold, the whistle or click is considered non-classifiable and
+				is labelled as &#8216;ambiguous&#8217;.
+			</p>
+		</li>
+		<li>
+			<p>
+				Encounter Threshold: the threshold value to use when <a
+					href="rocca_WhistleSchoolClassification.html#SchoolClassification">classifying
+					encounters</a>. If the percent of trees voting for the predicted
+				species in the random forest falls below this threshold, the
+				encounter is considered non-classifiable and is labelled as
+				&#8216;ambiguous&#8217;.
+			</p>
+		</li>
+		<li>
+			<p>The whistle/click threshold can be used in one of two ways: as
+				an absolute value, or as the minimum difference between the highest
+				vote and the second-highest vote. If used as an absolute, whistles
+				will only be classified if the percent of trees in the random forest
+				voting for the predicted species is higher than the selected
+				threshold. If used as a difference, whistles will only be classified
+				if the highest percentage of trees in the random forest voting for
+				the predicted species is greater than the second-highest percentage
+				by the threshold value.</p>
+		</li>
+		<li>
+			<p>
+				Noise Sensitivity: specify the global noise sensitivity parameter to
+				use when <a href="rocca_ContourExtractionManipulation.html">extracting
+					a whistle contour</a>.
+			</p>
+		</li>
+		<li>
+			<p>Energy Bin Calc Size: specify the size of the frequency bin
+				used to calculate the energy around each peak frequency.</p>
+		</li>
+		<li>
+			<p>
+				<a name="SchoolStats"></a>Calculate Whistle Encounter Stats:select
+				whether or not to calculate ancillary variables for the detected
+				whistles, for use by the Encounter Classifier. Calculations may
+				cause memory issues when there are many (&gt;1000) whistles.&nbsp;
+			</p>
+		</li>
+		<li>
+			<p>Calculate Click School Stats:select whether or not to
+				calculate ancillary variables for the detected clicks, for use by
+				the Encounter Classifier. Calculations may cause memory issues when
+				there are many (&gt;1000) clicks.</p>
+		</li>
+	</ol>
+	<p>Note that the Whistle, Click and Encounter classifiers selected
+		by the user should all have been trained with the same species list in
+		order to be compatible with each other.</p>
+	<p>
+		Note also that if either whistle or click encounter stats are not
+		calculated, the encounter classification will be based on whistle or
+		click classification results only. The number of trees that voted for
+		each species will be tallied over all whistles and clicks in the
+		encounter and the encounter will be classified as the species with
+		the&nbsp;<a href="rocca_WhistleSchoolClassification.html">highest
+			number of random forest tree votes</a>. Even if an encounter classifier
+		has been loaded, it will be ignored.
+	</p>
+	<br>
+	<h3>
+		<a name="rocca_ParamsOutput">Output tab</a>
+	</h3>
+	<img alt="" src="images/rocca_params_output3.png" height="593"
+		width="507">
+	<br>
+	<ol>
+		<li>
+			<p>
+				<a name="OutputDir">Output Directory</a>: specify which directory
+				clip wav files, whistle contour points and whistle contour variable
+				measurements are <a href="rocca_SavedFiles.html#individ">saved</a>
+				to. Note that, with Microsoft Windows operating systems, it is a
+				good idea to select a directory that does not require administrator
+				privileges to save to.
+			</p>
+		</li>
+		<li>
+			<p>
+				<a href="rocca_SavedFiles.html#contour">Contour Stats Save File</a>:
+				specify the name of the file that classified whistle contour
+				variables are saved to. The file will be saved to the output
+				directory, specified above. Each classified whistle is appended to
+				the end of the file when one of the Save buttons in the Spectrogram
+				Popup window is clicked.
+			</p>
+		</li>
+		<li>
+			<p>
+				<a name="rocca_SchoolStatsFile"></a><a
+					href="rocca_SavedFiles.html#school">Encounter Stats Save File</a>:
+				specify the name of the file that encounter classifications are
+				saved to. The file will be saved to the output directory, specified
+				above. Note that in order to use the latest encounter numbers, this
+				file is overwritten during each save. While this is not a problem as
+				long as PAMGuard is run continuously, if this file exists when
+				PAMGuard is first loaded the contents will be lost. If the file
+				exists during start up, the user is warned and given a chance to
+				load/rename/backup the existing file.
+			</p>
+		</li>
+	</ol>
+	<br>
+	<br>
+	<h3>
+		<a name="rocca_ParamsFilename">Filename Template tab</a>
+	</h3>
+	<img alt="" src="images/rocca_params_filename3.png" height="583"
+		width="452">
+	<p>In addition to the Contour Stats and Encounter Stats save files,
+		ROCCA also saves a whistle clip (wav format) and a list of the contour
+		points (time and frequency, csv format). These files will be named
+		according to the template given in the text box on this tab. As part
+		of the name, the user is able to use any of the following symbols.
+		When the files are saved, ROCCA will substitute the actual values for
+		the symbol names.</p>
+	<p>
+	<table class="roccaTable" align="center">
+		<tbody>
+			<tr>
+				<th width="90">Symbol</th>
+				<th width="150">Meaning</th>
+				<th width="50">&nbsp;</th>
+				<th width="90">Symbol</th>
+				<th width="150">Meaning</th>
+			</tr>
+			<tr>
+				<td>f</td>
+				<td>name of source</td>
+				<td>&nbsp;</td>
+				<td>H</td>
+				<td>hour, 24-hour clock</td>
+			</tr>
+			<tr>
+				<td>n</td>
+				<td>detection number</td>
+				<td>&nbsp;</td>
+				<td>h</td>
+				<td>hour, 12-hour clock</td>
+			</tr>
+			<tr>
+				<td>X</td>
+				<td>detection tally/count</td>
+				<td>&nbsp;</td>
+				<td>a</td>
+				<td><em>am</em> or <em>pm</em></td>
+			</tr>
+			<tr>
+				<td>t</td>
+				<td>channel/track number</td>
+				<td>&nbsp;</td>
+				<td>m</td>
+				<td>minute</td>
+			</tr>
+			<tr>
+				<td>Y</td>
+				<td>year, 4 digits</td>
+				<td>&nbsp;</td>
+				<td>s</td>
+				<td>second</td>
+			</tr>
+			<tr>
+				<td>y</td>
+				<td>year, 2 digits</td>
+				<td>&nbsp;</td>
+				<td>S</td>
+				<td>second of the day, 5 digits</td>
+			</tr>
+			<tr>
+				<td>M</td>
+				<td>month</td>
+				<td>&nbsp;</td>
+				<td>d</td>
+				<td>tenths of a second</td>
+			</tr>
+			<tr>
+				<td>D</td>
+				<td>day of the month</td>
+				<td>&nbsp;</td>
+				<td>c</td>
+				<td>hundredths of a second</td>
+			</tr>
+			<tr>
+				<td>J</td>
+				<td>day of the year, 3 digits</td>
+				<td>&nbsp;</td>
+				<td>i</td>
+				<td>thousandths of a second</td>
+			</tr>
+		</tbody>
+	</table>
+	</p>
+	<p>Note that all date/time values are GMT.</p>
+	<br>
+	<br>
+	<h3>
+		<a name="rocca_Notes">Notes tab</a>
+	</h3>
+	<img style="width: 402px; height: 566px;" alt=""
+		src="images/rocca_params_notes2.png" hspace="20">
+	<p>
+		This tab provides the user an opportunity to save additional
+		information about the data. Any number of text boxes can be used. The
+		information contained in the text boxes will be saved on every row of
+		the <a href="rocca_SavedFiles.html">Contour Parameters</a> file. In
+		addition, a text file containing standard notes can be loaded. The
+		contents of the text file will then be available in a drop-down list
+		for each text box. The format of the text file is one note per line.
+	</p>
+	<p>Note: commas cannot be used in the text boxes or the standard
+		notes text file.</p>
+	<br>
+	<br>
+	<h3>ROCCA&nbsp;Mark Observers</h3>
+	<p>
+		ROCCA&nbsp;must be added to the <a
+			href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Configuring.html#MarkObservers">Mark
+			Observers</a> list in the spectrogram in order to receive captured data.
+		To do so, right click on the spectrogram and select Settings. Select
+		the Mark Observers tab and check the box beside ROCCA. If ROCCA is not
+		listed as a possible mark observer, it has not been added as a module.
+	</p>
+	<br>
+	<br>
+	<br>
+	<p class="prevLink">
+		<a href="rocca_Overview.html">Previous: ROCCA Overview</a>
+	</p>
+	<p class="nextLink">
+		<a href="rocca_SelectingWhistle.html">Next: Selecting a Whistle</a>
+	</p>
+	<br>
+	<br>
+	<br>
+</body>
+</html>
