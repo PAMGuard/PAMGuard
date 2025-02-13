@@ -2983,8 +2983,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				}
 			}
 			catch (Exception e) {
-				// avoid synck lock 
-				System.out.println("Exception in wsl draw: " + e.getMessage());
+				// avoid synck lock Occasional exceptions are a concurrentmodifiedexception I think. 
+//				System.out.println("Exception in wsl draw: " + e.getMessage());
 //				e.printStackTrace();
 			}
 
