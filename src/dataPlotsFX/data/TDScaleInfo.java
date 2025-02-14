@@ -2,15 +2,12 @@ package dataPlotsFX.data;
 
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
-import PamguardMVC.debug.Debug;
 import dataPlots.data.TDDataInfo;
 import dataPlotsFX.projector.TDProjectorFX;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 /**
  * Information about the scale requirements
@@ -79,6 +76,11 @@ public class TDScaleInfo {
 	 *  minimum is at top of graph and the maximum is a the bottom 
 	 */
 	private boolean reverseAxis = false; 
+	
+//	/**
+//	 * String converter for axis. 
+//	 */
+//	private StringConverter<Double> stringConverter =  new DoubleStringConverter();
 
 
 	//	@Deprecated
@@ -387,6 +389,14 @@ public class TDScaleInfo {
 		minVal.set(scaleInfoData.minVal);
 		maxVal.set(scaleInfoData.maxVal);
 	}
+	
+//	/**
+//	 * Get the string converter. This is used for writing units to axis
+//	 * @return the string converter;
+//	 */
+//	public StringConverter<Double> getUnitConverter(){
+//		return stringConverter;
+//	}
 
 	/**
 	 * If true then the axis is reversed

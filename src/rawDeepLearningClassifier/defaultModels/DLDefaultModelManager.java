@@ -1,6 +1,8 @@
 package rawDeepLearningClassifier.defaultModels;
 
 import java.util.ArrayList;
+
+import PamModel.SMRUEnable;
 import rawDeepLearningClassifier.DLControl;
 
 /**
@@ -27,7 +29,9 @@ public class DLDefaultModelManager {
 		defaultModels.add(new RightWhaleModel1());
 		defaultModels.add(new HumpbackWhaleGoogle());
 		defaultModels.add(new HumpbackWhaleAtlantic());
-		defaultModels.add(new MultiSpeciesGoogle());
+		if (SMRUEnable.isDevEnable()) {
+			defaultModels.add(new MultiSpeciesGoogle());
+		}
 	}
 
 	

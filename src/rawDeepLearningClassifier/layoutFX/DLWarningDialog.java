@@ -14,7 +14,7 @@ public class DLWarningDialog {
 	private DLSettingsPane rawDLSettingsPane;
 
 	public DLWarningDialog(DLSettingsPane rawDLSettingsPane) {
-		this.rawDLSettingsPane=rawDLSettingsPane;
+	this.rawDLSettingsPane=rawDLSettingsPane;
 	}
 
 	/**
@@ -23,12 +23,12 @@ public class DLWarningDialog {
 	 */
 	public void showWarningDialog(DLStatus dlWarning) {
 		switch(dlWarning) {
-		case MODEL_ENGINE_FAIL: 
+		case MODEL_ENGINE_FAIL:
 			//special warning dialog 
 			// show the warning
 			if (warningShow) return;
 			warningShow=true;
-
+			
 			Platform.runLater(()->{
 				String helpURL = "http://www.pamguard.org/deeplearning/deep_learning_troubleshoot.html";
 				WarnOnce.showWarningFX(rawDLSettingsPane.getFXWindow(),  dlWarning.getName(),  dlWarning.getDescription() , AlertType.ERROR, helpURL, null,null, null, true);
@@ -36,26 +36,25 @@ public class DLWarningDialog {
 				//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
 			});
 
-
-			//			try {
-			//				SwingUtilities.invokeAndWait(()->{
-			//				WarnOnce.showWarning(dlWarning.getName(), dlWarning.getDescription(), WarnOnce.WARNING_MESSAGE, 
-			//						"https://www.pamguard.org/deeplearning/deep_lerning_troubleshoot.html", null, null, null, true);
-			//				warningShow=false;
-			//				});
-			//			} catch (Exception e) {
-			//				// TODO Auto-generated catch block
-			//				e.printStackTrace();
-			//			} 
+			
+//			try {
+//				SwingUtilities.invokeAndWait(()->{
+//				WarnOnce.showWarning(dlWarning.getName(), dlWarning.getDescription(), WarnOnce.WARNING_MESSAGE, 
+//						"https://www.pamguard.org/deeplearning/deep_lerning_troubleshoot.html", null, null, null, true);
+//				warningShow=false;
+//				});
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} 
 			break;
-
-		default:
+		default: 
 			//default for most warnings. 
 			ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
 			dlWarnings.add(DLSettingsPane.statusToWarnings(dlWarning)); 
-			showWarning(dlWarnings); 
-		}
+			showWarning(dlWarnings);
 
+		}	
 	}
 
 
@@ -70,15 +69,15 @@ public class DLWarningDialog {
 			warningShow = false;
 			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
 		});
-		//		try {
-		//			SwingUtilities.invokeAndWait(()->{
-		//		WarnOnce.showWarning("Deep Learning Warning", dlWarning, WarnOnce.WARNING_MESSAGE, 
-		//				null, null, null, null, true);
-		//			});
-		//		} catch (Exception e) {
-		//			// TODO Auto-generated catch block
-		//			e.printStackTrace();
-		//		} 
+//		try {
+//			SwingUtilities.invokeAndWait(()->{
+//		WarnOnce.showWarning("Deep Learning Warning", dlWarning, WarnOnce.WARNING_MESSAGE, 
+//				null, null, null, null, true);
+//			});
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} 
 		warningShow = false;
 		//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
 
