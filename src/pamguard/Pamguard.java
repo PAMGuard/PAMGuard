@@ -405,7 +405,8 @@ public class Pamguard {
 //		System.out.println("Revision " + PamguardVersionInfo.getRevision());
 		System.out.println("Build Date " + PamguardVersionInfo.date);
 		writePropertyString("user.dir");
-		writePropertyString("java.home");
+		writePropertyString("user.home"); // where launched from. 
+		writePropertyString("java.home"); // something in users, e.g. users/dg50
 		writePropertyString("java.name");
 		String javaV = writePropertyString("java.version");
 		writePropertyString("java.vendor");

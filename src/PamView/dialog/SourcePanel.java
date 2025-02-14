@@ -234,6 +234,9 @@ public class SourcePanel implements ActionListener{
 		if (channelBoxes == null) return;
 		int channels = 0;
 		PamDataBlock sb = getSource();
+		if (sb == null) {
+			return;
+		}
 		String chanOrSeqString = "Channel ";
 		channelListHeader.setText("Channel list ...");
 		
@@ -491,7 +494,11 @@ public class SourcePanel implements ActionListener{
 	 * @param channelList bitmap of currently selected channels
 	 */
 	public void setChannelList(int channelList) {
-		var availableChannels = getSource().getSequenceMap();
+		PamDataBlock source = getSource();
+		if (source == null) {
+			return;
+		}
+		var availableChannels = source.getSequenceMap();
 		var toSelect = channelList & availableChannels;
 
 		if (toSelect != channelList) {
