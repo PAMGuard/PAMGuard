@@ -57,6 +57,15 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	public synchronized DLStatus prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
+			
+			if (dlParams.modelPath==null) {
+				return DLStatus.FILE_NULL;
+			}
+			
+			if (!new File(dlParams.modelPath).exists()) {
+				System.out.println("FILE DOES NOT EXISTS!! " + dlParams.modelPath);
+				return DLStatus.MODEL_FILE_EXISTS;
+			}
 
 			// get the plugin class loader and set it as the context class loader
 			// NOTE THAT THIS IS REQUIRED TO MAKE THIS MODULE RUN AS A PLUGIN WHEN THE CLASS FILES

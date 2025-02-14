@@ -378,7 +378,7 @@ public class DLModelSelectPane extends PamBorderPane {
 				File fileChck = new File(file);
 
 	            if (!fileChck.exists()) {
-					return DLStatus.MODEL_LOAD_FAIL;
+					return DLStatus.MODEL_FILE_EXISTS;
 	            }
 				
 				//we are loading model from a file - anything can happen so put in a try catch. 				

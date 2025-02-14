@@ -1,5 +1,6 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
+import java.io.File;
 import java.nio.file.Paths;
 
 import org.jamdev.jdl4pam.animalSpot.AnimalSpotModel;
@@ -49,6 +50,14 @@ public class SoundSpotWorker extends DLModelWorker<StandardPrediction> {
 		//System.out.println("prepModel: " + soundSpotParams.useDefaultTransfroms); 
 
 		try {
+			
+			if (soundSpotParams.modelPath==null) {
+				return DLStatus.FILE_NULL;
+			}
+			
+			if (!new File(soundSpotParams.modelPath).exists()) {
+				return DLStatus.MODEL_FILE_EXISTS;
+			}
 
 			//			// get the plugin class loader and set it as the context class loader
 			//			// NOTE THAT THIS IS REQUIRED TO MAKE THIS MODULE RUN AS A PLUGIN WHEN THE CLASS FILES

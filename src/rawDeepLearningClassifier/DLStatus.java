@@ -6,11 +6,12 @@ package rawDeepLearningClassifier;
 public enum DLStatus {
 
 	FILE_NULL("The input file is null",
-			"The loaded file was null. If the file was download it may not have downloaded properly.", ErrorLevel.ERROR),
+			"The loaded file was null. If the file was downloaded, it may not have downloaded properly.", ErrorLevel.ERROR),
 
 	//generic error when something has gone wrong.
+	
 	MODEL_LOAD_FAIL("The model failed to load",
-			" The model failed to load - this could be because it is incompatible with PAMGuard or an uknown file format.",
+			" The model failed to load - this could be because it is incompatible with PAMGuard or an unknown file format.",
 			ErrorLevel.ERROR),
 
 	MODEL_LOAD_SUCCESS("The model loaded", " The model successfully loaded", ErrorLevel.NO_ERROR),
@@ -43,7 +44,10 @@ public enum DLStatus {
 
 	MODEL_ENGINE_FAIL("Deep learning engine failure", "The deep learning engine was not able to load. It is likely PAMGuard could not download the relevent libraries. Visit www.pamguard.org/deeplearning for a work around.", ErrorLevel.ERROR),
 	
-	MODEL_META_FAIL("Model metadata failure", "PAMGuard could not locte the metadata within the model. if this is a custom model ensure the associated .pgdl file is present and JSON valid", ErrorLevel.ERROR); 
+	MODEL_META_FAIL("Model metadata failure", "PAMGuard could not locte the metadata within the model. If this is a custom model ensure the associated .pgdl file is present and JSON valid", ErrorLevel.ERROR),
+
+	MODEL_FILE_EXISTS("The input file does  not exists",
+			"The selected model file does not exist on your computer. This can happen if you use a configuration on a different computer or have moved the file", ErrorLevel.ERROR),; 
 
 
 	/**
