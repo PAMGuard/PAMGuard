@@ -23,7 +23,7 @@ public class DLWarningDialog {
 	 */
 	public void showWarningDialog(DLStatus dlWarning) {
 		switch(dlWarning) {
-		case MODEL_ENGINE_FAIL ->{
+		case MODEL_ENGINE_FAIL:
 			//special warning dialog 
 			// show the warning
 			if (warningShow) return;
@@ -48,13 +48,11 @@ public class DLWarningDialog {
 //				e.printStackTrace();
 //			} 
 			break;
-		}
-		default -> {
+		default: 
 			//default for most warnings. 
 			ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
 			dlWarnings.add(DLSettingsPane.statusToWarnings(dlWarning)); 
-			showWarning(dlWarnings); 
-		}
+			showWarning(dlWarnings);
 
 		}	
 	}
