@@ -38,7 +38,7 @@ public class PDeployment extends NilusDocumentWrapper<Deployment>{
 
 	@Override
 	public String toString() {
-		return String.format("%s:%d; %s - %s", nilusObject.getId(), nilusObject.getDeploymentId(), 
+		return String.format("%s:%d; %s - %s", nilusObject.getId(), nilusObject.getDeploymentNumber(), 
 				PamCalendar.formatDBDateTime(getAudioStart()), PamCalendar.formatDBDateTime(getAudioEnd()));
 	}
 

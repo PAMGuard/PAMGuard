@@ -807,7 +807,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		int firstFree = 0;
 		if (projectDeployments != null) {
 			for (PDeployment dep : projectDeployments) {
-				firstFree = Math.max(firstFree, dep.nilusObject.getDeploymentId()+1);
+				firstFree = Math.max(firstFree, dep.nilusObject.getDeploymentNumber()+1);
 			}
 		}
 		return firstFree;
@@ -839,7 +839,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		
 //		Deployment globalDeplData = tethysControl.getGlobalDeplopymentData();
 		deployment.setId(deploymentId);
-		deployment.setDeploymentId(i);
+		deployment.setDeploymentNumber(i);
 
 		DeploymentRecoveryDetails deploymentDetails = deployment.getDeploymentDetails();
 		if (deploymentDetails == null) {

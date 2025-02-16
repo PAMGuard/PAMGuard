@@ -512,7 +512,10 @@ public class DBXMLQueries {
 
 				String Id = getElementData(returnedEl, "Id");
 				String project = getElementData(returnedEl, "Project");
-				String DeploymentId = getElementData(returnedEl, "DeploymentId");
+				String DeploymentNumber = getElementData(returnedEl, "DeploymentNumber");
+				if (DeploymentNumber == null) {
+					DeploymentNumber = getElementData(returnedEl, "DeploymentId");
+				}
 				String instrType = getElementData(returnedEl, "Instrument.Type");
 				String instrId = getElementData(returnedEl, "Instrument.InstrumentId");
 				String geometry = getElementData(returnedEl, "Instrument.GeometryType");
@@ -527,7 +530,12 @@ public class DBXMLQueries {
 				}
 				deployment.setId(Id);
 				deployment.setProject(projectName);
-				deployment.setDeploymentId(Integer.valueOf(DeploymentId));
+				try {
+					deployment.setDeploymentNumber(Integer.valueOf(DeploymentNumber));
+				}
+				catch (Exception e) {
+					System.out.printf("Invalid deployment Number in Doc Id %s: %s", Id, DeploymentNumber);
+				}
 				XMLGregorianCalendar gcStart = TethysTimeFuncs.fromGregorianXML(audioStart);
 				XMLGregorianCalendar gcEnd = TethysTimeFuncs.fromGregorianXML(audioEnd);
 				//				System.out.printf("Converted %s to %s\n", audioStart,
