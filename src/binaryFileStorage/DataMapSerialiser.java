@@ -1,5 +1,7 @@
 package binaryFileStorage;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,7 +58,7 @@ public class DataMapSerialiser {
 		ObjectInputStream oos = null;
 		try {
 			os = new FileInputStream(file);
-			oos = new ObjectInputStream(os);
+			oos = new ObjectInputStream(new BufferedInputStream(os));
 		} catch (FileNotFoundException e) {
 			System.out.println("Cached datamap file " + file.getAbsolutePath() + " not found.");
 			return false;
@@ -229,7 +231,7 @@ public class DataMapSerialiser {
 			return false;
 		}
 		try {
-			ObjectOutputStream oos = new ObjectOutputStream(os);
+			ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(os));
 			OfflineDataMap dm;
 			Object o;
 			for (int i = 0; i < streams.size(); i++) {

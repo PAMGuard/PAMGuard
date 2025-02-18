@@ -551,8 +551,8 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 				 *  from resetting every time the datamap is updated e.g. if the 
 				 *  acquisition file map changes when user selects correct folder.  
 				 */
+				intialiseLoadDone = true; // move earlier to avoid risk of recursion. 
 				initialiseScrollers();
-				intialiseLoadDone = true;
 			}
 			break;
 		}	
