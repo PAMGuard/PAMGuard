@@ -31,6 +31,8 @@ public class MulticastController extends CommandManager {
 	private byte[] byteBuffer = new byte[MAX_COMMAND_LENGTH];
 	private DatagramPacket lastDatagram;
 
+	private String testString = "Multicast Networking test complete";
+	
 	public MulticastController(PamController pamController) {
 		super(pamController, unitName);
 		this.pamController = pamController;
@@ -89,7 +91,23 @@ public class MulticastController extends CommandManager {
 //		System.out.println("********************************* Multicast String:" + str);
 //		str = str.substring(0, datagram.getLength());
 //		System.out.println("Datagram received \"" + str + "\"");
+		
 		interpretCommand(str, datagram.getData());
+	}
+
+	@Override
+	public boolean interpretCommand(String commandString, byte[] commandBytes) {
+		// just in case this is the test string used to trigger the firewall, try to ignore it. 
+		try {
+			if (commandString.trim().equals(testString)) {
+				System.out.println(commandString);
+				return false;
+			}
+		}
+		catch (Exception e) {
+			
+		}
+		return super.interpretCommand(commandString, commandBytes);
 	}
 
 	@Override
