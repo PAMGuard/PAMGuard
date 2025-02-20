@@ -12,6 +12,11 @@ public class PamScrollerData implements Serializable, Cloneable {
 	 */
 	protected String name;
 
+	public PamScrollerData() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @return the name
 	 */

@@ -662,7 +662,7 @@ Returns something like this:
 		}
 		String vS = null;
 		if (sp1+1<vData.length()) {
-			vData.substring(sp1+1);
+			vS = vData.substring(sp1+1);
 		}
 		
 		return new ServerVersion(vn, vS);

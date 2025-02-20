@@ -32,7 +32,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 
 	private boolean initialisationComplete;
 
-	private boolean intialiseLoadDone;
+	private boolean intialiseLoadDone = false;
 
 	private StoredScrollerData oldScrollerData = new StoredScrollerData();
 
@@ -542,11 +542,16 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			initialisationComplete = true;
 			break;
 		case PamControllerInterface.INITIALIZE_LOADDATA:
-			intialiseLoadDone = true;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
 		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
-			if (initialisationComplete && intialiseLoadDone) {
+			if (initialisationComplete && intialiseLoadDone == false) {
+				/*
+				 *  changed 20240114 so that this is only called once. Stops it 
+				 *  from resetting every time the datamap is updated e.g. if the 
+				 *  acquisition file map changes when user selects correct folder.  
+				 */
+				intialiseLoadDone = true; // move earlier to avoid risk of recursion. 
 				initialiseScrollers();
 			}
 			break;
