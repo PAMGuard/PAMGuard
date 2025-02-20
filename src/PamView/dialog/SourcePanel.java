@@ -491,7 +491,10 @@ public class SourcePanel implements ActionListener{
 	 * @param channelList bitmap of currently selected channels
 	 */
 	public void setChannelList(int channelList) {
-		var availableChannels = getSource().getSequenceMap();
+		int availableChannels;
+		if (getSource()!=null) availableChannels = getSource().getSequenceMap();
+		else availableChannels = -1; 
+
 		var toSelect = channelList & availableChannels;
 
 		if (toSelect != channelList) {

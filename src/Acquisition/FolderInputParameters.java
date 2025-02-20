@@ -18,7 +18,10 @@ public class FolderInputParameters extends FileInputParameters implements Serial
 
 	static public final long serialVersionUID = 1;
 
-	public boolean subFolders;
+	/**
+	 * Default this to true. 
+	 */
+	public boolean subFolders = true;
 
 	public boolean mergeFiles;
 
