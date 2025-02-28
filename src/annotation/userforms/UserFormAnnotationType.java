@@ -11,6 +11,8 @@ import annotation.binary.AnnotationBinaryHandler;
 import annotation.dataselect.AnnotationDataSelCreator;
 import annotation.handler.AnnotationOptions;
 import annotation.userforms.datasel.UserFormDataSelCreator;
+import annotation.xml.AnnotationXMLWriter;
+import annotation.xml.SQLXMLWriter;
 import generalDatabase.DBControlUnit;
 import generalDatabase.SQLLoggingAddon;
 import loggerForms.FormDescription;
@@ -222,5 +224,11 @@ public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotatio
 	@Override
 	public AnnotationDataSelCreator getDataSelectCreator(String selectorName, boolean allowScores) {
 		return userFormDataSelCreator;
+	}
+
+	@Override
+	public AnnotationXMLWriter<UserFormAnnotation<?>> getXMLWriter() {
+		// TODO Auto-generated method stub
+		return new SQLXMLWriter<>(this);
 	}
 }

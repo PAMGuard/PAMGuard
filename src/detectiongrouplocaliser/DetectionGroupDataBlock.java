@@ -5,10 +5,19 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import detectiongrouplocaliser.DetectionGroupProcess.DataSelector;
+import detectiongrouplocaliser.tethys.DetectionGroupSpeciesManager;
+import detectiongrouplocaliser.tethys.DetectionGroupTethysProvider;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 
 public class DetectionGroupDataBlock extends SuperDetDataBlock<DetectionGroupDataUnit, PamDataUnit> {
 
 	private DetectionGroupProcess detectionGroupProcess;
+	
+	private DetectionGroupTethysProvider detectionGroupTethysProvider;
+	
+	private DetectionGroupSpeciesManager detectionGroupSpeciesManager;
 
 	public DetectionGroupDataBlock(String dataName, DetectionGroupProcess detectionGroupProcess) {
 		super(DetectionGroupDataUnit.class, dataName, detectionGroupProcess, 0, SuperDetDataBlock.ViewerLoadPolicy.LOAD_OVERLAPTIME);
@@ -95,6 +104,22 @@ public class DetectionGroupDataBlock extends SuperDetDataBlock<DetectionGroupDat
 		}
 		DataSelector ds = detectionGroupProcess.getDataSelector();
 		return ds.wantDataBlock(subDataBlock);
+	}
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (detectionGroupTethysProvider == null) {
+			detectionGroupTethysProvider = new DetectionGroupTethysProvider(tethysControl, this);
+		}
+		return detectionGroupTethysProvider;
+	}
+
+	@Override
+	public DataBlockSpeciesManager<DetectionGroupDataUnit> getDatablockSpeciesManager() {
+		if (detectionGroupSpeciesManager == null) {
+			detectionGroupSpeciesManager = new DetectionGroupSpeciesManager(this);
+		}
+		return detectionGroupSpeciesManager;
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
@@ -217,7 +218,13 @@ public class PamModuleInfo implements PamDependent{
 			// create a new PamControlledUnit and add it to PamGuard ...
 			PamController pamController = PamController.getInstance();
 		
-			pamController.addModule(parentFrame, moduleInfo);
+			SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					pamController.addModule(parentFrame, moduleInfo);
+				}
+			});
 		}
 		
 	}
