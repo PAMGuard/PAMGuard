@@ -5,7 +5,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -23,12 +25,16 @@ import PamController.PamControlledUnit;
 import PamController.PamSettings;
 import PamDetection.LocalisationInfo;
 import PamUtils.PamUtils;
+import PamUtils.XMLUtils;
 import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.TFContourData;
 import PamguardMVC.TFContourProvider;
+import annotation.DataAnnotation;
+import annotation.DataAnnotationType;
+import annotation.xml.AnnotationXMLWriter;
 import binaryFileStorage.DataUnitFileInformation;
 import nilus.AlgorithmType;
 import nilus.Deployment;
@@ -39,6 +45,7 @@ import nilus.Detection.Parameters.UserDefined;
 import nilus.DetectionEffortKind;
 import nilus.GranularityEnumType;
 import nilus.Helper;
+import nilus.MarshalXML;
 import nilus.SpeciesIDType;
 import tethys.Collection;
 import tethys.TethysControl;
@@ -72,6 +79,8 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	private Helper helper;
 	private boolean addFrequencyInfo  = false;
 
+	private MarshalXML marshaller;
+
 	public AutoTethysProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
 		this.tethysControl = tethysControl;
 		this.pamDataBlock = pamDataBlock;
@@ -81,6 +90,10 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			helper = new Helper();
 		} catch (JAXBException e) {
 			e.printStackTrace();
+		}
+		try {
+			marshaller = new MarshalXML();
+		} catch (JAXBException e) {
 		}
 	}
 
@@ -367,9 +380,83 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		// the 32 bits is set. 
 		long chanMap = dataUnit.getChannelBitmap();
 		if (chanMap < 0) chanMap += 65536L;
-		addUserDefined(detParams, "ChannelBitmap", String.format("0x%X", chanMap));
+		Element userEl = addUserDefined(detParams, "ChannelBitmap", String.format("0x%X", chanMap));
+		// add annotations if they exist. 
+		int nAnnots = dataUnit.getNumDataAnnotations();
+		for (int i = 0; i < nAnnots; i++) {
+			DataAnnotation annotation = dataUnit.getDataAnnotation(i);
+			DataAnnotationType type = annotation.getDataAnnotationType();
+			AnnotationXMLWriter xmlWriter = type.getXMLWriter();
+			if (xmlWriter != null) {
+				// see near line 182 in TethysPArameterPacker
+				el = packAnnotation(annotation, dataUnit);
+				if (el != null) {
+					detParams.getUserDefined().getAny().add(el);
+				}
+//				el = null;
+//				Helper helper = null;
+//				try {
+//					helper = new Helper();
+//				} catch (JAXBException e) {
+//					e.printStackTrace();
+//				}
+//				try {
+//					el = helper.AddAnyElement(detParams.getUserDefined().getAny(), "annotation"+i, "dumvalue");
+//				} catch (JAXBException e) {
+//					e.printStackTrace();
+//					return null;
+//				} catch (ParserConfigurationException e) {
+//					e.printStackTrace();
+//					return null;
+//				}
+//				QName qnamef = new QName(MarshalXML.schema, "datafilter", "ty");
+//				JAXBElement<String> jaxelf = new JAXBElement<String>(
+//						qnamef, String.class, "annotation"+i);
+//				Document docf = null;
+//				try {
+//					docf = marshaller.marshalToDOM(jaxelf);
+//				} catch (JAXBException | ParserConfigurationException e1) {
+//					e1.printStackTrace();
+//				}  
+//				Element elf = docf.getDocumentElement();
+				
+				
+//				Document doc = XMLUtils.createBlankDoc();
+//				Element annotEl = xmlWriter.writeAnnotation(doc, dataUnit, annotation);
+//				if (annotEl != null) {
+//					userEl.appendChild(annotEl);
+//				}
+			}
+			
+		}
 
 		return detection;
+	}
+	public Element packAnnotation(DataAnnotation annotation, PamDataUnit dataUnit) {
+		DataAnnotationType type = annotation.getDataAnnotationType();
+		if (type == null) {
+			return null;
+		}
+		AnnotationXMLWriter xmlWriter = type.getXMLWriter();
+		if (xmlWriter == null) {
+			return null;
+		}
+		Document doc = null;
+		QName qname = new QName(MarshalXML.schema, "annotation", "ty");
+		JAXBElement<String> jaxel = new JAXBElement<String>(
+				qname, String.class, annotation.getClass().getCanonicalName());
+
+		
+		try {
+			doc = marshaller.marshalToDOM(jaxel);
+		} catch (JAXBException | ParserConfigurationException e1) {
+			e1.printStackTrace();
+		}  
+		Element el = doc.getDocumentElement();
+//		Element pEl = xmlWriter.writeObjectData(doc, el, data, null);
+		Element aEl = xmlWriter.writeAnnotation(doc, dataUnit, annotation);
+//		el.appendChild(aEl);
+		return el;
 	}
 
 	public static Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
