@@ -14,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -762,6 +763,11 @@ public class FilterDialogPanel implements ActionListener {
 			if (filterMethod == null) {
 				return;
 			}
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			   
+			
 			if (IIRFilterMethod.class.isAssignableFrom(filterMethod.getClass())) {
 				if (FilterParams.pzPlotStyle == FilterParams.PZPLOT_IMPULSE) {
 					paintIIRImpulseResponse(g);
@@ -796,7 +802,7 @@ public class FilterDialogPanel implements ActionListener {
 			}
 			double yScale = (r.getHeight()-margin*2) / (2*maxTap);
 			double xScale = (r.getWidth()-margin*2) / (nTaps-1);
-			g.setColor(Color.BLUE);
+			g.setColor(Color.BLACK);
 			g.drawLine(margin, margin, margin, getHeight()-margin);
 			g.drawLine(margin, midy, getWidth()-margin, midy);
 			g.drawString(String.format("%3.2f", maxTap), margin+1, margin);
@@ -808,6 +814,10 @@ public class FilterDialogPanel implements ActionListener {
 				g.drawLine(x, midy, x, y);
 				g.drawOval(x-cSize, y-cSize, cSize*2+1, cSize*2+1);
 			}
+
+			g.setColor(Color.BLACK);
+			String txt = "Impulse response";
+			cornerText(g, txt);
 
 		}
 
@@ -911,12 +921,13 @@ public class FilterDialogPanel implements ActionListener {
 			Graphics2D g2d = (Graphics2D) g;
 
 			g2d.setColor(PamColors.getInstance().getColor(PamColor.AXIS));
-			int charWidth = g2d.getFontMetrics().charWidth('2');
+			FontMetrics fm = g2d.getFontMetrics();
+			int charWidth = fm.charWidth('2');
 
 			Insets insets = getInsets();
 			Rectangle r = getBounds();
-			int marginL = charWidth*3+6;
-			int marginT = 6;
+			int marginL = charWidth*4+6;
+			int marginT = Math.max(fm.getAscent(), fm.getDescent());
 			int marginR = charWidth*2+3;
 			int x0 = marginL;
 			int y0 = getHeight()/2;
@@ -931,16 +942,20 @@ public class FilterDialogPanel implements ActionListener {
 			xAxis.drawAxis(g);
 			int lastX = -1;
 			int lastY = 0;
+			/**
+			 * Draw an upsampled copy of the impulse response which gives a smoother curve
+			 */
 			g.setColor(Color.GRAY);
-			for (int i = upsFactor; i < upsInput.length; i++) {
+			for (int i = 0; i < upsInput.length; i++) {
 				int x = (int) xAxis.getPosition((i-upsFactor)/sampleRate/upsFactor*tScale) + marginL;
 				int y = (int) yAxis.getPosition(upsOutput[i]) + marginT;
-				if (i > upsFactor) {
+				if (i >= upsFactor) {
 					g2d.drawLine(lastX, lastY, x, y);
 				}
 				lastX = x;
 				lastY = y;
 			}
+			// draw the impulse response at the filter frequency we're working at.
 			g.setColor(Color.RED);
 			for (int i = 0; i < input.length; i++) {
 				int x = (int) xAxis.getPosition(i/sampleRate*tScale) + marginL;
@@ -1231,7 +1246,7 @@ public class FilterDialogPanel implements ActionListener {
 		}
 
 		/**
-		 * Plots ansi standard 1/3 octave curves based around th emid frequency 
+		 * Plots ansi standard 1/3 octave curves based around the mid frequency 
 		 * of a bandpass filter. 
 		 * @param g
 		 */

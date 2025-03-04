@@ -29,17 +29,17 @@
 		and some noise measurement modules.
 	</p>
 
-	<h3>Configuration</h3>
+	<h2>Configuration</h2>
 
-	<img alt="Filters Settings" src="Images/FiltersSettings.png" />
+	<img alt="Filters Settings" src="Images/FiltersSettings.png">
 	<br>
-	<h4>Filter Type</h4>
+	<h3>Filter Type</h3>
 	<p>Select the type of filter, which can be one of: "None", 
 	"IIR <a href="http://en.wikipedia.org/wiki/Butterworth_filter">Butterworth</a>", 
 		"IIR <a href="http://en.wikipedia.org/wiki/Chebyshev_filter">Chebyshev</a>", "FIR Filter (Window Method)",
 		"Arbitrary FIR Filter".</p>
 
-	<h4>Filter Response</h4>
+	<h3>Filter Response</h3>
 	<p>For Butterworth, Chebychev and FIR Filters using the Window
 		Method, select either a High pass, Band Pass, Band Stop or Low Pass
 		response and the filter cut off frequencies in Hz. Note that these
@@ -84,11 +84,23 @@
 	<br>
 	<p>Use the import button to import the values from your text file</p>
 	<br>
-	<h4>Bode Plot</h4>
+	<h3>Bode Plot</h3>
 		<p>The filter dialog displays a bode plot (attenuation verses
 			frequency) for the chosen filter parameters. You can show this on either a logarithmic
 			of linear frequency scale. Double clicking the amplitude axis will change the range
 			of the amplitude scale. </p>
-		<br> <br> <br>
+		<br> 
+	<h3>Pole-Zero or Impulse Response Plot</h3>
+	<p>In the lower left corner you will see either a plot of the filters Impulse Response, or a 
+	Pole-Zero plot (IIR Filters only). The Impulse response of a filter is the signal that will come out of a filter
+	if a single unit sample is input to the filter, i.e. a 1 followed by an infinite number of zeros. 
+	It is important to understand since it 
+	shows how a filter will distort a waveform, generally delaying it, and elongating it in time. Particularly for 
+	very short sounds, such as dolphin echolocation clicks, the waveform you see in the click detector may be a function 
+	of any filters you've included in the detector as much as it is a function of the sound coming out of the animal.</p>
+	<p><a ref="https://en.wikipedia.org/wiki/Pole%E2%80%93zero_plot">Pole Zero plots are a part of IIR Filter design, but 
+	understanding them is probably not important to most PAMGuard users.
+	When designiing IIR Filters, you can switch between pole-zero and impulse responde plots by right clicking on the display. </p>
+	<br><br>  
 </body>
 </html>
