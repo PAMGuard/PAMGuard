@@ -32,6 +32,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.TFContourData;
 import PamguardMVC.TFContourProvider;
+import PamguardMVC.superdet.SuperDetection;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import annotation.xml.AnnotationXMLWriter;
@@ -362,8 +363,25 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		double ampli = dataUnit.getAmplitudeDB();
 		ampli = roundDecimalPlaces(ampli, 1);
 		detParams.setReceivedLevelDB(ampli);
+		// if there is a super detection, set the EventRef field in the parameters
+		SuperDetection superDet = dataUnit.getSuperDetection(0);
+		if (superDet != null) {
+			List<String> evRefs = detParams.getEventRef();
+			String evT = TethysTimeFuncs.xmlGregCalFromMillis(superDet.getTimeMilliseconds()).toString(); 
+//			evRefs.add(evT);
+			String uidS = String.format("%s;evT;UID:%d", superDet.getParentDataBlock().getLongDataName(), superDet.getUID());
+			evRefs.add(uidS);
+		}
+		
 		//		DataUnitBaseData basicData = dataUnit.getBasicData();
 		gotTonalContour(dataUnit, detParams);
+		
+		// if it's a super detection, fill in the count
+		if (dataUnit instanceof SuperDetection) {
+			superDet = (SuperDetection<?>) dataUnit;
+			int n = superDet.getSubDetectionsCount();
+			detection.setCount(BigInteger.valueOf(n));
+		}
 
 		String uid = BigInteger.valueOf(dataUnit.getUID()).toString();
 		Element el = addUserDefined(detParams,"PAMGuardUID", uid);
@@ -393,6 +411,17 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 				if (el != null) {
 					detParams.getUserDefined().getAny().add(el);
 				}
+//					try {
+//						Helper hhh = new Helper();
+//						hhh.AddAnyElement(detParams.getUserDefined().getAny(), "Dummyeleemnt", "summy value");
+//					} catch (JAXBException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (ParserConfigurationException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+				
 //				el = null;
 //				Helper helper = null;
 //				try {
@@ -441,12 +470,20 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		if (xmlWriter == null) {
 			return null;
 		}
+		/*
+		 * Helper has following:
+		 * 		QName qname = new QName(MarshalXML.schema, name, "ty");
+				JAXBElement<String> jaxel = new JAXBElement<String>(qname, String.class, value);
+		
+				Document doc = marshaller.marshalToDOM(jaxel);  
+				Element el = doc.getDocumentElement();
+				ellist.add(el);
+		 */
+		
 		Document doc = null;
 		QName qname = new QName(MarshalXML.schema, "annotation", "ty");
 		JAXBElement<String> jaxel = new JAXBElement<String>(
-				qname, String.class, annotation.getClass().getCanonicalName());
-
-		
+				qname, String.class, annotation.getDataAnnotationType().getAnnotationName());
 		try {
 			doc = marshaller.marshalToDOM(jaxel);
 		} catch (JAXBException | ParserConfigurationException e1) {
@@ -546,6 +583,11 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			return;
 		}
 		for (String speciesCode : speciesCodes) {
+			
+			boolean sel = exportParams.getSpeciesSelection(speciesCode);
+			if (sel == false) {
+				continue;
+			}
 
 			SpeciesMapItem mapItem = speciesMap.getItem(speciesCode);
 

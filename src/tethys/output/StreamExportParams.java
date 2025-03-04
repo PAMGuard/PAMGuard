@@ -2,6 +2,7 @@ package tethys.output;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
@@ -25,6 +26,13 @@ import tethys.pamdata.TethysDataProvider;
 public class StreamExportParams implements Serializable {
 
 	public static final long serialVersionUID = 1L;	
+	
+	/**
+	 * Map of selected species / call types for output. 
+	 * Only selected species will be added to the Detections document 
+	 * effort and only these species will be output whatever the granularity type. 
+	 */
+	private HashMap<String, Boolean> speciesSelection;
 
 	/**
 	 * Datablock long data name (used instead of datablock
@@ -88,6 +96,28 @@ public class StreamExportParams implements Serializable {
 		super();
 		this.longDataName = dataBlock.getLongDataName();
 		autoFill(tethysControl, dataBlock);
+	}
+	
+	/**
+	 * Set if a species or call type is selected. 
+	 * @param callName
+	 * @param sel
+	 */
+	public void setSpeciesSelection(String callName, boolean sel) {
+		getSpeciesSelection().put(callName, sel);
+	}
+	
+	/**
+	 * Get if a species or call type is selected. Return true by default. 
+	 * @param callName
+	 * @return
+	 */
+	public boolean getSpeciesSelection(String callName) {
+		Boolean sel = getSpeciesSelection().get(callName);
+		if (sel == null) {
+			return true;
+		}
+		return sel;
 	}
 
 //	public WrappedDescriptionType getDetectionDescription() {
@@ -198,6 +228,16 @@ public class StreamExportParams implements Serializable {
 
 	public void reSerialize() {
 		getWrappedDetections().reSerialise();
+	}
+
+	/**
+	 * @return the speciesSelection
+	 */
+	public HashMap<String, Boolean> getSpeciesSelection() {
+		if (speciesSelection == null) {
+			speciesSelection = new HashMap<String, Boolean>();
+		}
+		return speciesSelection;
 	}
 	
 //	/**

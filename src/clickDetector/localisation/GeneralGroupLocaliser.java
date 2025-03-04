@@ -1,7 +1,11 @@
 package clickDetector.localisation;
 
+import java.awt.Window;
+import java.io.Serializable;
 import java.util.ArrayList;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.LocaliserModel;
 import Localiser.LocaliserPane;
 import Localiser.algorithms.genericLocaliser.leastSquares.LeastSquares;
@@ -16,12 +20,13 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
-import clickDetector.ClickDetection;
+import tethys.localization.LocalizationBuilder;
+import tethys.localization.LocalizationCreator;
+import tethys.swing.export.LocalizationOptionsPanel;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 
-abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUnit> {
+abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUnit>, LocalisationAlgorithm, LocalisationAlgorithmInfo {
 
 	private PamWarning locWarning;
 	
@@ -48,16 +53,16 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 		//these are the default localisers
 		//ADD NEW LOCLAISERS HERE//
 		//least squares algorithm 
-		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<ClickDetection>>("Least Squares", new LeastSquares(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
+		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("Least Squares", new LeastSquares(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
 		//2D simplex localiser
-		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<ClickDetection>>("2D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
+		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("2D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
 		//3D simplex localiser 
-		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<ClickDetection>>("3D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 3 )); 
+		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("3D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 3 )); 
 		
 		//only add MCMC in viewer mode as way too processor intensive for real time operation
 		if (PamController.getInstance().getRunMode()==PamController.RUN_PAMVIEW){
 			//MCMC localiser
-			locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<ClickDetection>>("MCMC", new Simplex(), DetectionGroupLocaliser2.TIMEDELAY_GROUP, 3 )); 
+			locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("MCMC", new Simplex(), DetectionGroupLocaliser2.TIMEDELAY_GROUP, 3 )); 
 		}
 
 //		ClickLocParams clickLocParams=getClickLocParams(); 
@@ -246,8 +251,37 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 
 	@Override
 	public LocContents getLocContents() {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocContents(getLocalisationContents());
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		return new GroupTethysLocCreator(this);
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_AMBIGUITY | LocContents.HAS_LATLONG | LocContents.HAS_DEPTH;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Group Localiser";
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return getClickLocParams();
+	}
+
+	@Override
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
+		return new ClickLocDialogPanel(this);
 	}
 
 }

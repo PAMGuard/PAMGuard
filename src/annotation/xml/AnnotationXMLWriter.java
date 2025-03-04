@@ -23,4 +23,5 @@ public interface AnnotationXMLWriter<TDataAnnotation extends DataAnnotation<?>> 
 	 * @return
 	 */
 	public Element writeAnnotation(Document parent, PamDataUnit pamDataUnit, TDataAnnotation annotation);
+	
 }

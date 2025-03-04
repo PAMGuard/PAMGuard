@@ -230,12 +230,20 @@ public class DatablockSynchPanel extends TethysExportPanel {
 			break;
 		case UPDATESERVER:
 			enableExportButton();
+			updateBlockList();
 		}
 		
 		synchTableModel.fireTableDataChanged();
 		selectRow();
 	}
 	
+	private void updateBlockList() {
+		dataBlockSynchInfo = null;
+		getSychInfos();
+//		synchTableModel.fireTableDataChanged();
+		
+	}
+
 	public void addTableObserver(StreamTableObserver observer) {
 		tableObservers.add(observer);
 	}

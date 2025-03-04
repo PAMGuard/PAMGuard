@@ -268,6 +268,10 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		ProjectDeploymentsDialog.showDialog(getGuiFrame(), this);
 	}
 
+	/**
+	 * Get a list of datablocks that can be exported to Tethys. 
+	 * @return
+	 */
 	public ArrayList<PamDataBlock> getExportableDataBlocks() {
 		ArrayList<PamDataBlock> sets = new ArrayList<>();
 		ArrayList<PamDataBlock> allDataBlocks = getPamConfiguration().getDataBlocks();
@@ -302,6 +306,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 				dataBlockSynchInfos.remove(synchInfo);
 			}
 		}
+		countProjectDetections();
 
 		return dataBlockSynchInfos;
 	}
@@ -513,6 +518,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 */
 	private void initializationStuff() {
 		if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+			// don't do anything if we're in batch view. 
 			return;
 		}
 		deploymentHandler.createPamguardOverview();

@@ -429,6 +429,18 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 	}
 
 	/**
+	 * Global static call that will reattach all sub detections after a data load. 
+	 */
+	public static void reattachAllSubDetections() {				
+		ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDataBlocks();
+		for (PamDataBlock dataBlock:dataBlocks) {
+			// may no longer be needed depending on how reloading data goes.  
+			if (dataBlock instanceof SuperDetDataBlock) {
+				((SuperDetDataBlock) dataBlock).reattachSubdetections(null);
+			}
+		}
+	}
+	/**
 	 * New version of this call that only has to link data units into their sub detections
 	 * since the SubdetectionInfo lists are already in place in the SuperDetections.
 	 * @param viewLoadObserver

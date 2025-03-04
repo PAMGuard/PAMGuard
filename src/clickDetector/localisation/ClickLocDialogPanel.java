@@ -19,6 +19,7 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.warn.WarnOnce;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 /**
  * Dialog panel for click localisation, and probably some
@@ -26,7 +27,7 @@ import PamView.dialog.warn.WarnOnce;
  * @author dg50
  *
  */
-public class ClickLocDialogPanel implements PamDialogPanel {
+public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 	
 	/**
 	 * Reference to the group localiser. 
@@ -329,5 +330,10 @@ public class ClickLocDialogPanel implements PamDialogPanel {
 
 	public GeneralGroupLocaliser getGroupLocaliser() {
 		return groupLocaliser;
+	}
+
+	@Override
+	public boolean isBig() {
+		return false;
 	}
 }

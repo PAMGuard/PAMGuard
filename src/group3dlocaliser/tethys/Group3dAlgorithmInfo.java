@@ -9,7 +9,7 @@ import group3dlocaliser.Group3DParams;
 import tethys.localization.CoordinateName;
 import tethys.localization.LocalizationBuilder;
 import tethys.swing.export.CoordinateChoice;
-import tethys.swing.export.CoordinateChoisePanel;
+import tethys.swing.export.CoordinateChoicePanel;
 import tethys.swing.export.LocalizationOptionsPanel;
 
 public class Group3dAlgorithmInfo implements LocalisationAlgorithmInfo, CoordinateChoice {
@@ -39,7 +39,7 @@ public class Group3dAlgorithmInfo implements LocalisationAlgorithmInfo, Coordina
 
 	@Override
 	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
-		return new CoordinateChoisePanel(this);
+		return new CoordinateChoicePanel(this);
 	}
 
 	@Override

@@ -146,22 +146,6 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		}
 
 
-		// con only output one type. 
-		//		if (perp != null) {
-		//			AngularCoordinateType acType = new AngularCoordinateType();
-		//			acType.setAngle1(90);
-		//			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
-		//			Angular angular = new Angular();
-		//			angular.setCoordinate(acType);
-		//			if (errors != null) {
-		//				AngularCoordinateType angErr = new AngularCoordinateType();
-		//				angErr.setDistanceM(errors.norm());
-		//				angular.setCoordinateError(angErr);
-		//			}
-		//			loc.setAngular(angular);
-		//		}
-
-
 
 		return loc;
 	}

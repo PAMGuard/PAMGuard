@@ -13,7 +13,7 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.panel.WestAlignedPanel;
 import tethys.localization.CoordinateName;
 
-public class CoordinateChoisePanel implements LocalizationOptionsPanel {
+public class CoordinateChoicePanel implements LocalizationOptionsPanel {
 
 	private CoordinateChoice coordinateChoise;
 	
@@ -23,7 +23,7 @@ public class CoordinateChoisePanel implements LocalizationOptionsPanel {
 
 	private CoordinateName[] possibles;
 
-	public CoordinateChoisePanel(CoordinateChoice coordinateChoice) {
+	public CoordinateChoicePanel(CoordinateChoice coordinateChoice) {
 		this.coordinateChoise = coordinateChoice;
 		possibles = coordinateChoice.getPossibleCoordinates();
 		choiceButtons = new JRadioButton[possibles.length];

@@ -6,9 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JMenuItem;
 
+import Localiser.LocalisationAlgorithm;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamControllerInterface;
@@ -18,6 +20,7 @@ import PamView.PamColors;
 import PamView.PamSymbolType;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
+import annotation.DataAnnotationType;
 import detectiongrouplocaliser.dialogs.DetectionGroupDialog;
 import detectiongrouplocaliser.dialogs.DetectionGroupTableProvider;
 import detectiongrouplocaliser.dialogs.DisplayOptionsHandler;
@@ -170,5 +173,17 @@ public class DetectionGroupControl extends PamControlledUnit implements PamSetti
 	 */
 	public DisplayOptionsHandler getDisplayOptionsHandler() {
 		return displayOptionsHandler;
+	}
+
+
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		GroupAnnotationHandler annotationHandler = detectionGroupProcess.getAnnotationHandler();
+		List<DataAnnotationType<?>> usedAnnots = annotationHandler.getUsedAnnotationTypes();
+		for (DataAnnotationType<?> annotType : usedAnnots) {
+			if (annotType instanceof LocalisationAlgorithm) {
+				return (LocalisationAlgorithm) annotType;
+			}
+		}
+		return null;
 	}
 }

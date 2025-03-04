@@ -1,5 +1,7 @@
 package annotation.localise.targetmotion;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.LocaliserModel;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamguardMVC.PamDataUnit;
@@ -13,6 +15,7 @@ import annotation.handler.AnnotationOptions;
 import clickDetector.localisation.ClickLocParams;
 import clickDetector.localisation.GeneralGroupLocaliser;
 import generalDatabase.SQLLoggingAddon;
+import tethys.localization.LocalizationCreator;
 
 /**
  * Annotation type for target motion analysis. Target motion analysis requires a
@@ -21,7 +24,7 @@ import generalDatabase.SQLLoggingAddon;
  * @author Jamie Macaulay
  *
  */
-public class TMAnnotationType extends DataAnnotationType<TMAnnotation> {
+public class TMAnnotationType extends DataAnnotationType<TMAnnotation> implements LocalisationAlgorithm {
 
 	public static final String TMANNOTATIONNAME = "Target Motion";
 
@@ -182,5 +185,15 @@ public class TMAnnotationType extends DataAnnotationType<TMAnnotation> {
 			return null;
 		}
 		return tmGroupLocaliser.findLocaliserAlgorithm(modelName);
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return tmGroupLocaliser.getAlgorithmInfo();
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		return tmGroupLocaliser.getTethysCreator();
 	}
 }
