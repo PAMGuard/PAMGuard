@@ -151,8 +151,18 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	public Streamer clone()  {
 		try {
 			Streamer newStreamer =  (Streamer) super.clone();
-			newStreamer.allLocatorSettings = new ArrayList<>(allLocatorSettings);
-			newStreamer.allOriginSettings = new ArrayList<>(allOriginSettings);
+			if (allLocatorSettings != null) {
+				newStreamer.allLocatorSettings = new ArrayList<>(allLocatorSettings);
+			}
+			else {
+				newStreamer.allLocatorSettings = new ArrayList<>();
+			}
+			if (allOriginSettings != null) {
+				newStreamer.allOriginSettings = new ArrayList<>(allOriginSettings);
+			}
+			else {
+				newStreamer.allOriginSettings = new ArrayList<>();
+			}
 			newStreamer.checkAllocations();
 			OriginSettings os = this.getOriginSettings();
 			if (os != null) {
@@ -497,7 +507,7 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 ////				HydrophoneOriginMethod origin = HydrophoneOriginMethods.getInstance().getMethod(originClass);
 //			}
 //			else 
-			if (pamArray.getArrayLocatorClass() == StraightHydrophoneLocator.class) {
+			if (pamArray != null && pamArray.getArrayLocatorClass() == StraightHydrophoneLocator.class) {
 				locatorClass = StraightHydrophoneLocator.class;
 				originClass = GPSOriginMethod.class;
 				HydrophoneLocator locator = HydrophoneLocators.getInstance().getLocatorSystem(locatorClass).getLocator(pamArray, this);
@@ -559,7 +569,7 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	}
 
 	public void notifyModelChanged(int changeType, boolean initComplete) {
-		if (initComplete) {
+		if (initComplete && hydrophoneOrigin != null) {
 			hydrophoneOrigin.prepare();
 		}
 		switch (changeType) {
