@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
@@ -38,6 +39,8 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 	private StreamExportParams streamExportParams;
 
 	private DetectionsExportWizard detectionsExportWizard;
+	
+	private boolean exportDone = false;
 
 	public ExportWorkerCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(tethysControl, detectionsExportWizard, "Export", dataBlock);
@@ -103,6 +106,8 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 	}
 
 	protected void exportData() {
+		exportDone = false;
+		
 		DetectionsHandler detHandler = getTethysControl().getDetectionsHandler();
 		
 		detHandler.startExportThread(getDataBlock(), streamExportParams, this);
@@ -116,8 +121,13 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 
 	@Override
 	public boolean getParams(StreamExportParams streamExportParams) {
-		// TODO Auto-generated method stub
-		return true;
+		if (exportDone == false) {
+			exportData();
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 
 	@Override
@@ -166,6 +176,7 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 			detectionsExportWizard.getCancelButton().setText("Close");
 			detectionsExportWizard.getPreviousButton().setEnabled(false);
 //			getTethysControl().sendStateUpdate(new TethysState(StateType.EXPORTRDATA));
+			exportDone = true;
 			break;
 		case DetectionExportProgress.STATE_WRITING:
 			progressText.setText("Writing to Tethys: " + progress.currentDetections.getId());
@@ -180,6 +191,19 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 		cancel.setEnabled(!stopped);
 		detectionsExportWizard.getCancelButton().setEnabled(stopped);
 		detectionsExportWizard.getPreviousButton().setEnabled(stopped);
+		setButtonName();
+	}
+	
+	private void setButtonName() {
+		String name = exportDone ? "Finish" : "Export";
+		String tip = exportDone ? "Close export wizard" : "Export selected data to Tethys";
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				detectionsExportWizard.getOkButton().setText(name);
+				detectionsExportWizard.getOkButton().setToolTipText(tip);
+			}
+		});
 	}
 
 	@Override
@@ -189,7 +213,15 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 		 * we can see here if we're on this or not. 
 		 */
 		super.setVisible(visible);
-		detectionsExportWizard.getOkButton().setEnabled(!visible);
+//		detectionsExportWizard.getOkButton().setEnabled(!visible);
+		if (visible) {
+			// doesn't work because it get's overridden by internal call
+			// to enable controls anyway. 
+			setButtonName();
+		}
+		else {
+			detectionsExportWizard.enableControls(); // sets the button text. 
+		}
 	}
 
 }

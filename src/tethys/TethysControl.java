@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -31,6 +32,7 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamModel.SMRUEnable;
 import PamUtils.PamFileFilter;
+import PamView.PamGui;
 import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
@@ -161,7 +163,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * @param parentFrame
 	 * @return
 	 */
-	public JMenuItem createTethysMenu(Frame parentFrame) {
+	public JMenu createTethysMenu(Frame parentFrame) {
 		JMenu tethysMenu = new JMenu("Tethys");
 //		JMenuItem tethysExport = new JMenuItem("Export ...");
 //		tethysMenu.add(tethysExport);
@@ -216,24 +218,24 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		});
 		tethysMenu.add(showDeps);
 		
-		JMenuItem cals = new JMenuItem("Export calibrations");
-		cals.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				calibrationHandler.exportAllCalibrations();
-			}
-		});
-		tethysMenu.add(cals);
+//		JMenuItem cals = new JMenuItem("Export calibrations");
+//		cals.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				calibrationHandler.exportAllCalibrations();
+//			}
+//		});
+//		tethysMenu.add(cals);
 		
 		tethysMenu.addSeparator();
 		JMenuItem mapItem = new JMenuItem("Export species maps ...");
-		mapItem.setToolTipText("Export all species maps (PAMGuard codes to ITIS codes to file for import into other configurations");
+		mapItem.setToolTipText("Export species maps (save PAMGuard species names to ITIS codes mapping to file for import into other configurations)");
 				mapItem.addActionListener(SpeciesMapManager.getInstance().getExportAction(parentFrame));
 		tethysMenu.add(mapItem);
 		
 		mapItem = new JMenuItem("Import species maps ...");
-		mapItem.setToolTipText("Import species maps (PAMGuard codes to ITIS codes to file for import into other configurations");
+		mapItem.setToolTipText("Import species maps (PAMGuard species names to ITIS code mappings exported from other configurations)");
 		mapItem.addActionListener(SpeciesMapManager.getInstance().getImportAction(parentFrame));
 		tethysMenu.add(mapItem);
 		
@@ -246,6 +248,32 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		}
 		
 		return tethysMenu;
+	}
+
+	public JMenuBar getTabSpecificMenuBar(Frame parentFrame, JMenuBar standardMenu, PamGui pamGui) {
+		JMenuItem aMenu;
+		// start by making a completely new copy.
+		//		if (clickTabMenu == null) {
+		JMenuBar tabMenu = standardMenu;
+		try {
+		for (int i = 0; i < tabMenu.getMenuCount(); i++) {
+			if (tabMenu.getMenu(i).getText().equals("Settings")) {
+				//clickTabMenu.remove(clickTabMenu.getMenu(i));
+
+				aMenu = createDetectionMenu(parentFrame);
+				String txt = aMenu.getText();
+				tabMenu.add(aMenu, i+1);
+
+
+				break;
+			}
+		}
+		}
+		catch (Exception e) {
+			return standardMenu;
+		}
+		//		}
+		return tabMenu;
 	}
 
 	protected void openTempDocuments() {
@@ -507,6 +535,12 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		case PamControllerInterface.REMOVE_DATABLOCK:
 			if (PamController.getInstance().isInitializationComplete()) {
 				tethysTaskManager.generateTasks();
+			}
+			break;
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
+			if (PamController.getInstance().isInitializationComplete()) {
+				sendStateUpdate(new TethysState(StateType.UPDATESERVER)); 
 			}
 			break;
 		}

@@ -811,15 +811,15 @@ public class DetectionsHandler extends CollectionHandler {
 		/**
 		 * Check the species map is OK before doing anything. 
 		 */
-		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
-		if (spManager != null) {
-			String error = spManager.checkSpeciesMapError();
-			if (error != null) {
-				PamDialog.showWarning(PamController.getMainFrame(), "Datablock species manager error", error);
-				spManager.showSpeciesDialog();
-				return;
-			}
-		}
+//		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
+//		if (spManager != null) {
+//			String error = spManager.checkSpeciesMapError();
+//			if (error != null) {
+//				PamDialog.showWarning(PamController.getMainFrame(), "Datablock species manager error", error);
+//				spManager.showSpeciesDialog();
+//				return;
+//			}
+//		}
 
 		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock, true);
 

@@ -94,6 +94,7 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		c.gridx++;
 		c.gridwidth = 2;
 		processPanel.add(version, c);
+		version.setToolTipText("Serial number of calibration equipment");
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 1;
@@ -107,7 +108,9 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		c.gridwidth = 2;
 		processPanel.add(qaComment, c);
 
-		this.add(BorderLayout.CENTER, makeScrollablePanel(software, "Calibration method"));
+		JScrollPane pane;
+		this.add(BorderLayout.CENTER, pane = makeScrollablePanel(software, "Software / method detail"));
+		pane.setToolTipText("Method detail, including details of any software used / references to published methods, etc.");
 		
 	}
 

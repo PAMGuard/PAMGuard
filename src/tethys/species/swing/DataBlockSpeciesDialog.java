@@ -18,16 +18,27 @@ import PamView.panel.PamNorthPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.species.SpeciesMapManager;
 
+/**
+ * Dialog to edit ITIS species codes for a datablock. 
+ * @author dg50
+ *
+ */
 public class DataBlockSpeciesDialog extends PamDialog {
 
 	private static final long serialVersionUID = 1L;
 
 	private DataBlockSpeciesPanel speciesPanel;
 	
-	private DataBlockSpeciesDialog(Window parentFrame, PamDataBlock dataBlock) {
+	/**
+	 * Dialog to edit ITIS species codes. 
+	 * @param parentFrame parent window
+	 * @param dataBlock data block 
+	 * @param singleSpecies single species if only one species to be shown. null for all species. 
+	 */
+	private DataBlockSpeciesDialog(Window parentFrame, PamDataBlock dataBlock, String singleSpecies) {
 		super(parentFrame, dataBlock.getDataName() +  " species", false);
 		JPanel mainPanel = new JPanel(new BorderLayout());
-		speciesPanel = new DataBlockSpeciesPanel(dataBlock);
+		speciesPanel = new DataBlockSpeciesPanel(dataBlock, singleSpecies);
 		mainPanel.add(BorderLayout.CENTER, speciesPanel.getDialogComponent());
 		
 		JButton itisButton = new JButton("Go to ITIS web site");
@@ -39,7 +50,7 @@ public class DataBlockSpeciesDialog extends PamDialog {
 			}
 		});
 		JPanel nPanel = new JPanel(new BorderLayout());
-		nPanel.setBorder(new TitledBorder("Code management"));
+		nPanel.setBorder(new TitledBorder("ITIS Code Management"));
 		nPanel.add(BorderLayout.EAST, new PamNorthPanel(itisButton));
 		String otherMsg = 
 				"<html>Specify an ITIS taxonomic serial number (coding)."
@@ -61,8 +72,15 @@ public class DataBlockSpeciesDialog extends PamDialog {
 		PamGui.openURL("https://www.itis.gov");
 	}
 
-	public static void showDialog(Window parentFrame, PamDataBlock dataBlock) {
-		DataBlockSpeciesDialog speciesDialog = new DataBlockSpeciesDialog(parentFrame, dataBlock);
+	/**
+	 * 
+	 * Open Dialog to edit ITIS species codes. 
+	 * @param parentFrame parent window
+	 * @param dataBlock data block 
+	 * @param singleSpecies single species if only one species to be shown. null for all species. 
+	 */
+	public static void showDialog(Window parentFrame, PamDataBlock dataBlock, String singleSpecies) {
+		DataBlockSpeciesDialog speciesDialog = new DataBlockSpeciesDialog(parentFrame, dataBlock, singleSpecies);
 		speciesDialog.setParams();
 		speciesDialog.setVisible(true);
 	}

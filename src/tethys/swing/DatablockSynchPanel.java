@@ -20,10 +20,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
-
+import PamModel.SMRUEnable;
 import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
@@ -49,10 +50,8 @@ public class DatablockSynchPanel extends TethysExportPanel {
 	private ArrayList<DatablockSynchInfo> dataBlockSynchInfo;
 	
 	private ArrayList<StreamTableObserver> tableObservers = new ArrayList<>();
-	
-//	private TippedButton exportButton;
 
-//	private JLabel exportWarning;
+	private int selectedRow = -1;
 	
 	
 	public DatablockSynchPanel(TethysControl tethysControl) {
@@ -65,31 +64,13 @@ public class DatablockSynchPanel extends TethysExportPanel {
 		new SwingTableColumnWidths(tethysControl.getUnitName()+"SynchTable", synchTable);
 		JScrollPane scrollPane = new JScrollPane(synchTable);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
-//		PamPanel ctrlPanel = new PamPanel(new BorderLayout());
-//		exportButton = new TippedButton("Export ...", "Export Detections document");
-//		exportWarning = new JLabel("  ");
-//		exportWarning.setForeground(Color.RED);
-//		ctrlPanel.add(BorderLayout.WEST, exportButton);
-//		ctrlPanel.add(BorderLayout.CENTER, exportWarning);
-//		mainPanel.add(BorderLayout.NORTH, ctrlPanel);
-
 		
 		synchTable.addMouseListener(new MouseActions());
 		synchTable.addKeyListener(new KeyActions());
+		synchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
-//		exportButton.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				exportData();
-//			}
-//		});
 		enableExportButton();
 	}
-
-//	@Override
-//	public JComponent getComponent() {
-//		return mainPanel;
-//	}
 	
 	private class KeyActions extends KeyAdapter {
 		@Override
@@ -132,6 +113,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 		if (row < 0) {
 			return row;
 		}
+		selectedRow = row;
 		DatablockSynchInfo synchInfo = dataBlockSynchInfo.get(row);
 //		datablockDetectionsPanel.setDataBlock(synchInfo.getDataBlock());
 		notifyObservers(synchInfo.getDataBlock());
@@ -166,12 +148,15 @@ public class DatablockSynchPanel extends TethysExportPanel {
 			return;
 		}
 
-		PamDataBlock dataBlock = dataBlockSynchInfo.get(rows[0]).getDataBlock();
-		String mapError = checkSpeciesManager(dataBlock);
-		if (mapError != null) {
-			disableExport("Unable to export due to species map error: " + mapError + ". Right click table row to edit species list");
-			return;
-		}
+		/*
+		 * don't do this any more since the species map can be edited within the export Wizard.
+		 */
+//		PamDataBlock dataBlock = dataBlockSynchInfo.get(rows[0]).getDataBlock();
+//		String mapError = checkSpeciesManager(dataBlock);
+//		if (mapError != null) {
+//			disableExport("Unable to export due to species map error: " + mapError + ". Right click table row to edit species list");
+//			return;
+//		}
 		
 		enableExport(true);
 	}
@@ -207,7 +192,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 			return;
 		}
 		JPopupMenu popMenu = new JPopupMenu();
-		JMenuItem menuItem = new JMenuItem("Species info ...");
+		JMenuItem menuItem = new JMenuItem("PAMGuard ITIS Species mapping ...");
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -215,6 +200,19 @@ public class DatablockSynchPanel extends TethysExportPanel {
 			}
 		});
 		popMenu.add(menuItem);
+		if (SMRUEnable.isDevEnable()) {
+			menuItem = new JMenuItem("Clear species map");
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int ans = WarnOnce.showWarning("Delete datamap", "Are you sure ?", WarnOnce.YES_NO_OPTION);
+					if (ans == WarnOnce.OK_OPTION) {
+						speciesManager.clearMap();
+					}
+				}
+			});	
+			popMenu.add(menuItem);
+		}
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
@@ -263,7 +261,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 
 	private class SynchTableModel extends AbstractTableModel {
 
-		String[] columnNames = {"Data Stream", "N PAM Datas", "PAMGuard Time", "Tethys Documents"};//, "Tethys Time", "Options"};
+		String[] columnNames = {"Select", "Data Stream", "N Data", "PAMGuard Time", "Tethys Documents"};//, "Tethys Time", "Options"};
 		
 		@Override
 		public int getRowCount() {
@@ -278,25 +276,38 @@ public class DatablockSynchPanel extends TethysExportPanel {
 		@Override
 		public String getColumnName(int column) {
 			return columnNames[column];
+		}		
+		
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			if (columnIndex == 0) {
+				return Boolean.class;
+			}
+			return super.getColumnClass(columnIndex);
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			DatablockSynchInfo synchInfo = getSychInfos().get(rowIndex);
-			return getValueAt(synchInfo, columnIndex);
+			if (columnIndex == 0) {
+				return rowIndex == selectedRow;
+			}
+			else {
+				DatablockSynchInfo synchInfo = getSychInfos().get(rowIndex);
+				return getValueAt(synchInfo, columnIndex);
+			}
 		}
 
 		private Object getValueAt(DatablockSynchInfo synchInfo, int columnIndex) {
 			OfflineDataMap dataMap = synchInfo.getDataBlock().getPrimaryDataMap();
 			switch (columnIndex) {
-			case 0:
-				return synchInfo.getDataBlock().getLongDataName();
 			case 1:
+				return synchInfo.getDataBlock().getLongDataName();
+			case 2:
 				if (dataMap == null) {
 					return null;
 				}
 				return synchInfo.getDataBlock().getPrimaryDataMap().getDataCount();
-			case 2:
+			case 3:
 				if (dataMap == null) {
 					return null;
 				}
@@ -306,7 +317,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 				long start = synchInfo.getDataBlock().getPrimaryDataMap().getFirstDataTime();
 				long stop = synchInfo.getDataBlock().getPrimaryDataMap().getLastDataTime();
 				return String.format("%s - %s", PamCalendar.formatDBDateTime(start), PamCalendar.formatDBDateTime(stop));
-			case 3:
+			case 4:
 				return synchInfo.getDetectionDocumentCount() +  synchInfo.getLocalizationDocumentCount();
 			}
 			return null;

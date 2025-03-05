@@ -177,7 +177,7 @@ public class SpeciesMapManager implements PamSettings {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				importSpeciesMaps(parentFrame);
+				importSpeciesMaps(parentFrame, null);
 			}
 		};
 	}
@@ -190,7 +190,7 @@ public class SpeciesMapManager implements PamSettings {
 	public boolean exportSpeciesMaps(Window parentFrame) {
 		// gather the species maps from the data blocks...
 		gatherSpeciesMaps();
-		GlobalSpeciesMap toExport = SpeciesMapIODialog.showDialog(parentFrame, globalSpeciesMap, true);
+		GlobalSpeciesMap toExport = SpeciesMapIODialog.showDialog(parentFrame, globalSpeciesMap, true, null);
 		if (toExport == null) {
 			return false;
 		}
@@ -238,9 +238,10 @@ public class SpeciesMapManager implements PamSettings {
 	/**
 	 * Import global species maps from selected file. 
 	 * @param parentFrame
+	 * @param selectedBlock specific block, which will get checked by default in the dialog. Can be null
 	 * @return
 	 */
-	public boolean importSpeciesMaps(Window parentFrame) {
+	public boolean importSpeciesMaps(Window parentFrame, String selectedBlock) {
 		JFileChooser chooser = getFileChooser();
 		int ans = chooser.showOpenDialog(parentFrame);
 		if (ans != JFileChooser.APPROVE_OPTION) {
@@ -264,7 +265,7 @@ public class SpeciesMapManager implements PamSettings {
 			return false;
 		}
 
-		GlobalSpeciesMap keptMaps = SpeciesMapIODialog.showDialog(parentFrame, readSpeciesMap, false);
+		GlobalSpeciesMap keptMaps = SpeciesMapIODialog.showDialog(parentFrame, readSpeciesMap, false, selectedBlock);
 		if (keptMaps == null) {
 			return false;
 		}

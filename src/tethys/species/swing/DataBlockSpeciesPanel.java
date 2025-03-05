@@ -26,9 +26,18 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 	
 	private ArrayList<SpeciesSubPanel> subPanels = new ArrayList<>();
 
-	public DataBlockSpeciesPanel(PamDataBlock dataBlock) {
+	private String singleSpecies;
+
+	/**
+	 * Panel of info about a species name in PAMGuard relating it to a call type and ITIS 
+	 * code for output to Tethys. 
+	 * @param dataBlock Datablock with a DataBlockSpeciesManager
+	 * @param singleSpecies single species if only one species to be shown. null for all species. 
+	 */
+	public DataBlockSpeciesPanel(PamDataBlock dataBlock, String singleSpecies) {
 		super();
 		this.dataBlock = dataBlock;
+		this.singleSpecies = singleSpecies;
 		mainPanel = new JPanel(new BorderLayout());
 		speciesPanel = new JPanel();
 		JScrollPane scrollPane = new JScrollPane(speciesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -53,6 +62,9 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		ArrayList<String> speciesNames = speciesManager.getAllSpeciesCodes();
 		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
 		for (String aSpecies : speciesNames) {
+			if (singleSpecies != null && singleSpecies.equals(aSpecies) == false) {
+				continue;
+			}
 			SpeciesSubPanel subPanel = new SpeciesSubPanel(dataBlock, aSpecies);
 			subPanels.add(subPanel);
 			speciesPanel.add(subPanel.getDialogComponent());

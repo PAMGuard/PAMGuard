@@ -190,7 +190,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implement
 	}
 
 	public void showSpeciesDialog() {
-		DataBlockSpeciesDialog.showDialog(PamController.getMainFrame(), dataBlock);
+		DataBlockSpeciesDialog.showDialog(PamController.getMainFrame(), dataBlock, null);
 	}
 
 	/**
@@ -251,6 +251,18 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implement
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Used only in debug mode to clear the species map. Just used while
+	 * debugging so that I can check that it's easy to recreate the map 
+	 * and that dialogs don't go screwy when it's empty. 
+	 */
+	public void clearMap() {
+		if (datablockSpeciesMap == null) {
+			return;
+		}
+		datablockSpeciesMap.clearMap();
 	}
 
 	/*

@@ -212,6 +212,8 @@
 
    <tocitem text="Detections and Localizations " target="utilities.tethys.docs.detect_localize" image="topic"/>
 
+   <tocitem text="Granularity " target="utilities.tethys.docs.tethys_granularity" image="topic"/>
+
    <tocitem text="ITIS Species Codes " target="utilities.tethys.docs.tethys_speciescodes" image="topic"/>
 
    <tocitem text="PAMGuard Mapping " target="utilities.tethys.docs.tethys_mappings" image="topic"/>

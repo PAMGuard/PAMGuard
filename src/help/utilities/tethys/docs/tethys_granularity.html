@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Detections/Granularity</title>
+<style type="text/css">
+img.wrap {
+	float: left
+}
+
+img.wrapright {
+	float: right
+}
+
+img {
+	float: right;
+}
+</style>
+</head>
+
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<body>
+    <h1>Tethys Granularity</h1>
+    <h2>Tethys Granularity</h2>
+    <p>
+        When exporting Detections to Tethys, you must select the "Granularity" for the exports. This will be one
+        of the following: 
+        <ul>
+        <li>Call - each detected call, or noise measurement is individually output to Tethys.</li>
+        <li>Binned - Counts of calls in fixed time bins are output to Tethys.</li>
+        <li>Encounter - Counts of calls forming and Encounter, that is a period of calling without a predetermined gap between calls. </li>
+        <li>Grouped - A Count of groups of calls associated in some other way (for instance through manual grouping of detections).</li>
+        </ul> 
+    </p>
+    <p>Binned granularity will require you to enter the duration of each bin, and a minimum number of calls for a bin to be output (e.g. you might set this above 
+    1 if there were occasional false positive detections, but when the animals do call, you tend to get lots of them).</p>
+    <p>Encounter granularity will require you to enter a minimum gap between calls which would constitute a new encounter. As with Binned, you also enter
+    a minimum number of calls for a bin to be output</p>
+    
+    <p>
+    Encounter and Binned granularities also offer to output separate records for each detection channel (or hydrophone), or to group detections across channels. The former
+    would be most appropriate for widely spaces hydrophones, where you'd expect different encounters on each hydrophone, whereas the latter would be more suitable if the 
+    hydrophones were spaced close enough together that you'd expect broadly the same detections on them all. </p>   
+     
+    
+    <br>
+   <p class="prevLink"><a href="detect_localize.html">Previous: Detections and Localizations</a></p>
+   <p class="prevLink"><a href="tethys_speciescodes.html">Previous: Species Codes</a></p>
+    <br>
+    <br>
+    <br>
+</body>
+</html>

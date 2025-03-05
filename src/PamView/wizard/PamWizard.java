@@ -81,7 +81,10 @@ abstract public class PamWizard extends PamDialog {
 		boolean isLast = iCard == wizardCards.size()-1;
 //		getOkButton().setEnabled(!isLast);
 		getOkButton().setText(isLast ? "Finish" : "Next");
+		getOkButton().setToolTipText(isLast ? "Check values and close" : "Next page");
+		prevButton.setToolTipText(iCard == 0 ? null : "Previous page");
 	}
+	
 
 	private boolean checkCurrentCard() {
 		int iCard = getCardIndex();
