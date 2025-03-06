@@ -47,9 +47,9 @@ public class HistoFragmentStore extends BasicFragmentStore {
 
 
 	@Override
-	public void addFragemnt(WhistleFragment newFragment) {
+	public void addFragemnt(WhistleFragment newFragment, long time) {
 
-		super.addFragemnt(newFragment);
+		super.addFragemnt(newFragment, time);
 //		fragments.add(newFragment);
 		
 		double[] params = getLatestParams();
@@ -99,12 +99,14 @@ public class HistoFragmentStore extends BasicFragmentStore {
 	public void clearStore() {
 
 		super.clearStore();
-		
-		for (int i = 0; i < 3; i++) {
-			fitHistograms[i].clear();
+
+		if (fitHistograms != null) {
+			for (int i = 0; i < 3; i++) {
+				fitHistograms[i].clear();
+			}
+			posInflections.clear();
+			negInflections.clear();
 		}
-		posInflections.clear();
-		negInflections.clear();
 		
 	}
 

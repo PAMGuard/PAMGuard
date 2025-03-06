@@ -361,8 +361,10 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			}
 		}
 		double ampli = dataUnit.getAmplitudeDB();
-		ampli = roundDecimalPlaces(ampli, 1);
-		detParams.setReceivedLevelDB(ampli);
+		if (ampli != 0) {
+			ampli = roundDecimalPlaces(ampli, 1);
+			detParams.setReceivedLevelDB(ampli);
+		}
 		// if there is a super detection, set the EventRef field in the parameters
 		SuperDetection superDet = dataUnit.getSuperDetection(0);
 		if (superDet != null) {

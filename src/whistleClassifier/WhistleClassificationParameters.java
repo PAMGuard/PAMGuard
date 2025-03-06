@@ -64,7 +64,7 @@ public class WhistleClassificationParameters implements Cloneable, Serializable,
 	 * If fewer than lowWhistleNumber whistles collected over a period, then clear
 	 * and start again. 
 	 */
-	int lowWhistleNumber = 3;
+	public int lowWhistleNumber = 3;
 	
 	/**
 	 * classify anyway, even if not enough fragments when quitting due to low 

@@ -31,6 +31,8 @@ import classifier.ClassifierParams;
 import classifier.ClassifierTypes;
 import classifier.LinearClassifier;
 import whistleClassifier.offline.ClassifierOffline;
+import whistleClassifier.swing.WhistleClassificationDialog;
+import whistleClassifier.swing.WhistleClassifierTabPanelControl;
 import whistleClassifier.training.ClassifierTrainingDialog;
 
 /**

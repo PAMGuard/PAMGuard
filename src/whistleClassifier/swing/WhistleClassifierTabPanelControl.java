@@ -1,4 +1,4 @@
-package whistleClassifier;
+package whistleClassifier.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -14,6 +14,8 @@ import PamView.PamTabPanel;
 import PamView.panel.CornerLayoutContraint;
 import PamView.panel.PamBorderPanel;
 import pamMaths.HistogramDisplay;
+import whistleClassifier.FragmentStore;
+import whistleClassifier.WhistleClassifierControl;
 
 public class WhistleClassifierTabPanelControl implements PamTabPanel {
 
@@ -54,7 +56,7 @@ public class WhistleClassifierTabPanelControl implements PamTabPanel {
 	}
 	
 	FragmentStore findFragmentStore() {
-		return whistleClassifierControl.whistleClassifierProcess.getFragmentStore();
+		return whistleClassifierControl.getWhistleClassifierProcess().getFragmentStore();
 	}
 
 	@Override

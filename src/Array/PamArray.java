@@ -828,7 +828,9 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 				h.setStreamerId(newIndexes[oldInd]);
 			}
 		}
-		masterLocator.setupLocators(this);
+		if (masterLocator != null) {
+			masterLocator.setupLocators(this);
+		}
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package whistleClassifier;
+package whistleClassifier.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -27,6 +27,9 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
 import pamMaths.MatrixDialog;
+import whistleClassifier.FragmentClassifierParams;
+import whistleClassifier.WhistleClassificationParameters;
+import whistleClassifier.WhistleClassifierControl;
 import whistlesAndMoans.AbstractWhistleDataUnit;
 
 public class WhistleClassificationDialog extends PamDialog {

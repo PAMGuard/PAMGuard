@@ -13,8 +13,9 @@ public interface FragmentStore {
 	/**
 	 * Add a whistle fragment to the store
 	 * @param newFragment fragment
+	 * @param time fragment time in milliseconds
 	 */
-	public void addFragemnt(WhistleFragment newFragment);
+	public void addFragemnt(WhistleFragment newFragment, long time);
 
 	/**
 	 * Prepare the store to receive new data. 

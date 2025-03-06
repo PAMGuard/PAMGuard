@@ -1,4 +1,4 @@
-package whistleClassifier;
+package whistleClassifier.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import classifier.ClassifierTypes;
+import whistleClassifier.FragmentClassifierParams;
+import whistleClassifier.WhistleClassifierControl;
 
 /**
  * dialog panel to show basic information from a fragemtn classifier and to load

@@ -59,6 +59,7 @@ public class ReclassifyTask extends OfflineTask<AbstractWhistleDataUnit>{
 			// may want to do a classification anyway, even if data are insufficient. 
 			if (whistleClassifierControl.getWhistleClassificationParameters().alwaysClassify) {
 				whistleClassifierProcess.runClassification(dataEndTime);
+				whistleClassifierProcess.clearFragmentStore(dataEndTime);
 			}
 			
 		}
@@ -89,6 +90,11 @@ public class ReclassifyTask extends OfflineTask<AbstractWhistleDataUnit>{
 	@Override
 	public void prepareTask() {
 		whistleClassifierProcess.resetClassifier();
+	}
+
+	@Override
+	public boolean canRun() {
+		return true;
 	}
 
 }
