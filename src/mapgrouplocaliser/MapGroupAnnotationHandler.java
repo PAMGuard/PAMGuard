@@ -15,7 +15,7 @@ public class MapGroupAnnotationHandler extends AnnotationChoiceHandler {
 		super(pamDataBlock);
 		this.mapGroupLocaliserControl = mapGroupLocaliserControl;
 		addAnnotationType(new StringAnnotationType("Text Annotation", 80));
-		addAnnotationType(new UserFormAnnotationType());
+		addAnnotationType(new UserFormAnnotationType(mapGroupLocaliserControl.getMarkGroupProcess().getMarkGroupDataBlock()));
 	}
 
 	@Override

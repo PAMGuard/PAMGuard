@@ -24,6 +24,8 @@ import annotation.DataAnnotationType;
 import detectiongrouplocaliser.dialogs.DetectionGroupDialog;
 import detectiongrouplocaliser.dialogs.DetectionGroupTableProvider;
 import detectiongrouplocaliser.dialogs.DisplayOptionsHandler;
+import detectiongrouplocaliser.tethys.DetectionGroupSpeciesManager;
+import tethys.species.DataBlockSpeciesManager;
 import userDisplay.UserDisplayControl;
 
 /**
@@ -45,6 +47,8 @@ public class DetectionGroupControl extends PamControlledUnit implements PamSetti
 	private ArrayList<DetectionGroupObserver> groupObservers = new ArrayList<>();
 	
 	private DisplayOptionsHandler displayOptionsHandler;
+	
+	private DetectionGroupSpeciesManager detectionGroupSpeciesManager;
 	
 	public DetectionGroupControl(String unitName) {
 		super(unitType, unitName);
@@ -185,5 +189,26 @@ public class DetectionGroupControl extends PamControlledUnit implements PamSetti
 			}
 		}
 		return null;
+	}
+
+
+	public DataBlockSpeciesManager<DetectionGroupDataUnit> getDataBlockSpeciesManager() {
+		DetectionGroupDataBlock dataBlock = detectionGroupProcess.getDetectionGroupDataBlock();
+		if (detectionGroupSpeciesManager == null) {
+			detectionGroupSpeciesManager = new DetectionGroupSpeciesManager(dataBlock);
+		}
+		// see if any of the annotations have a species manager and use that by preference. 
+		GroupAnnotationHandler annHandler = detectionGroupProcess.getAnnotationHandler();
+		if (annHandler == null) {
+			return detectionGroupSpeciesManager;
+		}
+		List<DataAnnotationType<?>> usedAnnotations = annHandler.getUsedAnnotationTypes();
+		for (DataAnnotationType<?> aType : usedAnnotations) {
+			DataBlockSpeciesManager sppManager = aType.getDataBlockSpeciesManager();
+			if (sppManager != null) {
+				return sppManager;
+			}
+		}
+		return detectionGroupSpeciesManager;
 	}
 }

@@ -17,7 +17,7 @@ public class ManualAnnotationHandler extends OneStopAnnotationHandler {
 	@Override
 	public void createAnnotationTypes() {
 		addAnnotationType(new StringAnnotationType("Text Annotation", 80));
-		addAnnotationType(new UserFormAnnotationType());	
+		addAnnotationType(new UserFormAnnotationType(getPamDataBlock()));	
 		// now try to add their parameters. 
 		AnnotationChoices annotationChoices = getAnnotationChoices();
 		if (annotationChoices == null) {
