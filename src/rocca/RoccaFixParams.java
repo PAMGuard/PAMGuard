@@ -225,7 +225,7 @@ public class RoccaFixParams {
 			/* calculate parameters */
 			rcdb.setAsAWhistle(true);
 			rcdb.calculateStatistics();
-	        roccaProcess.roccaClassifier.classifyContour2(rcdb);
+	        roccaProcess.getRoccaClassifier().classifyContour2(rcdb);
 			
 			/* save the output */
 	        roccaProcess.saveContourStats(rcdb, 0, i, "xxx",listOfFiles[i].getName());

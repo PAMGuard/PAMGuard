@@ -120,7 +120,7 @@ public class RoccaClassifyThisEvent {
 		// load the classifier
 		System.out.println("Loading classifier...");
         roccaProcess.setClassifierLoaded
-        (roccaProcess.roccaClassifier.setUpClassifier());
+        (roccaProcess.getRoccaClassifier().setUpClassifier());
 			
 		// open the input file
 		try {
@@ -150,7 +150,7 @@ public class RoccaClassifyThisEvent {
 		while (dataRow != null){
 
 			// call the classifier and save the species name
-			String sp = roccaProcess.roccaClassifier.classifySighting(headerRow,dataRow);
+			String sp = roccaProcess.getRoccaClassifier().classifySighting(headerRow,dataRow);
 						
 			// generate the output line
 			String eventStats = sp + "," + dataRow;

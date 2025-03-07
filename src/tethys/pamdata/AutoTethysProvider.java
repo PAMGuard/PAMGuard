@@ -491,7 +491,9 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		} catch (JAXBException | ParserConfigurationException e1) {
 			e1.printStackTrace();
 		}  
+	
 		Element el = doc.getDocumentElement();
+		
 //		Element pEl = xmlWriter.writeObjectData(doc, el, data, null);
 		Element aEl = xmlWriter.writeAnnotation(doc, dataUnit, annotation);
 //		el.appendChild(aEl);

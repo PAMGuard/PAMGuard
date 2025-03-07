@@ -896,7 +896,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         	classifierTxt.setText(noClassifier);
         	classifierFile=null;
         	roccaParameters.setClassifyWhistles(false);
-            roccaControl.roccaProcess.setClassifierLoaded(false);
+            roccaControl.getRoccaProcess().setClassifierLoaded(false);
         } else if (e.getSource() == clickClassifierButton ) {
         	//selectClassifier(); serialVersionUID=24 2016/08/10 replaced with overloaded method
             clickClassifierFile=selectClassifier(clickClassifierTxt, clickClassifierFile, clickClassifierDesc);
@@ -905,7 +905,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         	clickClassifierTxt.setText(noClassifier);
         	clickClassifierFile=null;
         	roccaParameters.setClassifyClicks(false);
-            roccaControl.roccaProcess.setClassifierLoaded(false);
+            roccaControl.getRoccaProcess().setClassifierLoaded(false);
         } else if (e.getSource() == eventClassifierButton ) {
             eventClassifierFile=selectClassifier(eventClassifierTxt, eventClassifierFile, eventClassifierDesc);
             roccaParameters.setClassifyEvents(true);
@@ -914,11 +914,11 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         	eventClassifierFile=null;
         	roccaParameters.setClassifyEvents(false);
         } else if (e.getSource() == recalcButton) {
-        	RoccaFixParams recalc = new RoccaFixParams(roccaControl.roccaProcess);
+        	RoccaFixParams recalc = new RoccaFixParams(roccaControl.getRoccaProcess());
         } else if (e.getSource() == reclassifyButton) {
-        	RoccaClassifyThis reclassify = new RoccaClassifyThis(roccaControl.roccaProcess);
+        	RoccaClassifyThis reclassify = new RoccaClassifyThis(roccaControl.getRoccaProcess());
         } else if (e.getSource() == trainThenTestButton) {
-        	RoccaTrainThenTest trainThenTest = new RoccaTrainThenTest(roccaControl.roccaProcess);
+        	RoccaTrainThenTest trainThenTest = new RoccaTrainThenTest(roccaControl.getRoccaProcess());
         } else if (e.getSource() == fftButton) {
         	roccaParameters.setUseFFT(true);
         	this.enableTheCorrectSource();
@@ -1077,7 +1077,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 			// set the classifier parameters
 			currFile = fileChooser.getSelectedFile().getAbsolutePath();
             classifierFile = fileChooser.getSelectedFile();
-            roccaControl.roccaProcess.setClassifierLoaded(false);
+            roccaControl.getRoccaProcess().setClassifierLoaded(false);
             
             // get the classifier description and display
             String desc = getClassifierDesc();
@@ -1110,7 +1110,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 			// set the classifier parameters
 			currFile = fileChooser.getSelectedFile().getAbsolutePath();
 			classFile = fileChooser.getSelectedFile();
-            roccaControl.roccaProcess.setClassifierLoaded(false);
+            roccaControl.getRoccaProcess().setClassifierLoaded(false);
             
             // get the classifier description and display
             String desc = getClassifierDesc(classFile);
@@ -1695,7 +1695,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
             if (!Objects.equals(classifierFile, roccaParameters.roccaClassifierModelFilename) ||
             		!Objects.equals(clickClassifierFile, roccaParameters.roccaClickClassifierModelFilename) ||
             		!Objects.equals(eventClassifierFile, roccaParameters.roccaEventClassifierModelFilename)) {
-              roccaControl.roccaProcess.setClassifierLoaded(false);
+              roccaControl.getRoccaProcess().setClassifierLoaded(false);
             }
             roccaParameters.setRoccaClassifierModelFilename(classifierFile);
             roccaParameters.setRoccaClickClassifierModelFilename(clickClassifierFile); // serialVersionUID=24 2016/08/10 added

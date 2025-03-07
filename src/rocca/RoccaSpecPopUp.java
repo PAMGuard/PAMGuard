@@ -1797,7 +1797,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         roccaContourDataBlock.calculateStatistics();
 
         // call the classifier
-        roccaProcess.roccaClassifier.classifyContour2(roccaContourDataBlock);
+        roccaProcess.getRoccaClassifier().classifyContour2(roccaContourDataBlock);
 //        System.out.println(String.format("Whistle classified as %s ***", roccaContourDataBlock.getClassifiedAs()));
 
         // enable and update the label
@@ -1832,7 +1832,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         String[] sNumList = roccaProcess.roccaControl.roccaSidePanel.rsdb.
                 findDataUnitBySNum(sNum).getSpeciesAsString();
         String[] classifierList = RoccaSightingDataUnit.validateSpeciesList(
-                roccaProcess.roccaClassifier.getClassifierSpList());
+                roccaProcess.getRoccaClassifier().getClassifierSpList());
         if (!Arrays.equals(sNumList, classifierList)) {
             
             /* if the arrays are not equal, throw an error and force the user

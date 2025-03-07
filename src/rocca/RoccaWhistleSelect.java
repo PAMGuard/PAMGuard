@@ -193,7 +193,7 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
 
             /* open the selected whistle in a new pop-up spectrogram */
             RoccaSpecPopUp roccaSpecPopUp = new RoccaSpecPopUp
-                    (roccaControl.roccaProcess,
+                    (roccaControl.getRoccaProcess(),
                     selectedWhistle,
                     startFreq,
                     endFreq,

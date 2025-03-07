@@ -25,6 +25,11 @@ package rocca;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import rocca.tethys.RoccaSpeciesManager;
+import rocca.tethys.RoccaTethysProvider;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 
 /**
  *
@@ -34,6 +39,13 @@ import PamguardMVC.PamProcess;
 public class RoccaLoggingDataBlock extends PamDataBlock<RoccaLoggingDataUnit> {
 
     public RoccaProcess roccaProcess = null;
+    
+	private RoccaTethysProvider roccaTethysProvider;
+	
+	private RoccaSpeciesManager roccaSpeciesManager;
+
+	private RoccaControl roccaControl;
+	
 
     /**
      * Constructor.  Set the natural lifetime to the maximum integer value
@@ -46,12 +58,31 @@ public class RoccaLoggingDataBlock extends PamDataBlock<RoccaLoggingDataUnit> {
      * isn't really any point in keeping them anyway, because they're saved to the database almost
      * immediately after being created.
      */
-	public RoccaLoggingDataBlock(PamProcess parentProcess, int channelMap) {
+	public RoccaLoggingDataBlock(RoccaControl roccaControl, PamProcess parentProcess, int channelMap) {
 		super(RoccaLoggingDataUnit.class, "Rocca Whistle Stats", parentProcess, channelMap);
         this.roccaProcess = (RoccaProcess) parentProcess;
+        this.roccaControl = roccaControl;
         //this.setNaturalLifetime(Integer.MAX_VALUE/1000);	
         this.setNaturalLifetime(10);
     }
+
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (roccaTethysProvider == null) {
+			roccaTethysProvider = new RoccaTethysProvider(tethysControl, roccaControl, this);
+		}
+		return roccaTethysProvider;
+	}
+
+
+	@Override
+	public DataBlockSpeciesManager<RoccaLoggingDataUnit> getDatablockSpeciesManager() {
+		if (roccaSpeciesManager == null) {
+			roccaSpeciesManager = new RoccaSpeciesManager(roccaControl, this);
+		}
+		return roccaSpeciesManager;
+	}
 
     /**
      * Override the PamDataBlock clearAll() method, otherwise the detections

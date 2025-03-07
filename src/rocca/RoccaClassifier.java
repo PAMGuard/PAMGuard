@@ -249,7 +249,7 @@ public class RoccaClassifier {
 //                return;
 //            }
 //        }
-    	if (!roccaControl.roccaProcess.isClassifierLoaded()) {
+    	if (!roccaControl.getRoccaProcess().isClassifierLoaded()) {
     		double[] treeVotes = new double[] {0,1};
     		rcdb.setTreeVotes(treeVotes);
     		rcdb.setClassifiedAs(NOCLASS);
@@ -280,7 +280,7 @@ public class RoccaClassifier {
     public String classifySighting(String detectionHeader, String detectionStats) {
     	
         // if the model hasn't been loaded yet, do that now
-        if (!roccaControl.roccaProcess.isClassifierLoaded()) {
+        if (!roccaControl.getRoccaProcess().isClassifierLoaded()) {
         	
         	// since we're now allowing the user to run Rocca without a classifier, don't
         	// try and load it here.  Just return a "No Classifier" classification
@@ -597,10 +597,10 @@ public class RoccaClassifier {
         ArrayList<String> keyNames = rcdb.getKeyNames();
 
         // if the model hasn't been loaded yet, do that now
-        if (!roccaControl.roccaProcess.isClassifierLoaded()) {
-            roccaControl.roccaProcess.setClassifierLoaded(setUpClassifier());
+        if (!roccaControl.getRoccaProcess().isClassifierLoaded()) {
+            roccaControl.getRoccaProcess().setClassifierLoaded(setUpClassifier());
             // if there was an error loading the model, return null
-            if (!roccaControl.roccaProcess.isClassifierLoaded()) {
+            if (!roccaControl.getRoccaProcess().isClassifierLoaded()) {
                 return null;
             }
         }
@@ -664,10 +664,10 @@ public class RoccaClassifier {
         ArrayList<String> keyNames = rcdb.getKeyNames();
 
         // if the model hasn't been loaded yet, do that now
-        if (!roccaControl.roccaProcess.isClassifierLoaded()) {
-            roccaControl.roccaProcess.setClassifierLoaded(setUpClassifier());
+        if (!roccaControl.getRoccaProcess().isClassifierLoaded()) {
+            roccaControl.getRoccaProcess().setClassifierLoaded(setUpClassifier());
             // if there was an error loading the model, return null
-            if (!roccaControl.roccaProcess.isClassifierLoaded()) {
+            if (!roccaControl.getRoccaProcess().isClassifierLoaded()) {
                 return null;
             }
         }

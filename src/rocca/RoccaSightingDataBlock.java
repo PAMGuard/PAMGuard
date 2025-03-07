@@ -25,6 +25,8 @@ package rocca;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import rocca.tethys.RoccaSpeciesManager;
+import rocca.tethys.RoccaTethysProvider;
 
 /**
  * Container to hold all the sighting data
@@ -33,11 +35,14 @@ import PamguardMVC.PamProcess;
  */
 public class RoccaSightingDataBlock extends PamDataBlock<RoccaSightingDataUnit>  {
 
-    /**
+    private RoccaControl roccaControl;
+
+	/**
      * Main Constructor
      */
-	public RoccaSightingDataBlock(PamProcess parentProcess, int channelMap) {
+	public RoccaSightingDataBlock(RoccaControl roccaControl, PamProcess parentProcess, int channelMap) {
 		super(RoccaSightingDataUnit.class, "Rocca Encounter Stats", parentProcess, channelMap);
+		this.roccaControl = roccaControl;
     }
 
     /**

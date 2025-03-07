@@ -205,7 +205,7 @@ public class RoccaClassifyThis {
 		// load the classifier
 		System.out.println("Loading classifier...");
         roccaProcess.setClassifierLoaded
-        (roccaProcess.roccaClassifier.setUpClassifier());
+        (roccaProcess.getRoccaClassifier().setUpClassifier());
 			
 		// initialize the BufferedReader
 		BufferedReader inputFile = null;
@@ -345,7 +345,7 @@ public class RoccaClassifyThis {
 			contourStats.put(RoccaContourStats.ParamIndx.STEPDUR, Double.parseDouble(dataArray[60]));	
 			
 			// Run the classifier
-	        roccaProcess.roccaClassifier.classifyContour2(rcdb);
+	        roccaProcess.getRoccaClassifier().classifyContour2(rcdb);
 			
 			// generate the output line
 			String contourStats =

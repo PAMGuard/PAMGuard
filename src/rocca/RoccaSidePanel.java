@@ -106,7 +106,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
          */
 
         this.rsdb = new RoccaSightingDataBlock
-                (roccaControl.roccaProcess,
+                (roccaControl, roccaControl.getRoccaProcess(),
                 roccaControl.roccaParameters.getChannelMap());
         
         /*
@@ -118,7 +118,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
         rdl = new RoccaDetectionLogger(this, rsdb);
         rsdb.SetLogging(rdl);
         rsdb.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
-        roccaControl.roccaProcess.addOutputDataBlock(rsdb);
+        roccaControl.getRoccaProcess().addOutputDataBlock(rsdb);
 
         /* create a new SightingDataUnit and add it to the block; we don't have
          * a sighting number yet, but when the classifier is loaded an error
@@ -148,7 +148,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
 			setLayout(gb);
 
             /* if we've loaded a classifier, draw the species list */
-            if (roccaControl.roccaProcess.isClassifierLoaded()) {
+            if (roccaControl.getRoccaProcess().isClassifierLoaded()) {
                 drawThePanel();
                 
             /* otherwise, warn the user that no classifier has been loaded */
@@ -431,7 +431,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 nextSight.setEnabled(true);
             }
             
-            if (currentUnit.isSightingDataLost() || !roccaControl.roccaProcess.isClassifierLoaded()) {
+            if (currentUnit.isSightingDataLost() || !roccaControl.getRoccaProcess().isClassifierLoaded()) {
             	classifySighting.setEnabled(false);
             } else {
             	classifySighting.setEnabled(true);
@@ -600,7 +600,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
         			roccaControl.roccaParameters.areWeRunningAncCalcsOnClicks()) {
         		String detectionHeader = createDetectionStatsHeader();
 	        	String detectionStats = createDetectionStatsString(currentUnit);
-	        	currentUnit.setSightClass(roccaControl.roccaProcess.roccaClassifier.classifySighting(detectionHeader,detectionStats));        	
+	        	currentUnit.setSightClass(roccaControl.getRoccaProcess().getRoccaClassifier().classifySighting(detectionHeader,detectionStats));        	
         	
         	// otherwise, total up the tree votes for each species and classify the sighting as the species with the
         	// highest total
@@ -780,9 +780,9 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
             if (roccaControl.roccaParameters.weAreUsingGPS()) {
             	try {
 	            	detectionString += "," +
-	            			roccaControl.roccaProcess.getGpsSourceData().getLastUnit().getGpsData().getLatitude();
+	            			roccaControl.getRoccaProcess().getGpsSourceData().getLastUnit().getGpsData().getLatitude();
 	            	detectionString += "," +
-	            			roccaControl.roccaProcess.getGpsSourceData().getLastUnit().getGpsData().getLongitude();
+	            			roccaControl.getRoccaProcess().getGpsSourceData().getLastUnit().getGpsData().getLongitude();
             	} catch (Exception e) {
             		detectionString += ",0,0";
             	}
@@ -1117,7 +1117,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
             				0,
             				0,
             				newSNum,
-            				roccaControl.roccaProcess.roccaClassifier.getClassifierSpList(),
+            				roccaControl.getRoccaProcess().getRoccaClassifier().getClassifierSpList(),
             				roccaControl);
             
             rsdb.addPamData(rsdu);
