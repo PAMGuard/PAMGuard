@@ -10,13 +10,16 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialogPanel;
+import PamView.panel.PamAlignmentPanel;
+import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.species.DataBlockSpeciesMap;
+import tethys.species.SpeciesManagerObserver;
 import tethys.species.DataBlockSpeciesCodes;
 import tethys.species.SpeciesMapItem;
 
-public class DataBlockSpeciesPanel implements PamDialogPanel {
+public class DataBlockSpeciesPanel implements PamDialogPanel, SpeciesManagerObserver {
 	
 	private JPanel mainPanel;
 	
@@ -28,6 +31,8 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 
 	private String singleSpecies;
 
+	private DataBlockSpeciesManager speciesManager;
+
 	/**
 	 * Panel of info about a species name in PAMGuard relating it to a call type and ITIS 
 	 * code for output to Tethys. 
@@ -38,7 +43,19 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		super();
 		this.dataBlock = dataBlock;
 		this.singleSpecies = singleSpecies;
+
+		speciesManager = dataBlock.getDatablockSpeciesManager();
+		
 		mainPanel = new JPanel(new BorderLayout());
+		if (singleSpecies == null) {
+		    // only add additional options if it's the more global use of this dialog. 
+			 PamDialogPanel dialogPanel = speciesManager.getDialogPanel(this);
+			 if (dialogPanel != null) {
+				 JPanel nwPanel = new WestAlignedPanel(dialogPanel.getDialogComponent());
+				 mainPanel.add(BorderLayout.NORTH, nwPanel);
+			 }
+		}
+		
 		speciesPanel = new JPanel();
 		JScrollPane scrollPane = new JScrollPane(speciesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -57,7 +74,6 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		speciesPanel.setLayout(new BoxLayout(speciesPanel, BoxLayout.Y_AXIS));
 		subPanels.clear();
 		
-		DataBlockSpeciesManager speciesManager = dataBlock.getDatablockSpeciesManager();
 //		DataBlockSpeciesCodes speciesTypes = speciesManager.getSpeciesCodes();
 		ArrayList<String> speciesNames = speciesManager.getAllSpeciesCodes();
 		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
@@ -90,6 +106,11 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 			}
 		}
 		return errors == 0;
+	}
+
+	@Override
+	public void update() {
+		setParams();
 	}
 
 }

@@ -27,6 +27,8 @@ public class FormsSpeciesOptionsPanel implements PamDialogPanel {
 	private JPanel mainPanel;
 	private JComboBox<String> lookups;
 	private SpeciesManagerObserver speciesManagerObserver;
+	
+	private static final String tip = "User Forms annotation species selection options. Select any LOOKUP type control as species";
 
 	public FormsSpeciesOptionsPanel(FormsAnnotationSpeciesManager formsAnnotationSpeciesManager, SpeciesManagerObserver speciesManagerObserver) {
 		this.formsAnnotationSpeciesManager = formsAnnotationSpeciesManager;
@@ -35,7 +37,8 @@ public class FormsSpeciesOptionsPanel implements PamDialogPanel {
 		
 		mainPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		mainPanel.add(new JLabel("User form control for species ", JLabel.RIGHT), c);
+		JLabel label;
+		mainPanel.add(label = new JLabel("User form control for species ", JLabel.RIGHT), c);
 		lookups = new JComboBox<>();
 		lookups.setToolTipText("Select a drop down list that you use for species identity");
 		c.gridx++;
@@ -49,6 +52,8 @@ public class FormsSpeciesOptionsPanel implements PamDialogPanel {
 			}
 			lookups.addItem(aCtrl.getTitle());
 		}
+		label.setToolTipText(tip);
+		lookups.setToolTipText(tip);
 		setParams();
 	}
 

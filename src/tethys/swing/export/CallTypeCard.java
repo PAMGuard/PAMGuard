@@ -1,6 +1,7 @@
 package tethys.swing.export;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,7 +82,7 @@ public class CallTypeCard extends ExportWizardCard implements SpeciesManagerObse
 		
 		JPanel southPanel = new JPanel(new BorderLayout());
 //		southPanel.setBorder(new TitledBorder("Controls"));
-		JButton importButton = new JButton("Import species mapping");
+		JButton importButton = new JButton("Import species map");
 		importButton.setToolTipText("Import a species map previously saved from another PAMGuard configuration");
 		importButton.addActionListener(new ActionListener() {
 			@Override
@@ -89,7 +90,17 @@ public class CallTypeCard extends ExportWizardCard implements SpeciesManagerObse
 				importSpeciesMap(importButton);
 			}
 		});
-		southPanel.add(importButton, BorderLayout.WEST);
+		JButton exportButton = new JButton("Export species map");
+		exportButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportSpeciesMap(exportButton);
+			}
+		});
+		JPanel swPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		southPanel.add(swPanel, BorderLayout.WEST);
+		swPanel.add(importButton);
+		swPanel.add(exportButton);
 		this.add(southPanel, BorderLayout.SOUTH);
 	}
 	
@@ -183,6 +194,11 @@ public class CallTypeCard extends ExportWizardCard implements SpeciesManagerObse
 			speciesMap = newMap;
 			fillAllItemInfo();
 		}
+	}
+
+	private void exportSpeciesMap(JButton exportButton) {
+		SpeciesMapManager mapManager = SpeciesMapManager.getInstance();
+		mapManager.exportSpeciesMaps(getPamWizard(), getDataBlock().getLongDataName());
 	}
 
 	private class SpeciesAction implements ActionListener {
