@@ -21,11 +21,15 @@
 package rocca;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
+import PamView.GeneralProjector;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.symbol.SymbolData;
+import PamguardMVC.PamDataUnit;
 
 /**
  * @author Michael Oswald
@@ -46,8 +50,8 @@ public class RoccaGraphics extends PamDetectionOverlayGraphics {
 
 	int iCol = 0;
 
-	public RoccaGraphics(RoccaProcess roccaProcess) {
-		super(roccaProcess.fftDataBlockIn, new PamSymbol(defaultSymbol));
+	public RoccaGraphics(RoccaProcess roccaProcess, RoccaLoggingDataBlock rldb) {
+		super(rldb, new PamSymbol(defaultSymbol));
 		this.roccaProcess = roccaProcess;
 //		if (getPamSymbol() == null) {
 //			PamSymbol mapSymbol = new PamSymbol(PamSymbolType.SYMBOL_STAR, 8, 8, true,
@@ -56,10 +60,11 @@ public class RoccaGraphics extends PamDetectionOverlayGraphics {
 //		}
 	}
 
-//	@Override
-//	protected Rectangle drawOnSpectrogram(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
-//		return drawContourShape(g, (RoccaSightingDataUnit) pamDataUnit, generalProjector);
-//	}
+	@Override
+	protected Rectangle drawOnSpectrogram(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
+		return super.drawOnSpectrogram(g, pamDataUnit, generalProjector);
+	}
+
 //
 //	Rectangle drawContourShape(Graphics g, RoccaSightingDataUnit rsdu,
 //			GeneralProjector projector) {

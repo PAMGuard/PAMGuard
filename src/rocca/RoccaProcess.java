@@ -152,6 +152,7 @@ public class RoccaProcess extends PamProcess {
         roccaClassifier = new RoccaClassifier(this);
         rldb = new RoccaLoggingDataBlock(roccaControl, this, 0);
 
+        rldb.setOverlayDraw(new RoccaGraphics(this, rldb));
         rldb.SetLogging(new RoccaStatsLogger(roccaControl, rldb));
 		rldb.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
         addOutputDataBlock(rldb);

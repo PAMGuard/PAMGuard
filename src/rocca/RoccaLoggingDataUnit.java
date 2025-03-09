@@ -21,10 +21,16 @@
 
 package rocca;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Set;
+
+import com.google.protobuf.Duration;
 
 import PamDetection.PamDetection;
 import PamguardMVC.PamDataUnit;
+import rocca.RoccaContourStats.ParamIndx;
+import tethys.pamdata.AutoTethysProvider;
 
 
 /**
@@ -247,6 +253,88 @@ public class RoccaLoggingDataUnit extends PamDataUnit<PamDataUnit,PamDataUnit> i
 
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
+	}
+
+	@Override
+	public String getSummaryString() {
+		String base = super.getSummaryString();
+		
+//		if (detectionCount != 0) {
+//			base += String.format("Detection count: %d<br>", detectionCount);
+//		}
+		if (classifiedAs != null) {
+			base += "Classified as: " + classifiedAs + "<br>";
+		}
+		if (classifierUsed != null) {
+			base += "Classifier used: " + classifierUsed + "<br>";
+		}
+		if (classifier2Used != null) {
+			base += "Second Classifier: " + classifier2Used + "<br>";
+		}
+		
+		
+		if (contourStats == null) {
+			return base;
+		}
+		EnumMap<ParamIndx, Double> lst = contourStats.getContour();
+		if (lst == null) {
+			return base;
+		}
+		
+		int npRow = 3;
+		Set<ParamIndx> keys = lst.keySet();
+		int i = 0;
+		for (ParamIndx aKey : keys) {
+			Double data = lst.get(aKey);
+			if (data == null) {
+				continue;
+			}
+			data = AutoTethysProvider.roundDecimalPlaces(data, 3);
+			base += String.format("%s: %s", aKey.toString(), data.toString());
+			if (++i % npRow == 0) {
+				base += ",<br>";
+			}
+			else {
+				base += ", ";
+			}
+		}
+		
+		return base;
+	}
+
+	@Override
+	public double[] getFrequency() {
+		double[] fr = super.getFrequency();
+		if (fr != null && fr.length == 2 && fr[1] > 0) {
+			return fr;
+		}
+		if (contourStats.getContour() == null) {
+			return null;
+		}
+		ParamIndx[] ps = {RoccaContourStats.ParamIndx.FREQMIN, RoccaContourStats.ParamIndx.FREQMAX};
+		fr = new double[2];
+		for (int i = 0; i < 2; i++) {
+			Double f = contourStats.getContour().get(ps[i]);
+			if (f == null) {
+				return null;
+			}
+			else {
+				fr[i] = f;
+			}
+		}
+		return fr;
+	}
+
+	@Override
+	public Double getDurationInMilliseconds() {
+		if (contourStats.getContour() == null) {
+			return null;
+		}
+		Double dur = contourStats.getContour().get(RoccaContourStats.ParamIndx.DURATION);
+		if (dur == null) {
+			return null;
+		}
+		return dur*1000.;
 	}
     
     
