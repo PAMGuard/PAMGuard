@@ -5,6 +5,8 @@ import PamView.GroupedSourceParameters;
 import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import clickTrainDetector.dataselector.CTDataSelectCreator;
+import clipgenerator.ClipDataBlock;
+import clipgenerator.ClipDisplayDataBlock;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dataSelector.DLDataSelectCreator;
 import rawDeepLearningClassifier.tethys.DLSpeciesManager;
@@ -19,7 +21,7 @@ import tethys.species.DataBlockSpeciesManager;
  * @author Jamie Macaulay
  *
  */
-public class DLDetectionDataBlock extends AcousticDataBlock<DLDetection> implements GroupedDataSource {
+public class DLDetectionDataBlock extends ClipDisplayDataBlock<DLDetection> implements GroupedDataSource {
 
 	/**
 	 * Reference to the deep learning classifier process. 
