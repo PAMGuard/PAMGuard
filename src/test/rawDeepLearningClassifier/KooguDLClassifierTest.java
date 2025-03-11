@@ -92,7 +92,7 @@ public class KooguDLClassifierTest {
 
 				GroupedRawData groupedRawData = new GroupedRawData(0, 1, 0, duration, (int) duration);
 
-				//koogu predictions are in sam,ples
+				//koogu predictions are in samples
 				int startChunk =(int) (kooguPredicitions[i][0]*soundData.sampleRate/250); ///the start chunk is in decimated samples - uuurgh
 				
 
@@ -101,7 +101,6 @@ public class KooguDLClassifierTest {
 				ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
 				groupedData.add(groupedRawData);
 
-				
 				ArrayList<StandardPrediction> genericPrediciton = kooguWorker.runModel(groupedData, soundData.sampleRate, 0);		
 				float[] output =  genericPrediciton.get(0).getPrediction();
 
@@ -113,12 +112,14 @@ public class KooguDLClassifierTest {
 				if (testPassed) {
 					truecount++;
 				}
+				
+				
 			}
 			
 			//there are occasionaly slight differences between PMAGuard and Python so just make sure most data points are the same. 
 			double percTrue = 100*((double) truecount)/kooguPredicitions.length; 
 
-			System.out.println(String.format("Perecentage results true: %.2f  count %d", percTrue, truecount));
+			System.out.println(String.format("Percentage results true: %.2f  count %d", percTrue, truecount));
 			
 		    //at least 90% of results must match for the dataset
 			assertTrue(percTrue>0.9);

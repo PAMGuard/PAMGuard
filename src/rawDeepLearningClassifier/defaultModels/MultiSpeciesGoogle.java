@@ -71,7 +71,8 @@ public class MultiSpeciesGoogle implements DLModel {
 		//create the transforms. 
 		ArrayList<DLTransfromParams> dlTransformParamsArr = new ArrayList<DLTransfromParams>();
 
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, sr)); 
+		//Performed long series of test son which decimator is best for upsampling and it is, by far, the DECIMATE transform. 
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE, sr)); 
 
 		genericModelParams.dlTransfromParams = dlTransformParamsArr;
 
