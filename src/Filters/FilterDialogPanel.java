@@ -705,12 +705,18 @@ public class FilterDialogPanel implements ActionListener {
 				return;
 			}
 			if (IIRFilterMethod.class.isAssignableFrom(filterMethod.getClass())) {
+				paintIIRImpulseResponse(g);
 				paintPoleZeros(g);
 			}
 			else if (FIRFilterMethod.class.isAssignableFrom(filterMethod.getClass())) {
 				paintImpulseResponse(g);
 			}
 		}
+		/**
+		 * Paint the impulse response. For FIR filters, this is the only option and is
+		 * simply the taps of the filter function. 
+		 * @param g
+		 */
 		private void paintImpulseResponse(Graphics g) {
 			int margin = 20;
 			int cSize = 2;
@@ -775,6 +781,36 @@ public class FilterDialogPanel implements ActionListener {
 			for (int i = 0; i < iirFilterMethod.poleZeroCount(); i++) {
 				drawZero(g, zeros[i], center, radius);
 			}
+		}
+
+		/**
+		 * Paint the impulse response for IIR filters: We can calculate an
+		 * impulse response over a short time period by putting a 1 into the filter 
+		 * function followed by a load of zeros. Probably want about 5 times the number of
+		 * filter taps ? 
+		 * @param g
+		 */
+		private void paintIIRImpulseResponse(Graphics g) {
+			IIRFilterMethod iirFilterMethod = (IIRFilterMethod) filterMethod;
+			if (filterMethod == null) {
+				return;
+			}
+			int nPoints = iirFilterMethod.filterParams.filterOrder * 10;
+			Filter filter = iirFilterMethod.createFilter(0);
+			filter.prepareFilter();
+			double[] input = new double[nPoints];
+			double[] output = new double[nPoints];
+			input[0] = 1;
+			filter.runFilter(input, output);
+			// can now plot that. 
+
+			Graphics2D g2d = (Graphics2D) g;
+
+			g2d.setColor(PamColors.getInstance().getColor(PamColor.AXIS));
+
+			Insets insets = getInsets();
+			Rectangle r = getBounds();
+			
 		}
 
 		void drawPole(Graphics g, Complex p, Point center, int radius) {

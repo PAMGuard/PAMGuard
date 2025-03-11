@@ -441,7 +441,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
-			<version>0.0.59e</version>
+			<version>0.0.59f</version>
 								<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
 			<!--<exclusions>
 				<exclusion>

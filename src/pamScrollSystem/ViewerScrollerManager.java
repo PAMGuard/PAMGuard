@@ -32,7 +32,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 
 	private boolean initialisationComplete;
 
-	private boolean intialiseLoadDone = false;
+	private volatile boolean intialiseLoadDone = false;
 
 	private StoredScrollerData oldScrollerData = new StoredScrollerData();
 
