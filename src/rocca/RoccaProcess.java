@@ -150,8 +150,9 @@ public class RoccaProcess extends PamProcess {
         this.roccaControl = roccaControl;
         roccaContour = new RoccaContour(this);
         roccaClassifier = new RoccaClassifier(this);
-        rldb = new RoccaLoggingDataBlock(this, 0);
+        rldb = new RoccaLoggingDataBlock(roccaControl, this, 0);
 
+        rldb.setOverlayDraw(new RoccaGraphics(this, rldb));
         rldb.SetLogging(new RoccaStatsLogger(roccaControl, rldb));
 		rldb.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
         addOutputDataBlock(rldb);
@@ -421,7 +422,7 @@ public class RoccaProcess extends PamProcess {
 				}
 			}
 			
-			roccaClassifier.classifyContour2(rcdb);
+			getRoccaClassifier().classifyContour2(rcdb);
 	        
 	        /* check the side panel for a detection number.  If one has not yet been created,
 	         * create a default one now.  The user can always rename it later
@@ -527,7 +528,7 @@ public class RoccaProcess extends PamProcess {
 					}
 				}
 
-				roccaClassifier.classifyContour2(rcdb);
+				getRoccaClassifier().classifyContour2(rcdb);
 				
 		        // check the side panel for a detection number.  If one has not yet been created,
 		        // create a default one now.  The user can always rename it later
@@ -587,7 +588,7 @@ public class RoccaProcess extends PamProcess {
         }
         String[] sNumList =  roccaDataUnit.getSpeciesAsString();
         String[] classifierList = RoccaSightingDataUnit.validateSpeciesList(
-                roccaClassifier.getClassifierSpList());
+                getRoccaClassifier().getClassifierSpList());
         if (!Arrays.equals(sNumList, classifierList)) {
             
             /* if the arrays are not equal, throw an error and force the user
@@ -645,7 +646,7 @@ public class RoccaProcess extends PamProcess {
 	public void setupProcess() {
         // if the model hasn't been loaded yet, do that now
         if (!isClassifierLoaded()) {
-            setClassifierLoaded(roccaClassifier.setUpClassifier());
+            setClassifierLoaded(getRoccaClassifier().setUpClassifier());
 
             // if there was an error loading the model, return "Err"
             if (!isClassifierLoaded()) {
@@ -1428,6 +1429,14 @@ public class RoccaProcess extends PamProcess {
 
 	public GPSDataBlock getGpsSourceData() {
 		return gpsSourceData;
+	}
+
+
+	/**
+	 * @return the roccaClassifier
+	 */
+	public RoccaClassifier getRoccaClassifier() {
+		return roccaClassifier;
 	}
 	
 	

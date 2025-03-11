@@ -22,6 +22,7 @@
 package rocca;
 
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -30,20 +31,27 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import PamController.DataIntegrityChecker;
+import PamController.DataOutputStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.fileprocessing.StoreStatus;
 import PamUtils.PamCalendar;
 import PamView.PamGui;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMapPoint;
+import pamScrollSystem.ViewLoadObserver;
 
 
 /**
@@ -226,7 +234,7 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
     			continue;
     		}
     		cd.setOfflineEventID(eventList.getDatabaseIndex());
-			RoccaContourDataBlock rcdb = roccaProcess.newClickDetectorData(cd);
+			RoccaContourDataBlock rcdb = getRoccaProcess().newClickDetectorData(cd);
 			if (rcdb==null) {
 				//return;
 				continue;	// serialVersionUID=22 2015/06/23 don't break out of the loop completely, just skip to the next detection
@@ -278,7 +286,7 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 				}
 			}
 
-			roccaProcess.roccaClassifier.classifyContour2(rcdb);
+			getRoccaProcess().getRoccaClassifier().classifyContour2(rcdb);
 			
 
 	        // check the side panel for a detection number.  If one has not yet been created,
@@ -287,8 +295,8 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 	        if (sNum.equals(RoccaSightingDataUnit.NONE)) {
 	            sNum = roccaControl.roccaSidePanel.sidePanel.addASighting("Clk001");
 	        }
-	        roccaProcess.updateSidePanel(rcdb, true);  // serialVersionUID=22 2015/06/13 added
-	        roccaProcess.saveContourStats(rcdb, rcdb.getChannelMap(), i, sNum);
+	        getRoccaProcess().updateSidePanel(rcdb, true);  // serialVersionUID=22 2015/06/13 added
+	        getRoccaProcess().saveContourStats(rcdb, rcdb.getChannelMap(), i, sNum);
 			rcdb.setNaturalLifetimeMillis(0);
     	}
     }
@@ -438,15 +446,15 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 				roccaParameters = newParams.clone();
 
                 // if the classifier model isn't loaded, load it now...
-                if (!roccaProcess.isClassifierLoaded()) {
-                    roccaProcess.setClassifierLoaded(
-                            roccaProcess.roccaClassifier.setUpClassifier());
+                if (!getRoccaProcess().isClassifierLoaded()) {
+                    getRoccaProcess().setClassifierLoaded(
+                            getRoccaProcess().getRoccaClassifier().setUpClassifier());
                 }
 
                 // IF the source has been modified, run prepareProcess
 		        // serialVersionUID = 20 2015/05/20  
                 if (sourceHasChanged) {
-                	roccaProcess.prepareProcess();
+                	getRoccaProcess().prepareProcess();
                 }
 		        
 		        // update the Encounter ID and Known Species ID in the Sidebar
@@ -475,7 +483,7 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 		case PamControllerInterface.ADD_DATABLOCK:
 		case PamControllerInterface.REMOVE_DATABLOCK:
 			if (initialisationComplete) {
-				roccaProcess.prepareProcess();
+				getRoccaProcess().prepareProcess();
 			}
 		}
 	}
@@ -498,5 +506,67 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
  		return true;
     }
 
+	/**
+	 * @return the roccaProcess
+	 */
+	public RoccaProcess getRoccaProcess() {
+		return roccaProcess;
+	}
+/*
+ * Consider implementing the DataStore interface so that ROCCA data can be deleted on reprocessing. 
+	@Override
+	public void createOfflineDataMap(Window parentFrame) {
+		// not used, but part of required interface. 
+	}
+
+	@Override
+	public String getDataSourceName() {
+		return getUnitName();
+	}
+
+	@Override
+	public String getDataLocation() {
+		return null;
+	}
+
+	@Override
+	public boolean loadData(PamDataBlock dataBlock, OfflineDataLoadInfo offlineDataLoadInfo,
+			ViewLoadObserver loadObserver) {
+		return false;
+	}
+
+	@Override
+	public boolean saveData(PamDataBlock dataBlock) {
+		return false;
+	}
+
+	@Override
+	public boolean rewriteIndexFile(PamDataBlock dataBlock, OfflineDataMapPoint dmp) {
+		return false;
+	}
+
+	@Override
+	public DatagramManager getDatagramManager() {
+		return null;
+	}
+
+	@Override
+	public StoreStatus getStoreStatus(boolean getDetail) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean deleteDataFrom(long timeMillis) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public DataIntegrityChecker getInegrityChecker() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+*/
 
 }

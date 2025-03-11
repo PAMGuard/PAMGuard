@@ -347,8 +347,8 @@ public class UserDisplayControl extends PamControlledUnit implements
 	@Override
 	public JMenuBar getTabSpecificMenuBar(Frame parentFrame, JMenuBar standardMenu, PamGui pamGui) {
 
-		// always make a new manu - modules may have been added or removed
-		// start bymaking a completely new copy.
+		// always make a new menu - modules may have been added or removed
+		// start by making a completely new copy.
 		spectrogramTabMenu = standardMenu;//pamGui.makeGuiMenu();
 //		if (spectrogramTabMenu == null) {
 			for (int i = 0; i < spectrogramTabMenu.getMenuCount(); i++) {

@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import PamguardMVC.PamDataUnit;
+import annotation.xml.AnnotationXMLWriter;
 import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -163,8 +164,10 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 		//to make this a matrix
 		JSONArray classIDArray = new JSONArray();
 		short[] classID  = arrayList.get(0).getClassNames();
-		for (short aClassID : classID) {
-			classIDArray.put(aClassID); 
+		if (classID != null) {
+			for (short aClassID : classID) {
+				classIDArray.put(aClassID); 
+			}
 		}
 
 		jsonObject.put(PREDICTIONS_JSON_KEY, matrixArray);

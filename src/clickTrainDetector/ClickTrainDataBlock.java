@@ -8,7 +8,12 @@ import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import clickTrainDetector.dataselector.CTDataSelectCreator;
+import clickTrainDetector.tethys.ClickTrainSpeciesManager;
+import clickTrainDetector.tethys.ClickTrainTethysProvider;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 
 /**
  * 
@@ -30,6 +35,10 @@ public class ClickTrainDataBlock<T extends CTDetectionGroupDataUnit> extends Sup
 	 * The data selector for click trains. 
 	 */
 	private CTDataSelectCreator clickDataSelectCreator;
+	
+	private ClickTrainTethysProvider clickTrainTethysProvider;
+	
+	private ClickTrainSpeciesManager clickTrainSpeciesManager;
 
 
 	public ClickTrainDataBlock(ClickTrainControl clickTrainControl, PamProcess parentProcess, String name, int channelMap) {
@@ -174,6 +183,24 @@ public class ClickTrainDataBlock<T extends CTDetectionGroupDataUnit> extends Sup
 			clickDataSelectCreator = new CTDataSelectCreator(clickTrainControl, this);
 		}
 		return clickDataSelectCreator;
+	}
+
+
+	@Override
+	public DataBlockSpeciesManager<T> getDatablockSpeciesManager() {
+		if (clickTrainSpeciesManager == null) {
+			clickTrainSpeciesManager = new ClickTrainSpeciesManager(clickTrainControl, this);
+		}
+		return clickTrainSpeciesManager;
+	}
+
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (clickTrainTethysProvider == null) {
+			clickTrainTethysProvider = new ClickTrainTethysProvider(tethysControl, clickTrainControl, this);
+		}
+		return clickTrainTethysProvider;
 	}
 
 }

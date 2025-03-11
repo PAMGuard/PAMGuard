@@ -37,12 +37,15 @@ public class PamConfiguration {
 	private ArrayList<PamControlledUnit> pamControlledUnits;
 	
 	private ArrayList<PamSettings> settingsOwners = new ArrayList<>(); 
+	
+	private static ArrayList<PamConfiguration> allConfigurations = new ArrayList();
 
 	public PamConfiguration() {
 		super();
 		
 		// create the array list to hold multiple views
 		pamControlledUnits = new ArrayList<PamControlledUnit>();
+		allConfigurations.add(this);
 	}
 
 	/**
@@ -608,6 +611,15 @@ public class PamConfiguration {
 		}
 		return owners;
 		
+	}
+
+	/**
+	 * A static list of ALL configurations. Can be useful in the batch processor to find 
+	 * settings of the run configuration. 
+	 * @return the allConfigurations
+	 */
+	public static ArrayList<PamConfiguration> getAllConfigurations() {
+		return allConfigurations;
 	}
 
 }

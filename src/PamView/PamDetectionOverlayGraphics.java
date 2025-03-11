@@ -704,9 +704,13 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 		double[] frequency = pamDetection.getFrequency();
 		Coordinate3d topLeft = generalProjector.getCoord3d(pamDetection.getTimeMilliseconds(), 
 				frequency[1], 0);
+		double dur = 0;
+		Double duration = pamDetection.getDurationInMilliseconds();
+		if (duration != null) {
+			dur = duration;
+		}
 		Coordinate3d botRight = generalProjector.getCoord3d(pamDetection.getTimeMilliseconds() + 
-				pamDetection.getDurationInMilliseconds(),
-				frequency[0], 0);
+				dur, frequency[0], 0);
 				
 		if (botRight.x < topLeft.x){
 			botRight.x = g.getClipBounds().width;

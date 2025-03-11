@@ -43,8 +43,13 @@ public class SQLXMLWriter<TDataAnnotation extends DataAnnotation<?>> implements 
 		Element el;
 		int nItems = emptyTableDefinition.getTableItemCount();
 		// first one is id, which we'll ignore, do all the other ones
+//		Element dataEl = document.createElement("data");
+//		docEl.appendChild(dataEl);
 		int added = 0;
 		for (int i = 1; i < nItems; i++) {
+//			if (1<2) {
+//				continue;
+//			}
 			PamTableItem tableItem = emptyTableDefinition.getTableItem(i);
 			String itemName = tableItem.getName();
 			Object data = tableItem.getValue();
@@ -53,8 +58,9 @@ public class SQLXMLWriter<TDataAnnotation extends DataAnnotation<?>> implements 
 			}
 			String dataStr = data.toString();
 			el = document.createElement(itemName);
-			el.setNodeValue(dataStr);
-			el.setAttribute(itemName, dataStr);
+//			el.setNodeValue(dataStr);
+			el.setTextContent(dataStr);
+//			el.setAttribute(itemName, dataStr);
 			docEl.appendChild(el);
 			added++;
 		}

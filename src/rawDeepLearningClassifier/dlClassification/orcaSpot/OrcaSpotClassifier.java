@@ -198,7 +198,7 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 			modelResults.add(modelResult); 
 			dlControl.getDLClassifyProcess().getDLDetectionDatablock().addPamData(new DLDetection(groupedRawData.getTimeMilliseconds(), 
 					groupedRawData.getChannelBitmap(), groupedRawData.getStartSample(),
-					groupedRawData.getSampleDuration(), modelResults, null));
+					groupedRawData.getSampleDuration(), modelResults, null, dlControl.getDLClassifyProcess().getSampleRate()));
 		}
 
 		groupedRawData= null; //just in case 

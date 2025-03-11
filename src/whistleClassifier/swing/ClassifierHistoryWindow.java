@@ -1,4 +1,4 @@
-package whistleClassifier;
+package whistleClassifier.swing;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -41,6 +41,11 @@ import pamScrollSystem.PamScrollObserver;
 import pamScrollSystem.PamScroller;
 import pamScrollSystem.RangeSpinner;
 import pamScrollSystem.RangeSpinnerListener;
+import whistleClassifier.FragmentClassifierParams;
+import whistleClassifier.WhistleClassificationDataBlock;
+import whistleClassifier.WhistleClassificationDataUnit;
+import whistleClassifier.WhistleClassificationParameters;
+import whistleClassifier.WhistleClassifierControl;
 
 /**
  * Provides a history window for classification results. 
@@ -74,7 +79,7 @@ public class ClassifierHistoryWindow extends PamObserverAdapter {
 
 	Timer timer;
 
-	WhistleClasificationDataBlock whistleClasificationDataBlock;
+	WhistleClassificationDataBlock whistleClasificationDataBlock;
 	
 	private boolean isViewer = false;
 	
@@ -89,7 +94,7 @@ public class ClassifierHistoryWindow extends PamObserverAdapter {
 
 		historyWindowBorder = new HistoryWindowBorder();
 
-		whistleClasificationDataBlock = whistleClassifierControl.whistleClassifierProcess.whistleClasificationDataBlock;
+		whistleClasificationDataBlock = whistleClassifierControl.getWhistleClassifierProcess().getWhistleClasificationDataBlock();
 
 		if (whistleClasificationDataBlock != null) {
 			whistleClasificationDataBlock.addObserver(this);

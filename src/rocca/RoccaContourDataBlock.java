@@ -308,8 +308,8 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
         // add the latitude and longitude.
         if (roccaProcess.roccaControl.roccaParameters.weAreUsingGPS()) {
         	try {
-        		latitude = roccaProcess.roccaControl.roccaProcess.getGpsSourceData().getLastUnit().getGpsData().getLatitude();
-        		longitude = roccaProcess.roccaControl.roccaProcess.getGpsSourceData().getLastUnit().getGpsData().getLongitude();
+        		latitude = roccaProcess.roccaControl.getRoccaProcess().getGpsSourceData().getLastUnit().getGpsData().getLatitude();
+        		longitude = roccaProcess.roccaControl.getRoccaProcess().getGpsSourceData().getLastUnit().getGpsData().getLongitude();
         	} catch (Exception e) {
         		latitude=0;
         		longitude=0;
@@ -1287,7 +1287,7 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
 //        if (roccaProcess.isClassifierLoaded()) {
         	DecimalFormat df = new DecimalFormat("#.#####");
         	double roundedVal = 0.0;
-        	String[] classSpList = roccaProcess.roccaClassifier.getClassifierSpList();
+        	String[] classSpList = roccaProcess.getRoccaClassifier().getClassifierSpList();
         	int offset=0;
         	if (treeVotes.length>classSpList.length) {
         		offset=1;

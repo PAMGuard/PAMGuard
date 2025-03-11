@@ -75,6 +75,10 @@ public class FilterParams implements Serializable, Cloneable, ManagedParameters 
 	public static final int SCALE_LOG = 0;
 	public static final int SCALE_LIN = 1;
 
+	public static final int PZPLOT_PZ = 0;
+	public static final int PZPLOT_IMPULSE = 1;
+	public static int pzPlotStyle = PZPLOT_IMPULSE;
+
 	/**
 	 * Construct a filter parameter set with default params
 	 */

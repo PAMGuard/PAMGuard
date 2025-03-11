@@ -1,4 +1,4 @@
-package whistleClassifier;
+package whistleClassifier.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,6 +20,11 @@ import javax.swing.tree.TreePath;
 import PamUtils.FolderChangeListener;
 import PamUtils.SelectFolder;
 import PamView.dialog.PamDialog;
+import whistleClassifier.TrainingDataCollection;
+import whistleClassifier.TrainingDataGroup;
+import whistleClassifier.TrainingDataSet;
+import whistleClassifier.WhistleClassificationParameters;
+import whistleClassifier.WhistleClassifierControl;
 
 public class ClassifierTrainingDialog extends PamDialog {
 

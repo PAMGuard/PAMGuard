@@ -57,7 +57,7 @@ public class PrintScreenControl extends PamControlledUnit implements PamSettings
 		annotationHandler = new PrintScreenAnnotationChoiceHandler(this, printScreenDataBlock);
 		printScreenDataBlock.setAnnotationHandler(annotationHandler);
 		printScreenDataBlock.addDataAnnotationType(new StringAnnotationType("Comment", 50));
-		printScreenDataBlock.addDataAnnotationType(new UserFormAnnotationType());
+		printScreenDataBlock.addDataAnnotationType(new UserFormAnnotationType(printScreenDataBlock));
 		
 		PamSettingManager.getInstance().registerSettings(this);
 	}

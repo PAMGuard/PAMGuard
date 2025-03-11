@@ -303,6 +303,10 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		 * one. Otherwise Pamguard tends to get stuck in a loop of model change
 		 * notifications and setting of data blocks. 
 		 */
+		boolean instant =  (this instanceof PamInstantProcess);
+		if (instant) {
+			reThread = false;
+		}
 		if (parentDataBlock == newParentDataBlock) {
 			return;
 		}
@@ -312,7 +316,12 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		}
 		parentDataBlock = newParentDataBlock;
 		if (parentDataBlock != null) {
-			parentDataBlock.addObserver(this, PamModel.getPamModel().isMultiThread() & reThread);
+			if (instant) {
+				parentDataBlock.addInstantObserver(this);
+			}
+			else {
+				parentDataBlock.addObserver(this, PamModel.getPamModel().isMultiThread() & reThread);
+			}
 //			acousticDataSource = AcousticDataUnit.class.isAssignableFrom(parentDataBlock.getUnitClass());
 //			parentProcess = parentDataBlock.getParentProcess();
 			PamProcess pp = parentDataBlock.getParentProcess();

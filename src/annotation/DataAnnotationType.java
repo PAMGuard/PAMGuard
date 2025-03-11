@@ -13,6 +13,7 @@ import annotation.handler.AnnotationOptions;
 import annotation.xml.AnnotationXMLWriter;
 import annotation.xml.SQLXMLWriter;
 import generalDatabase.SQLLoggingAddon;
+import tethys.species.DataBlockSpeciesManager;
 
 /**
  * Something that can tell us a little more about 
@@ -228,6 +229,14 @@ public abstract class DataAnnotationType<TDataAnnotation extends DataAnnotation<
 	 */
 	public void setTargetDataBlock(PamDataBlock targetDataBlock) {
 		this.targetDataBlock = targetDataBlock;
+	}
+	
+	/**
+	 * Annotations may have a species manager. Most won't. 
+	 * @return
+	 */
+	public DataBlockSpeciesManager getDataBlockSpeciesManager() {
+		return null;
 	}
 	
 

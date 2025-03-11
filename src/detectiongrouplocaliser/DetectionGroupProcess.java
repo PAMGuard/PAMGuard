@@ -55,7 +55,7 @@ public class DetectionGroupProcess extends PamProcess {
 	public DetectionGroupProcess(DetectionGroupControl detectionGroupControl) {
 		super(detectionGroupControl, null);
 		this.detectionGroupControl = detectionGroupControl;
-		detectionGroupDataBlock = new DetectionGroupDataBlock(detectionGroupControl.getUnitName(), this);
+		detectionGroupDataBlock = new DetectionGroupDataBlock(detectionGroupControl.getUnitName(), detectionGroupControl, this);
 		
 		detectionGroupLogging = new DetectionGroupLogging(detectionGroupControl, detectionGroupDataBlock);
 		detectionGroupDataBlock.SetLogging(detectionGroupLogging);

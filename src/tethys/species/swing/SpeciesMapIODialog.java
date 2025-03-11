@@ -34,6 +34,8 @@ public class SpeciesMapIODialog extends PamDialog {
 	
 	private JPanel boxesPanel;
 	
+	private String preselectedBlock;
+	
 	/**
 	 * @param parentFrame
 	 * @param title
@@ -48,7 +50,7 @@ public class SpeciesMapIODialog extends PamDialog {
 		setDialogComponent(boxesPanel);
 	}
 	
-	public static GlobalSpeciesMap showDialog(Window parentFrame, GlobalSpeciesMap speciesMap, boolean export) {
+	public static GlobalSpeciesMap showDialog(Window parentFrame, GlobalSpeciesMap speciesMap, boolean export, String selectedBlock) {
 		if (singleInstance == null) {
 			singleInstance = new SpeciesMapIODialog(parentFrame);
 		}
@@ -56,6 +58,7 @@ public class SpeciesMapIODialog extends PamDialog {
 			singleInstance.showWarning("No Data block species maps are defined");
 			return speciesMap;
 		}
+		singleInstance.preselectedBlock = selectedBlock;
 		singleInstance.setTitle(export ? "Export species maps" : "Import species maps");
 		singleInstance.setParams(speciesMap);
 		singleInstance.setVisible(true);
@@ -86,6 +89,9 @@ public class SpeciesMapIODialog extends PamDialog {
 			c.gridy++;
 			blockBoxes[iBox] = new JCheckBox(item.getKey()); 
 			boxesPanel.add(blockBoxes[iBox], c);	
+			if (item.getKey().equals(preselectedBlock)) {
+				blockBoxes[iBox].setSelected(true);
+			}
 			iBox++;
 		}
 		

@@ -134,7 +134,7 @@ public class SequentialTrainingSelector extends TrainingSelector {
 							System.out.println("Consider restricting the frequency range of the classifier.");
 						}		
 
-						currentStore.addFragemnt(contourFragments[iFrag]);
+						currentStore.addFragemnt(contourFragments[iFrag], 0);
 						if (currentStore.getFragmentCount() == sectionLength) {
 							store.add(currentStore);
 							currentStore = null;

@@ -35,11 +35,11 @@ public class FragmentClassifierParams implements Serializable, Cloneable, Manage
 
 	public static final long serialVersionUID = 0;
 	
-	protected int classifierType = ClassifierTypes.CLASSIFIER_LINEAR;
+	public int classifierType = ClassifierTypes.CLASSIFIER_LINEAR;
 	
-	protected int fftLength, fftHop;
+	public int fftLength, fftHop;
 	
-	protected int fragmentLength, sectionLength;
+	public int fragmentLength, sectionLength;
 	
 	/**
 	 * Min probability for classification. 
@@ -50,23 +50,23 @@ public class FragmentClassifierParams implements Serializable, Cloneable, Manage
 	 * <p>With the quadratic classifier, output for each species is an absolute 
 	 * probability so setting a minimum will easily generate an unknown class. 
 	 */
-	protected double minimumProbability;
+	public double minimumProbability;
 	
-	protected double[] frequencyRange;
+	public double[] frequencyRange;
 	
-	protected float sampleRate;
+	public float sampleRate;
 	
-	protected int nBootstrap;
+	public int nBootstrap;
 	
-	protected Matrix confusionMatrix;
+	public Matrix confusionMatrix;
 	
-	protected Matrix stdConfusion;
+	public Matrix stdConfusion;
 		
-	protected ClassifierParams classifierParams;
+	public ClassifierParams classifierParams;
 	
 	private String[] speciesList;
 	
-	protected String fileName; // file name these parameters were stored in. 
+	public String fileName; // file name these parameters were stored in. 
 	
 	public boolean dumpTextFile; // text file output of all bootstrap data.
 	

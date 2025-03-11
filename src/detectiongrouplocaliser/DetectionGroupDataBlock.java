@@ -17,10 +17,11 @@ public class DetectionGroupDataBlock extends SuperDetDataBlock<DetectionGroupDat
 	
 	private DetectionGroupTethysProvider detectionGroupTethysProvider;
 	
-	private DetectionGroupSpeciesManager detectionGroupSpeciesManager;
+	private DetectionGroupControl detectionGroupControl;
 
-	public DetectionGroupDataBlock(String dataName, DetectionGroupProcess detectionGroupProcess) {
+	public DetectionGroupDataBlock(String dataName, DetectionGroupControl detectionGroupControl, DetectionGroupProcess detectionGroupProcess) {
 		super(DetectionGroupDataUnit.class, dataName, detectionGroupProcess, 0, SuperDetDataBlock.ViewerLoadPolicy.LOAD_OVERLAPTIME);
+		this.detectionGroupControl = detectionGroupControl;
 		this.detectionGroupProcess = detectionGroupProcess;
 	}
 
@@ -109,17 +110,14 @@ public class DetectionGroupDataBlock extends SuperDetDataBlock<DetectionGroupDat
 	@Override
 	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
 		if (detectionGroupTethysProvider == null) {
-			detectionGroupTethysProvider = new DetectionGroupTethysProvider(tethysControl, this);
+			detectionGroupTethysProvider = new DetectionGroupTethysProvider(tethysControl, this, detectionGroupControl);
 		}
 		return detectionGroupTethysProvider;
 	}
 
 	@Override
 	public DataBlockSpeciesManager<DetectionGroupDataUnit> getDatablockSpeciesManager() {
-		if (detectionGroupSpeciesManager == null) {
-			detectionGroupSpeciesManager = new DetectionGroupSpeciesManager(this);
-		}
-		return detectionGroupSpeciesManager;
+		return detectionGroupControl.getDataBlockSpeciesManager();
 	}
 
 }

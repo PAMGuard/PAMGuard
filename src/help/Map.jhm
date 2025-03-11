@@ -606,6 +606,8 @@
 
 <mapID target="utilities.SIDEModule.docs.SIDE_OpStat" url="utilities/SIDEModule/docs/SIDE_OpStat.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_granularity" url="utilities/tethys/docs/tethys_granularity.html"/>
+
 <mapID target="localisation.group3d.docs.3doutput" url="localisation/group3d/docs/3doutput.html"/>
 
 <mapID target="detectors.gpl.docs.notes" url="detectors/gpl/docs/notes.html"/>

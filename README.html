@@ -383,7 +383,7 @@ PAMGuardBeta_ViewerMode.exe):</p>
 <p class=MsoNormal><em><span style='font-family:"Calibri",sans-serif'>&nbsp;</span></em></p>
 
 <h2><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
-normal'><a href="#_Version_2.02.16_February">Latest Version 2.02.16 February
+normal'><a href="#_Version_2.02.16_February">Latest Version 2.02.16 March
 2025&nbsp;</a></span></em></h2>
 
 <h2><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
@@ -434,7 +434,7 @@ name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
 name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
 name="_Version_2.02.11_April"></a><a name="_Version_2.02.14_October"></a><a
 name="_2.02.15_December_2014"></a><a name="_Version_2.02.16_February"></a>Version
-2.02.16 February 2025</h1>
+2.02.16 March 2025</h1>
 
 <h2>New Features</h2>
 
@@ -443,6 +443,11 @@ name="_2.02.15_December_2014"></a><a name="_Version_2.02.16_February"></a>Versio
 <p class=MsoNormal>Updates to compatibility with Tethys Server version 3.2 beta
 2 and Nilus 3.2. PAMGuard is no longer compatible with 3.1, the pre-release
 version. </p>
+
+<p class=MsoNormal>Added Tethys functionality for the following modules:
+Whistle Classifier, Detection Group Localiser, Rocca, Click Train Detector, GPL
+Detector. IF the Detection Group Localiser is used with Logger Form
+annotations, species codes can be taken from the logger form. </p>
 
 <p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections,
 and Localisations) available as ‘offline tasks’. This is not useful when
@@ -461,6 +466,14 @@ data to Tethys. </p>
 
 <p class=MsoNormal>Multiple management changes to support batch processing of
 offline tasks. Compatible with batch processor 2.0. </p>
+
+<p class=MsoNormal>Added clip display for Deep Learning module.</p>
+
+<p class=MsoNormal>Added optional display of impulse response function to IIR
+Filter design dialog in place of the pole-zero diagram. </p>
+
+<p class=MsoNormal>Added ROCCA graphics, so ROCCA output can be displayed on
+the spectrogram display. </p>
 
 <h2>Bug Fixes</h2>
 
@@ -481,7 +494,7 @@ time, meaning you got an invalid file path. This has been fixed. </p>
 channel list from acquisition module and automatically removes channels that
 were selected in the FFT module, but are not available from the acquisition. </p>
 
-<p class=MsoNormal>Dealt with issue in Tethys module looking up IT IS species
+<p class=MsoNormal>Dealt with issue in Tethys module looking up ITIS species
 codes where the progress dialog would not close. </p>
 
 <p class=MsoNormal>Project Information abstract field was not saving /
@@ -793,8 +806,8 @@ processing.</span></p>
 <h2><span lang=EN-US>New Features</span></h2>
 
 <p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which
-generates random chirps between around 200 and 800Hz, roughly the frequency you'd
-expect sound from higher frequency baleen whales, such as humpbacks, to
+generates random chirps between around 200 and 800Hz, roughly the frequency
+you'd expect sound from higher frequency baleen whales, such as humpbacks, to
 vocalise at. &nbsp;&nbsp;</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Hiding tool tips. A menu item to
@@ -857,8 +870,8 @@ classifier was being trimmed. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Documentation</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>Comprehensive help file including description
-of the algorithm, screen grabs and examples.</span></p>
+<p class=MsoNormal><span lang=EN-US>Comprehensive help file including
+description of the algorithm, screen grabs and examples.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Bug fixes</span></p>
 
@@ -992,8 +1005,8 @@ href="http://www.PAMGuard.org/downloads.php?cat_id=3">here</a>.</p>
 <p class=MsoNormal><b><span lang=EN-US>Detection Group Localiser</span></b><span
 lang=EN-US> </span></p>
 
-<p class=MsoNormal>This module has been renamed &quot;Detection Grouper&quot;, so
-as to avoid confusion with the Group 3D localizer. This is because the
+<p class=MsoNormal>This module has been renamed &quot;Detection Grouper&quot;,
+so as to avoid confusion with the Group 3D localizer. This is because the
 Detection Grouper is more for organizing data into groups to be localized than
 it is for doing localization.</p>
 
@@ -1137,10 +1150,11 @@ name="_Latest_Beta_Version_2.01.05"></a><span lang=EN-US>&nbsp;</span></p>
 
 <h1><span lang=EN-US>Version 2.01.05 October 2020</span></h1>
 
-<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release (1.15.xx),
-PAMGuard Version 2 contains major updates. You should read and understand the
-notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a>
-before proceeding with installation and use of this version.</b></p>
+<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release
+(1.15.xx), PAMGuard Version 2 contains major updates. You should read and
+understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
+Version 2.00.10</a> before proceeding with installation and use of this
+version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
 (release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
@@ -1706,8 +1720,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 420. The Click Classifier set was not getting updated properly in Viewer
-mode.</p>
+</span>Bug 420. The Click Classifier set was not getting updated properly in
+Viewer mode.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2018,9 +2032,9 @@ see new options in main menu.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added Matched Template Click Classifier. Classifies clicks based
-on an ideal template to match and a template to reject. An example of this is
-to classify beaked whale clicks in an environment with dolphin clicks.</p>
+lang=EN-US> </span>Added Matched Template Click Classifier. Classifies clicks
+based on an ideal template to match and a template to reject. An example of
+this is to classify beaked whale clicks in an environment with dolphin clicks.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2614,9 +2628,9 @@ dependencies)</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Other Changes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle both
-64 bit and 32 bit installations. PAMGuard psf files are now registered in the
-Windows Registry, so double-clicking on a psf file should run PAMGuard in
+<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle
+both 64 bit and 32 bit installations. PAMGuard psf files are now registered in
+the Windows Registry, so double-clicking on a psf file should run PAMGuard in
 normal mode (as opposed to Viewer or Mixed modes). Note that the Windows
 Registry can only hold a single executable reference for psf files; therefore,
 for users with multiple installations of PAMGuard, double-clicking on a psf
@@ -2768,10 +2782,10 @@ the online help. Users of the Click Detector will notice the following changes:<
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>There is now a choice of least squares and Simplex based
-algorithms for real-time animal tracking. The improved algorithms also provide
-better error information both for display on the map and for storage in the
-database. </span></p>
+</span><span lang=EN-US>There is now a choice of least squares and Simplex
+based algorithms for real-time animal tracking. The improved algorithms also
+provide better error information both for display on the map and for storage in
+the database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2812,8 +2826,8 @@ the future. </span></p>
 
 <p class=MsoNormal><i>Logger Form Design</i></p>
 
-<p class=MsoNormal>A GUI driven system for designing Logger forms has been
-released. Currently, this feature has no online help, but is reasonably intuitive
+<p class=MsoNormal>A GUI driven system for designing Logger forms has been released.
+Currently, this feature has no online help, but is reasonably intuitive
 compared to the old method of typing directly into the database. </p>
 
 <p class=MsoNormal><i><span lang=EN-US>Improved Number handling</span></i></p>
@@ -3534,8 +3548,8 @@ module. </p>
 <p class=MsoNormal><i>Sound Recorder Module</i></p>
 
 <p class=MsoNormal>Now supports writing 8 and 24 bit as well as 16 bit files.
-Also writes data to dated sub folders, starting a new folder each day (UTC). Also
-provides additional information on disk space on the main display panel.
+Also writes data to dated sub folders, starting a new folder each day (UTC).
+Also provides additional information on disk space on the main display panel.
 Millisecond time is also now included in the output file names. </p>
 
 <p class=MsoNormal><i>Datagram Options</i></p>
@@ -3597,8 +3611,8 @@ whistle.</p>
  <li class=MsoNormal style='margin-bottom:0cm'>Airgun display. If this was
      included in the PAMGuard model before the GPS module it would hang
      PAMGuard. This has been rectified. </li>
- <li class=MsoNormal style='margin-bottom:0cm'>Fixed occasional exceptions in the
-     sound output modules when playing back from files. </li>
+ <li class=MsoNormal style='margin-bottom:0cm'>Fixed occasional exceptions in
+     the sound output modules when playing back from files. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Fixed exceptions in spectrogram
      user interface. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Fixed National Instruments sound
@@ -3680,8 +3694,8 @@ other data sources for the PAMGuard viewer. </p>
 storage to the database offline for any module having both binary and database
 storage. </p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access database
-(2007 and later *.accdb formats only).</p>
+<p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access
+database (2007 and later *.accdb formats only).</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Can open MS Access from within
 PAMGuard to make it easier to view database content. </p>
@@ -3764,8 +3778,8 @@ margin-left:36.0pt'>&nbsp;</p>
 <p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-18.0pt'><i>Ishmael
 Detection Modules</i></p>
 
-<p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-18.0pt'>We
-have implemented database storage for output of these modules. </p>
+<p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-18.0pt'>We have
+implemented database storage for output of these modules. </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>
 
@@ -3947,9 +3961,9 @@ length. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>The filter module can now also generate finite Impulse Response (FIR)
-filters. Note however, that FIR filters may require considerably more execution
-time than IIR filters. </p>
+</span>The filter module can now also generate finite Impulse Response (FIR) filters.
+Note however, that FIR filters may require considerably more execution time
+than IIR filters. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4000,10 +4014,10 @@ source, even if that data source is loaded after the FFT module is created.</p>
 
 <p class=MsoNormal>1. Binary storage module. </p>
 
-<p class=MsoNormal>Performs a parallel role to the PAMGAURD database but uses binary
-files in a proprietary format which is considerably more efficient for data of
-unknown length such as whistle contours or small clips of click waveform. This
-feature is currently implemented in the following modules:</p>
+<p class=MsoNormal>Performs a parallel role to the PAMGAURD database but uses
+binary files in a proprietary format which is considerably more efficient for
+data of unknown length such as whistle contours or small clips of click
+waveform. This feature is currently implemented in the following modules:</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4087,9 +4101,9 @@ and recording sounds to the default directory.&nbsp; </p>
 <p class=MsoNormal><b>Channel numbering</b></p>
 
 <p class=MsoNormal>A new internal channel numbering scheme for ASIO sound cards
-was released on 8 March in Alpha version 1.8.02. These changes have now been promoted
-to this Beta release 1.9.00. These changes were described in an email to
-PAMGuard User, the text of which is repeated here:</p>
+was released on 8 March in Alpha version 1.8.02. These changes have now been
+promoted to this Beta release 1.9.00. These changes were described in an email
+to PAMGuard User, the text of which is repeated here:</p>
 
 <p class=MsoNormal>Within PAMGuard, there have been constant problems with
 lookup tables relating hardware channel numbers to internal channel numbers.
@@ -4212,8 +4226,8 @@ column was setting to zero. This is now fixed</p>
 
 <p class=MsoNormal>Ishmael Detectors</p>
 
-<p class=MsoNormal>Better rendering of detection boxes on spectrogram display
-and more meaningful names in spectrogram display menu.</p>
+<p class=MsoNormal>Better rendering of detection boxes on spectrogram display and
+more meaningful names in spectrogram display menu.</p>
 
 <p class=MsoNormal>Sound acquisition</p>
 
@@ -4286,9 +4300,9 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>False buffer overflows at low sample rates stopped (size of data in
-individual data blocks had been increased at low sample rates, but when this
-exceeded 3s a false buffer overflow would occur).</p>
+</span>False buffer overflows at low sample rates stopped (size of data in individual
+data blocks had been increased at low sample rates, but when this exceeded 3s a
+false buffer overflow would occur).</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -4325,8 +4339,8 @@ will be displayed if you select them with the mouse.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>New click classifier methods, which include extraction of frequency sweep
-parameters. (Please note that this click is not yet documented. The old
+</span>New click classifier methods, which include extraction of frequency
+sweep parameters. (Please note that this click is not yet documented. The old
 classifier is still available). </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
@@ -4462,8 +4476,8 @@ them before proceeding with installation.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Installer now setting permissions on some of the default settings files
-so that under Vista they can still be written to without needed to be an
+</span>Installer now setting permissions on some of the default settings files so
+that under Vista they can still be written to without needed to be an
 Administrator</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
@@ -4536,10 +4550,10 @@ help pages</p>
 
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
-<p class=MsoNormal>Memory leak caused by Night / Day colour manager now fixed. This
-would cause memory leaks when multiple files were being analysed off-line and
-would eventually crash PAMGuard. The way that colours are managed in PAMGuard
-has been rewritten.&nbsp; </p>
+<p class=MsoNormal>Memory leak caused by Night / Day colour manager now fixed.
+This would cause memory leaks when multiple files were being analysed off-line
+and would eventually crash PAMGuard. The way that colours are managed in
+PAMGuard has been rewritten.&nbsp; </p>
 
 <p class=MsoNormal>Some issues with Swing fixed that might have been causing
 hang ups on startup especially on Macs/Linux machines</p>
@@ -4610,8 +4624,8 @@ file)</p>
 
 <p class=MsoNormal><b>Changes</b></p>
 
-<p class=MsoNormal>The User Input module (for text entry of information by the user)
-has been moved from the Displays sub menu of the Add Modules menu, to
+<p class=MsoNormal>The User Input module (for text entry of information by the
+user) has been moved from the Displays sub menu of the Add Modules menu, to
 Utilities. This will not affect how existing settings files are loaded. </p>
 
 <p class=MsoNormal><b>Multi-screen environments.</b></p>

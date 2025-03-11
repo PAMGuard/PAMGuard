@@ -10,13 +10,16 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialogPanel;
+import PamView.panel.PamAlignmentPanel;
+import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.species.DataBlockSpeciesMap;
+import tethys.species.SpeciesManagerObserver;
 import tethys.species.DataBlockSpeciesCodes;
 import tethys.species.SpeciesMapItem;
 
-public class DataBlockSpeciesPanel implements PamDialogPanel {
+public class DataBlockSpeciesPanel implements PamDialogPanel, SpeciesManagerObserver {
 	
 	private JPanel mainPanel;
 	
@@ -26,10 +29,33 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 	
 	private ArrayList<SpeciesSubPanel> subPanels = new ArrayList<>();
 
-	public DataBlockSpeciesPanel(PamDataBlock dataBlock) {
+	private String singleSpecies;
+
+	private DataBlockSpeciesManager speciesManager;
+
+	/**
+	 * Panel of info about a species name in PAMGuard relating it to a call type and ITIS 
+	 * code for output to Tethys. 
+	 * @param dataBlock Datablock with a DataBlockSpeciesManager
+	 * @param singleSpecies single species if only one species to be shown. null for all species. 
+	 */
+	public DataBlockSpeciesPanel(PamDataBlock dataBlock, String singleSpecies) {
 		super();
 		this.dataBlock = dataBlock;
+		this.singleSpecies = singleSpecies;
+
+		speciesManager = dataBlock.getDatablockSpeciesManager();
+		
 		mainPanel = new JPanel(new BorderLayout());
+		if (singleSpecies == null) {
+		    // only add additional options if it's the more global use of this dialog. 
+			 PamDialogPanel dialogPanel = speciesManager.getDialogPanel(this);
+			 if (dialogPanel != null) {
+				 JPanel nwPanel = new WestAlignedPanel(dialogPanel.getDialogComponent());
+				 mainPanel.add(BorderLayout.NORTH, nwPanel);
+			 }
+		}
+		
 		speciesPanel = new JPanel();
 		JScrollPane scrollPane = new JScrollPane(speciesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -48,11 +74,13 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		speciesPanel.setLayout(new BoxLayout(speciesPanel, BoxLayout.Y_AXIS));
 		subPanels.clear();
 		
-		DataBlockSpeciesManager speciesManager = dataBlock.getDatablockSpeciesManager();
 //		DataBlockSpeciesCodes speciesTypes = speciesManager.getSpeciesCodes();
 		ArrayList<String> speciesNames = speciesManager.getAllSpeciesCodes();
 		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
 		for (String aSpecies : speciesNames) {
+			if (singleSpecies != null && singleSpecies.equals(aSpecies) == false) {
+				continue;
+			}
 			SpeciesSubPanel subPanel = new SpeciesSubPanel(dataBlock, aSpecies);
 			subPanels.add(subPanel);
 			speciesPanel.add(subPanel.getDialogComponent());
@@ -78,6 +106,11 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 			}
 		}
 		return errors == 0;
+	}
+
+	@Override
+	public void update() {
+		setParams();
 	}
 
 }

@@ -18,10 +18,15 @@ public class BasicFragmentStore implements FragmentStore {
 	
 	private LinkedList<WhistleFragment> fragments;
 	
+	private long startTimeMillis, endTimeMillis;
+	
+	private double lowFreq, highFreq;
+	
 	
 	public BasicFragmentStore(float sampleRate) {
 		super();
 		this.setSampleRate(sampleRate);
+//		clearStore(); // don't. Will crash. It's dealt with in prepare store. 
 	}
 
 	private double[] latestParams;
@@ -34,13 +39,22 @@ public class BasicFragmentStore implements FragmentStore {
 	}
 	
 	@Override
-	public synchronized void addFragemnt(WhistleFragment newFragment) {
+	public synchronized void addFragemnt(WhistleFragment newFragment, long time) {
 
 		fragments.add(newFragment);
 		
 		latestParams = parameteriser.getParameters(newFragment);
 		if (latestParams != null) {
 			fragmentParams.add(latestParams);
+		}
+		
+		startTimeMillis = Math.min(startTimeMillis, time);
+		endTimeMillis = Math.max(endTimeMillis, time);
+		// pull out the frequency limits
+		double[] f = newFragment.getFreqsHz();
+		for (int i = 0; i < f.length; i++) {
+			lowFreq = Math.min(lowFreq, f[i]);
+			highFreq = Math.max(highFreq, f[i]);
 		}
 
 		fragmentCount++;
@@ -49,10 +63,20 @@ public class BasicFragmentStore implements FragmentStore {
 	@Override
 	public synchronized void clearStore() {
 
-		fragmentParams.clear();
-		fragments.clear();
+		if (fragmentParams != null) {
+			fragmentParams.clear();
+		}
+		if (fragments != null) {
+			fragments.clear();
+		}
 		
 		fragmentCount = 0;
+		
+		startTimeMillis = Long.MAX_VALUE; 
+		endTimeMillis = Long.MIN_VALUE;
+		
+		lowFreq = Double.MAX_VALUE;
+		highFreq = Double.MIN_VALUE;
 
 	}
 
@@ -148,6 +172,34 @@ public class BasicFragmentStore implements FragmentStore {
 	 */
 	public float getSampleRate() {
 		return sampleRate;
+	}
+
+	/**
+	 * @return the startTimeMillis
+	 */
+	public long getStartTimeMillis() {
+		return startTimeMillis;
+	}
+
+	/**
+	 * @return the endTimeMillis
+	 */
+	public long getEndTimeMillis() {
+		return endTimeMillis;
+	}
+
+	/**
+	 * @return the lowFreq
+	 */
+	public double getLowFreq() {
+		return lowFreq;
+	}
+
+	/**
+	 * @return the highFreq
+	 */
+	public double getHighFreq() {
+		return highFreq;
 	}
 
 

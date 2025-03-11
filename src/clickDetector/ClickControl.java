@@ -883,7 +883,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 		return true;
 	}
 
-	JMenuBar clickTabMenu = null;
+	JMenuBar tabMenu = null;
 
 	private ClickFFTOrganiser clickFFTDataOrganiser;
 
@@ -893,31 +893,31 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 	@Override
 	public JMenuBar getTabSpecificMenuBar(Frame parentFrame, JMenuBar standardMenu, PamGui pamGui) {
 		JMenu aMenu;
-		// start bymaking a completely new copy.
+		// start by making a completely new copy.
 		//		if (clickTabMenu == null) {
-		clickTabMenu = standardMenu;
-		for (int i = 0; i < clickTabMenu.getMenuCount(); i++) {
-			if (clickTabMenu.getMenu(i).getText().equals("Display")) {
+		tabMenu = standardMenu;
+		for (int i = 0; i < tabMenu.getMenuCount(); i++) {
+			if (tabMenu.getMenu(i).getText().equals("Display")) {
 				//clickTabMenu.remove(clickTabMenu.getMenu(i));
 
 				aMenu = createDetectionMenu(parentFrame);
 				String txt = aMenu.getText();
 				txt = checkMenuTit(txt, "settings");
 				aMenu.setText(txt);
-				clickTabMenu.add(aMenu, i+1);
+				tabMenu.add(aMenu, i+1);
 
 				aMenu = tabPanelControl.createMenu(parentFrame);
 //				aMenu.setText("Click Display");
 				txt = aMenu.getText();
 				txt = checkMenuTit(txt, "display");
 				aMenu.setText(txt);
-				clickTabMenu.add(aMenu, i+2);
+				tabMenu.add(aMenu, i+2);
 
 				break;
 			}
 		}
 		//		}
-		return clickTabMenu;
+		return tabMenu;
 	}
 
 	/**

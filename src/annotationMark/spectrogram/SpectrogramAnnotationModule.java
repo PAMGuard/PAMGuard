@@ -70,7 +70,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		annotationHandler.addAnnotationType(splAnnotationType =new SPLAnnotationType());
 		annotationHandler.addAnnotationType(stringAnnotationType = new StringAnnotationType("Note", 50));
 		annotationHandler.addAnnotationType(labelAnnotationType = new StringAnnotationType("Label", 50));
-		annotationHandler.addAnnotationType(new UserFormAnnotationType());
+		annotationHandler.addAnnotationType(new UserFormAnnotationType(getAnnotationProcess().getMarkDataBlock()));
 		//		spectrogramMarkObserver = new SpecMarkObserver();
 		//		SpectrogramMarkObservers.addSpectrogramMarkObserver(spectrogramMarkObserver);
 

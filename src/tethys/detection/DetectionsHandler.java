@@ -332,6 +332,8 @@ public class DetectionsHandler extends CollectionHandler {
 				totalMaps ++;
 				totalMappedPoints += mapPoint.getNDatas();
 				dataBlock.loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), null);
+				SuperDetDataBlock.reattachAllSubDetections();
+				
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
 				totalLoadedDatas += dataCopy.size();
 				System.out.printf("%d loaded from %s to %s %d kept\n", dataBlock.getUnitsCount(), PamCalendar.formatDateTime(mapPoint.getStartTime()),
@@ -401,6 +403,8 @@ public class DetectionsHandler extends CollectionHandler {
 
 		LocalizationHandler localizationHandler = tethysControl.getLocalizationHandler();
 		LocalizationBuilder localizationBuilder = null;
+
+		DataBlockSpeciesManager speciesManager = dataBlock.getDatablockSpeciesManager();
 
 		/*
 		 * The main documents for both dets and locs. 
@@ -477,10 +481,21 @@ public class DetectionsHandler extends CollectionHandler {
 					break;
 				}
 				dataBlock.loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), null);
+				SuperDetDataBlock.reattachAllSubDetections();
+				
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
 				Collections.sort(dataCopy);
 				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
 				for (PamDataUnit dataUnit : dataCopy) {
+					/*
+					 * Do additional check to see if this species is selected.
+					 */
+					String speciesCode = speciesManager.getSpeciesCode(dataUnit);
+					boolean sel = streamExportParams.getSpeciesSelection(speciesCode);
+					if (sel == false) {
+						continue;
+					}
+					
 					/*
 					 * Here is where we need to handle the different granularities.
 					 */
@@ -796,15 +811,15 @@ public class DetectionsHandler extends CollectionHandler {
 		/**
 		 * Check the species map is OK before doing anything. 
 		 */
-		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
-		if (spManager != null) {
-			String error = spManager.checkSpeciesMapError();
-			if (error != null) {
-				PamDialog.showWarning(PamController.getMainFrame(), "Datablock species manager error", error);
-				spManager.showSpeciesDialog();
-				return;
-			}
-		}
+//		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
+//		if (spManager != null) {
+//			String error = spManager.checkSpeciesMapError();
+//			if (error != null) {
+//				PamDialog.showWarning(PamController.getMainFrame(), "Datablock species manager error", error);
+//				spManager.showSpeciesDialog();
+//				return;
+//			}
+//		}
 
 		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock, true);
 

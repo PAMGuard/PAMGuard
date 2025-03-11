@@ -73,14 +73,6 @@ img {
     without affecting the selection state of other blocks.
   <p>
 
-  <p>
-    <em>
-      SUGGESTION:  It looks like we have to highlight these by clicking
-      on them.  As we use select boxes for recording periods, we might
-      want to do the same thing here...  We might want to rename
-      N PAM Datas to N PAM Data as data are already plural.
-    </em>
-  </p>
 
   <h2> Exporting data blocks </h2>
 
@@ -96,14 +88,39 @@ img {
 	 alt="List of details describing the mechanism, parameters, and version of modules used in processing"/>
   </div>
     
+    <br>
   <p>
     There is nothing to change in this summary.  Press Next once you
-    have reviewed it.  The second panel allows specification of your
+    have reviewed it. </p>
+    
+    <img src="./images/stream_species.png">
+    
+    <br>
+    <p>The second panel allows you to check <a href="tethys_speciescodes.html">ITIS species codes and call types</a> 
+    and to select which call types you want to export. </p>
+    
+    
+    <img src="./images/stream_granularity.png">
+    
+    <br>
+    <p>The next panel allows you to chose whether to export Detections, Localizations (if available), or both. Here, you 
+    can also select the <a href="tethys_granularity.html">granularity</a>, which will be a choice of "Call", "Encounter", "Binned", or "Grouped", depending on the 
+    type of data. You can also select an optional data filter which will restrict the output using criteria specific to the 
+    detector you're using. Note that there may be overlap between the data filter and the selections you make in the earlier species
+    selection page.   </p>
+    
+    <img src="./images/stream_description.png">
+    
+    <br>
+    <p>This panel allows specification of your
     objectives, abstract, and method.  Many modules will have
-    pre-populated the method for you.  While it is recommended to populate
-    the objectives and abstract, these fields are optional.
+    pre-populated the method for you.  It is recommended to populate
+    the objectives and abstract with as much information as possible.
   </p>
     
+    <img src="./images/stream_parameters.png">
+    
+    <br>
   <p>
     Press Next to proceed to the next step of the dialog.  You will be asked
     what details you wish to store within the parameters that were used to
@@ -118,7 +135,8 @@ img {
       later date or know whether or not the results of different
       studies can be used together. 
     </li>
-    <li> Data selector only - <strong>not sure what this is</strong> </li>
+    <li> Data selector only - Output only the details of the data filter (if any), for instance that
+    selected only a type of sound, or sounds with a received level above a set minimum.  
     <li>
       Module only - Report the parameters that were set with this
       module.  Only parameters associated with the specific module
@@ -131,21 +149,20 @@ img {
       parameters as well as anything else that is part of the signal processing chain that leads
       to the module.  As an example, a module only setting would not report the parameters that were
       used to generate a spectrogram that was presented to a module for classification, but the
-      full process chain would record these details as well.  Use this option will dramatically
+      full process chain would record these details as well.  Use of this option will dramatically
       increase the potential to reproduce your results, but it will generate a large amount of data
       about the signal processing chain, much of which might not be useful.
     </li>
   </ul>
   
+    <img src="./images/stream_export.png">
+    <br>
   <p>
-    The final page of the dialog has an "Export data" button.  Press
-    this to export the data.  The system will begin generating the
-    Tethys document and the "Export data" button will be relabeled "Export complete"
-    once it is done.  At this point, you can press "Finish" to close
-    the dialog.
+    The final page of the dialog has an "Export data" button.  Press either
+    this, or the Export button at the bottom of the dialog, to export the data.  The system will begin generating the
+    Tethys document and display progress as it works through the data. When complete, it will show a message to indicate that export was 
+    successful, or an error message.  
 
-    <em>Would it make more sense to export when the user presses
-    Finish (or change the Finish button Export)?</em>
   </p>
   
     

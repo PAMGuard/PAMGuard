@@ -1,4 +1,4 @@
-package whistleClassifier;
+package whistleClassifier.logging;
 
 import java.sql.Types;
 
@@ -11,6 +11,10 @@ import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
+import whistleClassifier.WhistleClassificationDataUnit;
+import whistleClassifier.WhistleClassificationParameters;
+import whistleClassifier.WhistleClassifierControl;
+import whistleClassifier.WhistleClassifierProcess;
 
 public class WhistleClassifierLogging extends SQLLogging {
 
@@ -22,9 +26,14 @@ public class WhistleClassifierLogging extends SQLLogging {
 
 	PamTableItem speciesName;
 	PamTableItem nFragments;
+	PamTableItem duration; // seconds
 	PamTableItem[] speciesProbabilities;
 
 	private String[] speciesNames;
+
+	private PamTableItem lowFreqItem;
+
+	private PamTableItem highFreqItem;
 
 	private static int DEFSPECIESNAMELEN = 20;
 
@@ -36,7 +45,7 @@ public class WhistleClassifierLogging extends SQLLogging {
 		setCanView(false);
 
 		this.whistleClassifierProcess = whistleClassifierProcess;
-		whistleClassifierControl = whistleClassifierProcess.whistleClassifierControl;
+		whistleClassifierControl = whistleClassifierProcess.getWhistleClassifierControl();
 
 
 		tableDefinition = createTableDefinition();
@@ -62,6 +71,9 @@ public class WhistleClassifierLogging extends SQLLogging {
 				maxLen = Math.max(maxLen, speciesNames[i].length()+1);
 			}
 			tableDef.addTableItem(speciesName = new PamTableItem("Species", Types.CHAR, maxLen));
+			tableDef.addTableItem(duration = new PamTableItem("Duration", Types.DOUBLE));
+			tableDef.addTableItem(lowFreqItem = new PamTableItem("lowFrequency", Types.DOUBLE));
+			tableDef.addTableItem(highFreqItem = new PamTableItem("highFrequency", Types.DOUBLE));
 			tableDef.addTableItem(nFragments = new PamTableItem("N Fragments", Types.INTEGER));
 			speciesProbabilities = new PamTableItem[speciesNames.length];
 			for (int i = 0; i < speciesNames.length; i++) {
@@ -146,6 +158,23 @@ public class WhistleClassifierLogging extends SQLLogging {
 		if (speciesName != null && speciesProbabilities != null) {
 			speciesName.setValue(wcdu.getSpecies());
 			nFragments.setValue(wcdu.getNFragments());
+			Double dur = wcdu.getDurationInMilliseconds();
+			if (dur != null) {
+				duration.setValue(dur/1000.);
+			}
+			else {
+				duration.setValue(null);
+			}
+			double[] fR = wcdu.getFrequency();
+			if (fR == null || fR.length != 2) {
+				lowFreqItem.setValue(null);
+				highFreqItem.setValue(null);
+			}
+			else {
+				lowFreqItem.setValue(fR[0]);
+				highFreqItem.setValue(fR[1]);
+			}
+			
 			double[] speciesProbs = wcdu.getSpeciesProbabilities();
 			for (int i = 0; i < speciesProbs.length; i++) {
 				speciesProbabilities[i].setValue(speciesProbs[i]);
@@ -168,7 +197,17 @@ public class WhistleClassifierLogging extends SQLLogging {
 			probs[i] = speciesProbabilities[i].getDoubleValue();
 		}
 		wcdu.setSpeciesProbabilities(probs);
-		getPamDataBlock().addPamData(wcdu);
+		Double dur = duration.getDoubleValue();
+		if (!Double.isNaN(dur)) {
+			wcdu.setDurationInMilliseconds(dur*1000.);
+		}
+		double f1 = lowFreqItem.getDoubleValue();
+		double f2 = highFreqItem.getDoubleValue();
+		if (Double.isNaN(f1*f2) == false) {
+			double[] f = {f1, f2};
+			wcdu.setFrequency(f);
+		}
+//		getPamDataBlock().addPamData(wcdu);
 		return wcdu;
 	}
 

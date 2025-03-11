@@ -5,6 +5,7 @@ import annotation.CentralAnnotationsList;
 import annotation.DataAnnotationType;
 import annotation.binary.AnnotationBinaryHandler;
 import annotation.dataselect.AnnotationDataSelCreator;
+import annotation.xml.AnnotationXMLWriter;
 import generalDatabase.SQLLoggingAddon;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dataPlotFX.DLSymbolModifier;
@@ -105,6 +106,12 @@ public class DLAnnotationType extends DataAnnotationType<DLAnnotation>  {
 			return dlDataSelectorCreator;
 		}
 
+		@Override
+		public AnnotationXMLWriter<DLAnnotation> getXMLWriter() {
+			// override since the SQLLogging one seems to output a load of Json. could replace 
+			// with something a bit nicer that makes xml. 
+			return null;
+		}
 		
 
 

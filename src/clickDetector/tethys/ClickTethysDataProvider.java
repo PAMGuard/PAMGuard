@@ -16,7 +16,8 @@ public class ClickTethysDataProvider extends AutoTethysProvider {
 
 	@Override
 	public GranularityEnumType[] getAllowedGranularities() {
-		return GranularityEnumType.values(); // everything !
+		GranularityEnumType[] allowed = {GranularityEnumType.CALL, GranularityEnumType.BINNED, GranularityEnumType.ENCOUNTER};
+		return allowed;
 	}
 
 }

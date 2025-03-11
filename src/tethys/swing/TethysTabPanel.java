@@ -17,7 +17,7 @@ public class TethysTabPanel implements PamTabPanel {
 	
 	@Override
 	public JMenu createMenu(Frame parentFrame) {
-		return null;
+		return tethysContol.createTethysMenu(parentFrame);
 	}
 
 	public TethysTabPanel(TethysControl tethysContol) {

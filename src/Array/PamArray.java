@@ -828,7 +828,9 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 				h.setStreamerId(newIndexes[oldInd]);
 			}
 		}
-		masterLocator.setupLocators(this);
+		if (masterLocator != null) {
+			masterLocator.setupLocators(this);
+		}
 	}
 
 	/**
@@ -1541,7 +1543,9 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	 * so it can get data out of the localisers, etc. 
 	 */
 	public void prepareToSerialize() {
-		masterLocator.getLocatorSettings();
+		if (masterLocator != null) {
+			masterLocator.getLocatorSettings();
+		}
 	}
 
 	/**
@@ -1549,8 +1553,10 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	 * data can be loaded back into the Hydrophone localisers.  
 	 */
 	public void arrayDeserialized() {
-		masterLocator.setupLocators(this);
-		masterLocator.setLocatorSettings(null);
+		if (masterLocator != null) { 
+			masterLocator.setupLocators(this);
+			masterLocator.setLocatorSettings(null);
+		}
 	}
 
 	/**

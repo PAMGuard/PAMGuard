@@ -1,12 +1,9 @@
 package tethys.species;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-import PamController.PamControlledUnitSettings;
 import PamController.PamController;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
+import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import tethys.species.swing.DataBlockSpeciesDialog;
@@ -26,7 +23,7 @@ import tethys.species.swing.DataBlockSpeciesDialog;
  * @author dg50
  *
  */
-abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implements PamSettings*/ {
+abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	
 	/**
 	 * The serialised bit. Always exists (or should be created) even if there
@@ -190,7 +187,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implement
 	}
 
 	public void showSpeciesDialog() {
-		DataBlockSpeciesDialog.showDialog(PamController.getMainFrame(), dataBlock);
+		DataBlockSpeciesDialog.showDialog(PamController.getMainFrame(), dataBlock, null);
 	}
 
 	/**
@@ -250,6 +247,27 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implement
 				return "No Species item for species code " + aCode;
 			}
 		}
+		return null;
+	}
+
+	/**
+	 * Used only in debug mode to clear the species map. Just used while
+	 * debugging so that I can check that it's easy to recreate the map 
+	 * and that dialogs don't go screwy when it's empty. 
+	 */
+	public void clearMap() {
+		if (datablockSpeciesMap == null) {
+			return;
+		}
+		datablockSpeciesMap.clearMap();
+	}
+	
+	/**
+	 * Return a (preferably) small dialog panel that can contain 
+	 * options for the species manager. 
+	 * @return
+	 */
+	public PamDialogPanel getDialogPanel(SpeciesManagerObserver speciesManagerObserver) {
 		return null;
 	}
 
