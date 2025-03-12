@@ -1,6 +1,12 @@
 package PamController.command;
 
+import java.awt.Component;
 import java.util.ArrayList;
+
+import javax.swing.JFrame;
+
+import PamController.PamController;
+import PamView.GuiFrameManager;
 
 public class HelpCommand extends ExtCommand {
 
@@ -25,6 +31,22 @@ public class HelpCommand extends ExtCommand {
 				out += "\n";
 			}
 		}
+
+		// check the focus
+		GuiFrameManager gui = PamController.getInstance().getGuiFrameManager();
+		System.out.println("Check GUI focus " + gui);
+		if (gui != null) {
+			JFrame frame = gui.getFrame(0);
+			Component focussed = frame.getMostRecentFocusOwner();
+			
+			if (focussed != null) {
+				System.out.printf("Focussed is %s: %s\n", focussed.toString(), focussed.getName());
+			}
+			else {
+				System.out.println("No focus available: " + focussed); 
+			}
+		}
+
 		commandManager.sendData(this, out);
 		return getName();
 	}

@@ -17,6 +17,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 //import org.kc7bfi.jflac.FLACDecoder;
@@ -198,12 +199,24 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 					mapDialog.setVisible(false);
 				}
 			}
-			//this is how progress should be passed to the GUI?
-			System.out.println("The offline wav file map has finished loading: ");
-			PamController.getInstance().notifyTaskProgress(
-					new FileMapProgress(FileMapProgress.STATUS_DONE, 0, 0, ""));
 
-			PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_OFFLINE_DATASTORE);
+
+			/**
+			 * 2025/03 - Very strange bug. whenever the Offline Sound data is loaded the
+			 * whole of PAMGuard freezes. There are no thread locks, no infinite loops, no
+			 * recursion etc. the bug is intermittent but removing notifymodelChnaged seems to
+			 * sort it out. Have put the notifyModelChanged with invokeLater as an attempt to 
+			 * sort this but not ideal. 
+			 */
+			SwingUtilities.invokeLater(()->{			
+				PamController.getInstance().notifyTaskProgress(
+						new FileMapProgress(FileMapProgress.STATUS_DONE, 0, 0, ""));
+	
+				PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_OFFLINE_DATASTORE);
+			});
+			
+			//this is how progress should be passed to the GUI?
+			System.out.println("The offline wav file map has finished loading 2: ");
 
 		}
 

@@ -238,11 +238,15 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 	public void notifyModelChanged(int changeType) {
 		//		System.out.println("TDControlAWT: Notify model changed: " + changeType );
 		//need to push onto fx thread. 
-		Platform.runLater(()->{
-			if (tdMainDisplay!=null){
-				tdMainDisplay.notifyModelChanged(changeType);
-			}
-		});
+		if (!Platform.isFxApplicationThread()) {
+			Platform.runLater(()->{
+				if (tdMainDisplay!=null) tdMainDisplay.notifyModelChanged(changeType);
+				
+			});
+		}
+		else {
+			if (tdMainDisplay!=null) tdMainDisplay.notifyModelChanged(changeType);
+		}
 	}
 
 	/**
