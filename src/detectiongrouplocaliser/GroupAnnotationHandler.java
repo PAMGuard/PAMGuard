@@ -17,7 +17,7 @@ public class GroupAnnotationHandler  extends AnnotationChoiceHandler {
 		super(pamDataBlock);
 		this.detectionGroupControl = detectionGroupControl;
 		addAnnotationType(new StringAnnotationType("Text Annotation", 80));
-		addAnnotationType(new UserFormAnnotationType());
+		addAnnotationType(new UserFormAnnotationType(pamDataBlock));
 		addAnnotationType(new TMAnnotationType());
 	}
 

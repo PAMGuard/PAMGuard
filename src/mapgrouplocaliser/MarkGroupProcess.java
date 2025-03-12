@@ -241,4 +241,11 @@ public class MarkGroupProcess extends PamProcess implements OverlayMarkObserver 
 		return null;
 	}
 
+	/**
+	 * @return the markGroupDataBlock
+	 */
+	public MarkGroupDataBlock getMarkGroupDataBlock() {
+		return markGroupDataBlock;
+	}
+
 }

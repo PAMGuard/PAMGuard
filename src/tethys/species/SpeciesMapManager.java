@@ -64,7 +64,9 @@ public class SpeciesMapManager implements PamSettings {
 
 	private SpeciesMapManager() {
 		PamSettingManager.getInstance().registerSettings(this);
-		globalSpeciesMap = new GlobalSpeciesMap();
+		if (globalSpeciesMap == null) {
+			globalSpeciesMap = new GlobalSpeciesMap();
+		}
 	}
 	
 	/**
@@ -169,7 +171,7 @@ public class SpeciesMapManager implements PamSettings {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				exportSpeciesMaps(parentFrame);
+				exportSpeciesMaps(parentFrame, null);
 			}
 		};
 	}
@@ -186,12 +188,13 @@ public class SpeciesMapManager implements PamSettings {
 	/**
 	 * Export all species maps to a serialized object file. 
 	 * @param parentFrame 
+	 * @param singleDataBlock name of datablock to automatically check.  
 	 * @return
 	 */
-	public boolean exportSpeciesMaps(Window parentFrame) {
+	public boolean exportSpeciesMaps(Window parentFrame, String singleDataBlock) {
 		// gather the species maps from the data blocks...
 		gatherSpeciesMaps();
-		GlobalSpeciesMap toExport = SpeciesMapIODialog.showDialog(parentFrame, globalSpeciesMap, true, null);
+		GlobalSpeciesMap toExport = SpeciesMapIODialog.showDialog(parentFrame, globalSpeciesMap, true, singleDataBlock);
 		if (toExport == null) {
 			return false;
 		}

@@ -134,7 +134,7 @@ public class DLDetectionBinarySource extends BinaryDataSource {
 		if (baseData.getChannelBitmap()==0) {
 			baseData.setChannelBitmap(1);
 		}
-		DLDetection newUnit = new DLDetection(baseData, rawData);
+		DLDetection newUnit = new DLDetection(baseData, rawData, clipDataBlock.getSampleRate());
 		
 		return newUnit;
 	}

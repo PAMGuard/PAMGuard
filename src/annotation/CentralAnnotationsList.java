@@ -31,7 +31,7 @@ public class CentralAnnotationsList {
 					singleInstance.addAnnotationType(new SNRAnnotationType());
 					singleInstance.addAnnotationType(new SPLAnnotationType());
 					singleInstance.addAnnotationType(new TMAnnotationType());
-					singleInstance.addAnnotationType(new UserFormAnnotationType());
+					singleInstance.addAnnotationType(new UserFormAnnotationType(null));
 					singleInstance.addAnnotationType(new WavAnnotationType());
 				}
 			}

@@ -1,12 +1,9 @@
 package tethys.species;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-import PamController.PamControlledUnitSettings;
 import PamController.PamController;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
+import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import tethys.species.swing.DataBlockSpeciesDialog;
@@ -26,7 +23,7 @@ import tethys.species.swing.DataBlockSpeciesDialog;
  * @author dg50
  *
  */
-abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implements PamSettings*/ {
+abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	
 	/**
 	 * The serialised bit. Always exists (or should be created) even if there
@@ -263,6 +260,15 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implement
 			return;
 		}
 		datablockSpeciesMap.clearMap();
+	}
+	
+	/**
+	 * Return a (preferably) small dialog panel that can contain 
+	 * options for the species manager. 
+	 * @return
+	 */
+	public PamDialogPanel getDialogPanel(SpeciesManagerObserver speciesManagerObserver) {
+		return null;
 	}
 
 	/*

@@ -12,6 +12,7 @@ import PamguardMVC.RawDataHolder;
 import PamguardMVC.RawDataTransforms;
 import annotation.DataAnnotation;
 import bearinglocaliser.annotation.BearingAnnotation;
+import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipSpectrogram;
 import rawDeepLearningClassifier.logging.DLAnnotation;
 
@@ -23,7 +24,7 @@ import rawDeepLearningClassifier.logging.DLAnnotation;
  * @author Jamie Macaulay 
  *
  */
-public class DLDetection extends PamDataUnit implements PamDetection, RawDataHolder {
+public class DLDetection extends ClipDataUnit implements PamDetection, RawDataHolder {
 	
 	/**
 	 * The abstract localisation 
@@ -51,8 +52,8 @@ public class DLDetection extends PamDataUnit implements PamDetection, RawDataHol
 	 */
 	@Deprecated
 	public DLDetection(long timeMilliseconds, int channelBitmap, long startSample, long durationSamples,
-			ArrayList<PredictionResult> modelResults, double[][] waveData) {
-		super(timeMilliseconds, channelBitmap, startSample, durationSamples);
+			ArrayList<PredictionResult> modelResults, double[][] waveData, float sampleRate) {
+		super(timeMilliseconds, timeMilliseconds, startSample, (int) durationSamples, channelBitmap, null, null, waveData, sampleRate);
 		DLAnnotation annotation = new DLAnnotation(null, modelResults); 
 		this.addDataAnnotation(annotation);
 		this.waveData=waveData; 
@@ -68,9 +69,17 @@ public class DLDetection extends PamDataUnit implements PamDetection, RawDataHol
 	 * @param probdata - the probability data. 
 	 * @param waveData - the wave data. 
 	 */
-	public DLDetection(DataUnitBaseData baseData, double[][] waveData) {
-		super(baseData);
-		//System.out.println("Load DL deteciton: " + this.getChannelBitmap());
+	public DLDetection(DataUnitBaseData baseData, double[][] waveData, float sampleRate) {
+//		super(baseData);
+		/*
+		 * 	public ClipDataUnit(long timeMilliseconds, long triggerMilliseconds,
+			long startSample, int durationSamples, int channelMap, String fileName,
+			String triggerName,	double[][] rawData, float sourceSampleRate) {
+		super(timeMilliseconds, channelMap, startSample, durationSamples);
+		 */
+		super(baseData.getTimeMilliseconds(), baseData.getTimeMilliseconds(), baseData.getStartSample(), waveData == null ? 0 : waveData[0].length, baseData.getChannelBitmap(), null,
+				null, waveData, sampleRate);
+		//System.out.println("Load DL detection: " + this.getChannelBitmap());
 		this.waveData=waveData; 
 		rawDataTransforms= new RawDataTransforms(this); 
 		setAmplitude();//must set amplitude as this is not stored in binary files. 
@@ -139,7 +148,7 @@ public class DLDetection extends PamDataUnit implements PamDetection, RawDataHol
 	 * @param channel
 	 * @return
 	 */
-	private double[] getWaveData(int channel) {
+	public double[] getWaveData(int channel) {
 		if (waveData!=null) {
 		return this.getWaveData()[channel];
 		}

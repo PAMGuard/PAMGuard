@@ -2973,7 +2973,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					}
 					int wantedMap = 1<<spectrogramParameters.channelList[panelId];
 					int dataChanMap = dataUnit.getSequenceBitmap();
-					if ((wantedMap & dataChanMap) == 0) {
+					if (dataChanMap != 0 && (wantedMap & dataChanMap) == 0) {
 						continue;
 					}
 					if (dataSelector != null && dataSelector.scoreData(dataUnit) <= 0) {

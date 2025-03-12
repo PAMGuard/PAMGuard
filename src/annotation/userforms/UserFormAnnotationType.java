@@ -4,6 +4,7 @@ import PamController.PamController;
 import PamView.symbol.AnnotationSymbolChooser;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.modifier.SymbolModifier;
+import PamguardMVC.PamDataBlock;
 import annotation.AnnotationDialogPanel;
 import annotation.AnnotationSettingsPanel;
 import annotation.DataAnnotationType;
@@ -11,6 +12,7 @@ import annotation.binary.AnnotationBinaryHandler;
 import annotation.dataselect.AnnotationDataSelCreator;
 import annotation.handler.AnnotationOptions;
 import annotation.userforms.datasel.UserFormDataSelCreator;
+import annotation.userforms.species.FormsAnnotationSpeciesManager;
 import annotation.xml.AnnotationXMLWriter;
 import annotation.xml.SQLXMLWriter;
 import generalDatabase.DBControlUnit;
@@ -18,6 +20,7 @@ import generalDatabase.SQLLoggingAddon;
 import loggerForms.FormDescription;
 import loggerForms.FormsControl;
 import loggerForms.LoggerForm;
+import tethys.species.DataBlockSpeciesManager;
 
 public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotation<?>> {
 
@@ -39,11 +42,18 @@ public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotatio
 	private UserFormBinaryHandler userFormBinaryHandler;
 	
 	private UserFormDataSelCreator userFormDataSelCreator;
+	
+	private FormsAnnotationSpeciesManager formsAnnotationSpeciesManager;
+	
 	/**
 	 * 
 	 */
 	public UserFormAnnotationType() {
+		this(null);
+	}
+	public UserFormAnnotationType(PamDataBlock pamDataBlock) {
 		super();
+		setTargetDataBlock(pamDataBlock);
 		userFormAnnotationOptions  = new UserFormAnnotationOptions(getAnnotationName());
 		userFormSQLAddon = new UserFormSQLAddon(this);
 
@@ -230,5 +240,13 @@ public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotatio
 	public AnnotationXMLWriter<UserFormAnnotation<?>> getXMLWriter() {
 		// TODO Auto-generated method stub
 		return new SQLXMLWriter<>(this);
+	}
+	
+	@Override
+	public DataBlockSpeciesManager getDataBlockSpeciesManager() {
+		if (formsAnnotationSpeciesManager == null) {
+			formsAnnotationSpeciesManager = new FormsAnnotationSpeciesManager(this, getTargetDataBlock());
+		}
+		return formsAnnotationSpeciesManager;
 	}
 }

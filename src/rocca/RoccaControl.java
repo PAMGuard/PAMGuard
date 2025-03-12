@@ -22,6 +22,7 @@
 package rocca;
 
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -30,20 +31,27 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import PamController.DataIntegrityChecker;
+import PamController.DataOutputStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.fileprocessing.StoreStatus;
 import PamUtils.PamCalendar;
 import PamView.PamGui;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMapPoint;
+import pamScrollSystem.ViewLoadObserver;
 
 
 /**
@@ -504,6 +512,61 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 	public RoccaProcess getRoccaProcess() {
 		return roccaProcess;
 	}
+/*
+ * Consider implementing the DataStore interface so that ROCCA data can be deleted on reprocessing. 
+	@Override
+	public void createOfflineDataMap(Window parentFrame) {
+		// not used, but part of required interface. 
+	}
 
+	@Override
+	public String getDataSourceName() {
+		return getUnitName();
+	}
+
+	@Override
+	public String getDataLocation() {
+		return null;
+	}
+
+	@Override
+	public boolean loadData(PamDataBlock dataBlock, OfflineDataLoadInfo offlineDataLoadInfo,
+			ViewLoadObserver loadObserver) {
+		return false;
+	}
+
+	@Override
+	public boolean saveData(PamDataBlock dataBlock) {
+		return false;
+	}
+
+	@Override
+	public boolean rewriteIndexFile(PamDataBlock dataBlock, OfflineDataMapPoint dmp) {
+		return false;
+	}
+
+	@Override
+	public DatagramManager getDatagramManager() {
+		return null;
+	}
+
+	@Override
+	public StoreStatus getStoreStatus(boolean getDetail) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean deleteDataFrom(long timeMillis) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public DataIntegrityChecker getInegrityChecker() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+*/
 
 }

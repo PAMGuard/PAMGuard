@@ -17,8 +17,6 @@ public class DetectionGroupDataBlock extends SuperDetDataBlock<DetectionGroupDat
 	
 	private DetectionGroupTethysProvider detectionGroupTethysProvider;
 	
-	private DetectionGroupSpeciesManager detectionGroupSpeciesManager;
-
 	private DetectionGroupControl detectionGroupControl;
 
 	public DetectionGroupDataBlock(String dataName, DetectionGroupControl detectionGroupControl, DetectionGroupProcess detectionGroupProcess) {
@@ -119,10 +117,7 @@ public class DetectionGroupDataBlock extends SuperDetDataBlock<DetectionGroupDat
 
 	@Override
 	public DataBlockSpeciesManager<DetectionGroupDataUnit> getDatablockSpeciesManager() {
-		if (detectionGroupSpeciesManager == null) {
-			detectionGroupSpeciesManager = new DetectionGroupSpeciesManager(this);
-		}
-		return detectionGroupSpeciesManager;
+		return detectionGroupControl.getDataBlockSpeciesManager();
 	}
 
 }

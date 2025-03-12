@@ -1,6 +1,7 @@
 package tethys.swing.export;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.border.TitledBorder;
 
 import PamController.PamController;
 import PamView.component.PamSettingsIconButton;
+import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamAlignmentPanel;
@@ -25,6 +27,7 @@ import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.species.DataBlockSpeciesMap;
+import tethys.species.SpeciesManagerObserver;
 import tethys.species.SpeciesMapItem;
 import tethys.species.SpeciesMapManager;
 import tethys.species.swing.DataBlockSpeciesDialog;
@@ -35,7 +38,7 @@ import tethys.species.swing.DataBlockSpeciesDialog;
  * @author dg50
  *
  */
-public class CallTypeCard extends ExportWizardCard {
+public class CallTypeCard extends ExportWizardCard implements SpeciesManagerObserver {
 
 	private DataBlockSpeciesManager speciesManager;
 //	private DataBlockSpeciesCodes codes;
@@ -53,18 +56,63 @@ public class CallTypeCard extends ExportWizardCard {
 
 	private DataBlockSpeciesMap speciesMap;
 
+	private JPanel speciesPanel;
+
 	public CallTypeCard(TethysControl tethysControl, PamWizard pamWizard, String title, PamDataBlock dataBlock) {
 		super(tethysControl, pamWizard, title, dataBlock);
 		speciesManager = dataBlock.getDatablockSpeciesManager();
 		speciesMap = speciesManager.getDatablockSpeciesMap();
+		speciesPanel = new JPanel();
+		speciesPanel.setLayout(new GridBagLayout());
+		speciesPanel.setToolTipText(bitTip);
+		fillSpeciesPanel();
+		JPanel nPanel = new PamAlignmentPanel(speciesPanel, BorderLayout.NORTH);
+		JScrollPane scrollPane = new JScrollPane(nPanel);
+		this.setBorder(new TitledBorder("Species / Call types to export"));
+		this.setLayout(new BorderLayout());
+		this.add(scrollPane, BorderLayout.CENTER);
+		
+		JPanel northPanel = new JPanel(new BorderLayout());
+		PamDialogPanel dialogComp = speciesManager.getDialogPanel(this);
+		if (dialogComp != null) {
+			northPanel.add(BorderLayout.WEST, dialogComp.getDialogComponent());
+			this.add(BorderLayout.NORTH, northPanel);
+		}
+		
+		
+		JPanel southPanel = new JPanel(new BorderLayout());
+//		southPanel.setBorder(new TitledBorder("Controls"));
+		JButton importButton = new JButton("Import species map");
+		importButton.setToolTipText("Import a species map previously saved from another PAMGuard configuration");
+		importButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				importSpeciesMap(importButton);
+			}
+		});
+		JButton exportButton = new JButton("Export species map");
+		exportButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportSpeciesMap(exportButton);
+			}
+		});
+		JPanel swPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		southPanel.add(swPanel, BorderLayout.WEST);
+		swPanel.add(importButton);
+		swPanel.add(exportButton);
+		this.add(southPanel, BorderLayout.SOUTH);
+	}
+	
+	private void fillSpeciesPanel() {
+		speciesPanel.removeAll();
+		
 		names = speciesManager.getAllSpeciesCodes();
 		speciesSelection = new JCheckBox[names.size()];
 		itisLabels = new JLabel[names.size()];
 		speciesNames = new JLabel[names.size()];
 		callTypes = new JLabel[names.size()];
-		JPanel spPanel = new JPanel();
-		spPanel.setLayout(new GridBagLayout());
-		spPanel.setToolTipText(bitTip);
+		
 		PamGridBagContraints c = new PamGridBagContraints();
 		commonNames = new JCheckBox("Species");
 		commonNames.addActionListener(new ActionListener() {
@@ -78,10 +126,10 @@ public class CallTypeCard extends ExportWizardCard {
 		for (int i = 0; i < tits.length; i++) {
 			JComponent lab;
 			if (i == 3) {
-				spPanel.add(lab=commonNames, c);
+				speciesPanel.add(lab=commonNames, c);
 			}
 			else {
-				spPanel.add(lab = new JLabel(tits[i], JLabel.LEFT), c);
+				speciesPanel.add(lab = new JLabel(tits[i], JLabel.LEFT), c);
 			}
 			lab.setToolTipText(tips[i]);
 			c.gridx++;
@@ -90,43 +138,26 @@ public class CallTypeCard extends ExportWizardCard {
 			c.gridx = 0;
 			c.gridy++;
 			speciesSelection[i] = new JCheckBox();
-			spPanel.add(speciesSelection[i], c);
+			speciesPanel.add(speciesSelection[i], c);
 			c.gridx++;
-			spPanel.add(new JLabel(names.get(i)), c);
+			speciesPanel.add(new JLabel(names.get(i)), c);
 			c.gridx++;
-			spPanel.add(itisLabels[i] = new JLabel(), c);
+			speciesPanel.add(itisLabels[i] = new JLabel(), c);
 			c.gridx++;
-			spPanel.add(speciesNames[i] = new JLabel(), c);
+			speciesPanel.add(speciesNames[i] = new JLabel(), c);
 			c.gridx++;
-			spPanel.add(callTypes[i] = new JLabel(), c);
+			speciesPanel.add(callTypes[i] = new JLabel(), c);
 			fillItemInfo(i);
 
 			c.gridx++;
 			PamSettingsIconButton but = new PamSettingsIconButton();
 			but.setToolTipText("Edit species id and call type");
 			but.addActionListener(new SpeciesAction(i));
-			spPanel.add(but, c);
+			speciesPanel.add(but, c);
 		}
-		JPanel nPanel = new PamAlignmentPanel(spPanel, BorderLayout.NORTH);
-		JScrollPane scrollPane = new JScrollPane(nPanel);
-		this.setBorder(new TitledBorder("Species / Call types to export"));
-		this.setLayout(new BorderLayout());
-		this.add(scrollPane, BorderLayout.CENTER);
 		
-		JPanel southPanel = new JPanel(new BorderLayout());
-//		southPanel.setBorder(new TitledBorder("Controls"));
-		JButton importButton = new JButton("Import species mapping");
-		importButton.setToolTipText("Import a species map previously saved from another PAMGuard configuration");
-		importButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				importSpeciesMap(importButton);
-			}
-		});
-		southPanel.add(importButton, BorderLayout.WEST);
-		this.add(southPanel, BorderLayout.SOUTH);
 	}
-	
+
 	private void fillAllItemInfo() {
 		for (int i = 0; i < names.size(); i++) {
 			fillItemInfo(i);
@@ -163,6 +194,11 @@ public class CallTypeCard extends ExportWizardCard {
 			speciesMap = newMap;
 			fillAllItemInfo();
 		}
+	}
+
+	private void exportSpeciesMap(JButton exportButton) {
+		SpeciesMapManager mapManager = SpeciesMapManager.getInstance();
+		mapManager.exportSpeciesMaps(getPamWizard(), getDataBlock().getLongDataName());
 	}
 
 	private class SpeciesAction implements ActionListener {
@@ -227,6 +263,11 @@ public class CallTypeCard extends ExportWizardCard {
 			speciesSelection[i].setSelected(sel);
 		}
 		
+	}
+
+	@Override
+	public void update() {
+		fillSpeciesPanel();
 	}
 
 }
