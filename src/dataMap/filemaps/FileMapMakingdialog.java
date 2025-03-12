@@ -23,6 +23,8 @@ public class FileMapMakingdialog extends PamDialog {
 	private static FileMapMakingdialog singleInstance;
 	
 	private OfflineFileServer offlineFileServer;
+	
+	private static Object synchObject = new Object();
 
 	private FileMapMakingdialog(Window parentFrame) {
 		super(parentFrame, "Map raw sound files", false);
@@ -42,19 +44,35 @@ public class FileMapMakingdialog extends PamDialog {
 		getCancelButton().setVisible(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setModalityType(Dialog.ModalityType.MODELESS);
+		
 	}
 	
 	public static FileMapMakingdialog showDialog(Window parent, OfflineFileServer fileServer) {
-		if (singleInstance == null || singleInstance.getOwner() != parent) {
-			singleInstance = new FileMapMakingdialog(parent);
+		// copy the reference, just in case it's deleted in a call to setVisible(false) 
+		FileMapMakingdialog anInstance = singleInstance;
+		synchronized (synchObject) {
+			if (singleInstance == null || singleInstance.getOwner() != parent) {
+				anInstance = singleInstance = new FileMapMakingdialog(parent);
+			}
 		}
-		singleInstance.offlineFileServer = fileServer;
-		singleInstance.progress.setIndeterminate(true);
-		singleInstance.fileName.setText(" ");
-		singleInstance.setVisible(true);
-		return singleInstance;
+		anInstance.offlineFileServer = fileServer;
+		anInstance.progress.setIndeterminate(true);
+		anInstance.fileName.setText(" ");
+		anInstance.setVisible(true);
+		return anInstance;
 	}
-	
+
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		if (visible == false) {
+			synchronized(synchObject) {
+				super.dispose();
+				singleInstance = null;
+			}
+		}
+	}
+
 	public void setProgress(FileMapProgress mapProgress) {
 		switch (mapProgress.countingState) {
 		case FileMapProgress.STATE_LOADINGMAP:
