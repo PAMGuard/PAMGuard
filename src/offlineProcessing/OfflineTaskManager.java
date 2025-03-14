@@ -271,13 +271,15 @@ public class OfflineTaskManager implements TaskMonitor {
 			groupParams.deleteOld = true;
 			groupParams.taskNote = "Batch process at " + PamCalendar.formatDBDateTime(System.currentTimeMillis());
 			int nT = taskGroup.getNTasks();
+			boolean sameIO = false;
 			for (int i = 0; i < nT; i++) {
 				OfflineTask task = taskGroup.getTask(i);
 				String taskName = task.getLongName();
 				boolean enable =  commandLineTasks.contains(taskName);
 				groupParams.setTaskSelection(i, enable);
-				System.out.printf("Set task eneable state for %s : %s in %s\n", taskName, enable, taskGroup.getUnitType());
+				System.out.printf("Set task enable state for %s : %s in %s\n", taskName, enable, taskGroup.getUnitType());
 			}
+			
 			System.out.println("Tasks in group is now " + taskGroup.getNTasks());
 		}
 		/*

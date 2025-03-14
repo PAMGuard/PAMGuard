@@ -17,15 +17,25 @@ public class BLOfflineTask extends OfflineTask {
 	private PamDataBlock detectionBlock, rawOrFFTBlock;
 	
 	public BLOfflineTask(BearingLocaliserControl bearingLocaliserControl) {
-		super(bearingLocaliserControl.getDetectionMonitor().getParentDataBlock());
-		detectionBlock = bearingLocaliserControl.getDetectionMonitor().getParentDataBlock();
+		super(bearingLocaliserControl, bearingLocaliserControl.getDetectionMonitor().getParentDataBlock());
 		this.bearingLocaliserControl = bearingLocaliserControl;
 		bearingProcess = bearingLocaliserControl.getBearingProcess();
-		this.addRequiredDataBlock(rawOrFFTBlock = bearingProcess.getParentDataBlock());
-		addAffectedDataBlock(detectionBlock);
+		checkDataBlocks();
 //		PamDataBlock detectionSource = bearingLocaliserControl.getDetectionMonitor().getParentDataBlock();
 //		this.setParentDataBlock(detectionSource);
 //		setParentDataBlock(bearingProcess.getParentDataBlock());
+	}
+	
+	/**
+	 *  do checks on the datablocks. Needed when this is running as an offline task since
+	 *  if was probably impossible to set these when it was constructed. 
+	 */
+	public void checkDataBlocks() {
+		detectionBlock = bearingLocaliserControl.getDetectionMonitor().getParentDataBlock();
+		this.addRequiredDataBlock(rawOrFFTBlock = bearingProcess.getParentDataBlock());
+		setParentDataBlock(detectionBlock);
+		addAffectedDataBlock(detectionBlock);
+		
 	}
 
 	@Override
@@ -101,6 +111,13 @@ public class BLOfflineTask extends OfflineTask {
 	public void loadedDataComplete() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public boolean canRun() {
+		// TODO Auto-generated method stub
+		super.canRun();
+		return true;
 	}
 
 }
