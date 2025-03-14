@@ -41,7 +41,7 @@ public class DetectionMonitor extends PamInstantProcess {
 		if (params.detectionSource == null) {
 			return;
 		}
-		PamDataBlock sourceData = PamController.getInstance().getDataBlockByLongName(params.detectionSource);
+		PamDataBlock sourceData = bearingLocaliserControl.getPamConfiguration().getDataBlockByLongName(params.detectionSource);
 		setParentDataBlock(sourceData);
 		if (sourceData != null) {
 			/*

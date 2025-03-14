@@ -871,6 +871,9 @@ public class OfflineTaskGroup implements PamSettings {
 		for (int i = 0; i < requiredDataBlocks.size(); i++) {
 			RequiredDataBlockInfo blockInfo = requiredDataBlocks.get(i);
 			PamDataBlock aDataBlock = blockInfo.getPamDataBlock();
+			if (aDataBlock == null) {
+				continue;
+			}
 			long reqStart = procDataStart - blockInfo.getPreLoadTime();
 			long reqEnd = procDataEnd + blockInfo.getPostLoadTime();
 //			if (aDataBlock.getCurrentViewDataStart() > reqStart ||

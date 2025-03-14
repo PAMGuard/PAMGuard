@@ -413,26 +413,31 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 			//removing the sync lock here was reallt helpful in preventing lock ups - especially because the datagram does not
 			//load wghen the scroller moves. 
 			//synchronized (acousticScrollerGraphics.getDataBlock().getSynchLock()) {
-				while (it.hasNext()) {
+			while (it.hasNext()) {
 
-					//					if (count%500==0){
-					//						AcousticDataGramGraphics acousticDataGramGraphics=(AcousticDataGramGraphics) acousticScrollerGraphics; 
-					//						System.out.println("Hello datagram load: " + count+ " "+ acousticScrollerGraphics.getDataBlock().getUnitsCount() +
-					//								" "+acousticDataGramGraphics.getDataGramStore().currentIndex);
-					//					}
-					//					count++;
-					currentCount++; 
+				//					if (count%500==0){
+				//						AcousticDataGramGraphics acousticDataGramGraphics=(AcousticDataGramGraphics) acousticScrollerGraphics; 
+				//						System.out.println("Hello datagram load: " + count+ " "+ acousticScrollerGraphics.getDataBlock().getUnitsCount() +
+				//								" "+acousticDataGramGraphics.getDataGramStore().currentIndex);
+				//					}
+				//					count++;
+				currentCount++; 
 
+				try {
 					acousticScrollerGraphics.addNewData(it.next());
-
-					if (this.isCancelled()){
-						return;
-					}
-
-					Platform.runLater(()->{
-						repaint(30);
-					});
 				}
+				catch (Exception e) {
+					System.err.println("Error in AcousticScrollerFX: " + e.getMessage());
+				}
+
+				if (this.isCancelled()){
+					return;
+				}
+
+				Platform.runLater(()->{
+					repaint(30);
+				});
+			}
 			//}
 		}
 

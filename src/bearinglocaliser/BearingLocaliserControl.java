@@ -13,13 +13,16 @@ import javax.swing.JMenuItem;
 
 import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
+import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.LocContents;
 import PamUtils.SimpleObservable;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import bearinglocaliser.algorithms.BearingAlgorithm;
 import bearinglocaliser.algorithms.BearingAlgorithmProvider;
@@ -56,8 +59,12 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	private SimpleObservable<PamDataUnit> configObservable = new SimpleObservable<>(); 
 	
 	private OLProcessDialog olProcessDialog;
+
+	private OfflineTaskGroup bearingTaskGroup;
+
+	private BLOfflineTask bearingOfflineTask;
 	
-	public BearingLocaliserControl(String unitName) {
+	public BearingLocaliserControl(PamConfiguration pamConfiguration, String unitName) {
 		super(unitType, unitName);
 
 		detectionMonitor = new DetectionMonitor(this);
@@ -74,6 +81,11 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 		UserDisplayControl.addUserDisplayProvider(bearingDisplayProvider);
 		
 		PamSettingManager.getInstance().registerSettings(this);
+
+		boolean secondConfig = pamConfiguration != PamController.getInstance().getPamConfiguration();
+		if (isViewer() || secondConfig) {
+			getOfflineTasks();
+		}
 		
 	}
 
@@ -114,13 +126,21 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 		return menu;
 	}
 	
+	/**
+	 * Create single instance of offline tasks so that it can be created in 
+	 * constructor and get's registered for offline batch processing. 
+	 * @return
+	 */
+	private OfflineTaskGroup getOfflineTasks() {
+		bearingTaskGroup = new OfflineTaskGroup(this, this.getUnitName());
+		bearingTaskGroup.addTask(bearingOfflineTask = new BLOfflineTask(this));
+		return bearingTaskGroup;
+	}
+	
 	protected void showOfflineDialog(Frame parentFrame) {
-//		if (olProcessDialog == null) {
-			OfflineTaskGroup otg = new OfflineTaskGroup(this, this.getUnitName());
-			otg.addTask(new BLOfflineTask(this));
-			otg.setPrimaryDataBlock(detectionMonitor.getParentDataBlock());
-			olProcessDialog = new OLProcessDialog(parentFrame, otg, getUnitName());
-//		}
+		OfflineTaskGroup otg = getOfflineTasks();
+		bearingTaskGroup.setPrimaryDataBlock(detectionMonitor.getParentDataBlock());
+		olProcessDialog = new OLProcessDialog(parentFrame, otg, getUnitName());
 		olProcessDialog.setVisible(true);		
 	}
 
@@ -287,5 +307,15 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	@Override
 	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
 		return null;
+	}
+
+	public void setParentDataBlock(PamDataBlock sourceDataBlock) {
+		PamDataBlock parentblock = detectionMonitor.getParentDataBlock();
+		if (bearingTaskGroup != null) {
+			bearingTaskGroup.setPrimaryDataBlock(detectionMonitor.getParentDataBlock());
+		}
+		if (bearingOfflineTask != null) {
+			bearingOfflineTask.checkDataBlocks();
+		}
 	}
 }
