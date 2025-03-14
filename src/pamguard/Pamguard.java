@@ -135,7 +135,6 @@ public class Pamguard {
 		String InputPsf = "NULL";
 		
 
-
 		// set up the system to output to both a log file and the console window.  Also
 		// set up a monitor to check for the size of the folder every hour - if it gets
 		// too big, just stop logging the messages

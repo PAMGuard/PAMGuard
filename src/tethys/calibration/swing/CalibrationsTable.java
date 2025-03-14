@@ -118,8 +118,17 @@ public class CalibrationsTable extends TethysGUIPanel {
 					showCalibration(doc);
 				}
 			});
+			popMenu.add(menuItem);			
+			menuItem = new JMenuItem("Export document " + doc.getDocumentName());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exportCalibration(doc);
+				}
+			});
 			popMenu.add(menuItem);
 		}
+		
 		popMenu.addSeparator();
 		if (n > 1) {
 			menuItem = new JMenuItem("Delete selected documents");
@@ -165,6 +174,11 @@ public class CalibrationsTable extends TethysGUIPanel {
 	protected void showCalibration(DocumentNilusObject<Calibration> docInfo) {
 		tethysControl.displayDocument(docInfo);
 		
+	}
+
+
+	protected void exportCalibration(DocumentNilusObject<Calibration> doc) {
+		tethysControl.exportDocument(Collection.Calibrations.toString(), doc.getDocumentName());
 	}
 
 
