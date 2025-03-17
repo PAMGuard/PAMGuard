@@ -75,8 +75,10 @@ public class BearingProcess extends PamInstantProcess {
 	private void setSourceDataBlock() {
 		
 		BearingLocaliserParams params = bearingLocaliserControl.getBearingLocaliserParams();
-		sourceDataBlock = PamController.getInstance().getDataBlockByLongName(params.getDataSource());
+		sourceDataBlock = bearingLocaliserControl.getPamConfiguration().getDataBlockByLongName(params.getDataSource());
 		setParentDataBlock(sourceDataBlock);
+		// need to tell offlinetasks in the controller that this has happened. 
+		bearingLocaliserControl.setParentDataBlock(sourceDataBlock);
 	
 	}
 

@@ -8,12 +8,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
+import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import generalDatabase.DBControlUnit;
 import ravendata.swing.RavenImportDialog;
 
 /**
@@ -81,6 +84,18 @@ public class RavenControl extends PamControlledUnit implements PamSettings {
 		if (ravenData != null) {
 			ravenProcess.createPAMGuardData(fileReader, ravenData);
 		}
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				PamController.getInstance().notifyModelChanged(PamController.EXTERNAL_DATA_IMPORTED);
+			}
+		});
+		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+		if (dbControl != null) {
+			dbControl.commitChanges();
+		}
+		
 	}
 
 	/**

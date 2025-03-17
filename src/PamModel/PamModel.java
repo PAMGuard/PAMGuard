@@ -491,14 +491,14 @@ final public class PamModel implements PamSettings {
 		mi.setHelpPoint("utilities/tethys/docs/tethys_overview.html");
 		mi.setAllowedModes(PamPluginInterface.VIEWERONLY);
 
-		if (isViewer) {
+//		if (isViewer) {
 			mi = PamModuleInfo.registerControlledUnit(RavenControl.class.getName(), RavenControl.defaultName);
 			mi.setToolTipText("Import data from Raven selection tables");
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setHidden(!SMRUEnable.isEnable());		
 			mi.setAllowedModes(PamPluginInterface.VIEWERONLY);	
 			
-		}		
+//		}		
 		
 		/*
 		 * ************* End Utilities  Group *******************

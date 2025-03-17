@@ -287,6 +287,9 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @param dataBlockInfo required data block with pre and post load times. 
 	 */
 	public void addRequiredDataBlock(RequiredDataBlockInfo dataBlockInfo) {
+		if (dataBlockInfo == null || dataBlockInfo.getPamDataBlock() == null) {
+			return;
+		}
 		if (requiredDatablocks == null) {
 			requiredDatablocks = new ArrayList<RequiredDataBlockInfo>();
 		}
@@ -346,6 +349,9 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @param dataBlock affected data block. 
 	 */
 	public void addAffectedDataBlock(PamDataBlock dataBlock) {
+		if (dataBlock == null) {
+			return;
+		}
 		if (affectedDataBlocks == null) {
 			affectedDataBlocks = new ArrayList<PamDataBlock>();
 		}
@@ -381,7 +387,11 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		if (affectedDataBlocks == null || affectedDataBlocks.size() == 0) {
 			return null;
 		}
-		String blocks = affectedDataBlocks.get(0).getDataName();
+		PamDataBlock block0 = affectedDataBlocks.get(0);
+		if (block0 == null) {
+			return null;
+		}
+		String blocks = block0.getDataName();
 		for (int i = 1; i < affectedDataBlocks.size(); i++) {
 			blocks += "; " + affectedDataBlocks.get(i).getDataName();
 		}
@@ -469,8 +479,42 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		}
 
 		for (PamDataBlock aBlock:affectedDataBlocks) {
+			if (isInputBlock(aBlock)) {
+				System.out.printf("Task %s: Don't delete data from \"%s\" since it input to this task", 
+					 this.getName(), aBlock.getLongDataName());
+				continue;
+			}
 			deleteOldData(aBlock, taskGroupParams);
 		}
+	}
+	
+	/**
+	 * See if the input to the task is the same as the output of 
+	 * the task. If this is the case, then FFS don't delete the input data. 
+	 * @return
+	 */
+	private boolean isInputBlock(PamDataBlock aDataBlock) {
+		if (parentDataBlock == aDataBlock) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * See if the data block is one of the required datablocks. 
+	 * @param aDataBlock
+	 * @return
+	 */
+	private boolean isRequiredBlock(PamDataBlock aDataBlock) {
+		if (requiredDatablocks != null) {
+			for (int i = 0; i < requiredDatablocks.size(); i++) {
+				RequiredDataBlockInfo blockInf = requiredDatablocks.get(i);
+				if (blockInf != null && blockInf.getPamDataBlock() == aDataBlock) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**

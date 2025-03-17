@@ -20,6 +20,8 @@ public class PamConnection {
 	private Connection connection;
 	
 	private SQLTypes sqlTypes;
+	
+	private String databaseName;
 
 	/**
 	 * Constructor needs a connection object and an sqlTypes object. 
@@ -59,6 +61,14 @@ public class PamConnection {
 		} catch (SQLException e) {
 			return "Database SQL keywords unavailable";
 		}
+	}
+
+	public String getDatabaseName() {
+		return databaseName;
+	}
+
+	public void setDatabaseName(String databaseName) {
+		this.databaseName = databaseName;
 	}
 
 }

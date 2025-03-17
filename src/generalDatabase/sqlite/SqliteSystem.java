@@ -270,7 +270,9 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 			return null;
 		}
 		//			System.out.println("-------------------------------     OpenedSQLite database " + dbName + " handle " + con);
-		return new PamConnection(this, con, sqlTypes);
+		PamConnection connection = new PamConnection(this, con, sqlTypes);
+		connection.setDatabaseName(dbName);
+		return connection;
 	}
 
 	@Override

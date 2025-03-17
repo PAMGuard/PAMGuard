@@ -90,6 +90,7 @@ public class RavenProcess extends PamProcess {
 		/**
 		 * Had to add an offset for some messed up Raven data. May or may not have to include
 		 * this as an option in future releases. 
+		 * Offset of 2843100 needed for mn23_055a tag data.
 		 */
 		long offsetMillis = 0;//2843100;
 		

@@ -241,7 +241,7 @@ public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotatio
 		// TODO Auto-generated method stub
 		return new SQLXMLWriter<>(this);
 	}
-
+	
 	@Override
 	public DataBlockSpeciesManager getDataBlockSpeciesManager() {
 		if (formsAnnotationSpeciesManager == null) {

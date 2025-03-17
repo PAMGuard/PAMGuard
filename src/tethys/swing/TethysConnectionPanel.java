@@ -258,6 +258,7 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		TethysExportParams newParams = SelectServerdDialog.showDialog(getTethysControl(), getTethysControl().getGuiFrame(), getTethysControl().getTethysExportParams());
 		if (newParams != null) {
 			getTethysControl().checkServer();//  sendStateUpdate(new TethysState(TethysState.StateType.UPDATESERVER));
+			fillServerControl();
 		}
 	}
 
