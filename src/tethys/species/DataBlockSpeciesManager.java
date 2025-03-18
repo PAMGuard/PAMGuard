@@ -34,6 +34,8 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	
 	private PamDataBlock<T> dataBlock;
 	
+	public static final String UNKNOWNSPECIES = "Unknown";
+	
 	public static final String unitType = "DBSpeciesManager";
 	
 	/*
@@ -136,7 +138,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 			allCodes.addAll(codeList.getSpeciesNames());
 		}
 		if (allCodes.size() == 0) {
-			allCodes.add("Unknown");
+			allCodes.add(UNKNOWNSPECIES);
 		}
 		return makeUniqueList(allCodes);
 	}

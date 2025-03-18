@@ -110,6 +110,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 	
 	private int selectRow() {
 		int row = synchTable.getSelectedRow();
+		boolean change = selectedRow != row;
 		if (row < 0) {
 			return row;
 		}
@@ -118,16 +119,19 @@ public class DatablockSynchPanel extends TethysExportPanel {
 //		datablockDetectionsPanel.setDataBlock(synchInfo.getDataBlock());
 		notifyObservers(synchInfo.getDataBlock());
 		enableExportButton();
+		if (change) {
+			synchTableModel.fireTableDataChanged();
+		}
 		return row;
 	}
 	
 	protected void exportData() {
-		int[] rows = synchTable.getSelectedRows();
-		if (rows == null || rows.length != 1) {
+//		int[] rows = synchTable.getSelectedRows();
+		if (selectedRow < 0) {
 			WarnOnce.showWarning("Data selection", "you must select a single data block for export", WarnOnce.WARNING_MESSAGE);
 			return;
 		}
-		PamDataBlock dataBlock = dataBlockSynchInfo.get(rows[0]).getDataBlock();
+		PamDataBlock dataBlock = dataBlockSynchInfo.get(selectedRow).getDataBlock();
 		getTethysControl().getDetectionsHandler().exportDataBlock(dataBlock);
 	}
 
@@ -142,7 +146,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 			disableExport("No Deployment document(s). Export Deployments prior to exporting Detections");
 			return;
 		}
-		boolean en = rows != null && rows.length == 1;
+		boolean en = selectedRow >= 0;//rows != null && rows.length == 1;
 		if (!en) {
 			disableExport("No PAMGuard datablock selected (click a row on the table below)");
 			return;

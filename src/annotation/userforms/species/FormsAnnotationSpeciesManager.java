@@ -53,11 +53,11 @@ public class FormsAnnotationSpeciesManager extends DataBlockSpeciesManager imple
 		Object data[] = annot.getLoggerFormData();
 		int ind = getLoggerItemIndex();
 		if (ind < 0 || ind > data.length) {
-			return null;
+			return UNKNOWNSPECIES;
 		}
 		Object dat = data[ind];
 		if (dat == null) {
-			return null;
+			return UNKNOWNSPECIES;
 		}
 		return dat.toString();
 	}
