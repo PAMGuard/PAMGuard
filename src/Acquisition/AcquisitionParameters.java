@@ -50,7 +50,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 
 	private PPSParameters ppsParameters;
 
-	public boolean subtractDC;
+	public boolean subtractDC = true;
 
 	public double dcTimeConstant; // time constant for DC subtraction in seconds.
 

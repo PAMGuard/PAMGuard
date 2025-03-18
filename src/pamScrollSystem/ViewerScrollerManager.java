@@ -449,7 +449,6 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 					"Data Load Complete, updating displays", 
 					dataLoadQueue.size(), dataLoadQueue.size(), 0, 0, 0, 0, 0);
 			publish(lpd);
-			PamController.getInstance().notifyModelChanged(PamControllerInterface.DATA_LOAD_COMPLETE);
 			return null;
 		}
 		
@@ -468,6 +467,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 				}
 			}
 			loadDone();
+			PamController.getInstance().notifyModelChanged(PamControllerInterface.DATA_LOAD_COMPLETE);
 			PamController.getInstance().notifyTaskProgress(new LoadQueueProgressData(PamTaskUpdate.STATUS_DONE));
 
 		}

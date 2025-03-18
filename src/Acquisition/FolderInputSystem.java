@@ -380,6 +380,14 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 * @return flag to indicate...nothing?
 	 */
 	public int makeSelFileList() {
+		
+		/**
+		 * This is only for real time operation. In Viewer mode, the list is entirely
+		 * handled in the OfflinefileServer object. 
+		 */
+		if (acquisitionControl.isViewer()) {
+			return 0;
+		}
 
 		String[] selection = checkComandLineFolder();
 
@@ -409,6 +417,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		//		String folderName = fileInputParameters.recentFiles.get(0);
 
 		//Swing calls a dialog with progress bar from the wavListWorker
+		if (acquisitionControl.isViewer()) {
+			return 0;
+		}
 		wavListStart = System.currentTimeMillis();
 
 		if (folderInputPane==null) {

@@ -154,13 +154,16 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
+//			System.out.println("DataMap notification " + changeType);
 			initialisationComplete = true;
+			break;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
 		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
 		case PamControllerInterface.INITIALIZE_LOADDATA:
 		case PamControllerInterface.EXTERNAL_DATA_IMPORTED:
 			if (initialisationComplete) {
+//				System.out.println("DataMap notification " + changeType);
 				if (getDataMapGUI() == null) {
 					break;
 				}
@@ -169,8 +172,9 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 				getDataMapGUI().createDataGraphs();
 				dataMapPanel.repaintAll();
 			}
-//			break;
+			break;
 		case PamControllerInterface.OFFLINE_DATA_LOADED:
+//			System.out.println("DataMap notification " + changeType);
 			dataMapPanel.repaintAll();
 		}
 		
