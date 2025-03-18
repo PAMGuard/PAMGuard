@@ -1537,11 +1537,11 @@ public class TDGraphFX extends PamBorderPane {
 			// String fmt = String.format(", %s %%s", graphAxis.)
 			str += String.format(", %3.2f %s  ", graphAxis.getDataValue(event.getY()), graphAxis.getLabel());
 			
-			System.out.println("Say mouse text: go 2! " + str);
+//			System.out.println("Say mouse text: go 2! " + str);
 
 			tdDisplay.mousePosTextProperty().set(str);
 			
-			System.out.println("Say mouse text: go 3 ! " + str);
+//			System.out.prigot iyntln("Say mouse text: go 3 ! " + str);
 
 		}
 
