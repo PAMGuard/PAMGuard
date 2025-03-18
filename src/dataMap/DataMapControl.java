@@ -172,7 +172,7 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 				getDataMapGUI().createDataGraphs();
 				dataMapPanel.repaintAll();
 			}
-			break;
+//			break;
 		case PamControllerInterface.OFFLINE_DATA_LOADED:
 //			System.out.println("DataMap notification " + changeType);
 			dataMapPanel.repaintAll();

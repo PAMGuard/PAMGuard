@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
-import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
@@ -182,7 +180,11 @@ public class PamZipDLClassifierTest {
 
 		//path to the same file at different sample rates
 		String relWavPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/multi-species-Google/NOPP6_EST_20090329_121500.wav";
-		String relWavPath2  =	"./src/test/resources/rawDeepLearningClassifier/Generic/multi-species-Google/NOPP6_EST_20090329_121500_upsample.wav";
+		String relWavPath2  =	"./src/test/resources/rawDeepLearningClassifier/Generic/multi-species-Google/NOPP6_EST_20090329_121500_upsample_pg.wav";
+		
+		/**
+		 * Test up-sampling using audio then downsampling agian
+		 */
 //		String relWavPath2  =	"./src/test/resources/rawDeepLearningClassifier/Generic/multi-species-Google/NOPP6_EST_20090329_121500.wav";
 
 		String matFileOut = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/google_multi_species/google_multi_species.mat"; 
@@ -202,13 +204,13 @@ public class PamZipDLClassifierTest {
 
 		MultiSpeciesGoogle multiSpeciesGoogle = new MultiSpeciesGoogle();
 		multiSpeciesGoogle.setParams(genericModelParams);
-		genericModelParams.dlTransfromParams.set(0, new SimpleTransformParams(DLTransformType.DECIMATE, 24000.)); 
+		//genericModelParams.dlTransfromParams.set(0, new SimpleTransformParams(DLTransformType.DECIMATE, 24000.)); 
 
 		System.out.println(genericModelParams);
 
 		double segSize = 5.; //one second hop size.
 		double segHop = 5.; //one second hop size.
-		int classIndex = 5; //Right whale atlantic - jus for output
+		int classIndex = 5; //Right whale atlantic - just for output
 		
 		//create MatFile for saving the image data to. 
 		MatFile matFile = Mat5.newMatFile();
@@ -227,9 +229,12 @@ public class PamZipDLClassifierTest {
 
 				//load audio
 				AudioData soundData = DLUtils.loadWavFile(wavFilePath);
+				
+				//TEMP
 //				if (i==1) {
 //					soundData=soundData.interpolate(24000);
 //				}
+				//////
 
 				int nseg =  (int) (soundData.samples.length/(segHop*soundData.sampleRate)); 
 				float[][] outputs = new float[nseg][]; 

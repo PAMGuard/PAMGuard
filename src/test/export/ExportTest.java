@@ -3,6 +3,7 @@ package test.export;
 import test.helper.PamControllerTestHelper;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetector;
+
 import org.junit.jupiter.api.Test;
 
 import clickDetector.ClickDetection;
@@ -21,7 +22,7 @@ public class ExportTest {
 	public void matFileTest() throws Exception {
 		PamControllerTestHelper.InitializePamControllerForTesting();
 
-		System.out.println("Matched template classifier test: match corr");
+		System.out.println("Export MATLAB TEST");
 
 		//create a list of click detections.
 		ClickControl control = new ClickControl("name");

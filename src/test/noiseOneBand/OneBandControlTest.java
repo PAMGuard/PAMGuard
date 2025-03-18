@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OneBandControlTest {
+	
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         PamControllerTestHelper.InitializePamControllerForTesting();
