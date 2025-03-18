@@ -71,6 +71,8 @@ public class OverlayGroupDisplay extends PamBorderPane {
 	 * Constructor for the group detection display.
 	 */
 	public OverlayGroupDisplay() {
+		
+		this.setStyle("-fx-background-color: -fx-background;");
 		//create two displays, one for super detections and the other for the
 		//sub detections. 
 		detectionsPane= new DetectionGroupDisplay(); 

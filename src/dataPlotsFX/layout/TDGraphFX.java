@@ -23,6 +23,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamScrollPane;
+import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane2;
@@ -69,6 +70,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
@@ -124,7 +127,7 @@ public class TDGraphFX extends PamBorderPane {
 	 * The layered pane contains all the plot panels but also any overlayed nodes,
 	 * e.g buttons to open hiding dialogs.
 	 */
-	private PamHiddenSidePane stackPane;
+	private PamHiddenSidePane mainStackPane;
 
 	/**
 	 * List of unique available units for plotting. We may have multiple types of
@@ -318,10 +321,10 @@ public class TDGraphFX extends PamBorderPane {
 		 * Create a stack pane to hold everything- means we can add overlay controls and
 		 * buttons Note: icons are set later in setOverlayColour(LIGHT_TD_DISPLAY);
 		 */
-		stackPane = new PamHiddenSidePane(null, null, scrollPane, dataSettingsScrollPane);
+		mainStackPane = new PamHiddenSidePane(null, null, scrollPane, dataSettingsScrollPane);
 
 		// stackPane.setMinHidePaneHeight(300);
-		stackPane.getChildren().add(plotPanels);
+		mainStackPane.getChildren().add(plotPanels);
 		plotPanels.toBack(); // need to send to back so hiding panes are not behind in the stack....
 
 		// //test
@@ -352,7 +355,7 @@ public class TDGraphFX extends PamBorderPane {
 
 
 		// add plots to center of main pane
-		this.setCenter(stackPane);
+		this.setCenter(mainStackPane);
 
 		// layout axis.
 		layoutTDGraph(tdDisplay.getTDParams().orientation);
@@ -452,8 +455,8 @@ public class TDGraphFX extends PamBorderPane {
 			setOverlayColour(LIGHT_TD_DISPLAY);
 			break;
 		}
-		stackPane.getLeftHidingPane().getShowButton().setGraphic(chevronRight);
-		stackPane.getRightHidingPane().getShowButton().setGraphic(settingsRight);
+		mainStackPane.getLeftHidingPane().getShowButton().setGraphic(chevronRight);
+		mainStackPane.getRightHidingPane().getShowButton().setGraphic(settingsRight);
 	}
 
 	// /**
@@ -610,16 +613,22 @@ public class TDGraphFX extends PamBorderPane {
 			dataSettingsScrollPane.setContent(dataSettingsTabs);
 		}
 		else {
-			PamBorderPane settingsHolder = new PamBorderPane(); 
+			PamVBox settingsHolder = new PamVBox(); 
+			
 			Label label = new Label(settingsPane.getShowingName()); 
 			label.setTextAlignment(TextAlignment.CENTER);
-			PamBorderPane.setAlignment(label, Pos.CENTER);
+			settingsHolder.setAlignment(Pos.TOP_CENTER);
 			
-			settingsHolder.setTop(label);
-			settingsHolder.setCenter(settingsPane.getPane());
-			settingsHolder.setPadding(new Insets(0,0,0,30));
-			
+			settingsHolder.getChildren().add(label);
+			settingsHolder.getChildren().add(settingsPane.getPane());
+			settingsHolder.setMinWidth(settingsPane.getPane().getPrefWidth());
+			PamVBox.setVgrow(settingsPane.getPane(), Priority.ALWAYS);
+			settingsHolder.setPadding(new Insets(0,0,0,35));
+
 			dataSettingsScrollPane.setContent(settingsHolder);
+			
+			mainStackPane.getRightHidingPane().setPrefSize(settingsPane.getPane().getPrefWidth()+35,Region.USE_PREF_SIZE);
+
 		}
 	}
 
@@ -1457,7 +1466,7 @@ public class TDGraphFX extends PamBorderPane {
 		}
 
 		public boolean mouseExited(MouseEvent event) {
-			tdDisplay.getMousePositionData().setText(null);
+			tdDisplay.mousePosTextProperty().set(null);
 			return false;
 		}
 
@@ -1511,18 +1520,29 @@ public class TDGraphFX extends PamBorderPane {
 		// }
 
 		private void sayMousePosition(MouseEvent event) {
+			//System.out.println("Say mouse text: ");
+
+
 			PamCoordinate screenPos = new Coordinate3d(event.getX(), event.getY());
 			PamCoordinate dataPos = graphProjector.getDataPosition(screenPos);
 			if (dataPos==null) return;
 			String str = String.format("Mouse %s %s ", PamCalendar.formatDate((long) dataPos.getCoordinate(0)),
 					PamCalendar.formatTime((long) dataPos.getCoordinate(0), true));
+			
+
 			// if (currentScaleInfo != null) {
 			// str += String.format(", %s %3.1f %s ", currentScaleInfo.getDataType(),
 			// dataPos.getCoordinate(1), currentScaleInfo.unit);
 			// }
 			// String fmt = String.format(", %s %%s", graphAxis.)
 			str += String.format(", %3.2f %s  ", graphAxis.getDataValue(event.getY()), graphAxis.getLabel());
-			tdDisplay.getMousePositionData().setText(str);
+			
+			System.out.println("Say mouse text: go 2! " + str);
+
+			tdDisplay.mousePosTextProperty().set(str);
+			
+			System.out.println("Say mouse text: go 3 ! " + str);
+
 		}
 
 	}
@@ -1710,7 +1730,7 @@ public class TDGraphFX extends PamBorderPane {
 	 * @return hiding pane which contains nodes for changing settings
 	 */
 	public HidingPane getAxisPane() {
-		return stackPane.getLeftHidingPane();
+		return mainStackPane.getLeftHidingPane();
 	}
 
 	/**
@@ -1720,7 +1740,7 @@ public class TDGraphFX extends PamBorderPane {
 	 * @return hiding pane which contains nodes for changing settings
 	 */
 	public HidingPane getSettingsPane() {
-		return stackPane.getRightHidingPane();
+		return mainStackPane.getRightHidingPane();
 	}
 
 	/*********** Viewer Mode Functions **************/
@@ -1786,8 +1806,8 @@ public class TDGraphFX extends PamBorderPane {
 			}
 			
 			//Finally save whether the hiding panels are open or not. 
-			graphParameters.showHidePaneLeft = stackPane.getLeftHidingPane().isShowing();
-			graphParameters.showHidePaneRight = stackPane.getRightHidingPane().isShowing();
+			graphParameters.showHidePaneLeft = mainStackPane.getLeftHidingPane().isShowing();
+			graphParameters.showHidePaneRight = mainStackPane.getRightHidingPane().isShowing();
 
 		}
 
@@ -1875,8 +1895,8 @@ public class TDGraphFX extends PamBorderPane {
 		
 		//Open hide panes if needed. 
 		//Finally save whether the hiding panels are open or not. 
-		stackPane.getLeftHidingPane().showHidePane(graphParameters.showHidePaneLeft);
-		stackPane.getRightHidingPane().showHidePane(graphParameters.showHidePaneRight);
+		mainStackPane.getLeftHidingPane().showHidePane(graphParameters.showHidePaneLeft);
+		mainStackPane.getRightHidingPane().showHidePane(graphParameters.showHidePaneRight);
 
 	}
 
@@ -2081,7 +2101,7 @@ public class TDGraphFX extends PamBorderPane {
 			// " "+ PamCalendar.formatDateTime((long) resultBack.getCoordinate(0)));
 
 		});
-		stackPane.getChildren().add(buttonTest);
+		mainStackPane.getChildren().add(buttonTest);
 		// Test
 	}
 

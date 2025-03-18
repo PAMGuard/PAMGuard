@@ -31,6 +31,7 @@ import dataPlotsFX.overlaymark.TDOverlayAdapter;
 import dataPlotsFX.scroller.TDAcousticScroller;
 import dataPlotsFX.sound.SoundOutputManager;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -190,6 +191,9 @@ public class TDDisplayFX extends PamBorderPane {
 	 */
 	private PamSplitPane splitPaneHolder;
 
+	
+	private SimpleStringProperty mousePosStringProperty = new SimpleStringProperty();
+
 	/**
 	 * Constructor for the main JavaFX display.
 	 * @param tdControl - the TDControlFX. 
@@ -271,6 +275,7 @@ public class TDDisplayFX extends PamBorderPane {
 		timeStamp=new Label();
 
 		mousePositionData = new Label();
+		mousePositionData.textProperty().bind(this.mousePosStringProperty); 
 
 		//layout the main pane
 		layoutTDMainPane(tdParametersFX.orientation);
@@ -287,8 +292,8 @@ public class TDDisplayFX extends PamBorderPane {
 		//layout the graphs within the main panel
 		layoutTDGraphs(tdParametersFX.orientation);		
 
-		//need to set the divder positon after the graphs as this doesn;t work if set before. 
-		splitPaneHolder.setDividerPosition(0, 0.95);
+		//need to set the divider position after the graphs as this doesn't work if set before. 
+		splitPaneHolder.setDividerPosition(0, 0.85);
 
 		intilized=true; 
 	}
@@ -427,7 +432,7 @@ public class TDDisplayFX extends PamBorderPane {
 		} 
 
 		//Set background so that same as the axis colour-fills in box on corner between x and y axis. 
-		timeAxisHolder.getStyleClass().add("pane");
+		//timeAxisHolder.getStyleClass().add("pane");
 
 		//layout the graphs within the main panel
 		layoutTDGraphs(tdParametersFX.orientation); 
@@ -1334,7 +1339,7 @@ public class TDDisplayFX extends PamBorderPane {
 	/**
 	 * @return the mousePositionData
 	 */
-	public Label getMousePositionData() {
+	private Label getMousePositionLabel() {
 		return mousePositionData;
 	}
 
@@ -1349,6 +1354,15 @@ public class TDDisplayFX extends PamBorderPane {
 				}
 			}
 		});
+	}
+
+
+	/**
+	 * Simple string property for mouse position in time axis. 
+	 * @return the position text property. 
+	 */
+	public SimpleStringProperty mousePosTextProperty() {
+		return this.mousePosStringProperty;
 	}
 
 }

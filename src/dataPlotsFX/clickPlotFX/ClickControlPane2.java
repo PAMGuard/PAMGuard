@@ -177,7 +177,12 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 	 */
 	private PamBorderPane extraSymbolPane;
 
-	private ToggleSwitch freqSwitch; 
+	private ToggleSwitch freqSwitch;
+
+	/**
+	 * Indicates whether min or max pane is changing to stop overlfow
+	 */
+	private volatile boolean minMxPaneChange = false; 
 
 
 	public ClickControlPane2(ClickPlotInfoFX clickPlotInfo) {
@@ -210,7 +215,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		scrollPane2.setHbarPolicy(ScrollBarPolicy.NEVER);
 		scrollPane2.getStyleClass().clear();
 		symbolTab.setContent(scrollPane2);
-		
+
 		Tab dataView=new Tab("Data");
 		dataView.setContent(dataSelectHolder);
 		dataView.getStyleClass().add("tab-square");
@@ -226,11 +231,11 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		enablePane();
 		setFreqType();
 		setParams(); 
-		
+
 		dataSelectPane.addSettingsListener(()->{
 			//dynamic settings pane so have to repaint whenever a control is selected. 
 			getParams();
-			
+
 			/**
 			 * If there are raw amplitude or frequency panes that have a buffer of painted units then
 			 * these have to be cleared for the data selector
@@ -238,7 +243,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 			clickPlotInfo.getClickRawPlotManager().clear();
 			clickPlotInfo.getClickFFTPlotManager().clear();
 
-			
+
 			clickPlotInfo.getTDGraph().repaint(50);
 		});
 
@@ -253,7 +258,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 	 * @return the data select pane. 
 	 */
 	private DynamicSettingsPane<Boolean> createDataSelectPane(){		
-//		System.out.println("DATA SELECTOR: " + clickPlotInfo.getClickDataSelector());
+		//		System.out.println("DATA SELECTOR: " + clickPlotInfo.getClickDataSelector());
 		return clickPlotInfo.getClickDataSelector().getDialogPaneFX();
 	}
 
@@ -294,7 +299,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		clickSizePane = this.createClickSizePane(); //pane for selecting the size of clicks. 
 		//
 		/**Frequency Pane**/
-		
+
 		freqThresholdPane = createFreqThresholdPane(); //pane for spectrogram showing clicks
 		freqColourPane = createFreqColorPane(); //pane for setting colour limits if clicks shown as spectrogram
 
@@ -315,12 +320,12 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 
 		Label freqTitle = new Label("Freq. Colour");
 		PamGuiManagerFX.titleFont2style(freqTitle);
-		
+
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5);
 		vBox.getChildren().addAll(freqTitle, hBox ); 
 		freqPane.setTop(vBox);
-		
+
 		symbolOptionsPane.getMainPane().setCenter(extraSymbolPane = new PamBorderPane());
 		symbolOptionsPane.getMainPane().setMaxWidth(PREF_WIDTH);
 
@@ -361,14 +366,14 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 			setFreqPaneType(FREQ_PANE_THRESHOLD); 
 			extraSymbolPane.setCenter(freqPane);
 			setFreqPaneType(freqSwitch.isSelected() ? FREQ_PANE_COLOUR : FREQ_PANE_THRESHOLD); 
-			
+
 			symbolOptionsPane.getVBoxHolder().setDisable(freqSwitch.isSelected());
 
 		}
 		else {
 			extraSymbolPane.setCenter(clickSizePane);
 		}
-		
+
 		//		//the colour choice 
 		//		int colourChoice = ((ClickSymbolOptions) clickPlotInfo.getClickSymbolChooser().getSymbolChooser().getSymbolOptions()).colourChoice;
 		//		
@@ -473,32 +478,39 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		});
 		minMaxWidthPane.setPrefSpinnerWidth(80); 
 		Label newLabelWidth = new Label(); 
-//		newLabelWidth.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.ARROWS_H, 
-//				PamGuiManagerFX.iconSize)); 
+		//		newLabelWidth.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.ARROWS_H, 
+		//				PamGuiManagerFX.iconSize)); 
 		newLabelWidth.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-left-right-bold",	PamGuiManagerFX.iconSize)); 
 		newLabelWidth.setPrefWidth(20);
 		minMaxWidthPane.getChildren().add(0, newLabelWidth);
 
-		
+
 		//height pane
 		minMaxHeightPane = new DualControlField<Double>("", "" , "", 2, 100, 1);  
+
+		minMxPaneChange = false;
 		minMaxHeightPane.addChangeListener((obsval, oldval, newval)->{
 			newSettings();
-			//do not allow the min ti be larger than the max. 
-			if (minMaxHeightPane.getSpinner().getValue()>=minMaxHeightPane.getSpinner2().getValue()) {
-				minMaxHeightPane.getSpinner().getValueFactory().setValue(minMaxHeightPane.getSpinner2().getValue()-1.0);
-				return;
-			}
+			if (!minMxPaneChange == false) {
+				minMxPaneChange = true;
+				//do not allow the min ti be larger than the max. 
+				if (minMaxHeightPane.getSpinner().getValue()>=minMaxHeightPane.getSpinner2().getValue()) {
 
-			if (minMaxHeightPane.getSpinner2().getValue()<=minMaxHeightPane.getSpinner().getValue()) {
-				minMaxHeightPane.getSpinner2().getValueFactory().setValue(minMaxHeightPane.getSpinner().getValue()+1.0);
+					minMaxHeightPane.getSpinner().getValueFactory().setValue(minMaxHeightPane.getSpinner2().getValue()-1.0);
+					return;
+				}
+
+				if (minMaxHeightPane.getSpinner2().getValue()<=minMaxHeightPane.getSpinner().getValue()) {
+					minMaxHeightPane.getSpinner2().getValueFactory().setValue(minMaxHeightPane.getSpinner().getValue()+1.0);
+				}
+				minMxPaneChange=false;
 			}
 		});
 		minMaxHeightPane.setPrefSpinnerWidth(80); 
 
 		Label newLabelHeight = new Label(); 
-//		newLabelHeight.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.ARROWS_V, 
-//				PamGuiManagerFX.iconSize)); 
+		//		newLabelHeight.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.ARROWS_V, 
+		//				PamGuiManagerFX.iconSize)); 
 		newLabelHeight.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-up-down-bold",	PamGuiManagerFX.iconSize)); 
 		newLabelHeight.setPrefWidth(20);
 		minMaxHeightPane.getChildren().add(0, newLabelHeight);
@@ -596,7 +608,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		spectroControlPane.getColorBox().valueProperty().addListener((obsval, oldval, newval)->{
 			newSettings();
 		});
-		
+
 		//need to do this so that text of colourbar is not squished when in a scrollpane
 		spectroControlPane.setMinHeight(85);
 
@@ -623,7 +635,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		fftSpinnerHop.setEditable(true);
 		fftSpinnerHop.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		fftSpinnerHop.getValueFactory().valueProperty().addListener((obs, before, after)->{
-			
+
 			if (after==0) fftSpinnerHop.getValueFactory().setValue(before==0 ? 32 : before);
 			newSettings(100);
 		});
@@ -715,10 +727,10 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 			clickPlotInfo.getClickDisplayParams().freqAmplitudeRange = clickPlotInfo.getClickDisplayParams().getDefaultFreqAmpRange(); 
 		}; 
 
-//		if (clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits==null) {
-//			//can happen with old .psfx save files. 
-			clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits =clickPlotInfo.getClickDisplayParams().getDefaultFreqAmpLimits(); 
-//		}
+		//		if (clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits==null) {
+		//			//can happen with old .psfx save files. 
+		clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits =clickPlotInfo.getClickDisplayParams().getDefaultFreqAmpLimits(); 
+		//		}
 
 		this.spectroControlPane.setAmplitudeRange(clickPlotInfo.getClickDisplayParams().freqAmplitudeRange, 
 				clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits);
@@ -776,9 +788,9 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits[0] = spectroControlPane.getColourSlider().getMin(); 
 		clickPlotInfo.getClickDisplayParams().freqAmplitudeLimits[1] = spectroControlPane.getColourSlider().getMax(); 
 
-		
+
 		clickPlotInfo.getClickDisplayParams().thresholdFFT = !freqSwitch.isSelected();
-		
+
 		clickPlotInfo.getClickDisplayParams().fftHop = this.fftSpinnerHop.getValue().intValue();
 		clickPlotInfo.getClickDisplayParams().fftLength = this.fftSpinnerLength.getValue().intValue(); 
 		clickPlotInfo.getClickDisplayParams().colourMap = this.spectroControlPane.getColourArrayType(); 
@@ -839,14 +851,14 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 	 * Notify the click pane of an update that may change controls 
 	 */
 	public void notifyUpdate() {
-		
-		
+
+
 		//called whenever the y axis data type changes.
 		//17/09/2021- this was causing the spectrogram to reset back to normal lines every time 
 		//a module dialog was closed. 
 		//setFreqType();
-		
-		
+
+
 		this.enablePane();
 		//in case there has been a global medium update. 
 	}

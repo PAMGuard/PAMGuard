@@ -1,5 +1,7 @@
 package annotation;
 
+import org.w3c.dom.Element;
+
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataBlock;
