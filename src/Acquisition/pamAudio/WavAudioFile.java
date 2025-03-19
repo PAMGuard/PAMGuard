@@ -283,18 +283,18 @@ public class WavAudioFile implements PamAudioFileLoader {
 	}
 	
 	
-	public static void main(String args[]) {
-		
-		File wavFile = new File("E:\\SoundNet\\1chan_analysis\\pamguard\\67150826\\mf_wav\\20180529\\PAM_20180529_055114_000.wav");
-		try {
-			WavFileInputStream.openInputStream(wavFile);
-			System.out.println("Wav file opened successfully: " + isSoundFile(wavFile));
-			
-		} catch (UnsupportedAudioFileException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String args[]) {
+//		
+//		File wavFile = new File("E:\\SoundNet\\1chan_analysis\\pamguard\\67150826\\mf_wav\\20180529\\PAM_20180529_055114_000.wav");
+//		try {
+//			WavFileInputStream.openInputStream(wavFile);
+//			System.out.println("Wav file opened successfully: " + isSoundFile(wavFile));
+//			
+//		} catch (UnsupportedAudioFileException | IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 
 	@Override
 	public PamAudioSettingsPane getSettingsPane() {

@@ -30,6 +30,7 @@ package PamguardMVC;
 import java.util.ListIterator;
 
 import Acquisition.AcquisitionProcess;
+import Acquisition.DCFilter;
 import Acquisition.RawDataBinaryDataSource;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
@@ -56,6 +57,8 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	private double[] summaryTotals2 = new double[PamConstants.MAX_CHANNELS];
 	private double[] summaryMaxVal = new double[PamConstants.MAX_CHANNELS];
 	private int[] summaryCount = new int[PamConstants.MAX_CHANNELS];
+	
+	private DCFilter dcFilter;
 
 	/**
 	 * Keep a record of the last sample added. 
@@ -183,6 +186,14 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 //			return; add the data anyway, may get back into synch !!!! 
 		}
 		prevChannelSample[thisChannel] = pamDataUnit.getStartSample();
+		if (dcFilter != null) {
+			int callCount = dcFilter.getChannelCallCount(thisChannel);
+			dcFilter.filterData(thisChannel, pamDataUnit.getRawData());
+			if (callCount == 0) {
+				// run again for luck now that it should have settled. 
+				dcFilter.filterData(thisChannel, pamDataUnit.getRawData());
+			}
+		}
 //		System.out.println(String.format("Sample %d channel %d in %s is in  synch - expected sample %d",
 //				pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample));
 		addSummaryData(thisChannel, pamDataUnit);
@@ -607,6 +618,28 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	@Override
 	public EffortProvider autoEffortProvider() {
 		return null;
+	}
+
+	/**
+	 * DC filter to use on all incoming data. Don't probably want this in 
+	 * normal mode since it's already done in the acquisition thread, but 
+	 * have option to do it in viewer mode if it's set from the 
+	 * process owning this data block. 
+	 * @param dcFilter
+	 */
+	public void setDcFilter(DCFilter dcFilter) {
+		this.dcFilter = dcFilter;
+	}
+
+	/**	 
+	 * DC filter to use on all incoming data. Don't probably want this in 
+	 * normal mode since it's already done in the acquisition thread, but 
+	 * have option to do it in viewer mode if it's set from the 
+	 * process owning this data block. 
+	 * @return
+	 */
+	public DCFilter getDcFilter() {
+		return dcFilter;
 	}
 
 

@@ -496,13 +496,7 @@ public class AcquisitionProcess extends PamProcess {
 		lastStallCheckSamples = 0;
 		lastStallState = false;
 
-		if (acquisitionControl.acquisitionParameters.subtractDC) {
-			dcFilter = new DCFilter(acquisitionControl.acquisitionParameters.sampleRate,
-					acquisitionControl.acquisitionParameters.dcTimeConstant, PamConstants.MAX_CHANNELS);
-		}
-		else {
-			dcFilter = null;
-		}
+		dcFilter = createDCFilter();
 
 		setSampleRate(acquisitionControl.acquisitionParameters.sampleRate, true);
 
@@ -525,6 +519,22 @@ public class AcquisitionProcess extends PamProcess {
 
 	}
 
+
+	public DCFilter createDCFilter() {
+		if (acquisitionControl.acquisitionParameters.subtractDC) {
+			if (dcFilter == null) {
+				dcFilter = new DCFilter(acquisitionControl.acquisitionParameters.sampleRate,
+						acquisitionControl.acquisitionParameters.dcTimeConstant, PamConstants.MAX_CHANNELS);
+			}
+			else {
+				dcFilter.setTimeContant(acquisitionControl.acquisitionParameters.sampleRate, acquisitionControl.acquisitionParameters.dcTimeConstant);
+			}
+		}
+		else {
+			dcFilter = null;
+		}
+		return dcFilter;
+	}
 
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
@@ -1159,6 +1169,10 @@ public class AcquisitionProcess extends PamProcess {
 
 //		System.out.println("AquisitionProcess: GetofflineData: " + offlineLoadDataInfo.getCurrentObserver().getObserverName())
 
+		// set the DC filter so that offline data benefit from it too
+		dcFilter = createDCFilter();
+		rawDataBlock.setDcFilter(dcFilter);
+		
 		if (acquisitionControl.getOfflineFileServer() == null) {
 			return PamDataBlock.REQUEST_NO_DATA;
 		}
