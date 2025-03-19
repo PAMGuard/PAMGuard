@@ -2091,9 +2091,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (changeType == DATA_LOAD_COMPLETE) {
 			firstDataLoadComplete = true;
 		}
-		if (firstDataLoadComplete && changeType == OFFLINE_DATA_LOADED) {
+		
+		if (changeType == OFFLINE_DATA_LOADED) {
 			// this is the final notification that comes through in Viewer startup. 
-			if (runMode == RUN_PAMVIEW && GlobalArguments.isBatch() && batchFirst ) {
+			if (firstDataLoadComplete && runMode == RUN_PAMVIEW && GlobalArguments.isBatch() && batchFirst ) {
 				batchFirst = false; // only happens once. 
 				OfflineTaskManager.getManager().launchOfflineBatchTasks();
 			}

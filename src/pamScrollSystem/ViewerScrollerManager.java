@@ -246,6 +246,8 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 		for (int i = 0; i < pamScrollers.size(); i++) {
 			pamScrollers.get(i).notifyRangeChange();
 		}
+		PamController.getInstance().notifyModelChanged(PamControllerInterface.DATA_LOAD_COMPLETE);
+		PamController.getInstance().notifyTaskProgress(new LoadQueueProgressData(PamTaskUpdate.STATUS_DONE));
 		PamController.getInstance().notifyModelChanged(PamControllerInterface.OFFLINE_DATA_LOADED);
 	}
 
@@ -467,8 +469,6 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 				}
 			}
 			loadDone();
-			PamController.getInstance().notifyModelChanged(PamControllerInterface.DATA_LOAD_COMPLETE);
-			PamController.getInstance().notifyTaskProgress(new LoadQueueProgressData(PamTaskUpdate.STATUS_DONE));
 
 		}
 
