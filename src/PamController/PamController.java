@@ -2031,11 +2031,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public void notifyModelChanged(int changeType) {
 
 		// see what thread the message is arriving on
-		Thread currentThread = Thread.currentThread();
-		Boolean isEvDT = SwingUtilities.isEventDispatchThread();
-		if (isEvDT == false) {
-			System.out.printf("***** notify %d on thread %s is EventDispatch = %s\n", changeType, currentThread.getName(), isEvDT.toString());
-		}
+//		Thread currentThread = Thread.currentThread();
+//		Boolean isEvDT = SwingUtilities.isEventDispatchThread();
+//		if (isEvDT == false) {
+//			System.out.printf("***** notify %d on thread %s is EventDispatch = %s\n", changeType, currentThread.getName(), isEvDT.toString());
+//		}
 		
 //		System.out.println("PamController: notify model changed: " +changeType );
 		if (changeType == CHANGED_MULTI_THREADING) {

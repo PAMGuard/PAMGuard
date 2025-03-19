@@ -34,13 +34,15 @@ public class NotifyCommand extends ExtCommand {
 			return String.format("Command \"%s\" is not a valid parameter for the notiry command", pStr);
 		}
 		final int pInt2 = pInt;
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				PamController.getInstance().notifyModelChanged(pInt2);
-			}
-		});
+		System.out.println(command);
+		PamController.getInstance().notifyModelChanged(pInt2);
+//		SwingUtilities.invokeLater(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+////				PamController.getInstance().notifyModelChanged(pInt2);
+//			}
+//		});
 		return null;
 	}
 

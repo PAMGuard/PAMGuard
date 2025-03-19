@@ -427,7 +427,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 					acousticScrollerGraphics.addNewData(it.next());
 				}
 				catch (Exception e) {
-					System.err.println("Error in AcousticScrollerFX: " + e.getMessage());
+//					System.err.println("Error in AcousticScrollerFX: " + e.getMessage());
 				}
 
 				if (this.isCancelled()){
