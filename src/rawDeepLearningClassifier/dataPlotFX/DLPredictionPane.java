@@ -69,6 +69,8 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 		predColHolder.setPadding(new Insets(5,0,0,0));
 
 		this.setParams();
+		
+		mainPane.setPrefWidth(300);
 
 //		if (dlPredictionPlotInfoFX.getDlControl().getDLModel()!=null) {
 //			layoutColourPanes( dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames());
