@@ -21,6 +21,10 @@ import us.hebi.matlab.mat.format.Mat5File;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
 
+
+/**
+ * Model from Thomas webber which is a good way to test the click based stuff is working in PAMGUard.
+ */
 public class ClickDLTest {
 
 
