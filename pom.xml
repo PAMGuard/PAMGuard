@@ -311,11 +311,82 @@
 			          </execution>
 			          -->
 						</executions>
-					</plugin>
+					</plugin>				
+				
+					 <!--Creates a deb file for Linux-->
+					<plugin>
+			            <artifactId>jdeb</artifactId>
+			            <groupId>org.vafer</groupId>
+			            <version>1.11</version>
+			            <executions>
+			                <execution>
+			                    <phase>package</phase>
+			                    <goals>
+			                        <goal>jdeb</goal>
+			                    </goals>
+			                    <configuration>
+			                        <controlDir>${basedir}/build/deb</controlDir>
+			                        <dataSet>
+			                            <data>
+				                            <!--TODO-really hte jar file should be named properly but thos would mean we would 
+				                            have to change the anme in the desktop file too. For now create a link to the jar file
+				                            with correct version number-->
+			                                <src>${project.build.directory}/Pamguard.jar</src>
+			                                <type>file</type>
+			                                <mapper>
+			                                    <type>perm</type>
+			                                    <prefix>/usr/share/pamguard</prefix>
+			                                </mapper>
+			                            </data>
+			                             <data>
+			                                <src>${basedir}/liblinux</src>
+			                                <type>directory</type>
+			                                <includes>*.txt</includes>
+			                                <includes>*.so</includes>
+			                                <mapper>
+			                                    <type>perm</type>
+			                                    <prefix>/usr/share/pamguard/liblinux</prefix>
+			                                </mapper>
+			                            </data>
+			                             <data>
+			                                <src>${basedir}/build/deb/PAMGuardIcon2.png</src>
+			                                <type>file</type>
+			                                <mapper>
+			                                    <type>perm</type>
+			                                    <prefix>/usr/share/pamguard</prefix>
+			                                </mapper>
+			                            </data>
+			                             <data>
+			                                <src>${basedir}/build/deb/pamguard.desktop</src>
+			                                <type>file</type>
+			                                <mapper>
+			                                    <type>perm</type>
+			                                    <prefix>/usr/share/applications</prefix>
+			                                </mapper>
+			                            </data>
+								    	<data>
+			                                <type>link</type>
+			                                <linkName>/usr/share/pamguard/PAMGuard</linkName>
+			                                <linkTarget>/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
+			                                <symlink>true</symlink>
+			                            </data>
+			                            <!--<data>
+			                                <src>${project.basedir}/build/deb/set-java-property.sh</src>
+			                                <type>file</type>
+			                				<mapper>
+			                                    <type>perm</type>
+			                                    <prefix>/usr/bin</prefix>
+			                                    <filemode>755</filemode>
+			                                </mapper>
+			                            </data>-->
+			                        </dataSet>
+			                    </configuration>
+			                </execution>
+			            </executions>
+		        </plugin>
 
 				</plugins>
 
-		
 				<pluginManagement>
 					<plugins>
 						<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
@@ -359,6 +430,51 @@
 		
 	</profiles>
 	
+			<!--  Plugin which creates a .dmg file for MacOS. 
+		    <plugin>
+		        <groupId>de.perdian.maven.plugins</groupId>
+		        <artifactId>macosappbundler-maven-plugin</artifactId>
+		        <version>1.21.1</version>
+		        <configuration>
+		            <plist>
+		                <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
+		               <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
+		                <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+		                <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+		                <CFBundleURLTypes>
+		                    <string>msa</string>
+		                </CFBundleURLTypes>
+		                <JVMVersion>21+</JVMVersion>
+		                <JVMArguments>
+		                    <string>-c</string>
+		                </JVMArguments>
+		            </plist>
+		              <dmg>
+		                <generate>true</generate>
+		                <additionalResources>
+		                    <additionalResource>
+		                        <directory>src/target/bundle/</directory>
+		                    </additionalResource>
+		                </additionalResources>
+		            </dmg>
+		             <jdk>
+			            <include>false</include>
+			            <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
+			        </jdk>
+		        </configuration>
+		        <executions>
+		            <execution>
+		                <phase>package</phase>
+		                <goals>
+		                    <goal>bundle</goal>
+		                </goals>
+		            </execution>
+		        </executions>
+		    </plugin>-->
+		    
+
+			    
+		    
 
 
 	<reporting>
@@ -1065,7 +1181,7 @@
 	-->
 		<dependency>
 			<groupId>org.pamguard</groupId>
-			<artifactId>x3</artifactId>
+			<artifactId>X3</artifactId>
 			<version>2.2.8</version>
 		</dependency>
 

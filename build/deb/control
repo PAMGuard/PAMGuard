@@ -1,0 +1,13 @@
+Package: PAMGuard
+Version: 2.0.1
+Section: java
+Priority: optional
+Architecture: all
+Maintainer: Jamie Macaulay <jdjm@st-andrews.ac.uk>
+Description: A complex Java application with additional dependencies.
+Icon: pamguard_icon.png
+Depends: openjdk-21-jre
+postinst script:
+  #!/bin/bash
+  # Set JVM options for the application
+  export JAVA_OPTS="-Xmx2g -Xms512m"
