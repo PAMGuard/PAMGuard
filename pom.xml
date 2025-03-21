@@ -328,10 +328,10 @@
 			                        <controlDir>${basedir}/build/deb</controlDir>
 			                        <dataSet>
 			                            <data>
-				                            <!--TODO-really hte jar file should be named properly but thos would mean we would 
-				                            have to change the anme in the desktop file too. For now create a link to the jar file
+				                            <!--TODO-really the jar file should be named properly but thos would mean we would 
+				                            have to change the name in the desktop file too. For now create a link to the jar file
 				                            with correct version number-->
-			                                <src>${project.build.directory}/Pamguard.jar</src>
+			                                <src>${project.build.directory}/${project.build.finalName}.jar</src>
 			                                <type>file</type>
 			                                <mapper>
 			                                    <type>perm</type>
@@ -356,6 +356,7 @@
 			                                    <prefix>/usr/share/pamguard</prefix>
 			                                </mapper>
 			                            </data>
+			                             <!---THe desktop file will create a PAMGuard icon in the applications tray-->
 			                             <data>
 			                                <src>${basedir}/build/deb/pamguard.desktop</src>
 			                                <type>file</type>
@@ -364,9 +365,11 @@
 			                                    <prefix>/usr/share/applications</prefix>
 			                                </mapper>
 			                            </data>
+			                            <!---Create a link which is just called Pamguard. This means the .desktop file does not need
+			                            to be altered depending on the build name-->
 								    	<data>
 			                                <type>link</type>
-			                                <linkName>/usr/share/pamguard/PAMGuard</linkName>
+			                                <linkName>/usr/share/pamguard/Pamguard</linkName>
 			                                <linkTarget>/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
 			                                <symlink>true</symlink>
 			                            </data>
