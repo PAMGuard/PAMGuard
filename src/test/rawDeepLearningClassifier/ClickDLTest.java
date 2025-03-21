@@ -42,9 +42,8 @@ public class ClickDLTest {
 	@Test
 	public void aclickDLTest()   {
 
-		System.out.println("CLickDLTest: Single click test");
+		System.out.println("*****CLickDLTest: Single click test*****");
 
-		float SAMPLE_RATE = 500000;
 		//relative paths to the resource folders.
 		System.out.println("*****Click classification Deep Learning C*****"); 
 
@@ -109,10 +108,8 @@ public class ClickDLTest {
 			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.NORMALISE_WAV, 0., 1, AudioData.ZSCORE)); //needs to be here
 			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PEAK_TRIM, 64, 1)); 
 			
-
 			genericModelParams.dlTransfromParams = dlTransformParamsArr;
 			genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
-			
 		
 			//create the clicks. 
 			path = Paths.get(clicksPath);
@@ -182,13 +179,13 @@ public class ClickDLTest {
 	@Test
 	public void clicksDLTest() {
 
-		float SAMPLE_RATE = 500000;
+		float SAMPLE_RATE = 96000;
 		//relative paths to the resource folders.
-		System.out.println("*****Click classification Deep Learning C*****"); 
+		System.out.println("*****CLickDLTest: Clicks test*****");
 
 		//relative paths to the resource folders.		
 		String relModelPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/model_pb/saved_model.pb";
-		String clicksPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/Click_Detector_Click_Detector_Clicks_20220603_111000.mat";
+		String clicksPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/Click_Detector_Click_Detector_Clicks_20220603_111000_classified.mat";
 
 		Path path = Paths.get(relModelPath);
 
@@ -211,29 +208,29 @@ public class ClickDLTest {
 
 		//create the clicks. 
 		path = Paths.get(clicksPath);
-		ArrayList<PredGroupedRawData> clicks = importClicks(path.toAbsolutePath().normalize().toString(),  SAMPLE_RATE); 
+		ArrayList<PredGroupedRawData> clicks = importClicks(path.toAbsolutePath().normalize().toString(), SAMPLE_RATE); 
 
 		//prep the model
 		genericModelWorker.prepModel(genericModelParams, null);
 
-		System.out.println("Model has loaded"); 
+		System.out.println("Model has loaded: n clicks " + clicks.size()); 
 
-		ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
 
-		for (int i=0; i<1; i++) {
+		for (int i=0; i<clicks.size(); i++) {
 
 			float prediction = (float) clicks.get(i).getPrediction()[0]; 
-
+			
+			ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
 			groupedData.add(clicks.get(i)); //TODO for loop
 
 			//System.out.println("Waveform input: " + groupedData.get(i).getRawData().length + " " + groupedData.get(i).getRawData()[0].length);
 
 			ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData,SAMPLE_RATE, 0);		
 
-			float[] output = genericPrediction.get(i).getPrediction();
+			float[] output = genericPrediction.get(0).getPrediction();
 
-			System.out.println(String.format("Click %d Predicted output: %.2f true output: %.2f passed: %b", clicks.get(i).getUID(),
-					output[0], prediction, output[0]>prediction*0.9 && output[0]<prediction*1.1)); 
+			System.out.println(String.format("Click %d Predicted output: %.4f true output: %.4f passed: %b  delta %.2f", clicks.get(i).getUID(),
+					output[0], prediction, output[0]>prediction*0.9 && output[0]<prediction*1.1, (Math.abs(output[0] -prediction)))); 
 
 		}
 
@@ -273,7 +270,7 @@ public class ClickDLTest {
 				clickData = new PredGroupedRawData(clickmillis.getLong(0), channelMap.getInt(0), startSample.getLong(0), sampleDuration.getLong(0), sampleDuration.getInt(0));
 				clickData.setUID(clickUID.getLong(0));
 				clickData.setRawData(clickwaveform);
-				clickData.setPrediction(new double[] {pred.getDouble(0), pred.getDouble(1)});
+				clickData.setPrediction(new double[] {pred.getDouble(0)});
 
 				clicks.add(clickData); 
 			}
