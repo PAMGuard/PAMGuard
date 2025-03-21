@@ -82,6 +82,7 @@ public abstract class DLModelWorker<T> {
 			DLTransform transform = modelTransforms.get(0); 
 			for (int i =0; i<modelTransforms.size(); i++) {
 				transform = modelTransforms.get(i).transformData(transform); 
+
 //				//TEMP
 //				if (transform instanceof FreqTransform) {
 //					transformedData = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 

@@ -1,12 +1,18 @@
 package test.rawDeepLearningClassifier;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
+import org.jamdev.jdl4pam.transforms.WaveTransform;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jpamutils.wavFiles.AudioData;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
@@ -19,6 +25,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.MatFile;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
 
@@ -30,9 +37,10 @@ public class ClickDLTest {
 
 	/**
 	 * Test just one click
+	 * @throws  
 	 */
 	@Test
-	public void aclickDLTest() {
+	public void aclickDLTest()   {
 
 		System.out.println("CLickDLTest: Single click test");
 
@@ -40,15 +48,22 @@ public class ClickDLTest {
 		//relative paths to the resource folders.
 		System.out.println("*****Click classification Deep Learning C*****"); 
 
+//		//relative paths to the resource folders.		
+//		String relModelPath  =	"/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/model_pb/saved_model.pb";
+//		String clicksPath  =	"/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/example_2000021.mat";
+		
 		//relative paths to the resource folders.		
-		String relModelPath  =	"/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/model_pb/saved_model.pb";
-		String clicksPath  =	"/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/example_2000021.mat";
-
+		String relModelPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/model_pb/saved_model.pb";
+		String clicksPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/example_2000021.mat";
 		//load the click up
 
+//		String matout  =	"/home/jamiemac/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/generic_classifier/example_2000021_transforms.mat";
+		String matout=null;
 		// load the click data up.
 		Path clkPath = Paths.get(clicksPath);
 		PredGroupedRawData clickData = null;
+		
+		Struct matclkStruct = Mat5.newStruct();
 		try {
 			Mat5File mfr = Mat5.readFromFile(clkPath.toAbsolutePath().normalize().toString());
 
@@ -60,6 +75,7 @@ public class ClickDLTest {
 			Matrix modelInputM= mlArrayRetrived.get("wave_pad", 0);
 
 			double[][] clickWaveform= PamArrayUtils.matrix2array(clickWavM);
+			clickWaveform=PamArrayUtils.transposeMatrix(clickWaveform);
 
 			//get the raw model input so we can test the model directly. 
 			double[][] pythonModelInput= PamArrayUtils.matrix2array(modelInputM);
@@ -90,12 +106,14 @@ public class ClickDLTest {
 
 			//waveform transforms. 
 			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, 248000.)); 
+			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.NORMALISE_WAV, 0., 1, AudioData.ZSCORE)); //needs to be here
 			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PEAK_TRIM, 64, 1)); 
-			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.NORMALISE_WAV, 0., 1, AudioData.ZSCORE)); 
+			
 
 			genericModelParams.dlTransfromParams = dlTransformParamsArr;
 			genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
-
+			
+		
 			//create the clicks. 
 			path = Paths.get(clicksPath);
 
@@ -107,27 +125,55 @@ public class ClickDLTest {
 
 			System.out.println("Waveform input: " + groupedData.get(0).getRawData().length + " " + groupedData.get(0).getRawData()[0].length);
 
-			ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData,SAMPLE_RATE, 0);		
+			ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData,248000, 0);		
 
-			System.out.println("PAMGuard input len: " + pythonModelInputF.length); 
+//			System.out.println("PAMGuard input len: " + pythonModelInputF.length); 
 			
 			float[] outputPAMGuard = genericPrediction.get(0).getPrediction();
 
 			System.out.println("Model output PAMGuard: " + outputPAMGuard[0]);
+			
+			//run the transforms so we can take a look at the inpout
+			((WaveTransform) genericModelParams.dlTransfroms.get(0)).setWaveData(new AudioData(groupedData.get(0).getRawData()[0], 248000));;
+			//create the transformed wave
+			DLTransform transform = genericModelParams.dlTransfroms.get(0); 
+			double[] audioOut = null;
+			for (int i=0; i<genericModelParams.dlTransfroms .size(); i++) {
+				transform = genericModelParams.dlTransfroms.get(i).transformData(transform); 
+				audioOut = ((WaveTransform)  transform).getWaveData().getScaledSampleAmplitudes(); 
+				matclkStruct.set(transform.getDLTransformType().getJSONString(), DLMatFile.array2Matrix(audioOut));
+			}
 
 			//RUN THE RAW MODEL with Python transformed input
 
-			System.out.println("Python input len: " + pythonModelInputF.length); 
+//			System.out.println("Python input len: " + pythonModelInputF.length); 
+//			float[] outPutPython = genericModelWorker.getModel().runModel(new float[][] {PamArrayUtils.double2Float(audioOut)});
+
 			float[] outPutPython = genericModelWorker.getModel().runModel(new float[][] {pythonModelInputF});
 
-
 			System.out.println("Model output Python: " + outPutPython[0]);
+			
+			assertEquals(outputPAMGuard[0], outPutPython[0], 0.05);
 
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			assertTrue(false); //make sure the unit test fails
 			return; 
+		}
+		
+		if (matout!=null) {
+			// Create MAT file with a scalar in a nested struct
+			MatFile matFile = Mat5.newMatFile()
+			    .addArray("click_transforms", matclkStruct); 
+			// Serialize to disk using default configurations
+			try {
+				Mat5.writeToFile(matFile, matout);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -141,8 +187,8 @@ public class ClickDLTest {
 		System.out.println("*****Click classification Deep Learning C*****"); 
 
 		//relative paths to the resource folders.		
-		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/risso_click/uniform_model/saved_model.pb";
-		String clicksPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/risso_click/clicks.mat";
+		String relModelPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/model_pb/saved_model.pb";
+		String clicksPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/Click_Detector_Click_Detector_Clicks_20220603_111000.mat";
 
 		Path path = Paths.get(relModelPath);
 
@@ -157,8 +203,8 @@ public class ClickDLTest {
 
 		//waveform transforms. 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, 248000.)); 
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PEAK_TRIM, 128, 1)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.NORMALISE_WAV, 0., 1, AudioData.ZSCORE)); 
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PEAK_TRIM, 64, 1)); 
 
 		genericModelParams.dlTransfromParams = dlTransformParamsArr;
 		genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
@@ -203,7 +249,7 @@ public class ClickDLTest {
 			Mat5File mfr = Mat5.readFromFile(filePath);
 
 			//		//get array of a name "my_array" from file
-			Struct mlArrayRetrived = mfr.getStruct( "clickpreds" );
+			Struct mlArrayRetrived = mfr.getStruct( "binarydata" );
 
 			int numClicks= mlArrayRetrived.getNumCols();
 			ArrayList<PredGroupedRawData> clicks = new ArrayList<PredGroupedRawData>(numClicks); 
