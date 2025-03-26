@@ -19,6 +19,8 @@ import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.junit.jupiter.api.Test;
 
 import PamUtils.PamArrayUtils;
+import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
@@ -34,6 +36,79 @@ import us.hebi.matlab.mat.types.Struct;
  * Model from Thomas webber which is a good way to test the click based stuff is working in PAMGUard.
  */
 public class ClickDLTest {
+	
+	/**
+	 * Test just one click using the zipped classifier
+	 * @throws  
+	 */
+	@Test
+	public void aclickDLTestZip()   {
+
+		System.out.println("*****CLickDLTest: Single click test zip*****");
+		
+		//relative paths to the resource folders.		
+		String relModelPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/model_pb.zip";
+		String clicksPath  =	"/home/jamiemac/Dropbox/PAMGuard_dev/Deep_Learning/click_classifier_Thomas/model_v2/example_2000021.mat";
+		
+//		String matout  =	"/home/jamiemac/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/generic_classifier/example_2000021_transforms.mat";
+		String matout=null;
+		// load the click data up.
+		Path clkPath = Paths.get(clicksPath);
+		PredGroupedRawData clickData = null;
+		
+		Struct matclkStruct = Mat5.newStruct();
+		try {
+			Mat5File mfr = Mat5.readFromFile(clkPath.toAbsolutePath().normalize().toString());
+
+			//		//get array of a name "my_array" from file
+			Struct mlArrayRetrived = mfr.getStruct( "newStruct" );
+			
+			Matrix clickWavM = mlArrayRetrived.get("wave", 0);
+
+			double[][] clickWaveform= PamArrayUtils.matrix2array(clickWavM);
+			clickWaveform=PamArrayUtils.transposeMatrix(clickWaveform);
+
+			Matrix clickUID= mlArrayRetrived.get("UID", 0);
+			Matrix pred= mlArrayRetrived.get("pred", 0);
+
+			//create a click object whihc we can pass through transforms etc. 
+			clickData = new PredGroupedRawData(0L, 1, 0, clickWaveform[0].length, clickWaveform[0].length);
+			clickData.setUID(clickUID.getLong(0));
+			clickData.setRawData(clickWaveform);
+			clickData.setPrediction(new double[] {pred.getDouble(0)});
+
+			// load the model up
+			Path path = Paths.get(relModelPath);
+
+			ArchiveModelWorker genericModelWorker = new ArchiveModelWorker(); 
+
+			StandardModelParams genericModelParams = new StandardModelParams(); 
+			genericModelParams.modelPath =  path.toAbsolutePath().normalize().toString();
+
+			//prep the model - all setting are included within the model
+			genericModelWorker.prepModel(genericModelParams, null);
+			System.out.println("seglen: " +  genericModelParams.defaultSegmentLen);
+			
+			ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
+			groupedData.add(clickData);
+
+			System.out.println("Waveform input: " + groupedData.get(0).getRawData().length + " " + groupedData.get(0).getRawData()[0].length);
+
+			ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData,96000, 0);	
+			
+			float[] outputPAMGuard = genericPrediction.get(0).getPrediction();
+
+			System.out.println("Model output PAMGuard: " + outputPAMGuard[0]);
+			assertEquals(outputPAMGuard[0], 0.99, 0.05);
+			
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			assertTrue(false); //make sure the unit test fails
+			return; 
+		}
+	}
 
 	/**
 	 * Test just one click
@@ -104,7 +179,7 @@ public class ClickDLTest {
 			ArrayList<DLTransfromParams> dlTransformParamsArr = new ArrayList<DLTransfromParams>();
 
 			//waveform transforms. 
-			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, 248000.)); 
+			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, 96000.)); 
 			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.NORMALISE_WAV, 0., 1, AudioData.ZSCORE)); //needs to be here
 			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PEAK_TRIM, 64, 1)); 
 			
@@ -122,7 +197,7 @@ public class ClickDLTest {
 
 			System.out.println("Waveform input: " + groupedData.get(0).getRawData().length + " " + groupedData.get(0).getRawData()[0].length);
 
-			ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData,248000, 0);		
+			ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData,96000, 0);		
 
 //			System.out.println("PAMGuard input len: " + pythonModelInputF.length); 
 			
@@ -199,7 +274,7 @@ public class ClickDLTest {
 		ArrayList<DLTransfromParams> dlTransformParamsArr = new ArrayList<DLTransfromParams>();
 
 		//waveform transforms. 
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, 248000.)); 
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, 96000.)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.NORMALISE_WAV, 0., 1, AudioData.ZSCORE)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PEAK_TRIM, 64, 1)); 
 
@@ -215,7 +290,8 @@ public class ClickDLTest {
 
 		System.out.println("Model has loaded: n clicks " + clicks.size()); 
 
-
+		float count = 0; 
+		long timeStart = System.currentTimeMillis();
 		for (int i=0; i<clicks.size(); i++) {
 
 			float prediction = (float) clicks.get(i).getPrediction()[0]; 
@@ -231,10 +307,17 @@ public class ClickDLTest {
 
 			System.out.println(String.format("Click %d Predicted output: %.4f true output: %.4f passed: %b  delta %.2f", clicks.get(i).getUID(),
 					output[0], prediction, output[0]>prediction*0.9 && output[0]<prediction*1.1, (Math.abs(output[0] -prediction)))); 
+			
+			if (output[0]>prediction*0.9 && output[0]<prediction*1.1) {
+				count++;
+			}
 
 		}
+		long timeEnd = System.currentTimeMillis();
 
+		double perctrue = count/clicks.size();
 
+		System.out.println(String.format("Percentage clicks passed: %.2f TIme to process %d clicks - %2f seconds", perctrue, clicks.size(), ((double) (timeEnd-timeStart))/1000.)); 
 	}
 
 	/**
