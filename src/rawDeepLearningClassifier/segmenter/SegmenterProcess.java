@@ -241,7 +241,7 @@ public class SegmenterProcess extends PamProcess {
 					newRawDataUnit(pamRawData); 
 				}
 				else if (pamRawData instanceof ClickDetection) {
-					newClickData( pamRawData);
+					newClickData(pamRawData);
 				}
 				else if (pamRawData instanceof ClipDataUnit)  {
 					newClipData(pamRawData);
@@ -491,7 +491,7 @@ public class SegmenterProcess extends PamProcess {
 	public void newClickData(PamDataUnit pamRawData) {
 
 		//the raw data units should appear in sequential channel order  
-		//		System.out.println("New raw data in: chan: " + PamUtils.getSingleChannel(pamRawData.getChannelBitmap()) + " Size: " +  pamRawData.getSampleDuration()); 
+		//System.out.println("New raw data in: chan: " + PamUtils.getSingleChannel(pamRawData.getChannelBitmap()) + " Size: " +  pamRawData.getSampleDuration()); 
 
 		ClickDetection clickDataUnit = (ClickDetection) pamRawData;
 
@@ -542,6 +542,12 @@ public class SegmenterProcess extends PamProcess {
 					//segment the data unit into different chunks. 
 					newRawData(pamDataUnit,
 							rawDataChunk[i], chans[i], dlControl.getDLParams().rawSampleSize, dlControl.getDLParams().sampleHop, true);
+					//the way that the newRawdata works is it waits for the next chunk and copies all relevant bits
+					//from previous chunks into segments. This is fine for continuous data but means that chunks of data
+					//don't get their last hop...
+					
+					//got to save the last chunk of raw data -even if the segment has not been filled. 
+					saveRawGroupData(true);
 				}
 				else {
 //					//send the whole data chunk to the deep learning unit
@@ -551,13 +557,8 @@ public class SegmenterProcess extends PamProcess {
 //							pamDataUnit.getStartSample(), 	rawDataChunk[i].length, 	rawDataChunk[i].length); 
 				}
 				
-			//the way that the newRawdata works is it waits for the next chunk and copies all relevant bits
-			//from previous chunks into segments. This is fine for continuous data but means that chunks of data
-			//don't get their last hop...
 		}
 
-		//got to save the last chunk of raw data -even if the segment has not been filled. 
-		saveRawGroupData(true);
 	}
 
 
@@ -600,7 +601,7 @@ public class SegmenterProcess extends PamProcess {
 		long timeMilliseconds = unit.getTimeMilliseconds();
 		long startSampleTime = unit.getStartSample(); 
 
-		//System.out.println("Segmenter: RawDataIn: chan: 1 " + getSourceParams().countChannelGroups() + currentRawChunks); 
+		//System.out.println("Segmenter: RawDataIn: chan: 1 " + getSourceParams().countChannelGroups() + currentRawChunks + " rawSampleSize " + rawSampleSize + " rawSampleHop: " +rawSampleHop); 
 
 		if (currentRawChunks==null) {
 			System.err.println("Current raw chunk arrays are null");
@@ -753,6 +754,7 @@ public class SegmenterProcess extends PamProcess {
 	 * @param forceSave - true to also save the remaining unfilled segment. 
 	 */
 	private void saveRawGroupData(boolean forceSave) {
+		//System.out.println("Segmenter process: saveRawGroupData(boolean forceSave)");
 		for (int i=0; i<getSourceParams().countChannelGroups(); i++) {
 			saveRawGroupData(i, forceSave); 
 		}
@@ -771,6 +773,7 @@ public class SegmenterProcess extends PamProcess {
 	 * @param i - the group index. 
 	 */
 	private void saveRawGroupData(int i) {
+		//System.out.println("Segmenter process: saveRawGroupData(int i)");
 		saveRawGroupData(i, false); 
 	}
 
