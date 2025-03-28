@@ -58,7 +58,13 @@ public class Group3DOfflineTask extends OfflineTask<PamDataUnit>{
 
 	@Override
 	public boolean processDataUnit(PamDataUnit dataUnit) {
+		try {
 		group3DProcess.newData(null, dataUnit);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		//System.out.println("New data unit added: " +dataUnit);
 		return false;
 	}
 
