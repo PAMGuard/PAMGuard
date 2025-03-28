@@ -388,7 +388,8 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		PamVector centre = geometry.getGeometricCentre();
 		int[] hydrophones = toadInformation.getHydrophoneList();
 		double xArray[] = new double[geom.length];
-		for (int i = 0; i < geom.length; i++) {
+		//System.out.println("Hyperbolic loc: Geom length: " + hydrophones.length + " " + geom.length); 
+		for (int i = 0; i < hydrophones.length; i++) {
 			xArray[i] = geom[hydrophones[i]].sub(centre).dotProd(arrayAxes);
 		}
 
@@ -581,6 +582,8 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 ////		glr.setModel(model);
 //		return groupLocalisation;
 		LinearLocalisation linLoc = new LinearLocalisation(groupDataUnit, toadInformation.getHydrophoneMap(), geometry.getArrayAxes(), angle, r);
+		linLoc.setChi2(chiData);
+	
 		GpsData refPos = new GpsData(geometry.getReferenceGPS().addDistanceMeters(geometry.getGeometricCentre()));
 		linLoc.setReferencePosition(refPos);
 		return linLoc;
