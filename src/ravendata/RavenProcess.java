@@ -95,7 +95,7 @@ public class RavenProcess extends PamProcess {
 		 * this as an option in future releases. 
 		 * Offset of 2843100 needed for mn23_055a tag data.
 		 */
-		long offsetMillis = 0;//2843100;
+		long offsetMillis = (long) (ravenControl.getRavenParameters().timeOffsetSeconds * 1000.);
 		
 		RavenDataRow prevRow = null;
 		for (RavenDataRow ravenRow : ravenData) {

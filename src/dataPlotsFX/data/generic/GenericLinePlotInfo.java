@@ -36,6 +36,11 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	 * TRhe managed symbol chooser. 
 	 */
 	private TDSymbolChooserFX managedSymbolChooser;
+	
+	/**
+	 * The radius if drawing a point instead of a line i.e. if there is only one data  point. 
+	 */
+	public static final double OVAL_RADIUS = 10; 
 
 	/**
 	 * The last units
@@ -157,7 +162,9 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 
 					if (lastUnits[chan][i]==null) {
 						lastUnits[chan][i] = new TimePoint2D(tC, dataPixel, pamDataUnit.getTimeMilliseconds() ); 
-						g.fillOval(tC, dataPixel, 10,10);
+						
+						
+						g.fillOval(tC-OVAL_RADIUS/2, dataPixel-OVAL_RADIUS/2, OVAL_RADIUS,OVAL_RADIUS);
 						//						System.out.println("Fill oval:");
 						return null; 
 					}

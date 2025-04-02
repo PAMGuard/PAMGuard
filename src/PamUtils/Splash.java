@@ -49,6 +49,7 @@ import javax.swing.border.EmptyBorder;
 
 import PamController.PamController;
 import PamController.PamguardVersionInfo;
+import PamController.PamguardVersionInfo.ReleaseType;
 import PamUtils.PlatformInfo.OSType;
 import pamguard.Pamguard;
 
@@ -163,11 +164,15 @@ public class Splash extends JWindow implements Runnable {
 		else if (runMode == PamController.RUN_PAMVIEW) {
 			modeText = "Viewer";
 		}
+		String typeText = " " + PamguardVersionInfo.getReleaseType().toString();
+		if (PamguardVersionInfo.getReleaseType() == ReleaseType.CORE) {
+			typeText = "";
+		}
 		if (modeText != null) {
-			version = modeText + " " + PamguardVersionInfo.version + " " + PamguardVersionInfo.getReleaseType().toString();
+			version = modeText + " " + PamguardVersionInfo.version + typeText;
 		}
 		else {
-			version = "Version " + PamguardVersionInfo.version + " " + PamguardVersionInfo.getReleaseType().toString();
+			version = "Version " + PamguardVersionInfo.version + typeText;
 		}
 		
 		// get image graphics handle.
