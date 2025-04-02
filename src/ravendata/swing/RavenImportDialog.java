@@ -10,6 +10,7 @@ import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
@@ -30,6 +31,7 @@ public class RavenImportDialog extends PamDialog {
 	
 	private JButton chooseButton;
 	
+	private JTextField timeOffset;
 
 
 	private RavenImportDialog(Window parentFrame) {
@@ -40,10 +42,30 @@ public class RavenImportDialog extends PamDialog {
 		ravenFile = new JTextField(80);
 		ravenFile.setEditable(false);
 		chooseButton = new JButton("Select ...");
+		
 		c.gridwidth = 2;
+		c.gridx = c.gridy = 0;
 		mainPanel.add(ravenFile, c);
+		
+		JPanel p2 = new JPanel(new GridBagLayout());
+		GridBagConstraints c2 = new PamGridBagContraints();
+		c2.gridx = 1;
+		c2.gridwidth = 1;
+		p2.add(chooseButton, c2);
+		
+		c2.gridx = 0;
+		c2.gridy++;
+		c2.gridwidth = 1;
+		p2.add(new JLabel("Time offset (s) ", JLabel.RIGHT), c2);
+		c2.gridx++;
+		p2.add(timeOffset = new JTextField(7), c2);
+		String tip = "Added to data as it's read from file";
+		timeOffset.setToolTipText(tip);
+		
+		c.gridwidth = 2;
 		c.gridy++;
-		mainPanel.add(new PamAlignmentPanel(chooseButton, BorderLayout.EAST), c);
+		mainPanel.add(new PamAlignmentPanel(p2, BorderLayout.EAST), c);
+		
 		
 		chooseButton.addActionListener(new ActionListener() {
 			@Override
@@ -80,6 +102,7 @@ public class RavenImportDialog extends PamDialog {
 	private void setParams(RavenParameters ravenParameters) {
 		this.ravenParameters = ravenParameters;
 		ravenFile.setText(ravenParameters.importFile);
+		timeOffset.setText(String.format("%5.3f", ravenParameters.timeOffsetSeconds));
 	}
 
 	@Override
@@ -94,6 +117,12 @@ public class RavenImportDialog extends PamDialog {
 			return showWarning(str);
 		}
 		ravenParameters.importFile = fn;
+		try {
+			ravenParameters.timeOffsetSeconds = Double.valueOf(timeOffset.getText());
+		}
+		catch (NumberFormatException e) {
+			return showWarning("Invalid time offset value. Must be a number");
+		}
 		return true;
 	}
 

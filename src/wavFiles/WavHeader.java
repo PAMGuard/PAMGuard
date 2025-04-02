@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioFormat;
 
 import clickDetector.WindowsFile;
+import wavFiles.xwav.HarpHeader;
+import wavFiles.xwav.XWavException;
 
 public class WavHeader {
 
@@ -109,6 +111,18 @@ public class WavHeader {
 					
 					windowsWavFile.seek(fmtEnd);
 					//			break;
+				}
+				else if (testString.equals("harp")) {
+					chunkSize = windowsWavFile.readWinInt();
+					headChunk = new byte[chunkSize];
+					windowsWavFile.read(headChunk);
+					try {
+						HarpHeader.readHarpHeader(headChunk);
+					} catch (XWavException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+//					wavHeadChunks.add(new WavHeadChunk(testString, headChunk));
 				}
 				else {
 					/*

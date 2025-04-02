@@ -143,7 +143,7 @@ public class ClickDetector extends PamProcess {
 
 	private PamDataBlock<TriggerLevelDataUnit> triggerDataBlock;
 
-	private PamRawDataBlock doubleFilteredData;
+//	private PamRawDataBlock doubleFilteredData;
 
 	// protected PamDataBlock<ClickDetection> trackedClicks;
 	private PamDataBlock trackedClicks;
@@ -730,12 +730,12 @@ public class ClickDetector extends PamProcess {
 		// }
 
 		if ((newRawData.getChannelBitmap() & clickControl.clickParameters.getChannelBitmap()) == 0)
-			return;
+			return; // not a channel we're interested in
 		//
 		// if (obs == filteredDataBlock || obs == doubleFilteredData)
 		// return;
 
-		clickControl.newRawData(obs, newData);
+		clickControl.newRawData(obs, newData); // does nothing
 
 		// see if it's time to start a new file
 		// only do this here if it's not multithread
@@ -1496,7 +1496,9 @@ public class ClickDetector extends PamProcess {
 			int keepMillis = (int) (relSamplesToMilliseconds(requiredKeepSamples) * 2);
 			// int keepSeconds = Math.max(1, (int)
 			// relSamplesToMilliseconds(requiredKeepSamples)/1000);
-			keepMillis = Math.max(1000, keepMillis);
+			// add an extra second on 2025-04-01 to try to avoid null clicks. 
+			
+			keepMillis = Math.max(1000, keepMillis) + 1000;
 			// filteredDataBlock.setNaturalLifetime(keepSeconds);
 			finalDataSource = filteredDataBlock;
 			finalDataSource.setNaturalLifetimeMillis(keepMillis);
@@ -1642,7 +1644,7 @@ public class ClickDetector extends PamProcess {
 			/*
 			 * Waveform data ends up pointing either to the raw data, or the output of the
 			 * fist filter if there is one. new wavefformData is created every time (or
-			 * recycled from the data block) since we may beed to go back a while to find
+			 * recycled from the data block) since we may need to go back a while to find
 			 * data from a previous block
 			 */
 			double[][] waveformData = new double[nChannels][];

@@ -1,7 +1,6 @@
 package PamView.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -16,12 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
-
-
-
-
 
 import PamController.PamController;
 import PamDetection.LocalisationInfo;
@@ -29,7 +23,6 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
 
 /**
  * Standard panel for dialogs that shows a list of
