@@ -1484,7 +1484,7 @@ public class ClickDetector extends PamProcess {
 			int keepMillis = (int) (relSamplesToMilliseconds(requiredKeepSamples) * 2);
 			// int keepSeconds = Math.max(1, (int)
 			// relSamplesToMilliseconds(requiredKeepSamples)/1000);
-			keepMillis = Math.max(1000, keepMillis);
+			keepMillis = Math.max(1000, keepMillis) + 1000;
 			// filteredDataBlock.setNaturalLifetime(keepSeconds);
 			finalDataSource = filteredDataBlock;
 			finalDataSource.setNaturalLifetimeMillis(keepMillis);
