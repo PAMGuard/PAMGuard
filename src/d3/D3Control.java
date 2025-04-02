@@ -45,7 +45,7 @@ public class D3Control extends OfflineFileControl {
 		super(unitType, unitName);
 
 		TDDataProviderRegister.getInstance().registerDataInfo(d3DataPlotProvider = new D3DataPlotProvider(this, getD3DataBlock()));
-		TDDataProviderRegisterFX.getInstance().registerDataInfo(d3PlotProvider = new D3DataProviderFX(this, getD3DataBlock()));
+//		TDDataProviderRegisterFX.getInstance().registerDataInfo(d3PlotProvider = new D3DataProviderFX(this, getD3DataBlock()));
 	}
 
 	@Override
