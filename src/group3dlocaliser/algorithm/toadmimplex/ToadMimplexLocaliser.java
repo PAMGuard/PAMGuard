@@ -17,6 +17,7 @@ import group3dlocaliser.algorithm.toadmcmc.MCMCLocaliserPane;
 import group3dlocaliser.algorithm.toadmcmc.ToadMCMCLocaliser;
 import group3dlocaliser.algorithm.toadsimplex.ToadSimplexLocaliser;
 import group3dlocaliser.grouper.DetectionGroupedSet;
+import group3dlocaliser.localisation.LinearLocalisation;
 
 
 /**
@@ -94,7 +95,7 @@ public class ToadMimplexLocaliser extends ToadMCMCLocaliser {
 	 */
 	public DetectionGroupedSet preFilterLoc(DetectionGroupedSet preGroups) {
 		
-		System.out.println("Pre filter groups: " + preGroups.getNumGroups());
+		//System.out.println("Pre filter groups: " + preGroups.getNumGroups());
 		
 		MimplexParams params = (MimplexParams) group3dLocaliser.getLocaliserAlgorithmParams(this).getAlgorithmParameters();
 		
@@ -105,12 +106,12 @@ public class ToadMimplexLocaliser extends ToadMCMCLocaliser {
 			return preGroups;
 		}
 	
-		//no need to do a y more processing. 
+		//no need to do a any more processing. 
 		if (preGroups.getNumGroups()<=2 && params.useFirstCombination) {
 			return preGroups;
 		}
 
-		//localiser using both hyperbolic and the
+		//localiser using both hyperbolic and simplex the
 		// will have to make a data unit for each group now...
 		Group3DDataUnit[] group3dDataUnits = new Group3DDataUnit[preGroups.getNumGroups()];
 
@@ -121,18 +122,22 @@ public class ToadMimplexLocaliser extends ToadMCMCLocaliser {
 			
 			group3dDataUnits[i] = new Group3DDataUnit(preGroups.getGroup(i));
 
+			//System.out.println("ToadMImplex. group3dDataUnits[i]: " + group3dDataUnits[i] );
 
-			GroupLocalisation preAbstractLocalisation = null;
+			AbstractLocalisation preAbstractLocalisation = null;
 			double minChi2 = Double.MAX_VALUE;
 
 			GroupLocResult locResult = null;
 			for (LocaliserModel model: preLocaliserModels) {
+				
+				//System.out.println("ToadMImplex. model: " + model );
+
 
 				locResult = null; 
 				minChi2=Double.MAX_VALUE;
 				 preAbstractLocalisation = null; //must reset this. 
 				try {
-					preAbstractLocalisation = (GroupLocalisation) model.runModel(group3dDataUnits[i], null, false);
+					preAbstractLocalisation = model.runModel(group3dDataUnits[i], null, false);
 				}
 				catch (Exception e) {
 					System.out.println("Mimplex pre filter loclaisation failed"); 
@@ -142,12 +147,23 @@ public class ToadMimplexLocaliser extends ToadMCMCLocaliser {
 //				System.out.println("Pre-localisation result: " + locResult + "  " + model.getName() + "N units: " + preGroups.getGroup(i).size());
 				
 				if (preAbstractLocalisation!=null) {
+					
+					if (preAbstractLocalisation instanceof GroupLocalisation) {
 					//now iterate through the potential ambiguities (this is a bit redunadant with Simplex and Hyperbolic)
-					for (GroupLocResult groupLocResult: preAbstractLocalisation.getGroupLocResults()) {
+					for (GroupLocResult groupLocResult: ((GroupLocalisation) preAbstractLocalisation).getGroupLocResults()) {
 						if (groupLocResult.getChi2()<minChi2) {
 							locResult = groupLocResult; 
 						}
 					}
+					}
+					if (preAbstractLocalisation instanceof LinearLocalisation) {
+						//if a linear vertical array (exactly) then will return a linear localisation. 	Need to make this into
+						//a group localisation to satisfy the mimplex localiser. 
+						if (((LinearLocalisation) preAbstractLocalisation).getChi2()<minChi2) {
+							locResult = new LinearGroupLocResult(((LinearLocalisation) preAbstractLocalisation)); 
+						}
+					}
+					
 				}
 			}
 			

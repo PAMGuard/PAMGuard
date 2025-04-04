@@ -121,8 +121,7 @@ public class ConnectionNodeFactory {
 	 * @param y - the pixel y co-ordinate
 	 */
 	public StandardConnectionNode addNewStructure(StructureRectangle structureRectangle, double x, double y) {
-		//		System.out.println("DataModelConnectPane: add new structure " + structureRectangle.getStructureType() 
-		//		+ " no. nodes: " + this.getConnectionNodes().size());
+				System.out.println("DataModelConnectPane: add new structure " + structureRectangle.getStructureType() );
 		StandardConnectionNode connectionNode = createConnectionNode(structureRectangle.getStructureType(), null);
 
 		if (connectionNode!=null) {

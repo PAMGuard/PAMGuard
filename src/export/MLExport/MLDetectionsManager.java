@@ -153,6 +153,9 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	public boolean hasCompatibleUnits(List<PamDataUnit> dataUnits) {
 		//first need to figure out how many data units there are. 
 		for (int j=0; j<dataUnits.size(); j++){
+			
+			
+			
 			if (hasCompatibleUnits(dataUnits.get(j).getClass())) return true;
 		}
 		return false; 

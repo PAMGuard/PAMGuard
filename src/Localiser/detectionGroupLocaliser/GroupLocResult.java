@@ -106,10 +106,6 @@ public class GroupLocResult implements Comparable<GroupLocResult>, LocalisationC
 		this.chi2 = chi2;
 	}
 
-	public GroupLocResult(double[] result, double[] resultErrors, int side, double chi2) {
-		// TODO Auto-generated constructor stub
-	}
-
 	/**
 	 * @return the latLong
 	 */

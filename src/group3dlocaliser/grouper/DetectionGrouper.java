@@ -244,6 +244,7 @@ public class DetectionGrouper {
 	 */
 	public synchronized void closeMotherGroup() {
 		processFirstGroup(motherGroup);
+		if (maxInterGroupSamples==null) return;
 		motherGroup = new FirstGrouping(maxInterGroupSamples.length, 0, null);
 	
 	}

@@ -5,6 +5,7 @@ import Localiser.detectionGroupLocaliser.LocalisationChi2;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamguardMVC.PamDataUnit;
+import group3dlocaliser.algorithm.Chi2Data;
 import pamMaths.PamVector;
 
 public class LinearLocalisation extends AbstractLocalisation implements LocalisationChi2{
@@ -12,6 +13,7 @@ public class LinearLocalisation extends AbstractLocalisation implements Localisa
 	private double[] angles;
 	private Double range;
 	private GpsData referencePosition;
+	private Chi2Data chi2Dat;
 
 	public LinearLocalisation(PamDataUnit pamDataUnit, int referenceHydrophones, PamVector[] arrayAxes, double bearing, Double range) {
 		super(pamDataUnit, LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY, referenceHydrophones);
@@ -42,8 +44,7 @@ public class LinearLocalisation extends AbstractLocalisation implements Localisa
 
 	@Override
 	public Double getChi2() {
-		// TODO Auto-generated method stub
-		return null;
+		return chi2Dat.getChi2();
 	}
 
 	@Override
@@ -83,6 +84,14 @@ public class LinearLocalisation extends AbstractLocalisation implements Localisa
 	 */
 	public void setReferencePosition(GpsData referencePosition) {
 		this.referencePosition = referencePosition;
+	}
+
+	/**
+	 * Set Chi2 data
+	 * @param chi2dat
+	 */
+	public void setChi2(Chi2Data chi2dat) {
+		this.chi2Dat = chi2dat;
 	}
 	
 	

@@ -59,7 +59,7 @@ public class PeakTrimTransformPane extends DLTransformPane {
 		});
 		
 		//spinner for changing filter order.
-		targetLenSpinner = new Spinner<Integer>(1,50,4,1);
+		targetLenSpinner = new Spinner<Integer>(1,Integer.MAX_VALUE,4,1);
 		targetLenSpinner.valueProperty().addListener((obsVal, oldVal, newVal)->{
 			this.notifySettingsListeners();
 		});

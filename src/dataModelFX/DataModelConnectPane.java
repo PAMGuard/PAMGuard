@@ -54,13 +54,18 @@ public class DataModelConnectPane extends ConnectionPane {
 			@Override
 			public void handle(DragEvent event)
 			{
+				
+//				System.out.println("START drag over node drag dropped" + dataModelPaneFX.getDraggingStructure());
+
 				final Dragboard dragboard = event.getDragboard();
 				if (dragboard.hasString()
 						&& dataModelPaneFX.getModuleDragKey().equals(dragboard.getString())
 						&& dataModelPaneFX.getDraggingModule().get() != null || dataModelPaneFX.getDraggingStructure()!=null)
 				{
-					event.acceptTransferModes(TransferMode.MOVE);
-					event.consume();
+//					System.out.println("ACCEPT drag over node drag dropped" + dataModelPaneFX.getDraggingStructure());
+
+					event.acceptTransferModes(TransferMode.ANY);
+					//event.consume(); //causesd issues with dropping nodes not being detected
 				}
 			}
 		});
@@ -70,6 +75,9 @@ public class DataModelConnectPane extends ConnectionPane {
 			@Override
 			public void handle(DragEvent event)
 			{
+				
+				System.out.println("Add Some Node drag dropped: " + dataModelPaneFX.getDraggingStructure());
+
 				final Dragboard dragboard = event.getDragboard();
 				if (dragboard.hasString()
 						&& dataModelPaneFX.getModuleDragKey().equals(dragboard.getString())
@@ -80,6 +88,7 @@ public class DataModelConnectPane extends ConnectionPane {
 
 					ModuleRectangle moduleRect = dataModelPaneFX.getDraggingModule().get();
 
+//					System.out.println("Add Connection Node drag dropped");
 					dataModelPaneFX.getDraggingModule().set(null);
 					dataModelPaneFX.getConnectionNodeFactory().addNewModule(moduleRect.getPamModuleInfo(), event.getX(), event.getY()); 
 
@@ -88,6 +97,7 @@ public class DataModelConnectPane extends ConnectionPane {
 				if (dragboard.hasString()
 						&& dataModelPaneFX.getModuleDragKey().equals(dragboard.getString())
 						&& dataModelPaneFX.getDraggingStructure().get() != null){
+//					System.out.println("Add Structure Node drag dropped");
 
 					dataModelPaneFX.getConnectionNodeFactory().addNewStructure(dataModelPaneFX.getDraggingStructure().get(), event.getX(), event.getY()); 
 					dataModelPaneFX.getDraggingStructure().set(null);

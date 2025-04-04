@@ -132,11 +132,14 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		//		if (superDetection.getSubDetection(0).getUID() == 9035004477L) {
 		//			System.out.println("Found it");
 		//		}
+		
+
 		TOADInformation toadInformation = toadCalculator.getTOADInformation(superDetection.getSubDetections(), sampleRate, allChannels, geometry);
+		
 
 		boolean toadOK = checkTOADInformation(toadInformation);
 		
-//		System.out.println("ToadOK: " + toadOK + " toadInformation: " + toadInformation + " allChannels: " + allChannels + " geometry: " + geometry);
+		//System.out.println("ToadOK: " + toadOK + " toadInformation: " + toadInformation + " allChannels: " + allChannels + " geometry: " + geometry.getGeometry() + "n sub: " + superDetection.getSubDetectionsCount() );
 
 		if (!toadOK) {
 			return null;
