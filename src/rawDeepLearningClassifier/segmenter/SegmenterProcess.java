@@ -96,7 +96,7 @@ public class SegmenterProcess extends PamProcess {
 		segmenterDataBlock = new SegmenterDataBlock("Segmented Raw Data", this,
 				dlControl.getDLParams().groupedSourceParams.getChanOrSeqBitmap());
 		
-		segmenterGroupDataBlock = new SegmenterGroupDataBlock("Segmented data units", this,
+		segmenterGroupDataBlock = new SegmenterGroupDataBlock("Segmented Group Data", this,
 				dlControl.getDLParams().groupedSourceParams.getChanOrSeqBitmap());
 		
 		addOutputDataBlock(segmenterDataBlock);
