@@ -131,4 +131,11 @@ public class RavenControl extends PamControlledUnit implements PamSettings {
 		return true;
 	}
 
+	/**
+	 * @return the ravenParameters
+	 */
+	public RavenParameters getRavenParameters() {
+		return ravenParameters;
+	}
+
 }

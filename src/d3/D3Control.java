@@ -16,12 +16,15 @@ import d3.calibration.CalFileReader;
 import d3.calibration.CalibrationInfo;
 import d3.calibration.CalibrationSet;
 import d3.plots.D3DataPlotProvider;
+import d3.plots.D3DataProviderFX;
 import dataPlots.data.TDDataProviderRegister;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
 import fileOfflineData.OfflineFileControl;
 import fileOfflineData.OfflineFileMapPoint;
 import fileOfflineData.OfflineFileProcess;
 //import au.com.bytecode.opencsv.CSVReader;
 import pamScrollSystem.ViewLoadObserver;
+import userDisplay.UserDisplayControl;
 import wavFiles.WavFileReader;
 import wavFiles.WavHeader;
 
@@ -35,13 +38,14 @@ public class D3Control extends OfflineFileControl {
 	private D3DataPlotProvider d3DataPlotProvider;
 	private float[] oldAccell = new float[3];
 	private D3DataUnit previousJerkUnit;
+	private D3DataProviderFX d3PlotProvider;
 
 
 	public D3Control(String unitName) {
 		super(unitType, unitName);
 
 		TDDataProviderRegister.getInstance().registerDataInfo(d3DataPlotProvider = new D3DataPlotProvider(this, getD3DataBlock()));
-//		UserDisplayControl.addUserDisplayProvider(d3PlotProvider = new D3PlotProvider(this));
+//		TDDataProviderRegisterFX.getInstance().registerDataInfo(d3PlotProvider = new D3DataProviderFX(this, getD3DataBlock()));
 	}
 
 	@Override
@@ -321,6 +325,9 @@ public class D3Control extends OfflineFileControl {
 	float[] calulateDepth(D3DataUnit dataUnit) {
 		
 		// find the pressure calibration and make a depth line. 
+		if (calibrations == null) {
+			return null;
+		}
 		CalibrationInfo depthCal = calibrations.findCalibrationInfo("press");
 		CalibrationInfo tempCal = calibrations.findCalibrationInfo("press:bridge");
 		int pressInd = findSensorIndex("press");

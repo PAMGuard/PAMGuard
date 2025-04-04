@@ -257,6 +257,9 @@ public class TDProjectorFX extends TimeProjectorFX {
 	 * @return the axis type string. 
 	 */
 	public static String getUnitName(ParameterUnits axisType){
+		if (axisType == null) {
+			return null;
+		}
 		return axisType.toString(); 
 		
 //		String axisUnits=""; 
@@ -301,6 +304,9 @@ public class TDProjectorFX extends TimeProjectorFX {
 	 * @return the axis type string. 
 	 */
 	public static String getAxisName(ParameterType axisType){
+		if (axisType == null) {
+			return null;
+		}
 		return axisType.toString(); 
 		
 //		String axisName=""; 

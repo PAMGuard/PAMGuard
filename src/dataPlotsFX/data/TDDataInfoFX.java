@@ -143,6 +143,11 @@ public abstract class TDDataInfoFX {
 
 		scaleInfoIndex = -1;
 		for (int i = 0; i < scaleInfos.size(); i++) {
+			TDScaleInfo scaleInfo = scaleInfos.get(i);
+			ParameterType scaleDataType = scaleInfo.getDataType();
+			if (scaleDataType == null) {
+				continue;
+			}
 			if (scaleInfos.get(i).getDataType().equals(dataType) && scaleInfos.get(i).getDataUnit().equals(dataUnits)) {
 				scaleInfoIndex = i;
 				return true;
@@ -167,7 +172,15 @@ public abstract class TDDataInfoFX {
 	 */
 	public boolean hasAxisName(ParameterType dataType, ParameterUnits dataUnits) {
 		for (int i = 0; i < scaleInfos.size(); i++) {
-			if (scaleInfos.get(i).getDataType().equals(dataType) 
+			TDScaleInfo scaleInfo = scaleInfos.get(i);
+			if (scaleInfo == null) {
+				return false;
+			}
+			ParameterType scaleDataType = scaleInfo.getDataType();
+			if (scaleDataType == null) {
+				return false;
+			}
+			if (scaleInfo.getDataType().equals(dataType) 
 					&& scaleInfos.get(i).getDataUnit().equals(dataUnits)) {
 				return true;
 			}
@@ -291,6 +304,9 @@ public abstract class TDDataInfoFX {
 	 */
 	public TDScaleInfo getScaleInfo() {
 		if (scaleInfoIndex==-1 && scaleInfos.size()>0) scaleInfoIndex=0; 
+		if (scaleInfoIndex < 0 || scaleInfoIndex >= scaleInfos.size()) {
+			return null;
+		}
 		return scaleInfos.get(this.scaleInfoIndex);
 	}
 

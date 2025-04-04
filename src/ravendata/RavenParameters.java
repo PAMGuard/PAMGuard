@@ -9,6 +9,8 @@ public class RavenParameters implements Serializable, Cloneable {
 
 	public String importFile;
 	
+	public double timeOffsetSeconds = 0;
+	
 	private ArrayList<RavenColumnInfo> extraColumns;
 
 	public ArrayList<RavenColumnInfo> getExtraColumns() {

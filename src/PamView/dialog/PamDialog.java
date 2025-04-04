@@ -620,6 +620,13 @@ abstract public class PamDialog extends JDialog {
 		return showWarning(warningTitle, warningText);
 	}
 
+	/**
+	 * Display a warning text. 
+	 * @param owner
+	 * @param warningTitle
+	 * @param warningText
+	 * @return
+	 */
 	public static boolean showWarning(Window owner, String warningTitle, String warningText) {
 		JOptionPane.showMessageDialog(owner, warningText, warningTitle, JOptionPane.ERROR_MESSAGE);
 		return false;

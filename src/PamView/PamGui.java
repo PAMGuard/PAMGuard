@@ -641,15 +641,18 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		menuItem = new JMenuItem("Module Ordering ...");
 		menuItem.addActionListener(new menuModuleOrder());
+		menuItem.setToolTipText("Change the order of modules in the PAMGuard configuration");
 		orderModulesEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
 
 		menuItem = new JMenuItem("Show Object List ...");
 		menuItem.addActionListener(new menuShowObjectList());
+		menuItem.setToolTipText("Show a list of data and detections currnetly held in memory for each module");
 		fileMenu.add(menuItem);
 
 		menuItem = new JMenuItem("Show Data Model ...");
 		menuItem.addActionListener(new menuShowObjectDiagram());
+		menuItem.setToolTipText("Show a graphical representation of modules and their interconnections");
 		fileMenu.add(menuItem);
 
 		if (!isViewer) {
