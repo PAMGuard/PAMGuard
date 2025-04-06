@@ -27,6 +27,8 @@ public class WavHeader {
 	private ArrayList<WavHeadChunk> wavHeadChunks = new ArrayList<WavHeadChunk>();
 
 	private long headerSize;
+
+	private HarpHeader harpHeader;
 	
 	/**
 	 * Construct a blank Wav Header object, generally used when about to read a header from a file. 
@@ -116,12 +118,13 @@ public class WavHeader {
 					chunkSize = windowsWavFile.readWinInt();
 					headChunk = new byte[chunkSize];
 					windowsWavFile.read(headChunk);
+					HarpHeader harpHeader = null;
 					try {
-						HarpHeader.readHarpHeader(headChunk);
+						harpHeader = HarpHeader.readHarpHeader(headChunk, sampleRate, nChannels, blockAlign);
 					} catch (XWavException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					this.harpHeader = harpHeader;
 //					wavHeadChunks.add(new WavHeadChunk(testString, headChunk));
 				}
 				else {

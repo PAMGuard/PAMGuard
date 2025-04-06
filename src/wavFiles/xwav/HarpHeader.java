@@ -3,6 +3,7 @@ package wavFiles.xwav;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import PamUtils.LittleEndianDataInputStream;
@@ -10,36 +11,59 @@ import PamUtils.PamCalendar;
 
 public class HarpHeader {
 
+	int harpSize;
+	int xhdVersion;
+	String firmwareVersion;
+	String insId;
+	String site;
+	String experiment;// could be 8 in example  
+	int diskSequenceNumber;
+	String diskSerialNumber;
+	int numRF;
+	int longitude; // defo written as integers. guessing float*1e5. 
+	int latitude;
+	int depth;
+	
+	public ArrayList<HarpCycle> harpCycles;
+	private int sampleRate;
+	private short blockAlign;
+	private short nChannels;
+	
 	private HarpHeader() {
-		// TODO Auto-generated constructor stub
+		harpCycles = new ArrayList<>();
 	}
 	
 	/**
 	 * Unpack harp data junk from a xwav file. 
 	 * @param chunkData
+	 * @param blockAlign 
+	 * @param sampleRate 
 	 * @return
 	 */
-	public static HarpHeader readHarpHeader(byte[] chunkData) throws XWavException {
+	public static HarpHeader readHarpHeader(byte[] chunkData, int sampleRate, short nChannels, short blockAlign) throws XWavException {
 		/*
 		 * Based on matlab code found at https://github.com/MarineBioAcousticsRC/Wav2XWav/blob/main/wrxwavhdX.m
 		 */
 		LittleEndianDataInputStream dis = new LittleEndianDataInputStream(new ByteArrayInputStream(chunkData));
+		HarpHeader harpHeader = new HarpHeader();
 //		new LittleEnd
 		try {
-			int harpSize = chunkData.length;
-			int xhdVersion = dis.readUnsignedByte();
-			String firmwareVersion = readString(dis, 10);
-			String insId = readString(dis, 4);
-			String site = readString(dis, 4);
-			String experiment = readString(dis, 8);// could be 8 in example  
-			int diskSequenceNumber = dis.readUnsignedByte();
-			String diskSerialNumber = readString(dis, 8);
-			int numRF = dis.readUnsignedShort();
-			int longitude = dis.readInt(); // defo written as integers. guessing float*1e5. 
-			int latitude = dis.readInt();
-//			float longitude = dis.readFloat();
-//			float latitude = dis.readFloat();
-			int depth = dis.readShort();
+			// add these three to the harp header since they are useful for calculating durations. 
+			harpHeader.sampleRate = sampleRate;
+			harpHeader.blockAlign = blockAlign;
+			harpHeader.nChannels = nChannels;
+			harpHeader.harpSize = chunkData.length;
+			harpHeader.xhdVersion = dis.readUnsignedByte();
+			harpHeader.firmwareVersion = readString(dis, 10);
+			harpHeader.insId = readString(dis, 4);
+			harpHeader.site = readString(dis, 4);
+			harpHeader.experiment = readString(dis, 8);// could be 8 in example  
+			harpHeader.diskSequenceNumber = dis.readUnsignedByte();
+			harpHeader.diskSerialNumber = readString(dis, 8);
+			harpHeader.numRF = dis.readUnsignedShort();
+			harpHeader.longitude = dis.readInt(); // defo written as integers. guessing float*1e5. 
+			harpHeader.latitude = dis.readInt();
+			harpHeader.depth = dis.readShort();
 			// skip 8. 
 			dis.skip(8);
 			/*
@@ -47,20 +71,23 @@ public class HarpHeader {
 			 *  have harpSize = 29752, so expecting about (29752-50)/32
 			 */
 			long lastT = 0;
-			for (int iRF = 0; iRF < numRF; iRF++) {
+			for (int iRF = 0; iRF < harpHeader.numRF; iRF++) {
 				// time is from datevec, so it's year, month ... second in the first six
 				int[] dateVec = new int[7];
 				for (int i = 0; i < 6; i++) {
 					dateVec[i] = dis.readUnsignedByte();
 				}
 				dateVec[6] = dis.readUnsignedShort(); // number of millis.
-				long byteLoc = dis.readUnsignedInt();
-				long byteLength = dis.readUnsignedInt();
-				long writeLength = dis.readUnsignedInt();
-				long sampleRate = dis.readUnsignedInt();
-				int gain = dis.readUnsignedByte();
+				HarpCycle harpCycle = new HarpCycle();
+				harpCycle.tMillis = dateVec2Millis(dateVec);
+				harpCycle.byteLoc = dis.readUnsignedInt();
+				harpCycle.byteLength = dis.readUnsignedInt();
+				harpCycle.writeLength = dis.readUnsignedInt();
+				harpCycle.sampleRate = dis.readUnsignedInt();
+				harpCycle.gain = dis.readUnsignedByte();
+				harpCycle.durationMillis = harpCycle.byteLength * 1000 / blockAlign / harpCycle.sampleRate;
 				dis.skip(7);
-				long tMillis = dateVec2Millis(dateVec);
+				harpHeader.harpCycles.add(harpCycle);
 //				if (lastT != 0) {
 //					System.out.printf("%s length %d = %3.3fs, step = %dms\n", PamCalendar.formatDBDateTime(tMillis, true), byteLength, 
 //							(double) byteLength / (double) sampleRate / 2., tMillis-lastT);
@@ -69,15 +96,46 @@ public class HarpHeader {
 //					System.out.printf("%s length %d = %3.3fs\n", PamCalendar.formatDBDateTime(tMillis, true), byteLength, 
 //							(double) byteLength / (double) sampleRate / 2.);
 //				}
-				lastT = tMillis;
 			}
 			
 		} catch (IOException e) {
 			throw new XWavException(e.getMessage());
 		}
+		harpHeader.consolodate();
 		
+		return harpHeader;
+	}
+	
+	/**
+	 * Consolodate the cycle information, merging any entries that clearly don't have
+	 * any gap between them. 
+	 * @return
+	 */
+	public int consolodate() {
+		if (harpCycles == null) {
+			return 0;
+		}
+		ArrayList<HarpCycle> cList = new ArrayList<>();
+		if (harpCycles.size() == 0) {
+			return 0;
+		}
+		HarpCycle current = harpCycles.get(0).clone();
+		cList.add(current);
+		for (int i = 1; i < harpCycles.size(); i++) {
+			HarpCycle other = harpCycles.get(i);
+			if (current.isConsecutive(other) && current.compatible(other)) {
+				// extend the current cycle. 
+				current.merge(other);
+			}
+			else {
+				// start a new cycle. 
+				current.isConsecutive(other);
+				cList.add(current = other.clone());
+			}
+		}
+		this.harpCycles = cList;
 		
-		return null;
+		return cList.size();
 	}
 	
 	/**
