@@ -232,7 +232,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 				}
 			}
 		
-//			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
+			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;

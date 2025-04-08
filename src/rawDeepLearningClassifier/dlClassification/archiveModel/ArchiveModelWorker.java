@@ -139,9 +139,8 @@ public class ArchiveModelWorker extends GenericModelWorker {
 			System.out.println(modelParams.dlTransforms);
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(modelParams.dlTransforms); 
 
-//			///HACK here for now to fix an issue with dB and Ketos transforms having zero length somehow...
 //			for (int i=0; i<modelParams.dlTransforms.size(); i++) {
-//				System.out.println(modelParams.dlTransforms.get(i)); 
+//				System.out.println(modelParams.dlTransforms.get(i).toString()); 
 //			}
 
 			//only load new transforms if defaults are selected

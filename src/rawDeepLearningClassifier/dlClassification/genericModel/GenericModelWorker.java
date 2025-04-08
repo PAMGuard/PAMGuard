@@ -104,6 +104,7 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			}
 			
 			setModelTransforms(genericParams.dlTransfroms); 
+		
 
 			//is this a waveform or a spectrogram model?
 			setWaveFreqModel(genericParams);

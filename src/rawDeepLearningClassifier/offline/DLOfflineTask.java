@@ -1,5 +1,7 @@
 package rawDeepLearningClassifier.offline;
 
+import java.util.ListIterator;
+
 import PamController.PamController;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -8,6 +10,7 @@ import dataMap.OfflineDataMapPoint;
 import matchedTemplateClassifer.MTClassifierControl;
 import offlineProcessing.OfflineTask;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess;
 
@@ -48,7 +51,7 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 	@Override
 	public boolean processDataUnit(PamDataUnit<?, ?> dataUnit) {
 		//		System.out.println("--------------");
-		//		System.out.println("Offline task start: " + dataUnit.getUpdateCount() + " UID " + dataUnit.getUID());
+		//System.out.println("Offline task start: " + dataUnit.getUpdateCount() + " UID " + dataUnit.getUID() + " " + dlControl.getDLParams().enableSegmentation);
 		boolean saveBinary = false; 
 		try {
 
@@ -79,9 +82,16 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 				//detection has been added we force the classifier to run on all the segments generated from 
 				//the raw data. 
 				
-				//Process a data unit
+				//Process a data unit within the segmenter
 				dlControl.getSegmenter().newData(dataUnit); 
-
+				
+				//System.out.println("Segments: " + dlControl.getSegmenter().getSegmenterDataBlock().getUnitsCount());
+				//need to add the segmenter data units into the classification buffer
+				ListIterator<GroupedRawData> iterator = dlControl.getSegmenter().getSegmenterDataBlock().getListIterator(0); 
+				while (iterator.hasNext()) {
+					dlControl.getDLClassifyProcess().newData(dlControl.getSegmenter().getSegmenteGroupDataBlock(), iterator.next());
+				}
+				
 				//force click data save
 				dlControl.getDLClassifyProcess().forceRunClassifier(dataUnit);
 

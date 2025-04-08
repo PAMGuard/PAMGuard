@@ -583,10 +583,11 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	@Override
 	public void setParams(RawDLParams currParams) {
-
-		sourcePane.setParams(currParams.groupedSourceParams);
+		
+		
 		sourcePane.sourceChanged();
 		sourcePane.setSourceList();
+		sourcePane.setParams(currParams.groupedSourceParams);
 
 		dlControl.createDataSelector(sourcePane.getSource());
 
