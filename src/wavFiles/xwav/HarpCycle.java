@@ -81,4 +81,53 @@ public class HarpCycle implements Cloneable {
 		return str;
 	}
 
+	/**
+	 * @return the tMillis
+	 */
+	public long gettMillis() {
+		return tMillis;
+	}
+
+	/**
+	 * @return the byteLoc
+	 */
+	public long getByteLoc() {
+		return byteLoc;
+	}
+
+	/**
+	 * @return the byteLength
+	 */
+	public long getByteLength() {
+		return byteLength;
+	}
+
+	/**
+	 * @return the writeLength
+	 */
+	public long getWriteLength() {
+		return writeLength;
+	}
+
+	/**
+	 * @return the sampleRate
+	 */
+	public long getSampleRate() {
+		return sampleRate;
+	}
+
+	/**
+	 * @return the gain
+	 */
+	public int getGain() {
+		return gain;
+	}
+
+	/**
+	 * @return the durationMillis
+	 */
+	public long getDurationMillis() {
+		return durationMillis;
+	}
+
 }

@@ -8,7 +8,7 @@ import dataMap.OfflineDataMapPoint;
 
 /**
  * This was WavFileDataMapPoint, but can be used for any file types with OfflineFileServer. Won't rename
- * or move though since it's often serialised so 
+ * or move though since it's often serialised so leave alone. 
  * @author dg50
  *
  */
@@ -17,6 +17,8 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	private static final long serialVersionUID = 4955333805088379820L;
 	
 	private File soundFile;
+	
+	private FileSubSection fileSubSection;
 
 	public FileDataMapPoint(File soundFile, long startTime, long endTime) {
 		super(startTime, endTime, (int) Math.max(((endTime-startTime)/1000),1), 0);
@@ -25,7 +27,6 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return soundFile.getName();
 	}
 
@@ -79,6 +80,20 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = super.getParameterSet();
 		return ps;
+	}
+
+	/**
+	 * @return the fileSubSection
+	 */
+	public FileSubSection getFileSubSection() {
+		return fileSubSection;
+	}
+
+	/**
+	 * @param fileSubSection the fileSubSection to set
+	 */
+	public void setFileSubSection(FileSubSection fileSubSection) {
+		this.fileSubSection = fileSubSection;
 	}
 
 }

@@ -392,4 +392,11 @@ public class WavHeader {
 	public long getHeaderSize() {
 		return headerSize;
 	}
+
+	/**
+	 * @return the harpHeader
+	 */
+	public HarpHeader getHarpHeader() {
+		return harpHeader;
+	}
 }
