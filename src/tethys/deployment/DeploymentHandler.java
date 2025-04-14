@@ -88,6 +88,7 @@ import tethys.dbxml.TethysException;
 import tethys.deployment.swing.DeploymentWizard;
 import tethys.deployment.swing.EffortProblemDialog;
 import tethys.deployment.swing.RecordingGapDialog;
+import tethys.detection.DetectionsHandler;
 import tethys.localization.TethysLatLong;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
@@ -960,32 +961,33 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			gpsPoint.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(gpsDataUnit.getTimeMilliseconds()));
 			gpsPoint.setLatitude(TethysLatLong.formatLatitude(gpsData.getLatitude()));
 			gpsPoint.setLongitude(TethysLatLong.formatLongitude(gpsData.getLongitude()));
-			CourseOverGroundDegN cog = gpsPoint.getCourseOverGroundDegN();
-			if (cog == null) {
-				cog = new CourseOverGroundDegN();
-				gpsPoint.setCourseOverGroundDegN(cog);
-			}
-			cog.setValue(PamUtils.constrainedAngle(gpsData.getCourseOverGround()));
-			cog.setNorth(HeadingTypes.TRUE.toString());
-			Double trueHead = gpsData.getTrueHeading();
-			if (trueHead != null && Double.isFinite(trueHead)) {
-				HeadingDegN th = new HeadingDegN();
-				th.setValue(PamUtils.constrainedAngle(trueHead));
-//				th.setNorth(HeadingTypes.TRUE.toString());
-				gpsPoint.setHeadingDegN(th);
-			}
-			else {
-				// else try magnetic, but corrected for deviation
-				Double magHead = gpsData.getMagneticHeading();
-				if (magHead != null && Double.isFinite(magHead)) {
-					magHead = gpsData.getHeading(); // corrected for deviation
-					if (magHead == null) magHead = gpsData.getMagneticHeading(); // go back!
-					HeadingDegN mh = new HeadingDegN();
-					mh.setValue(PamUtils.constrainedAngle(magHead));
-//					mh.setNorth(HeadingTypes.MAGNETIC.toString());
-					gpsPoint.setHeadingDegN(mh);
-				}
-			}
+//			CourseOverGroundDegN cog = gpsPoint.getCourseOverGroundDegN();
+//			if (cog == null) {
+//				cog = new CourseOverGroundDegN();
+//				gpsPoint.setCourseOverGroundDegN(cog);
+//			}
+//			cog.setValue(AutoTethysProvider.roundDecimalPlaces(PamUtils.constrainedAngle(gpsData.getCourseOverGround()),1));
+//			cog.setNorth(HeadingTypes.TRUE.toString());
+			
+//			Double trueHead = gpsData.getTrueHeading();
+//			if (trueHead != null && Double.isFinite(trueHead)) {
+//				HeadingDegN th = new HeadingDegN();
+//				th.setValue(PamUtils.constrainedAngle(trueHead));
+////				th.setNorth(HeadingTypes.TRUE.toString());
+//				gpsPoint.setHeadingDegN(th);
+//			}
+//			else {
+//				// else try magnetic, but corrected for deviation
+//				Double magHead = gpsData.getMagneticHeading();
+//				if (magHead != null && Double.isFinite(magHead)) {
+//					magHead = gpsData.getHeading(); // corrected for deviation
+//					if (magHead == null) magHead = gpsData.getMagneticHeading(); // go back!
+//					HeadingDegN mh = new HeadingDegN();
+//					mh.setValue(PamUtils.constrainedAngle(magHead));
+////					mh.setNorth(HeadingTypes.MAGNETIC.toString());
+//					gpsPoint.setHeadingDegN(mh);
+//				}
+//			}
 			
 			gpsPoint.setSpeedOverGround(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
 			

@@ -167,6 +167,9 @@ public class TMALocalizationCreator implements LocalizationCreator {
 
 	private boolean makeWGS84Localization(LocalizationType loc, AbstractLocalisation pamLoc) {
 		LatLong latLong = pamLoc.getLatLong(0);
+		if (latLong == null) {
+			return false;
+		}
 		GroupLocalisation groupLoc = (GroupLocalisation) pamLoc;
 		GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
 		LocaliserModel tmaModel = groupLocResult.getModel();
