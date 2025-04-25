@@ -13,6 +13,8 @@ import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryStore;
 
 public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
+	
+	private boolean includeAllBaseData = true;
 
 	/** 
 	 * The data object to load parameters into - this is what will be used to generate
@@ -35,6 +37,11 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	 * </ul>
 	 */
 	protected JSONObjectDataSource() {
+	}
+	
+	protected JSONObjectDataSource(boolean includeAllBaseData) {
+		this.includeAllBaseData = includeAllBaseData;
+		
 	}
 
 
@@ -78,69 +85,77 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		DataUnitBaseData baseData = dataUnit.getBasicData();
 		
 		// transfer over the data common to all data unit types
-		objectData.flagBitmap = baseData.getS1Contents();
 		objectData.millis = baseData.getTimeMilliseconds();
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMENANOSECONDS) != 0) {
-			objectData.timeNanos = baseData.getTimeNanoseconds();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_CHANNELMAP) != 0) {
-			objectData.channelMap = baseData.getChannelBitmap();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_UID) != 0) {
-			objectData.UID = baseData.getUID();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_STARTSAMPLE) != 0) {
-			objectData.startSample = baseData.getStartSample();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_SAMPLEDURATION) != 0) {
-			objectData.sampleDuration = baseData.getSampleDuration();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_FREQUENCYLIMITS) != 0) {
-			double[] freq = baseData.getFrequency();
-			objectData.freqLimits = new Double[]{freq[0], freq[1]};
+		objectData.dateReadable = PamCalendar.formatDateTime2(objectData.millis, "yyyy MMMM dd HH:mm:ss.SSS", false);
+
+		if(this.includeAllBaseData) {
 			
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_MILLISDURATION) != 0) {
-			objectData.millisDuration = baseData.getMillisecondDuration();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMEDELAYSSECONDS) != 0) {
-			double[] delays = baseData.getTimeDelaysSeconds();
-			objectData.numTimeDelays = delays.length;
-			objectData.timeDelays = new Double[objectData.numTimeDelays];
-			for (int i=0; i<delays.length; i++) {
-				objectData.timeDelays[i] = delays[i];
-			}
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSEQUENCEMAP) != 0) {
-			objectData.sequenceMap = baseData.getSequenceBitmap();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASNOISE) != 0) {
-			objectData.noise = baseData.getNoiseBackground();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNAL) != 0) {
-			objectData.signal = baseData.getSignalSPL();
-		}
-		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNALEXCESS) != 0) {
-			objectData.signalExcess = baseData.getSignalExcess();
-		}	
 		
-		// force the subclass to set the object type
-		setObjectType(dataUnit);
+			objectData.flagBitmap = baseData.getS1Contents();
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMENANOSECONDS) != 0) {
+				objectData.timeNanos = baseData.getTimeNanoseconds();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_CHANNELMAP) != 0) {
+				objectData.channelMap = baseData.getChannelBitmap();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_UID) != 0) {
+				objectData.UID = baseData.getUID();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_STARTSAMPLE) != 0) {
+				objectData.startSample = baseData.getStartSample();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_SAMPLEDURATION) != 0) {
+				objectData.sampleDuration = baseData.getSampleDuration();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_FREQUENCYLIMITS) != 0) {
+				double[] freq = baseData.getFrequency();
+				objectData.freqLimits = new Double[]{freq[0], freq[1]};
+				
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_MILLISDURATION) != 0) {
+				objectData.millisDuration = baseData.getMillisecondDuration();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMEDELAYSSECONDS) != 0) {
+				double[] delays = baseData.getTimeDelaysSeconds();
+				objectData.numTimeDelays = delays.length;
+				objectData.timeDelays = new Double[objectData.numTimeDelays];
+				for (int i=0; i<delays.length; i++) {
+					objectData.timeDelays[i] = delays[i];
+				}
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSEQUENCEMAP) != 0) {
+				objectData.sequenceMap = baseData.getSequenceBitmap();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASNOISE) != 0) {
+				objectData.noise = baseData.getNoiseBackground();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNAL) != 0) {
+				objectData.signal = baseData.getSignalSPL();
+			}
+			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNALEXCESS) != 0) {
+				objectData.signalExcess = baseData.getSignalExcess();
+			}	
+			
+			// force the subclass to set the object type
+			setObjectType(dataUnit);
+		}
 		
 		// now add any fields specific to the subclass
 		addClassSpecificFields(dataUnit);
 		
 		// finally, add in the new fields used in the convertBinToJSON Matlab script
-		objectData.dateReadable = PamCalendar.formatDateTime2(objectData.millis, "yyyy MMMM dd HH:mm:ss.SSS", false);
 		objectData.filePath = "Network Sender";
-		BinaryDataSource theBinarySource = dataUnit.getParentDataBlock().getBinaryDataSource();
-		if(theBinarySource!=null) {
-			objectData.moduleType = theBinarySource.getModuleType();
-			objectData.moduleName = theBinarySource.getModuleName();
-			objectData.streamName = theBinarySource.getStreamName();
-			objectData.moduleVersion = theBinarySource.getModuleVersion();
-			objectData.pamguardVersion = PamguardVersionInfo.version;
-			objectData.fileFormat = BinaryStore.getCurrentFileFormat();
+		
+		if(this.includeAllBaseData) {
+			BinaryDataSource theBinarySource = dataUnit.getParentDataBlock().getBinaryDataSource();
+			if(theBinarySource!=null) {
+				objectData.moduleType = theBinarySource.getModuleType();
+				objectData.moduleName = theBinarySource.getModuleName();
+				objectData.streamName = theBinarySource.getStreamName();
+				objectData.moduleVersion = theBinarySource.getModuleVersion();
+				objectData.pamguardVersion = PamguardVersionInfo.version;
+				objectData.fileFormat = BinaryStore.getCurrentFileFormat();
+			}
 		}
 	}
 	

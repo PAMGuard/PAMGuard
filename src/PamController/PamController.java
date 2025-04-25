@@ -45,9 +45,11 @@ import PamController.fileprocessing.ReprocessManager;
 import PamController.fileprocessing.ReprocessManagerMonitor;
 import PamController.fileprocessing.ReprocessStoreChoice;
 import PamController.masterReference.MasterReferencePoint;
+import PamController.memory.PamMemory;
 import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.XMLWriterDialog;
 import PamController.soundMedium.GlobalMediumManager;
+import PamController.status.ModuleStatus;
 import PamDetection.PamDetection;
 import PamDetection.RawDataUnit;
 import PamModel.PamModel;
@@ -123,6 +125,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int PAM_COMPLETE = 6;
 	public static final int PAM_MAPMAKING = 7;
 	public static final int PAM_OFFLINETASK = 8;
+	//Treat this the same as pam stalled for now. 
+	public static final int PAM_MEMORYLEAK = 3;
 
 	public static final int BUTTON_START = 1;
 	public static final int BUTTON_STOP = 2;
@@ -2230,6 +2234,17 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public int getPamStatus() {
 		return pamStatus;
 	}
+	
+	public double getMemoryAvailablePercent() {
+		PamMemory mem = new PamMemory();
+		double freeMem = (double)mem.getAvailable();
+		double maxMem = (double)Runtime.getRuntime().maxMemory();
+		double freeMemoryPercent = 100.0*(freeMem/maxMem);
+		if(freeMemoryPercent<5.0) {
+			System.out.println("Memory available is less than 5 percent. Maximum allocation is "+mem.formatMemory(mem.getMax())+" and there are "+mem.formatMemory(mem.getAvailable())+" left.");
+		}
+		return freeMemoryPercent;
+	}
 
 	public void setPamStatus(int pamStatus) {
 		this.pamStatus = pamStatus;
@@ -2247,6 +2262,34 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		showStatusWarning(pamStatus);
 	}
+	
+	public int getNetReceiveStatus() {
+		double freeMemPercent = getMemoryAvailablePercent();
+		if(freeMemPercent<5.0) {
+			System.out.println("Less than 5% of JVM Memory left. Attempting to garbage collect. Current free memory percent: "+freeMemPercent);
+			Runtime.getRuntime().gc();
+			if((freeMemPercent=getMemoryAvailablePercent())<5.0) {
+				System.out.println("Garbage collection did not sufficiently make room. Current free memory percent: "+freeMemPercent+" Sending 'PAM_STALLED' signal.");
+				//Will implement unique status behavior truly eventually, but for now this is just the same as pam stalled. 
+				return PAM_MEMORYLEAK;
+			}else {
+				System.out.println("Garbage collection moved the memory usage from the alert threshold (<5%) to "+freeMemPercent);
+			}
+		}
+		for (PamControlledUnit aUnit : pamConfiguration.getPamControlledUnits()) {
+			if(aUnit.getModuleStatus()!=null) {
+				if(aUnit instanceof AcquisitionControl) {
+					continue;
+				}
+				if(aUnit.getModuleStatus().getStatus()!=ModuleStatus.STATUS_OK) {
+					System.out.println("Module status reported not okay. Module name: "+aUnit.getUnitName()+". Issue: "+aUnit.getModuleStatus().toString()+". Sending 'PAM_STALLED' signal.");
+					return PAM_STALLED;
+				}
+			}
+		}
+		return getPamStatus();
+		
+	}
 
 	/**
 	 * This was within the StatusCommand class, but useful to have it here since
@@ -2263,7 +2306,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		int runMode = PamController.getInstance().getRunMode();
 		if (runMode == PamController.RUN_NETWORKRECEIVER) {
-			return PamController.PAM_RUNNING;
+			return getNetReceiveStatus();
 		}
 		int status = pamController.getPamStatus();
 		if (status == PamController.PAM_IDLE) {
