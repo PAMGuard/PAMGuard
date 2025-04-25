@@ -27,7 +27,7 @@ public class DeploymentsPanel extends TethysExportPanel implements DeploymentTab
 	
 	private PAMGuardDeploymentsTable pamDeploymentsTable;
 	
-	private DeploymentExportPanel exportPanel;
+//	private DeploymentExportPanel exportPanel;
 	
 	private JLabel effortName;
 
@@ -35,8 +35,8 @@ public class DeploymentsPanel extends TethysExportPanel implements DeploymentTab
 		super(tethysControl, tethysControl.getDeploymentHandler(), true);
 		DeploymentHandler deploymentHandler = tethysControl.getDeploymentHandler();
 		pamDeploymentsTable = new PAMGuardDeploymentsTable(tethysControl);
-		exportPanel = new DeploymentExportPanel(tethysControl, pamDeploymentsTable);
-		pamDeploymentsTable.addObserver(exportPanel);
+//		exportPanel = new DeploymentExportPanel(tethysControl, pamDeploymentsTable);
+//		pamDeploymentsTable.addObserver(exportPanel);
 		
 		JPanel mainPanel = getMainPanel();
 		mainPanel.setBorder(new TitledBorder("Recording periods and deployment information"));
@@ -107,6 +107,10 @@ public class DeploymentsPanel extends TethysExportPanel implements DeploymentTab
 
 	@Override
 	protected void exportButtonPressed(ActionEvent e) {
+		ArrayList<RecordingPeriod> selected = pamDeploymentsTable.getSelectedPeriods();
+		if (selected == null || selected.size() == 0) {
+			return;
+		}
 		getTethysControl().getDeploymentHandler().exportDeployments();
 	}
 
