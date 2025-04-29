@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.net.URL;
 
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,8 +13,10 @@ import org.w3c.dom.Element;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.PamguardVersionInfo;
 import PamUtils.DeepCloner;
 import PamView.PamSymbol;
+import PamView.dialog.warn.WarnOnce;
 import PamView.symbol.SymbolData;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
@@ -66,6 +69,44 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 		clickDetector = clickControl.getClickDetector();
 		sweepClassifierWorker = new SweepClassifierWorker(clickControl, this);
 		PamSettingManager.getInstance().registerSettings(this);
+		checkEnables();
+	}
+
+	/**
+	 * Handles a configuration change at >2.02.16b. Will only ever be called once, 
+	 * but it's important to warn users. 
+	 */
+	private void checkEnables() {
+		if (sweepClassifierParameters == null) {
+			return;
+		}
+		int nSets = sweepClassifierParameters.getNumSets();
+		boolean nullEnable = false;
+		for (int i = 0; i < nSets; i++) {
+			if (sweepClassifierParameters.getSet(i).getEnableObject() == null) {
+				nullEnable = true;
+				break;
+			}
+		}
+		if (nullEnable) {
+			String msg = "<html>PAMGuard Version update V" + PamguardVersionInfo.version + "<br>"
+					+ "Recent code changes may have altered which Click Sweep classifiers are enabled. <br>" + 
+					"You should go to the click classifier settings and check your classifier selections.";
+			int ans = WarnOnce.showWarning("Click Classifier Configuration", msg, WarnOnce.OK_CANCEL_OPTION);
+			if (ans == WarnOnce.OK_OPTION) {
+				// open the dialog in the next Swing call loop
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						openSwingDialog();
+					}
+				});
+			}
+		}
+	}
+	
+	private void openSwingDialog() {
+		clickControl.classificationDialog(clickControl.getGuiFrame());
 	}
 
 	@Override
