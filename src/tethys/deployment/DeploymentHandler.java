@@ -499,7 +499,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		ArrayList<RecordingPeriod> gaps = recordingPeriod.getRecordingGaps();
 		DutyCycleInfo dc = recordingPeriod.getDutyCycleInfo();
 		if (dc != null) {
-			// add the duty cycle information
+			// add the duty cycle information - it will have already been added in createDeploymentDocument
 		}
 		else if (dc == null && gaps != null) {
 			/*

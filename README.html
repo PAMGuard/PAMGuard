@@ -434,7 +434,25 @@ name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
 name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
 name="_Version_2.02.11_April"></a><a name="_Version_2.02.14_October"></a><a
 name="_2.02.15_December_2014"></a><a name="_Version_2.02.16_February"></a>Version
-2.02.16 March 2025</h1>
+2.02.17 ?????</h1>
+
+<p class=MsoNormal><b>New Features</b></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b>Bug fixes</b></p>
+
+<p class=MsoNormal>Issue 207. Marked clicks in click detector not rematching
+when data reloaded. This was occurring when multiple clicks had the same millisecond
+time and has now been rectified. </p>
+
+<p class=MsoNormal>Tethys deployments table. Deployments table in Tethys was
+showing multiple lines for duty cycled data. Duty cycled data will now display
+as a single row of data in the Deployments table on the display. </p>
+
+<h1>Version 2.02.16 March 2025</h1>
 
 <h2>New Features</h2>
 
@@ -689,8 +707,8 @@ lang=EN-US> by right clicking on sqlite database and selecting &quot;open with
 
 <p class=MsoNormal><b><span lang=EN-US>Logger Forms</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>Boolean (logical true/false, yes/no) data
-were not showing correctly in Viewer mode. Now fixed</span></p>
+<p class=MsoNormal><span lang=EN-US>Boolean (logical true/false, yes/no) data were
+not showing correctly in Viewer mode. Now fixed</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Data selectors for plotting on map were not
 working, also fixed</span></p>
@@ -704,8 +722,8 @@ correctly saving updated bearings to the database. Now fixed. </span></p>
 Fixed bug that threw an error if no classifier files were &nbsp;specified in
 Rocca Params dialog</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Fix memory issue with RoccaContourDataBlocks
-not being released for garbage collection</span></p>
+<p class=MsoNormal><span lang=EN-US>Fix memory issue with
+RoccaContourDataBlocks not being released for garbage collection</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Set RoccaContourDataBlock objects to null
 and stop PamObserver Timer to</span></p>
@@ -794,8 +812,8 @@ the first two characters of the string name may be. </span></p>
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
 <p class=MsoNormal><span lang=EN-US>Use of localization sensor and orientation
-data for static hydrophones had a bug whereby it would continually ‘forget'
-angle offsets applied to static hydrophones in viewer mode. This is now fixed. </span></p>
+data for static hydrophones had a bug whereby it would continually ‘forget' angle
+offsets applied to static hydrophones in viewer mode. This is now fixed. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event
 selection options even if no species classification options are in place. </span></p>
@@ -808,8 +826,8 @@ mode. Now fixed. </span></p>
 caused PAMGuard to crash when processing large data sets with the ROCCA
 classifier. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Ishmael Modules: Fixed bug which occasionally
-caused crashes when processing many files offline. </span></p>
+<p class=MsoNormal><span lang=EN-US>Ishmael Modules: Fixed bug which
+occasionally caused crashes when processing many files offline. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>PAMDog: Fixed bug in watchdog program which
 was trying to start PAMGuard before modules were fully loaded. The watchdog now
@@ -868,10 +886,10 @@ system to have nested classifiers which can be enabled or disabled. </span></p>
 <p class=MsoNormal><span lang=EN-US>Changes to classification GUI to
 accommodate the new classification system.</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Addition of data selectors to the minimum
-number of clicks accepted by the classifier. This allows the click-by-click
-classifier and the click train detector to be used to together to improve
-classification accuracy. </span></p>
+<p class=MsoNormal><span lang=EN-US>Addition of data selectors to the minimum number
+of clicks accepted by the classifier. This allows the click-by-click classifier
+and the click train detector to be used to together to improve classification
+accuracy. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug fixes</span></b></p>
 
@@ -900,8 +918,8 @@ click re-classification, bearing calculation, etc.)</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Data selector for Whistle Classifier module</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Variable sound output level when using National
-Instruments devices for sound playback.</span></p>
+<p class=MsoNormal><span lang=EN-US>Variable sound output level when using
+National Instruments devices for sound playback.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Speed improvement when processing flac
 audio files. </span></p>
@@ -996,11 +1014,11 @@ font-family:"Times New Roman",serif'>&nbsp;</span></p>
 
 <h2>File Format Change</h2>
 
-<p class=MsoNormal>Changes have been made to the binary file format to support
-the output of additional noise outputs for certain detectors (See below).
-Binary files created with this version will not be compatible with earlier
-versions 2.01.### and below. This version will read and may convert earlier
-format binary files.</p>
+<p class=MsoNormal>Changes have been made to the binary file format to support the
+output of additional noise outputs for certain detectors (See below). Binary
+files created with this version will not be compatible with earlier versions
+2.01.### and below. This version will read and may convert earlier format
+binary files.</p>
 
 <p class=MsoNormal style='margin-bottom:0cm'><span style='font-size:12.0pt;
 font-family:"Times New Roman",serif'>&nbsp;</span></p>
@@ -1109,9 +1127,9 @@ lang=EN-US> </span>Update Rocca module to allow operation without a classifier
 (in case all you need are the measurements) </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>12. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Update whistle and moan detector to better handle small stubs or spurs coming
-off the side of whistles </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Update whistle and moan detector to better handle small
+stubs or spurs coming off the side of whistles </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>13. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1391,10 +1409,10 @@ lang=EN-US> </span>Add functionality for bluetooth headsets. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Add user-facing option to adjust the startup delay for the time-correction
-(Global Time module). This provides a workaround to speed up analysis of
-thousands of wav files (i.e. by setting startup delay to 0 instead of default
-value of 2000 ms). </p>
+lang=EN-US> </span>Add user-facing option to adjust the startup delay for the
+time-correction (Global Time module). This provides a workaround to speed up
+analysis of thousands of wav files (i.e. by setting startup delay to 0 instead
+of default value of 2000 ms). </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1627,10 +1645,10 @@ compatible with Java 12. psfx files generated in previous beta releases should
 be compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Java 12 is better at handling Windows scaling issues on high-DPI displays.
-Beyond that, users should not notice much of a difference between this version
-and previous beta releases.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Java 12 is better at handling Windows scaling issues on
+high-DPI displays. Beyond that, users should not notice much of a difference
+between this version and previous beta releases.</p>
 
 <!-- ************************************************************************************************************************** --><!-- ************************************************************************************************************************** -->
 
@@ -2010,8 +2028,8 @@ measurement period.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 389. Multiple annotations of the same class would not be stored to
-the database if they had the same class. This was affecting the Spectrogram
+</span>Bug 389. Multiple annotations of the same class would not be stored to the
+database if they had the same class. This was affecting the Spectrogram
 Annotation module which has now been given two text type annotations.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>9. </span><span
@@ -2166,11 +2184,11 @@ including expanding to work with whistles.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added option to export all settings and parameters as an XML-formatted
-file. Note that this required changes to the structure of the Array Manager,
-and as such any settings (psf) files created with this version of PAMGuard
-cannot be used in older versions. Older psf files can be loaded with this
-version, but will be converted.</p>
+lang=EN-US> </span>Added option to export all settings and parameters as an
+XML-formatted file. Note that this required changes to the structure of the
+Array Manager, and as such any settings (psf) files created with this version
+of PAMGuard cannot be used in older versions. Older psf files can be loaded
+with this version, but will be converted.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2255,8 +2273,8 @@ about this and encouraged to manually fix the database.</p>
 <h1><a name="_Latest_Beta_Version_2.00.12"></a><span lang=EN-US>Beta Version
 2.00.12 January 2018</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -2409,8 +2427,8 @@ Added circular movement option to source simulation </p>
 2.00.10 June 2017</span></h1>
 
 <p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand these notes before proceeding with installation
-and use of this version. These changes have been funded under contract to NOAA
+You should read and understand these notes before proceeding with installation and
+use of this version. These changes have been funded under contract to NOAA
 Fisheries, contract no. WE-133F-16-SE-1126.</span></p>
 
 <h3><span lang=EN-US>Binary File Structural Changes</span></h3>
@@ -2503,8 +2521,8 @@ relatively simple through the PAMGuard GUI. </span></p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><span lang=EN-US>Bug 317. Rocca Module Data Purging. </span>The ROCCA
-module was not performing data purging when using classifiers developed for
-Hawaii/Temperate Pacific/North Atlantic datasets. This has been corrected.</p>
+module was not performing data purging when using classifiers developed for Hawaii/Temperate
+Pacific/North Atlantic datasets. This has been corrected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2785,15 +2803,15 @@ lang=EN-US>3.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times N
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>4.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><span lang=EN-US>Bug 290. Click bearings on spectrogram display plug in
-were reversed if the first hydrophone was behind the second hydrophone in the
-configuration. This is now fixed so that it displays the same bearings as the
-main click detector display. </span></p>
+were reversed if the first hydrophone was behind the second hydrophone in the configuration.
+This is now fixed so that it displays the same bearings as the main click
+detector display. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Target Motion Analysis</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>A major piece of work has been undertaken to
-improve the Target Motion tracking with PAMGuard. Details are available in the
-online help. Users of the Click Detector will notice the following changes:</span></p>
+<p class=MsoNormal><span lang=EN-US>A major piece of work has been undertaken
+to improve the Target Motion tracking with PAMGuard. Details are available in
+the online help. Users of the Click Detector will notice the following changes:</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2804,9 +2822,9 @@ the database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>The number of data streams associated with the click detector
-has been tidied up so that there are a) All Click, b) Tracked Clicks (those
-which are part of an event) and c) Events. </span></p>
+</span><span lang=EN-US>The number of data streams associated with the click
+detector has been tidied up so that there are a) All Click, b) Tracked Clicks
+(those which are part of an event) and c) Events. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2930,10 +2948,10 @@ GUI instead. This has been Fixed.</p>
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>8.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Bug 280. Recorder control option to automatically restart recording were
-causing confusion. It was working in that the recorder would return to its
-previous state, but it was sometimes difficult for users to set it so that
-recording would always start as soon as PAMGuard started. More sensible and
-easy to understand options have been developed in a new options dialog.</p>
+causing confusion. It was working in that the recorder would return to its previous
+state, but it was sometimes difficult for users to set it so that recording
+would always start as soon as PAMGuard started. More sensible and easy to
+understand options have been developed in a new options dialog.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>9.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3118,13 +3136,13 @@ for details. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>GPS Loading into PAMGuard Viewer. This has been modified
-so that the rules governing GPS data collection and storage also apply when
-loading data from the database. For instance, if you've stored all GPS data,
-you've probably got a record every second in the database which can create
-memory overflows if you try to load a lot of data in the viewer. You can now
-tell PAMGuard to only load a data point every n seconds which will reduce the
-number of points loaded. Useful when making large scale overview maps of a
+</span><span lang=EN-US>GPS Loading into PAMGuard Viewer. This has been
+modified so that the rules governing GPS data collection and storage also apply
+when loading data from the database. For instance, if you've stored all GPS
+data, you've probably got a record every second in the database which can
+create memory overflows if you try to load a lot of data in the viewer. You can
+now tell PAMGuard to only load a data point every n seconds which will reduce
+the number of points loaded. Useful when making large scale overview maps of a
 survey. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4.</span><span
@@ -3488,11 +3506,11 @@ whistles as well. </p>
 
 <p class=MsoNormal><i>Accelerometer Readout</i> (Sensors group)</p>
 
-<p class=MsoNormal>This module, funded by NOAA for the South West Fisheries
-Science Centre (SWFSC), measures pitch and roll from analogue accelerometer
-sensors in a hydrophone. Data are fed real time into the updated hydrophone
-array manager in order that bearings from a tetrahedral tracking array are
-correctly calculated in real world coordinates. </p>
+<p class=MsoNormal>This module, funded by NOAA for the South West Fisheries Science
+Centre (SWFSC), measures pitch and roll from analogue accelerometer sensors in
+a hydrophone. Data are fed real time into the updated hydrophone array manager
+in order that bearings from a tetrahedral tracking array are correctly
+calculated in real world coordinates. </p>
 
 <p class=MsoNormal><i>Wild ArcGIS Interface</i> (Maps and Mapping group)</p>
 
@@ -3554,10 +3572,11 @@ different. Details are available in the online help. </p>
 <p class=MsoNormal><i>FLAC File Support</i></p>
 
 <p class=MsoNormal>Can now read raw audio data direct from FLAC files. <a
-href="http://en.wikipedia.org/wiki/FLAC">FLAC</a> is a lossless compression algorithm
-for audio data. Files, or folders of files are accessed in the same way as WAV
-and AIFF files in the Sound Acquisition module. In a future release we also
-hope to provide support for writing FLAC files from the sound recorder module. </p>
+href="http://en.wikipedia.org/wiki/FLAC">FLAC</a> is a lossless compression
+algorithm for audio data. Files, or folders of files are accessed in the same
+way as WAV and AIFF files in the Sound Acquisition module. In a future release
+we also hope to provide support for writing FLAC files from the sound recorder
+module. </p>
 
 <p class=MsoNormal><i>Sound Recorder Module</i></p>
 
@@ -3666,9 +3685,9 @@ whistle.</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Clip Generator: Saves and
-displays short waveform clips around detections. Can work with any detector (or
-indeed any other data stream within PAMGuard). &nbsp;</p>
+<p class=MsoNormal style='margin-left:36.0pt'>Clip Generator: Saves and displays
+short waveform clips around detections. Can work with any detector (or indeed
+any other data stream within PAMGuard). &nbsp;</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Local time display: displays the
 computers local time on the main display panel. </p>
@@ -3681,8 +3700,8 @@ survey software package.</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Core Functionality</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>New storage options have been implemented
-which give the user greater control of where data are stored. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>New storage options have been
+implemented which give the user greater control of where data are stored. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Modules have been arranged into
 different groups in the configuration menus and tool tip texts have been added
@@ -3744,9 +3763,9 @@ information correctly in the binary files. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Logger Forms</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>A substantial amount of work has
-been carried out on Logger forms, funded by the South West fisheries Science
-Center. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>A substantial amount of work has been
+carried out on Logger forms, funded by the South West fisheries Science Center.
+</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Click Detector</i></p>
 
@@ -3769,8 +3788,8 @@ inter-detection interval.</p>
 margin-left:36.0pt'>&nbsp;</p>
 
 <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;
-margin-left:36.0pt'>Target Motion Analysis: Updated target motion analysis module
-so that it works in three (as opposed to two) dimensions.</p>
+margin-left:36.0pt'>Target Motion Analysis: Updated target motion analysis
+module so that it works in three (as opposed to two) dimensions.</p>
 
 <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;
 margin-left:36.0pt'>&nbsp;</p>
@@ -3805,8 +3824,8 @@ elements has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Database Speed: A substantial rewriting of some of the indexing methods in
-the database module has led to a significant increase in the speed at which
+</span>Database Speed: A substantial rewriting of some of the indexing methods
+in the database module has led to a significant increase in the speed at which
 data are written to the database (orders of magnitude for large databases).
 This is having a significant impact on the overall reliability of the software.
 Other changes have increased the speed (again by orders of magnitude) at which
@@ -4203,9 +4222,9 @@ database tables connected to PAMGuard. </p>
 
 <p class=MsoNormal>Spectrogram Display overlays</p>
 
-<p class=MsoNormal>The mechanism behind this has changed. Should not affect
-operations, but if you have problems with overlays on the spectrogram, please
-notify <a href="mailto:support@PAMGuard.org">support@PAMGuard.org</a> </p>
+<p class=MsoNormal>The mechanism behind this has changed. Should not affect operations,
+but if you have problems with overlays on the spectrogram, please notify <a
+href="mailto:support@PAMGuard.org">support@PAMGuard.org</a> </p>
 
 <p class=MsoNormal>All display overlays</p>
 
@@ -4221,8 +4240,8 @@ existing configurations. </p>
 
 <p class=MsoNormal>Sound acquisition</p>
 
-<p class=MsoNormal>Changes made for a previous Mac build now incorporated into main
-Beta branch. This should allow for basic 2 channel sound acquisition using
+<p class=MsoNormal>Changes made for a previous Mac build now incorporated into
+main Beta branch. This should allow for basic 2 channel sound acquisition using
 Macs. </p>
 
 <p class=MsoNormal>Bug Fixes</p>
@@ -4409,9 +4428,9 @@ display correctly and amplitude scale updates after scale parameter changes. </p
 
 <p class=MsoNormal><b>Speed improvement</b>. </p>
 
-<p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT
-library which gives a factor 2 speed improvement compared to previous FFT
-methods used in PAMGuard</p>
+<p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT library
+which gives a factor 2 speed improvement compared to previous FFT methods used
+in PAMGuard</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -4523,10 +4542,10 @@ loaded. Now issues a warning message to the terminal and does not crash. </p>
 
 <p class=MsoNormal>National Instruments DAQ support (Windows 32 bit JVM Only)</p>
 
-<p class=MsoNormal>The National Instruments interface has now been
-comprehensively rewritten and is now stable. One or more NI data acquisition
-devices can be used to acquire high speed data on multiple channels. See the
-PAMGuard help file for details. </p>
+<p class=MsoNormal>The National Instruments interface has now been comprehensively
+rewritten and is now stable. One or more NI data acquisition devices can be
+used to acquire high speed data on multiple channels. See the PAMGuard help
+file for details. </p>
 
 <p class=MsoNormal><b>Performance Tests</b></p>
 
@@ -4896,10 +4915,10 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoNormal><b>Multithreading</b></p>
 
 <p class=MsoNormal>PAMGuard now processes data in each module in a different
-processing thread. This allows PAMGuard to use both processor cores on dual or
-multi core processor machines. However, multithreading may still cause
-instability in some modules. An option is therefore accessible from the main
-Detection menu to enable and disable multithreading. </p>
+processing thread. This allows PAMGuard to use both processor cores on dual or multi
+core processor machines. However, multithreading may still cause instability in
+some modules. An option is therefore accessible from the main Detection menu to
+enable and disable multithreading. </p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -5025,7 +5044,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <h2>0.5b&nbsp;&nbsp;&nbsp; 31 August 2007 </h2>
 
-<p class=MsoNormal>Requires Java 6 Update 2 (http://java.com/en/download/manual.jsp)</p>
+<p class=MsoNormal>Requires Java 6 Update 2
+(http://java.com/en/download/manual.jsp)</p>
 
 <p class=MsoNormal>Major new features include:</p>
 
@@ -5068,8 +5088,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoNormal>&nbsp;</p>
 
 <p class=MsoNormal><a name="_Toc312065304"></a><a name="_Toc312063949"></a><span
-class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 -
-PAMGuard starts two releases, core and beta release</span></span>, </p>
+class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 - PAMGuard
+starts two releases, core and beta release</span></span>, </p>
 
 <p class=MsoNormal>this is the beta release</p>
 
