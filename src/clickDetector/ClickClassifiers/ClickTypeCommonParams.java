@@ -47,7 +47,7 @@ abstract public class ClickTypeCommonParams implements Cloneable, Serializable, 
 	/**
 	 * True for the classifier to be enabled. 
 	 */
-	public static final Boolean enable = true;
+	private Boolean enable = true;
 
 	/**
 	 * The name of the classifier 
@@ -179,8 +179,29 @@ abstract public class ClickTypeCommonParams implements Cloneable, Serializable, 
 	/**
 	 * @return the enable
 	 */
-	public static Boolean getEnable() {
+	public boolean getEnable() {
+		if (enable == null) {
+			enable = true;
+		}
 		return enable;
+	}
+	
+	/**
+	 * Don't use this function. Use getEnable which 
+	 * will return a primitive and default to true. This is used
+	 * for some startup checks to deal with a bug. 
+	 * @return
+	 */
+	public Boolean getEnableObject() {
+		return enable;
+	}
+	
+	/**
+	 * Set enabled. 
+	 * @param enable
+	 */
+	public void setEnable(boolean enable) {
+		this.enable = enable;
 	}
 
 	/**
