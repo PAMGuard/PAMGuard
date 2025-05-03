@@ -129,27 +129,27 @@ public class CalibrationsTable extends TethysGUIPanel {
 			popMenu.add(menuItem);
 		}
 		
-		popMenu.addSeparator();
-		if (n > 1) {
-			menuItem = new JMenuItem("Delete selected documents");
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteCalibrations(rows);
-				}
-			});
-			popMenu.add(menuItem);
-		}
-		else {
-			menuItem = new JMenuItem("Delete document " + doc.getDocumentName());
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteCalibration(doc);
-				}
-			});
-			popMenu.add(menuItem);
-		}
+//		popMenu.addSeparator();
+//		if (n > 1) {
+//			menuItem = new JMenuItem("Delete selected documents");
+//			menuItem.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					deleteCalibrations(rows);
+//				}
+//			});
+//			popMenu.add(menuItem);
+//		}
+//		else {
+//			menuItem = new JMenuItem("Delete document " + doc.getDocumentName());
+//			menuItem.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					deleteCalibration(doc);
+//				}
+//			});
+//			popMenu.add(menuItem);
+//		}
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
