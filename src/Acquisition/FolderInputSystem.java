@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
@@ -127,6 +128,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				}
 				fileStart = getFileStartTime(aF);
 				fileEnd = fileStart + (long) (aF.getDurationInSeconds()*1000.);
+//				fileEnd = fileStart + getFileDuration(aF, aF);
 				if (fileEnd > currentAnalysisTime + 2000) { // don't go 2s at end of file
 					currentFile = i; // set the correct file. 
 					millisToSkip = currentAnalysisTime - fileStart; // how much of the file to skip.
@@ -593,14 +595,14 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	}
 
 	@Override
-	public void interpretNewFile(String newFile) {
+	public void interpretNewFile(WavFileType newFile) {
 		if (newFile == null) {
 			return;
 		}
 		/*
 		 *  don't actually need to do anything ? Could make a new list, but do it from what's in the
 		 *  folder parameters, not the file parameters. do nothing here, or it gets too complicated.
-		 *  Call the search function from the file select part of the dialot.
+		 *  Call the search function from the file select part of the dialog.
 		 */
 
 		// test the new Wav list worker ...
@@ -617,6 +619,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 		//		System.out.printf("Wav list recieved with %d files after %d millis\n",
 		//				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+		fileListData.sort();
 		allFiles = fileListData.getListCopy();
 
 		List<WavFileType> asList = allFiles;
@@ -625,7 +628,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		//set the date of the first file.
 		setFileDateText();
 
-		//set any bespoke options for the files to be laoded.
+		//set any bespoke options for the files to be loaded.
 		setFileOptionPanel();
 
 		// also open up the first file and get the sample rate and number of channels from it
@@ -736,7 +739,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	}
 
 	@Override
-	public File getCurrentFile() {
+	public WavFileType getCurrentFile() {
 		//System.out.println("All files: " +  allFiles);
 		//		System.out.printf("Folder: getCurrentfile. on %d of %d\n", currentFile, allFiles.size());
 		if (allFiles != null && allFiles.size() > currentFile) {
@@ -758,10 +761,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (currentFile >= 0) {
 			try {
 				WavFileType currentWav = allFiles.get(currentFile);
-				currFileStart = getFileStartTime(currentWav.getAbsoluteFile());
+				currFileStart = getFileStartTime(currentWav);
 				if (audioStream != null) {
-					fileSamples = audioStream.getFrameLength();
-					currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
+//					fileSamples = audioStream.getFrameLength();
+//					currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
+//					currFileLength = getFileDuration(getCurrentFile(), audioStream);
+					currFileLength = (long) (currentWav.getDurationInSeconds() * 1000.);
 					currFileEnd = currFileStart + currFileLength;
 				}
 			}
@@ -1023,9 +1028,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			return null;
 		}
 		WavFileType firstFile = allFiles.get(0);
-		long firstFileStart = getFileStartTime(firstFile.getAbsoluteFile());
+		long firstFileStart = getFileStartTime(firstFile);
 		WavFileType lastFile = allFiles.get(allFiles.size()-1);
-		long lastFileStart = getFileStartTime(lastFile.getAbsoluteFile());
+		long lastFileStart = getFileStartTime(lastFile);
 		lastFile.getAudioInfo();
 		long lastFileEnd = (long) (lastFileStart + lastFile.getDurationInSeconds()*1000.);
 		InputStoreInfo storeInfo = new InputStoreInfo(acquisitionControl, allFiles.size(), firstFileStart, lastFileStart, lastFileEnd);
@@ -1034,7 +1039,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long[] allFileEnds = new long[allFiles.size()];
 			for (int i = 0; i < allFiles.size(); i++) {
 				WavFileType aFile = allFiles.get(i);
-				allFileStarts[i] = getFileStartTime(aFile.getAbsoluteFile());
+				allFileStarts[i] = getFileStartTime(aFile);
 				aFile.getAudioInfo();
 				allFileEnds[i] = (allFileStarts[i] + (long) (aFile.getDurationInSeconds()*1000.));
 				if (allFileStarts[i] < firstFileStart) {
@@ -1078,14 +1083,14 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		 * If the starttime is maxint then there is nothing to do, but we do need to set the file index
 		 * correctly to not over confuse the batch processing system.
 		 */
-		long lastFileTime = getFileStartTime(allFiles.get(allFiles.size()-1).getAbsoluteFile());
+		long lastFileTime = getFileStartTime(allFiles.get(allFiles.size()-1));
 		if (startTime > lastFileTime) {
 			currentFile = allFiles.size();
 			System.out.println("Folder Acquisition processing is complete and no files require processing");
 			return true;
 		}
 		for (int i = 0; i < allFiles.size(); i++) {
-			long fileStart = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+			long fileStart = getFileStartTime(allFiles.get(i));
 			if (fileStart >= startTime) {
 				currentFile = i;
 				PamCalendar.setSoundFile(true);

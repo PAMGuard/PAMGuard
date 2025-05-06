@@ -21,6 +21,18 @@ public class WavFileType extends File {
 	 */
 	private AudioFormat audioInfo;
 	
+
+	/**
+	 * Used for HARP data where we'll be making multiple WavFileType objects
+	 * for a single duty cycled HARP .x.wav file. Number of samples to offset by
+	 * and the total number of samples to read before restarting. 
+	 */
+	private long samplesOffset;
+	
+	private long maxSamples;
+	
+	private long startMilliseconds; 
+	
 	/**
 	 * True to use the file
 	 */
@@ -47,9 +59,18 @@ public class WavFileType extends File {
 		
 		//this is a temporary hack as FX GUI uses the audioformat. Not neat. 
 		if (PamGUIManager.isFX()) {
-		this.setAudioInfo(getAudioFormat(baseFile));
+			this.setAudioInfo(getAudioFormat(baseFile));
 		}
 	}
+
+	/**
+	 * Simple constructor to use with a single string file name
+	 * @param newFile
+	 */
+	public WavFileType(String newFile) {
+		this(new File(newFile));
+	}
+
 
 	/**
 	 * @return the audioInfo
@@ -81,7 +102,12 @@ public class WavFileType extends File {
 			
 			//some additonal useful info
 			 long audioFileLength = file.length();
-			 durationInSeconds = (audioFileLength / (audioFormat.getFrameSize() * audioFormat.getFrameRate()));
+			 if (maxSamples > 0) {
+				 durationInSeconds = (float) maxSamples / audioFormat.getSampleRate();
+			 }
+			 else {
+				 durationInSeconds = (audioFileLength / (audioFormat.getFrameSize() * audioFormat.getFrameRate()));
+			 }
 			    
 			    
 			audioStream.close();
@@ -123,6 +149,83 @@ public class WavFileType extends File {
 	 */
 	public BooleanProperty useWavFileProperty() {
 		return useFile;
+	}
+
+
+	/**
+	 * HARP data, samples to skip before this chunk. 
+	 * @return the samplesOffset
+	 */
+	public long getSamplesOffset() {
+		return samplesOffset;
+	}
+
+
+	/**
+	 * HARP data, samples to skip before this chunk. 
+	 * @param samplesOffset the samplesOffset to set
+	 */
+	public void setSamplesOffset(long samplesOffset) {
+		this.samplesOffset = samplesOffset;
+	}
+
+
+	/**
+	 * HARP data maximum samples in this chunk. 
+	 * @return the maxSamples
+	 */
+	public long getMaxSamples() {
+		return maxSamples;
+	}
+
+
+	/**
+	 * HARP data maximum samples in this chunk. 
+	 * @param maxSamples the maxSamples to set
+	 */
+	public void setMaxSamples(long maxSamples) {
+		this.maxSamples = maxSamples;
+		if (audioInfo != null) {
+			durationInSeconds = (float) maxSamples / audioInfo.getSampleRate();
+		}
+	}
+
+
+	/**
+	 * Chunk start in milliseconds. If zero, will process file name for a 
+	 * time as usual. 
+	 * @return the startMilliseconds
+	 */
+	public long getStartMilliseconds() {
+		return startMilliseconds;
+	}
+
+
+	/**	 
+	 * Chunk start in milliseconds. If zero, will process file name for a 
+	 * time as usual. 
+	 * @param startMilliseconds the startMilliseconds to set
+	 */
+	public void setStartMilliseconds(long startMilliseconds) {
+		this.startMilliseconds = startMilliseconds;
+	}
+
+
+	@Override
+	public int compareTo(File pathname) {
+		if (pathname instanceof WavFileType == false) {
+			return super.compareTo(pathname);
+		}
+		long thisT = this.startMilliseconds;
+		WavFileType oth = (WavFileType) pathname;
+		long thatT = oth.getStartMilliseconds();
+		if (thisT != 0 && thatT != 0) {
+			return (int) Math.signum(thisT-thatT);
+		}
+		// otherwise use file names
+		String thisN = this.getName();
+		String thatN = oth.getName();
+		return thisN.compareTo(thatN);
 	}
 
 }

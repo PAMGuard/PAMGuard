@@ -46,6 +46,7 @@ public class HarpHeader {
 		 */
 		LittleEndianDataInputStream dis = new LittleEndianDataInputStream(new ByteArrayInputStream(chunkData));
 		HarpHeader harpHeader = new HarpHeader();
+		long samplesSkipped = 0;
 //		new LittleEnd
 		try {
 			// add these three to the harp header since they are useful for calculating durations. 
@@ -79,6 +80,7 @@ public class HarpHeader {
 				}
 				dateVec[6] = dis.readUnsignedShort(); // number of millis.
 				HarpCycle harpCycle = new HarpCycle();
+				harpCycle.samplesSkipped = samplesSkipped;
 				harpCycle.tMillis = dateVec2Millis(dateVec);
 				harpCycle.byteLoc = dis.readUnsignedInt();
 				harpCycle.byteLength = dis.readUnsignedInt();
@@ -88,6 +90,7 @@ public class HarpHeader {
 				harpCycle.durationMillis = harpCycle.byteLength * 1000 / blockAlign / harpCycle.sampleRate;
 				dis.skip(7);
 				harpHeader.harpCycles.add(harpCycle);
+				samplesSkipped += harpCycle.byteLength / blockAlign; // for next time. 
 //				if (lastT != 0) {
 //					System.out.printf("%s length %d = %3.3fs, step = %dms\n", PamCalendar.formatDBDateTime(tMillis, true), byteLength, 
 //							(double) byteLength / (double) sampleRate / 2., tMillis-lastT);
@@ -102,6 +105,8 @@ public class HarpHeader {
 			throw new XWavException(e.getMessage());
 		}
 		harpHeader.consolodate();
+		
+//		harpHeader.dumpCycles();
 		
 		return harpHeader;
 	}
@@ -136,6 +141,26 @@ public class HarpHeader {
 		this.harpCycles = cList;
 		
 		return cList.size();
+	}
+	
+	public void dumpCycles() {
+		if (harpCycles == null) {
+			return;
+		}
+		HarpCycle prev = null;
+		
+		for (int i = 0; i < harpCycles.size(); i++) {
+			HarpCycle c = harpCycles.get(i);
+			System.out.printf("%2d %s length %d = %3.3fs", i, PamCalendar.formatDBDateTime(c.tMillis, true), c.byteLength, 
+					(double) c.byteLength / (double) sampleRate / 2.);
+			if (i == 0) {
+				System.out.printf("\n");
+			}
+			else {
+				System.out.printf(", gap %3.1fs\n", (c.tMillis - (prev.tMillis+prev.durationMillis))/1000.);
+			}
+			prev = c;
+		}
 	}
 	
 	/**

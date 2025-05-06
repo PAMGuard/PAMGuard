@@ -16,6 +16,7 @@ public class HarpCycle implements Cloneable {
 	long sampleRate;
 	int gain;
 	public long durationMillis;
+	long samplesSkipped; // samples prior to this chunk. 
 	
 	public HarpCycle() {
 	}
@@ -128,6 +129,13 @@ public class HarpCycle implements Cloneable {
 	 */
 	public long getDurationMillis() {
 		return durationMillis;
+	}
+
+	/**
+	 * @return the samplesSkipped
+	 */
+	public long getSamplesSkipped() {
+		return samplesSkipped;
 	}
 
 }

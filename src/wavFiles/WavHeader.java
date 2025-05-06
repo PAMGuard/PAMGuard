@@ -30,6 +30,7 @@ public class WavHeader {
 
 	private HarpHeader harpHeader;
 	
+	
 	/**
 	 * Construct a blank Wav Header object, generally used when about to read a header from a file. 
 	 */
@@ -130,7 +131,7 @@ public class WavHeader {
 				else {
 					/*
 					 * As an example, SCRIPPS HARP .x.wav files have a chunk 
-					 * in here called 'harp', an example of which has 29752
+					 * in here called 'harp', (now dealt with above) an example of which has 29752
 					 * bytes data, beginning  'V2.64 D104NO01CHNMS ...'
 					 */
 					chunkSize = windowsWavFile.readWinInt();

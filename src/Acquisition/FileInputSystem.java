@@ -182,6 +182,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 */
 	protected volatile long currentAnalysisTime;
 
+	private WavFileType currentFile;
+
 	public FileInputSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
 		PamSettingManager.getInstance().registerSettings(this);
@@ -425,7 +427,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			fileInputParameters.recentFiles.add(0, newFile);
 			fillFileList();
 		}
-		interpretNewFile(newFile);
+		interpretNewFile(new WavFileType(newFile));
 	}
 	
 	public String getFirstFile() {
@@ -439,17 +441,20 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 * Called when a new file or folder is selected.
 	 * @param newFile
 	 */
-	public void interpretNewFile(String newFile){
+	public void interpretNewFile(WavFileType newFile){
 		if ((newFile == null) || (newFile.length() == 0)) return;
 
-		File file = new File(newFile);
+		File file = newFile.getAbsoluteFile();
 
 		setSelectedFileTypes(acquisitionControl.soundFileTypes.getUsedTypes(file));
 
 		if (file == null) return;
-
-		// try to work out the date of the file
-		fileDateMillis = getFileStartTime(file);
+		
+		fileDateMillis = newFile.getStartMilliseconds();
+		if (fileDateMillis == 0) {
+			// try to work out the date of the file
+			fileDateMillis = getFileStartTime(newFile);
+		}
 		fileDateStrip.setDate(fileDateMillis);
 		fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
 		//		if (fileDateMillis <= 0) {
@@ -466,23 +471,26 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 //				System.out.println("FileInputSystem - interpretNewFile");
 				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
-				//      // Get additional information from the header if it's a wav file.
-				//				if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
-				//					WavHeader wavHeader = ((WavFileInputStream) audioStream).getWavHeader();
-				//					int nChunks = wavHeader.getNumHeadChunks();
-				//					for (int i = 0; i < nChunks; i++) {
-				//						WavHeadChunk aChunk = wavHeader.getHeadChunk(i);
-				//						System.out.println(String.format("Chunk %d %s: %s", i, aChunk.getChunkName(), aChunk.toString()));
-				//					}
-				//				}
+				      // Get additional information from the header if it's a wav file.
+//								if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
+//									WavHeader wavHeader = ((WavFileInputStream) audioStream).getWavHeader();
+//									int nChunks = wavHeader.getNumHeadChunks();
+//									for (int i = 0; i < nChunks; i++) {
+//										WavHeadChunk aChunk = wavHeader.getHeadChunk(i);
+//										System.out.println(String.format("Chunk %d %s: %s", i, aChunk.getChunkName(), aChunk.toString()));
+//									}
+//								}
 
 				if (audioStream instanceof SudAudioInputStream) {
-					acquisitionControl.getSUDNotificationManager().interpretNewFile(newFile, (SudAudioInputStream) audioStream);
+					acquisitionControl.getSUDNotificationManager().interpretNewFile(newFile.getAbsolutePath(), (SudAudioInputStream) audioStream);
 				}
 
 				AudioFormat audioFormat = audioStream.getFormat();
 				//				fileLength = file.length();
 				fileSamples = audioStream.getFrameLength();
+				if (currentFile.getMaxSamples() > 0) {
+					fileSamples = currentFile.getMaxSamples();
+				}
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());
 				acquisitionDialog.setChannels(audioFormat.getChannels());
 				fileInputParameters.bitDepth = audioFormat.getSampleSizeInBits();
@@ -604,11 +612,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		return true;
 	}
 
-	public File getCurrentFile() {
+	public WavFileType getCurrentFile() {
 //		System.out.println("fileInputParameters: " + fileInputParameters);
 		if ((fileInputParameters.recentFiles == null) || (fileInputParameters.recentFiles.size() < 1)) return null;
 		String fileName = fileInputParameters.recentFiles.get(0);
-		return new File(fileName);
+		return new WavFileType(new File(fileName));
 	}
 
 
@@ -626,7 +634,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 */
 	public boolean prepareInputFile() {
 
-		File currentFile = getCurrentFile();
+		currentFile = getCurrentFile();
 		if (currentFile == null) {
 			System.out.println("The current file was null");
 			return false;
@@ -668,6 +676,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				return false;
 			}
 			long toSkip = (long) (millisToSkip * audioFormat.getFrameRate() / 1000) * audioFormat.getFrameSize();
+			// this next line deals with harp data offsets.
+			toSkip += currentFile.getSamplesOffset() * audioFormat.getFrameSize();
 			if (toSkip > 0) {
 				audioStream.skip(toSkip);
 			}
@@ -675,6 +685,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			//			fileLength = currentFile.length();
 			fileSamples = audioStream.getFrameLength();
+			if (currentFile.getMaxSamples() > 0) {
+				fileSamples = currentFile.getMaxSamples();
+			}
 			readFileSamples = 0;
 
 			acquisitionControl.getAcquisitionProcess().setSampleRate(audioFormat.getSampleRate(), true);
@@ -787,8 +800,31 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public long getFileStartTime(File file) {
 		// if there is no file, return 0
 		if (file==null) return 0;
+		if (file instanceof WavFileType) {
+			WavFileType wt = (WavFileType) file;
+			if (wt.getStartMilliseconds() > 0) {
+				return wt.getStartMilliseconds();
+			}
+		}
 		return acquisitionControl.getFileDate().getTimeFromFile(file);
 	}
+	
+//	/**
+//	 * Get the file duration, either from the file type or the audio format. 
+//	 * @param file
+//	 * @param af
+//	 * @return
+//	 */
+//	public long getFileDuration(File file, AudioFormat af) {
+//		if (file instanceof WavFileType) {
+//			WavFileType wt = (WavFileType) file;
+//			if (wt.getDurationInSeconds() > 0) {
+//				return (long) (wt.getDurationInSeconds() * 1000.);
+//			}
+//		}
+////		return (long) af.getFrameLength() * 1000L / (long) af.getFormat().getFrameSize();	
+//		return af.get
+//	}
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
@@ -1020,16 +1056,24 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			int startbyte;
 			RawDataUnit newDataUnit = null;
 			long ms;
+			long maxSamples = Long.MAX_VALUE;
+			if (currentFile.getMaxSamples() > 0) {
+				maxSamples = currentFile.getMaxSamples();
+			}
+			long maxBytes = maxSamples * audioFormat.getFrameSize();
+			long totalBytesRead = 0;
 
 
 			while (dontStop && audioStream != null) {
+				int toRead = (int) Math.min(blockSize, maxBytes-totalBytesRead);
 				try {
-					bytesRead = audioStream.read(byteArray, 0, blockSize);
+					bytesRead = audioStream.read(byteArray, 0, toRead);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					break; // file read error
 				}
-				while (bytesRead < blockSize) {
+				totalBytesRead += bytesRead;
+				while (bytesRead < toRead) {
 					// for single file operation, don't do anything, but need to have a hook
 					// in here to read multiple files, in which case we may just get the extra
 					// samples from the next file.
@@ -1112,6 +1156,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				}
 				else {
 					break; // end of file
+				}
+				if (totalBytesRead == maxBytes) {
+					break; // called at end of HARP chunk. 
 				}
 			}
 			if (audioStream != null) {
@@ -1343,13 +1390,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	@Override
 	public InputStoreInfo getStoreInfo(boolean detail) {
 //		System.out.println("FileInputSystem: Get store info start:");
-		File currentFile = getCurrentFile();
+		WavFileType currentFile = getCurrentFile();
 		if (currentFile == null || currentFile.exists() == false) {
 			return null;
 		}
 		WavFileType wavType = new WavFileType(currentFile);
 		wavType.getAudioInfo();
-		long firstFileStart = getFileStartTime(currentFile.getAbsoluteFile());
+		long firstFileStart = getFileStartTime(currentFile);
 		float duration = wavType.getDurationInSeconds();
 		long fileEnd = (long) (firstFileStart + duration*1000.);
 		long[] allFileStarts = {firstFileStart};
