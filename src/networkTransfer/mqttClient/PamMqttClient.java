@@ -1,5 +1,12 @@
 package networkTransfer.mqttClient;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.Instant;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -7,14 +14,11 @@ import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParams;
@@ -23,6 +27,7 @@ import networkTransfer.send.ClientConnectFailedException;
 import networkTransfer.send.NetTransmitException;
 import networkTransfer.send.NetworkQueuedObject;
 import networkTransfer.send.NetworkSendParams;
+import pamguard.Pamguard;
 
 public class PamMqttClient extends NetworkClient  implements MqttCallback{
 
@@ -51,21 +56,55 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 			if(isAlsoNetRx) {
 				this.stationId = this.networkParams.stationId;
 			}
-			mqttConnectionId = this.stationId+"PAM"+getRandomLongString();
+			mqttConnectionId = this.stationId+"PAM"+getRememberedStationKey();
 			System.out.println("Network send station id "+this.mqttConnectionId);
 		}else {
 			this.networkReceiveParams = (NetworkReceiveParams) networkParams;
 			stationId = networkReceiveParams.stationId;
-			mqttConnectionId = this.stationId+getRandomLongString();
+			mqttConnectionId = this.stationId+getRememberedStationKey();
 			System.out.println("Network receive station id "+this.mqttConnectionId);
 		}
 		requireReconnect = false;
 		this.configureClient(networkParams);
 	}
 	
+	private static File rememberKey = Paths.get(Pamguard.getSettingsFolder(),"mqttStation.txt").toFile();
+	
+	private String getRememberedStationKey() { 
+		if(rememberKey.exists()) {
+			try (BufferedReader reader = new BufferedReader(new FileReader(rememberKey))) {
+	            String line = reader.readLine();
+	            if(line!=null) {
+	            	return line;
+	            }else {
+	            	return generateStationKeyFile();
+	            }
+	        } catch (Exception e) {
+	            return generateStationKeyFile();
+	        }
+		}else {
+			return generateStationKeyFile();
+		}
+	}
+	
+	private String generateStationKeyFile() {
+		String thisNewKey = getRandomLongString();
+		if(rememberKey.exists()) {
+			rememberKey.delete();
+		}
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(rememberKey))) {
+            writer.write(thisNewKey);
+            System.out.println("Generated unique MQTT station ID: "+thisNewKey);
+        } catch (IOException e) {
+            System.err.println("Error writing to MQTT key file: " + e.getMessage());
+        }
+		
+		return thisNewKey;
+	}
+	
 	private String getRandomLongString() {
 		double rand = Math.random();
-		rand = rand*100000L;
+		rand = rand*10000000L;
 		long longRand = Math.round(rand);
 		return "_"+String.valueOf(longRand);
 	}

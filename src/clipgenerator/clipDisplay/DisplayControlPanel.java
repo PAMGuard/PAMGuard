@@ -213,7 +213,9 @@ public class DisplayControlPanel {
 			
 		}
 		controlPanel.add(historyPanel);
-		controlPanel.add(sortPanel);
+		controlPanel.add(sortPanel);		
+		
+		
 	}
 	
 	

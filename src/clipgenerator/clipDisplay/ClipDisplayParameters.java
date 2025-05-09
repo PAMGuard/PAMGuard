@@ -2,16 +2,21 @@ package clipgenerator.clipDisplay;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
+import Layout.DisplayChannelFilter;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.ColourArray.ColourArrayType;
+import PamView.panel.PamPanel;
 
-public class ClipDisplayParameters implements Cloneable, Serializable, ManagedParameters {
+public class ClipDisplayParameters extends DisplayChannelFilter implements Cloneable, Serializable, ManagedParameters {
 
 	public static final long serialVersionUID = 1L;
+	
+	public ClipDisplayPanel displayPanel;
 
 	/*
 	 * Values that get used for controlling the display
@@ -41,6 +46,10 @@ public class ClipDisplayParameters implements Cloneable, Serializable, ManagedPa
 	double amplitudeRangeMax = 200;
 	double amplitudeRangeStep = 10;
 
+	public ClipDisplayParameters(ClipDisplayPanel clipDisplayPanel) {		
+		this.displayPanel = clipDisplayPanel;
+	}
+
 	@Override
 	protected ClipDisplayParameters clone() {
 		try {
@@ -60,6 +69,23 @@ public class ClipDisplayParameters implements Cloneable, Serializable, ManagedPa
 
 	public void setColourMap(ColourArrayType colourMap) {
 		this.colourMap = colourMap;
+	}
+	
+	public void updateMenuSet(int allChannelSources, int newChannelMap) {
+		if(allChannelSources==this.channels) {
+			return;
+		}
+		if(this.channelGroups==null) {
+			this.channelGroups = new int[0];
+		}
+		int[] newChannelGroups = new int[this.channelGroups.length+1];
+		for(int i=0;i<this.channelGroups.length;i++) {
+			newChannelGroups[i] = this.channelGroups[i];
+		}
+		newChannelGroups[newChannelGroups.length-1] = newChannelMap;
+		this.noteNewSettings(allChannelSources, newChannelGroups);
+		
+		
 	}
 
 	/**
@@ -87,6 +113,12 @@ public class ClipDisplayParameters implements Cloneable, Serializable, ManagedPa
 	
 	public void setNewClipOrder(boolean newClipsLast){
 		newClipOrder = newClipsLast ? -1 : 0;
+	}
+	
+	@Override
+	protected void repaintAsNeeded() {
+		this.displayPanel.showAndHideClips();
+		
 	}
 
 	@Override

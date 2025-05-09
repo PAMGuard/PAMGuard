@@ -2,12 +2,13 @@ package clickDetector;
 
 import java.io.Serializable;
 
+import Layout.DisplayChannelFilter;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import clickDetector.tdPlots.ClickSymbolOptions;
 
-public class BTDisplayParameters implements Serializable, Cloneable, ManagedParameters {
+public class BTDisplayParameters extends DisplayChannelFilter implements Serializable, Cloneable, ManagedParameters {
 
 	static public final long serialVersionUID = 2;
 	
@@ -45,7 +46,6 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	public int minClickLength = 2, maxClickLength = 12;
 	public int minClickHeight = 2, maxClickHeight = 12;
 	private double timeRange = 10;
-	public int displayChannels = 0;
 	public boolean view360;
 	public boolean amplitudeSelect = false;
 //	public double minAmplitude = 0;
@@ -148,6 +148,12 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 //			e.printStackTrace();
 //		}
 		return ps;
+	}
+
+	@Override
+	protected void repaintAsNeeded() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

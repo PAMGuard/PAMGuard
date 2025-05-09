@@ -100,15 +100,15 @@ public class BuoyStatusDataBlock extends PamDataBlock<BuoyStatusDataUnit> {
 			long timeSinceLastData = System.currentTimeMillis()-unit.getBuoyStatusData().getLastDataTime();
 			long tenMinutes = 1000L*60L*10L;
 			if(timeSinceLastData>tenMinutes) {
-				System.out.println(unit.getBuoyName()+": Last buoy data time was "+unit.getLastDataTime()+" at "+PamCalendar.getTime()+". Milliseconds since last data: "+timeSinceLastData);
+				//System.out.println(unit.getBuoyName()+": Last buoy data time was "+unit.getLastDataTime()+" at "+PamCalendar.getTime()+". Milliseconds since last data: "+timeSinceLastData);
 				continue;
 			}
 			if(unit.getBuoyStatusData()==null) {
-				System.out.println(unit.getBuoyName()+": buoy status data is null");
+				//System.out.println(unit.getBuoyName()+": buoy status data is null");
 				continue;
 			}
 			if(!isBuoySocketOpen(unit)) {
-				System.out.println(unit.getBuoyName()+": buoy socket is not open");
+				//System.out.println(unit.getBuoyName()+": buoy socket is not open");
 				continue;
 			}
 			if(unit.getCommandStatus()!=NetworkReceiver.NET_PAM_COMMAND_START) {

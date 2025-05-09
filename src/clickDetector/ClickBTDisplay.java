@@ -2483,28 +2483,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			menu.addSeparator();
 			zoomer.appendZoomMenuItems(menu);
 		}
-
-		// just do the stuff for selecting different channel groups for now
-		int channels = clickControl.clickParameters.getChannelBitmap();
-		int[] channelGroups = clickControl.clickParameters.getChannelGroups();
-		int nChannelGroups = GroupedSourcePanel.countChannelGroups(channels, channelGroups);
-		if (nChannelGroups > 1) {
-			menu.addSeparator();
-			menuItem = new JCheckBoxMenuItem("Show all channel groups");
-			menuItem.addActionListener(new ChannelGroupAction(0));
-			menu.add(menuItem);
-			if (getDisplayChannels() == 0) menuItem.setSelected(true);
-			String str;
-			int groupChannels;
-			for (int i = 0; i < nChannelGroups; i++) {
-				str = "Show channels " + GroupedSourcePanel.getGroupList(i, channels, channelGroups);
-				menuItem = new JCheckBoxMenuItem(str);
-				groupChannels = GroupedSourcePanel.getGroupChannels(i, channels, channelGroups);
-				menuItem.addActionListener(new ChannelGroupAction(groupChannels));
-				if (getDisplayChannels() == groupChannels) menuItem.setSelected(true);
-				menu.add(menuItem);
-			}
-		}
+		
+		this.btDisplayParameters.addMenuSet(menu);
 
 		// now the key options
 		menu.addSeparator();
@@ -2950,23 +2930,6 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			getVScaleManager().setSelected();
 		}
 		repaintBoth();
-	}
-
-	class ChannelGroupAction implements ActionListener{
-		int groupSelection;
-
-		public ChannelGroupAction(int groupSelection) {
-			super();
-			this.groupSelection = groupSelection;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			setDisplayChannels(groupSelection);
-
-		}
-
 	}
 
 
@@ -3569,7 +3532,10 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 //		if (btDisplayParameters.amplitudeSelect && click.getAmplitudeDB() < btDisplayParameters.minAmplitude) {
 //			return false;
 //		}
-		if (btDisplayParameters.displayChannels > 0 && (btDisplayParameters.displayChannels & click.getChannelBitmap()) == 0) return false;
+		
+		return this.btDisplayParameters.shouldPlot(click);
+		
+		
 
 //		int speciesIndex = clickControl.getClickIdentifier().codeToListIndex(click.getClickType());	
 //		boolean showSpecies = btDisplayParameters.getShowSpecies(speciesIndex+1);
@@ -3580,7 +3546,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 //		else {
 //			return showSpecies | showEvents;
 //		}
-		return true;
+		//return true;
 	}
 
 	/**
@@ -3662,10 +3628,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		int[] channelGroups = clickControl.clickParameters.getChannelGroups();
 		int nChannelGroups = GroupedSourcePanel.countChannelGroups(channels, channelGroups);
 		//		if (GroupedSourcePanel.)
-		if (GroupedSourcePanel.getGroupIndex(btDisplayParameters.displayChannels,
-				channels, channelGroups) < 0) {
-			btDisplayParameters.displayChannels = 0;
-		}
+		btDisplayParameters.noteNewSettings(channels, channelGroups);
+		
 
 		btPlot.createKey();
 		repaintBoth();
@@ -3695,14 +3659,14 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		sampleRate = clickControl.clickDetector.getSampleRate();
 	}
 
-	public int getDisplayChannels() {
-		return btDisplayParameters.displayChannels;
+	/*public int getDisplayChannels() {
+		return btDisplayParameters.getDisplayChannels();
 	}
 
 	public void setDisplayChannels(int displayChannels) {
-		btDisplayParameters.displayChannels = displayChannels;
+		btDisplayParameters.setDisplayChannels(displayChannels);;
 		repaintBoth();
-	}
+	}*/
 
 	@Override
 	public Serializable getSettingsReference() {

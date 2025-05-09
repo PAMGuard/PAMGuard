@@ -29,7 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import Array.Hydrophone;
-import Array.streamerOrigin.StaticOriginMethod.StaticHydrophoneDialogComponent.MenuButton;
+//import Array.streamerOrigin.StaticOriginMethod.StaticHydrophoneDialogComponent.MenuButton;
 import Map.gridbaselayer.GridDialogPanel;
 import PamUtils.LatLong;
 import PamView.dialog.PamDialog;
@@ -213,9 +213,17 @@ public class MapParametersDialog extends PamDialog {
 			if(mapParameters.lockMap) {
 				mapParameters.lockedMapCenter = this.staticMapOptionsPanel.getLatLon();
 				mapParameters.lockedMapScale = this.staticMapOptionsPanel.getScale();
+				/*if(this.simpleMap!=null) {
+					this.simpleMap.disableMapMouseControl();
+				}*/
+			}else {
+				/*if(this.simpleMap!=null) {
+					this.simpleMap.enableMapMouseControl();
+				}*/
 			}
 		}
 		catch (Exception Ex) {
+			System.out.println("Error setting new map params. Error: "+Ex.getMessage());
 			return false;
 		}
 		mapParameters.mapFile = filePanel.getMapFile();
@@ -397,8 +405,8 @@ public class MapParametersDialog extends PamDialog {
 		
 		public void setFields(LatLong center, int heightM) {
 			isSet = true;
-			this.latitude.setText(center.formatLatitude());
-			this.longitude.setText(center.formatLongitude());
+			this.latitude.setText(Double.toString(center.getLatitude()));
+			this.longitude.setText(Double.toString(center.getLongitude()));
 			this.initHeightKM.setText(Integer.toString(heightM));
 		}
 		
@@ -407,6 +415,12 @@ public class MapParametersDialog extends PamDialog {
 		}
 		
 		private void addMapCenterFields(GridBagConstraints c) {
+			c.gridx+=c.gridwidth;
+			c.gridheight = 2;
+			c.gridheight = 1;
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 1;
 			PamDialog.addComponent(this, new JLabel("Center Latitude (decimal degrees): ", JLabel.RIGHT), c);
 			c.gridx ++;
 			c.gridwidth = 2;

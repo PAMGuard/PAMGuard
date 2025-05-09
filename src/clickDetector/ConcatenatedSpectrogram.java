@@ -254,6 +254,9 @@ public class ConcatenatedSpectrogram extends ClickDisplay implements PamSettings
 		if (click == null) {
 			return;
 		}
+		if(this.shouldDisplayClick(click)!=true) {
+			return;
+		}
 		if (!needUpdate(click)) {
 			return;
 		}
