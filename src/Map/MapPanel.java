@@ -1594,7 +1594,9 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	// }
 	// }
 
-	JPopupMenu plotDetectorMenu() {
+	protected JPopupMenu plotDetectorMenu() {
+		
+		simpleMapRef.mapDetectionsManager.createBlockList();
 
 		// refreshPlotableDetectorLists();
 		plotDetectorMenu = new JPopupMenu();
@@ -1775,7 +1777,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Frame frame = (JFrame) PamController.getMainFrame();
-			if (mapController.getPamView() != null) {
+			//mapController.getGui
+			if (mapController.getPamView()!=null) {
 				frame = mapController.getGuiFrame();
 			}
 

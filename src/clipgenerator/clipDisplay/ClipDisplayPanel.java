@@ -7,12 +7,15 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -56,17 +59,13 @@ import clipgenerator.ClipProcess;
  */
 public class ClipDisplayPanel extends UserDisplayComponentAdapter implements PamSettings, SymbolUpdateMonitor {
 
-	/**
-	 * 
-	 */
-
 	private ClipDisplayParent clipDisplayParent;
 
 	private JPanel displayPanel;
 
 	protected JPanel unitsPanel;
 
-	protected ClipDisplayParameters clipDisplayParameters = new ClipDisplayParameters(this);
+	protected ClipDisplayParameters clipDisplayParameters = new ClipDisplayParameters();
 	
 	private ClipDisplayProjector clipDisplayProjector;
 	
@@ -97,13 +96,12 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 	private UnitsMouse unitsMouse;
 	
 	int knownChannelSources;
+	
+	int displayChannels;
 
 	public ClipDisplayPanel(ClipDisplayParent clipDisplayParent) {
 		super();
 		this.clipDisplayParent = clipDisplayParent;
-		knownChannelSources = 0;
-		
-		clipDisplayParameters = new ClipDisplayParameters(this);
 
 		clipFont = new Font("Arial", Font.PLAIN, 10);
 		displayPanel = new ClipMainPanel(new BorderLayout());
@@ -227,7 +225,6 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 			int map = knownChannelSources | arg.getChannelBitmap();
 			if(map!=knownChannelSources) {
 				knownChannelSources = map;
-				clipDisplayParameters.updateMenuSet(knownChannelSources,arg.getChannelBitmap());
 			}
 			
 //			if (arg.getUpdateCount() == 0) {
@@ -254,10 +251,6 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		clipDataUnit.setTriggerDataUnit(triggerDataUnit);
 		ClipDisplayUnit clipDisplayUnit = new ClipDisplayUnit(this, clipDataUnit, triggerDataUnit);
 		
-		if(clipDisplayParameters.displayPanel==null) {
-			clipDisplayParameters.displayPanel = this;
-		}
-		
 		synchronized (unitsPanel.getTreeLock()) {
 			//TODO: Add logic to sort by time of (manual) selection, clip start time, and maybe by hydrophone 
 			if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
@@ -275,8 +268,8 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		}
 	}
 	
-	protected boolean shouldChannelFilter(ClipDisplayUnit dataUnit) {
-		if(this.clipDisplayParameters.shouldPlot(dataUnit.getClipDataUnit())!=true) {
+	protected boolean shouldAllowChannel(ClipDisplayUnit dataUnit) {
+		if (displayChannels > 0 && (displayChannels & dataUnit.getClipDataUnit().getChannelBitmap()) == 0) {
 			return false;
 		}
 		return true;
@@ -758,7 +751,23 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 					}
 				}));
 			}
-			this.clipDisplayParameters.addMenuSet(popMenu);
+			
+			if(PamUtils.PamUtils.getChannelArray(knownChannelSources).length>1) {
+				popMenu.addSeparator();
+				JCheckBoxMenuItem channelMenu = new JCheckBoxMenuItem("Show all channel groups");
+				channelMenu.addActionListener(new ChannelGroupAction(0));
+				popMenu.add(channelMenu);
+				String str;
+				for(int chIdx:PamUtils.PamUtils.getChannelArray(knownChannelSources)) {
+					str = "Only show channel " + chIdx;
+					channelMenu = new JCheckBoxMenuItem(str);
+					int chMap = PamUtils.PamUtils.makeChannelMap(new int[] {chIdx});
+					channelMenu.addActionListener(new ChannelGroupAction(chMap));
+					if (displayChannels == chMap) channelMenu.setSelected(true);
+					popMenu.add(channelMenu);
+				}
+			}
+			
 //			// also add the generic superdetection stuff. 
 //			List<JMenuItem> superDetMenuItems = GlobalSymbolManager.getInstance().getSuperDetMenuItems(getUniqueName(), getClipDataProjector(), this);
 //			if (superDetMenuItems != null) {
@@ -770,6 +779,22 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 //			}
 			popMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
+	}
+	
+	class ChannelGroupAction implements ActionListener{
+		int groupSelection;
+
+		public ChannelGroupAction(int groupSelection) {
+			super();
+			this.groupSelection = groupSelection;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			displayChannels = groupSelection;
+			showAndHideClips();
+		}
+
 	}
 	
 	/**
@@ -802,7 +827,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 			vis = dataSelector.scoreData(clipUnit) > 0;
 		}
 //		boolean vis = (dataSelector != null && clipUnit != null && dataSelector.scoreData(clipUnit) > 0);
-		vis = vis && this.shouldChannelFilter(clipDisplayUnit);
+		vis = vis && this.shouldAllowChannel(clipDisplayUnit);
 		clipDisplayUnit.setVisible(vis);
 	}
 	
