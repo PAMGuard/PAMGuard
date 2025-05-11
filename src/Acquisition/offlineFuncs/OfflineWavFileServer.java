@@ -19,6 +19,7 @@ import Acquisition.pamAudio.PamAudioFileLoader;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import PamController.OfflineFileDataStore;
 import PamController.fileprocessing.StoreStatus;
+import PamUtils.worker.filelist.WavFileType;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import clickDetector.WindowsFile;
@@ -70,6 +71,9 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 		}
 		if (harpHeader == null || harpHeader.harpCycles == null) {
 			FileDataMapPoint mapPoint = new FileDataMapPoint(file, startTime, endTime);
+			/*
+			 * Create a single map point as normal. 
+			 */
 			return mapPoint;
 		}
 		else {
@@ -78,8 +82,16 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			OfflineDataMap<FileDataMapPoint> map = getDataMap();
 			for (int i = 0; i < cycles.size(); i++) {
 				HarpCycle harpCycle = cycles.get(i);
+				/**
+				 * It's cycled HARP data so make lots of map points and add them to the map 
+				 * here, then return null so that the functions in the main map maker (OfflineFileServer)
+				 * doesn't add anything itself. 
+				 */
 				FileSubSection subSection = new FileSubSection(harpCycle.getByteLoc(), harpCycle.getByteLoc()+harpCycle.getByteLength());
-				FileDataMapPoint mapPoint = new FileDataMapPoint(file, harpCycle.gettMillis(), harpCycle.getEndMillis());
+				WavFileType harpFile = new WavFileType(file);
+				harpFile.setSamplesOffset(harpCycle.getSamplesSkipped());
+				harpFile.setMaxSamples(harpCycle.getDurationMillis() * harpCycle.getSampleRate() / 1000);
+				FileDataMapPoint mapPoint = new FileDataMapPoint(harpFile, harpCycle.gettMillis(), harpCycle.getEndMillis());
 				mapPoint.setFileSubSection(subSection);
 				map.addDataPoint(mapPoint);
 			}
@@ -232,6 +244,11 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			return false;
 		}
 		
+		/**
+		 * This just gets a loader based on the types of audio file. These are a bit different
+		 * for wav, flac, and SUD files. The loading itself of multiple map points is handled a 
+		 * bit later in the call to loadAudioData, which will iterate again through the file map. 
+		 */
 		PamAudioFileLoader audioFile = PamAudioFileManager.getInstance().getAudioFileLoader(mapPoint.getSoundFile()); 
 		
 		if (audioFile==null) {
