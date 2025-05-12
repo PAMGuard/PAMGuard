@@ -124,6 +124,7 @@ public class NoiseBandProcess extends PamProcess {
 
 		public void setupFilters() {
 			decimationGroups = new DecimationGroup[decimationFilterMethods.size()+1];
+			// first group doesn't get decimated at all. 
 			decimationGroups[0] = new DecimationGroup(this, null);
 			if (bandFilterMethods == null) {
 				return;
@@ -241,21 +242,46 @@ public class NoiseBandProcess extends PamProcess {
 			/*
 			 * Now process the decimated data with as many band filters as are present. 
 			 */
-			Filter bandFilter;
-			BandOutput bandOutput;
-			double aValue;
+//			double aValue;
 //			double[] testArr = new double[200];
 //			double dum;
-			for (int i = 0; i < bandFilters.size(); i++) {
-				bandFilter = bandFilters.get(i);
-				bandOutput = bandOutputs.get(i);
-				for (int s = 0; s < decSamples; s++) {
-					bandOutput.addSample(bandFilter.runFilter(decimatedData[s]));
-//					if (s < 200) {
-//						testArr[s] = dum;
-//					}
-				}
+			/*
+			 * Run every filter in a separate thread. Bit pointless for octave, 
+			 * but good for finer filter resolutions. 
+			 */
+			Thread[] threads = new Thread[bandFilters.size()];
+			for (int i = 0; i < threads.length; i++) {
+				int threadInd = i;
+				threads[threadInd] = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						Filter bandFilter = bandFilters.get(threadInd);
+						BandOutput bandOutput = bandOutputs.get(threadInd);
+						for (int s = 0; s < decSamples; s++) {
+							bandOutput.addSample(bandFilter.runFilter(decimatedData[s]));
+						}						
+					}
+				});
+				threads[i].start();
 			}
+			try {
+				// wait for them all to finish. 
+				for (int i = 0; i < threads.length; i++) {
+					threads[i].join();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+//			for (int i = 0; i < bandFilters.size(); i++) {
+//				Filter bandFilter = bandFilters.get(i);
+//				BandOutput bandOutput = bandOutputs.get(i);
+//				for (int s = 0; s < decSamples; s++) {
+//					bandOutput.addSample(bandFilter.runFilter(decimatedData[s]));
+////					if (s < 200) {
+////						testArr[s] = dum;
+////					}
+//				}
+//			}
 			
 			return decSamples;
 		}

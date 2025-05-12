@@ -1063,8 +1063,15 @@ private void setAxisLabels() {
 			NoiseMeasurementBand mb;
 			checkBoxes = new JCheckBox[nBands];
 			for (int i = 0; i < nBands; i++) {
-				buttonPanel.add(checkBoxes[i] = new PamCheckBox(noiseDataBlock.getBandLongName(i)));
+				String name = noiseDataBlock.getBandLongName(i);
+				buttonPanel.add(checkBoxes[i] = new PamCheckBox(name));
 				checkBoxes[i].addActionListener(selectionChanged);
+				Double fc = noiseDataBlock.getBandCentreFrequency(i);
+				if (fc != null) {
+					String tip = String.format("Centre frequency %s, range %s", 
+							FrequencyFormat.formatFrequency(fc, true), name);
+					checkBoxes[i].setToolTipText(tip);
+				}
 			}
 			for (int i = 0; i < checkBoxes.length; i++) {
 				checkBoxes[i].setSelected(noiseDisplaySettings.isSelectData(i));

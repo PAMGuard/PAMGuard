@@ -45,9 +45,14 @@ public class BandAnalyser {
 		int nPointsPerOctave = 300;
 		int nPointsPerBand = nPointsPerOctave;
 		double logStep = 1./(double)(nPointsPerOctave);
-		if (noiseBandSettings.bandType == BandType.THIRDOCTAVE) {
-			nPointsPerBand /= 3;
-		}
+		double bandSize = noiseBandSettings.bandType.getBandRatio();
+		nPointsPerBand /= (Math.log(2.)/Math.log(bandSize));
+//		if (noiseBandSettings.bandType == BandType.THIRDOCTAVE) {
+//			nPointsPerBand /= 3.;
+//		}
+//		if (noiseBandSettings.bandType == BandType.TENTHOCTAVE) {
+//			nPointsPerBand /= 10.;
+//		}
 		double f;
 		double sampleRate = topSampleRate;
 		double omega;
