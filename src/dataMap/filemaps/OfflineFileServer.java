@@ -39,6 +39,9 @@ import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import pamScrollSystem.ViewLoadObserver;
 import PamController.AWTScheduler;
+import PamController.DataInputStore;
+import PamController.DataStoreInfoHolder;
+import PamController.InputStoreInfo;
 import PamController.OfflineDataStore;
 import PamController.OfflineFileDataStore;
 import PamController.PamControlledUnitSettings;
@@ -58,7 +61,7 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
  * @author Doug Gillespie
  *
  */
-public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> implements OfflineDataStore, PamSettings {
+public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> implements OfflineDataStore, PamSettings, DataStoreInfoHolder {
 
 	private OfflineFileDataStore offlineRawDataStore;
 
@@ -457,5 +460,27 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	public OfflineFileDataStore getOfflineRawDataStore() {
 		return offlineRawDataStore;
 	}
+
+
+	@Override
+	public InputStoreInfo getStoreInfo(boolean detail) {
+		if (dataMap == null || dataMap.getNumMapPoints() == 0) {
+			return null;
+		}
+		long firstStart = dataMap.getFirstDataTime();
+		long lastEnd = dataMap.getLastMapPoint().getEndTime();
+		long lastStart = dataMap.getLastMapPoint().getStartTime();
+		InputStoreInfo info = new InputStoreInfo(this, dataMap.getNumMapPoints(), firstStart, lastStart, lastEnd);
+		if (detail) {
+			// get all times of all files 
+			long[][] startsEnds = dataMap.getAllStartsAndEnds();
+			if (startsEnds != null) {
+				info.setFileStartTimes(startsEnds[0]);
+				info.setFileEndTimes(startsEnds[1]);
+			}
+		}
+		return info;
+	}
+
 
 }

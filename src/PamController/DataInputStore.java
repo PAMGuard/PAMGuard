@@ -11,14 +11,9 @@ package PamController;
  * @See DataOutputStore
  *
  */
-public interface DataInputStore {
+public interface DataInputStore extends DataStoreInfoHolder {
 	
-	/**
-	 * Get information about the input store (e.g. start times of all files). 
-	 * @param detail
-	 * @return information about data input. 
-	 */
-	public InputStoreInfo getStoreInfo(boolean detail);
+
 
 	/**
 	 * Set an analysis start time. This might get called just before

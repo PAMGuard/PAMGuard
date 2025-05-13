@@ -1020,6 +1020,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	public InputStoreInfo getStoreInfo(boolean detail) {
 		System.out.println("FolderInputSystem: Get store info start:");
 		if (allFiles == null || allFiles.size() == 0) {
+			// returns null in viewer mode because I stopped it recataloging files 
+			// using the online file list. Need to get the offline file mal. 
 			return null;
 		}
 		WavFileType firstFile = allFiles.get(0);
