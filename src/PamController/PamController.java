@@ -382,6 +382,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 				startOfflineTasks();
 			}
 		}
+		else {
+		}
 	}
 
 	/**

@@ -322,13 +322,13 @@ public class RecorderProcess extends PamProcess {
 		if (forceStart) {
 			stopRecording();
 		}
-		return false;
+		return true;
 	}
 
 	protected boolean stopRecording() {
 		grabBuffer = 0;
 		recorderControl.recorderStorage.closeStorage();
-		return false;	
+		return true;	
 	}
 
 	protected void storageClosed() {
@@ -369,6 +369,8 @@ public class RecorderProcess extends PamProcess {
 		if (getParentDataBlock() != null) {
 			recorderControl.recorderSettings.getChannelBitmap(getParentDataBlock().getChannelMap());
 		}
+		
+		collectedChannels = 0;
 
 		recorderControl.enableRecording();
 
@@ -399,7 +401,8 @@ public class RecorderProcess extends PamProcess {
 		//recorderControl.recorderStorage.closeStorage();
 		dataComing = false;
 		recorderControl.enableRecording();
-		soundData = null;
+		// don't do this, it creates a condition that occasionally crashed PAMGuard if this gets called while it's writing. 
+//		soundData = null;
 	}
 
 

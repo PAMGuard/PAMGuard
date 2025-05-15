@@ -10,6 +10,8 @@ import Acquisition.DaqSystem;
 import PamController.PamController;
 import PamModel.PamModel;
 import PamUtils.PamCalendar;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * This is a decorator class for PamObservers which intercepts any
@@ -35,6 +37,7 @@ public class ThreadedObserver implements PamObserver {
 	private int jitterSleep;
 	private boolean stopFlag;
 
+	public static String MODULEEXCEPTIONLINE = " Exception in module";
 
 	private Object synchLock = new Object();
 	
@@ -298,7 +301,8 @@ public class ThreadedObserver implements PamObserver {
 	protected void waitForQueueToBeReady(ObservedObject theObject) {
 		boolean needSleep = true;
 		int nSleeps = 0;
-		ObservedObject oldestObject = null, newestObject = null;
+		ObservedObject oldestObject = null;
+//		newestObject = null;
 		while(needSleep) {
 			synchronized (synchLock) {
 				int sz = toDoList.size();
@@ -306,9 +310,10 @@ public class ThreadedObserver implements PamObserver {
 					long dt=0;
 					try {
 						oldestObject = toDoList.get(0);
-						newestObject = toDoList.get(toDoList.size()-1);
-						dt = theObject.getTimeMillis() - toDoList.get(0).getTimeMillis();
+//						newestObject = toDoList.get(toDoList.size()-1);
+						dt = theObject.getTimeMillis() - oldestObject.getTimeMillis();
 					} catch (IndexOutOfBoundsException e) {
+//						System.out.println("Exception waiting in in " + singleThreadObserver.getObserverName());
 						// if the list has already emptied out, the toDoList.get(0) above will throw an
 						// IndexOutOfBoundsException.  If that's the case, just move along
 						// because there's no need to sleep
@@ -415,9 +420,13 @@ public class ThreadedObserver implements PamObserver {
 	 */
 	class NewObserverThread implements Runnable {
 
+		
+		private PamWarning threadWarning;
+
 		@Override
 		public void run() {
 			boolean alreadyDisplayed = false;
+			
 			
 			while (!killThread) {
 
@@ -469,7 +478,30 @@ public class ThreadedObserver implements PamObserver {
 							}
 						}
 						// need to do this bit outside of the synch block. 
-						performAction(observedObject);
+						try {
+							performAction(observedObject);
+						}
+						catch (Exception e) {
+							// definitely print the stack trace
+							// but with additional information
+							System.out.println("************************************************************************************");
+							System.out.println("*                                                                                   *");
+							System.out.printf("%s %s. Please report this error to the PAMGuard team\n", MODULEEXCEPTIONLINE, getObserverName());
+							e.printStackTrace();
+							System.out.println("*                                                                                   *");
+							System.out.println("************************************************************************************");
+							// and also show something in the PAMWarning area ...
+							long now = PamCalendar.getTimeInMillis();
+							if (threadWarning != null && threadWarning.getEndOfLife() <= now) {
+								// don't need to make it since it's probably already showing. 
+							}
+							else {
+								// make a new warning. 
+								threadWarning = new PamWarning(getObserverName(), e.getMessage(), 2);
+							}
+							threadWarning.setEndOfLife(PamCalendar.getTimeInMillis() + 5000);
+							WarningSystem.getWarningSystem().addWarning(threadWarning);
+						}
 //						synchronized(synchLock) {
 //							if (toDoList.size() > 0) { // list may have been cleared during a shut down. 
 //								toDoList.remove(0);
