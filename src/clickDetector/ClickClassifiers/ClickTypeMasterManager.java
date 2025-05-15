@@ -72,6 +72,9 @@ public class ClickTypeMasterManager implements ClickTypeProvider {
 
 	@Override
 	public int codeToListIndex(int code) {
+		if (code == 0) {
+			return -1;
+		}
 		if (types==null) return -1; 
 		for (int i=0; i<types.length; i++) {
 			if (types[i]==code) return i; 

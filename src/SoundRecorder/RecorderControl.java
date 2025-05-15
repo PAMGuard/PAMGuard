@@ -450,8 +450,6 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 				System.err.println("Unable to set recording storage folder " + globFolder);
 			}
 		}
-
-		newParams();
 		
 		return true;
 	}

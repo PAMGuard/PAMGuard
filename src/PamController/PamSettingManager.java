@@ -50,6 +50,8 @@ import javafx.scene.control.Alert.AlertType;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxSettingsPanes.SettingsFileDialogFX;
 import pamguard.GlobalArguments;
+import pamguard.LogFileUtils;
+import pamguard.Pamguard;
 
 //XMLSettings
 //import org.jdom.Document;
@@ -1049,11 +1051,19 @@ public class PamSettingManager {
 		
 
 		if (!PamSettingManager.RUN_REMOTE && !GlobalArguments.isBatch()) {
+			// run the log file check and the tips of the day here. 
+			
+			
 			if (settingsFileData != null) {
+				if (settingsFileData.getCheckLogFileErrors()) {
+					LogFileUtils.checkLogFileErrors(Pamguard.getSettingsFolder());
+				}
+				
+				
 				TipOfTheDayManager.getInstance().setShowAtStart(settingsFileData.showTipAtStartup);
 				if (settingsFileData.showTipAtStartup) {
 					if (PamGUIManager.isSwing()) {
-					TipOfTheDayManager.getInstance().showTip(null, null);
+						TipOfTheDayManager.getInstance().showTip(null, null);
 					}
 				}
 			}
@@ -2403,6 +2413,27 @@ public class PamSettingManager {
 	 */
 	public void setSecondaryConfiguration(PamConfiguration secondaryConfiguration) {
 		this.secondaryConfiguration = secondaryConfiguration;
+	}
+	
+	/**
+	 * Check log files at PAMGuard startup ? 
+	 * @return
+	 */
+	public boolean isCheckLogFileErrors() {
+		if (settingsFileData == null) {
+			return false;
+		}
+		return settingsFileData.getCheckLogFileErrors();
+	}
+	
+	/**
+	 * Check log files for errors at PAMGuard startup
+	 * @param check
+	 */
+	public void setCheckLogFileErrors(boolean check) {
+		if (settingsFileData != null) {
+			settingsFileData.setCheckLogFileErrors(check);
+		}
 	}
 
 }

@@ -104,5 +104,12 @@ public class NilusDocumentWrapper<T> {
 	public Collection getCollection() {
 		return Collection.fromClass(getNilusClass());
 	}
+
+	/**
+	 * @return the nilusObject
+	 */
+	public T getNilusObject() {
+		return nilusObject;
+	}
 	
 }

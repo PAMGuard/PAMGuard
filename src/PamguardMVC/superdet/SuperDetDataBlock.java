@@ -485,7 +485,10 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 						}
 					}
 					if (subDetectionFinder != null && subDetectionFinder.inUTCRange(sdInfo.getChildUTC())) {
-						PamDataUnit subDet = subDetectionFinder.findDataUnit(sdInfo);
+						PamDataUnit subDet = subDetectionFinder.findDataUnit(sdInfo, true);
+						if (subDet == null) {
+							subDet = subDetectionFinder.findDataUnit(sdInfo, false);
+						}
 						sdInfo.setSubDetection(subDet);
 						if (subDet != null) {
 							aData.addSubDetection(subDet);
@@ -523,6 +526,11 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 		@Override
 		public int match(PamDataUnit dataUnit, Object... criteria) {
 			SubdetectionInfo subTableData = (SubdetectionInfo) criteria[0];
+			boolean strict = true;
+			if (criteria.length >= 2 && criteria[1] instanceof Boolean) {
+				strict = (boolean) criteria[1];
+			}
+			
 			long comp = subTableData.getChildUTC() - dataUnit.getTimeMilliseconds();
 			if (comp != 0) {
 				return Long.signum(comp);
@@ -531,6 +539,10 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 			if (comp == 0) {
 				return 0; 
 			}
+			if (strict) {
+				return Long.signum(comp);
+			}
+			
 			/**
 			 * Some problems in some datasets where the uid is corrupt. So also check 
 			 * on binary file information. This is slower, but since we've already matched on 

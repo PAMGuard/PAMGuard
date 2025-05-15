@@ -158,14 +158,14 @@ public class SweepClassifierPanel extends UserTypesPanel {
 		if (sweepSet == null) {
 			return null;
 		}
-		return sweepSet.enable;
+		return sweepSet.getEnable();
 	}
 
 
 	@Override
 	public void setSpeciesEnable(int species, Boolean enable) {
 		SweepClassifierSet sweepSet = sweepClassifier.sweepClassifierParameters.getSet(species);
-		sweepSet.enable = enable;		
+		sweepSet.setEnable(enable);		
 	}
 
 
