@@ -32,6 +32,7 @@ import tethys.TethysState.StateType;
 import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
+import tethys.deployment.DutyCycleInfo;
 import tethys.deployment.RecordingList;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
@@ -57,6 +58,8 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	private ArrayList<DeploymentTableObserver> observers = new ArrayList<>();
 
 	private RecordingList masterList;
+
+	private ArrayList<RecordingPeriod> displayPeriods;
 
 	public PAMGuardDeploymentsTable(TethysControl tethysControl) {
 		super(tethysControl);
@@ -102,9 +105,12 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public void mouseClicked(MouseEvent e) {
 			int aRow = table.getSelectedRow();
 			int col = table.getSelectedColumn();
-			ArrayList<RecordingPeriod> periods = getMasterList().getEffortPeriods();
-			if (aRow >= 0 && aRow < periods.size() && col == TableModel.SELECTCOLUMN) {
-				periods.get(aRow).toggleSelected();
+//			ArrayList<RecordingPeriod> periods = getMasterList().getEffortPeriods();
+			if (displayPeriods == null) {
+				return;
+			}
+			if (aRow >= 0 && aRow < displayPeriods.size() && col == TableModel.SELECTCOLUMN) {
+				displayPeriods.get(aRow).toggleSelected();
 				notifyObservers();
 			}
 		}
@@ -125,7 +131,10 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		}
 		// make a list of RecordingPeriods which don't currently have a Deployment document
 		ArrayList<RecordingPeriod> newPeriods = new ArrayList<>();
-		ArrayList<RecordingPeriod> allPeriods = getMasterList().getEffortPeriods();
+		if (displayPeriods == null) {
+			return;
+		}
+		ArrayList<RecordingPeriod> allPeriods = displayPeriods;//getMasterList().getEffortPeriods();
 		//		ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
 		ArrayList<PDeployment> matchedDeployments = new ArrayList<>();
 		for (int i = 0; i < selRows.length; i++) {
@@ -180,16 +189,16 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			});
 			popMenu.add(menuItem);
 
-			popMenu.addSeparator();
+//			popMenu.addSeparator();
 
-			menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteDeployment(matchedDeployments.get(0));
-				}
-			});
-			popMenu.add(menuItem);
+//			menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
+//			menuItem.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					deleteDeployment(matchedDeployments.get(0));
+//				}
+//			});
+//			popMenu.add(menuItem);
 
 		}
 		else if (matchedDeployments.size() > 1){
@@ -210,10 +219,13 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	}
 
 	protected void selectAll(boolean select) {
-		ArrayList<RecordingPeriod> recordingPeriods = getMasterList().getEffortPeriods();
+//		ArrayList<RecordingPeriod> recordingPeriods = getMasterList().getEffortPeriods();
+		if (displayPeriods == null) {
+			return;
+		}
 		//		ArrayList<RecordingPeriod> recordingPeriods = deploymentOverview.getRecordingPeriods();
-		for (int i = 0; i < recordingPeriods.size(); i++) {
-			recordingPeriods.get(i).setSelected(select);
+		for (int i = 0; i < displayPeriods.size(); i++) {
+			displayPeriods.get(i).setSelected(select);
 		}
 
 		tableModel.fireTableDataChanged();
@@ -353,10 +365,10 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	 * @return
 	 */
 	public ArrayList<RecordingPeriod> getSelectedPeriods() {
-		if (deploymentOverview == null) {
+		if (deploymentOverview == null || displayPeriods == null) {
 			return null;
 		}
-		ArrayList<RecordingPeriod> allPeriods = getMasterList().getEffortPeriods();
+		ArrayList<RecordingPeriod> allPeriods = displayPeriods;//getMasterList().getEffortPeriods();
 		ArrayList<RecordingPeriod> selPeriods = new ArrayList();
 		int n = allPeriods.size();
 		for (int i = 0; i < n; i++) {
@@ -375,10 +387,12 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	private void updateDeployments() {
 		DeploymentHandler deploymentHandler = getTethysControl().getDeploymentHandler();
 		deploymentOverview = deploymentHandler.getDeploymentOverview();
+		displayPeriods = null;
 		if (deploymentOverview == null) {
 			return;
 		}
 		masterList = deploymentOverview.getMasterList(getTethysControl());
+		displayPeriods = masterList.getCompoundPeriods(deploymentHandler.getDeploymentExportOptions());
 		tableModel.fireTableDataChanged();
 		//		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
 		//		ArrayList<Deployment> projectDeployments = getTethysControl().getDbxmlQueries().getProjectDeployments(deplData.getProject());
@@ -391,20 +405,17 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] columnNames = {"Id", "Select", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment", "Deployment Effort"};
+		private String[] columnNames = {"Id", "Select", "Start", "Stop", "Gap", "Duration", "Duty Cycle", "Tethys Deployment", "Deployment Effort"};
 
 		private static final int SELECTCOLUMN = 1;
 
 		@Override
 		public int getRowCount() {
-			if (deploymentOverview == null) {
+			if (displayPeriods == null) {
 				return 0;
 			}
 			else {
-				if (getMasterList() == null) {
-					return 0;
-				}
-				return getMasterList().size();
+				return displayPeriods.size();
 			}
 		}
 
@@ -429,14 +440,19 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			RecordingList masterList = getMasterList();
-			RecordingPeriod period = masterList.getEffortPeriods().get(rowIndex);
+			RecordingPeriod period = displayPeriods.get(rowIndex);
 			//			DeploymentRecoveryPair deplInfo = deploymentInfo.get(rowIndex);
 			if (columnIndex == 6) {
-				return masterList.assessDutyCycle();
+				DutyCycleInfo dc = period.getDutyCycleInfo();
+				if (dc == null || dc.isDutyCycled == false) {
+					return null;
+				}
+				else {
+					return dc.toString();
+				}
 			}
 			if (columnIndex == 4 && rowIndex > 0) {
-				RecordingPeriod prevPeriod = masterList.getEffortPeriods().get(rowIndex-1);
+				RecordingPeriod prevPeriod = displayPeriods.get(rowIndex-1);
 				long gap = period.getRecordStart() - prevPeriod.getRecordStop();
 				return PamCalendar.formatDuration(gap);
 			}

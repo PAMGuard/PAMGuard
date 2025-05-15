@@ -319,7 +319,7 @@ public class EffortFunctions {
 		List<OfflineDataMapPoint> mapPoints = bestMap.getMapPoints();
 		for (OfflineDataMapPoint mapPoint : mapPoints) {
 			recPeriods.add(new RecordingPeriod(mapPoint.getStartTime(), mapPoint.getEndTime()));
-			recPeriods.add(mapPoint.getStartTime(), mapPoint.getEndTime());
+//			recPeriods.add(mapPoint.getStartTime(), mapPoint.getEndTime());
 		}
 		return recPeriods;
 	}

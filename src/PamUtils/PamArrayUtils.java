@@ -1381,7 +1381,25 @@ public class PamArrayUtils {
 	}
 
 
-
+	/**
+	 * Convert a matrix to a 
+	 * @param matrix - the MAT file matrix
+	 * @return double[][] array of results
+	 */
+	public static float[][] matrix2arrayF(Matrix matrix) {
+		if (matrix==null) return null;
+		
+		float[][] arrayOut = new float[matrix.getNumRows()][];
+		float[] arrayRow;
+		for (int i=0; i<matrix.getNumRows(); i++) {
+			arrayRow=new float[matrix.getNumCols()];
+			for (int j=0; j<matrix.getNumCols(); j++) {
+				arrayRow[j] = matrix.getFloat(i, j);
+			}
+			arrayOut[i]=arrayRow;
+		}
+		return arrayOut;
+	}
 
 
 

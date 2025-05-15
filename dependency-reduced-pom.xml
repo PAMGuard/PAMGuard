@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.16a</version>
+  <version>2.02.16c</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -26,6 +26,71 @@
     </resources>
   </build>
   <profiles>
+    <profile>
+      <id>linux-profile</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.vafer</groupId>
+            <artifactId>jdeb</artifactId>
+            <version>1.11</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>jdeb</goal>
+                </goals>
+                <configuration>
+                  <controlDir>${basedir}/build/deb</controlDir>
+                  <dataSet>
+                    <data>
+                      <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                      <type>file</type>
+                      <mapper>
+                        <type>perm</type>
+                        <prefix>/usr/share/pamguard</prefix>
+                      </mapper>
+                    </data>
+                    <data>
+                      <src>${basedir}/liblinux</src>
+                      <type>directory</type>
+                      <includes>*.txt</includes>
+                      <includes>*.so</includes>
+                      <mapper>
+                        <type>perm</type>
+                        <prefix>/usr/share/pamguard/liblinux</prefix>
+                      </mapper>
+                    </data>
+                    <data>
+                      <src>${basedir}/build/deb/PAMGuardIcon2.png</src>
+                      <type>file</type>
+                      <mapper>
+                        <type>perm</type>
+                        <prefix>/usr/share/pamguard</prefix>
+                      </mapper>
+                    </data>
+                    <data>
+                      <src>${basedir}/build/deb/pamguard.desktop</src>
+                      <type>file</type>
+                      <mapper>
+                        <type>perm</type>
+                        <prefix>/usr/share/applications</prefix>
+                      </mapper>
+                    </data>
+                    <data>
+                      <type>link</type>
+                      <linkName>/usr/share/pamguard/Pamguard</linkName>
+                      <linkTarget>/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
+                      <symlink>true</symlink>
+                    </data>
+                  </dataSet>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>macos-profile</id>
       <build>

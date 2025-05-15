@@ -44,7 +44,7 @@ public class ClickBlockSpeciesManager extends DataBlockSpeciesManager<ClickDetec
 		}
 		int listIndex = masterManager.codeToListIndex(dataUnit.getClickType());
 		if (listIndex < 0) {
-			return null;
+			return getDefaultSpeciesCode();
 		}
 		return masterManager.getSpeciesList()[listIndex];
 	}

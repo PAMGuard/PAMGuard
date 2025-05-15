@@ -11,6 +11,7 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
 
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
@@ -82,10 +83,17 @@ public abstract class DLModelWorker<T> {
 			DLTransform transform = modelTransforms.get(0); 
 			for (int i =0; i<modelTransforms.size(); i++) {
 				transform = modelTransforms.get(i).transformData(transform); 
+
 //				//TEMP
 //				if (transform instanceof FreqTransform) {
 //					transformedData = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
 //					System.out.println("DLModelWorker: transform : " + modelTransforms.get(i).getDLTransformType() + " "+ i + transformedData.length + "  " + transformedData[0].length + " minmax: " + PamArrayUtils.minmax(transformedData)[0] + " " + PamArrayUtils.minmax(transformedData)[1]);
+//				}
+				
+//				//TEMP
+//				if (transform instanceof WaveTransform) {
+//					transformedData1 = ((WaveTransform) transform).getWaveData().getScaledSampleAmplitudes();
+//					System.out.println("DLModelWorker: transform : " + modelTransforms.get(i).getDLTransformType() + " "+ i + "  " + transformedData1.length + "  " +  PamArrayUtils.minmax(transformedData1)[0] + " " + PamArrayUtils.minmax(transformedData1)[1]);
 //				}
 			}
 

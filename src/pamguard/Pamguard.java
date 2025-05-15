@@ -138,7 +138,9 @@ public class Pamguard {
 		// set up the system to output to both a log file and the console window.  Also
 		// set up a monitor to check for the size of the folder every hour - if it gets
 		// too big, just stop logging the messages
-		String logFile = getSettingsFolder() + File.separator + "PamguardLog";
+//		LogFileUtils.checkLogFileErrors(Pamguard.getSettingsFolder());
+		
+		String logFile = getSettingsFolder() + File.separator + LogFileUtils.LogFileRootName;
 		System.setOut(new ProxyPrintStream(System.out, logFile));
 		System.setErr(new ProxyPrintStream(System.err, logFile));   
 		FolderSizeMonitor folderSizeMon = new FolderSizeMonitor();

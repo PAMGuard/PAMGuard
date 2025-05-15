@@ -100,6 +100,9 @@ import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamguardMVC.datakeeper.DataKeeper;
 import annotation.tasks.AnnotationManager;
 import metadata.MetaDataContol;
+import pamViewFX.PamSettingsMenuPane;
+import pamguard.LogFileUtils;
+import pamguard.Pamguard;
 import performanceTests.PerformanceDialog;
 import tipOfTheDay.TipOfTheDayManager;
 /**
@@ -537,6 +540,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 * changes. 
 	 */
 	private JMenuItem hydrophoneArrayMenu;
+	private JCheckBoxMenuItem checkLogFiles;
 
 	public JMenuBar makeGuiMenu() {
 
@@ -919,6 +923,13 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		toggleLogFile.addActionListener(new ToggleLogFile());
 		logFileMenu.add(toggleLogFile);
 		menu.add(logFileMenu);
+		
+		checkLogFiles = new JCheckBoxMenuItem("Check Log Files at Startup");
+		checkLogFiles.setToolTipText("Checks old log files at startup and prompts user to report any errors");
+		checkLogFiles.setSelected(PamSettingManager.getInstance().isCheckLogFileErrors());
+		logFileMenu.add(checkLogFiles);
+		checkLogFiles.addActionListener(new CheckLogFiles());
+		
 
 		menu.addSeparator();
 		menuItem = new JMenuItem("Set Display Scaling Factor");
@@ -1182,6 +1193,19 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 	}
 
+	class CheckLogFiles implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			boolean check = checkLogFiles.isSelected();
+			PamSettingManager.getInstance().setCheckLogFileErrors(check);
+			if (check) {
+				// check it now 
+				LogFileUtils.checkLogFileErrors(Pamguard.getSettingsFolder());
+			}
+		}
+		
+	}
 
 	class ScalingFactorManager implements ActionListener {
 		@Override
