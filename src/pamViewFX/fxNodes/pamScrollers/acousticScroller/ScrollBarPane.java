@@ -425,6 +425,13 @@ public class ScrollBarPane extends PamBorderPane {
 		rectangle.setOnMouseDragged((event)->{
 			rectangleDragged(event);
 		});
+		
+		
+		rectangle.setOnMouseDragReleased((event)->{
+			isChanging.set(false);
+		});
+
+		
 	
 
 		return rectangle; 
@@ -502,7 +509,6 @@ public class ScrollBarPane extends PamBorderPane {
 	
 		textBox.setOnMouseReleased((event)->{
 			rectangleReleased(event);
-	
 		});
 	
 		//text box needs to drag the rectangle so there isn't a drag 'dead space' 
@@ -510,10 +516,27 @@ public class ScrollBarPane extends PamBorderPane {
 			rectangleDragged(event);
 		});
 		
-		//text box needs to drag the rectangle so there isn't a drag 'dead space' 
+		
+		textBox.setOnMouseDragReleased((event)->{
+			isChanging.set(false);
+		});
+		
+
+		textBox.getTextBox().setOnMouseReleased((event)->{
+			rectangleReleased(event);
+		});
+		
+		
 		textBox.getTextBox().setOnMouseDragged((event)->{
 			rectangleDragged(event);
 		});
+		
+		textBox.getTextBox().setOnMouseDragReleased((event)->{
+			isChanging.set(false);
+		});
+		
+		
+		//Text and visibility animations
 	
 		textBox.setOnMouseEntered((event)->{
 			setTextBoxVisible(true);
