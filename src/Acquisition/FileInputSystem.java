@@ -1056,7 +1056,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			int startbyte;
 			RawDataUnit newDataUnit = null;
 			long ms;
-			long maxSamples = Long.MAX_VALUE;
+			long maxSamples = (long) Integer.MAX_VALUE * 2L;
 			if (currentFile.getMaxSamples() > 0) {
 				maxSamples = currentFile.getMaxSamples();
 			}

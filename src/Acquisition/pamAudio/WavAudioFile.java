@@ -110,7 +110,7 @@ public class WavAudioFile implements PamAudioFileLoader {
 		RawDataUnit newDataUnit;
 		long skipped = 0; 
 		long samplePosition = 0;
-		long maxReadBytes = Long.MAX_VALUE / 4;
+		long maxReadBytes = (long) Integer.MAX_VALUE * 2L; 
 		long maxSamples = maxReadBytes / audioFormat.getFrameSize();
 		if (currentTime < offlineDataLoadInfo.getStartMillis()) {
 			// need to fast forward in current file. 
