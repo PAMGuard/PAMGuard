@@ -218,12 +218,16 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 				System.err.println("UnsupportedAudioFileException: Could not open sud file: not a supported file "
 						+ soundFile.getName());
 				System.err.println(e.getMessage());
-				// e.printStackTrace();
+				 e.printStackTrace();
 			} catch (IOException e) {
 				System.err.println("Could not open sud file: IO Exception: " + soundFile.getName());
-
 				e.printStackTrace();
 			}
+			
+			//important that these are here otherwise the blocking dialog does not know the process has completed (even if there has been an errot)
+			//and will block the GUI
+			this.done = true;
+			this.result = null;
 			return null;
 		}
 

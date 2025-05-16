@@ -16,7 +16,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 
 /**
- * Some Swing and FX controls to allow a user to chnage sud parameters. 
+ * Some Swing and FX controls to allow a user to change sud parameters. 
  */
 public class SudAudioSettingsPane implements PamAudioSettingsPane {
 

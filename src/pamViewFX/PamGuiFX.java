@@ -560,6 +560,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			reProcess.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", PamGuiManagerFX.iconSize));
 			reProcess.setOnAction((action)->{
 				//Open reprocess dialog. 
+				
 			});
 			
 			
@@ -573,7 +574,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			PamButton importButton = new PamButton("Import data");
 			importButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-database-import", PamGuiManagerFX.iconSize));
 			importButton.setOnAction((action)->{
-				//iport dialog
+				//import dialog
 			});
 
 
