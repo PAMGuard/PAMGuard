@@ -202,8 +202,10 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 					}
 					AudioFormat audioFormat = audioStream.getFormat();
 					audioStream.close();
+					
 					fileSamples = audioStream.getFrameLength();
 					float sampleRate = audioFormat.getSampleRate();
+										
 					fileMillis = (long) (fileSamples*1000/sampleRate);
 					mapPoint.setEndTime(mapPoint.getStartTime() + fileMillis);
 				} catch (UnsupportedAudioFileException e) {

@@ -14,6 +14,7 @@ import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 import dataPlotsFX.scrollingPlot2D.Scrolling2DPlotInfo;
 import dataPlotsFX.scrollingPlot2D.Scrolling2DScaleInfo;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
+import fftManager.FFTDataBlock;
 import fftManager.PamFFTControl;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
 
@@ -31,12 +32,28 @@ public class FFTPlotInfo extends Scrolling2DPlotInfo {
 	private TDSpectrogramControlPane spectrogramControlPane;
 
 	private SpectrogramParamsFX specParams;
+
+	/**
+	 * Reference to FFT datablock
+	 */
+	private FFTDataBlock fftDataBlock;
 	
 	public FFTPlotInfo(TDDataProviderFX tdDataProvider, TDGraphFX tdGraph, PamFFTControl fftControl,
 			DataBlock2D pamDataBlock) {
 		super(tdDataProvider, tdGraph, pamDataBlock);
 		spectrogramControlPane = new TDSpectrogramControlPane(tdGraph, this);
+		
+		 fftDataBlock = (FFTDataBlock) getDataBlock();
+
 	}
+	
+	
+//	@Override
+//	protected long getSmooshMillis() {
+//		//use the FFT length to define the extra data to order before the start of the display
+//		return (long) Math.ceil(5*(fftDataBlock.getFftLength()/fftDataBlock.getSampleRate())*1000); 
+//	}
+
 
 	/* (non-Javadoc)
 	 * @see dataPlotsFX.scrollingPlot2D.Scrolling2DPlotInfo#createPlotParams()

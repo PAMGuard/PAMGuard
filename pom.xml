@@ -16,7 +16,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<javafx.version>23</javafx.version>
+		<javafx.version>21</javafx.version>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<!-- Tethys version control -->
@@ -1208,8 +1208,8 @@
 	-->
 		<dependency>
 			<groupId>org.pamguard</groupId>
-			<artifactId>X3</artifactId>
-			<version>2.2.8</version>
+			<artifactId>x3</artifactId>
+			<version>2.2.9</version>
 		</dependency>
 
 

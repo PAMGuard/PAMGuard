@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri May 16 11:33:36 BST 2025
+x3-2.2.9-javadoc.jar>=
+x3-2.2.9-sources.jar>=
+x3-2.2.9.pom>=
+x3-2.2.9.jar>=
