@@ -16,6 +16,7 @@ import org.pamguard.x3.sud.SudAudioInputStream;
 
 import Acquisition.offlineFuncs.AquisitionLoadPoint;
 import PamDetection.RawDataUnit;
+import PamUtils.worker.filelist.WavFileType;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamConstants;
 //import PamUtils.CPUMonitor;
@@ -119,9 +120,22 @@ public class WavAudioFile implements PamAudioFileLoader {
 
 		RawDataUnit newDataUnit;
 		long skipped = 0; 
+		long samplePosition = 0;
+		long maxReadBytes = (long) Integer.MAX_VALUE * 2L; 
+		long maxSamples = maxReadBytes / audioFormat.getFrameSize();
 		if (currentTime < offlineDataLoadInfo.getStartMillis()) {
 			// need to fast forward in current file. 
-			long skipBytes = (long) (((offlineDataLoadInfo.getStartMillis()-currentTime)*audioFormat.getSampleRate()*audioFormat.getFrameSize())/1000.);
+			samplePosition = (long) (((offlineDataLoadInfo.getStartMillis()-currentTime)*audioFormat.getSampleRate())/1000.);
+			long skipBytes = samplePosition*audioFormat.getFrameSize();
+			if (mapPoint.getSoundFile() instanceof WavFileType) {
+				WavFileType wavFile = (WavFileType) mapPoint.getSoundFile();
+				// for HARP data, may need to skip the start of the file. 
+				// and also limit how far we can read without going into the next section. 
+				//this doesn't add to the samples count. 
+				skipBytes += wavFile.getSamplesOffset() * audioFormat.getFrameSize();
+				maxSamples = wavFile.getMaxSamples();
+				maxReadBytes = maxSamples * audioFormat.getFrameSize();
+			}
 			try {
 
 //				CPUMonitor cpuMonitor = new CPUMonitor();
@@ -144,27 +158,24 @@ public class WavAudioFile implements PamAudioFileLoader {
 			currentTime = offlineDataLoadInfo.getStartMillis();
 		}
 		ms = currentTime;
+		int readSamples = inputBuffer.length;
 		while (ms < offlineDataLoadInfo.getEndMillis() && currentTime < offlineDataLoadInfo.getEndMillis()) {
 			
 			if (offlineDataLoadInfo.cancel) {
 				//add the position we got to 
 				offlineDataLoadInfo.setLastLoadInfo(new AquisitionLoadPoint(ms, bytesRead)); 
-
-				//System.out.println("WavAudioFile: cancel" );
-
 				break;
 			}
 			try {
-				
-				//SudAudioInputStream inpoutStreamSud = 	(SudAudioInputStream) audioInputStream;
-				
-//				double uncmpr = (double) inpoutStreamSud.available()/ inpoutStreamSud.getSudFileExpander().getSudInputStream().available();
-//				System.out.println("WavAudioFile: input buffer len: " + inputBuffer.length + " available uncmpr: " + inpoutStreamSud.available() 
-//				+ " read uncmpr: " + inpoutStreamSud.getBytesRead() + " inputstream cmprsd: " + inpoutStreamSud.getSudFileExpander().getSudInputStream().available() + " ratio: " + uncmpr);
-
-				if (inputBuffer.length<audioInputStream.available()) {
-					bytesRead = audioInputStream.read(inputBuffer);
-					//System.out.println("WavAudioFile: bytesRead: " + bytesRead);
+				// check how far we can read into this file. 
+				long maxRead = (maxSamples - samplePosition)*audioFormat.getFrameSize(); // stupid large unless it's HARP data
+				maxRead = Math.min(maxRead, inputBuffer.length);
+				maxRead = Math.min(maxRead, audioInputStream.available());
+//				if (inputBuffer.length<audioInputStream.available()) {
+//					bytesRead = audioInputStream.read(inputBuffer);
+//				}
+				if (maxRead > 0) {
+					bytesRead = audioInputStream.read(inputBuffer, 0, (int) maxRead);
 				}
 				else {
 					bytesRead = 0; //force new file to load. 
@@ -195,8 +206,22 @@ public class WavAudioFile implements PamAudioFileLoader {
 						//System.out.println("WavAudioFile: file gap" );
 						break;
 					}
+					samplePosition = 0;
+					long skipBytes = 0;
+					if (mapPoint.getSoundFile() instanceof WavFileType) {
+						WavFileType wavFile = (WavFileType) mapPoint.getSoundFile();
+						// for HARP data, may need to skip the start of the file. 
+						// and also limit how far we can read without going into the next section. 
+						//this doesn't add to the samples count. 
+						skipBytes += wavFile.getSamplesOffset() * audioFormat.getFrameSize();
+						maxSamples = wavFile.getMaxSamples();
+						maxReadBytes = maxSamples * audioFormat.getFrameSize();
+					}
 					// try again to read data. 
 					try {
+						if (skipBytes>0) {
+							audioInputStream.skip(skipBytes);
+						}
 						bytesRead = audioInputStream.read(inputBuffer);
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -210,6 +235,7 @@ public class WavAudioFile implements PamAudioFileLoader {
 			
 			
 			newSamples = bytesRead / frameSize;
+			samplePosition += newSamples;
 			doubleData = new double[nChannels][newSamples];
 			int convertedSamples = byteConverter.bytesToDouble(inputBuffer, doubleData, bytesRead);
 			ms = offlineFileServer.getOfflineRawDataStore().getParentProcess().absSamplesToMilliseconds(totalSamples);
