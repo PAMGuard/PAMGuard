@@ -159,8 +159,22 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 				addFiles(pamWorker, newFileList, rootFile);
 			}
 		}
+		
+		finaliseFileList(pamWorker, newFileList);
 
 		return newFileList;
+	}
+
+	/**
+	 * Do any final jobs to the file list. This is needed in listing of xwav 
+	 * files since we have to go in and get the chunks. Might as well do the start
+	 * times and audio formats for all files while we're at it to save time later. 
+	 * By doing it here in the progress bar, we can at least show progress sensibly. 
+	 * @param pamWorker
+	 * @param newFileList
+	 */
+	public void finaliseFileList(PamWorker<FileListData<T>> pamWorker, FileListData<T> newFileList) {
+		// default file listing does nothing here. 
 	}
 
 	private void addFiles(PamWorker<FileListData<T>> pamWorker, FileListData<T> newFileList, File folder) {
