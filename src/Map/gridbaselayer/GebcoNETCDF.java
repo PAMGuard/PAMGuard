@@ -80,11 +80,15 @@ public class GebcoNETCDF {
 			Array varA = var.read();
 			Index index = varA.getIndex();
 			
-			range[0] = varA.getDouble(index.set(pos[0], pos[1]));
+			Index aa = index.set(pos[0]);
+			range[0] = varA.getDouble(aa);
 			pos[0] = n-1;
-			range[1] = varA.getDouble(index.set(pos[0], pos[1]));
+			range[1] = varA.getDouble(index.set(pos[0]));
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		catch (Exception e2) {
+			e2.printStackTrace();
 		}
 		return range;
 	}
