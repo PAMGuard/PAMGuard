@@ -215,6 +215,9 @@ public class WavAudioFile implements PamAudioFileLoader {
 			ms = offlineFileServer.getOfflineRawDataStore().getParentProcess().absSamplesToMilliseconds(totalSamples);
 			ms = currentTime + (long)(totalSamples * 1000 / (double) audioFormat.getSampleRate());
 
+			
+			if (offlineDataLoadInfo.cancel) return false;
+			
 			for (int ichan = 0; ichan < nChannels; ichan++) {
 
 				newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
@@ -225,8 +228,11 @@ public class WavAudioFile implements PamAudioFileLoader {
 				newDataUnit.setRawData(doubleData[ichan], true);
 
 				//System.out.println("New wav data: " + PamCalendar.formatDateTime(newDataUnit.getTimeMilliseconds()));
+			
 				offlineFileServer.getRawDataBlock().addPamData(newDataUnit);
 			}
+			
+			
 			if (fileGap) {
 				currentTime = mapPoint.getStartTime();
 				totalSamples = 0;
