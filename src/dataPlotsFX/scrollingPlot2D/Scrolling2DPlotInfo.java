@@ -611,8 +611,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		long dataStart = getVisibleStart()-getSmooshMillis();
 		long dataEnd = getVisibleEnd();
 		
-		//System.out.println("Order offline data from: " + PamCalendar.formatDateTime2(dataStart) + "to : " + PamCalendar.formatDateTime2(dataEnd) + "  " + getSmooshMillis());
-
+		System.out.println("Order offline data from: " + PamCalendar.formatDateTime2(dataStart) + "to : " + PamCalendar.formatDateTime2(dataEnd) + "  " + getSmooshMillis());
 
 		if (lastReqStart == dataStart && lastReqEnd == dataEnd) {
 			return true;
