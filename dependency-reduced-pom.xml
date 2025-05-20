@@ -365,7 +365,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <powermock.version>1.6.6</powermock.version>
-    <javafx.version>23</javafx.version>
+    <javafx.version>21</javafx.version>
     <jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
     <jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
   </properties>

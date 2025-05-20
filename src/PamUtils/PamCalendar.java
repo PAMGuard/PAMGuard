@@ -883,6 +883,7 @@ public class PamCalendar {
 	 * other problems. 
 	 */
 	public static void setSessionStartTime(long sessionStartTime) {
+//		System.out.printf("Session start : %s\n", formatDBDateTime(sessionStartTime, true));
 		setSessionStartTime(sessionStartTime, 0);
 	}
 

@@ -27,6 +27,9 @@ public class WavHeader {
 	private ArrayList<WavHeadChunk> wavHeadChunks = new ArrayList<WavHeadChunk>();
 
 	private long headerSize;
+
+	private HarpHeader harpHeader;
+	
 	
 	/**
 	 * Construct a blank Wav Header object, generally used when about to read a header from a file. 
@@ -116,18 +119,19 @@ public class WavHeader {
 					chunkSize = windowsWavFile.readWinInt();
 					headChunk = new byte[chunkSize];
 					windowsWavFile.read(headChunk);
+					HarpHeader harpHeader = null;
 					try {
-						HarpHeader.readHarpHeader(headChunk);
+						harpHeader = HarpHeader.readHarpHeader(headChunk, sampleRate, nChannels, blockAlign);
 					} catch (XWavException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					this.harpHeader = harpHeader;
 //					wavHeadChunks.add(new WavHeadChunk(testString, headChunk));
 				}
 				else {
 					/*
 					 * As an example, SCRIPPS HARP .x.wav files have a chunk 
-					 * in here called 'harp', an example of which has 29752
+					 * in here called 'harp', (now dealt with above) an example of which has 29752
 					 * bytes data, beginning  'V2.64 D104NO01CHNMS ...'
 					 */
 					chunkSize = windowsWavFile.readWinInt();
@@ -388,5 +392,12 @@ public class WavHeader {
 	 */
 	public long getHeaderSize() {
 		return headerSize;
+	}
+
+	/**
+	 * @return the harpHeader
+	 */
+	public HarpHeader getHarpHeader() {
+		return harpHeader;
 	}
 }

@@ -341,8 +341,8 @@ public class RecordingList implements Serializable {
 		if (effortPeriods == null || effortPeriods.size() < 1) {
 			return null;
 		}
-		RecordingPeriod f = effortPeriods.getFirst();
-		RecordingPeriod l = effortPeriods.getLast();
+		RecordingPeriod f = effortPeriods.get(0);
+		RecordingPeriod l = effortPeriods.get(effortPeriods.size()-1);
 		RecordingPeriod single = new RecordingPeriod(f.getRecordStart(), l.getRecordStop());
 		periods.add(single);
 		// then add the off effort periods to single
@@ -381,7 +381,7 @@ public class RecordingList implements Serializable {
 		if (periods == null || periods.size() == 0) {
 			return periods;
 		}
-		RecordingPeriod f = periods.getFirst();
+		RecordingPeriod f = periods.get(0);
 		f.setDutyCycleInfo(ds);
 		return periods;
 	}

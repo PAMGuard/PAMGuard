@@ -12,7 +12,7 @@ import java.util.ListIterator;
  * @author dg50
  *
  */
-public class FileListData<T extends File> {
+public class FileListData<T extends File> implements Cloneable {
 
 	private ArrayList<T> fileList = new ArrayList<T>();
 	
@@ -33,6 +33,13 @@ public class FileListData<T extends File> {
 	public int addFile(T aFile) {
 		fileList.add(aFile);
 		return fileList.size();
+	}
+	
+	/**
+	 * Clear the file list. 
+	 */
+	public void clear() {
+		fileList.clear();
 	}
 	
 	public ListIterator<T> getFileIterator() {
@@ -97,6 +104,27 @@ public class FileListData<T extends File> {
 			return n1.compareTo(n2);
 		}
 	}
+	
+	/**
+	 * Sort using supplied comparator. 
+	 * @param comparator
+	 */
+	public void sort(Comparator<T> comparator) {
+		if (fileList == null) {
+			return;
+		}
+		fileList.sort(comparator);
+	}
+	
+	/**
+	 * Sort using internal compartor of list type. 
+	 */
+	public void sort() {
+		if (fileList == null) {
+			return;
+		}
+		Collections.sort(fileList);
+	}
 
 	private class FilePathCompare implements Comparator<T> {
 
@@ -111,6 +139,19 @@ public class FileListData<T extends File> {
 			String n1 = f1.getPath();
 			String n2 = f2.getPath();
 			return n1.compareTo(n2);
+		}
+	}
+
+	@Override
+	protected FileListData<T> clone() {
+		try {
+			// full clone of the array list (but not it's elements)
+			FileListData<T> newList = (FileListData<T>) super.clone();
+			newList.fileList = (ArrayList<T>) newList.fileList.clone();
+			return newList;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }
