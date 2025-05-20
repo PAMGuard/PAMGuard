@@ -245,20 +245,29 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		}
 
 	}
-
+	
+	//New data received. The data has already been written to a binary file. 
 	private void newDataUnit(ClipDataUnit clipDataUnit) {
 		PamDataUnit triggerDataUnit = findTriggerDataUnit(clipDataUnit);
 		clipDataUnit.setTriggerDataUnit(triggerDataUnit);
 		ClipDisplayUnit clipDisplayUnit = new ClipDisplayUnit(this, clipDataUnit, triggerDataUnit);
 		
+		//NEW CODE PROPOSED
+		if(shouldAllowChannel(clipDisplayUnit) != true) {
+			return;
+		}
+		// "shouldAllowChannel" was half of the bulk of the development time for last week's change.
+		
 		synchronized (unitsPanel.getTreeLock()) {
-			//TODO: Add logic to sort by time of (manual) selection, clip start time, and maybe by hydrophone 
 			if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 				unitsPanel.add(clipDisplayUnit.getComponent(), -1);
 			}
 			else {
+				//Add new data to memory
 				unitsPanel.add(clipDisplayUnit.getComponent(), clipDisplayParameters.newClipOrder);
 			}
+			//Determine whether to show or hide the new clip (this method is called for each of the clips in memory when the "toggle" switch is pulled)
+			//This was the half of the bulk of the development time for last week's change. 
 			showAndHideClip(clipDisplayUnit);
 		}
 
@@ -756,6 +765,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 				popMenu.addSeparator();
 				JCheckBoxMenuItem channelMenu = new JCheckBoxMenuItem("Show all channel groups");
 				channelMenu.addActionListener(new ChannelGroupAction(0));
+				if (displayChannels == 0) channelMenu.setSelected(true);
 				popMenu.add(channelMenu);
 				String str;
 				for(int chIdx:PamUtils.PamUtils.getChannelArray(knownChannelSources)) {
