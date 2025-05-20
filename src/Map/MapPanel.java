@@ -1918,6 +1918,12 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 
 	public void setSimpleMapRef(SimpleMap simpleMapRef) {
 		this.simpleMapRef = simpleMapRef;
+		if(simpleMapRef==null || simpleMapRef.mapDetectionsManager==null) {
+			return;
+		}
+		if(PamController.getInstance().isInitializationComplete()) {
+			simpleMapRef.mapDetectionsManager.createBlockList();
+		}
 	}
 
 	@Override
