@@ -33,7 +33,7 @@ public class SweepClassifierSet extends ClickTypeCommonParams
 
 	public PamSymbol symbol;
 	
-	public boolean enable;
+//	public boolean enable;
 	
 	/**
 	 * These next three parameters have been moved to a super class. However, for 

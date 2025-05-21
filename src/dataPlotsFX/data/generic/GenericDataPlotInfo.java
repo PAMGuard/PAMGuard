@@ -136,6 +136,8 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 			System.out.println("GenericDataPlotInfo: Single frequency measure in data unit " + pamDataUnit.toString());
 		}
 		
+		//System.out.println("Frequency: " + f[0] + " " + f[1] + " " + pamDataUnit);
+		
 		// draw a frequency box. 
 		double y0 = tdProjector.getYPix(f[0]);
 		double y1 = tdProjector.getYPix(f[1]);

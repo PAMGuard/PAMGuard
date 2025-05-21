@@ -261,7 +261,7 @@ public class Scrolling2DPlotDataFX {
 		
 		//if the image is currently being rebuilt keep a track of the number of bins that have been added but dump data.  
 		if (reBuildImage){
-			lastPowerSpecTime = fftDataUnit.getTimeMilliseconds();
+			setLastPowerSpecTime(fftDataUnit.getTimeMilliseconds());
 			rebuildAdd++; 
 			return; 
 		}
@@ -325,7 +325,7 @@ public class Scrolling2DPlotDataFX {
 		if (++lastPowerSpecBin >= historyBins) {
 			lastPowerSpecBin = 0;
 		}
-		lastPowerSpecTime = fftDataUnit.getTimeMilliseconds();
+		setLastPowerSpecTime(fftDataUnit.getTimeMilliseconds());
 //		ComplexArray fftData = fftDataUnit.getFftData();
 		
 //		AcquisitionProcess daqProcess = null;
@@ -618,7 +618,7 @@ public class Scrolling2DPlotDataFX {
 		 double tScale = timePixels / (timeAxis.getMaxVal()-timeAxis.getMinVal()) / 1000.;
 
 		//the number of screen pixels the wrap takes up
-		 wrapScreenPix=tdProjector.getTimePix(0)+Math.max(timeAxis.getPosition(-tdProjector.getVisibleTime()/1000.), (lastPowerSpecTime - scrollEndTime) * tScale);;
+		 wrapScreenPix=tdProjector.getTimePix(0)+Math.max(timeAxis.getPosition(-tdProjector.getVisibleTime()/1000.), (getLastPowerSpecTime() - scrollEndTime) * tScale);;
 
 		//the length of the wrap section in spectrogram image pixels (not time display pixels)
 		 wrapImagePixdw=wrapScreenPix/(timeScale * 1000. * tScale * timeCompression); 
@@ -723,7 +723,7 @@ public class Scrolling2DPlotDataFX {
 		//the time scale in pixels per millisecond
 		tScale = timePixels / (timeAxis.getMaxVal()-timeAxis.getMinVal()) / 1000.;
 		//the end of the screen in pixels. This s not just timePixels
-		endScreenPix = timePixels+Math.max(timeAxis.getPosition(-tdProjector.getVisibleTime()/1000.), (lastPowerSpecTime - scrollEndTime) * tScale); //FIXME- add this section on appears to cause issues in swing but not JavaFX?...
+		endScreenPix = timePixels+Math.max(timeAxis.getPosition(-tdProjector.getVisibleTime()/1000.), (getLastPowerSpecTime() - scrollEndTime) * tScale); //FIXME- add this section on appears to cause issues in swing but not JavaFX?...
 		//the number of pixels on image in memory, from zero to current location of pointer. 
 		nImagePixs = imageXPos+1;
 		//the number of screen pixels corresponding to the current position on the writable image to zero. 
@@ -1243,6 +1243,14 @@ public class Scrolling2DPlotDataFX {
 	public long getTotalPowerSpec() {
 		// TODO Auto-generated method stub
 		return this.totalPowSpec;
+	}
+
+	public long getLastPowerSpecTime() {
+		return lastPowerSpecTime;
+	}
+
+	public void setLastPowerSpecTime(long lastPowerSpecTime) {
+		this.lastPowerSpecTime = lastPowerSpecTime;
 	}
 
 

@@ -1,6 +1,5 @@
 package PamguardMVC.dataOffline;
 
-import PamUtils.PamCalendar;
 import PamguardMVC.LoadObserver;
 import PamguardMVC.PamObserver;
 
@@ -162,12 +161,16 @@ public class OfflineDataLoadInfo implements Cloneable {
 //		}
 		return true;
 	}
+	
 	/**
 	 * Resets the load data for another data load. 
 	 */
 	public void reset(){
 		this.loadKeepLayers=this.originalKeepLayers;
-		this.cancel=false;
+		/**
+		 * This causes
+		 */
+		//this.cancel=false;
 		this.currentDataObserver=this.startObserver;
 	}
 

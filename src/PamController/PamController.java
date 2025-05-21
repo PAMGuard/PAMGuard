@@ -382,6 +382,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 				startOfflineTasks();
 			}
 		}
+		else {
+		}
 	}
 
 	/**
@@ -2886,16 +2888,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-<<<<<<< Updated upstream
 	 * Respond to storage options dialog. Selects whether data 
 	 * are stored in binary, database or both
 	 * @param parentFrame 
-=======
-	 * Respond to storage options dialog. Selects whethere data are stored in
-	 * binary, database or both
-	 * 
-	 * @param parentFrame
->>>>>>> Stashed changes
 	 */
 	public void storageOptions(JFrame parentFrame) {
 		StorageOptions.getInstance().showDialog(parentFrame);

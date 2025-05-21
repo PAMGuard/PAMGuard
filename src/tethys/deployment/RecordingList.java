@@ -6,9 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 import PamUtils.PamCalendar;
 import pamMaths.STD;
+import tethys.TethysControl;
+import tethys.output.TethysExportParams;
 
 /**
  * Information about periods of effort that might come from either the raw data recordings or 
@@ -21,6 +24,8 @@ public class RecordingList implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private ArrayList<RecordingPeriod> effortPeriods = new ArrayList();
+	
+	private ArrayList<RecordingPeriod> compoundPeriods;
 	
 	/**
 	 * Name / source of this list. 
@@ -247,5 +252,137 @@ public class RecordingList implements Serializable {
 	 */
 	public ArrayList<RecordingPeriod> getEffortPeriods() {
 		return effortPeriods;
+	}
+
+	/**
+	 * @return the compoundPeriods
+	 */
+	public ArrayList<RecordingPeriod> getCompoundPeriods(DeploymentExportOpts exportParams) {
+		if (compoundPeriods == null) {
+			compoundPeriods = makeCompoundPeriods(exportParams);
+		}
+		return compoundPeriods;
+	}
+	/**
+	 * @return the compoundPeriods
+	 */
+	private ArrayList<RecordingPeriod> makeCompoundPeriods(DeploymentExportOpts exportParams) {
+		/**
+		 * What do we really want here ? 
+		 * 
+		 */
+		
+		ArrayList<RecordingPeriod> periods = new ArrayList<>();
+		if (effortPeriods == null) {
+			return null;
+		}
+		if (effortPeriods.size() < 2) {
+			periods.addAll(effortPeriods);
+			return periods;
+		}
+		// otherwise, work out what duty cycle info we want to use and return it. 
+		boolean isOne = false;
+		DutyCycleInfo ds = assessDutyCycle();
+		switch (exportParams.sepDeployments) {
+		case ALWAYSSEPARATE:
+			return makeSeparatePeriods(exportParams);
+		case ALWAYSSINGLE:
+			return makeSinglePeriod(exportParams);
+		case AUTOSCHEDULE:
+			return makeAutoPeriods(exportParams);
+		default:
+			break;
+		
+		}
+		
+		
+		return compoundPeriods;
+	}
+
+	/**
+	 * Keep largely as it was, but only include items that exceeded the minimum and merge some
+	 * very close ones addording to the rules. 
+	 * @param exportParams
+	 * @return
+	 */
+	private ArrayList<RecordingPeriod> makeSeparatePeriods(DeploymentExportOpts exportParams) {
+		if (effortPeriods == null) {
+			return null;
+		}
+		ArrayList<RecordingPeriod> periods = new ArrayList<>();
+		RecordingPeriod last = null;
+		for (RecordingPeriod p : effortPeriods) {
+			if (last != null && (p.getRecordStart()-last.getRecordStop() < exportParams.maxRecordingGapSeconds * 1000)) {
+				last.setRecordStop(p.getRecordStop()); // don't even bother to record that there is a gap. 
+			}
+			else {
+				// move this period across, but clone it in case it get's extended in the next iteration. 
+				periods.add(last = p.clone());
+			}
+		}
+		/*
+		 * Then remove the short ones - note that this is done AFTER short periods may have been joined together. 
+		 */
+		ListIterator<RecordingPeriod> it = periods.listIterator();
+		while (it.hasNext()) {
+			RecordingPeriod p = it.next();
+			if (p.getDuration() < exportParams.minRecordingLengthSeconds * 1000) {
+				it.remove();
+			}			
+		}
+		
+		return periods;
+	}
+
+	private ArrayList<RecordingPeriod> makeSinglePeriod(DeploymentExportOpts exportParams) {
+
+
+		ArrayList<RecordingPeriod> periods = new ArrayList<>();
+		if (effortPeriods == null || effortPeriods.size() < 1) {
+			return null;
+		}
+		RecordingPeriod f = effortPeriods.get(0);
+		RecordingPeriod l = effortPeriods.get(effortPeriods.size()-1);
+		RecordingPeriod single = new RecordingPeriod(f.getRecordStart(), l.getRecordStop());
+		periods.add(single);
+		// then add the off effort periods to single
+		ListIterator<RecordingPeriod> it = effortPeriods.listIterator();
+		RecordingPeriod prev = it.next(); // should be ok, becuase there is always >= 1
+		while (it.hasNext()) {
+			RecordingPeriod p = it.next();
+			RecordingPeriod gap = new RecordingPeriod(prev.getRecordStop(), p.getRecordStart());
+			single.addRecordingGap(gap);
+			prev = p;
+		}
+		DutyCycleInfo ds = assessDutyCycle();
+		if (ds.isDutyCycled) {
+//			return makeDutyCycledList(exportParams, ds);
+			single.setDutyCycleInfo(ds);
+		}
+		
+		return periods;
+	}
+
+
+	private ArrayList<RecordingPeriod> makeAutoPeriods(DeploymentExportOpts exportParams) {
+		DutyCycleInfo ds = assessDutyCycle();
+		if (ds.isDutyCycled) {
+			return makeDutyCycledList(exportParams, ds);
+		}
+		else {
+			return makeSeparatePeriods(exportParams);
+		}
+	}
+
+	// know it's a duty cycled list, so get on with it. 
+	private ArrayList<RecordingPeriod> makeDutyCycledList(DeploymentExportOpts exportParams, DutyCycleInfo ds) {
+		// can just make the single list option, then add the duty cycle information I think. 
+		ArrayList<RecordingPeriod> periods = makeSinglePeriod(exportParams);
+		if (periods == null || periods.size() == 0) {
+			return periods;
+		}
+		RecordingPeriod f = periods.get(0);
+		f.setDutyCycleInfo(ds);
+		return periods;
 	}
 }

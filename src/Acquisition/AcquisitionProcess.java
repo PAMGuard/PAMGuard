@@ -221,6 +221,7 @@ public class AcquisitionProcess extends PamProcess {
 		 */
 		collectDataThread = new Thread(new WaitForData());
 		collectDataThread.setPriority(Thread.MAX_PRIORITY);
+		collectDataThread.setName("Colection: " + getProcessName());
 
 		acquisitionControl.daqMenuEnabler.enableItems(false);
 		acquisitionControl.fillStatusBarText();
