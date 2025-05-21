@@ -119,11 +119,12 @@ public class OneBandDialog extends PamDialog {
 	}
 
 	private void setParams(float sampleRate) {
-		filterDialogPanel.setSampleRate(sampleRate);
-		filterDialogPanel.setParams(params.getFilterParams());
 
 		sourcePanel.setSource(params.dataSource);
 		sourcePanel.setChannelList(params.channelMap);
+		
+		filterDialogPanel.setSampleRate(sourcePanel.getSource()!=null ? sourcePanel.getSource().getSampleRate(): sampleRate);
+		filterDialogPanel.setParams(params.getFilterParams());
 		
 		measurementInterval.setText(String.format("%d", params.measurementInterval));
 		integrationTime.setText(String.format("%d", params.selIntegrationTime));

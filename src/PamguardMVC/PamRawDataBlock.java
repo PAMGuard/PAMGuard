@@ -154,6 +154,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	 */
 	@Override
 	public void reset() {
+		desiredSample = -1;
 		prevChannelSample = new long[PamConstants.MAX_CHANNELS];
 		summaryTotals = new double[PamConstants.MAX_CHANNELS];
 		summaryTotals2 = new double[PamConstants.MAX_CHANNELS];

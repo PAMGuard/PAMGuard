@@ -43,6 +43,8 @@
 
   <tocitem text="Uinique Data Identifiers " target="overview.uid.docs.uid" image="topic"/>
 
+  <tocitem text="Log Files " target="overview.PamMasterHelp.docs.logfiles" image="topic"/>
+
   <tocitem text="Hydrophone Array Manager ">
    <tocitem text="Overview " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Overview" image="topic"/>
 

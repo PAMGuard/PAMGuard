@@ -116,8 +116,15 @@ public class NoiseProcess extends PamProcess {
 		}
 		long measureInterval = noiseControl.noiseSettings.measurementIntervalSeconds * 
 		(long) getSampleRate() / (nMeasures+1);
-		for (int i = 0; i < nMeasures; i++) {
-			measurementTimes[i] = currentTime + i*measureInterval + r.nextInt((int) measureInterval);
+		/**
+		 * Avoid exception on offchance that this is zero - don't see how that can 
+		 * happen, but someone managed to do it - possible through a zero length file or
+		 * something. 
+		 */
+		if (measureInterval > 0) {
+			for (int i = 0; i < nMeasures; i++) {
+				measurementTimes[i] = currentTime + i*measureInterval + r.nextInt((int) measureInterval);
+			}
 		}
 		iMeasurement = 0;
 		int nChan = PamUtils.getNumChannels(noiseControl.noiseSettings.channelBitmap);

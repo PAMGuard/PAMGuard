@@ -11,6 +11,7 @@ import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.DataBlock2D;
 import PamguardMVC.DataUnit2D;
@@ -247,7 +248,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	/**
 	 * The number of panels which need to be rebuilt 
 	 */
-	private int nRebuilt=0; 
+	private int nRebuilt=0;
 
 	/**
 	 * @return the nRebuilt
@@ -393,10 +394,16 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 				//							+ " "+dataUnit.getFrequency());
 				//					count=0;
 				//				}
-			
+//				if (count%1000==0) {
+//					System.out.println("FFT time: " + PamCalendar.formatDateTime2(dataUnit.getTimeMilliseconds())+ "  " + o + " ");
+//				}
+				count++;
 
 				new2DData((DataUnit2D) dataUnit); //do not put in FX thread!
+				
 
+				
+				
 				Platform.runLater(()->{
 					//only repaint the base canvas. Otherwise overlaid detections will repaint and this can take a 
 					//a very long time. 
@@ -478,15 +485,36 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	 * @param dataUnit2D
 	 */
 	public void new2DData(DataUnit2D dataUnit2D) {
+		
+		//TODO - added this here because sometimes a data order returns units that are from the 
+		//the wrong time. Not sure why this is but likely to do with queue issues perhaps. This 
+		//temporary fix will help but will not work when we move the spectrogram to loading sections
+		//of data outwith the visible display
+		if (dataUnit2D.getTimeMilliseconds() < (getVisibleStart() -getSmooshMillis()) ||
+				dataUnit2D.getTimeMilliseconds() > getVisibleEnd()	) {
+			//System.out.println("data unit not in range: " + PamCalendar.formatDateTime2(dataUnit2D.getTimeMilliseconds())); 
+
+			return;
+		}
+		
+
 
 		int chan = PamUtils.getSingleChannel(dataUnit2D.getSequenceBitmap());
 
 		if (scrolling2DPlotData[chan]==null){ 
 			configureDisplay();
 		}
+		
+		
 		if (scrolling2DPlotData[chan] != null) {
+//			if (scrolling2DPlotData[chan].getLastPowerSpecTime()>dataUnit2D.getEndTimeInMilliseconds()) {
+//				System.out.println("Last data unit was after the current one: " + PamCalendar.formatDateTime2(dataUnit2D.getTimeMilliseconds())); 
+//				scrolling2DPlotData[chan].resetForLoad();
+//				return;
+//			}
 			scrolling2DPlotData[chan].new2DData(dataUnit2D);
 		}
+		
 
 	}
 
@@ -502,7 +530,6 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	 * call once scrolling has stopped, ensuring the spectrogram is in sync time wise with the rest of the scrolling data. 
 	 */
 	private void orderOfflineData(){
-
 
 		long currentTime=System.currentTimeMillis();
 		
@@ -536,9 +563,9 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	}
 
 	//refers 	
-	private long lastReqStart;
+	private volatile long lastReqStart;
 
-	private long lastReqEnd;
+	private volatile long lastReqEnd;
 
 	/**
 	 * Order offline viewer data for viewer mode. 
@@ -546,6 +573,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	 * @throws InterruptedException  - throws the interrupted expression. We want the thread to be interrupted and cancelled here. Allows fast scrolling
 	 */
 	private synchronized boolean orderOfflineData(Task<Boolean> task) throws InterruptedException {
+		
 		
 		//do not try and order an data before everything has set up. 
 		if (!PamController.getInstance().isInitializationComplete()) return false;
@@ -565,7 +593,10 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		/**
 		 * First cancel the last order and reset pointers in the output images. 
 		 */
-		dataBlock2D.cancelDataOrder();
+		dataBlock2D.cancelDataOrder(true);
+		//don't know why, but some weird order quue stuff going on sometimes and this seems to 
+		//help prevent extra data, outwith the order still being ordered...
+		Thread.sleep(100);		
 
 		for (int i = 0; i < scrolling2DPlotData.length; i++) {
 			if (scrolling2DPlotData[i] != null) {
@@ -577,8 +608,10 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 
 		if (task!=null && task.isCancelled()) return false; 
 
-		long dataStart =getTDGraph().getTDDisplay().getTimeScroller().getValueMillis();
-		long dataEnd = dataStart + (long) (getTDGraph().getTDDisplay().getVisibleTime());
+		long dataStart = getVisibleStart()-getSmooshMillis();
+		long dataEnd = getVisibleEnd();
+		
+		System.out.println("Order offline data from: " + PamCalendar.formatDateTime2(dataStart) + "to : " + PamCalendar.formatDateTime2(dataEnd) + "  " + getSmooshMillis());
 
 		if (lastReqStart == dataStart && lastReqEnd == dataEnd) {
 			return true;
@@ -588,12 +621,40 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 
 		//need to know that it's THIS class that is ordering. Otherwise the observer can accept FFTData from the FFTDataBlock if another process is orderring
 		isOrderring=true;
-		
+
 		//order offline data
 
 		dataBlock2D.orderOfflineData(this.fftObserver, new DataLoadObserver(), dataStart, dataEnd, 0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT);
 
 		return true; 
+	}
+	
+	
+	/**
+	 * Get the start time of the visible portion of the display.
+	 * @return the start time of the display in millis.
+	 */
+	protected long getVisibleStart() {
+		return getTDGraph().getTDDisplay().getTimeScroller().getValueMillis();
+	}
+	
+	/**
+	 * Get the end time of the visible portion of the display.
+	 * @return the end time of the display in millis.
+	 */
+	protected long getVisibleEnd() {
+		return getVisibleStart() + (long) (getTDGraph().getTDDisplay().getVisibleTime());
+	}
+	
+	/**
+	 * Get the extra millis for loading data. 
+	 * @return the end time of the display in millis.
+	 */
+	protected long getSmooshMillis() {
+		// assume we will never have an FFT length above 5 seconds in time. That should
+		// be fine for blue whales with a sample rate of 500Hz == FFT length of 2500
+		// samples which would look terrible.
+		return Math.min((long) (getTDGraph().getTDDisplay().getVisibleTime()*0.2), 5000);
 	}
 
 	/**
@@ -776,5 +837,19 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		 */
 		return 0;
 	}
+	
+	/**
+	 * Notify of changes from PamController. 
+	 * @param changeType - the chnage type. 
+	 */
+	@Override
+	public void notifyChange(int changeType){
+		switch (changeType) {
+		case PamController.OFFLINE_DATA_LOADED :
+			//this.orderOfflineData();
+			break;
+		}
+	}
+	
 
 }

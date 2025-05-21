@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioFormat;
+
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.glyphfont.Glyph;
@@ -609,8 +611,18 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		//need to set the sample rate and channels in the main pane.
 		if (fileList!=null && fileList.size()>0) {
-			this.acquisitionPaneFX.setSampleRate(fileList.get(0).getAudioInfo().getSampleRate());
-			this.acquisitionPaneFX.setChannels(fileList.get(0).getAudioInfo().getChannels());
+			/*
+			 *  get the first valid file. Some corrupt sud files, and zero length wav files
+			 *  may have a null aurdioInfo
+			 */
+			for (int i = 0; i < fileList.size(); i++) {
+				AudioFormat audioInfo = fileList.get(i).getAudioInfo();
+				if (audioInfo != null) {
+					this.acquisitionPaneFX.setSampleRate(audioInfo.getSampleRate());
+					this.acquisitionPaneFX.setChannels(audioInfo.getChannels());
+					break;
+				}
+			}
 		}
 
 		progressBar.setVisible(false);

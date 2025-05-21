@@ -30,6 +30,7 @@ import PamUtils.FileParts;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileFilter;
 import PamUtils.PamUtils;
+import PamUtils.worker.filelist.WavFileType;
 import wavFiles.ByteConverter;
 
 /**
@@ -213,7 +214,7 @@ public class RonaInputSystem extends FolderInputSystem {
 		 * 		files are in the format 20051209-185714-02.flac
 		 * so get the time and add an offset to make a new file name.
 		 */
-		long fileTime = getFileStartTime(baseFile);
+		long fileTime = getFileStartTime(new WavFileType(baseFile));
 		if (fileTime <= 0) {
 			return null;
 		}
@@ -248,7 +249,7 @@ public class RonaInputSystem extends FolderInputSystem {
 		this.newDataUnits = acquisitionControl.getDaqProcess().getNewDataQueue();
 		if (this.newDataUnits == null) return false;
 
-		File baseFile = getCurrentFile();
+		WavFileType baseFile = getCurrentFile();
 
 		PamCalendar.setSoundFile(true);
 		PamCalendar.setSoundFileTimeInMillis(0);

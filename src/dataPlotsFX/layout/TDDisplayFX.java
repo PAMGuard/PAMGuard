@@ -915,6 +915,7 @@ public class TDDisplayFX extends PamBorderPane {
 					aGraph.timeScrollRangeChanged(pamScroller.getMinimumMillis(), pamScroller.getMaximumMillis());
 				}
 				setTimeStamp();
+				System.out.println("Scroll range changed"); 
 				repaintAll(0);
 			});
 		}
