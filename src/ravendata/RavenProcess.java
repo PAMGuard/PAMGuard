@@ -65,14 +65,14 @@ public class RavenProcess extends PamProcess {
 		 */
 		AcquisitionControl daqControl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
 		if (daqControl == null) {
-			WarnOnce.showWarning("No acquisition module", "Can only import ROCCA data if there is a Sound Acquisition Module", 
+			WarnOnce.showWarning("No acquisition module", "Can only import RAVEN data if there is a Sound Acquisition Module", 
 					WarnOnce.WARNING_MESSAGE);
 			return;
 		}
 		// need to get the detailed data map. 
 		InputStoreInfo daqInfo = daqControl.getStoreInfo(true);
 		if (daqInfo == null || daqInfo.getAllFileEnds() == null || daqInfo.getAllFileEnds().length == 0) {
-			WarnOnce.showWarning("No sound file info module", "Can only import ROCCA data if sound files arre present to extract absolute times", 
+			WarnOnce.showWarning("No sound file info module", "Can only import RAVEN data if sound files arre present to extract absolute times", 
 					WarnOnce.WARNING_MESSAGE);
 			return;
 		}
