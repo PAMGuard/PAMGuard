@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import Acquisition.offlineFuncs.WavFileDataMap;
 import PamController.OfflineDataStore;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -145,6 +146,9 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 	 * @param mapPoint new map point to add
 	 */
 	synchronized public void addDataPoint(TmapPoint mapPoint) {
+//		if (this instanceof WavFileDataMap) {
+//			System.out.println(mapPoint);
+//		}
 		boolean first = (mapPoints.size() == 0);
 		if (mapPoint.getStartTime() > oneDayInMillis) {
 			firstDataTime = Math.min(firstDataTime, mapPoint.getStartTime());
@@ -864,5 +868,26 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 			prevPoint = mapPoint;
 		}
 		return overlaps;
+	}
+
+	/**
+	 * Get start and end times for all points in a datamap as a 2xn array. 
+	 * @return
+	 */
+	public long[][] getAllStartsAndEnds() {
+		if (mapPoints == null) {
+			return null;
+		}
+		int n = mapPoints.size();
+		long[][] se = new long[2][n];
+		Iterator<TmapPoint> it = mapPoints.iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			TmapPoint p = it.next();
+			se[0][i] = p.getStartTime();
+			se[1][i] = p.getEndTime();
+			i++;
+		}
+		return se;
 	}
 }
