@@ -339,13 +339,19 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		holder.setPadding(new Insets(5,5,5,5));
 		popOver.setContentNode(holder);
 
-
+		//set the parameters
 		popOver.showingProperty().addListener((obs, old, newval)->{
 			if (newval) {
+				//showing
 				dlControl.getDataSelector().getDialogPaneFX().setParams(true);
 			}
+			else {
+				//hiding
+				dlControl.getDataSelector().getDialogPaneFX().getParams(true);
+			}
 		});
-
+		
+	
 		popOver.show(dataSelectorButton);
 	} 
 
