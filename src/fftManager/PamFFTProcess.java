@@ -391,31 +391,35 @@ public class PamFFTProcess extends PamProcess {
 				}
 			}
 		}
+		/**
+		 * Make a local copy of the array
+		 */
 		TempOutputStore[] oldStores = tempStores;
+		
 		if (iChan == PamUtils.getHighestChannel(fftParameters.channelMap)) {
 			// time to empty the stores - assume they all have the same
 			// amount of data 
 			int[] chanList = PamUtils.getChannelArray(fftParameters.channelMap);
 			try {
-				int n = tempStores[iChan].getN();
+				int n = oldStores[iChan].getN();
 				for (int iF = 0; iF < n; iF++) {
 					for (int iC = 0; iC < chanList.length; iC++) {
 						//					pu = tempStores[chanList[iC]].get(iF);
 						try {
-							outputData.addPamData(tempStores[chanList[iC]].get(iF));
+							outputData.addPamData(oldStores[chanList[iC]].get(iF));
 						}
 						catch (ArrayIndexOutOfBoundsException e) {
 							//						e.printStackTrace();
 							System.err.printf("%s.newData: %s Store %s (was %s) iC: %d of %d iF: %d of %d\n", 
 									this.getPamControlledUnit().getUnitName(), e.getMessage(), 
-									tempStores[chanList[iC]], oldStores[chanList[iC]],
+									oldStores[chanList[iC]], oldStores[chanList[iC]],
 									iC, chanList.length, iF, n);
 						}
 						//					outputData.addPamData(null);
 					}
 				}
 				for (int iC = 0; iC < chanList.length; iC++) {
-					tempStores[chanList[iC]].clearStore();
+					oldStores[chanList[iC]].clearStore();
 				}
 			}
 			catch (Exception e) {

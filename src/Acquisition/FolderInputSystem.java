@@ -113,6 +113,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		 * Here, need to handle restarts if we've stopped and are restarting. 
 		 * There are two things to do. 1 identify correct file for processing based
 		 * on currentAnalysisTime, then if necessary, skip part of that first file. 
+		 * 
+		 * The behaviour of this is a bit (OK, very) weird since it's basically looking for 
+		 * a file that ends later than the current end time and it always backs up one before
+		 * starting. I can't remember why this is. However, if there is a corrupt file that
+		 * has a null audioformat, it's going to go back one if we're not careful and start
+		 * to repeat the same file again and again. 
 		 */
 		if (currentFile > 0) {
 			currentFile--; // shouldn't ever need to go back more than one.  
@@ -124,7 +130,17 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				WavFileType aF = allFiles.get(i);
 				AudioFormat audioformat = aF.getAudioFormat(aF);
 				if (audioformat == null) {
-					break; // can't do much now!
+					System.out.printf("Error in audio file %s: no AudioFormat available\n", aF.toString());
+					/* continue rather than break so we don't get stuck in a loop. But be careful, because if
+					 * this is the last file, then currentFile will never be set, so will be at one less than
+					 * we started with, so will start repeating the last two good files !
+					 */
+					currentFile = i; // as a minimum !!!
+					if (i == allFiles.size()-1) {
+						// we're at the end. Last file is corrupt. Need to stop. 
+						return false;
+					}
+					continue; 
 				}
 				fileStart = getFileStartTime(aF);
 				fileEnd = fileStart + (long) (aF.getDurationInSeconds()*1000.);
@@ -146,7 +162,17 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public boolean prepareInputFile() {
-		boolean ans = super.prepareInputFile();
+		boolean ans = false;
+		// allow for the file to be corrupt. 
+		while (currentFile < allFiles.size()) {
+			ans = super.prepareInputFile();
+			if (ans == true) {
+				break;
+			}
+			else {
+				currentFile++;
+			}
+		}
 		if (!ans && ++currentFile < allFiles.size()) {
 			System.out.println("Failed to open sound file. Try again with file " + allFiles.get(currentFile).getName());
 			/*
