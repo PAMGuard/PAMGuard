@@ -11,6 +11,8 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamObserver;
 import dataPlots.TDParameters;
 import dataPlotsFX.data.TDDataInfoFX;
+import dataPlotsFX.data.TDDataProviderFX;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.layout.TDDisplayFX;
 import dataPlotsFX.layout.TDGraphFX;
 import detectiongrouplocaliser.DetectionGroupSummary;
@@ -229,6 +231,19 @@ public abstract class TDControl implements PamSettings {
 	 */
 	public void newSelectedDetectionGroup(DetectionGroupSummary detectionGroup, TDGraphFX tdGraph) {
 		
+	}
+	
+	/**
+	 * Update the provider register. This removes any data block which no longer exist in the data model. 
+	 */
+	public void updateProviderRegister() {
+		ArrayList<TDDataProviderFX> dataInfos=TDDataProviderRegisterFX.getInstance().getDataInfos();
+		for (int i=0; i<dataInfos.size() ;i++){
+			if (!PamController.getInstance().getDataBlocks().contains(dataInfos.get(i).getDataBlock())){
+				//no datablock in model. must unregister!
+				TDDataProviderRegisterFX.getInstance().unRegisterDataInfo(dataInfos.get(i));
+			}
+		}
 	}
 
 
