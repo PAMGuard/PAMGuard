@@ -22,7 +22,7 @@ import noiseMonitor.NoiseLogging;
 public class NoiseBandProcess extends PamProcess {
 
 	private NoiseBandControl noiseBandControl;
-	private ArrayList<FilterMethod> decimationFilterMethods;
+	private ArrayList<DecimatorMethod> decimationFilterMethods;
 	private ArrayList<FilterMethod> bandFilterMethods;
 	private int[] decimatorIndexes;
 	private ChannelProcess[] channelProcesses;
@@ -59,10 +59,10 @@ public class NoiseBandProcess extends PamProcess {
 	public void setupProcess() {
 		super.setupProcess();
 		PamDataBlock sourceData = noiseBandControl.getPamConfiguration().getDataBlock(RawDataUnit.class, noiseBandControl.noiseBandSettings.rawDataSource);
-		
-//		System.out.println("********************************************************");
-//		System.out.println("NOISE BAND PROCESS: " + sourceData + "  " + noiseBandControl.noiseBandSettings.rawDataSource);
-//		System.out.println("********************************************************");
+
+		//		System.out.println("********************************************************");
+		//		System.out.println("NOISE BAND PROCESS: " + sourceData + "  " + noiseBandControl.noiseBandSettings.rawDataSource);
+		//		System.out.println("********************************************************");
 		if (sourceData == null) {
 			return;
 		}
@@ -112,8 +112,8 @@ public class NoiseBandProcess extends PamProcess {
 
 	class ChannelProcess {
 		private int iChan;
-//		private Filter[] decimationFilters;
-//		private Filter[] bandFilters;
+		//		private Filter[] decimationFilters;
+		//		private Filter[] bandFilters;
 		private BandOutput[] bandOutputs;
 		DecimationGroup[] decimationGroups;
 		long lastOutputTime = 0;
@@ -124,6 +124,7 @@ public class NoiseBandProcess extends PamProcess {
 
 		public void setupFilters() {
 			decimationGroups = new DecimationGroup[decimationFilterMethods.size()+1];
+			// first group doesn't get decimated at all. 
 			decimationGroups[0] = new DecimationGroup(this, null);
 			if (bandFilterMethods == null) {
 				return;
@@ -137,15 +138,15 @@ public class NoiseBandProcess extends PamProcess {
 				bandOutputs[i] = new BandOutput();
 				decimationGroups[decimatorIndexes[i]+1].addBand(i, bandFilterMethods.get(i), bandOutputs[i]);
 			}
-			
-//			if (2>1) {
-//				Debug.out.printf("Noise band channel %d with %d decimator groups\n", iChan, decimationGroups.length);
-//				for (int i = 0; i < decimationGroups.length; i++) {
-//					Debug.out.printf("Decimator %2d:\n%s", i, decimationGroups[i].toString());
-//				}
-//			}
+
+			//			if (2>1) {
+			//				Debug.out.printf("Noise band channel %d with %d decimator groups\n", iChan, decimationGroups.length);
+			//				for (int i = 0; i < decimationGroups.length; i++) {
+			//					Debug.out.printf("Decimator %2d:\n%s", i, decimationGroups[i].toString());
+			//				}
+			//			}
 		}
-		
+
 		protected void newData(RawDataUnit rawDataUnit) {
 			long timeMillis = rawDataUnit.getTimeMilliseconds();
 			double[] lastOutput = rawDataUnit.getRawData();
@@ -154,15 +155,15 @@ public class NoiseBandProcess extends PamProcess {
 				lastOutputLength = decimationGroups[i].processData(lastOutput, lastOutputLength);
 				lastOutput = decimationGroups[i].decimatedData;
 			}
-			if (bandOutputs[0].getNSamples() == 48000) {
-				return;
-			}
+//			if (bandOutputs[0].getNSamples() == 48000) { // why ?
+//				return;
+//			}
 			if (lastOutputTime == 0) {
 				lastOutputTime = timeMillis;
 			}
 			else if (timeMillis - lastOutputTime >= noiseBandControl.noiseBandSettings.outputIntervalSeconds*1000) {
 				double ampTerm = daqProcess.prepareFastAmplitudeCalculation(iChan);
-//				System.out.printf("Amplitude term cahnnel %d is %3.1f\n", iChan, ampTerm);
+				//				System.out.printf("Amplitude term cahnnel %d is %3.1f\n", iChan, ampTerm);
 				double[][] measurementStats = new double[bandOutputs.length][2];
 				for (int i = 0; i < bandOutputs.length; i++) {
 					measurementStats[bandOutputs.length-i-1][0] = daqProcess.rawAmplitude2dB(bandOutputs[i].getRMS(), iChan, true);
@@ -172,7 +173,7 @@ public class NoiseBandProcess extends PamProcess {
 				NoiseDataUnit ndu = new NoiseDataUnit(timeMillis, 1<<iChan, rawDataUnit.getLastSample(), 0);
 				ndu.setNoiseBandData(measurementStats);
 				noiseDataBlock.addPamData(ndu);
-				
+
 				lastOutputTime = timeMillis;
 			}
 		}
@@ -187,31 +188,33 @@ public class NoiseBandProcess extends PamProcess {
 	 *
 	 */
 	private class DecimationGroup {
-		private FilterMethod decimatorMethod;
+		private DecimatorMethod decimatorMethod;
 		private ArrayList<FilterMethod> bandFilterMethodss = new ArrayList<FilterMethod>();
 		private ArrayList<Filter> bandFilters = new ArrayList<Filter>();
 		private ArrayList<BandOutput> bandOutputs = new ArrayList<BandOutput>();
 		private Filter decimationFilter;
 		private ChannelProcess channelProcess;
-//		double inputSampleRate;
-//		private double outputSampleRate;
+		//		double inputSampleRate;
+		//		private double outputSampleRate;
 		double[] decimatedData;
 		double[] preDecimatedData;
 		int decimatorOffset = 0;
+		int decimateFactor = 1;
 
-		DecimationGroup(ChannelProcess channelProcess, FilterMethod decimatorMethod) {
+		DecimationGroup(ChannelProcess channelProcess, DecimatorMethod decimatorMethod2) {
 			this.channelProcess = channelProcess;
-			this.decimatorMethod = decimatorMethod;
-			if (decimatorMethod != null) {
-				decimationFilter = decimatorMethod.createFilter(channelProcess.iChan);
+			this.decimatorMethod = decimatorMethod2;
+			if (decimatorMethod2 != null) {
+				decimationFilter = decimatorMethod2.getFilterMethod().createFilter(channelProcess.iChan);
 				decimationFilter.prepareFilter();
-//				inputSampleRate = decimatorMethod.getSampleRate();
-//				outputSampleRate = inputSampleRate / 2;
+				decimateFactor = noiseBandControl.getNoiseBandSettings().bandType.getDecimateFactor();
+				//				inputSampleRate = decimatorMethod.getSampleRate();
+				//				outputSampleRate = inputSampleRate / 2;
 			}
 			else {
 				// no decimator on first group. 
-//				inputSampleRate = 1;
-//				outputSampleRate = inputSampleRate;
+				//				inputSampleRate = 1;
+				//				outputSampleRate = inputSampleRate;
 			}
 
 		}
@@ -240,23 +243,49 @@ public class NoiseBandProcess extends PamProcess {
 			int decSamples = decimateData(inputData, nSamples);
 			/*
 			 * Now process the decimated data with as many band filters as are present. 
+			 *
+			 * If there are > 1 filters, then run every filter in a separate thread. 
+			 * Good for finer filter resolutions. Note that this slows eclipse quite badly in debug mode
 			 */
-			Filter bandFilter;
-			BandOutput bandOutput;
-			double aValue;
-//			double[] testArr = new double[200];
-//			double dum;
-			for (int i = 0; i < bandFilters.size(); i++) {
-				bandFilter = bandFilters.get(i);
-				bandOutput = bandOutputs.get(i);
-				for (int s = 0; s < decSamples; s++) {
-					bandOutput.addSample(bandFilter.runFilter(decimatedData[s]));
-//					if (s < 200) {
-//						testArr[s] = dum;
-//					}
+			if (bandFilters.size() > 1) {
+				Thread[] threads = new Thread[bandFilters.size()];
+				for (int i = 0; i < threads.length; i++) {
+					int threadInd = i;
+					threads[threadInd] = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							Filter bandFilter = bandFilters.get(threadInd);
+							BandOutput bandOutput = bandOutputs.get(threadInd);
+							for (int s = 0; s < decSamples; s++) {
+								bandOutput.addSample(bandFilter.runFilter(decimatedData[s]));
+							}						
+						}
+					});
+					threads[i].start();
+				}
+				try {
+					// wait for them all to finish. 
+					for (int i = 0; i < threads.length; i++) {
+						threads[i].join();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
-			
+			else {
+				//				don't run separate threads. 
+				for (int i = 0; i < bandFilters.size(); i++) {
+					Filter bandFilter = bandFilters.get(i);
+					BandOutput bandOutput = bandOutputs.get(i);
+					for (int s = 0; s < decSamples; s++) {
+						bandOutput.addSample(bandFilter.runFilter(decimatedData[s]));
+						//					if (s < 200) {
+						//						testArr[s] = dum;
+						//					}
+					}
+				}
+			}
+
 			return decSamples;
 		}
 
@@ -278,7 +307,7 @@ public class NoiseBandProcess extends PamProcess {
 				decimatedData = inputData;
 				return inputData.length;
 			}
-			int deciLength = (nSamples+1)/2;
+			int deciLength = (nSamples+decimateFactor)/decimateFactor;
 			if (decimatedData == null) {
 				decimatedData = new double[deciLength];
 			}
@@ -293,7 +322,7 @@ public class NoiseBandProcess extends PamProcess {
 			}
 			int newSamples = 0;
 			int sample;
-			for (sample = decimatorOffset; sample < nSamples; sample+=2) {
+			for (sample = decimatorOffset; sample < nSamples; sample+=decimateFactor) {
 				decimatedData[newSamples++] = preDecimatedData[sample];
 			}
 			decimatorOffset = sample - nSamples;
@@ -304,41 +333,42 @@ public class NoiseBandProcess extends PamProcess {
 		public String toString() {
 			String str = "";
 			if (decimationFilter != null) {
-				str += String.format("Input fs %3.1fHz, LP filter %3.1fHz\n", decimatorMethod.getSampleRate(), decimatorMethod.getFilterParams().lowPassFreq);
+				FilterMethod filterMethod = decimatorMethod.getFilterMethod();
+				str += String.format("Input fs %3.1fHz, LP filter %3.1fHz\n", filterMethod.getSampleRate(), filterMethod.getFilterParams().lowPassFreq);
 			}
 			for (int i = 0; i < bandFilterMethodss.size(); i++) {
-			FilterMethod aFilt = bandFilterMethodss.get(i);
+				FilterMethod aFilt = bandFilterMethodss.get(i);
 				FilterParams fPs = aFilt.getFilterParams();
 				str += String.format(" band %d filter %3.1f to %3.1f Hz\n", i, fPs.highPassFreq, fPs.lowPassFreq);
 			}
-			
+
 			return str;
 		}
-		
+
 	}
 	class BandOutput {
 		private int nSamples;
 		private double maxValue;
 		private double sumSquared;
-		
+
 		void addSample(double sample) {
 			nSamples++;
 			maxValue = Math.max(Math.abs(sample), maxValue);
 			sumSquared += sample*sample;
 		}
-		
+
 		double getMaxValue() {
 			return maxValue;
 		}
-		
+
 		double getRMS() {
 			return(Math.sqrt(sumSquared/nSamples));
 		}
-		
+
 		int getNSamples() {
 			return nSamples;
 		}
-		
+
 		void clear() {
 			nSamples = 0;
 			maxValue = 0;
@@ -355,7 +385,7 @@ public class NoiseBandProcess extends PamProcess {
 	/**
 	 * @return the decimationFilterMethods
 	 */
-	public ArrayList<FilterMethod> getDecimationFilterMethods() {
+	public ArrayList<DecimatorMethod> getDecimationFilterMethods() {
 		return decimationFilterMethods;
 	}
 

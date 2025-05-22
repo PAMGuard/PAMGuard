@@ -11,16 +11,17 @@
 	<h2>Overview</h2>
 	<br>
 
-	<p>This module allows you to measure noise is a multiple octave or third octave 
-	frequency bands. These measurements are compatible with the ANSI Standard 
-	<a href = "http://scitation.aip.org/content/asa/standard/ansi/ASASTD.ANSI.ASA.S1.11">
+	<p>This module allows you to measure noise in 
+	frequency bands of different widths: Octave, Third Octave, Deci-Decade, Decade, 1/10 Octave, and 1/12 Octave. 
+	These measurements are compatible with the ANSI Standard 
+	<a href = "https://webstore.ansi.org/standards/asa/ansiasas1112004r2009">
 	ANSI S1.11-2004 American National Standard Specification for
 Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
 	</p>
-	<p>The method works by measuring noise in three third octave (or one octave) band in the highest octave 
-	of the available data using a bank o fband pass filters. The data are then decimated
-	 by a factor 2 and a further three third octave (or one octave)
-	band measurements made in the highest octave of the decimated data. This process can be repeated for as many decimators /
+	<p>The method works by first measuring noise noise bands the highest octave 
+	of the available data using a bank of band pass filters. The data are then decimated
+	 by a factor 2 (or 10 for Decade bands) and a further set of measurements made in the next octave down
+	(i.e. the highest octave of the decimated data). This process can be repeated for as many decimators /
 	octaves of data that you wish, reaching lower and lower frequencies. Because the amount of raw data to be processed
 	is halved in each decimator, each bank of filters requires increasingly less processing power. </p>
 
@@ -49,20 +50,25 @@ Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
 		the channels you want to measure noise on.
 	</p>
 
-<br>
+
 	<h4>Output Interval</h4>
 	<p>Enter the interval between measurements in seconds.</p>
 	
-<br>
+
 	<h4>Measurement Bands</h4>
-	<p>Select Octave or Third Octave bands and the band number of the highest band you wish to measure. Select the 
-	number of decimators, which will in turn control the lowest frequency that the module measures noise at. 
+	<p>Select the band type you wish to measure in from the drop down list, and the Reference Frequency, which is the centre 
+	frequency of a band, against which all other band centres will be calculated. By default, this is 1000Hz. </p>
+	 
+	<p>Select the maximum and minimum frequencies you want to measure between. Bands will then be calculated to fit between these 
+	limits, i.e. the upper edge of the highest band will not be greater than the maximum frequency and the lower edge of the lowest band
+	will not be lower than the minimum frequency. e.g. if you are working with third octave bands and set the frequency limits to be 200Hz and 24kHz, 
+	you'll get 20 bands between 222.7Hz and 22.63kHz.
 	</p>
 	
-<br>
+
 	<h4>Filters</h4>
 	<p>Select Butterworth or IIR Filters. Generally, Butterworth filters will operate much faster than FIR filters on a 
-	desktop computer. Generally 5th order Butterworth or 7th oder (128 tap) FIR filters are more than adequate. 
+	desktop computer. Generally 6th order Butterworth or 7th oder (128 tap) FIR filters are more than adequate. 
 	The exact cut off frequencies and filter responses are shown for information only. 
 	</p>
 	
