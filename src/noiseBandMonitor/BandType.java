@@ -1,9 +1,11 @@
 package noiseBandMonitor;
 
 public enum BandType {
+	
 	OCTAVE, THIRDOCTAVE, DECIDECADE, DECADE, TENTHOCTAVE, TWELTHOCTAVE;
 
 	/* (non-Javadoc)
+	 * Band name to use in drop down lists. 
 	 * @see java.lang.Enum#toString()
 	 */
 	@Override
@@ -16,7 +18,7 @@ public enum BandType {
 		case DECIDECADE:
 			return "Deci Decade";
 		case DECADE:
-			return "Decade Bands";
+			return "Decade";
 		case TENTHOCTAVE:
 			return "Tenth Octave";
 		case TWELTHOCTAVE:
@@ -25,6 +27,31 @@ public enum BandType {
 		return null;
 	}
 	
+	/**
+	 * For Decade bands, decimate by a factor 10 for each band. For all others
+	 * decimate by a factor 2. 
+	 * @return
+	 */
+	public int getDecimateFactor() {
+		switch (this) {
+		case DECIDECADE:
+		case OCTAVE:
+		case TENTHOCTAVE:
+		case THIRDOCTAVE:
+		case TWELTHOCTAVE:
+			return 2;
+		case DECADE:
+			return 10;
+		default:
+			break;
+		}
+		return 2;
+	}
+	
+	/**
+	 * Longer description to use in tool tips. 
+	 * @return
+	 */
 	public String description() {
 		switch(this) {
 		case OCTAVE:
@@ -36,54 +63,13 @@ public enum BandType {
 		case DECADE:
 			return "Decadal (x10) frequency bands";
 		case TENTHOCTAVE:
-			return "Tenth Octave Bands";
+			return "Tenth Octave Bands (warning - slow to process)";
 		case TWELTHOCTAVE:
-			return "Twelth Octave Bands";
+			return "Twelth Octave Bands (warning - slow to process)";
 		}
 		return null;
 	}
 	
-	/**
-	 * Get the number of frequency bands per octave. 
-	 * @return
-	 */
-//	public double bandsPerOctave() {
-//		switch (this) {
-//		case OCTAVE:
-//			return 2;
-//		case THIRDOCTAVE:
-//			return 3;
-//		case DECIDECADE:
-//			return .1/Math.log10(2);
-//		case TENTHOCTAVE:
-//			return 10;
-//		case TWELTHOCTAVE:
-//			return 12;
-//		default:
-//			break;
-//		}
-//		return 0;
-//	}
-	
-//	/**
-//	 * Is it a standard band - this means 1/3 octave or octave. Tenth and other
-//	 * band types need a different calculation in the BandData class. 
-//	 * @return
-//	 */
-//	public boolean standardBand() {
-//		switch (this) {
-//		case OCTAVE:
-//		case THIRDOCTAVE:
-//		case DECIDECADE:
-//			return true;
-//		case TENTHOCTAVE:
-//		case TWELTHOCTAVE:
-//			return false;
-//		default:
-//			break;
-//		}
-//		return false;
-//	}
 	
 	/**
 	 * Ratio between centres of adjacent bands. 
@@ -105,28 +91,6 @@ public enum BandType {
 			return Math.pow(2, 1./12.);
 		}
 		return 0;
-//		return Math.pow(2., 1./(double) bandsPerOctave());
 	}
 	
-//	/**
-//	 * These are referring to some ANSI standard 1/3 octave bands, 
-//	 * so only apply to octave and 1/3 octave bands. The step for 1/3 is 
-//	 * 1 and for octave is 3, i.e. taking every third centre frequency. 
-//	 * @return
-//	 */
-//	public int getBandStep() {
-//		switch(this) {
-//		case OCTAVE:
-//			return 3;
-//		case THIRDOCTAVE:
-//			return 1;
-//		case DECIDECADE:
-//			return .1/Math.log10(2);
-//		case TENTHOCTAVE:
-//			return -3;
-//		case TWELTHOCTAVE:
-//			return -3;
-//		}
-//		return 0;		
-//	}
 }

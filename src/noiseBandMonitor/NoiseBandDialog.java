@@ -35,6 +35,7 @@ import javax.swing.event.ChangeListener;
 
 import Filters.ANSIStandard;
 import Filters.FilterMethod;
+import Filters.FilterParams;
 import Filters.FilterType;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
@@ -94,7 +95,7 @@ public class NoiseBandDialog extends PamDialog {
 
 	private boolean setupComplete = false;
 
-	ArrayList<FilterMethod> decimationFilters = new ArrayList<FilterMethod>();
+	ArrayList<DecimatorMethod> decimationFilters = new ArrayList<DecimatorMethod>();
 	ArrayList<FilterMethod> bandFilters = new ArrayList<FilterMethod>();
 	int[] decimatorIndexes;
 
@@ -564,15 +565,15 @@ public class NoiseBandDialog extends PamDialog {
 			g.setColor(Color.red);
 			Graphics2D g2d = (Graphics2D) g;
 			int iDecimator = 0;
-			for (FilterMethod aMethod:decimationFilters) {
+			for (DecimatorMethod aMethod:decimationFilters) {
 				if (iDecimator == selectedDecimator) {
 					g2d.setStroke(selBandStroke);
 				}
 				else {
 					g2d.setStroke(singleStroke);
 				}
-				paintFilter(g, aMethod);
-				int xPos = (int) bodePlotAxis.xAxis.getPosition(aMethod.getSampleRate()/4);
+				paintFilter(g, aMethod.getFilterMethod());
+				int xPos = (int) bodePlotAxis.xAxis.getPosition(aMethod.getOutputSampleRate()/2);
 				int yPos = (int) bodePlotAxis.yAxis.getPosition(0);
 				g.drawLine(xPos, yPos, xPos, yPos+getHeight()/20);
 				iDecimator++;
@@ -604,8 +605,12 @@ public class NoiseBandDialog extends PamDialog {
 			sampleRate = (float) aFilter.getSampleRate();
 			maxPixel = (int) xAxis.getPosition(sampleRate/2.);
 			filterConstant = aFilter.getFilterGainConstant();
+			FilterParams filterParams = aFilter.getFilterParams();
 			for (int iPix = 0; iPix <= maxPixel; iPix++) {
 				freqVal = xAxis.getDataValue(iPix);
+//				if (freqVal > filterParams.lowPassFreq) {
+//					break;
+//				}
 				gainVal = aFilter.getFilterGain(freqVal / sampleRate * Math.PI * 2) / filterConstant;
 				if (gainVal > 0) {
 					gainVal = 20.*Math.log10(gainVal);

@@ -118,17 +118,14 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	}
 	
 
-	public ArrayList<FilterMethod> makeDecimatorFilters(NoiseBandSettings noiseSettings, double sampleRate) {
-		ArrayList<FilterMethod> decFilters = new ArrayList<FilterMethod>();
+	public ArrayList<DecimatorMethod> makeDecimatorFilters(NoiseBandSettings noiseSettings, double sampleRate) {
+		ArrayList<DecimatorMethod> decFilters = new ArrayList<DecimatorMethod>();
 		/*
 		 * Now that we have Decade bands as well as octave, third octave, and smaller, we 
 		 * need to think more about the step size for the decimators: 2 for most, but 10 if 
 		 * it's Decade bands. 
 		 */
-		int deciStep = 2;
-		if (noiseSettings.bandType == BandType.DECADE) {
-			deciStep = 10;
-		}
+		int deciStep = noiseSettings.bandType.getDecimateFactor();
 		/*
 		 * We only need an additional Decimator if the nyquist frequency of the data is
 		 * much over deciStep* the maximum frequency of the band we're working with. 
@@ -150,20 +147,20 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 			filterParams.filterType = noiseSettings.filterType;
 			filterParams.lowPassFreq = (float) sampleRate/4;
 			double filterFreq = currFS/2/deciStep;
+			FilterMethod filterMethod = null;
 			switch(noiseSettings.filterType) {
 			case BUTTERWORTH:
 				filterParams.filterOrder = noiseSettings.iirOrder+2;
 				filterParams.lowPassFreq = (float) filterFreq;
-				ButterworthMethod bm;
-				decFilters.add(bm = new ButterworthMethod(currFS, filterParams));
+				filterMethod = new ButterworthMethod(currFS, filterParams);
 				break;
 			case FIRWINDOW:
 				filterParams.filterOrder = noiseSettings.firOrder;
-				decFilters.add(new FIRFilterMethod(currFS, filterParams));
+				filterMethod = new FIRFilterMethod(currFS, filterParams);
 				break;
 			}
 			currFS/=deciStep;
-			
+			decFilters.add(new DecimatorMethod(filterMethod, currFS));
 		}
 		
 ////		float sampleRate = (float) getSampleRate();
@@ -192,7 +189,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 
 	
 	public ArrayList<FilterMethod> makeBandFilters(NoiseBandSettings noiseSettings, 
-			ArrayList<FilterMethod> decimationFilters, 
+			ArrayList<DecimatorMethod> decimationFilters, 
 			double topSampleRate) {
 		// work out the lowest frequency we're likely to go to. 
 		ArrayList<FilterMethod> bandFilters = new ArrayList<FilterMethod>();
@@ -207,7 +204,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 		double[] loEdges = bandData.getBandLoEdges();
 		double[] hiEdges = bandData.getBandHiEdges();
 		double[] centreFreqs = bandData.getBandCentres();
-		FilterMethod decimator;
+		DecimatorMethod decimator;
 		bandFilters.clear();
 		if (hiEdges == null) {
 			return null;
@@ -226,7 +223,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 			}
 			else {
 				decimator = decimationFilters.get(decimatorIndex[iBand]);
-				sampleRate = (float) decimator.getSampleRate()/2;
+				sampleRate = (float) decimator.getOutputSampleRate();
 			}
 			FilterParams filterParams = new FilterParams();
 			filterParams.chebyGamma = noiseSettings.firGamma;
@@ -276,7 +273,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	 * @param hiFreq
 	 * @return
 	 */
-	int findDecimatorIndex(ArrayList<FilterMethod> decimationFilters, double hiFreq) {
+	int findDecimatorIndex(ArrayList<DecimatorMethod> decimationFilters, double hiFreq) {
 		if (decimationFilters == null) {
 			return -1;
 		}
@@ -284,7 +281,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 		FilterMethod aFilter;
 		double bandGap = getBandGap();
 		for (int i = nDecimators-1; i >= 0; i--) {
-			aFilter = decimationFilters.get(i);
+			aFilter = decimationFilters.get(i).getFilterMethod();
 //			if (aFilter.getFilterParams().filterType == FilterType.BUTTERWORTH) {
 //				bandGap = Math.pow(2, 1./2.);
 //			}

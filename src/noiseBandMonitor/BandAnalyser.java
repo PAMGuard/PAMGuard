@@ -11,7 +11,7 @@ import Filters.FilterMethod;
  */
 public class BandAnalyser {
 
-	private ArrayList<FilterMethod> decimationFilters;
+	private ArrayList<DecimatorMethod> decimationFilters;
 	private ArrayList<FilterMethod> bandFilters;
 	private double topSampleRate;
 	private BandPerformance[] bandPerformances;
@@ -64,7 +64,7 @@ public class BandAnalyser {
 		double input, output;
 		decimatorConstants[0] = 1;
 		for (int i = 0; i < decimationFilters.size(); i++) {
-			decimatorConstants[i+1] = decimationFilters.get(i).getFilterGainConstant();
+			decimatorConstants[i+1] = decimationFilters.get(i).getFilterMethod().getFilterGainConstant();
 		}
 		int nFreqs = (int) ((highestFreq2-lowestFreq2) / logStep) + 1;
 		frequencyList = new double[nFreqs];
@@ -88,7 +88,7 @@ public class BandAnalyser {
 			for (int d = 0; d < decimationFilters.size(); d++) {
 				omega = Math.PI*2.*f/sampleRate;
 				decimatorOutput[d+1] = decimatorOutput[d] * 
-					decimationFilters.get(d).getFilterGain(omega) /
+					decimationFilters.get(d).getFilterMethod().getFilterGain(omega) /
 					decimatorConstants[d+1];  
 //				for (int b = 0; b < bandFilters.size(); b++) {
 //					if ()
@@ -96,7 +96,7 @@ public class BandAnalyser {
 				
 				
 				f = getDecimatedFreq(f, sampleRate);
-				sampleRate /= 2;
+				sampleRate = decimationFilters.get(d).getOutputSampleRate();
 				decimatedFrequency[d+1] = f;
 			}
 			for (int b = 0; b < bandFilters.size(); b++) {
@@ -139,7 +139,7 @@ public class BandAnalyser {
 	/**
 	 * @return the decimationFilters
 	 */
-	public ArrayList<FilterMethod> getDecimationFilters() {
+	public ArrayList<DecimatorMethod> getDecimationFilters() {
 		return decimationFilters;
 	}
 
