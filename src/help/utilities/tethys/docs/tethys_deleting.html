@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Viewing and Deleting Documents</title>
+</head>
+<body>
+	<h1>Viewing and Deleting</h1>
+	<br>
+	<h3>Viewing Documents</h3>
+	<p>The best way to view documents is the Tethys Web Client. This can easily be opened by pressing the 
+	<b>Open Client</b> button near the top of the display. Alternatively, if you're not already
+	running PAMGuard, you can just enter http://localhost:9779/Client/l into the title bar of a web browser
+	(replacing 9779 with the appropriate port number if you've launched the Tethys server using a different port). 
+	</p>
+	<p>In the top right hand corner of the web page is a small image of the Tethys goddess. To the right of this 
+	is a small dropdown menu, where you can open pages listing the various types of Tethys documents.</p>
+	<br>
+	<center><img src=images/clientmenu.png></center>
+	<br>
+	<p>Clicking on any document will open it and display it's contents.</p>
+	<p>You can also jump straight to opening the web browser page for any document type using the small dropdown 
+	menu to the right of the <b>Open Client</b> button.</p>
+	<br>
+	<center><img src=images/docsmenu.png></center>
+	<br>
+	<p>If <em>Show in Browser</em> is selected, the same web pages that are part of the Tethys Client will open. 
+	Otherwise, if <em>Show in PAMGuard</em> is selected, a documents list will open within PAMGuard:</p>
+	<br>
+	<center><img src=images/documentlist.png></center>
+	<br>
+	<p>At the top of this list, you can select the types of document to list. You can also use the checkboxes
+	to only show documents from the current Tethys Project, or from the current PAMGuard dataset.</p>
+	<p>To view a document, right click on it and select <em>Display Document ...</em> from the drop down menu and the
+	document text will be displayed in a new window. You can copy text out of this window, but not change it. </p>
+	
+	<h3>Deleting Documents</h3>
+	<p>Deleting documents is not something you should be doing often, but sometimes you will want to. Be particularly careful 
+	if you're deleting a Deployment document, since it's possible that some Detections and Localizations documents will be referring
+	to that Deployment document, so you may end up with a Tethys database that's going to behave abnormally. Ideally, if you need to 
+	delete a Deployment, delete everything to do with that Deployment and start over. </p>
+	<p>Documents can be deleted from the PAMGuard built in document viewer, described above. For safety, you are only able to 
+	delete documents associated with the Tethys Project you're currently working with, though this may encompass multiple 
+	PAMGuard datasets.   Once you've found the document you wish to delete in the PAMGuard document list, simply right click 
+	and select <em>Delete Document ...</em>.
+	
+	
+	
+	<br>
+	<br>
+    <p class="prevLink"><a href="tethys_mappings.html">Previous: Tethys / PAMGuard mappings</a></p>
+	</p>
+	<p class="nextLink">
+		<a href="tethys_batch.html">Next: Batch Output</a>
+	</p>
+	<br>
+</body>
+</html>

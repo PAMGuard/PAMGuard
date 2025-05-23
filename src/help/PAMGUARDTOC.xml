@@ -220,7 +220,9 @@
 
    <tocitem text="PAMGuard Mapping " target="utilities.tethys.docs.tethys_mappings" image="topic"/>
 
-   <tocitem text="Batch output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
+   <tocitem text="Viewing and Deleting Documents " target="utilities.tethys.docs.tethys_deleting" image="topic"/>
+
+   <tocitem text="Batch Output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
 
   </tocitem>
  </tocitem>

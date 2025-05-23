@@ -45,6 +45,8 @@ import PamController.PamSettings;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
+import PamUtils.worker.PamWorkMonitor;
+import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorker;
 import PamUtils.worker.filelist.FileListData;
 import PamUtils.worker.filelist.WavFileType;
@@ -268,6 +270,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		constraints.anchor = GridBagConstraints.WEST;
 		addComponent(p, subFolders = new JCheckBox("Include sub folders"), constraints);
 		subFolders.addActionListener((a)->{
+			folderInputParameters.subFolders = subFolders.isSelected();
 			if (folderInputParameters.getSelectedFiles()!=null) {
 				makeSelFileList(folderInputParameters.getSelectedFiles());
 			}
@@ -455,12 +458,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			//need to make sure this is dynamically set - following means that the dialog will work 
 			//with whatever has been set by the user but if cancel is pressed settings will still revert.
 			boolean useSubFolders = false;
-			if (subFolders!=null) {
-				useSubFolders = subFolders.isSelected();
-			}
-			else {
+//			if (subFolders!=null) {
+//				useSubFolders = subFolders.isSelected();
+//			}
+//			else {
 				useSubFolders = folderInputParameters.subFolders;
-			}
+//			}
 			//Swing way
 			wavListWorker.startFileListProcess(PamController.getMainFrame(), rootList,
 					useSubFolders, true);
@@ -1048,7 +1051,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	}
 
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 //		System.out.println("FolderInputSystem: Get store info start:");
 		if (allFiles == null || allFiles.size() == 0) {
 			// returns null in viewer mode because I stopped it recataloging files 
@@ -1079,6 +1082,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 					//					System.out.printf("Swap last file from %s to %s\n", lastFile.getName(), allFiles.get(i).getName());
 					lastFile = allFiles.get(i);
 					lastFileEnd = allFileStarts[i] + (long) (lastFile.getDurationInSeconds()*1000.);
+				}
+				if (workMonitor != null) {
+					int prog = (i+1)*100/allFiles.size();
+					String msg = String.format("File %d of %d: %s", i+1, allFiles.size(), aFile.getName());
+					PamWorkProgressMessage progMsg = new PamWorkProgressMessage(prog, msg);
+					workMonitor.update(progMsg);
 				}
 			}
 			storeInfo.setFirstFileStart(firstFileStart); // just incase changed.

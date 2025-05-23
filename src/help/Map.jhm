@@ -438,6 +438,8 @@
 
 <mapID target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation" url="classifiers/roccaHelp/docs/rocca_ContourExtractionManipulation.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_deleting" url="utilities/tethys/docs/tethys_deleting.html"/>
+
 <mapID target="visual_methods.loggerFormsHelp.docs.SINGLE" url="visual_methods/loggerFormsHelp/docs/SINGLE.html"/>
 
 <mapID target="utilities.datamap.docs.datamap" url="utilities/datamap/docs/datamap.html"/>

@@ -51,6 +51,7 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
+import PamUtils.worker.PamWorkMonitor;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -463,7 +464,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 
 
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 		if (dataMap == null || dataMap.getNumMapPoints() == 0) {
 			return null;
 		}
