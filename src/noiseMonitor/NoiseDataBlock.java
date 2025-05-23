@@ -44,6 +44,8 @@ public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements Alarm
 	public static final String[] displayNames = {"Mean", "Median", "Lower 95%", "Upper 95%", "Minimum", "Maximim", "Peak"};
 	
 	private int statisticTypes;
+	
+	
 	private TethysNoiseDataProvider tethysNoiseDataProvider;
 	private FixedSpeciesManager fixedSpeciesManager;
 	
