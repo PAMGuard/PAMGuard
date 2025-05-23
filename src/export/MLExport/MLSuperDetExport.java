@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.renjin.sexp.ListVector.NamedBuilder;
 
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 import us.hebi.matlab.mat.format.Mat5;
@@ -113,6 +114,11 @@ public class MLSuperDetExport extends MLDataUnitExport {
 	@Override
 	public String getName() {
 		return "super_detection";
+	}
+
+	@Override
+	protected Struct detectionHeader(PamDataBlock pamDataBlock) {
+		return null;
 	}
 
 

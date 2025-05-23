@@ -3,6 +3,7 @@ package export.MLExport;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 
 import PamUtils.PamCalendar;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import pamMaths.PamVector;
 import us.hebi.matlab.mat.format.Mat5;
@@ -171,5 +172,12 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 
 		return new double[] {bearing, pitch};
 	}
+
+	/**
+	 * Get the detection header for the specific detection type.
+	 * @param pamDataBlock 
+	 * @return the detection header structure. 
+	 */
+	protected abstract Struct detectionHeader(PamDataBlock pamDataBlock);
 	
 }

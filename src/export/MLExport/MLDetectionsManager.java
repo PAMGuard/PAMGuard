@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.zip.Deflater;
 
 import PamUtils.PamArrayUtils;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import javafx.scene.layout.Pane;
@@ -63,6 +64,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 		mlDataUnitsExport.add(new MLWhistleMoanExport()); 
 		mlDataUnitsExport.add(new MLCPODExport()); 
 		mlDataUnitsExport.add(new MLRawExport()); 
+		mlDataUnitsExport.add(new MLNoiseExport());
 	}
 
 	@Override
@@ -197,7 +199,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 			Struct mlStructure= Mat5.newStruct(new int[]{n, 1});
 
 			float sampleRate = -1;
-
+			PamDataBlock parentBlock = null;
 
 			n=0; 
 			//allocate the class now. 
@@ -208,6 +210,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 					mlStructure=mlDataUnitsExport.get(i).detectionToStruct(mlStructure, dataUnits.get(j), n); 
 
 					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
+					parentBlock = dataUnits.get(j).getParentDataBlock(); 
 					n++; 
 					alreadyStruct[j] = true;
 				}
@@ -216,6 +219,12 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 			if (n>0) {
 				list.set(mlDataUnitsExport.get(i).getName(),mlStructure);
 				list.set(mlDataUnitsExport.get(i).getName()+"_sR", Mat5.newScalar(sampleRate)); 
+				
+				//set the header if there is one. 
+				if ( mlDataUnitsExport.get(i).detectionHeader(parentBlock)!=null) {
+					list.set(mlDataUnitsExport.get(i).getName()+"_metadata", mlDataUnitsExport.get(i).detectionHeader(parentBlock)); 
+				}
+
 			}
 		}
 

@@ -84,7 +84,8 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	 */
 	public Polygon drawPredicition(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
-		//		System.out.println("A Plot line: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()));
+		
+		//System.out.println("A Plot line: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()));
 
 
 		double mintC= -1000.;
@@ -129,8 +130,9 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 		Color color;
 		double dataBin; //the time between the data points in millis
 
-		//		System.out.println("A Plot line 2: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()) + " detData " + detData.length);
+		//System.out.println("A Plot line 2: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()) + " detData " + detData.length + " " +  detData[0].length);
 
+		//iterate through each line from det data
 		for (int i=0; i<detData.length; i++) {
 
 			if (getColor(i).enabled) {
@@ -139,6 +141,7 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 				g.setStroke(color);
 				g.setFill(color); 
 
+				//iterate through each data point in the line
 				for (int j=0; j<detData[i].length; j++) {
 					
 					if (lastUnits[chan][i]!=null && lastUnits[chan][i].getTimeMillis()>pamDataUnit.getTimeMilliseconds() ) {
@@ -165,8 +168,7 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 						
 						
 						g.fillOval(tC-OVAL_RADIUS/2, dataPixel-OVAL_RADIUS/2, OVAL_RADIUS,OVAL_RADIUS);
-						//						System.out.println("Fill oval:");
-						return null; 
+
 					}
 					else {
 						if (tC>lastUnits[chan][i].getX() && (!this.getTDGraph().isWrap() ||
