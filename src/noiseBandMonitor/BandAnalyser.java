@@ -89,11 +89,7 @@ public class BandAnalyser {
 				omega = Math.PI*2.*f/sampleRate;
 				decimatorOutput[d+1] = decimatorOutput[d] * 
 					decimationFilters.get(d).getFilterMethod().getFilterGain(omega) /
-					decimatorConstants[d+1];  
-//				for (int b = 0; b < bandFilters.size(); b++) {
-//					if ()
-//				}
-				
+					decimatorConstants[d+1];  			
 				
 				f = getDecimatedFreq(f, sampleRate);
 				sampleRate = decimationFilters.get(d).getOutputSampleRate();
@@ -104,11 +100,18 @@ public class BandAnalyser {
 				f = decimatedFrequency[decimatorIndexes[b]+1]; // signal frequency after decimation and aliassing. 
 				FilterMethod bandFilter = bandFilters.get(b);
 				sampleRate = bandFilter.getSampleRate(); // input sample rate of filter. 
-				omega = Math.PI*2.*f/sampleRate;
-				output = input*bandFilter.getFilterGain(omega)/bandConstants[b];
+				double nyquist = sampleRate / 2;
+				if (frequencyList[iF] >= nyquist) {
+					output = 1e-9;
+				}
+				else { 
+					omega = Math.PI*2.*f/sampleRate;
+					output = input*bandFilter.getFilterGain(omega)/bandConstants[b];
+				}
 				bandPerformances[b].addData(iF, output);
 			}
 		}
+		
 		return bandPerformances;
 	}
 
@@ -120,10 +123,10 @@ public class BandAnalyser {
 	 * @return aliased frequency. 
 	 */
 	private double getDecimatedFreq(double f, double sampleRate) {
-		double newNiquist = sampleRate / 4;
-//		if (f < newNiquist) {
-//			return f; // below new niquist. 
-//		}
+		double newNiquist = sampleRate / noiseBandSettings.bandType.getDecimateFactor() / 2;
+		if (f < newNiquist) {
+			return f; // below new niquist. 
+		}
 		while (f < 0 || f > newNiquist) {
 			if (f < 0) {
 				f = -f;
