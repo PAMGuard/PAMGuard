@@ -23,6 +23,7 @@ import PamController.status.ProcessCheck;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import PamUtils.worker.PamWorkMonitor;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -1239,12 +1240,12 @@ public class AcquisitionProcess extends PamProcess {
 		return daqStatusDataBlock;
 	}
 
-	public InputStoreInfo getStoreInfo(boolean detail) {
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 		if (runningSystem == null) {
 			runningSystem = acquisitionControl.findDaqSystem(null);
 		}
 		if (runningSystem instanceof DataInputStore) {
-			return ((DataInputStore) runningSystem).getStoreInfo(detail);
+			return ((DataInputStore) runningSystem).getStoreInfo(workMonitor, detail);
 		}
 		else {
 			return null;

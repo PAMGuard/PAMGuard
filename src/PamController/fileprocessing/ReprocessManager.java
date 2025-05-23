@@ -275,7 +275,7 @@ public class ReprocessManager {
 			if (workMonitor != null) {
 				workMonitor.update(new PamWorkProgressMessage(-1, "Checking input data " + aPCU.getUnitName()));
 			}
-			inputInfo = inputStore.getStoreInfo(true);
+			inputInfo = inputStore.getStoreInfo(workMonitor, true);
 //			System.out.println("Input store info: " + inputInfo);
 		}
 		StoreChoiceSummary choiceSummary = new StoreChoiceSummary(inputInfo);

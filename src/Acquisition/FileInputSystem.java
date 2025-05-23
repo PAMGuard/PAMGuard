@@ -59,6 +59,7 @@ import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
+import PamUtils.worker.PamWorkMonitor;
 import PamUtils.worker.filelist.WavFileType;
 import PamView.dialog.PamLabel;
 import PamView.dialog.warn.WarnOnce;
@@ -1388,7 +1389,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		}
 	}
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 //		System.out.println("FileInputSystem: Get store info start:");
 		WavFileType currentFile = getCurrentFile();
 		if (currentFile == null || currentFile.exists() == false) {
