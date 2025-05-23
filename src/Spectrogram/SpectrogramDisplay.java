@@ -1735,9 +1735,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				else {
 					botInset += 2;
 				}
-				if (spectrogramOuterPanel.getHeight() == 0) {
-					System.out.println("no outer panel");
-				}
+//				if (spectrogramOuterPanel.getHeight() == 0) {
+//					System.out.println("no outer panel");
+//				}
 //				System.out.printf("Set spec botInset to %d as %d - %d\n", botInset, spectrogramPlotPanel.getHeight(), spectrogramOuterPanel.getHeight());
 			}
 //			System.out.printf("Setting spec axis positiong at %d / %d\n", axisInsets.top, botInset);
