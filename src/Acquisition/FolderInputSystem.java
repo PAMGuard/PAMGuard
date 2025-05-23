@@ -270,6 +270,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		constraints.anchor = GridBagConstraints.WEST;
 		addComponent(p, subFolders = new JCheckBox("Include sub folders"), constraints);
 		subFolders.addActionListener((a)->{
+			folderInputParameters.subFolders = subFolders.isSelected();
 			if (folderInputParameters.getSelectedFiles()!=null) {
 				makeSelFileList(folderInputParameters.getSelectedFiles());
 			}
@@ -457,12 +458,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			//need to make sure this is dynamically set - following means that the dialog will work 
 			//with whatever has been set by the user but if cancel is pressed settings will still revert.
 			boolean useSubFolders = false;
-			if (subFolders!=null) {
-				useSubFolders = subFolders.isSelected();
-			}
-			else {
+//			if (subFolders!=null) {
+//				useSubFolders = subFolders.isSelected();
+//			}
+//			else {
 				useSubFolders = folderInputParameters.subFolders;
-			}
+//			}
 			//Swing way
 			wavListWorker.startFileListProcess(PamController.getMainFrame(), rootList,
 					useSubFolders, true);

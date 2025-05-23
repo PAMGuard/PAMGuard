@@ -384,7 +384,7 @@ public class PamFFTProcess extends PamProcess {
 				dataPointer = fftOverlap;
 				if (dataPointer > 0) {
 					copyFrom = fftParameters.fftHop;
-					for (int j = 0; j < fftOverlap; j++) {
+					for (int j = 0; j < fftOverlap && copyFrom < fftParameters.fftLength; j++) {
 						windowedData[iChan][j] = windowedData[iChan][copyFrom++];
 //						windowedData[iChan] = Arrays.copyOfRange(windowedData[iChan], fftParameters.fftHop, fftParameters.fftHop+fftParameters.fftLength);
 					}

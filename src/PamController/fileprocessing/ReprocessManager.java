@@ -192,7 +192,9 @@ public class ReprocessManager {
 		for (PamControlledUnit aPCU : inputStores) {
 			DataInputStore inputStore = (DataInputStore) aPCU;
 			OK &= inputStore.setAnalysisStartTime(procStartTime);
-			System.out.println("Input store info: " + inputInfo);
+			if (inputInfo != null) {
+				System.out.println("Input store info: " + inputInfo);
+			}
 		}
 		return OK;
 	}
@@ -268,22 +270,8 @@ public class ReprocessManager {
 		if (inputStores == null || inputStores.size() == 0) {
 			return new StoreChoiceSummary(null, ReprocessStoreChoice.STARTNORMAL);
 		}
-		InputStoreInfo inputInfo = null;
-		
-		for (PamControlledUnit aPCU : inputStores) {
-			DataInputStore inputStore = (DataInputStore) aPCU;
-			if (workMonitor != null) {
-				workMonitor.update(new PamWorkProgressMessage(-1, "Checking input data " + aPCU.getUnitName()));
-			}
-			inputInfo = inputStore.getStoreInfo(workMonitor, true);
-//			System.out.println("Input store info: " + inputInfo);
-		}
-		StoreChoiceSummary choiceSummary = new StoreChoiceSummary(inputInfo);
-		
-		if (inputInfo == null || inputInfo.getFileStartTimes() == null) {
-			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
-			return choiceSummary;
-		}
+		StoreChoiceSummary choiceSummary = new StoreChoiceSummary(null);
+
 				
 		choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 		
@@ -312,7 +300,25 @@ public class ReprocessManager {
 		if (partStores == false)  {
 //			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 			return null; // no part full stores, so can start without questions
+		}		
+		
+		// now deal with the input data. 
+		InputStoreInfo inputInfo = null;
+		for (PamControlledUnit aPCU : inputStores) {
+			DataInputStore inputStore = (DataInputStore) aPCU;
+			if (workMonitor != null) {
+				workMonitor.update(new PamWorkProgressMessage(-1, "Checking input data " + aPCU.getUnitName()));
+			}
+			inputInfo = inputStore.getStoreInfo(workMonitor, true);
+//			System.out.println("Input store info: " + inputInfo);
 		}
+		choiceSummary.setInputStoreInfo(inputInfo);
+		
+		if (inputInfo == null || inputInfo.getFileStartTimes() == null) {
+			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
+			return choiceSummary;
+		}
+		
 		if (choiceSummary.getInputStartTime() >= choiceSummary.getOutputEndTime()) {
 			/*
 			 *  looks like it's new data that starts after the end of the current store,
