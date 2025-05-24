@@ -42,6 +42,8 @@
 
   <tocitem text="Uinique Data Identifiers " target="overview.uid.docs.uid" image="topic"/>
 
+  <tocitem text="Log Files " target="overview.PamMasterHelp.docs.logfiles" image="topic"/>
+
   <tocitem text="Hydrophone Array Manager ">
    <tocitem text="Overview " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Overview" image="topic"/>
 
@@ -217,7 +219,9 @@
 
    <tocitem text="PAMGuard Mapping " target="utilities.tethys.docs.tethys_mappings" image="topic"/>
 
-   <tocitem text="Batch output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
+   <tocitem text="Viewing and Deleting Documents " target="utilities.tethys.docs.tethys_deleting" image="topic"/>
+
+   <tocitem text="Batch Output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
 
   </tocitem>
  </tocitem>
