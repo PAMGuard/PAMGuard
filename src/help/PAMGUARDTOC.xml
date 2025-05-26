@@ -45,6 +45,10 @@
 
   <tocitem text="Log Files " target="overview.PamMasterHelp.docs.logfiles" image="topic"/>
 
+  <tocitem text="Data Map " target="utilities.datamap.docs.datamap" image="topic"/>
+
+  <tocitem text="Data Export " target="overview.dataexport.docs.dataexport" image="topic"/>
+
   <tocitem text="Hydrophone Array Manager ">
    <tocitem text="Overview " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Overview" image="topic"/>
 
@@ -55,10 +59,6 @@
    <tocitem text="Hydrophones " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone" image="topic"/>
 
   </tocitem>
-  <tocitem text="Data Map ">
-   <tocitem text="Overview " target="utilities.datamap.docs.datamap" image="topic"/>
-
-  </tocitem>
   <tocitem text="Data Annotation ">
    <tocitem text="Overview " target="overview.annotations.docs.annotations" image="topic"/>
 
@@ -67,10 +67,6 @@
    <tocitem text="Logger Forms Annotation " target="overview.annotations.docs.loggerannotation" image="topic"/>
 
    <tocitem text="Target Motion Annotation " target="overview.annotations.docs.targetmotionannotation" image="topic"/>
-
-  </tocitem>
-  <tocitem text="Data Export ">
-   <tocitem text="Data Export " target="overview.dataexport.docs.dataexport" image="topic"/>
 
   </tocitem>
  </tocitem>
