@@ -679,12 +679,12 @@ final public class PamModel implements PamSettings {
 
 		mi = PamModuleInfo.registerControlledUnit("noiseMonitor.NoiseControl", "Noise Monitor");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
-		mi.setToolTipText("Measures noise in predefined frequency bands (e.g. thrid octave)");
+		mi.setToolTipText("Measures noise in predefined frequency bands (e.g. thrid octave) using FFT data");
 		mi.setModulesMenuGroup(processingGroup);
 
 		mi = PamModuleInfo.registerControlledUnit("noiseBandMonitor.NoiseBandControl", "Noise Band Monitor");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
-		mi.setToolTipText("Measure noise in octave or third octave bands");
+		mi.setToolTipText("Measure noise in octave or third octave bands using filter banks");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/NoiseBands/Docs/NoiseBands.html");
 

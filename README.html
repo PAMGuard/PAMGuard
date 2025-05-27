@@ -449,10 +449,13 @@ analyse the log file from the previous run for errors. If errors are found,
 then the user will be prompted to send a report to the PAMGuard team via email.
 See help on log files for further details. &nbsp;</p>
 
-<p class=MsoNormal>Issue 211. Noise Band Measurement module. Added features to
-support other types of frequency band as well as standard octave and third
-octave. PAMGuard now supports Octave, Third Octave, Deci-decade, Decade, 1/10
-Octave, and 1/12 Octave bands. </p>
+<p class=MsoNormal>Issue 211. Noise Band Measurement module (the one that uses
+filter banks). Added features to support other types of frequency band as well
+as standard octave and third octave. PAMGuard now supports Octave, Third
+Octave, Deci-decade, Decade, 1/10 Octave, and 1/12 Octave bands. </p>
+
+<p class=MsoNormal>Noise Monitor Module (the one that used FFT data). Added
+1/10 decade bands options. Improved data selection handling. </p>
 
 <p class=MsoNormal>Issue 215. x.wav Files. Support for duty cycling with .x.wav
 files from SCRIPPS HARP recorders. &nbsp;</p>
@@ -473,8 +476,8 @@ as a single row of data in the Deployments table on the display. </p>
 multi channel files; handling corrupt files; reloading audio data for
 spectrogram displays in viewer. </p>
 
-<p class=MsoNormal>Issue 230. Updated SUD reader to handle latest soundtrap firmware
-that supports accelerometers and magnetometers. </p>
+<p class=MsoNormal>Issue 230. Updated SUD reader to handle latest soundtrap
+firmware that supports accelerometers and magnetometers. </p>
 
 <p class=MsoNormal>Issue 220. Fixed spectrogram scrolling issues in Spectrogram
 and FX Time display.</p>
@@ -497,8 +500,8 @@ Whistle Classifier, Detection Group Localiser, Rocca, Click Train Detector, GPL
 Detector. If the Detection Group Localiser is used with Logger Form
 annotations, species codes can be taken from the logger form. </p>
 
-<p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections,
-and Localisations) available as Offline tasks. This is not useful when running
+<p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections, and
+Localisations) available as Offline tasks. This is not useful when running
 Tethys on a single dataset, since all tasks can be easily performed using
 ‘Export’ buttons on the main Tethys interface. However, this change means that
 these export tasks become available to the <a
@@ -509,8 +512,8 @@ online help pages and help pages for the Batch processor for details.</p>
 
 <p class=MsoNormal><b>Deep Learning Classifier</b></p>
 
-<p class=MsoNormal>Better error dialogs to indicate when models are incorrect and
-when the libraries have not been installed correctly.</p>
+<p class=MsoNormal>Better error dialogs to indicate when models are incorrect
+and when the libraries have not been installed correctly.</p>
 
 <p class=MsoNormal>DelphinID Whistle classifier support now implemented.</p>
 
@@ -1670,9 +1673,9 @@ Detector display. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>This version of PAMGuard has been upgraded to make it
-compatible with Java 12. psfx files generated in previous beta releases should
-be compatible with this version, and vice-versa.</p>
+lang=EN-US> </span>This version of PAMGuard has been upgraded to make it compatible
+with Java 12. psfx files generated in previous beta releases should be
+compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2191,8 +2194,8 @@ database.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>12. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 378. TMA dialog not displaying current Model type, and unclear when event
-not selected.</p>
+</span>Bug 378. TMA dialog not displaying current Model type, and unclear when
+event not selected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>13. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2652,11 +2655,11 @@ milliseconds. However, getDuration actually returns the number of samples.
 
 <p class=MsoNormal><b><span lang=EN-US>Plug-Ins</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard
-is how plug-ins are managed. PAMGuard now has the ability to dynamically load plug-in
-modules (saved as jar files) at runtime. This will greatly simplify the process
-of testing and distributing newly developed modules, since only a small jar
-file will be required rather than a new bespoke PAMGuard installation.</span></p>
+<p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard is
+how plug-ins are managed. PAMGuard now has the ability to dynamically load
+plug-in modules (saved as jar files) at runtime. This will greatly simplify the
+process of testing and distributing newly developed modules, since only a small
+jar file will be required rather than a new bespoke PAMGuard installation.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Module code development remains largely
 unchanged, in most cases simply requiring the addition of an interface class.
@@ -2691,9 +2694,9 @@ dependencies)</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Other Changes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle both
-64 bit and 32 bit installations. PAMGuard psf files are now registered in the
-Windows Registry, so double-clicking on a psf file should run PAMGuard in
+<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle
+both 64 bit and 32 bit installations. PAMGuard psf files are now registered in
+the Windows Registry, so double-clicking on a psf file should run PAMGuard in
 normal mode (as opposed to Viewer or Mixed modes). Note that the Windows
 Registry can only hold a single executable reference for psf files; therefore,
 for users with multiple installations of PAMGuard, double-clicking on a psf
@@ -2772,11 +2775,11 @@ was used. This is fixed. </p>
 
 <p class=MsoListParagraph style='margin-left:40.5pt;text-indent:-22.5pt'>5.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 295. If a click has a total length of a single sample, the code attempting
-to estimate the time delay between channels would crash. This is now fixed.
-This could only occur if both pre sample and post sample were set to 0 in the
-click detector, which is generally not a good idea, so this bug may have been
-there for some time, it's just that no one noticed before. Fixed</p>
+</span>Bug 295. If a click has a total length of a single sample, the code
+attempting to estimate the time delay between channels would crash. This is now
+fixed. This could only occur if both pre sample and post sample were set to 0
+in the click detector, which is generally not a good idea, so this bug may have
+been there for some time, it's just that no one noticed before. Fixed</p>
 
 <p class=MsoListParagraph style='margin-left:40.5pt;text-indent:-22.5pt'>6.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2845,10 +2848,10 @@ the online help. Users of the Click Detector will notice the following changes:<
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>There is now a choice of least squares and Simplex based
-algorithms for real-time animal tracking. The improved algorithms also provide
-better error information both for display on the map and for storage in the
-database. </span></p>
+</span><span lang=EN-US>There is now a choice of least squares and Simplex
+based algorithms for real-time animal tracking. The improved algorithms also
+provide better error information both for display on the map and for storage in
+the database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3279,8 +3282,8 @@ allocation to allow more memory for the database interface. Hopefully Fixed. </p
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-AU>9.</span><span lang=EN-AU style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 239. <span lang=EN-AU>Fixed bug in the DIFAR module that was incorrectly
-preventing cross-fixes for some calls.</span></p>
+</span>Bug 239. <span lang=EN-AU>Fixed bug in the DIFAR module that was
+incorrectly preventing cross-fixes for some calls.</span></p>
 
 <p class=MsoNormal>Details of these bugs can be found at <a
 href="https://sourceforge.net/p/PAMGuard/bugs">https://sourceforge.net/p/PAMGuard/bugs</a></p>
@@ -3771,9 +3774,9 @@ databases.</p>
 <p class=MsoNormal style='margin-left:36.0pt'>National Instruments cards: Added
 code in support of the new x-series devices. </p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>ASIO sound cards: Added support
-for a new open source ASIO driver system (jasiohost). The old system has been
-left in place for now while we assess users response to the newer system. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>ASIO sound cards: Added support for
+a new open source ASIO driver system (jasiohost). The old system has been left
+in place for now while we assess users response to the newer system. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>AIS</i></p>
 
@@ -3848,9 +3851,9 @@ have implemented database storage for output of these modules. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Radar Display: A bug which stopped the radar display from correctly displaying
-bearings to whistles from arrays containing more than two hydrophone elements
-has been fixed. </p>
+</span>Radar Display: A bug which stopped the radar display from correctly
+displaying bearings to whistles from arrays containing more than two hydrophone
+elements has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4096,11 +4099,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal>2. Improved offline viewer functionality. </p>
 
-<p class=MsoNormal>The offline viewer is much improved with better data
-scrolling and the ability to view data either stored in the database or the
-binary storage system. Work has stated on functions which read and use data
-stored in audio files. This is currently limited to re-calculating and
-displaying displaying spectrogram data during viewer mode operation.&nbsp; </p>
+<p class=MsoNormal>The offline viewer is much improved with better data scrolling
+and the ability to view data either stored in the database or the binary
+storage system. Work has stated on functions which read and use data stored in
+audio files. This is currently limited to re-calculating and displaying
+displaying spectrogram data during viewer mode operation.&nbsp; </p>
 
 <p class=MsoNormal>3. Heading sensor readout</p>
 
@@ -4201,8 +4204,8 @@ channels 0 and 1. Similarly if you switched sound cards, you may have to
 reconfigure every detector and several of the displays to handle the changes in
 channel numbering. </p>
 
-<p class=MsoNormal>I have spent a considerable amount of time trying to work
-out a better system for handling channel numbering in PAMGuard and have decided
+<p class=MsoNormal>I have spent a considerable amount of time trying to work out
+a better system for handling channel numbering in PAMGuard and have decided
 that the only practical thing to do is to force all software channel numbering
 back to a zero indexed system. i.e. even if you read out hardware channels
 3,4,5 and 6, within PAMGuard, everywhere apart from the Sound acquisition
@@ -4395,8 +4398,8 @@ synchronisation.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Wigner time-frequency plot for the click detector. Clicks are NOT
-automatically displayed in the Winger window as they are for the waveform and spectrum
+</span>Wigner time-frequency plot for the click detector. Clicks are NOT automatically
+displayed in the Winger window as they are for the waveform and spectrum
 windows since the Wigner transformation is very time consuming. Clicks will be
 displayed if you select them with the mouse.</p>
 
@@ -4701,8 +4704,8 @@ start-up takes slightly longer than previously. </p>
 
 <p class=MsoNormal><b>Outstanding bugs</b></p>
 
-<p class=MsoNormal>The patch panel is known to crash if output channel numbers
-from the patch panel a higher than the highest input channel number of the data
+<p class=MsoNormal>The patch panel is known to crash if output channel numbers from
+the patch panel a higher than the highest input channel number of the data
 acquisition.&nbsp; </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>

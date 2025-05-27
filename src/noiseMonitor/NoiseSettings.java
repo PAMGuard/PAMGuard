@@ -36,7 +36,7 @@ public class NoiseSettings implements Serializable, Cloneable, ManagedParameters
 	 * Tells PAMGUARD to use every single FFT data coming in. 
 	 * <p> Overrides nMeasures.
 	 */
-	public boolean useAll;
+	public boolean useAll = true;
 	
 	private ArrayList<NoiseMeasurementBand> measurementBands;
 	

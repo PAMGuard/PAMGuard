@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ListIterator;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -24,6 +25,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import PamUtils.FrequencyFormat;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
@@ -41,7 +43,7 @@ public class NoiseDialog extends PamDialog {
 	private SourcePanel sourcePanel;
 
 
-	private String[] colNames = {"Name", "F1 (Hz)", "F2 (Hz)"};
+	private String[] colNames = {"Name", "F1 (Hz)", "Centre (Hz)", "F2 (Hz)"};
 
 	private NoiseTableData noiseTableData;
 
@@ -53,6 +55,7 @@ public class NoiseDialog extends PamDialog {
 
 	private JButton removeButton, editButton;
 	private JCheckBox thirdsButton;
+	private JCheckBox decidecButton;
 	private JButton othersButton;
 	private JCheckBox useAllButton;
 
@@ -109,15 +112,23 @@ public class NoiseDialog extends PamDialog {
 
 		JPanel bPanelN = new JPanel(new BorderLayout());
 		JPanel bPanel = new JPanel();
-		bPanel.setLayout(new GridLayout(4,1));
+		bPanel.setLayout(new GridLayout(5,1));
 		bPanel.add(thirdsButton = new JCheckBox("Add 1/3 Octaves"));
+		bPanel.add(decidecButton = new JCheckBox("Add 1/10 Decades"));
 		bPanel.add(othersButton = new JButton("Add Other bands"));
 		bPanel.add(removeButton = new JButton("Remove"));
 		bPanel.add(editButton = new JButton("Edit ..."));
 		bPanelN.add(BorderLayout.NORTH, bPanel);
 		mPanel.add(BorderLayout.EAST, bPanelN);	
+		
+		thirdsButton.setToolTipText("Standard 1/3 octave bands referenced at 1kHz");
+		decidecButton.setToolTipText("Standard 1/10 decade bands referenced at 1kHz");
+//		ButtonGroup bg = new ButtonGroup();
+//		bg.add(thirdsButton);
+//		bg.add(decidecButton);
 
 		thirdsButton.addActionListener(new ThirdOctaves());
+		decidecButton.addActionListener(new DeciDecades());
 		othersButton.addActionListener(new AddButton());
 		removeButton.addActionListener(new RemoveButton());
 		editButton.addActionListener(new EditButton());
@@ -130,9 +141,9 @@ public class NoiseDialog extends PamDialog {
 	}
 
 	static public NoiseSettings showDialog(NoiseControl noiseControl, Frame parentFrame, NoiseSettings noiseSettings) {
-		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
+//		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new NoiseDialog(parentFrame);
-		}
+//		}
 		singleInstance.noiseControl = noiseControl;
 		singleInstance.noiseSettings = noiseSettings.clone();
 		singleInstance.setParams();
@@ -192,6 +203,8 @@ public class NoiseDialog extends PamDialog {
 
 	private void thirdOctaves() {
 		if (thirdsButton.isSelected()) {
+			decidecButton.setSelected(false);
+			removeDeciDecadeBands();
 			addThirdOctaveBands();
 		}
 		else {
@@ -199,7 +212,32 @@ public class NoiseDialog extends PamDialog {
 		}
 		noiseTableData.fireTableDataChanged();
 	}
+	
+	private void deciDecades() {
+		if (decidecButton.isSelected()) {
+			thirdsButton.setSelected(false);
+			removeThirdOctaveBands();
+			addDeciDecadeBands();
+		}
+		else {
+			removeDeciDecadeBands();
+		}
+		noiseTableData.fireTableDataChanged();
+	}
 
+
+	private void removeDeciDecadeBands() {
+		ListIterator<NoiseMeasurementBand> li = noiseSettings.getBandIterator();
+		NoiseMeasurementBand nmb;
+		while (li.hasNext()) {
+			nmb = li.next();
+			if (nmb.getType() == NoiseMeasurementBand.TYPE_DECIDECADE) {
+				li.remove();
+			}
+		}
+		
+	}
+	
 	private void removeThirdOctaveBands() {
 		ListIterator<NoiseMeasurementBand> li = noiseSettings.getBandIterator();
 		NoiseMeasurementBand nmb;
@@ -208,6 +246,25 @@ public class NoiseDialog extends PamDialog {
 			if (nmb.getType() == NoiseMeasurementBand.TYPE_THIRDOCTAVE) {
 				li.remove();
 			}
+		}
+	}
+
+	private void addDeciDecadeBands() {
+		if (haveDeciDecades()) {
+			removeDeciDecadeBands();
+		}
+
+		FFTDataBlock source = findSourceData();
+		if (source == null) {
+			return;
+		}
+		double fRes = source.getSampleRate() / source.getFftLength();
+		double[][] edges = noiseControl.createDeciDecateBands(fRes*8, source.getSampleRate()/2);
+		NoiseMeasurementBand nmb;
+		for (int i = 0; i < edges.length; i++) {
+			nmb = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_DECIDECADE, "DeciDecade", 
+					edges[i][0], edges[i][1]);
+			noiseSettings.addNoiseMeasurementBand(nmb);
 		}
 	}
 
@@ -220,7 +277,8 @@ public class NoiseDialog extends PamDialog {
 			return;
 		}
 		double fRes = source.getSampleRate() / source.getFftLength();
-		double[][] edges = noiseControl.createThirdOctaveBands(fRes*8, source.getSampleRate()/2);
+//		double[][] edges = noiseControl.createThirdOctaveBands(fRes*8, source.getSampleRate()/2);
+		double[][] edges = noiseControl.createANSIThirdOctaveBands(fRes*8, source.getSampleRate()/2);
 		NoiseMeasurementBand nmb;
 		for (int i = 0; i < edges.length; i++) {
 			nmb = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_THIRDOCTAVE, "ThirdOctave", 
@@ -228,7 +286,25 @@ public class NoiseDialog extends PamDialog {
 			noiseSettings.addNoiseMeasurementBand(nmb);
 		}
 	}
+	
+	/**
+	 * Do we have ANY bands that are 1/10 decade ? 
+	 * @return
+	 */
+	private boolean haveDeciDecades() {
+		int n = noiseSettings.getNumMeasurementBands();
+		for (int i = 0; i < n; i++) {
+			if (noiseSettings.getMeasurementBand(i).getType() == NoiseMeasurementBand.TYPE_DECIDECADE) {
+				return true;
+			}
+		}
+		return false;
+	}
 
+	/**
+	 * Have any bands that are 1/3 octave ? 
+	 * @return
+	 */
 	private boolean haveThirdOctaves() {
 		int n = noiseSettings.getNumMeasurementBands();
 		for (int i = 0; i < n; i++) {
@@ -355,6 +431,12 @@ public class NoiseDialog extends PamDialog {
 			thirdOctaves();
 		}
 	}
+	class DeciDecades implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			deciDecades();
+		}
+	}
 	class AddButton implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -421,9 +503,11 @@ public class NoiseDialog extends PamDialog {
 			case 0:
 				return nmb.name;
 			case 1:
-				return nmb.f1;
+				return FrequencyFormat.formatFrequency(nmb.f1, true);
 			case 2:
-				return nmb.f2;
+				return FrequencyFormat.formatFrequency(Math.sqrt(nmb.f1*nmb.f2), true);
+			case 3:
+				return FrequencyFormat.formatFrequency(nmb.f2, true);
 			}
 			return null;
 		}

@@ -10,6 +10,7 @@ public class NoiseMeasurementBand implements Serializable, Cloneable, ManagedPar
 
 	public static final int TYPE_USER = 0;
 	public static final int TYPE_THIRDOCTAVE = 1;
+	public static final int TYPE_DECIDECADE = 2;
 	
 	public static final long serialVersionUID = 1L;
 

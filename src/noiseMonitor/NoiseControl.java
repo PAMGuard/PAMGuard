@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JMenuItem;
@@ -45,6 +46,7 @@ public class NoiseControl extends PamControlledUnit implements PamSettings {
 	/**
 	 * Centre frequencies for third octave bands. Bands extend from f^(-1/6) to f^(1/6)
 	 * or from 0.891f to 1.122f (Richardson et al. p24.)
+	 * Don't use these, but move to ANSI standard bands centred at 1kHz?
 	 */
 	public static final double[] THIRDOCTAVES = {1.0, 1.25, 1.6, 2.0, 2.5, 3.15, 4.0, 5.0, 6.3, 8.0};
 	
@@ -70,6 +72,75 @@ public class NoiseControl extends PamControlledUnit implements PamSettings {
 		menuItem.addActionListener(new SettingsMenu(parentFrame));
 		return menuItem;
 	}
+	/**
+	 * Work out the frequency edges of deci-decadee bands between fmin and fmax. 
+	 * fmin should be > 0 and should in practice also be greater than the minimum 
+	 * frequency resolution of the FFT you are using. fmax will probably be niquist
+	 * but the highest band edge will probably end up being below this, i.e. it will
+	 * stop at 20kHz for 44kHz sampled data. 
+	 * @param fmin
+	 * @param fmax
+	 * @return array of edges of bands. Final number of bands will be this - 1.
+	 */
+	protected double[][] createDeciDecateBands(double fmin, double fmax) {
+		double bandRatio = Math.pow(10, .1);
+		double halfRatio = Math.sqrt(bandRatio);
+		// start at decade point below fmin.
+		// this is going to be the lower edge of the lowest band
+		ArrayList<double[]> edges = new ArrayList<>(); 
+		double f0 = Math.pow(10, Math.floor(Math.log10(fmin))) / halfRatio;
+		while (f0 < fmax/bandRatio) {
+			double f1 = f0 * bandRatio;
+			if (f0 < fmin) {
+				f0 *= bandRatio;
+				continue;
+			}
+			if (f1 > fmax) {
+				break;
+			}
+			double[] edge = {f0, f1};
+			edges.add(edge);
+			
+			f0 *= bandRatio;
+		}
+		double[][] edgeArray = new double[edges.size()][2];
+		for (int i = 0; i < edges.size(); i++) {
+			edgeArray[i] = edges.get(i);
+		}
+		return edgeArray;
+	}
+	
+	protected double[][] createANSIThirdOctaveBands(double fmin, double fmax) {
+		double bandRatio = Math.pow(2., 1./3.);
+		double halfRatio = Math.sqrt(bandRatio);
+		fmin = Math.max(fmin, 1);
+		// start at decade point below fmin.
+		// this is going to be the lower edge of the lowest band
+		ArrayList<double[]> edges = new ArrayList<>(); 
+		double f0 = 1000 / halfRatio;
+		while (f0 > fmin) {
+			f0 /= 2.;
+		}
+		while (f0 < fmax/bandRatio) {
+			double f1 = f0 * bandRatio;
+			if (f0 < fmin) {
+				f0 *= bandRatio;
+				continue;
+			}
+			if (f1 > fmax) {
+				break;
+			}
+			double[] edge = {f0, f1};
+			edges.add(edge);
+			
+			f0 *= bandRatio;
+		}
+		double[][] edgeArray = new double[edges.size()][2];
+		for (int i = 0; i < edges.size(); i++) {
+			edgeArray[i] = edges.get(i);
+		}
+		return edgeArray;
+	}
 	
 	/**
 	 * Work out the frequency edges of third octave bands between fmin and fmax. 
@@ -77,6 +148,8 @@ public class NoiseControl extends PamControlledUnit implements PamSettings {
 	 * frequency resolution of the FFT you are using. fmax will probably be niquist
 	 * but the highest band edge will probably end up being below this, i.e. it will
 	 * stop at 20kHz for 44kHz sampled data. 
+	 * These use som eband edges from Richardson et al, which are actually 1/10 decade bands. 
+	 * Am switching to using true third octave as above, so this is deprecated for now. 
 	 * @param fmin
 	 * @param fmax
 	 * @return array of edges of bands. Final number of bands will be this - 1.
