@@ -263,7 +263,7 @@ public class NoiseBandDialog extends PamDialog {
 		refFrequency.setToolTipText("Reference centre frequency: Other bands are calculated relative to this. Default 1000Hz");
 		minFrequency.setToolTipText("Minimum frequency of lower edge of lowest band");
 		maxFrequency.setToolTipText("Maximum Frequency of upper edge of highest band");
-		setHelpPoint("sound_processing.NoiseBands.Docs.NoiseBands");
+		setHelpPoint("sound_processing.NoiseBands.Docs.NoiseBandsFilters");
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			

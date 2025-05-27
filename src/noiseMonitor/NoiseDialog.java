@@ -136,14 +136,15 @@ public class NoiseDialog extends PamDialog {
 
 		mainPanel.add(BorderLayout.CENTER, mPanel);
 
-
+		setHelpPoint("sound_processing.NoiseBands.Docs.NoiseBandsFFT");
+		
 		setDialogComponent(mainPanel);
 	}
 
 	static public NoiseSettings showDialog(NoiseControl noiseControl, Frame parentFrame, NoiseSettings noiseSettings) {
-//		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
+		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new NoiseDialog(parentFrame);
-//		}
+		}
 		singleInstance.noiseControl = noiseControl;
 		singleInstance.noiseSettings = noiseSettings.clone();
 		singleInstance.setParams();

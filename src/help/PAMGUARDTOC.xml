@@ -390,7 +390,11 @@
   <tocitem text="Noise Band Measurement ">
    <tocitem text="Noise Band Measurement " target="sound_processing.NoiseBands.Docs.NoiseBands" image="topic"/>
 
-   <tocitem text="Noise Band Displays " target="sound_processing.NoiseBands.Docs.NoiseBandDisplays" image="topic"/>
+   <tocitem text="FFT Method " target="sound_processing.NoiseBands.Docs.NoiseBandsFFT" image="topic"/>
+
+   <tocitem text="Filter Bank Method " target="sound_processing.NoiseBands.Docs.NoiseBandsFilters" image="topic"/>
+
+   <tocitem text="Displays and Output " target="sound_processing.NoiseBands.Docs.NoiseBandDisplays" image="topic"/>
 
   </tocitem>
   <tocitem text="Filtered Noise Measurement ">
