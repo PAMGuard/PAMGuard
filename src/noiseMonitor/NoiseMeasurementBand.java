@@ -5,12 +5,13 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import noiseBandMonitor.BandType;
 
 public class NoiseMeasurementBand implements Serializable, Cloneable, ManagedParameters {
 
-	public static final int TYPE_USER = 0;
-	public static final int TYPE_THIRDOCTAVE = 1;
-	public static final int TYPE_DECIDECADE = 2;
+	private static final int TYPE_USER = 0;
+	private static final int TYPE_THIRDOCTAVE = 1;
+	private static final int TYPE_DECIDECADE = 2;
 	
 	public static final long serialVersionUID = 1L;
 
@@ -24,33 +25,35 @@ public class NoiseMeasurementBand implements Serializable, Cloneable, ManagedPar
 	
 	private int type;
 
-	public int getType() {
-		return type;
-	}
+	private BandType bandType;
+
+//	public int getType() {
+//		return type;
+//	}
+
+//
+//	public void setType(int type) {
+//		this.type = type;
+//	}
 
 
-	public void setType(int type) {
-		this.type = type;
-	}
-
-
-	public NoiseMeasurementBand(int type, String name, double f1, double f2) {
+	public NoiseMeasurementBand(BandType type, double f1, double f2) {
 		super();
-		this.type = type;
-		this.name = name;
+		this.bandType = type;
+		this.name = getAutoName(type);
 		this.f1 = f1;
 		this.f2 = f2;
 		autoEnable();
 	}
 
 
-	public NoiseMeasurementBand(int type) {
-		this.type = type;
+	public NoiseMeasurementBand(BandType invalid) {
+		this.bandType = invalid;
 		autoEnable();
 	}
 	
 	private void autoEnable() {
-		canEdit = canRemove = (type==TYPE_USER);
+		canEdit = canRemove = (bandType==null);
 	}
 
 	@Override
@@ -91,6 +94,30 @@ public class NoiseMeasurementBand implements Serializable, Cloneable, ManagedPar
 		return canRemove;
 	}
 	
+	/**
+	 * Have to override the names in this from the 
+	 * defaults in the band type enum for compatibility 
+	 * with old database logging. 
+	 * @param type 
+	 * @return
+	 */
+	private String getAutoName(BandType type) {
+		switch (type) {
+		case DECADE:
+			return "Decade";
+		case DECIDECADE:
+			return "DeciDecade";
+		case OCTAVE:
+			return "Octave";
+		case THIRDOCTAVE:
+			return "ThirdOctave";
+		default:
+			break;
+		
+		}
+		return null;
+	}
+	
 	public String getLongName() {
 		String unit = "Hz";
 		double scale = 1.;
@@ -106,5 +133,42 @@ public class NoiseMeasurementBand implements Serializable, Cloneable, ManagedPar
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
+	}
+
+
+	/**
+	 * @return the bandType
+	 */
+	public BandType getBandType() {
+		if (bandType == null) {
+			bandType = oldBandType(type);
+		}
+		return bandType;
+	}
+
+
+	/**
+	 * Convert old integer type to new enum type
+	 * @param type2
+	 * @return
+	 */
+	private BandType oldBandType(int oldType) {
+		switch (oldType) {
+		case TYPE_USER:
+			return null;
+		case TYPE_THIRDOCTAVE:
+			return BandType.THIRDOCTAVE;
+		case TYPE_DECIDECADE:
+			return BandType.DECIDECADE;
+		}
+		return null;
+	}
+
+
+	/**
+	 * @param bandType the bandType to set
+	 */
+	public void setBandType(BandType bandType) {
+		this.bandType = bandType;
 	}
 }

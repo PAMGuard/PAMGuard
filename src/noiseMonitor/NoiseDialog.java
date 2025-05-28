@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -33,6 +34,7 @@ import PamView.dialog.SourcePanelMonitor;
 import PamguardMVC.PamDataBlock;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
+import noiseBandMonitor.BandType;
 
 public class NoiseDialog extends PamDialog {
 
@@ -54,8 +56,7 @@ public class NoiseDialog extends PamDialog {
 	private JTextField nMeasures;
 
 	private JButton removeButton, editButton;
-	private JCheckBox thirdsButton;
-	private JCheckBox decidecButton;
+	private JCheckBox[] bandButtons;
 	private JButton othersButton;
 	private JCheckBox useAllButton;
 
@@ -112,27 +113,24 @@ public class NoiseDialog extends PamDialog {
 
 		JPanel bPanelN = new JPanel(new BorderLayout());
 		JPanel bPanel = new JPanel();
-		bPanel.setLayout(new GridLayout(5,1));
-		bPanel.add(thirdsButton = new JCheckBox("Add 1/3 Octaves"));
-		bPanel.add(decidecButton = new JCheckBox("Add 1/10 Decades"));
+		BandType[] bands = NoiseControl.BANDTYPES;
+		bPanel.setLayout(new GridLayout(3+bands.length,1));
+		bandButtons = new JCheckBox[bands.length];
+		for (int i = 0; i < bands.length; i++) {
+			bandButtons[i] = new JCheckBox(bands[i].toString());
+			bPanel.add(bandButtons[i]);
+			bandButtons[i].setToolTipText(String.format("Standard %s frequency bands", bands[i].toString()));
+			bandButtons[i].addActionListener(new BandButtonListener(bandButtons[i], bands[i]));
+		}
 		bPanel.add(othersButton = new JButton("Add Other bands"));
 		bPanel.add(removeButton = new JButton("Remove"));
 		bPanel.add(editButton = new JButton("Edit ..."));
-		bPanelN.add(BorderLayout.NORTH, bPanel);
+		bPanelN.add(BorderLayout.NORTH, bPanel); // simply to north align. 
 		mPanel.add(BorderLayout.EAST, bPanelN);	
-		
-		thirdsButton.setToolTipText("Standard 1/3 octave bands referenced at 1kHz");
-		decidecButton.setToolTipText("Standard 1/10 decade bands referenced at 1kHz");
-//		ButtonGroup bg = new ButtonGroup();
-//		bg.add(thirdsButton);
-//		bg.add(decidecButton);
 
-		thirdsButton.addActionListener(new ThirdOctaves());
-		decidecButton.addActionListener(new DeciDecades());
 		othersButton.addActionListener(new AddButton());
 		removeButton.addActionListener(new RemoveButton());
 		editButton.addActionListener(new EditButton());
-
 
 		mainPanel.add(BorderLayout.CENTER, mPanel);
 
@@ -153,7 +151,11 @@ public class NoiseDialog extends PamDialog {
 	}
 
 	private void setParams() {
-		thirdsButton.setSelected(haveThirdOctaves());
+		BandType[] types = NoiseControl.BANDTYPES;
+		for (int i = 0; i < bandButtons.length; i++) {
+			bandButtons[i].setSelected(haveBandType(types[i]));
+		}
+//		thirdsButton.setSelected(haveThirdOctaves());
 		sourcePanel.setSource(noiseSettings.dataSource);	
 		sourcePanel.setChannelList(noiseSettings.channelBitmap);
 		sourceSelectionChanged();
@@ -162,6 +164,7 @@ public class NoiseDialog extends PamDialog {
 		useAllButton.setSelected(noiseSettings.useAll);
 		resolutionPanel.setParams(findSourceData());
 		enableControls();
+		updateTable();
 	}
 
 
@@ -201,120 +204,202 @@ public class NoiseDialog extends PamDialog {
 	private void useAll() {
 		enableControls();
 	}
-
-	private void thirdOctaves() {
-		if (thirdsButton.isSelected()) {
-			decidecButton.setSelected(false);
-			removeDeciDecadeBands();
-			addThirdOctaveBands();
-		}
-		else {
-			removeThirdOctaveBands();
-		}
-		noiseTableData.fireTableDataChanged();
-	}
 	
-	private void deciDecades() {
-		if (decidecButton.isSelected()) {
-			thirdsButton.setSelected(false);
-			removeThirdOctaveBands();
-			addDeciDecadeBands();
-		}
-		else {
-			removeDeciDecadeBands();
-		}
+	/**
+	 * Updates table, also repacks, since scroll bar messes up layout. 
+	 */
+	private void updateTable() {
 		noiseTableData.fireTableDataChanged();
+		SwingUtilities.invokeLater(new Runnable() {
+	
+			@Override
+			public void run() {
+				pack();
+			}
+		});
 	}
 
+//	private void thirdOctaves() {
+//		if (thirdsButton.isSelected()) {
+//			decidecButton.setSelected(false);
+//			removeDeciDecadeBands();
+//			addThirdOctaveBands();
+//		}
+//		else {
+//			removeThirdOctaveBands();
+//		}
+//		noiseTableData.fireTableDataChanged();
+//	}
+//	
+//	private void deciDecades() {
+//		if (decidecButton.isSelected()) {
+//			thirdsButton.setSelected(false);
+//			removeThirdOctaveBands();
+//			addDeciDecadeBands();
+//		}
+//		else {
+//			removeDeciDecadeBands();
+//		}
+//		noiseTableData.fireTableDataChanged();
+//	}
 
-	private void removeDeciDecadeBands() {
+
+	/**
+	 * Remove bands of a particular type. 
+	 * @param bandType
+	 */
+	private void removeBands(BandType bandType) {
 		ListIterator<NoiseMeasurementBand> li = noiseSettings.getBandIterator();
 		NoiseMeasurementBand nmb;
 		while (li.hasNext()) {
 			nmb = li.next();
-			if (nmb.getType() == NoiseMeasurementBand.TYPE_DECIDECADE) {
+			if (nmb.getBandType() == bandType) {
 				li.remove();
+			}
+		}
+		updateTable();
+	}
+
+	/**
+	 * Remove bands of all other types. 
+	 * @param bandType
+	 */
+	private void removeOtherBands(BandType bandType) {
+		BandType[] types = NoiseControl.BANDTYPES;
+		for (int i = 0; i < types.length; i++) {
+			if (types[i] == bandType) {
+				continue;
+			}
+			else {
+				removeBands(types[i]);
+			}
+		}
+	}
+	
+	public void createBands(boolean selected, BandType bandType) {
+		if (selected == false) {
+			removeBands(bandType);
+		}
+		else {
+			uncheckOthers(bandType);
+			addBands(bandType);
+		}
+	}
+
+	/**
+	 * Uncheck other band check boxes
+	 * @param bandType
+	 */
+	private void uncheckOthers(BandType bandType) {
+		BandType[] types = NoiseControl.BANDTYPES;
+		for (int i = 0; i < types.length; i++) {
+			if (types[i] == bandType) {
+				continue;
+			}
+			else {
+				bandButtons[i].setSelected(false);
 			}
 		}
 		
 	}
-	
-	private void removeThirdOctaveBands() {
-		ListIterator<NoiseMeasurementBand> li = noiseSettings.getBandIterator();
-		NoiseMeasurementBand nmb;
-		while (li.hasNext()) {
-			nmb = li.next();
-			if (nmb.getType() == NoiseMeasurementBand.TYPE_THIRDOCTAVE) {
-				li.remove();
-			}
-		}
-	}
 
-	private void addDeciDecadeBands() {
-		if (haveDeciDecades()) {
-			removeDeciDecadeBands();
-		}
-
+	private void addBands(BandType bandType) {
+		removeOtherBands(bandType);
+		removeBands(bandType);
 		FFTDataBlock source = findSourceData();
 		if (source == null) {
 			return;
 		}
 		double fRes = source.getSampleRate() / source.getFftLength();
-		double[][] edges = noiseControl.createDeciDecateBands(fRes*8, source.getSampleRate()/2);
+		double[][] edges = noiseControl.createBands(bandType, fRes*8, source.getSampleRate()/2);
 		NoiseMeasurementBand nmb;
 		for (int i = 0; i < edges.length; i++) {
-			nmb = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_DECIDECADE, "DeciDecade", 
-					edges[i][0], edges[i][1]);
+			nmb = new NoiseMeasurementBand(bandType, edges[i][0], edges[i][1]);
 			noiseSettings.addNoiseMeasurementBand(nmb);
 		}
+		updateTable();
 	}
 
-	private void addThirdOctaveBands() {
-		if (haveThirdOctaves()) {
-			removeThirdOctaveBands();
-		}
-		FFTDataBlock source = findSourceData();
-		if (source == null) {
-			return;
-		}
-		double fRes = source.getSampleRate() / source.getFftLength();
-//		double[][] edges = noiseControl.createThirdOctaveBands(fRes*8, source.getSampleRate()/2);
-		double[][] edges = noiseControl.createANSIThirdOctaveBands(fRes*8, source.getSampleRate()/2);
-		NoiseMeasurementBand nmb;
-		for (int i = 0; i < edges.length; i++) {
-			nmb = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_THIRDOCTAVE, "ThirdOctave", 
-					edges[i][0], edges[i][1]);
-			noiseSettings.addNoiseMeasurementBand(nmb);
-		}
-	}
+//	private void addDeciDecadeBands() {
+//		if (haveDeciDecades()) {
+//			removeDeciDecadeBands();
+//		}
+//
+//		FFTDataBlock source = findSourceData();
+//		if (source == null) {
+//			return;
+//		}
+//		double fRes = source.getSampleRate() / source.getFftLength();
+//		double[][] edges = noiseControl.createDeciDecateBands(fRes*8, source.getSampleRate()/2);
+//		NoiseMeasurementBand nmb;
+//		for (int i = 0; i < edges.length; i++) {
+//			nmb = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_DECIDECADE, "DeciDecade", 
+//					edges[i][0], edges[i][1]);
+//			noiseSettings.addNoiseMeasurementBand(nmb);
+//		}
+//	}
+//
+//	private void addThirdOctaveBands() {
+//		if (haveThirdOctaves()) {
+//			removeThirdOctaveBands();
+//		}
+//		FFTDataBlock source = findSourceData();
+//		if (source == null) {
+//			return;
+//		}
+//		double fRes = source.getSampleRate() / source.getFftLength();
+////		double[][] edges = noiseControl.createThirdOctaveBands(fRes*8, source.getSampleRate()/2);
+//		double[][] edges = noiseControl.createANSIThirdOctaveBands(fRes*8, source.getSampleRate()/2);
+//		NoiseMeasurementBand nmb;
+//		for (int i = 0; i < edges.length; i++) {
+//			nmb = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_THIRDOCTAVE, "ThirdOctave", 
+//					edges[i][0], edges[i][1]);
+//			noiseSettings.addNoiseMeasurementBand(nmb);
+//		}
+//	}
 	
 	/**
-	 * Do we have ANY bands that are 1/10 decade ? 
+	 * Do we have any at all of the given band type ? 
+	 * @param bandType
 	 * @return
 	 */
-	private boolean haveDeciDecades() {
+	private boolean haveBandType(BandType bandType) {
 		int n = noiseSettings.getNumMeasurementBands();
 		for (int i = 0; i < n; i++) {
-			if (noiseSettings.getMeasurementBand(i).getType() == NoiseMeasurementBand.TYPE_DECIDECADE) {
+			if (noiseSettings.getMeasurementBand(i).getBandType() == bandType) {
 				return true;
 			}
 		}
 		return false;
 	}
+	
+//	/**
+//	 * Do we have ANY bands that are 1/10 decade ? 
+//	 * @return
+//	 */
+//	private boolean haveDeciDecades() {
+//		int n = noiseSettings.getNumMeasurementBands();
+//		for (int i = 0; i < n; i++) {
+//			if (noiseSettings.getMeasurementBand(i).getType() == NoiseMeasurementBand.TYPE_DECIDECADE) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
-	/**
-	 * Have any bands that are 1/3 octave ? 
-	 * @return
-	 */
-	private boolean haveThirdOctaves() {
-		int n = noiseSettings.getNumMeasurementBands();
-		for (int i = 0; i < n; i++) {
-			if (noiseSettings.getMeasurementBand(i).getType() == NoiseMeasurementBand.TYPE_THIRDOCTAVE) {
-				return true;
-			}
-		}
-		return false;
-	}
+//	/**
+//	 * Have any bands that are 1/3 octave ? 
+//	 * @return
+//	 */
+//	private boolean haveThirdOctaves() {
+//		int n = noiseSettings.getNumMeasurementBands();
+//		for (int i = 0; i < n; i++) {
+//			if (noiseSettings.getMeasurementBand(i).getType() == NoiseMeasurementBand.TYPE_THIRDOCTAVE) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
 	private void addButton() {
 
@@ -323,7 +408,7 @@ public class NoiseDialog extends PamDialog {
 			return;
 		}
 		noiseSettings.addNoiseMeasurementBand(newBand);
-		noiseTableData.fireTableDataChanged();
+		updateTable();
 
 	}
 	private void removeButton() {
@@ -332,7 +417,7 @@ public class NoiseDialog extends PamDialog {
 			return;
 		}
 		noiseSettings.removeMeasurementBand(selRow);
-		noiseTableData.fireTableDataChanged();
+		updateTable();
 	}
 	private void editButton() {
 		int selRow = noiseTable.getSelectedRow();
@@ -346,7 +431,7 @@ public class NoiseDialog extends PamDialog {
 		}
 		noiseSettings.removeMeasurementBand(selRow);
 		noiseSettings.addNoiseMeasurementBand(selRow, newBand);
-		noiseTableData.fireTableDataChanged();
+		updateTable();
 	}
 
 	private FFTDataBlock findSourceData() {
@@ -426,18 +511,34 @@ public class NoiseDialog extends PamDialog {
 			useAll();
 		}
 	}
-	class ThirdOctaves implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			thirdOctaves();
+	class BandButtonListener implements ActionListener {
+
+		private JCheckBox checkBox;
+		private BandType bandType;
+
+		public BandButtonListener(JCheckBox checkBox, BandType bandType) {
+			this.checkBox = checkBox;
+			this.bandType = bandType;
 		}
-	}
-	class DeciDecades implements ActionListener {
+
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			deciDecades();
+		public void actionPerformed(ActionEvent e) {
+			createBands(checkBox.isSelected(), bandType);
 		}
+		
 	}
+//	class ThirdOctaves implements ActionListener {
+//		@Override
+//		public void actionPerformed(ActionEvent arg0) {
+//			thirdOctaves();
+//		}
+//	}
+//	class DeciDecades implements ActionListener {
+//		@Override
+//		public void actionPerformed(ActionEvent arg0) {
+//			deciDecades();
+//		}
+//	}
 	class AddButton implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {

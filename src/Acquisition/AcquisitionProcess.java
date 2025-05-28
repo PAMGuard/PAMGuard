@@ -191,6 +191,7 @@ public class AcquisitionProcess extends PamProcess {
 	public void pamStart() {
 		// called by PamController. Don't actually start if
 		// we're in network receive mode.
+//		System.out.println("In AcquisitionProcess pamStart()");
 
 		if (!systemPrepared) return;
 

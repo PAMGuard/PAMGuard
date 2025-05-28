@@ -455,7 +455,8 @@ as standard octave and third octave. PAMGuard now supports Octave, Third
 Octave, Deci-decade, Decade, 1/10 Octave, and 1/12 Octave bands. </p>
 
 <p class=MsoNormal>Noise Monitor Module (the one that used FFT data). Added
-1/10 decade bands options. Improved data selection handling. </p>
+1/10 decade, Octave, and Decade bands options. Improved data selection
+handling. </p>
 
 <p class=MsoNormal>Issue 215. x.wav Files. Support for duty cycling with .x.wav
 files from SCRIPPS HARP recorders. &nbsp;</p>
@@ -485,6 +486,10 @@ and FX Time display.</p>
 <p class=MsoNormal>Issue 216. GEBCO Raster map files not loading. Issue now
 fixed. </p>
 
+<p class=MsoNormal>Issue 232. Files without dates. Will now correctly process a
+folder of files without dates. However, you are strongly recommended to have
+valid dates in your file names. </p>
+
 <h1>Version 2.02.16 March 2025</h1>
 
 <h2>New Features</h2>
@@ -500,8 +505,8 @@ Whistle Classifier, Detection Group Localiser, Rocca, Click Train Detector, GPL
 Detector. If the Detection Group Localiser is used with Logger Form
 annotations, species codes can be taken from the logger form. </p>
 
-<p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections, and
-Localisations) available as Offline tasks. This is not useful when running
+<p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections,
+and Localisations) available as Offline tasks. This is not useful when running
 Tethys on a single dataset, since all tasks can be easily performed using
 ‘Export’ buttons on the main Tethys interface. However, this change means that
 these export tasks become available to the <a
@@ -782,9 +787,9 @@ clicks not being correctly reassigned to different events. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Screen Position</span></b><span
 lang=EN-US>: When using multiple monitors, if you move a configuration to a
-computer with a different monitor layout, the GUI should work out if it's
-opening on a screen area which no longer exists and move itself onto the
-primary monitor. </span></p>
+computer with a different monitor layout, the GUI should work out if it's opening
+on a screen area which no longer exists and move itself onto the primary
+monitor. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>File Folder Processing</span></b><span
 lang=EN-US>: Previous version had a bug which caused files to not always be
@@ -1221,10 +1226,10 @@ Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
-(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
-should be compatible with this version, and vice-versa. PSF files generated in
-core releases (1.15.xx) can be loaded in this version, but will be converted to
-PSFX files when PAMGuard exits.</p>
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should
+be compatible with this version, and vice-versa. PSF files generated in core
+releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
+files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1673,9 +1678,9 @@ Detector display. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>This version of PAMGuard has been upgraded to make it compatible
-with Java 12. psfx files generated in previous beta releases should be
-compatible with this version, and vice-versa.</p>
+lang=EN-US> </span>This version of PAMGuard has been upgraded to make it
+compatible with Java 12. psfx files generated in previous beta releases should
+be compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2655,11 +2660,11 @@ milliseconds. However, getDuration actually returns the number of samples.
 
 <p class=MsoNormal><b><span lang=EN-US>Plug-Ins</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard is
-how plug-ins are managed. PAMGuard now has the ability to dynamically load
-plug-in modules (saved as jar files) at runtime. This will greatly simplify the
-process of testing and distributing newly developed modules, since only a small
-jar file will be required rather than a new bespoke PAMGuard installation.</span></p>
+<p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard
+is how plug-ins are managed. PAMGuard now has the ability to dynamically load plug-in
+modules (saved as jar files) at runtime. This will greatly simplify the process
+of testing and distributing newly developed modules, since only a small jar
+file will be required rather than a new bespoke PAMGuard installation.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Module code development remains largely
 unchanged, in most cases simply requiring the addition of an interface class.
@@ -2694,9 +2699,9 @@ dependencies)</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Other Changes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle
-both 64 bit and 32 bit installations. PAMGuard psf files are now registered in
-the Windows Registry, so double-clicking on a psf file should run PAMGuard in
+<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle both
+64 bit and 32 bit installations. PAMGuard psf files are now registered in the
+Windows Registry, so double-clicking on a psf file should run PAMGuard in
 normal mode (as opposed to Viewer or Mixed modes). Note that the Windows
 Registry can only hold a single executable reference for psf files; therefore,
 for users with multiple installations of PAMGuard, double-clicking on a psf
@@ -2848,10 +2853,10 @@ the online help. Users of the Click Detector will notice the following changes:<
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>There is now a choice of least squares and Simplex
-based algorithms for real-time animal tracking. The improved algorithms also
-provide better error information both for display on the map and for storage in
-the database. </span></p>
+</span><span lang=EN-US>There is now a choice of least squares and Simplex based
+algorithms for real-time animal tracking. The improved algorithms also provide
+better error information both for display on the map and for storage in the
+database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3774,9 +3779,9 @@ databases.</p>
 <p class=MsoNormal style='margin-left:36.0pt'>National Instruments cards: Added
 code in support of the new x-series devices. </p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>ASIO sound cards: Added support for
-a new open source ASIO driver system (jasiohost). The old system has been left
-in place for now while we assess users response to the newer system. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>ASIO sound cards: Added support
+for a new open source ASIO driver system (jasiohost). The old system has been
+left in place for now while we assess users response to the newer system. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>AIS</i></p>
 
@@ -3851,9 +3856,9 @@ have implemented database storage for output of these modules. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Radar Display: A bug which stopped the radar display from correctly
-displaying bearings to whistles from arrays containing more than two hydrophone
-elements has been fixed. </p>
+</span>Radar Display: A bug which stopped the radar display from correctly displaying
+bearings to whistles from arrays containing more than two hydrophone elements
+has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4099,11 +4104,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal>2. Improved offline viewer functionality. </p>
 
-<p class=MsoNormal>The offline viewer is much improved with better data scrolling
-and the ability to view data either stored in the database or the binary
-storage system. Work has stated on functions which read and use data stored in
-audio files. This is currently limited to re-calculating and displaying
-displaying spectrogram data during viewer mode operation.&nbsp; </p>
+<p class=MsoNormal>The offline viewer is much improved with better data
+scrolling and the ability to view data either stored in the database or the
+binary storage system. Work has stated on functions which read and use data
+stored in audio files. This is currently limited to re-calculating and
+displaying displaying spectrogram data during viewer mode operation.&nbsp; </p>
 
 <p class=MsoNormal>3. Heading sensor readout</p>
 
@@ -4204,8 +4209,8 @@ channels 0 and 1. Similarly if you switched sound cards, you may have to
 reconfigure every detector and several of the displays to handle the changes in
 channel numbering. </p>
 
-<p class=MsoNormal>I have spent a considerable amount of time trying to work out
-a better system for handling channel numbering in PAMGuard and have decided
+<p class=MsoNormal>I have spent a considerable amount of time trying to work
+out a better system for handling channel numbering in PAMGuard and have decided
 that the only practical thing to do is to force all software channel numbering
 back to a zero indexed system. i.e. even if you read out hardware channels
 3,4,5 and 6, within PAMGuard, everywhere apart from the Sound acquisition
@@ -4398,10 +4403,10 @@ synchronisation.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Wigner time-frequency plot for the click detector. Clicks are NOT automatically
-displayed in the Winger window as they are for the waveform and spectrum
-windows since the Wigner transformation is very time consuming. Clicks will be
-displayed if you select them with the mouse.</p>
+</span>Wigner time-frequency plot for the click detector. Clicks are NOT
+automatically displayed in the Winger window as they are for the waveform and
+spectrum windows since the Wigner transformation is very time consuming. Clicks
+will be displayed if you select them with the mouse.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4704,8 +4709,8 @@ start-up takes slightly longer than previously. </p>
 
 <p class=MsoNormal><b>Outstanding bugs</b></p>
 
-<p class=MsoNormal>The patch panel is known to crash if output channel numbers from
-the patch panel a higher than the highest input channel number of the data
+<p class=MsoNormal>The patch panel is known to crash if output channel numbers
+from the patch panel a higher than the highest input channel number of the data
 acquisition.&nbsp; </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>

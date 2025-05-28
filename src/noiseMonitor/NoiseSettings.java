@@ -9,10 +9,12 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
+import noiseBandMonitor.BandType;
 
 public class NoiseSettings implements Serializable, Cloneable, ManagedParameters {
 
 	public static final long serialVersionUID = 1L;
+	
 	
 	public String dataSource;
 	
