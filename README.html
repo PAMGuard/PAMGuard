@@ -383,7 +383,7 @@ PAMGuardBeta_ViewerMode.exe):</p>
 <p class=MsoNormal><em><span style='font-family:"Calibri",sans-serif'>&nbsp;</span></em></p>
 
 <p class=MsoNormal><em><b><u><span style='font-size:12.0pt;font-family:"Calibri",sans-serif;
-font-style:normal'><a href="#_Version_2.02.17_?????">Version 2.02.17 ????
+font-style:normal'><a href="#_Version_2.02.17_?????">Version 2.02.17 May
 2025&nbsp;</a></span></u></b></em></p>
 
 <h2><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
@@ -431,13 +431,14 @@ href="#_Latest_Version_2.02.01">Version 2.02.01 October 2021</a></span></h1>
 
 <h1><span style='font-size:12.0pt'><a href="#_Older_Versions">Older Versions</a></span></h1>
 
-<h1><a name="_Hlk174698335"></a><a name="_Latest_Version_2.02.03_1"></a><a
-name="_Latest_Version_2.02.05"></a><a name="_Latest_Version_2.02.06"></a><a
-name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
-name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
-name="_Version_2.02.11_April"></a><a name="_Version_2.02.14_October"></a><a
-name="_2.02.15_December_2014"></a><a name="_Version_2.02.16_February"></a><a
-name="_Version_2.02.17_?????"></a>Version 2.02.17 ?????</h1>
+<h1><a name="_Hlk199155185"></a><a name="_Hlk174698335"></a><a
+name="_Latest_Version_2.02.03_1"></a><a name="_Latest_Version_2.02.05"></a><a
+name="_Latest_Version_2.02.06"></a><a name="_Latest_Version_2.02.07"></a><a
+name="_Latest_Version_2.02.08"></a><a name="_Version_2.02.09_June"></a><a
+name="_Version_2.02.10_January"></a><a name="_Version_2.02.11_April"></a><a
+name="_Version_2.02.14_October"></a><a name="_2.02.15_December_2014"></a><a
+name="_Version_2.02.16_February"></a><a name="_Version_2.02.17_?????"></a>Version
+2.02.17 May 2025</h1>
 
 <p class=MsoNormal><b>New Features</b></p>
 
@@ -448,13 +449,19 @@ analyse the log file from the previous run for errors. If errors are found,
 then the user will be prompted to send a report to the PAMGuard team via email.
 See help on log files for further details. &nbsp;</p>
 
-<p class=MsoNormal>Issue 211. Noise Band Measurement module. Added features to
-support other types of frequency band as well as standard octave and third
-octave. PAMGuard now supports Octave, Third Octave, Deci-decade, Decade, 1/10
-Octave, and 1/12 Octave bands. </p>
+<p class=MsoNormal>Issue 211. Noise Band Measurement module (the one that uses
+filter banks). Added features to support other types of frequency band as well
+as standard octave and third octave. PAMGuard now supports Octave, Third
+Octave, Deci-decade, Decade, 1/10 Octave, and 1/12 Octave bands. </p>
 
-<p class=MsoNormal>Issue 215. x.wav Files. Support for duty cycling with wav
+<p class=MsoNormal>Noise Monitor Module (the one that used FFT data). Added
+1/10 decade, Octave, and Decade bands options. Improved data selection
+handling. </p>
+
+<p class=MsoNormal>Issue 215. x.wav Files. Support for duty cycling with .x.wav
 files from SCRIPPS HARP recorders. &nbsp;</p>
+
+<p class=MsoNormal>Export function for noise band data to Matlab, R, etc. </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>
 
@@ -468,12 +475,20 @@ as a single row of data in the Deployments table on the display. </p>
 
 <p class=MsoNormal>Issue 210. SUD Files. Fixed several issues: support for
 multi channel files; handling corrupt files; reloading audio data for
-spectrogram displays in viewer </p>
+spectrogram displays in viewer. </p>
 
-<p class=MsoNormal>Fixed spectrogram scrolling issues in FX Time display</p>
+<p class=MsoNormal>Issue 230. Updated SUD reader to handle latest soundtrap
+firmware that supports accelerometers and magnetometers. </p>
+
+<p class=MsoNormal>Issue 220. Fixed spectrogram scrolling issues in Spectrogram
+and FX Time display.</p>
 
 <p class=MsoNormal>Issue 216. GEBCO Raster map files not loading. Issue now
 fixed. </p>
+
+<p class=MsoNormal>Issue 232. Files without dates. Will now correctly process a
+folder of files without dates. However, you are strongly recommended to have
+valid dates in your file names. </p>
 
 <h1>Version 2.02.16 March 2025</h1>
 
@@ -509,9 +524,9 @@ and when the libraries have not been installed correctly.</p>
 
 <p class=MsoNormal><b>Other</b></p>
 
-<p class=MsoNormal>Made click detector offline click event data integrity checking
-available as offline task, so that this can be run prior to exporting data to
-Tethys. </p>
+<p class=MsoNormal>Made click detector offline click event data integrity
+checking available as offline task, so that this can be run prior to exporting
+data to Tethys. </p>
 
 <p class=MsoNormal>Multiple management changes to support batch processing of
 offline tasks. Compatible with batch processor 2.0. </p>
@@ -772,9 +787,9 @@ clicks not being correctly reassigned to different events. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Screen Position</span></b><span
 lang=EN-US>: When using multiple monitors, if you move a configuration to a
-computer with a different monitor layout, the GUI should work out if it's
-opening on a screen area which no longer exists and move itself onto the
-primary monitor. </span></p>
+computer with a different monitor layout, the GUI should work out if it's opening
+on a screen area which no longer exists and move itself onto the primary
+monitor. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>File Folder Processing</span></b><span
 lang=EN-US>: Previous version had a bug which caused files to not always be
@@ -1211,10 +1226,10 @@ Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
-(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
-should be compatible with this version, and vice-versa. PSF files generated in
-core releases (1.15.xx) can be loaded in this version, but will be converted to
-PSFX files when PAMGuard exits.</p>
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should
+be compatible with this version, and vice-versa. PSF files generated in core
+releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
+files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1486,9 +1501,9 @@ lang=EN-US> </span>Added ctrl-p hotkey to print-screen button. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>14. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Update simulated daq so that it generates new random noise correctly
-on each call rather then recycling old data. Makes the output more spectrally
-flat. </p>
+lang=EN-US> </span>Update simulated daq so that it generates new random noise
+correctly on each call rather then recycling old data. Makes the output more
+spectrally flat. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>14. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1992,8 +2007,8 @@ number of initial samples used in the calculation. This can be useful for
 cleaning up delays in the presence of echoes and small time delays.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Increased upsampling to 2, 3 or 4 times.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Increased upsampling to 2, 3 or 4 times.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2646,13 +2661,13 @@ milliseconds. However, getDuration actually returns the number of samples.
 <p class=MsoNormal><b><span lang=EN-US>Plug-Ins</span></b></p>
 
 <p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard
-is how plug-ins are managed. PAMGuard now has the ability to dynamically load
-plug-in modules (saved as jar files) at runtime. This will greatly simplify the
-process of testing and distributing newly developed modules, since only a small
-jar file will be required rather than a new bespoke PAMGuard installation.</span></p>
+is how plug-ins are managed. PAMGuard now has the ability to dynamically load plug-in
+modules (saved as jar files) at runtime. This will greatly simplify the process
+of testing and distributing newly developed modules, since only a small jar
+file will be required rather than a new bespoke PAMGuard installation.</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Module code development remains largely unchanged,
-in most cases simply requiring the addition of an interface class.
+<p class=MsoNormal><span lang=EN-US>Module code development remains largely
+unchanged, in most cases simply requiring the addition of an interface class.
 &nbsp;Instructions for the development of new modules utilizing the plug-in
 system can be found <a href="http://www.PAMGuard.org/16_HowtomakePlug-Ins.html"
 scheme can be found>here</a>. &nbsp;Plug-in modules can be downloaded from the
@@ -2838,10 +2853,10 @@ the online help. Users of the Click Detector will notice the following changes:<
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>There is now a choice of least squares and Simplex
-based algorithms for real-time animal tracking. The improved algorithms also
-provide better error information both for display on the map and for storage in
-the database. </span></p>
+</span><span lang=EN-US>There is now a choice of least squares and Simplex based
+algorithms for real-time animal tracking. The improved algorithms also provide
+better error information both for display on the map and for storage in the
+database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2903,9 +2918,9 @@ noticed by users. </span></p>
 
 <p class=MsoNormal><i><span lang=EN-US>Click Detector RainbowClick file output</span></i></p>
 
-<p class=MsoNormal><span lang=EN-US>This feature has been removed since it has been
-obsolete for several years. Users should use the PAMGuard binary storage system
-for Click Detector data. </span></p>
+<p class=MsoNormal><span lang=EN-US>This feature has been removed since it has
+been obsolete for several years. Users should use the PAMGuard binary storage
+system for Click Detector data. </span></p>
 
 <h1><a name="_Latest_Version_1.15.04"></a><span lang=EN-US>Version 1.15.04 July
 2016</span></h1>
@@ -3040,8 +3055,8 @@ and datagram creation.</p>
 
 <h1><a name="_Toc444450394"></a><span lang=EN-US>Version 1.15.00 February 2016</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>Beta Version 1.15.00 64 bit and Core version
-1.15.00 32 bit. Both using identical Java core software but linking to
+<p class=MsoNormal><span lang=EN-US>Beta Version 1.15.00 64 bit and Core
+version 1.15.00 32 bit. Both using identical Java core software but linking to
 different libraries for control of sound input devices. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>This is the first release of a 64 bit
@@ -4388,10 +4403,10 @@ synchronisation.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Wigner time-frequency plot for the click detector. Clicks are NOT automatically
-displayed in the Winger window as they are for the waveform and spectrum
-windows since the Wigner transformation is very time consuming. Clicks will be
-displayed if you select them with the mouse.</p>
+</span>Wigner time-frequency plot for the click detector. Clicks are NOT
+automatically displayed in the Winger window as they are for the waveform and
+spectrum windows since the Wigner transformation is very time consuming. Clicks
+will be displayed if you select them with the mouse.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4519,11 +4534,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>New menu functionality by right clicking on any of the tabs of the main tab
-control will allow the user to copy the tab contents to the system clipboard
-from where it can be copied into other programs (e.g. Word, Powerpoint,
-etc.).Some modules, such as the map, have this implemented in other menus
-(right click) and also allow printing.&nbsp; </p>
+</span>New menu functionality by right clicking on any of the tabs of the main
+tab control will allow the user to copy the tab contents to the system
+clipboard from where it can be copied into other programs (e.g. Word,
+Powerpoint, etc.).Some modules, such as the map, have this implemented in other
+menus (right click) and also allow printing.&nbsp; </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4591,8 +4606,8 @@ online help. </p>
 
 <p class=MsoNormal><b>PAMGuard Mixed Mode operation</b></p>
 
-<p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with GPS
-data reloaded from a database so that detected sounds may be correctly
+<p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with
+GPS data reloaded from a database so that detected sounds may be correctly
 localised. Multiple display frames - enables PAMGuard GUI to be split into
 multiple display windows, displayed on multiple monitors if desired. Enables
 the operator to simultaneously view the map and the click detector for example,
@@ -4622,9 +4637,9 @@ Mac/Linux machines)</p>
 
 <p class=MsoNormal>Parameters dialog shows correct channel numbers</p>
 
-<p class=MsoNormal>Click classifier mean filter option had a computational error
-which meant that classifiers using this option would not work. This has now
-been fixed. </p>
+<p class=MsoNormal>Click classifier mean filter option had a computational
+error which meant that classifiers using this option would not work. This has
+now been fixed. </p>
 
 <p class=MsoNormal><b>Sound Recorder</b></p>
 

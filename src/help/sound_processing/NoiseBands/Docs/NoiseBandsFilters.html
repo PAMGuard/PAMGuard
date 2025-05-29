@@ -1,0 +1,85 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Noise Band Measurement</title>
+</head>
+
+<body>
+
+	<h1>Noise Band Measurement</h1>
+	<h2>Overview</h2>
+	<br>
+
+	<p>This module allows you to measure noise in 
+	frequency bands of different widths: Octave, Third Octave, Deci-Decade, Decade, 1/10 Octave, and 1/12 Octave. 
+	These measurements are compatible with the ANSI Standard 
+	<a href = "https://webstore.ansi.org/standards/asa/ansiasas1112004r2009">
+	ANSI S1.11-2004 American National Standard Specification for
+Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
+	</p>
+	<p>The method works by first measuring noise noise bands the highest octave 
+	of the available data using a bank of band pass filters. The data are then decimated
+	 by a factor 2 (or 10 for Decade bands) and a further set of measurements made in the next octave down
+	(i.e. the highest octave of the decimated data). This process can be repeated for as many decimators /
+	octaves of data that you wish, reaching lower and lower frequencies. Because the amount of raw data to be processed
+	is halved in each decimator, each bank of filters requires increasingly less processing power. </p>
+
+	<h3>Creating the module</h3>
+	<p>
+		From the <em><strong>File>Add modules>Sound Processing</strong></em>
+		menu, or from the pop-up menu on the data model display select "<em><strong>
+				Noise Band Monitor</strong></em>". Enter a name for the new module and press Ok.
+	</p>
+	
+	<h3>Configuring the module</h3>
+	<p>
+		To configure the module, open the settings dialog from the <em><strong>Detection>"your
+				module name" </strong></em> menu:
+	</p>
+	<br>
+	<img alt="Filters Settings" src="Images/NoiseBandDialog.png" />
+	<br>
+	<h4>Raw Data Source</h4>
+	<p>
+		Select a source of raw data. This will generally be a <a
+			href="../../AcquisitionHelp/docs/AcquisitionOverview.html">
+			Sound Acquisition Module</a> or the output of a <a
+			href="../../decimatorHelp/docs/decimator_decimator.html">
+			Decimator</a> if a lower frequency noise measurement is required. Check
+		the channels you want to measure noise on.
+	</p>
+
+	<h4>Output Interval</h4>
+	<p>Enter the interval between measurements in seconds.</p>
+
+	<h4>Measurement Bands</h4>
+	<p>Select the band type you wish to measure in from the drop down list, and the Reference Frequency, which is the centre 
+	frequency of a band, against which all other band centres will be calculated. By default, this is 1000Hz. </p>
+	 
+	<p>Select the maximum and minimum frequencies you want to measure between. Bands will then be calculated to fit between these 
+	limits, i.e. the upper edge of the highest band will not be greater than the maximum frequency and the lower edge of the lowest band
+	will not be lower than the minimum frequency. e.g. if you are working with third octave bands and set the frequency limits to be 200Hz and 24kHz, 
+	you'll get 20 bands between 222.7Hz and 22.63kHz.
+	</p>
+	
+
+	<h4>Filters</h4>
+	<p>Select Butterworth or IIR Filters. Generally, Butterworth filters will operate much faster than FIR filters on a 
+	desktop computer. Generally 6th order Butterworth or 7th order (128 tap) FIR filters are more than adequate. 
+	The exact cut off frequencies and filter responses are shown for information only. 
+	</p>
+	
+<br>
+	<h4>Bode Plots</h4>
+	<p>The filter responses and the responses of the decimators are shown in the Bode plot on the right
+	hand side of the dialog. It is also possible to overlay the various ANSI standards. The scale of the 
+	amplitude axis can be altered by double clicking on it. 
+	</p>
+
+	<br>
+<p CLASS="prevLink"><a href="NoiseBandsFFT.html">Previous: FFT Method </a></p>
+<p CLASS="nextLink"><a href="NoiseBandDisplays.html">Next: Displays and Output </a></p>
+	<br>
+</body>
+</html>

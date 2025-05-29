@@ -25,6 +25,7 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import clickDetector.WindowsFile;
 import dataMap.OfflineDataMap;
 import dataMap.filemaps.FileDataMapPoint;
+import dataMap.filemaps.FileMapProgress;
 import dataMap.filemaps.FileSubSection;
 import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.ViewLoadObserver;
@@ -135,19 +136,23 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 	}
 
 	@Override
-	public void sortMapEndTimes() {
+	public void sortMapEndTimes(OfflineFileServer.MapMaker mapMaker) {
 		OfflineDataMap<FileDataMapPoint> dataMap = this.getDataMap();
 		Iterator<FileDataMapPoint> it = dataMap.getListIterator();
 		FileDataMapPoint mapPoint;
 		File file;
 		int totalPoints = dataMap.getNumMapPoints();
 		int opened = 0;
+		int nDone = 0;
 		while (it.hasNext()) {
 			mapPoint = it.next();
+			nDone ++;
 			if (mapPoint.getFileSubSection() != null) {
 				// already sorted for xwav viles, so do nothing more
 				continue;
 			}
+			String msg = String.format("Checking file %d of %d: %s", nDone, totalPoints, mapPoint.getSoundFile().getName());
+			mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_MAPPINGFILES, totalPoints, nDone, msg));
 			if (mapPoint.getMatchedPoint() != null) {
 				// this shows that the map point has come back from the serialised file
 				// so the time information will already be ok. 
