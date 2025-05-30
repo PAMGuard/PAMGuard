@@ -86,6 +86,14 @@ public class WavHeader {
 			riff = read4Chars(windowsWavFile);
 			totalSize = windowsWavFile.readWinInt();
 			totalSize = checkUintProblem(totalSize);
+			if (riff[0] != 'R' || riff[1] != 'I' || riff[2] != 'F' || riff[3] != 'F') {
+				System.err.println("Not a valid RIFF file: " + windowsWavFile.getFile());
+				return false;
+			}
+			if (totalSize < 36) {
+				System.err.println("Not a valid RIFF file: " + windowsWavFile.getFile() + " - total size is too small: " + totalSize);
+				return false;
+			}
 			wave = read4Chars(windowsWavFile);
 			while (true) {
 				// look for the fmt chunk and skip all other chunks in the 

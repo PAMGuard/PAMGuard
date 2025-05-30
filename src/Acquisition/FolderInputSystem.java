@@ -1057,6 +1057,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
+		
 //		System.out.println("FolderInputSystem: Get store info start:");
 		if (allFiles == null || allFiles.size() == 0) {
 			// returns null in viewer mode because I stopped it recataloging files 
@@ -1075,7 +1076,13 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long[] allFileEnds = new long[allFiles.size()];
 			for (int i = 0; i < allFiles.size(); i++) {
 				WavFileType aFile = allFiles.get(i);
-				allFileStarts[i] = getFileStartTime(aFile);
+				try {
+					//System.out.println("Get file time for " + aFile.getName());
+					allFileStarts[i] = getFileStartTime(aFile);
+				}
+				catch (Exception e) {
+					System.err.println("Error getting audio info for " + aFile.getName() + " " + e.getLocalizedMessage());
+				}
 				aFile.getAudioInfo();
 				allFileEnds[i] = (allFileStarts[i] + (long) (aFile.getDurationInSeconds()*1000.));
 				if (allFileStarts[i] < firstFileStart) {
@@ -1102,6 +1109,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 //		System.out.println("FolderInputSystem: Get store info complete:");
 		return storeInfo;
+		
 	}
 
 	@Override
