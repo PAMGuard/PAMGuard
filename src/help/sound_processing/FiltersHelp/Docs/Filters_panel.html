@@ -12,12 +12,16 @@
 	<br>
 
 	<p>Two main types of filter are available in PAMGuard. IIRF
-		(Infinite Impulse Response) Filters are generally preferred since they
-		are faster than the alternative FIR (Finite Impulse Response) filter
+		(<b>Infinite Impulse Response</b>) Filters are generally preferred since they
+		are faster than the alternative FIR (<b>Finite Impulse Response</b>) filter
 		types. However there may be circumstances when you prefer to use an
 		FIR filter, particularly if an unusual filter response is required
 		(for instance, one mimicking the hearing response of an animal, or
 		with multiple 'notches' to remove noise).</p>
+		<p>Butterworth filters have a flat response over frequencies in the pass band, so are
+		preferred for any processes that will be making noise measurements downstream of the filter.</p>
+		<p>Chebyshev filters have a slightly better attenuation, but at the expense of some ripple
+		in the pass band.</p> 
 	<p>
 		Both types of filter can be configured from within PAMGuard's filter
 		design panel. This is used in the stand alone <a

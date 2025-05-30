@@ -16,14 +16,14 @@ displays will also be more clearer.</p>
 <p>
 A decimator can be inserted anywhere in the PAMGuard data model where there are raw audio data. 
 </p>
-<br>
+
 <h3>Creating a Decimator</h3>
 
 <p>
 From the <strong><em>File>Add modules>Sound Processing</em></strong> menu, or from the pop-up menu on the 
 data model display select "<strong><em>Decimator</em></strong>". 
 Enter a name for the new decimator module (e.g. "2kHz", etc) and press Ok.</p>
-<br>
+
 
 <h3>Configure the Decimator</h3>
 <p>The Decimator module requires a source of raw data before it can operate. 
@@ -34,23 +34,27 @@ or from processed data such as the output from a filter, another decimator, etc.
 To configure the decimator, go to the <strong><em>Detection>"your decimator name ...">
 menu </em></strong></p>
 <br>
-<img alt="Decimator Dialog" src="Images/DecimatorDialog.png"/><br>
+<center><img alt="Decimator Dialog" src="Images/DecimatorDialog.png"/></center><br>
 <p>
-Select the data source and specify the sample rate of the output data.
+Select the input data source and specify the sample rate of the output data.
 </p> 
 
+
 <h3>Filter Settings</h3>
-<p>
-For a decimator to work correctly, you <b>must</b> correctly
-filter the data before it is downsampled. 
+<p>It is important that data are filtered correctly prior to decimation, otherwise aliasing will occur: that's when 
+higher frequencies in the data 'fold' down onto lower frequencies.  You therefore need to filter the data
+at half the sample rate of the output data. Pressing the default button will generate a 6 pole Butterworth
+filter at the right frequency. If you want to do something different, you can 
+press the filter settings dialog and the filter dialog will appear (see the
+<a href="../../FiltersHelp/Docs/Filters_panel.html">Filters Design</a> help page). 
 </p>
-<p>
-Press the filter settings dialog and the filter dialog will appear (see
-<a href="../../FiltersHelp/Docs/Filters_filters.html">the IIRF Filter help</a>). 
-You need to set up the filter so that most of the energy is filtered out below the Nyquist 
-frequency (half the output sample rate). A low pass 4th or 6th order Chebyshev filter with a cut off frequency 
-of 0.8 times the Nyquist frequency should be adequate. 
-</p>
+
+<h3>Interpolation</h3>
+<p>PAMGuard can handle decimation to frequencies which are not an exact submultiple of the original frequency, 
+e.g. from a 500kHz input sample rate, to 48kHz output sample rate.</p>
+<p>If you are decimating to a frequency that is not a submultiple, then you should consider using interpolation to improve the quality of the output data. Linear
+interpolation will use data points either side of the required sample point, quadratic will use the three closest 
+samples. Both these methods use a small additional amount of CPU. </p>
 
 <br>
 </body>

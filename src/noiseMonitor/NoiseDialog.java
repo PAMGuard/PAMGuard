@@ -311,7 +311,14 @@ public class NoiseDialog extends PamDialog {
 			return;
 		}
 		double fRes = source.getSampleRate() / source.getFftLength();
-		double[][] edges = noiseControl.createBands(bandType, fRes*8, source.getSampleRate()/2);
+		/*
+		 * Minimum frequency depends a bit on band type. For octave and decade bands
+		 * can go a bit lower without losing too much accuracy, the narrower bands need 
+		 * to start a bit higher to have any accuracy at low FFT bins
+		 * This will give a minimum lowest band which is at least two FFT bins. 
+		 */
+		double fMin = fRes*2 / (bandType.getBandRatio() - 1);
+		double[][] edges = noiseControl.createBands(bandType, fMin, source.getSampleRate()/2);
 		NoiseMeasurementBand nmb;
 		for (int i = 0; i < edges.length; i++) {
 			nmb = new NoiseMeasurementBand(bandType, edges[i][0], edges[i][1]);
