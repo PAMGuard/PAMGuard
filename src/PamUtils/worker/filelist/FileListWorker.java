@@ -201,6 +201,11 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 			}
 		}
 		sayProgress(pamWorker, newFileList, folder);
+		
+		//Now all files in this folder have been added, so do any final tasks including checking for duplicates
+		String message = String.format("Found %d files - removing duplicates", newFileList.getFileCount());
+		pamWorker.update(new PamWorkProgressMessage(null, null, message));
+		newFileList.removeDuplicates("wav"); // remove duplicates and preferentially keep wav files
 	}
 
 	private void sayProgress(PamWorker<FileListData<T>> pamWorker, FileListData<T> newFileList, File folder) {

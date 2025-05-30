@@ -4,8 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Information about a list of files. 
@@ -82,6 +87,17 @@ public class FileListData<T extends File> implements Cloneable {
 		Collections.sort(fileList, new FileNameCompare());
 	}
 	
+	
+	/**
+	 * Remove duplicates from the file list, keeping only the first instance of each file name.
+	 * If a preferred extension is provided, it will keep the file with that extension if duplicates exist.
+	 * 
+	 * @param preferredExtension - the preferred file extension to keep in case of duplicates.
+	 */
+	public void removeDuplicates(String preferredExtension) {
+		fileList = (ArrayList<T>) filterDuplicateFiles(fileList,  preferredExtension);
+	}
+	
 	/**
 	 * Sort the file list, sorting by the full path.
 	 */
@@ -154,4 +170,93 @@ public class FileListData<T extends File> implements Cloneable {
 			return null;
 		}
 	}
+	
+	
+	 /**
+     * Filters a list of File objects to remove duplicates based on the name (excluding extension).
+     * If duplicates exist, it keeps the one with the preferred extension. If none of the
+     * duplicates have the preferred extension, it keeps the first encountered duplicate File object
+     * from the original list.
+     *
+     * @param files              A list of File objects.
+     * @param preferredExtension The preferred file extension (e.g., "pdf", "docx").
+     * @return A new list of File objects with duplicates removed according to the specified rules.
+     */
+    public static List<? extends File> filterDuplicateFiles(List<? extends File> files, String preferredExtension) {
+        if (files == null || files.isEmpty()) {
+            return new ArrayList<>(); // Return an empty list if input is null or empty
+        }
+
+        String normalizedPreferredExtension = preferredExtension.startsWith(".")
+                ? preferredExtension.substring(1)
+                : preferredExtension;
+
+        Map<String, List<File>> filesByBaseName = new HashMap<>();
+
+        // Group File objects by their base name
+        for (File file : files) {
+            if (file == null) {
+                continue; // Skip null File objects
+            }
+            String fileName = file.getName();
+            if (fileName.trim().isEmpty()) {
+                continue; // Skip files with empty names
+            }
+
+            String baseName = FilenameUtils.getBaseName(fileName);
+            filesByBaseName.computeIfAbsent(baseName, k -> new ArrayList<>()).add(file);
+        }
+
+        List<File> result = new ArrayList<>();
+
+        // Process each group of files
+        for (Map.Entry<String, List<File>> entry : filesByBaseName.entrySet()) {
+            List<File> duplicates = entry.getValue();
+
+            if (duplicates.size() == 1) {
+                result.add(duplicates.get(0)); // No duplicates, add the single file
+            } else {
+                File fileToKeep = null;
+                // Check for preferred extension among duplicates
+                for (File duplicateFile : duplicates) {
+                    String currentFileName = duplicateFile.getName();
+                    String extension = FilenameUtils.getExtension(currentFileName);
+                    if (extension != null && extension.equalsIgnoreCase(normalizedPreferredExtension)) {
+                        fileToKeep = duplicateFile;
+                        break; // Found the preferred one
+                    }
+                }
+
+                if (fileToKeep != null) {
+                    result.add(fileToKeep);
+                } else {
+                    // No preferred extension found, keep the first one encountered in the original input list
+                    // from this group of duplicates.
+                    File firstInOriginalList = null;
+                    int minIndex = Integer.MAX_VALUE;
+
+                    for (File duplicateFileFromGroup : duplicates) {
+                        int currentIndex = files.indexOf(duplicateFileFromGroup); // Find original index
+                        if (currentIndex != -1 && currentIndex < minIndex) {
+                            minIndex = currentIndex;
+                            firstInOriginalList = duplicateFileFromGroup;
+                        }
+                    }
+
+                    if (firstInOriginalList != null) {
+                        result.add(firstInOriginalList);
+                    } else if (!duplicates.isEmpty()){
+                        // Fallback: Should not happen if duplicates list is populated from 'files'
+                        // and 'files' is not modified concurrently.
+                        // This could happen if a file in 'duplicates' was not in the original 'files' list
+                        // (e.g. if 'files' was cleared or objects are not identical).
+                        // As a robust fallback, add the first file from the current duplicates group.
+                        result.add(duplicates.get(0));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
 }
