@@ -10,46 +10,65 @@
 	<h1>Noise Band Measurement</h1>
 	<h2>Overview</h2>
 	<br>
-	<p>PAMGuard contains two modules which can measure noise levels in multiple frequency bands. These
-	are called the <a href=NoiseBandsFFT.html>Noise Monitor</a> and the <a href=NoiseBandsFilters.html>Noise Band Monitor</a>, 
-	both available from the <em>File / Add Modules / Sound Processing</em> menu.</p>
-	<p>Both modules should give the same results to within a fraction of a Decibel, so which you use is largely up to you. 
-	however, there are some subtle differences. </p>
-	<p>The Noise Monitor module works using FFT data as input. The resolution of the noise measurements in both time and
-	frequency is therefore governed by how you've set up the FFF. For example, if you've data with a sample rate
-	of 48kHz and are using a FFT length of 1024 samples, then the frequency resolution of the FFT will be 48000/1024 = 46.9Hz. Since
-	the measurements are made by adding up multiple bins of data from the FFT's, you can't get a sensible measurement below a frequency 
-	bin size of about 200Hz. Further, the FFT time intervals may not align nicely with exact seconds, so the intervals between
-	measurements may be a bit longer than you've asked for. </p>
-	<p>The Noise Band Monitor works differently, using a bank of filters to process the incoming raw data and these filters can go 
-	as low in frequency as you like, and take measurements from the data at the exat times you've asked for. 
-	On the other hand, the filter banks are slow to process, so this module will take more resources
-	on your computer than the FFT based method. </p>
-	<p>The advantages and disadvantages of the two methods are laid out below</p>
+	<p>
+		PAMGuard contains two modules which can measure noise levels in
+		multiple frequency bands. These are called the <a
+			href=NoiseBandsFFT.html>Noise Monitor</a> and the <a
+			href=NoiseBandsFilters.html>Noise Band Monitor</a>, both available
+		from the <em>File / Add Modules / Sound Processing</em> menu.
+	</p>
+	<p>Both modules should give the same results to within a fraction
+		of a Decibel, so which you use is largely up to you. however, there
+		are some subtle differences.</p>
+	<p>The Noise Monitor module works using FFT data as input. The
+		resolution of the noise measurements in both time and frequency is
+		therefore governed by how you've set up the FFF. For example, if
+		you've data with a sample rate of 48kHz and are using a FFT length of
+		1024 samples, then the frequency resolution of the FFT will be
+		48000/1024 = 46.9Hz. Since the measurements are made by adding up
+		multiple bins of data from the FFT's, you can't get a sensible
+		measurement below a frequency bin size of about 200Hz. Further, the
+		FFT time intervals may not align nicely with exact seconds, so the
+		intervals between measurements may be a bit longer than you've asked
+		for.</p>
+	<p>The Noise Band Monitor works differently, using a bank of
+		filters to process the incoming raw data and these filters can go as
+		low in frequency as you like, and take measurements from the data at
+		the exat times you've asked for. On the other hand, the filter banks
+		are slow to process, so this module will take more resources on your
+		computer than the FFT based method.</p>
+	<p>The advantages and disadvantages of the two methods are laid out
+		below</p>
 	<table>
-	<tr>
-	<th>Method</th> <th>Advantages</th> <th>Disadvantages</th>
-	</tr>
-	<tr><td><a href=NoiseBandsFFT.html>Noise Monitor</a>
-	<td>Faster (especially if you're doing the FFT anyway)</td>
-	<td>Poor resolution at low frequency
-	<br>
-	Time intervals between measurement may not be precise</td>
-	</tr>
-	<tr><td><a href=NoiseBandsFilters.html>Noise Band Monitor</a></td>
-	<td>Good resolution at low frequency
-	<br>
-	Accurate time intervals.
-	<br>
-	More frequency band options.
-	</td>
-	<td>Slower</td>
-	</table> 
+		<tr>
+			<th>Method</th>
+			<th>Advantages</th>
+			<th>Disadvantages</th>
+		</tr>
+		<tr>
+			<td><a href=NoiseBandsFFT.html>Noise Monitor</a> (FFT method)</td>
+			<td><p>Faster (especially if you're doing the FFT anyway);</p><p>
+			User can create  non-standard bands</p>
+			</td>
+			<td><p>Poor resolution at low frequency;</p> <p>Time intervals
+				between measurement may not be precise</p>
+			</td>
+		</tr>
+		<tr>
+			<td><a href=NoiseBandsFilters.html>Noise Band Monitor</a> (Filter bank method)</td>
+			<td><p>Better resolution at low frequency;</p> <p>Accurate time
+				intervals;</p> 
+			</td>
+			<td>Slower</td>
+		</tr>
+	</table>
 
 
 
 	<br>
-<p CLASS="nextLink"><a href="NoiseBandsFFT.html">Next: FFT Method </a></p>
+	<p CLASS="nextLink">
+		<a href="NoiseBandsFFT.html">Next: FFT Method </a>
+	</p>
 	<br>
 </body>
 </html>
