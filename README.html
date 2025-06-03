@@ -449,10 +449,14 @@ analyse the log file from the previous run for errors. If errors are found,
 then the user will be prompted to send a report to the PAMGuard team via email.
 See help on log files for further details. &nbsp;</p>
 
-<p class=MsoNormal>Issue 211. Noise Band Measurement module. Added features to
-support other types of frequency band as well as standard octave and third
-octave. PAMGuard now supports Octave, Third Octave, Deci-decade, Decade, 1/10
-Octave, and 1/12 Octave bands. </p>
+<p class=MsoNormal>Issue 211. Noise Band Measurement module (the one that uses
+filter banks). Added features to support other types of frequency band as well
+as standard octave and third octave. PAMGuard now supports Octave, Third
+Octave, Deci-decade, Decade, 1/10 Octave, and 1/12 Octave bands. </p>
+
+<p class=MsoNormal>Noise Monitor Module (the one that used FFT data). Added
+1/10 decade, Octave, and Decade bands options. Improved data selection
+handling. </p>
 
 <p class=MsoNormal>Issue 215. x.wav Files. Support for duty cycling with .x.wav
 files from SCRIPPS HARP recorders. &nbsp;</p>
@@ -473,14 +477,18 @@ as a single row of data in the Deployments table on the display. </p>
 multi channel files; handling corrupt files; reloading audio data for
 spectrogram displays in viewer. </p>
 
-<p class=MsoNormal>Issue 230. Updated SUD reader to handle latest soundtrap firmware
-that supports accelerometers and magnetometers. </p>
+<p class=MsoNormal>Issue 230. Updated SUD reader to handle latest soundtrap
+firmware that supports accelerometers and magnetometers. </p>
 
 <p class=MsoNormal>Issue 220. Fixed spectrogram scrolling issues in Spectrogram
 and FX Time display.</p>
 
 <p class=MsoNormal>Issue 216. GEBCO Raster map files not loading. Issue now
 fixed. </p>
+
+<p class=MsoNormal>Issue 232. Files without dates. Will now correctly process a
+folder of files without dates. However, you are strongly recommended to have
+valid dates in your file names. </p>
 
 <h1>Version 2.02.16 March 2025</h1>
 
@@ -509,8 +517,8 @@ online help pages and help pages for the Batch processor for details.</p>
 
 <p class=MsoNormal><b>Deep Learning Classifier</b></p>
 
-<p class=MsoNormal>Better error dialogs to indicate when models are incorrect and
-when the libraries have not been installed correctly.</p>
+<p class=MsoNormal>Better error dialogs to indicate when models are incorrect
+and when the libraries have not been installed correctly.</p>
 
 <p class=MsoNormal>DelphinID Whistle classifier support now implemented.</p>
 
@@ -779,9 +787,9 @@ clicks not being correctly reassigned to different events. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Screen Position</span></b><span
 lang=EN-US>: When using multiple monitors, if you move a configuration to a
-computer with a different monitor layout, the GUI should work out if it's
-opening on a screen area which no longer exists and move itself onto the
-primary monitor. </span></p>
+computer with a different monitor layout, the GUI should work out if it's opening
+on a screen area which no longer exists and move itself onto the primary
+monitor. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>File Folder Processing</span></b><span
 lang=EN-US>: Previous version had a bug which caused files to not always be
@@ -1218,10 +1226,10 @@ Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
-(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
-should be compatible with this version, and vice-versa. PSF files generated in
-core releases (1.15.xx) can be loaded in this version, but will be converted to
-PSFX files when PAMGuard exits.</p>
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should
+be compatible with this version, and vice-versa. PSF files generated in core
+releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
+files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -2191,8 +2199,8 @@ database.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>12. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 378. TMA dialog not displaying current Model type, and unclear when event
-not selected.</p>
+</span>Bug 378. TMA dialog not displaying current Model type, and unclear when
+event not selected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>13. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2772,11 +2780,11 @@ was used. This is fixed. </p>
 
 <p class=MsoListParagraph style='margin-left:40.5pt;text-indent:-22.5pt'>5.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 295. If a click has a total length of a single sample, the code attempting
-to estimate the time delay between channels would crash. This is now fixed.
-This could only occur if both pre sample and post sample were set to 0 in the
-click detector, which is generally not a good idea, so this bug may have been
-there for some time, it's just that no one noticed before. Fixed</p>
+</span>Bug 295. If a click has a total length of a single sample, the code
+attempting to estimate the time delay between channels would crash. This is now
+fixed. This could only occur if both pre sample and post sample were set to 0
+in the click detector, which is generally not a good idea, so this bug may have
+been there for some time, it's just that no one noticed before. Fixed</p>
 
 <p class=MsoListParagraph style='margin-left:40.5pt;text-indent:-22.5pt'>6.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3279,8 +3287,8 @@ allocation to allow more memory for the database interface. Hopefully Fixed. </p
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-AU>9.</span><span lang=EN-AU style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 239. <span lang=EN-AU>Fixed bug in the DIFAR module that was incorrectly
-preventing cross-fixes for some calls.</span></p>
+</span>Bug 239. <span lang=EN-AU>Fixed bug in the DIFAR module that was
+incorrectly preventing cross-fixes for some calls.</span></p>
 
 <p class=MsoNormal>Details of these bugs can be found at <a
 href="https://sourceforge.net/p/PAMGuard/bugs">https://sourceforge.net/p/PAMGuard/bugs</a></p>
@@ -4396,9 +4404,9 @@ synchronisation.</p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Wigner time-frequency plot for the click detector. Clicks are NOT
-automatically displayed in the Winger window as they are for the waveform and spectrum
-windows since the Wigner transformation is very time consuming. Clicks will be
-displayed if you select them with the mouse.</p>
+automatically displayed in the Winger window as they are for the waveform and
+spectrum windows since the Wigner transformation is very time consuming. Clicks
+will be displayed if you select them with the mouse.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

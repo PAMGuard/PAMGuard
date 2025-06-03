@@ -1,0 +1,82 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Noise Band Measurement</title>
+</head>
+
+<body>
+
+	<h1>Noise Band Measurement</h1>
+	<h2>Overview</h2>
+	<br>
+
+	<p>This module allows you to measure noise in 
+	frequency bands of  Third Octave, Deci-Decade, Octave, Decade, or bands you type in yourself. 
+	These measurements are compatible with the ANSI Standard 
+	<a href = "https://webstore.ansi.org/standards/asa/ansiasas1112004r2009">
+	ANSI S1.11-2004 American National Standard Specification for
+Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
+	</p>
+	
+	<p>The module requires <a href=../../fftManagerHelp/docs/FFTEngine_Overview.html>FFT data</a> 
+	as input. It works out which FFT data belong to 
+	which of the defined frequency bands, and as data arrive, sums the FFT data for
+	each band. This means that at low frequencies, where the frequency bands your measuring
+	are probably smaller, you start to lose resolution in frequency. If you want to measure noise 
+	at very low frequencies, you'll either have to use a very long FFT length, or switch to 
+	using the <a href=NoiseBandsFilters.html>Noise Band Monitor</a>. </p> 
+	
+	
+	<h3>Creating the module</h3>
+	<p>
+		From the <em><strong>File>Add modules>Sound Processing</strong></em>
+		menu, or from the pop-up menu on the data model display select "<em><strong>
+				Noise Monitor</strong></em>". Enter a name for the new module and press Ok.
+	</p>
+	
+	<h3>Configuring the module</h3>
+	<p>
+		To configure the module, open the settings dialog from the <em><strong>Detection>"your
+				module name" </strong></em> menu:
+	</p>
+	<br>
+	<center><img  src="Images/NoiseDialog.png"></center>
+	<br>
+	<p>For standard bands: Third Octave, Deci Decade, Octave, and Decade, just click the appropriate check box to the right of the
+	dialog. These buttons will automatically generate as many bands as possible depending on the frequency resolution of the FFT 
+	data and the <a href=https://en.wikipedia.org/wiki/Nyquist_frequency>Nyquist frequency</a>. 
+	The minimum frequency is calculated such that the lowest frequency band spans a minimum of two frequency bins in the FFF data. 
+	Bands will be centred at multiples	of 1000Hz. </p>
+	<p>If you require other bands, for example, decade bands with edges at 100, 1000, 10000Hz, etc., you can enter these 
+	manually by pressing the  <em>Add Other Bands</em> button. Remember that it's not going to give accurate results if you enter
+	band frequencies that are a fraction of the FFT data's frequency resolution. If you require measurements at lower frequencies
+	you'll have to use a long FFT length, or <a href=../../decimatorHelp/docs/decimator_decimator.html>decimate</a> 
+	the audio data to a lower frequency.</p>
+
+	<h4>Output Interval</h4>
+	<p>Enter the interval between measurements in seconds. Note that you may not get measurements at exactly these intervals
+	because the start times of the FFT data may not like exactly on second boundaries.</p>
+	
+
+	<h4>Number of measures in interval</h4>
+	<p>Generally, it's best to select the 'Use all FFT data' button, so that all data in all FFT's in the selected time 
+	interval will be included in noise measurement. However, if you're intervals are very long and you want to reduce processing
+	load by only using a random sample of the data, you can set a lower number of measurement to take from that interval.</p>
+	
+	
+	
+	<h4>Input FFT Length</h4>
+	<p>If you want your output times aligned nicely on second boundaries, you can use a FFT Hop, in the FFT module that is an
+	exact factor of the sample rate. With the modern FFT algorithm used by PAMGuard, it's also generally OK to pick an FFT length 
+	that is not a power of 2. e.g. if you have data sampled at 384kHz, and want noise measurements right down to 10Hz, you could
+	set up an FFT with a length of 384000 samples, and a hop of 192000. This would use more processing power than an FFT
+	length of 262144 samples (the nearest exact power of 2), but will probably be OK. </p>
+
+
+	<br>
+<p CLASS="prevLink"><a href="NoiseBands.html">Previous: Overview </a></p>
+<p CLASS="nextLink"><a href="NoiseBandsFilters.html">Next: Filter Bank Method </a></p>
+	<br>
+</body>
+</html>

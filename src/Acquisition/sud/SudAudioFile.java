@@ -11,9 +11,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.SwingUtilities;
 
 import org.pamguard.x3.sud.ChunkHeader;
+import org.pamguard.x3.sud.SudAudioInputStream;
+import org.pamguard.x3.sud.SudFileMap;
 import org.pamguard.x3.sud.SudMapListener;
 
-import Acquisition.AcquisitionParameters;
 import Acquisition.pamAudio.PamAudioSettingsPane;
 import Acquisition.pamAudio.WavAudioFile;
 import PamController.PamControlledUnitSettings;
@@ -83,7 +84,7 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 			}
 			if (soundFile != null) {
 
-				if (new File(soundFile.getAbsolutePath() + "x").exists()) {
+				if (isValidSudMapFile(soundFile)) {
 //				System.out.println("----NO NEED TO MAP SUD FILE-----"  + soundFile);
 					try {
 						return new SudAudioFileReader(sudParams.zeroPad).getAudioInputStream(soundFile);
@@ -91,7 +92,8 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} else {
+				}
+				else {
 
 //				System.out.println("----MAP SUD FILE ON OTHER THREAD-----" + soundFile);
 
@@ -108,9 +110,15 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 						worker = new PamWorker<AudioInputStream>(sudMapWorker,
 								PamController.getInstance().getMainFrame(), 1,
 								"Mapping sud file: " + soundFile.getName());
-//					System.out.println("Sud Audio Stream STARTED: " + soundFile.getName());
+						
+			
 
 						SwingUtilities.invokeLater(() -> {
+							
+						worker.getPamWorkDialog().setLocation(worker.getPamWorkDialog().getX(), 
+									worker.getPamWorkDialog().getY() + 200);
+						worker.getPamWorkDialog().validate();
+						//System.out.println("Sud Audio Stream STARTED: " + soundFile.getName());
 							worker.start();
 						});
 						// this should block AWT thread but won't block if called on another thread..
@@ -145,6 +153,28 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 
 		return null;
 	}
+
+	/**
+     * Checks if the .sudx file exists and has the correct serialVersionUID to be opened as a SudFileMap.
+     */
+    private boolean isValidSudMapFile(File soundFile) {
+        File sudxFile = new File(soundFile.getAbsolutePath() + "x");
+        if (!sudxFile.exists()) {
+            return false;
+        }
+        try {
+			SudFileMap sudFileMap = SudAudioInputStream.loadSudMap(sudxFile);
+			if (sudFileMap != null) {
+				// System.out.println("Valid Sud Map File: " + sudxFile.getName());
+				return true;
+			} else {
+				// System.out.println("Invalid Sud Map File: " + sudxFile.getName());
+			}
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
 
 	public class SudMapProgress implements SudMapListener {
 

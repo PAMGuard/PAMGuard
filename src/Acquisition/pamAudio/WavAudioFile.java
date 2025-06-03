@@ -312,9 +312,17 @@ public class WavAudioFile implements PamAudioFileLoader {
 				return WavFileInputStream.openInputStream(soundFile);
 			}
 			catch (UnsupportedAudioFileException | IOException e) {
-				e.printStackTrace(); 
+//				e.printStackTrace(); 
 				// don't do anything and it will try the built in Audiosystem
 				System.err.println("Could not open wav file: trying default audio stream: " + soundFile.getName() + "  " + soundFile.length()); 
+			
+				/* 
+				 * If it's a  wav file, we need to give up at this point and return null, however
+				 * other types may need to go the the default audio system.
+				 */
+				if (soundFile.getName().toLowerCase().endsWith(".wav")) {
+					return null;
+				}
 			}
 		}
 		try {
