@@ -1351,8 +1351,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//				System.out.println("Invalid reprocess choice command: " + reprocessString);
 		//			}
 		//		}
-
-		if (saveSettings && getRunMode() == RUN_NORMAL) { // only true on a button press or network start.
+		
+		/*
+		 *  only want to run the reprocess manager if it's file analysis, not for real time, since in real
+		 *  time, things can only move forwards.  
+		 */
+		boolean isRT = globalTimeManager.isRealTime();
+		if (saveSettings && getRunMode() == RUN_NORMAL && isRT == false) { // only true on a button press or network start and it's not real time
 			checkReprocessManager(saveSettings, startTime);
 		}
 		else {

@@ -163,6 +163,11 @@ public class PamWorker<T> {
 	}
 	
 
+	public PamWorkDialog getPamWorkDialog() {
+		return pamWorkDialog;
+	}
+
+
 	public BackgroundWorker getBackgroundWorker() {
 		return backgroundWorker;
 	}

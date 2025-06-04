@@ -438,6 +438,8 @@
 
 <mapID target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation" url="classifiers/roccaHelp/docs/rocca_ContourExtractionManipulation.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_deleting" url="utilities/tethys/docs/tethys_deleting.html"/>
+
 <mapID target="visual_methods.loggerFormsHelp.docs.SINGLE" url="visual_methods/loggerFormsHelp/docs/SINGLE.html"/>
 
 <mapID target="utilities.datamap.docs.datamap" url="utilities/datamap/docs/datamap.html"/>
@@ -742,6 +744,8 @@
 
 <mapID target="localisation.group3d.docs.3dalgorithms" url="localisation/group3d/docs/3dalgorithms.html"/>
 
+<mapID target="sound_processing.NoiseBands.Docs.NoiseBandsFilters" url="sound_processing/NoiseBands/Docs/NoiseBandsFilters.html"/>
+
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_thresholding" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html#thresholding"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules__Classifiers" url="overview/PamMasterHelp/docs/modules.html#_Classifiers"/>
@@ -839,6 +843,8 @@
 <mapID target="mapping.NMEA.docs.configuringNMEADataSource_NMEAStringList" url="mapping/NMEA/docs/configuringNMEADataSource.html#NMEAStringList"/>
 
 <mapID target="sensors.analogarray.docs.analogarraycalibration" url="sensors/analogarray/docs/analogarraycalibration.html"/>
+
+<mapID target="sound_processing.NoiseBands.Docs.NoiseBandsFFT" url="sound_processing/NoiseBands/Docs/NoiseBandsFFT.html"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal" url="sound_processing/fftManagerHelp/docs/noise_removal.html"/>
 

@@ -2,6 +2,7 @@ package export.MLExport;
 
 import org.jamdev.jdl4pam.utils.DLMatFile;
 
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import cpod.CPODClick;
 import cpod.CPODClickTrainDataUnit;
@@ -106,6 +107,12 @@ public class MLCPODExport extends MLDataUnitExport<PamDataUnit<?, ?>>{
 	@Override
 	public String getName() {
 		return "cpod";
+	}
+
+	@Override
+	protected Struct detectionHeader(PamDataBlock pamDataBlock) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

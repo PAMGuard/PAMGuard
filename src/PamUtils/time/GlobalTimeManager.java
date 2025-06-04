@@ -132,7 +132,7 @@ public class GlobalTimeManager implements PamSettings {
 	 * no need to do time checks. 
 	 * @return true if it's a realtime system
 	 */
-	private boolean isRealTime() {
+	public boolean isRealTime() {
 		if (PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
 			return false;
 		}

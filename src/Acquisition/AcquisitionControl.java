@@ -62,6 +62,7 @@ import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
 import PamUtils.PlatformInfo;
 import PamUtils.PlatformInfo.OSType;
+import PamUtils.worker.PamWorkMonitor;
 import PamView.MenuItemEnabler;
 import PamView.PamStatusBar;
 import PamView.dialog.PamLabel;
@@ -886,8 +887,14 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		}
 	}
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
-		return getDaqProcess().getStoreInfo(detail);
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
+		if (isViewer) {
+			// I think this might always be true, but get it from the offlineFileServer
+			return offlineFileServer.getStoreInfo(workMonitor, detail);
+		}
+		else {
+			return getDaqProcess().getStoreInfo(workMonitor, detail);
+		}
 	}
 
 	@Override
