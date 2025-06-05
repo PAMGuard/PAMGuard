@@ -94,10 +94,12 @@ public class DLZipUtils {
 		try (ZipFile zipFile = new ZipFile(zipFileIn)) {
 		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		    //this iterates through all files, including in sub folders. 
+		    String name;
 		    while (entries.hasMoreElements()) {
 		        ZipEntry entry = entries.nextElement();
 		        // Check if entry is a directory
-		        if (!entry.isDirectory()) {
+		        name = new File(entry.getName()).getName();
+		        if (!entry.isDirectory() && !name.startsWith(".")) {
 		           //System.out.println(entry); 
 		           if (entry.getName().contains(filePattern)) {
 		        	   return entry.getName();
