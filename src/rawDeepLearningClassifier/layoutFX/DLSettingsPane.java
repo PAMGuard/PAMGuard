@@ -126,6 +126,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private DLWarningDialog dlWarningDialog ;
 
+	private String currentClassifierModel;
+
 
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
@@ -410,9 +412,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	protected void setClassifierPane() {
 		//set the classifier Pane.class 
-		
-		//System.out.println("SET CLASSIFIER PANE"); 
-		
+			
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
 
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
