@@ -30,6 +30,8 @@ public class DLGroupDetection extends SegmenterDetectionGroup implements PamDete
 			double maxFreq =  Double.NEGATIVE_INFINITY;
 
 			double[] freq;
+			
+			
 			for (int j=0; j<getSubDetectionsCount(); j++) {
 
 
@@ -47,5 +49,13 @@ public class DLGroupDetection extends SegmenterDetectionGroup implements PamDete
 		return super.getFrequency();
 	}
 
+	@Override
+	public int getSubDetectionsCount() {
+		
+		for (int j=0; j<getSubDetectionsCount(); j++) {
+			if (getSubDetection(j) != null) return 0;
+		}
+		return super.getSubDetectionsCount();
+	}
 
 }

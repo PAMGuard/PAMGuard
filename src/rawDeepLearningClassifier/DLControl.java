@@ -49,6 +49,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.DLDetectionDataBlock;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier;
+import rawDeepLearningClassifier.dlClassification.deepAcoustics.DeepAcousticsClassifier;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
@@ -340,6 +341,8 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		dlModels.add(new KooguClassifier(this));
 		dlModels.add(new PamZipModelClassifier(this));
 		dlModels.add(new DelphinIDClassifier(this));
+		dlModels.add(new DeepAcousticsClassifier(this));
+
 		
 		//it is important the Generic Model is last because we need to check 
 		//for PG metadata in all other models before resorting to manually 

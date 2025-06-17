@@ -172,7 +172,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				dlParams.numClasses = (int) modelParams.defaultOutputShape.get(1);
 			}
 
-			//ok 0 the other values are not user selectable but this is. If we relaod the same model we probably want to keep it....
+			//ok 0 the other values are not user selectable but this is. If we reload the same model we probably want to keep it....
 			//So this is a little bit of a hack but will probably be OK in most cases. 
 			if (dlParams.binaryClassification==null || dlParams.binaryClassification.length!=dlParams.numClasses) {
 				dlParams.binaryClassification = new boolean[dlParams.numClasses]; 

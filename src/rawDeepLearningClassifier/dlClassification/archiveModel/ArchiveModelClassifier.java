@@ -154,7 +154,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		StandardModelParams newParameters = (StandardModelParams) pamControlledUnitSettings.getSettings();
 		if (newParameters != null) {
 			standardDLParams = newParameters.clone();
-			System.out.println("KetosParams have been restored. : " + standardDLParams.dlTransfromParams);
+			System.out.println("Archive model params have been restored. : " + standardDLParams.dlTransfromParams);
 			if (standardDLParams.dlTransfromParams != null) {
 				standardDLParams.dlTransfroms = DLTransformsFactory
 						.makeDLTransforms((ArrayList<DLTransfromParams>) standardDLParams.dlTransfromParams);
