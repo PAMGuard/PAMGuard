@@ -62,7 +62,7 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 
 	@Override
 	public DLStatus prepModel(StandardModelParams dlParams, DLControl dlControl) {
-		//most of the model prep is done in the perent class. 
+		//most of the model prep is done in the parent class. 
 		DLStatus status = super.prepModel(dlParams, dlControl);
 				
 		//now have to read the whsitle2image transform to get correct parameters for that. 
@@ -84,7 +84,6 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		}
 		
 		return status;
-	
 	}
 
 	@Override

@@ -13,14 +13,16 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
  * @author Jamie Macaulay
  *
  */
-public class DeepAcousticsDataUnit extends StandardPrediction {
+public class DeepAcousticsPrediction extends StandardPrediction {
 
 	/**
 	 * The result from the Deep Acoustics model. 
 	 */
 	private DeepAcousticsResult result;
+	
+	
 
-	public DeepAcousticsDataUnit(DeepAcousticsResult result) {
+	public DeepAcousticsPrediction(DeepAcousticsResult result) {
 		super(result.getPredicitions());
 		this.result = result; 
 	}

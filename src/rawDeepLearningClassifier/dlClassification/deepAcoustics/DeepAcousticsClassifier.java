@@ -12,6 +12,9 @@ import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelClass
  *
  */
 public class DeepAcousticsClassifier extends ArchiveModelClassifier {
+	
+	public static String MODEL_NAME = "DeepAcoustics";
+
 
 	public DeepAcousticsClassifier(DLControl dlControl) {
 		super(dlControl);
@@ -20,8 +23,10 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 	@Override
 	public String getName() {
 		//important because this is used to identify model from JSON file
-		return "deepacoustics";
+		return MODEL_NAME;
 	}
+	
+	
 	
 	
 
