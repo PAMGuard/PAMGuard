@@ -32,6 +32,8 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
 
 		JSONObject jsonObject = new JSONObject(jsonString); 
+		
+		//we want to get info on the network from here.,
 
 		return status;
 	}
@@ -50,8 +52,8 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 
 	@Override
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException, EngineException {
-
-		return new SimpleArchiveModel(new File(currentPath2)); 
+		//Override here to return a deep acoutics model. 
+		return new DeepAcousticsModel(new File(currentPath2)); 
 	}
 
 
