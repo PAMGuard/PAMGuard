@@ -273,6 +273,8 @@ public class AcquisitionProcess extends PamProcess {
 	}
 
 	Thread collectDataThread;
+
+	private ResolutionChecker resolutionChecker;
 	class ReallyStart implements ActionListener {
 
 		@Override
@@ -517,6 +519,13 @@ public class AcquisitionProcess extends PamProcess {
 			System.out.printf("Unable to find daq system %s\n", acquisitionControl.acquisitionParameters.daqSystemType);
 			return;
 		}
+		
+		if (resolutionChecker == null) {
+			resolutionChecker = new ResolutionChecker(this, runningSystem.getSampleBits());
+		}
+		else {
+			resolutionChecker.setDepth(runningSystem.getSampleBits());
+		}
 
 		systemPrepared = runningSystem.prepareSystem(acquisitionControl);
 
@@ -677,6 +686,14 @@ public class AcquisitionProcess extends PamProcess {
 			newDataUnit = new RawDataUnit(unitMillis,
 					threadDataUnit.getChannelBitmap(), threadDataUnit.getStartSample(),
 					threadDataUnit.getSampleDuration());
+			/*
+			 *  check the bits if it's 24 bit data to see that it really is returning 24 bit
+			 *  data and not scaled up 16 bit data. 
+			 *  Do this before the background subtraction when data should still be pretty raw.  
+			 */
+			if (runningSystem.getSampleBits() == 24) {
+				resolutionChecker.checkResolution(threadDataUnit.getRawData());
+			}
 			if (dcFilter != null) {
 				dcFilter.filterData(channel, threadDataUnit.getRawData());
 			}

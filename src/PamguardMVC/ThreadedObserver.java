@@ -502,11 +502,11 @@ public class ThreadedObserver implements PamObserver {
 							threadWarning.setEndOfLife(PamCalendar.getTimeInMillis() + 5000);
 							WarningSystem.getWarningSystem().addWarning(threadWarning);
 						}
-//						synchronized(synchLock) {
-//							if (toDoList.size() > 0) { // list may have been cleared during a shut down. 
-//								toDoList.remove(0);
-//							}
-//						}
+						synchronized(synchLock) {
+							if (toDoList.size() > 0) { // list may have been cleared during a shut down. 
+								toDoList.remove(0);
+							}
+						}
 					}
 				}
 			}			

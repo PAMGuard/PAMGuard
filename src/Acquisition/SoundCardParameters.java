@@ -19,6 +19,10 @@ public class SoundCardParameters implements Serializable, Cloneable, ManagedPara
 	public int deviceNumber;
 
 	public String systemType;
+	
+	public static final int[] BITDEPTHS = {16, 24};
+	
+	private int bitDepth = 16;
 
 
 	/**
@@ -49,5 +53,24 @@ public class SoundCardParameters implements Serializable, Cloneable, ManagedPara
 
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
+	}
+	
+	/**
+	 * @return the bitDepth
+	 */
+	public int getBitDepth() {
+		if (bitDepth == 0) {
+			bitDepth = 16;
+		}
+		// Java sound does not support 24 bit audio, so this is a waste of time (at least on Windows)
+		bitDepth = 16;
+		return bitDepth;
+	}
+
+	/**
+	 * @param bitDepth the bitDepth to set
+	 */
+	public void setBitDepth(int bitDepth) {
+		this.bitDepth = bitDepth;
 	}
 }
