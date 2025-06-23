@@ -50,7 +50,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	 * The Ketos worker. this handles the heavy lifting such as loading and running
 	 * models. 
 	 */
-	private ArchiveModelWorker archiveModelWorker; 
+	protected ArchiveModelWorker archiveModelWorker; 
 
 	public ArchiveModelClassifier(DLControl dlControl) {
 		super(dlControl);
@@ -64,8 +64,8 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	}
 
 
-	public void setDLParams(StandardModelParams ketosParams) {
-		this.standardDLParams=ketosParams;
+	public void setDLParams(StandardModelParams modelParams) {
+		this.standardDLParams=modelParams;
 		
 	}
 	

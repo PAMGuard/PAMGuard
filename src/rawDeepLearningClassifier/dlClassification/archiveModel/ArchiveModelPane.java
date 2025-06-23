@@ -26,19 +26,12 @@ public class ArchiveModelPane extends StandardModelPane {
 		this.setCurrentSelectedFile(file);
 
 		if (this.getParamsClone()==null) {
-			this.setParamsClone(new KetosDLParams()); 
+			this.setParamsClone(new StandardModelParams()); 
 		}
 		
 			
 		StandardModelParams params  = getParamsClone(); 
 		
-		
-//		if (params.dlTransfromParams!=null) {
-//			System.out.println("Ketos: Decimator: " + params.dlTransfromParams.get(0).params[0]); 
-//		}
-//		else {
-//			System.out.println("Ketos:dltransform params is null" + getParamsClone().dlTransfromParams); 
-//		}
 		
 		//prep the model with current parameters; 
 		

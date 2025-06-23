@@ -3,9 +3,14 @@ package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.jamdev.jdl4pam.ArchiveModel;
+import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticResultArray;
+import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticsResult;
+import org.jamdev.jdl4pam.genericmodel.GenericModel;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
+import org.jamdev.jdl4pam.utils.DLUtils;
 import org.json.JSONObject;
 
 import PamguardMVC.PamDataUnit;
@@ -21,35 +26,69 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
 
 public class DeepAcousticsWorker extends ArchiveModelWorker {
 
-
-	@Override
-	public DLStatus prepModel(StandardModelParams dlParams, DLControl dlControl) {
-		//most of the model prep is done in the parent class. 
-		DLStatus status = super.prepModel(dlParams, dlControl);
-
-		//need to get info on anchor boxes
-		//now have to read the whsitle2image transform to get correct parameters for that. 
-		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
-
-		JSONObject jsonObject = new JSONObject(jsonString); 
-		
-		//we want to get info on the network from here.,
-
-		return status;
-	}
-
-
-
 	@Override
 	public synchronized ArrayList<StandardPrediction> runModel(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan) {
 
-		//need to override as the input is 4D array float[][][][]
+		try {
+			//PamCalendar.isSoundFile(); 
+			//create an audio data object from the raw data chunk
+			long timeStart = System.nanoTime(); 
+			
+			float[][][] transformedDataStack  = dataUnits2ModelInput(dataUnits,  sampleRate,  iChan);
+			
+			float[][][][] transformedDataStack4D = DeepAcousticsModel.formatDataStack4D(transformedDataStack);
+			
+			// convert to 4D array which has 3 dimensions for colour. However, the image is
+			// greyscale so this third dimension is for compatibility but
+			// is completely redundant.
+
+			//run the model. 
+			float[] output = null; 
+			
+			long time1 = System.currentTimeMillis();
+			
+			DeepAcousticResultArray modelResults = getDeepAcxousticsModel().runModel(transformedDataStack4D);
+			
+			
+//			System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
+			long time2 = System.currentTimeMillis();
 
 
-		return null;
-
+			//			System.out.println(PamCalendar.formatDBDateTime(rawDataUnits.get(0).getTimeMilliseconds(), true) + 
+			//					" Time to run model: " + (time2-time1) + " ms for spec of len: " + transformedDataStack.length + 
+			//					"output: " + output.length + " " + numclasses); 
+			
+			//now we need to convert the model results into a standard prediction object.
+			ArrayList<StandardPrediction> dlModelResults = new ArrayList<StandardPrediction>();
+			DeepAcousticsResult modelResult;
+			DeepAcousticsPrediction dlModelResult;
+			for (int i=0; i<modelResults.size(); i++) {
+				 modelResult = modelResults.get(i);
+				
+				 dlModelResult = new DeepAcousticsPrediction(modelResult);
+			
+				//add the result to the list
+				dlModelResults.add(dlModelResult);
+			}
+			
+			return dlModelResults;
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
-
+	
+	/**
+	 * Prepare the model.
+	 * Note it is important to put a synchronized here or the model loading can fail.
+	 */
+	private DeepAcousticsModel getDeepAcxousticsModel() {
+		return (DeepAcousticsModel) getModel();
+	}
+	
+	
 	@Override
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException, EngineException {
 		//Override here to return a deep acoutics model. 

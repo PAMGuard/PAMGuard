@@ -28,6 +28,8 @@ public class DeepAcousticsTest {
 		 try {
 			DeepAcousticsModel model = new DeepAcousticsModel(modelFile);
 			
+			
+			
 			System.out.println("Deep Acoustics Model loaded successfully.");
 		} catch (MalformedModelException | EngineException | IOException e) {
 			// TODO Auto-generated catch block

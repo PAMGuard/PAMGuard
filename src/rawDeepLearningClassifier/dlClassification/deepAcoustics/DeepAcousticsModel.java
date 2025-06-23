@@ -127,6 +127,38 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 		return null;
 	}
 
+	/**
+	 * Format the data stack into a 4D array suitable for the model input.
+	 * 
+	 * @param transformedDataStack The input data stack as a 3D float array.
+	 * @return The formatted data stack as a 4D float array.
+	 */
+	public static float[][][][] formatDataStack4D(float[][][] transformedDataStack) {
+		float[][][][] dataStack4D = new float[transformedDataStack.length][][][];
+		
+		for (int i = 0; i < transformedDataStack.length; i++) {
+			dataStack4D[i] = colourSizeImage( transformedDataStack[i]);
+		}
+		return dataStack4D;
+	}
+	
+	
+	/**
+	 * 
+	 * @param dataF - the image data as a 2D float array.
+	 * @return image data colourized as a greyscale image. 
+	 */
+	private static float[][][] colourSizeImage(float[][] dataF) {
+		//NEED TO COLOURISE SPECTROGRAM TO MAKE IT A 3D INPUT
+		float[][][] dataF3 = new float[160][160][3];
+		for (int i=0; i<160; i++) {
+			for (int j=0; j<160; j++) {
+				dataF3[i][j] = new float[] {dataF[i][j],dataF[i][j],dataF[i][j]};
+			}
+		}
+		return dataF3;
+	}
+
 
 
 

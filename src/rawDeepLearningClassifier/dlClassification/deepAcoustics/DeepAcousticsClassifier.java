@@ -1,7 +1,9 @@
 package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelClassifier;
+import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 
 
 /**
@@ -26,9 +28,22 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 		return MODEL_NAME;
 	}
 	
+	@Override
+	public StandardModelParams makeParams() {
+		return new DeepAcousticParams();
+	}
 	
-	
-	
+
+	/**
+	 * Get the KetosWorker. this handles loading and running the Ketos model. 
+	 * @return the Ketos worker. 
+	 */
+	public ArchiveModelWorker getModelWorker() {
+		if (archiveModelWorker==null) {
+			archiveModelWorker= new DeepAcousticsWorker(); 
+		}
+		return archiveModelWorker;
+	}
 
 
 }
