@@ -135,6 +135,7 @@ public class DLModelSelectPane extends PamBorderPane {
 		PamButton pamButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize));
 		pathLabel.setMinWidth(100);
 
+		
 		modelLoadIndicator = new ProgressIndicator(-1);
 		modelLoadIndicator.setVisible(false);
 		modelLoadIndicator.prefHeightProperty().bind(pamButton.heightProperty().subtract(3));

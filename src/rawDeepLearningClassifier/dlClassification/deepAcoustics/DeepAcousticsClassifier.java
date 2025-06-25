@@ -1,9 +1,18 @@
 package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 
+import java.util.ArrayList;
+
+import PamUtils.PamCalendar;
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
+import warnings.WarningSystem;
 
 
 /**
@@ -20,8 +29,10 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 
 	public DeepAcousticsClassifier(DLControl dlControl) {
 		super(dlControl);
+		archiveModelUI = new DeepAcousticsUI(this);
 	}
 	
+
 	@Override
 	public String getName() {
 		//important because this is used to identify model from JSON file

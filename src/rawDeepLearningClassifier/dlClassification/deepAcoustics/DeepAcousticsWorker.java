@@ -3,25 +3,13 @@ package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.jamdev.jdl4pam.ArchiveModel;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticResultArray;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticsResult;
-import org.jamdev.jdl4pam.genericmodel.GenericModel;
-import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
-import org.jamdev.jdl4pam.utils.DLUtils;
-import org.json.JSONObject;
-
 import PamguardMVC.PamDataUnit;
 import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
-import rawDeepLearningClassifier.DLControl;
-import rawDeepLearningClassifier.DLStatus;
-import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
-import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveModel;
-import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 public class DeepAcousticsWorker extends ArchiveModelWorker {
@@ -47,6 +35,9 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			
 			long time1 = System.currentTimeMillis();
 			
+			System.out.println("DeepAcousticsWorker: input size: " + transformedDataStack4D.length);
+
+			
 			DeepAcousticResultArray modelResults = getDeepAcxousticsModel().runModel(transformedDataStack4D);
 			
 			
@@ -62,6 +53,8 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			ArrayList<StandardPrediction> dlModelResults = new ArrayList<StandardPrediction>();
 			DeepAcousticsResult modelResult;
 			DeepAcousticsPrediction dlModelResult;
+			
+			System.out.println("DeepAcousticsWorker: Model results size: " + modelResults.size());
 			for (int i=0; i<modelResults.size(); i++) {
 				 modelResult = modelResults.get(i);
 				

@@ -158,8 +158,59 @@ public class DataTransformPaneFactory {
 			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.SPECNORMALISE_MINIMAX.toString()); 
 			settingsPane.setPadding(new Insets(0,0,0,20));
 			break;
+		case CLAHE:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Block size ", "Bins ", "Slope "},  new String[]{"pixels", "", ""}, 2); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, 500000,  1); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0, 500000,  1);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   0.1);
+			break;
+		case CLAHE2:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Clip limit ", "alpha "},  new String[]{"", ""}, 2); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   0.1); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
+			break;
+		case FFT:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"FFT length"},  new String[]{"samples"}); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
+			break;
+		case SPECFLIP:
+			settingsPane = new LabelTransfromPane(dlTransfrom, dlTransfrom.getDLTransformType().toString()); 
+			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
+		case SPECFREQTRIM:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Min. Freq. ", "Max. Freq. "},  new String[]{"Hz", "Hz"}, 2); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   100.); //hmmmm would be nice to have the sample rate here...
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
+			break;
+		case SPECRESIZE:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Time bins", "Freq. bins"},  new String[]{"", ""}); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0,Integer.MAX_VALUE,   1);
+			break;
+		case SPECTRUM_DOWNSAMPLE_MEAN:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Window"},  new String[]{"bins"}); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
+			break;
+		case SPECTRUM_NORMALISE_SUM:
+			settingsPane = new LabelTransfromPane(dlTransfrom, dlTransfrom.getDLTransformType().toString()); 
+			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
+		case SPECTRUM_SMOOTH:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Window"},  new String[]{"bins"}); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
+			break;
+		case SPECTRUM_TRIM_FREQ:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Min. Freq. ", "Max. Freq. "},  new String[]{"Hz", "Hz"}, 2); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   100.); //hmmmm would be nice to have the sample rate here...
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
+			break;
+		case SPECTRUM_dB:
+			settingsPane = new LabelTransfromPane(dlTransfrom, dlTransfrom.getDLTransformType().toString()); 
+			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
 		default:
 			break;
+
 	
 		}
 		

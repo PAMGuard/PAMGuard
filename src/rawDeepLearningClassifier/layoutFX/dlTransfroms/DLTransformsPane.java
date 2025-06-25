@@ -6,7 +6,6 @@ import java.util.List;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
-import org.jamdev.jdl4pam.transforms.SimpleTransform;
 import org.jamdev.jdl4pam.transforms.WaveTransform;
 
 import javafx.geometry.Pos;
@@ -22,6 +21,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.orderedList.PamDraggableList;
 
 /**
+ * 
  * Pane which allows users to create a series of transforms for 
  * raw data before inputting into a deep learning model. 
  * 

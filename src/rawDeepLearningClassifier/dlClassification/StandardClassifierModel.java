@@ -94,7 +94,6 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
 				modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
 				modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
-
 			}
 
 			return modelResult; //returns to the classifier. 

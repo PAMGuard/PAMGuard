@@ -70,6 +70,9 @@ public class SpectrogramImage {
 	public WritableImage writeImageData(double[][] data, ColourArray colourArray, double[] clims) {
 
 		//		double[][] data = spectrogram.getAbsoluteSpectrogramData(); 
+		if (data == null || data.length == 0 || data[0].length == 0) {
+			return null; //no data to draw
+		}
 		WritableImage specImage = new WritableImage(data.length, data[0].length); 
 
 		PixelWriter writer = specImage.getPixelWriter(); 

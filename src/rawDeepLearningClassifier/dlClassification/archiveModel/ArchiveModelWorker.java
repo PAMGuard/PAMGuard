@@ -19,6 +19,7 @@ import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 /**
  * 
@@ -188,6 +189,16 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				//set the number of class names from the default output shape
 				dlParams.numClasses = (int) modelParams.defaultOutputShape.get(1);
 			}
+			
+			//finally, is there an example sound
+			//is there an example sound there?
+			JSONObject jsonObject = new JSONObject(jsonString);
+			if (jsonObject.has("example_sound")) {
+				System.out.println("Example sound found in model metadata: " + jsonObject.getString("example_sound")+ "  " + ExampleSoundType.valueOf(jsonObject.getString("example_sound")));
+				//finally do we have an example model?
+				dlParams.setExampleSound(ExampleSoundType.valueOf(jsonObject.getString("example_sound")));
+			}
+			
 		}
 		catch (Exception e) {
 			dlModel=null; 
@@ -226,6 +237,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 
 		//standard format. 
 		GenericModelParams params = DLTransformParser2.readJSONParams(jsonObject);
+	
 
 		return params; 
 	}

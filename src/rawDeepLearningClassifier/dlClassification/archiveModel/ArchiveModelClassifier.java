@@ -15,8 +15,6 @@ import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosUI;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -44,7 +42,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	/**
 	 * The UI components of the Ketos classifier
 	 */
-	private ArchiveModelUI archiveModelUI; 
+	protected ArchiveModelUI archiveModelUI; 
 
 	/**
 	 * The Ketos worker. this handles the heavy lifting such as loading and running

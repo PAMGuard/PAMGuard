@@ -51,6 +51,7 @@ public class ArchiveModelPane extends StandardModelPane {
 		///set the advanced pane parameters. 
 		getAdvSettingsPane().setParams(getParamsClone());
 		
+		
 		return status;
 		
 	}
