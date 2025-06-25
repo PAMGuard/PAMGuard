@@ -113,6 +113,7 @@
                 <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
                 <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
                 <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+                <NSMicrophoneUsageDescription>Microphone is needed to enable soundcard access for Sound Acquisition module</NSMicrophoneUsageDescription>
                 <CFBundleURLTypes>
                   <string>msa</string>
                 </CFBundleURLTypes>
