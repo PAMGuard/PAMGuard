@@ -5,17 +5,22 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
 /**
  * Parameters for the Deep Acoustics model.
  * This class extends StandardModelParams to include specific parameters for the Deep Acoustics model.
+ * Parameters for the Deep Acoustics classifier.
+ * 
  * 
  * @author Jamie Macaulay
  */
 public class DeepAcousticParams extends StandardModelParams {
 
 	private static final long serialVersionUID = 1L; 	
+
+	
+	public double minConfidence = 0.5; //minimum confidence for a detection to be considered valid
 	
 	/**
-	 * The minimum confidence threshold for a detection to be considered valid.
-	 * This is used to filter out low-confidence detections.
+	 * True to merge overlapping boxes. 
 	 */
-	public double minConfidence = 0.5; // Minimum confidence for a detection to be considered valid
+	public boolean mergeOverlap = true;
+
 
 }

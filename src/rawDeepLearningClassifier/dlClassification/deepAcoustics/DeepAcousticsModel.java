@@ -3,6 +3,7 @@ package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.checkerframework.common.returnsreceiver.qual.This;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticResultArray;
@@ -33,7 +34,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	/**
 	 * The predictor for the model if using images as input
 	 */
-	private Predictor<float[][][][], DeepAcousticResultArray> objectPredictor;
+	private Predictor<float[][][][], ArrayList<DeepAcousticResultArray>> objectPredictor;
 
 	/**
 	 * Constructor for the DeepAcousticsModel.
@@ -115,9 +116,9 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	 * @param specImage The input spectrogram image as a 4D float array.
 	 * @return The results of the model prediction as a DeepAcousticResultArray.
 	 */
-	public DeepAcousticResultArray runModel(float[][][][] specImage) {
+	public List<DeepAcousticResultArray> runModel(float[][][][] specImage) {
 		try {
-			DeepAcousticResultArray results  = objectPredictor.predict(specImage);
+			List<DeepAcousticResultArray> results  = objectPredictor.predict(specImage);
 			//DLUtils.printArray(results);
 			return results; 
 		} catch (TranslateException e) {

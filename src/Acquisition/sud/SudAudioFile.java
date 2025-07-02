@@ -87,7 +87,7 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 				if (isValidSudMapFile(soundFile)) {
 //				System.out.println("----NO NEED TO MAP SUD FILE-----"  + soundFile);
 					try {
-						//System.out.println("Opening SUD file without mapping: " + soundFile.getName() + " ZERODPAD: " + sudParams.zeroPad);
+						System.out.println("Opening SUD file without mapping: " + soundFile.getName() + " ZERODPAD: " + sudParams.zeroPad);
 						return new SudAudioFileReader(sudParams.zeroPad).getAudioInputStream(soundFile);
 					} catch (UnsupportedAudioFileException | IOException e) {
 						// TODO Auto-generated catch block

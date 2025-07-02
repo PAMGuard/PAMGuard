@@ -499,7 +499,7 @@ public class DLClassifyProcess extends PamProcess {
 
 
 	/**
-	 * Create a data unit form a model result. This is called whenever data passes a prediction threshold.
+	 * Create a data unit from a model result. This is called whenever data passes a prediction threshold.
 	 * 
 	 * @param modelResult - the model result. 
 	 * @param pamRawData - the raw data unit which the model result came from. 
@@ -695,6 +695,8 @@ public class DLClassifyProcess extends PamProcess {
 		//		System.out.println("Model result: " + modelResult.size()); 
 		DLDetection dlDetection = new DLDetection(basicData, rawdata, getSampleRate()); 
 		addDLAnnotation(dlDetection,modelResult); 
+		
+		
 		dlDetection.setFrequency(new double[] {0, this.getSampleRate()/2});
 
 		//create the data unit

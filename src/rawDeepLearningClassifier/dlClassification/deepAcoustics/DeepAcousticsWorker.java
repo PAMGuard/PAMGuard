@@ -3,6 +3,8 @@ package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.jamdev.jdl4pam.ArchiveModel;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticResultArray;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticsResult;
@@ -35,10 +37,10 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			
 			long time1 = System.currentTimeMillis();
 			
-			System.out.println("DeepAcousticsWorker: input size: " + transformedDataStack4D.length);
+			//System.out.println("DeepAcousticsWorker: input size: " + transformedDataStack4D.length);
 
 			
-			DeepAcousticResultArray modelResults = getDeepAcxousticsModel().runModel(transformedDataStack4D);
+			List<DeepAcousticResultArray> modelResults = getDeepAcxousticsModel().runModel(transformedDataStack4D);
 			
 			
 //			System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
@@ -54,14 +56,17 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			DeepAcousticsResult modelResult;
 			DeepAcousticsPrediction dlModelResult;
 			
-			System.out.println("DeepAcousticsWorker: Model results size: " + modelResults.size());
+			//System.out.println("DeepAcousticsWorker: Model results size: " + modelResults.size());
 			for (int i=0; i<modelResults.size(); i++) {
-				 modelResult = modelResults.get(i);
-				
-				 dlModelResult = new DeepAcousticsPrediction(modelResult);
-			
-				//add the result to the list
-				dlModelResults.add(dlModelResult);
+				for (int j=0; j<modelResults.get(i).size(); j++) {
+					modelResult = modelResults.get(i).get(j);
+					
+					dlModelResult = new DeepAcousticsPrediction(modelResult);
+					dlModelResult.setSegmentID(dataUnits.get(i).getUID()); //set the  ID to the UID of the input data unit (which is usually the segment UID).
+					
+					//add the result to the list
+					dlModelResults.add(dlModelResult);
+				}
 			}
 			
 			return dlModelResults;

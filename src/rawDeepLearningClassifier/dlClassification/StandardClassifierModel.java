@@ -90,11 +90,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				return null;
 			}
 			
-			for (int i =0; i<modelResult.size(); i++) {
-				modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
-				modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
-				modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
-			}
+			//add time stamps and class names to the model results.
+			processModelResults(groupedRawData, modelResult);
 
 			return modelResult; //returns to the classifier. 
 		}
@@ -108,6 +105,20 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			workerThread.getQueue().add(groupedRawData);
 		}
 		return null;
+	}
+	
+	/**
+	 *Process the model results - for example to add class names and time stamps.
+	 * @param groupedRawData - the grouped raw data used for input data into the model
+	 * @param modelResult - the model results. 
+	 */
+	protected  List<StandardPrediction> processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
+		for (int i =0; i<modelResult.size(); i++) {
+			modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
+			modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
+			modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
+		}
+		return modelResult;
 	}
 	
 	

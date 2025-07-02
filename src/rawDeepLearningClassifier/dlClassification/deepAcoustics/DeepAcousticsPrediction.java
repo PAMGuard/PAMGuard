@@ -21,6 +21,11 @@ public class DeepAcousticsPrediction extends StandardPrediction {
 	private DeepAcousticsResult result;
 	
 	/**
+	 * The segment ID associated with this prediction.Usually the UID of the segment. 
+	 */
+	private long segmentID;
+	
+	/**
 	 * Constructor that takes a DeepAcousticsResult and converts it to a standard prediction.
 	 * 
 	 * @param result The DeepAcousticsResult containing the predictions.
@@ -109,5 +114,10 @@ public class DeepAcousticsPrediction extends StandardPrediction {
 	 */
 	public double[] getBoundingBox() {
 		return result.getBoundingBox();
+	}
+
+	public void setSegmentID(long uid) {
+		this.segmentID = uid;
+		
 	}
 }
