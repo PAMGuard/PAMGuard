@@ -96,8 +96,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 			}
 			
 			//Print out some results
-			System.out.println("Anchor boxes: " + anchorBoxes.size() + " " + anchorBoxes.get(0).length + " " + anchorBoxes.get(0)[0].length);
-			
+			//System.out.println("Anchor boxes: " + anchorBoxes.size() + " " + anchorBoxes.get(0).length + " " + anchorBoxes.get(0)[0].length);
 			
 			DeepAcousticsNetwork network = new DeepAcousticsNetwork(this.getInputShape(), anchorBoxes);
 			

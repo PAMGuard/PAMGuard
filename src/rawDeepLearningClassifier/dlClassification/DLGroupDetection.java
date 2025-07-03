@@ -52,8 +52,8 @@ public class DLGroupDetection extends SegmenterDetectionGroup implements PamDete
 	@Override
 	public int getSubDetectionsCount() {
 		
-		for (int j=0; j<getSubDetectionsCount(); j++) {
-			if (getSubDetection(j) != null) return 0;
+		for (int j=0; j<super.getSubDetectionsCount(); j++) {
+			if (getSubDetection(j) == null) return 0;
 		}
 		return super.getSubDetectionsCount();
 	}

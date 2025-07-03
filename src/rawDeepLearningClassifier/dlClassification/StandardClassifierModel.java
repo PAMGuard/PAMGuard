@@ -108,7 +108,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	}
 	
 	/**
-	 *Process the model results - for example to add class names and time stamps.
+	 * Process the model results - for example to add class names and time stamps.
 	 * @param groupedRawData - the grouped raw data used for input data into the model
 	 * @param modelResult - the model results. 
 	 */
@@ -117,6 +117,9 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
 			modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
 			modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
+			modelResult.get(i).setDurationMillis(groupedRawData.get(i).getDurationInMilliseconds());
+			//System.out.println("Frequency limits: " + groupedRawData.get(i).getFrequency()[0] + "  " + groupedRawData.get(i).getFrequency()[1]);
+			modelResult.get(i).setFreqLimits(new double[] {groupedRawData.get(i).getFrequency()[0], groupedRawData.get(i).getFrequency()[1]});
 		}
 		return modelResult;
 	}

@@ -7,6 +7,9 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
  * This class extends StandardModelParams to include specific parameters for the Deep Acoustics model.
  * Parameters for the Deep Acoustics classifier.
  * 
+ * Parameters for the Deep Acoustics classifier.
+ * 
+ * This class extends StandardModelParams and adds specific parameters for the Deep Acoustics model.
  * 
  * @author Jamie Macaulay
  */

@@ -122,6 +122,18 @@ public class OrcaSpotModelResult implements PredictionResult {
 		return 0;
 	}
 
+	@Override
+	public double getDurationMillis() {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
+	@Override
+	public double[] getFreqLimits() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
 

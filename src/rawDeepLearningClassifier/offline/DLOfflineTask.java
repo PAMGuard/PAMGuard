@@ -172,6 +172,8 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 		if (dlControl.isGroupDetections()) {
 			runGroupClassifier(dlControl.getSegmenter().getSegmenteGroupDataBlock().getFirstUnit());
 		}
+		
+		PamController.getInstance().updateDataMap();
 	}
 
 @Override

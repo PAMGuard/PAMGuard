@@ -17,6 +17,20 @@ public interface PredictionResult {
 	 */
 	public long getTimeMillis(); 
 	
+	
+	/**
+	 * Get duration in millis
+	 * @return the duration of the result in millis.
+	 */
+	public double getDurationMillis(); 
+	
+	
+	/**
+	 * Get frequency limits of the prediction result
+	 * @return the frequency limits of the prediction result
+	 */
+	public double[] getFreqLimits(); 
+	
 
 	/**
 	 * Get the predictions for this result. The array contains the probabilities for all classes. 

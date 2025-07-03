@@ -673,7 +673,8 @@ public class DLClassifyProcess extends PamProcess {
 		double[][] rawdata = new double[PamUtils.getNumChannels(groupDataBuffer.get(0).getChannelBitmap())]
 				[dlControl.getDLParams().sampleHop*(groupDataBuffer.size()-1) + dlControl.getDLParams().rawSampleSize]; 
 
-		//copy all data into a new data buffer making sure to compensate for hop size.  
+		//copy all data into a new data buffer making sure to compensate for hop size. 
+		
 		for (int i=0; i<groupDataBuffer.size(); i++) {
 
 			int copyLen = dlControl.getDLParams().sampleHop; 
@@ -690,12 +691,10 @@ public class DLClassifyProcess extends PamProcess {
 		DataUnitBaseData basicData  = groupDataBuffer.get(0).getBasicData().clone(); 
 		basicData.setMillisecondDuration(1000.*rawdata[0].length/this.sampleRate);
 		basicData.setSampleDuration((long) (groupDataBuffer.size()*dlControl.getDLParams().rawSampleSize));
-		
 
 		//		System.out.println("Model result: " + modelResult.size()); 
 		DLDetection dlDetection = new DLDetection(basicData, rawdata, getSampleRate()); 
 		addDLAnnotation(dlDetection,modelResult); 
-		
 		
 		dlDetection.setFrequency(new double[] {0, this.getSampleRate()/2});
 

@@ -40,7 +40,7 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			//System.out.println("DeepAcousticsWorker: input size: " + transformedDataStack4D.length);
 
 			
-			List<DeepAcousticResultArray> modelResults = getDeepAcxousticsModel().runModel(transformedDataStack4D);
+			List<DeepAcousticResultArray> modelResults = getDeepAcousticsModel().runModel(transformedDataStack4D);
 			
 			
 //			System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
@@ -82,7 +82,7 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 	 * Prepare the model.
 	 * Note it is important to put a synchronized here or the model loading can fail.
 	 */
-	private DeepAcousticsModel getDeepAcxousticsModel() {
+	private DeepAcousticsModel getDeepAcousticsModel() {
 		return (DeepAcousticsModel) getModel();
 	}
 	

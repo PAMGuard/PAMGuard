@@ -36,7 +36,21 @@ public class StandardPrediction implements PredictionResult {
 	/**
 	 * Analysis time in seconds. 
 	 */
-	public double analysisTime=0; 
+	public double analysisTime=0;
+
+	/**
+	 * Frequency limits of the prediction result. Use for bounding boxes. 
+	 * Can be null if not set. 
+	 */
+	private double[] freqLimits; 
+
+
+	/**
+	 * Duration in millis. 
+	 * Can be -1 if not set. 
+	 */
+	private double durationMillis = -1.; //duration in millis, can be null if not set.
+	
 	
 
 	/**
@@ -120,6 +134,34 @@ public class StandardPrediction implements PredictionResult {
 
 	public void setTimeMillis(long timeMillis) {
 		this.timeMillis = timeMillis;
+	}
+
+
+	@Override
+	public double getDurationMillis() {
+		return durationMillis;
+	}
+
+
+	@Override
+	public double[] getFreqLimits() {
+		return freqLimits;
+	}
+	
+	/**
+	 * Set the frequency limits of the prediction result. 
+	 * @param freqLimits - the frequency limits of the prediction result.
+	 */
+	public void setFreqLimits(double[] freqLimits) {
+		this.freqLimits = freqLimits;
+	}
+
+	/**
+	 * Set the duration in millis. 
+	 * @param durationMillis - the duration in millis. 
+	 */
+	public void setDurationMillis(double durationMillis) {
+		this.durationMillis = durationMillis;
 	}
 
 }
