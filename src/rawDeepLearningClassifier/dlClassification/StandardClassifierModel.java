@@ -117,7 +117,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
 			modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
 			modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
-			modelResult.get(i).setDurationMillis(groupedRawData.get(i).getDurationInMilliseconds());
+			modelResult.get(i).setStartSample(groupedRawData.get(i).getStartSample());
+			modelResult.get(i).setDuratioSamples(groupedRawData.get(i).getSampleDurationAsInt());
 			//System.out.println("Frequency limits: " + groupedRawData.get(i).getFrequency()[0] + "  " + groupedRawData.get(i).getFrequency()[1]);
 			modelResult.get(i).setFreqLimits(new double[] {groupedRawData.get(i).getFrequency()[0], groupedRawData.get(i).getFrequency()[1]});
 		}
@@ -250,8 +251,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 
 		@Override
 		public void newDLResult(StandardPrediction soundSpotResult, PamDataUnit groupedRawData) {
-			soundSpotResult.setClassNameID(getClassNameIDs(getDLParams())); 
-			soundSpotResult.setBinaryClassification(isDecision(soundSpotResult, getDLParams())); 
+//			soundSpotResult.setClassNameID(getClassNameIDs(getDLParams())); 
+//			soundSpotResult.setBinaryClassification(isDecision(soundSpotResult, getDLParams())); 
 			newResult(soundSpotResult, groupedRawData);
 		}
 

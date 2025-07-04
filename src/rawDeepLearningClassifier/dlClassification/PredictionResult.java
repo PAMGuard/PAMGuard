@@ -19,10 +19,17 @@ public interface PredictionResult {
 	
 	
 	/**
-	 * Get duration in millis
-	 * @return the duration of the result in millis.
+	 * Get the start sample
+	 * @return the start sample
 	 */
-	public double getDurationMillis(); 
+	public long getStartSample(); 
+	
+	
+	/**
+	 * Get duration in sample
+	 * @return the duration of the result in samples.
+	 */
+	public int getSampleDuration(); 
 	
 	
 	/**

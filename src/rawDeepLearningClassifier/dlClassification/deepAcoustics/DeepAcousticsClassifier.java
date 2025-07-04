@@ -56,6 +56,7 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 
 	@Override
 	protected  List<StandardPrediction>  processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
+		System.out.println("DeepAcousticsClassifier: processModelResults called with " + modelResult.size() + " results for " + groupedRawData.size() + " segments.");
 		//the main difference between deepAcoustics and most other models is that multiple results can be returned per segment. 
 		//Therefore the number of prediction does not correspond to the number of input data units
 		DeepAcousticsPrediction deepAcousticsPrediction;
