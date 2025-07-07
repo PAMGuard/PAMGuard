@@ -19,14 +19,16 @@ public interface PredictionResult {
 	
 	
 	/**
-	 * Get the start sample
+	 * Get the start sample - this is the sample number of the first sample in the result.
+	 * 	 * Note: required for object detection results where the start sample may not be same as the input data
 	 * @return the start sample
 	 */
 	public long getStartSample(); 
 	
 	
 	/**
-	 * Get duration in sample
+	 * Get duration in sample - this is the number of samples in the result.
+	 * Note: required for object detection results where the duration is not the same as the input data
 	 * @return the duration of the result in samples.
 	 */
 	public int getSampleDuration(); 

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.checkerframework.common.returnsreceiver.qual.This;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticResultArray;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticsTranslator;
 import org.jamdev.jdl4pam.deepAcoustics.Pred2BoxDJL3.DeepAcousticsNetwork;
@@ -34,7 +33,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	/**
 	 * The predictor for the model if using images as input
 	 */
-	private Predictor<float[][][][], ArrayList<DeepAcousticResultArray>> objectPredictor;
+	private Predictor<float[][][][], List<DeepAcousticResultArray>> objectPredictor;
 
 	/**
 	 * Constructor for the DeepAcousticsModel.

@@ -5,6 +5,7 @@ import java.util.List;
 
 import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
@@ -55,7 +56,7 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 
 
 	@Override
-	protected  List<StandardPrediction>  processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
+	protected  ArrayList<ArrayList<? extends PredictionResult>>  processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
 		System.out.println("DeepAcousticsClassifier: processModelResults called with " + modelResult.size() + " results for " + groupedRawData.size() + " segments.");
 		//the main difference between deepAcoustics and most other models is that multiple results can be returned per segment. 
 		//Therefore the number of prediction does not correspond to the number of input data units
@@ -65,11 +66,13 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 			deepAcousticsPrediction.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
 			deepAcousticsPrediction.setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
 			
+			//so to calculate the time we need the start time of the segment, the position of the bounding box in the segment and the segment length.
+			
 			//TODO
 			//now the model results UID should be the UID of the input data. Also, the bounding box will have frequency and time limits and these need to be set. 
 			//deepAcousticsPrediction.setTimeMillis(deepAcousticsPrediction.startTimeMillis);
 		}
-		return modelResult;
+		return null;
 	}
 
 }

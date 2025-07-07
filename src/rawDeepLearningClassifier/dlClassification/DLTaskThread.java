@@ -55,11 +55,13 @@ public abstract class DLTaskThread extends Thread {
 					ArrayList<StandardPrediction> modelResult = dlModelWorker.runModel(groupedRawData, 
 							groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); //TODO channel?
 
-					for (int i =0; i<modelResult.size(); i++) {
-//						modelResult.get(i).setClassNameID(getClassNameIDs()); 
-//						modelResult.get(i).setBinaryClassification(isBinaryResult(modelResult.get(i))); 
-						newDLResult(modelResult.get(i), groupedRawData.get(i));
-					}
+					
+					newDLResult(modelResult, groupedRawData);
+//					for (int i =0; i<modelResult.size(); i++) {
+////						modelResult.get(i).setClassNameID(getClassNameIDs()); 
+////						modelResult.get(i).setBinaryClassification(isBinaryResult(modelResult.get(i))); 
+//						newDLResult(modelResult.get(i), groupedRawData.get(i));
+//					}
 
 				}
 				else {
@@ -75,11 +77,11 @@ public abstract class DLTaskThread extends Thread {
 	}
 	
 	/**
-	 * Called whenever there is a new result. 
+	 * Called whenever there is a new result. ArrayList<StandardPrediction> modelResult 
 	 * @param soundSpotResult - the new result.
 	 * @param groupedRawData - the grouped data unit. 
 	 */
-	public abstract void newDLResult(StandardPrediction soundSpotResult, PamDataUnit groupedRawData); 
+	public abstract void newDLResult(ArrayList<StandardPrediction> modelResult, ArrayList<? extends PamDataUnit> groupedRawData); 
 
 	/**
 	 * Get the grouped data queue

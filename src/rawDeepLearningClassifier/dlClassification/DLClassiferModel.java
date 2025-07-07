@@ -3,6 +3,7 @@ package rawDeepLearningClassifier.dlClassification;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
@@ -10,11 +11,9 @@ import org.jamdev.jdl4pam.transforms.SimpleTransform;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 
 import PamguardMVC.PamDataUnit;
-import javafx.scene.Node;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import warnings.PamWarning;
 
 /**
  * The classifier model. Each classifier must satisfy this interface.
@@ -29,11 +28,13 @@ public interface DLClassiferModel {
 	 * corresponding list of model results.
 	 * <p>
 	 * Note the reason we use list is that often it is more efficient to get a model
-	 * to predict a stacked group of inputs rather than one at a time.
+	 * to predict a stacked group of inputs rather than one at a time. The inner list
+	 * is because some models can return more than one result for each input. 
+	 * The size of the inner list is USUALLY 1 but not always
 	 * 
 	 * @return the deep learning model.
 	 */
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnit);
+	public ArrayList<ArrayList<? extends PredictionResult>> runModel(ArrayList<? extends PamDataUnit> rawDataUnit);
 
 	/**
 	 * Prepare the model. This is called on PAMGuard start up and before processing in viewer mode. 

@@ -66,7 +66,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	@Override
 	@SuppressWarnings("rawtypes")
-	public ArrayList<? extends PredictionResult> runModel( ArrayList<? extends PamDataUnit> groupedRawData) {
+	public ArrayList<ArrayList<? extends PredictionResult>> runModel( ArrayList<? extends PamDataUnit> groupedRawData) {
 		if (getDLWorker().isModelNull()) return null; 
 
 		//		System.out.println("SoundSpotClassifier: PamCalendar.isSoundFile(): " 
@@ -81,7 +81,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
 			//run the model 
 			@SuppressWarnings("unchecked")
-			ArrayList<StandardPrediction> modelResult = (ArrayList<StandardPrediction>) getDLWorker().runModel(groupedRawData, 
+			List<StandardPrediction> modelResult = (List<StandardPrediction>) getDLWorker().runModel(groupedRawData, 
 					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
 			
 			if (modelResult==null) {
@@ -91,9 +91,10 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			}
 			
 			//add time stamps and class names to the model results.
-			processModelResults(groupedRawData, modelResult);
-
-			return modelResult; //returns to the classifier. 
+			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
+			
+	
+			return modelResults; //returns to the classifier. 
 		}
 		else {
 			//REAL TIME
@@ -106,13 +107,13 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		}
 		return null;
 	}
-	
+		
 	/**
 	 * Process the model results - for example to add class names and time stamps.
 	 * @param groupedRawData - the grouped raw data used for input data into the model
 	 * @param modelResult - the model results. 
 	 */
-	protected  List<StandardPrediction> processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
+	protected ArrayList<ArrayList<? extends PredictionResult>> processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
 		for (int i =0; i<modelResult.size(); i++) {
 			modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
 			modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
@@ -122,7 +123,17 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			//System.out.println("Frequency limits: " + groupedRawData.get(i).getFrequency()[0] + "  " + groupedRawData.get(i).getFrequency()[1]);
 			modelResult.get(i).setFreqLimits(new double[] {groupedRawData.get(i).getFrequency()[0], groupedRawData.get(i).getFrequency()[1]});
 		}
-		return modelResult;
+		
+		//now convert the model results to a lits of lists to satisfy the interface
+		ArrayList<ArrayList<? extends PredictionResult>> modelResults = new ArrayList<>();
+		ArrayList<StandardPrediction> aList;
+		for (StandardPrediction aModelResult:modelResult) {
+			aList = new ArrayList<>();
+			aList.add(aModelResult);
+			modelResults.add(aList);
+		}
+		
+		return modelResults;
 	}
 	
 	
@@ -250,10 +261,21 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		}
 
 		@Override
-		public void newDLResult(StandardPrediction soundSpotResult, PamDataUnit groupedRawData) {
-//			soundSpotResult.setClassNameID(getClassNameIDs(getDLParams())); 
-//			soundSpotResult.setBinaryClassification(isDecision(soundSpotResult, getDLParams())); 
-			newResult(soundSpotResult, groupedRawData);
+		public void newDLResult(ArrayList<StandardPrediction> modelResult,
+				ArrayList<? extends PamDataUnit> groupedRawData) {
+			
+			if (modelResult==null) {
+				dlClassifierWarning.setWarningMessage(getName() + " deep learning model returned null");
+				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
+				return ;
+			}
+			
+			//add time stamps and class names to the model results.
+			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
+			
+			//process the raw model results
+			dlControl.getDLClassifyProcess().newRawModelResults(modelResults, (ArrayList<GroupedRawData>) groupedRawData);
+			
 		}
 
 	}
@@ -310,16 +332,16 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	}
 	
 	
-	/**
-	 * Send a new result form the thread queue to the process. 
-	 * @param modelResult - the model result;
-	 * @param groupedRawData - the grouped raw data. 
-	 */
-	protected void newResult(StandardPrediction modelResult, PamDataUnit groupedRawData) {
-		if (groupedRawData instanceof GroupedRawData) {
-			this.dlControl.getDLClassifyProcess().newRawModelResult(modelResult, (GroupedRawData) groupedRawData);
-		}
-	}
+//	/**
+//	 * Send a new result form the thread queue to the process. 
+//	 * @param modelResult - the model result;
+//	 * @param groupedRawData - the grouped raw data. 
+//	 */
+//	protected void newResult(StandardPrediction modelResult, PamDataUnit groupedRawData) {
+//		if (groupedRawData instanceof GroupedRawData) {
+//			this.dlControl.getDLClassifyProcess().newRawModelResult(modelResult, (GroupedRawData) groupedRawData);
+//		}
+//	}
 //	
 //	@Override
 //	public ArrayList<PamWarning> checkSettingsOK() {
