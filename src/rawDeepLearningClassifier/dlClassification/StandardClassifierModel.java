@@ -124,7 +124,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			modelResult.get(i).setFreqLimits(new double[] {groupedRawData.get(i).getFrequency()[0], groupedRawData.get(i).getFrequency()[1]});
 		}
 		
-		//now convert the model results to a lits of lists to satisfy the interface
+		//now convert the model results to a list of lists to satisfy the interface - note this assumes a one to one mapping of model results to input data units.
 		ArrayList<ArrayList<? extends PredictionResult>> modelResults = new ArrayList<>();
 		ArrayList<StandardPrediction> aList;
 		for (StandardPrediction aModelResult:modelResult) {

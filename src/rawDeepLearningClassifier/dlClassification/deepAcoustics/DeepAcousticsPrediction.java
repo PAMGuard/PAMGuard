@@ -116,8 +116,12 @@ public class DeepAcousticsPrediction extends StandardPrediction {
 		return result.getBoundingBox();
 	}
 
-	public void setSegmentID(long uid) {
+	public void setParentSegmentID(long uid) {
 		this.segmentID = uid;
 		
+	}
+
+	public long getParentSegmentID() {
+		return segmentID;
 	}
 }

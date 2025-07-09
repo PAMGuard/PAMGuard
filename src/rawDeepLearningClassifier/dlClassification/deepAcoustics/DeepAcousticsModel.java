@@ -33,7 +33,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	/**
 	 * The predictor for the model if using images as input
 	 */
-	private Predictor<float[][][][], ArrayList<DeepAcousticResultArray>> objectPredictor;
+	private Predictor<float[][][][], List<DeepAcousticResultArray>> objectPredictor;
 
 	/**
 	 * Constructor for the DeepAcousticsModel.

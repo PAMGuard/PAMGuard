@@ -18,6 +18,8 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 
 	@Override
 	public synchronized ArrayList<StandardPrediction> runModel(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan) {
+		
+		System.out.println("DeepAcousticsWorker: runModel called with " + dataUnits.size() + " data units, sample rate: " + sampleRate + ", channel: " + iChan);
 
 		try {
 			//PamCalendar.isSoundFile(); 
@@ -37,13 +39,12 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			
 			long time1 = System.currentTimeMillis();
 			
-			//System.out.println("DeepAcousticsWorker: input size: " + transformedDataStack4D.length);
-
 			
 			List<DeepAcousticResultArray> modelResults = getDeepAcousticsModel().runModel(transformedDataStack4D);
 			
 			
-//			System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
+			System.out.println("DeepAcousticsWorker: Model out: " + modelResults.size() + " results for " + transformedDataStack4D.length + " input segments.");
+			
 			long time2 = System.currentTimeMillis();
 
 
@@ -62,13 +63,14 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 					modelResult = modelResults.get(i).get(j);
 					
 					dlModelResult = new DeepAcousticsPrediction(modelResult);
-					dlModelResult.setSegmentID(dataUnits.get(i).getUID()); //set the  ID to the UID of the input data unit (which is usually the segment UID).
+					dlModelResult.setParentSegmentID(dataUnits.get(i).getUID()); //set the  ID to the UID of the input data unit (which is usually the segment UID).
 					
 					//add the result to the list
 					dlModelResults.add(dlModelResult);
 				}
 			}
-			
+			System.out.println("DeepAcousticsWorker: dlModelResults out: " + dlModelResults.size());
+
 			return dlModelResults;
 		} 
 		catch (Exception e) {
