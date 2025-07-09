@@ -524,7 +524,7 @@ public class DLClassifyProcess extends PamProcess {
 
 		//the model result may be null if the classifier uses a new thread. 
 
-		//System.out.println("New segment: parent UID: " + pamRawData.getParentDataUnit().getUID() + " Prediciton: " + modelResult.getPrediction()[0]+ "  " + getSourceParams().countChannelGroups());
+//		System.out.println("New segment: parent UID: " + pamRawData.getParentDataUnit().getUID() + " Prediciton: " + modelResult.getPrediction()[0]+ "  " + getSourceParams().countChannelGroups());
 
 		//create a new data unit - always add to the model result section. 
 		DLDataUnit dlDataUnit;
@@ -557,9 +557,9 @@ public class DLClassifyProcess extends PamProcess {
 				 */
 				if (pamRawData.getParentDataUnit() instanceof RawDataUnit) {
 
-					for (int j=0; j<dlDataUnits.size(); i++) {
+					for (int j=0; j<dlDataUnits.size(); j++) {
 						/****Make our own data units****/
-						if (dlDataUnits.get(i).getPredicitionResult().isBinaryClassification()) {
+						if (dlDataUnits.get(j).getPredicitionResult().isBinaryClassification()) {
 							//if the model result has a binary classification then it is added to the data buffer unless the data
 							//buffer has reached a maximum size. In that case the data is saved. 
 							groupRawDataBuffer[i].add(pamRawData); 
