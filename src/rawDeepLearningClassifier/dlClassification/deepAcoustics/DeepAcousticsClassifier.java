@@ -63,46 +63,52 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 		//the main difference between deepAcoustics and most other models is that multiple results can be returned per segment. 
 		//Therefore the number of prediction does not correspond to the number of input data units
 		DeepAcousticsPrediction deepAcousticsPrediction;
-		for (int i=0; i<modelResult.size(); i++) {
-			deepAcousticsPrediction = (DeepAcousticsPrediction) modelResult.get(i);
-			deepAcousticsPrediction.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
-			deepAcousticsPrediction.setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
-			
-			//so to calculate the time we need the start time of the segment, the position of the bounding box in the segment and the segment length.
+		
+		//so to calculate the time we need the start time of the segment, the position of the bounding box in the segment and the segment length.
 
-			int imWidth = this.getDLParams().getImageWidth();
-			long boxMillis;
-			long boxSamples;
-			//find the correct segment
-			for (PamDataUnit dataUnit : groupedRawData) {
+		int imWidth = 100;
+		long boxMillis;
+		long boxSamples;
+		
+		ArrayList<ArrayList<? extends PredictionResult>>  processedResults = new ArrayList<ArrayList<? extends PredictionResult>>();
+		//iterate through segments and results, matching the segment UID to the parent segment ID in the result.
+		for (PamDataUnit dataUnit : groupedRawData) {
+
+			ArrayList<DeepAcousticsPrediction> aSegmentResult = new ArrayList<DeepAcousticsPrediction>();
+			for (int i=0; i<modelResult.size(); i++) {
+				
+				deepAcousticsPrediction = (DeepAcousticsPrediction) modelResult.get(i);
+				deepAcousticsPrediction.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
+				deepAcousticsPrediction.setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
+				
+				
+				
 				if (dataUnit.getUID() == deepAcousticsPrediction.getParentSegmentID()) {
 					//we have the correct segment for the bounding box. Now need to set the correct absolute sample and datetime values
 
-	
 					boxMillis = DeepAcousticResultArray.calcBoundingBoxMillis(dataUnit.getTimeMilliseconds(), dataUnit.getDurationInMilliseconds(), deepAcousticsPrediction.getResult(),  imWidth);
 					boxSamples = DeepAcousticResultArray.calcBoundingBoxMillis(dataUnit.getStartSample(), dataUnit.getSampleDuration(), deepAcousticsPrediction.getResult(),  imWidth);
-
 					
 					deepAcousticsPrediction.setTimeMillis(boxMillis);
 
 					deepAcousticsPrediction.setStartSample(boxSamples);
 					deepAcousticsPrediction.setDuratioSamples((int) (((double) deepAcousticsPrediction.getResult().getWidth())/imWidth * dataUnit.getSampleDuration()));
 					
+					aSegmentResult.add(deepAcousticsPrediction);
+
 					break;
 				}
 			}
+			
+			processedResults.add(aSegmentResult);
 			
 			//TODO
 			//now the model results UID should be the UID of the input data. Also, the bounding box will have frequency and time limits and these need to be set. 
 			//deepAcousticsPrediction.setTimeMillis(deepAcousticsPrediction.startTimeMillis);
 		}
 		
-		
-		
-		
-		
-		
-		return deepAcousticsPrediction;
+	
+		return processedResults;
 	}
 
 }
