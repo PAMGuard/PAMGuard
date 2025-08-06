@@ -5,7 +5,6 @@ import java.util.List;
 
 import PamDetection.RawDataUnit;
 import PamUtils.PamArrayUtils;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.DataUnitBaseData;
@@ -33,6 +32,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
  * @author Jamie Macaulay
  *
  */
+@SuppressWarnings("rawtypes")
 public class DLClassifyProcess extends PamProcess {
 
 
@@ -133,6 +133,7 @@ public class DLClassifyProcess extends PamProcess {
 	/**
 	 * Setup the classification process. 
 	 */
+	@SuppressWarnings("unchecked")
 	private void setupClassifierProcess() {
 
 		//System.out.println("Setup raw deep learning classiifer process: "); 
@@ -245,6 +246,7 @@ public class DLClassifyProcess extends PamProcess {
 	/**
 	 * Run a model for which the input is a detection group. 
 	 */
+	@SuppressWarnings("unchecked")
 	private synchronized void runDetectionGroupModel() {
 		if (classificationBuffer.size()<=0) return; 
 		ArrayList<PamDataUnit> classificationBufferTemp = (ArrayList<PamDataUnit>) classificationBuffer.clone(); 
@@ -394,6 +396,7 @@ public class DLClassifyProcess extends PamProcess {
 		if (classificationBuffer.size()<=0) return; 
 
 		//run the deep learning algorithm 
+		@SuppressWarnings("unchecked")
 		ArrayList<GroupedRawData> classificationBufferTemp = (ArrayList<GroupedRawData>) classificationBuffer.clone(); 
 		
 		/**
@@ -524,7 +527,7 @@ public class DLClassifyProcess extends PamProcess {
 
 		//the model result may be null if the classifier uses a new thread. 
 
-//		System.out.println("New segment: parent UID: " + pamRawData.getParentDataUnit().getUID() + " Prediciton: " + modelResult.getPrediction()[0]+ "  " + getSourceParams().countChannelGroups());
+//		System.out.println("DLClassifyProcess: New newRawModelResult: startSample " + pamRawData.getStartSample() + " No. prediction results: " + modelResult.size()+ "  " + getSourceParams().countChannelGroups());
 
 		//create a new data unit - always add to the model result section. 
 		DLDataUnit dlDataUnit;
@@ -687,6 +690,8 @@ public class DLClassifyProcess extends PamProcess {
 	 */
 	private synchronized DLDetection makeRawDLDetection(ArrayList<GroupedRawData> groupDataBuffer, ArrayList<PredictionResult> modelResult) {
 
+//		System.out.println("DLClassifyProcess: makeRawDLDetection: " + groupDataBuffer.size() + " data units, " + modelResult.size() + " model results");
+		
 		if (groupDataBuffer==null || groupDataBuffer.size()<=0) {
 			return null; 
 		}
@@ -753,15 +758,14 @@ public class DLClassifyProcess extends PamProcess {
 
 		}
 		
-		System.out.println("Make raw DL detection: " + groupDataBuffer.get(0).getUID() + "  " + 
-				PamCalendar.formatDateTime2(startMillis, "dd MMM yyyy HH:mm:ss.SSS", false) + "  " + groupDataBuffer.get(0).getChannelBitmap() 
-				+ "  " + rawdata[0].length + " samples");
+//		System.out.println("DLClassifyProcess: makeRawDLDetection 2: " + groupDataBuffer.get(0).getUID() + "  " + 
+//				PamCalendar.formatDateTime2(startMillis, "dd MMM yyyy HH:mm:ss.SSS", false) + "  " + groupDataBuffer.size()+ "  " 
+//				+ rawdata[0].length + " sampleDuration " + groupDataBuffer.get(0).getSampleDuration());
 
 		//Now we have the time limits of the predictions, check whether the raw data is within these limits.
 		if (rawdata[0].length!=(endSample-startSample)) {
-			//need to trim the raw data to the time limits of the data unit.
+						//need to trim the raw data to the time limits of the data unit.
 			rawdata = trimRawData(rawdata, groupDataBuffer.get(0).getStartSample(),  startSample, endSample);
-			System.out.println("TRIM DATA: " );
 		}
 
 		DataUnitBaseData basicData  = groupDataBuffer.get(0).getBasicData().clone(); 
@@ -777,6 +781,7 @@ public class DLClassifyProcess extends PamProcess {
 		DLDetection dlDetection = new DLDetection(basicData, rawdata, getSampleRate()); 
 		addDLAnnotation(dlDetection,modelResult); 
 
+		//System.out.println("DLClassifyProcess: freqLims: " + freqLims + " sample rate: " + this.getSampleRate());
 		if (freqLims==null) {
 			//set default frequency limits
 			dlDetection.setFrequency(new double[] {0, this.getSampleRate()/2});
@@ -804,6 +809,9 @@ public class DLClassifyProcess extends PamProcess {
 		//trime the rawdata which starts at rawStartSample to the target start and end sample
 		int startOffset = (int) (targetStartSample-rawStartSample);
 		int endOffset = (int) (targetEndSample-rawStartSample);
+		
+//		System.out.println("DLClassifyProcess: Trim raw data: " + rawStartSample + " targetStartSample: " + targetStartSample + " targetEndSample " 
+//		+ targetEndSample + " startOffset: " + startOffset + " endOffset: " + endOffset + "  " + (int) (targetEndSample-targetStartSample+1));
 
 		double[][] trimmedData = new double[rawdata.length][];
 		for (int i=0; i<rawdata.length; i++) {
@@ -904,7 +912,6 @@ public class DLClassifyProcess extends PamProcess {
 				runDetectionGroupModel(); //any other data units. 
 			}
 		}
-
 		//21/11/2022 - it seems like this causes a memory leak when models are reopened and closed every file...
 		//this.dlControl.getDLModel().closeModel(); 
 	}

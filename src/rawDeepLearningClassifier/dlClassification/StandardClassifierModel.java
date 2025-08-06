@@ -97,7 +97,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			return modelResults; //returns to the classifier. 
 		}
 		else {
-			//REAL TIME
+			//REAL TIME - when using a sound card. 
 			//add to a buffer if in real time. 
 			if (workerThread.getQueue().size()>DLModelWorker.MAX_QUEUE_SIZE) {
 				//we are not doing well - clear the buffer

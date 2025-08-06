@@ -3,7 +3,6 @@ package rawDeepLearningClassifier.dlClassification;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;

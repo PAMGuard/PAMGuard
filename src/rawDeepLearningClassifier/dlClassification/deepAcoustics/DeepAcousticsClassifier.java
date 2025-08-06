@@ -16,8 +16,16 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
 
 
 /**
- * A classifier based on the Deep Acoustics method which uses object detection models within spectrograms to predict
- * dolphin whistle detections and then classify to species.. 
+ * A classifier based on the Deep Acoustics method which uses object detection
+ * models within spectrograms to predict dolphin whistle detections and then
+ * classify to species.
+ * 
+ * This extends the ArchiveModelClassifier to provide functionality for
+ * interpreting the results from the Deep Acoustics model, which detects objects
+ * within input segments. Specifically the deep acoustics model can return
+ * multiple results per segment and bounding boxes (i.e. time and frequency
+ * limits of input data is not necassarily the same as the output) which is
+ * different from most other models
  * 
  * @author Jamie Macaulay
  *
@@ -59,14 +67,15 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 
 	@Override
 	protected  ArrayList<ArrayList<? extends PredictionResult>>  processModelResults(ArrayList<? extends PamDataUnit> groupedRawData, List<StandardPrediction> modelResult) {
-		System.out.println("DeepAcousticsClassifier: processModelResults called with " + modelResult.size() + " results for " + groupedRawData.size() + " segments.");
+//		System.out.println("DeepAcousticsClassifier: processModelResults called with " + modelResult.size() + " results for " + groupedRawData.size() + " segments.");
 		//the main difference between deepAcoustics and most other models is that multiple results can be returned per segment. 
 		//Therefore the number of prediction does not correspond to the number of input data units
 		DeepAcousticsPrediction deepAcousticsPrediction;
 		
 		//so to calculate the time we need the start time of the segment, the position of the bounding box in the segment and the segment length.
 
-		int imWidth = 100;
+		int imWidth = (int) archiveModelWorker.getModel().getInputShape().get(1);
+		int imHeight = (int) archiveModelWorker.getModel().getInputShape().get(2);
 		long boxMillis;
 		long boxSamples;
 		
@@ -75,16 +84,18 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 		for (PamDataUnit dataUnit : groupedRawData) {
 
 			ArrayList<DeepAcousticsPrediction> aSegmentResult = new ArrayList<DeepAcousticsPrediction>();
+			
 			for (int i=0; i<modelResult.size(); i++) {
 				
 				deepAcousticsPrediction = (DeepAcousticsPrediction) modelResult.get(i);
-				deepAcousticsPrediction.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
-				deepAcousticsPrediction.setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
-				
-				
-				
+			
 				if (dataUnit.getUID() == deepAcousticsPrediction.getParentSegmentID()) {
 					//we have the correct segment for the bounding box. Now need to set the correct absolute sample and datetime values
+					deepAcousticsPrediction.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
+					
+					//set whether the results is a binary classification or not
+					deepAcousticsPrediction.setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
+					deepAcousticsPrediction.setBinaryClassification(true); //TODO: this is a temporary fix to get the binary classification working.
 
 					boxMillis = DeepAcousticResultArray.calcBoundingBoxMillis(dataUnit.getTimeMilliseconds(), dataUnit.getDurationInMilliseconds(), deepAcousticsPrediction.getResult(),  imWidth);
 					boxSamples = DeepAcousticResultArray.calcBoundingBoxMillis(dataUnit.getStartSample(), dataUnit.getSampleDuration(), deepAcousticsPrediction.getResult(),  imWidth);
@@ -92,11 +103,23 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 					deepAcousticsPrediction.setTimeMillis(boxMillis);
 
 					deepAcousticsPrediction.setStartSample(boxSamples);
-					deepAcousticsPrediction.setDuratioSamples((int) (((double) deepAcousticsPrediction.getResult().getWidth())/imWidth * dataUnit.getSampleDuration()));
+					
+					int boxSampleDuration = (int) (((double) deepAcousticsPrediction.getResult().getWidth())/imWidth * dataUnit.getSampleDuration());
+					deepAcousticsPrediction.setDuratioSamples(boxSampleDuration);
+					
+					//now set the correct frequency limits. 
+					double startFreq =  (1-deepAcousticsPrediction.getResult().getY()/imHeight)*dataUnit.getParentDataBlock().getSampleRate()/2.0;
+					double bandWidth =  (deepAcousticsPrediction.getResult().getHeight()/imHeight)*dataUnit.getParentDataBlock().getSampleRate()/2.0;
+
+					deepAcousticsPrediction.setFreqLimits(new double[] { startFreq, startFreq - bandWidth});
+					
+//					System.out.println("DeepAcousticsClassifier: processModelResults boxStartSample "  + boxSamples + " boxSampleDuration " + boxSampleDuration + 
+//							" for segment " + dataUnit.getUID() + " with "  + dataUnit.getSampleDurationAsInt() + " samples from "  + dataUnit.getStartSample()); 
+					
+					
 					
 					aSegmentResult.add(deepAcousticsPrediction);
 
-					break;
 				}
 			}
 			
@@ -107,7 +130,13 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 			//deepAcousticsPrediction.setTimeMillis(deepAcousticsPrediction.startTimeMillis);
 		}
 		
-	
+//		System.out.println("DeepAcousticsClassifier: processModelResults returned with " + processedResults.size() + " results for " + groupedRawData.size() + " segments.");
+//		for (ArrayList<? extends PredictionResult> dataUnit : processedResults) {
+//			System.out.println("DeepAcousticsClassifier: processModelResults returned with " + dataUnit.size() + " results for a segment.");
+//		}
+
+		
+		
 		return processedResults;
 	}
 

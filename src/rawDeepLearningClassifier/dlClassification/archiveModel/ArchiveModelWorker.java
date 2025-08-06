@@ -108,7 +108,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 			//read the JSON string from the the file. 
 			String jsonString  = DLTransformsParser.readJSONString(new File(dlModel.getAudioReprFile()));
 			
-			System.out.println("Archive model params: \n"+ jsonString);
+			//System.out.println("Archive model params: \n"+ jsonString);
 			
 
 			//convert the JSON string to a parameters object. 

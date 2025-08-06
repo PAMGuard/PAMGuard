@@ -19,7 +19,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -32,7 +31,6 @@ import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.validator.PamValidator;
@@ -238,6 +236,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		defaultButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
 		defaultButton.setTooltip(new Tooltip("Set default hop size"));
 		defaultButton.setOnAction((action)->{
+
 			hopLength.getValueFactory().setValue(Math.round(windowLength.getValue()/2));
 		});
 
@@ -680,7 +679,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 
-		System.out.println("Set the segment length: " + defaultSegmentLen + " sR " + sR);
+		//System.out.println("Set the segment length: " + defaultSegmentLen + " sR " + sR);
 
 		//automatically set the default segment length. 
 		getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue((int) (sR*defaultSegmentLen/1000.));

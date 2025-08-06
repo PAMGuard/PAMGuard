@@ -20,7 +20,8 @@ import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveMode
 
 /**
  * The DeepAcousticsModel class extends SimpleArchiveModel to provide functionality
- * for running deep acoustics models packaged with a settings file.
+ * for running deep acoustics models via a new djl translator and extracting some
+ * extra info from the JSON file that is not included in the generalised metadata.
  * @author Jamie Macaulay
  */
 public class DeepAcousticsModel extends SimpleArchiveModel {
@@ -152,7 +153,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 		float[][][] dataF3 = new float[160][160][3];
 		for (int i=0; i<160; i++) {
 			for (int j=0; j<160; j++) {
-				dataF3[i][j] = new float[] {dataF[i][j],dataF[i][j],dataF[i][j]};
+				dataF3[j][i] = new float[] {dataF[i][j],dataF[i][j],dataF[i][j]};
 			}
 		}
 		return dataF3;

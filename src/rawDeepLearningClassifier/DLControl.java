@@ -18,14 +18,10 @@ import PamController.SettingsPane;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSidePanel;
 import PamView.WrapperControlledGUISwing;
-import PamView.symbol.StandardSymbolManager;
-import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
-import ai.djl.engine.Engine;
 import annotation.handler.AnnotationHandler;
-import clickTrainDetector.layout.ClickTrainSymbolManager;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.clipDisplay.ClipDisplayDecorations;
@@ -34,7 +30,6 @@ import clipgenerator.clipDisplay.ClipDisplayUnit;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import generalDatabase.SQLLoggingAddon;
-import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLGroupSymbolManager;
@@ -46,7 +41,6 @@ import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
-import rawDeepLearningClassifier.dlClassification.DLDetectionDataBlock;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier;
 import rawDeepLearningClassifier.dlClassification.deepAcoustics.DeepAcousticsClassifier;
@@ -782,6 +776,17 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	public void notifyModelChanged(int changeType) {
+		super.notifyModelChanged(changeType);
+//		
+//		if (PamController.PAM_STOPPING) {
+//		
+//		}
+	}
+	
+	
 
 
 

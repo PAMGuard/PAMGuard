@@ -172,8 +172,10 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			defaultSegmentLenChanged(); 
 			//only set the hop if the user physically changes the toggle switch. This is not included in defaultSegmentLenChanged
 			//becuase defaultSegmentLenChanged can be called from elsewhere
-			int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
-			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
+			
+			//int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
+			//cannot set the default hop length here because it means when PG restarts the hop length is reset. 
+			//dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 		});
 		usedefaultSeg.setPadding(new Insets(0,0,0,0));
 		//there is an issue with the toggle switch which means that it has dead space to the left if
