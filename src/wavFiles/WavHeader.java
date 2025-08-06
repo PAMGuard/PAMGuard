@@ -30,6 +30,8 @@ public class WavHeader {
 
 	private HarpHeader harpHeader;
 	
+	private static int formatWarnings = 0;
+	
 	
 	/**
 	 * Construct a blank Wav Header object, generally used when about to read a header from a file. 
@@ -110,6 +112,16 @@ public class WavHeader {
 					fmtSize = windowsWavFile.readWinInt();
 					fmtEnd = windowsWavFile.getFilePointer() + fmtSize;
 					fmtTag =  windowsWavFile.readWinUShort();
+					if (fmtTag == 65534) {
+						/*
+						 * This seems to be a problem when files were created with the R writewave function
+						 * which inserts an invalid format tag. I'm getting it as 65534, but perhaps it's -2 as a signed ? 
+						 */
+						if (formatWarnings++ < 2) {
+							System.out.printf("Unexpected WAV format %d in file header. Setting to default value\n", fmtTag);
+						}
+						fmtTag = 1;
+					}
 					nChannels = (short) windowsWavFile.readWinShort();
 					sampleRate = windowsWavFile.readWinInt();
 					bytesPerSec = windowsWavFile.readWinInt();
@@ -141,6 +153,10 @@ public class WavHeader {
 					 * As an example, SCRIPPS HARP .x.wav files have a chunk 
 					 * in here called 'harp', (now dealt with above) an example of which has 29752
 					 * bytes data, beginning  'V2.64 D104NO01CHNMS ...'
+					 * The Tascam files have three additional chunks: 'bext', 'cue ', and 'LIST'
+					 * Possibly some info on bext at https://github.com/Zeugma440/atldotnet/blob/main/ATL/AudioData/IO/Helpers/BextTag.cs
+					 * It would appear that the date string is characters 320 - 329 and time is 330 - 337 (-1). Easy to unpack. 
+					 * 
 					 */
 					chunkSize = windowsWavFile.readWinInt();
 					headChunk = new byte[chunkSize];
