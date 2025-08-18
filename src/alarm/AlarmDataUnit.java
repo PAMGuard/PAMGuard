@@ -1,9 +1,10 @@
 package alarm;
 
+import PamDetection.PamDetection;
 import PamguardMVC.PamDataUnit;
 
 
-public class AlarmDataUnit extends PamDataUnit {
+public class AlarmDataUnit extends PamDataUnit implements PamDetection {
 
 	private long[] firstStateTime  =new long[AlarmParameters.COUNT_LEVELS+1]; 
 	private long[] lastStateTime = new long[AlarmParameters.COUNT_LEVELS+1];
