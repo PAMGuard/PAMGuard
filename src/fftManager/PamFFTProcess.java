@@ -157,7 +157,7 @@ public class PamFFTProcess extends PamProcess {
 		//added as null pointer causing exception in FFT module on viewer start up. 
 		//26/02/2018
 		if (rawDataBlock==null) return;
-		
+
 		setParentDataBlock(rawDataBlock);
 		
 		if (rawDataBlock == null) return;
@@ -445,6 +445,7 @@ public class PamFFTProcess extends PamProcess {
 
 	@Override
 	public boolean prepareProcessOK() {
+
 		setupFFT();
 
 		int fftChannelMap = fftControl.fftParameters.channelMap;

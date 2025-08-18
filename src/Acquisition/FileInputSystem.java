@@ -489,7 +489,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				AudioFormat audioFormat = audioStream.getFormat();
 				//				fileLength = file.length();
 				fileSamples = audioStream.getFrameLength();
-				if (currentFile.getMaxSamples() > 0) {
+				if (currentFile != null && currentFile.getMaxSamples() > 0) {
 					fileSamples = currentFile.getMaxSamples();
 				}
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());

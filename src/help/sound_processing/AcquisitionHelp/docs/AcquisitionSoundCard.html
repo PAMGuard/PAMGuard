@@ -31,9 +31,36 @@ you're running PAMGuard). These drop outs can result in the lost of several perc
 <p>If you are using a laptop and need an external sound card, try to get one that connects using Firewire (IEEE 1394).</p>
 
 <h3>Sample Rate Conversions</h3>
-<p>The Windows drivers in particular may make multiple sample rate conversions. this means that your beautiful 
-high frequency data that you sampled at 96 kHz may be down-sampled to 48kHz and then up-sampled to 96kHz again without
+<p>The Windows drivers are clever. That's not a good thing ! They are designed such that multiple applications
+on your computer can all use the same sound card, and all think they are using it at different sample rates, all 
+at the same time. This is of course impossible.</p>
+<p>What's really happening is that the sound card is sampling at one sample rate, and Windows is converting the 
+data to whatever sample rate you've requested. This means that your beautiful 
+high frequency data that you sampled at 192 kHz may actually be sampling the data at 48kHz and then up-sampling to 192kHz again without
 you knowing it. This will of course destroy all data at higher frequencies.</p>
+<p>In windows 11, it's reasonably easy to get around this, by going to the "Sound Settings" part 
+of the control panel. </p>
+<br>
+<img src="images/ctrlpanel1.png"></img>
+<br>
+<p>In this case, I want to configure the E1DA Cosmos ADC PCM32/384 card, so click on the little arrow to 
+the right of that card to open the advanced properties controls for that card.</p>
+<p>You can also see that the card I want to use with PAMGuard is not the default device for my laptop. That is a good thing !
+It means that any beeps or boings that Windows want's to make are going to go to a different device to the one I'm using
+for data collection.</p>
+<br>
+<img src=images/ctrlpanel2.png></img>
+<br>
+<p>You can see that the card is currently set to sample 2 channels, 16 bit, at 48kHz which is what it's going
+to do, even though I want to sample at a higher frequency. </p>
+<br>
+<img src=images/ctrlpanel3.png></img>
+<br>
+<p>From the drop down list of formats select the sample rate and data quality that you want, close the dialogs and
+test.</p>
+<p>Always check that the card is really doing what you want it to do by running a 
+spectrogram display on the raw data to ensure that you genuinely do have data at high frequencies. </p> 
+
 <p>Some manufacturers provide alternative Windows drivers which you should use wherever possible.</p>
 <p>If possible, test your sound card with a signal generator while viewing a spectrogram of 
 the data to check that the high frequency data are OK</p> 
