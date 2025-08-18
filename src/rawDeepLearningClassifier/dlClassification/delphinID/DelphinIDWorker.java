@@ -2,35 +2,22 @@ package rawDeepLearningClassifier.dlClassification.delphinID;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.transforms.DLTransform;
-import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jdl4pam.transforms.SpectrumTransform;
-import org.jamdev.jdl4pam.transforms.WaveTransform;
-import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
-import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.JamArr;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
-import ai.djl.Model;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
-import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
-import us.hebi.matlab.mat.format.Mat5;
-import us.hebi.matlab.mat.types.MatFile;
-import us.hebi.matlab.mat.types.Matrix;
-import us.hebi.matlab.mat.types.Struct;
 
 /**
  * The delphinID worker. This worker has two additional tasks compared to it's
