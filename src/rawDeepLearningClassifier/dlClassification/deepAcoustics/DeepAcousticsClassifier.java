@@ -63,6 +63,28 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 		}
 		return archiveModelWorker;
 	}
+	
+
+	@Override
+	public void prepModel() {
+		
+		//need to set the bounding box merger in the worker. 
+		float minOverlap = ((DeepAcousticParams) this.getDLParams()).minMergeOverlap; 
+		boolean mergeBoundingBoxes = ((DeepAcousticParams) this.getDLParams()).mergeOverlap;
+		
+		if (mergeBoundingBoxes) {
+			//set the minimum overlap threshold for merging bounding boxes
+			((DeepAcousticsWorker) getModelWorker()).setMinOverlapThreshold(minOverlap);
+		
+		} 
+		else {
+			//if not merging bounding boxes, set the threshold to 0 so that no boxes are merged.
+			((DeepAcousticsWorker) getModelWorker()).setMinOverlapThreshold(1.0f);
+		}
+
+		super.prepModel();
+
+	}
 
 
 	@Override

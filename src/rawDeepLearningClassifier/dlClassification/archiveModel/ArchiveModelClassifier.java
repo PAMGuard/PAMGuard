@@ -28,12 +28,12 @@ import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 
 	private static final String MODEL_NAME = "Zip Model";
-	
+
 	/**
 	 * The file extensions
 	 */
 	private String[] fileExtensions = new String[] {"*.zip"};
-		
+
 	/**
 	 * Parameters for a Ketos classifier. 
 	 */
@@ -55,7 +55,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		this.standardDLParams = makeParams(); 
 
 		this.archiveModelUI= new ArchiveModelUI(this); 
-		
+
 		//load the previous settings
 		PamSettingManager.getInstance().registerSettings(this);
 
@@ -64,9 +64,9 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 
 	public void setDLParams(StandardModelParams modelParams) {
 		this.standardDLParams=modelParams;
-		
+
 	}
-	
+
 	@Override
 	public String getName() {
 		return MODEL_NAME;
@@ -76,7 +76,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	public DLCLassiferModelUI getModelUI() {
 		return this.archiveModelUI;
 	}
-	
+
 
 	@Override
 	public DLModelWorker<StandardPrediction> getDLWorker() {
@@ -88,7 +88,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	public StandardModelParams getDLParams() {
 		return standardDLParams;
 	}
-	
+
 	/**
 	 * Get the parameters for the Ketos classifier. 
 	 * @param standardDLParams - the Ketos parameters. 
@@ -132,11 +132,11 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		if (standardDLParams==null) {
 			standardDLParams = makeParams();
 		}
-		
+
 		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(standardDLParams.dlTransfroms);
-		
+
 		standardDLParams.dlTransfromParams=dlTransformParams; 
-//		System.out.println("KetosParams have been saved. : " + standardDLParams.dlTransfromParams); 
+		//		System.out.println("KetosParams have been saved. : " + standardDLParams.dlTransfromParams); 
 		return standardDLParams;
 	}
 
@@ -163,7 +163,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		}
 		return true;
 	}
-	
+
 	/**
 	 *Create the parameters class for the model. This can be overridden for bespoke parameters. 
 	 *classes. 
@@ -186,8 +186,6 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	public String[] getFileExtensions() {
 		return fileExtensions;
 	}
-
-
-
-
 }
+
+

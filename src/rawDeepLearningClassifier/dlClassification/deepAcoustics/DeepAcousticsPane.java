@@ -39,7 +39,6 @@ public class DeepAcousticsPane extends StandardModelPane {
 
 	private PamToggleSwitch mergBoxesSwitch;
 
-
 	public DeepAcousticsPane(DeepAcousticsClassifier deepAcousticClassifier) {
 		super(deepAcousticClassifier);
 		this.deepAcousticClassifier = deepAcousticClassifier; 
@@ -73,17 +72,23 @@ public class DeepAcousticsPane extends StandardModelPane {
 
 	private Pane createMergeControls() {
 		
-		mergBoxesSwitch = new PamToggleSwitch("Merge detections with >");
+		Label label1 = new Label("with >=");
+		Label label2 = new Label("overlap");
+		
+		mergBoxesSwitch = new PamToggleSwitch("Merge detections");
 		mergBoxesSwitch.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 			mergePercentageSpinner.setDisable(!newVal); 
+			label1.setDisable(!newVal); 
+			label2.setDisable(!newVal); 
 		});
 		
 		PamHBox hBox = new PamHBox();
 		hBox.setSpacing(5);
 		hBox.setAlignment(Pos.CENTER_LEFT);
 		
-		
+
 		hBox.getChildren().add(mergBoxesSwitch);
+		hBox.getChildren().add(label1);
 
 		//Spinner for the merge percentage
 
@@ -152,7 +157,7 @@ public class DeepAcousticsPane extends StandardModelPane {
 
 
 		hBox.getChildren().add(mergePercentageSpinner);
-		hBox.getChildren().add(new Label("overlap"));
+		hBox.getChildren().add(label2);
 
 		return hBox;
 	}
@@ -192,9 +197,7 @@ public class DeepAcousticsPane extends StandardModelPane {
 			this.setParamsClone(new DeepAcousticParams()); 
 		}
 
-
 		StandardModelParams params  = getParamsClone(); 
-
 
 		//prep the model with current parameters; 
 
@@ -231,6 +234,7 @@ public class DeepAcousticsPane extends StandardModelPane {
 		return deepParams;
 	}
 
+	
 	@Override
 	public void setParams(StandardModelParams currParams) {
 		super.setParams(currParams);
@@ -242,7 +246,21 @@ public class DeepAcousticsPane extends StandardModelPane {
 		mergePercentageSpinner.setDisable(!deepParams.mergeOverlap); 
 
 		mergBoxesSwitch.setSelected(deepParams.mergeOverlap);
+		
+		enableControls(currParams); 	
+	}
 
+	
+	private void enableControls(StandardModelParams currParams) {
+		if (currParams!=null && currParams.modelPath!=null) {
+			this.deepAcousticClassifier.getDLControl().getSettingsPane().getMaxRemergeSpinner().setDisable(true);
+
+		}
+		else {
+			this.deepAcousticClassifier.getDLControl().getSettingsPane().getMaxRemergeSpinner().setDisable(false);
+
+		}
+		
 	}
 
 
