@@ -260,6 +260,9 @@ PamSettingsSource, DataOutputStore {
 	private void openStores() {
 		long dataTime = PamCalendar.getTimeInMillis();
 		long analTime = System.currentTimeMillis();
+		
+		//System.out.println("BinaryStore.OpenStore: Session start time: " + PamCalendar.formatDBDateTime(  PamCalendar.getSessionStartTime(), true) + " sound file time "+ PamCalendar.getSoundFileTimeInMillis()); 	
+		
 		BinaryOutputStream outputStream;
 		if (!checkOutputFolder()) {
 			storesOpen = false;

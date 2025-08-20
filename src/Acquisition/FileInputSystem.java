@@ -600,8 +600,12 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean prepareSystem(AcquisitionControl daqControl) {
 
 		this.acquisitionControl = daqControl;
+		
 
 		fileSamples = 0;
+		//Need to set this to zero so that file times reset to the true file time if contiguous is not set. 
+		currentAnalysisTime=0;
+		
 		PamCalendar.setSoundFileTimeInMillis(0);
 		// check a sound file is selected and open it.
 		//		if (fileInputParameters.recentFiles == null) return false;
@@ -747,6 +751,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		PamCalendar.setSoundFile(true);
 		PamCalendar.setSoundFileTimeInMillis(0);
 		long fileTime = getFileStartTime(getCurrentFile());
+		
+		//System.out.println("FolderInputSystem.runFileAnalysis: currentAnalysisTime "  + currentAnalysisTime);
+
+		
 		if (currentAnalysisTime > 0) {
 			PamCalendar.setSessionStartTime(currentAnalysisTime);
 		}
