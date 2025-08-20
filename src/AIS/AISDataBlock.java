@@ -20,8 +20,6 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 		super(AISDataUnit.class, "AIS Data", parentProcess, 0);
 		this.aisControl = aisControl;
 		setNaturalLifetime(600);
-		//setNaturalLifetime(87100);
-
 	}
 	/**
 	 * aisDataUnit is always a new unit extracted from a 
