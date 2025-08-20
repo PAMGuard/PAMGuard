@@ -1,6 +1,7 @@
 package signal;
 
 import PamUtils.complex.ComplexArray;
+import Spectrogram.WindowFunction;
 import fftManager.FFTDataUnit;
 import fftManager.FastFFT;
 
@@ -18,19 +19,32 @@ public class SpectralDataUnit extends FFTDataUnit{
 	private double[] magnitude;
 	private double[] magSquared;
 	
+	double[] window;
 	
-	
-	public SpectralDataUnit(double[] waveform, int fftLength, float fs) {
+	public SpectralDataUnit(double[] waveform, int fftLength, float fs, double[] windowFunction) {
 		this(System.currentTimeMillis(), 0, 0, waveform.length, null, 0, fs);
+		this.window = windowFunction;
 		ComplexArray fftData = fft(waveform, fftLength);
 		this.setFftData(fftData);
 	}
 
 	public SpectralDataUnit(long timeMilliseconds, int channelBitmap, long startSample, long duration, ComplexArray fftData, int fftSlice, float fs) {
 		super(timeMilliseconds, channelBitmap, startSample, duration, fftData, fftSlice);
-		this.df = fs/(double) fftData.length();
-		this.N = (int) Math.ceil((double)fftData.length()/2.0);
+		this.setFftData(fftData);
 		this.fs = fs;
+	}
+	
+	@Override
+	public void setFftData(ComplexArray fftData) {
+		super.setFftData(fftData);
+		if(fftData==null) {
+			return;
+		}
+		this.N = fftData.length();
+		
+		this.df = (fs/2.0)/(double)N;
+		System.out.println(fs+" "+N+" "+df);
+		
 	}
 	
 	public double[] getFrequencyDomain() {
@@ -77,9 +91,13 @@ public class SpectralDataUnit extends FFTDataUnit{
 	
 	private void calculateFDomain() {
 		double[] fDomain = new double[N];
+		System.out.println();
 		for(int i=0;i<N;i++) {
-			fDomain[i] = i*df;
+			fDomain[i] = (i+1)*df;
+			System.out.print(fDomain[i]+" ");
 		}
+		System.out.println();
+
 		this.fDomain = fDomain;
 	}
 	
@@ -107,10 +125,24 @@ public class SpectralDataUnit extends FFTDataUnit{
 			paddedRawData[i] = 0;
 		}
 		
-		ComplexArray transform = fastFFT.rfft(paddedRawData, fftLength);
+		double[] windowedData = windowData(paddedRawData,fftLength);
+		
+		ComplexArray transform = fastFFT.rfft(windowedData, fftLength);
 						
 		return transform;
 	
+	}
+	
+	private double[] windowData(double[] waveform, int fftLength) {
+		double[] windowedData = new double[fftLength];
+		for (int w = 0; w < fftLength; w++) {
+			if(w>=waveform.length) {
+				windowedData[w] = 0 * window[w];
+			}else {
+				windowedData[w] = waveform[w] * window[w];
+			}
+		}
+		return windowedData;
 	}
 
 	public double getBinWidth() {
