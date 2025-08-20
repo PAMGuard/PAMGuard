@@ -27,12 +27,19 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
  * @author Jamie Macaulay
  */
 public class DeepAcousticsWorker extends ArchiveModelWorker {
-
+	
 //	//.mat file write for debugging
 //	private DeepAcousticMatWriter writer = null; //if not null, then write the results to a mat file with this name.
 //	
 //	int count = 0;
 	
+	
+	/**
+	 * The minimum overlap threshold for combining bounding boxes.
+	 */
+	public float minOverlapThreshold = 0.20f; //default minimum overlap threshold for combining bounding boxes, can be changed by the user.
+	
+
 	public DeepAcousticsWorker() {
 		super();
 		
@@ -71,6 +78,23 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 
 			List<DeepAcousticResultArray> modelResults = getDeepAcousticsModel().runModel(transformedDataStack4D);
 
+			List<DeepAcousticsResult> flattenedModelResults = new 	ArrayList<DeepAcousticsResult>();
+			
+			ArrayList<Long> parentID = new ArrayList<Long>(); //to store the parent IDs of the input data units, which will be used to set the parent ID of the model results.
+			
+			
+			for (int i=0; i<modelResults.size(); i++) {
+				//flatten the results into a single list
+				flattenedModelResults.addAll(modelResults.get(i));
+				for (int j = 0;j < modelResults.get(i).size(); j++) {
+					//add the parent ID of the input data unit to the list so we have a record of which input data unit this result came from.
+					parentID.add(dataUnits.get(i).getUID());
+				}
+			}
+			
+			if (minOverlapThreshold!=1) {
+				flattenedModelResults = BoundingBoxMerger.combineBoxes(flattenedModelResults, minOverlapThreshold); //combine the results with a minimum overlap threshold of XX %.
+			}
 
 //			if (writer != null) {
 //				for (int i=0; i<dataUnits.size(); i++) {
@@ -97,20 +121,17 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 			ArrayList<StandardPrediction> dlModelResults = new ArrayList<StandardPrediction>();
 			DeepAcousticsResult modelResult;
 			DeepAcousticsPrediction dlModelResult;
-
-			//System.out.println("DeepAcousticsWorker: Model results size: " + modelResults.size());
-			for (int i=0; i<modelResults.size(); i++) {
-				for (int j=0; j<modelResults.get(i).size(); j++) {
-					modelResult = modelResults.get(i).get(j);
-
-					dlModelResult = new DeepAcousticsPrediction(modelResult);
-					dlModelResult.setParentSegmentID(dataUnits.get(i).getUID()); //set the  ID to the UID of the input data unit (which is usually the segment UID).
-
-					//add the result to the list
-					dlModelResults.add(dlModelResult);
-				}
+			
+			for (int i=0; i<flattenedModelResults.size(); i++) {
+				modelResult = flattenedModelResults.get(i);
+				
+				//create a new DeepAcousticsPrediction object from the model result
+				dlModelResult = new DeepAcousticsPrediction(modelResult);
+				dlModelResult.setParentSegmentID(parentID.get(i)); //set the ID to the UID of the input data unit (which is usually the segment UID).
+				
+				//add the result to the list
+				dlModelResults.add(dlModelResult);
 			}
-			//System.out.println("DeepAcousticsWorker: dlModelResults out: " + dlModelResults.size());
 
 			return dlModelResults;
 		} 
@@ -140,6 +161,25 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 //	public void closeModel() {
 //		super.closeModel();
 //	}
+	
+	/**
+	 * Get the minimum overlap threshold for combining bounding boxes.
+	 * 
+	 * @return The minimum overlap threshold.
+	 */
+	public float getMinOverlapThreshold() {
+		return minOverlapThreshold;
+	}
+
+	
+	/**
+	 * Set the minimum overlap threshold for combining bounding boxes.
+	 * 
+	 * @param minOverlapThreshold The minimum overlap threshold to set.
+	 */
+	public void setMinOverlapThreshold(float minOverlapThreshold) {
+		this.minOverlapThreshold = minOverlapThreshold;
+	}
 
 
 

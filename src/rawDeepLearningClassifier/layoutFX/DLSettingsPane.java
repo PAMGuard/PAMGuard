@@ -15,6 +15,7 @@ import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -403,6 +404,16 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	public PamSpinner<Integer> getHopLenSpinner() {
 		return this.hopLength;
 	}
+	
+	
+	/**
+	 * Get the spinner which sets the maximum number of segments that can be re-merged.
+	 * @return the spinner which sets the maximum number of segments that can be re-merged.
+	 */
+	public PamSpinner<Integer> getMaxRemergeSpinner() {
+		return this.reMergeSeg;
+	}
+
 
 
 
@@ -411,11 +422,19 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	protected void setClassifierPane() {
 		//set the classifier Pane.class 
-			
+		
+		//reset all the spinners incase classifier types have set them to disabled
+		this.windowLength.setDisable(false);
+		this.hopLength.setDisable(false);
+		this.reMergeSeg.setDisable(false);
+		
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
 
+			//now set the classifier pane to the model UI settings pane.
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
 
+			//now check the source requirements for the model and set the source list accordingly.
+			//For example, if the model requires a specific type of data then set the source list to that type.
 			if (modelSelectPane.currentClassifierModel!=null) {
 				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
 				setSourceList(modelSelectPane.currentClassifierModel);
@@ -427,6 +446,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		}
 		else {
+			//if there is no classifier model then set the classifier pane to null
 			classifierPane.setCenter(null); 
 			setDefaultSourceList();
 		}
@@ -588,8 +608,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	@Override
 	public void setParams(RawDLParams currParams) {
-		
-		
+				
 		sourcePane.sourceChanged();
 		sourcePane.setSourceList();
 		sourcePane.setParams(currParams.groupedSourceParams);
@@ -610,22 +629,27 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		dataSelectorCheckBox.setSelected(currParams.useDataSelector);
 
-		setClassifierPane(); 
-
+		//setClassifierPane(); 
+		
 		setSegInfoLabel();
 
 		segEnableSwitch.setSelected(currParams.enableSegmentation);
 
 		//		//set up the model and the custom pane if necessary.  
-		this.modelSelectPane.loadNewModel(currParams.modelURI); 
+		System.out.println("DLSettingsPane: setParams 5");
+
+
 		//this.modelSelectPane.updatePathLabel(); 
-		this.setClassifierPane();
-		
+		//this.setClassifierPane();
 		
 		enableControls(); 
+		
+		//important that we do not se the model URI before the model select pane is set up - otherwise the 
+		//pane freezes and not a great user experience.  Once this has finished then setClassifierPane will be called.
+		this.modelSelectPane.loadNewModel(currParams.modelURI); 
 
-		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
 		Platform.runLater(()->{
+		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
 			sourcePane.getChannelValidator().validate();
 		});
 
@@ -702,6 +726,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		dlWarningDialog.showWarningDialog(status);
 		
 	}
+
+
 
 
 
