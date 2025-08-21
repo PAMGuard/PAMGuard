@@ -22,6 +22,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.PamGUIManager;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
 import PamView.ColourArray;
@@ -214,6 +215,9 @@ public class ConcatenatedSpectrogram extends ClickDisplay implements PamSettings
 	}
 
 	protected void showDialog(ActionEvent e) {
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			return;
+		}
 		ConcatenatedSpectParams newParams = ConcatenatedSpectrogramdialog.showDialog(PamController.getMainFrame(), 
 				getFrame().getLocationOnScreen(), concatenatedSpectParams);
 		if (newParams != null) {

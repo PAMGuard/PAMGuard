@@ -45,7 +45,10 @@ public class ReprocessManager {
 		synchronized (synch) {
 			workDialog = new PamWorkDialog(mainFrame, 1, "Checking input files and existing output data");
 		}
-		workDialog.setVisible(true);
+		if(PamGUIManager.getGUIType()!=PamGUIManager.NOGUI) {
+			workDialog.setVisible(true);
+		}
+		
 	}
 	
 	private void closeWorkDialog() {

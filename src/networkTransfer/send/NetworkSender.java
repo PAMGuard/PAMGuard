@@ -254,7 +254,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		}
 		
 		if(persistenceDir!=null) {
-			networkSendParams.persistenceDir = persistenceDir;
+			networkSendParams.persistenceDirectory = persistenceDir;
 		}
 		
 		boolean isSetJson = false;

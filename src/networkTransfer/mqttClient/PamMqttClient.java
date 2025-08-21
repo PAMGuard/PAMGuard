@@ -14,11 +14,13 @@ import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParams;
@@ -38,7 +40,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	protected MqttAsyncClient mqttClient;
 	private MqttConnectOptions mqttOptions;
 	private IMqttToken connectToken;
-	private CustomFilePersistence persistence;
+	private MqttClientPersistence persistence;
 	
 	public NetworkSendParams networkSendParams;
 	public NetworkReceiveParams networkReceiveParams;
@@ -422,10 +424,11 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	
 	private void generateClientPersistence() throws Exception{
 		if(this.networkParams.persistenceDirectory!=null) {
+			Paths.get(networkParams.persistenceDirectory).toFile().mkdirs();
         	System.out.println("Setting memory persistance directory to "+this.networkParams.persistenceDirectory);
         	persistence = new CustomFilePersistence(this.networkParams.persistenceDirectory);
         }else {
-        	//persistence = new MemoryPersistence();
+        	persistence = new MemoryPersistence();
         }
 	}
 	
