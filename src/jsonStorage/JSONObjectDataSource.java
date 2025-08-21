@@ -52,6 +52,10 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	public String getPackedObject(PamDataUnit dataUnit) {
 		setFields(dataUnit);
 		
+		if(objectData.shouldIgnoreDataUnit) {
+			return null;
+		}
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 		

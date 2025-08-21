@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamController.PamGUIManager;
 
 public abstract class ExtCommand {
 
@@ -42,7 +43,7 @@ public abstract class ExtCommand {
 	 * to execute in a later thread. 
 	 */
 	public final String executeCommand(String commandString) {
-		if (immediate) {
+		if (immediate || PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
 			return execute(commandString);
 		}
 		

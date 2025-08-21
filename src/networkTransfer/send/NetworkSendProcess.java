@@ -118,7 +118,7 @@ public class NetworkSendProcess extends PamProcess {
 		else if (outputFormat == NetworkSendParams.NETWORKSEND_JSON) {
 			String jsonString = networkObjectPacker.packDataUnit((PamDataBlock) dataBlock, dataUnit);
 			if (jsonString==null) {
-				System.out.println("Error creating json string from " + dataBlock.getClass());
+				//System.out.println("Error creating json string from " + dataBlock.getClass());
 			} else {
 				qo = new  NetworkQueuedObject(jsonString,dataUnit.getParentDataBlock().getDataName());
 			}

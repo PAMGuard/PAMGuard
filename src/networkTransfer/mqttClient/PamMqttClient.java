@@ -42,7 +42,6 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	
 	public NetworkSendParams networkSendParams;
 	public NetworkReceiveParams networkReceiveParams;
-	private IMqttToken connectToken;
 	
 	private String mqttConfigureError;
 	

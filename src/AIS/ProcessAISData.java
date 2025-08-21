@@ -48,6 +48,7 @@ public class ProcessAISData extends PamProcess {
 		
 		aisDataBlock.SetLogging(new AISLogger(aisDataBlock, this));
 		aisDataBlock.setBinaryDataSource(new AISBinaryDataSource(aisController, aisDataBlock));
+		aisDataBlock.setJSONDataSource(new AISJsonDataSource());
 	}
 	
 	public AISDataBlock getOutputDataBlock() {
