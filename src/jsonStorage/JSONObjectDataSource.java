@@ -1,6 +1,7 @@
 package jsonStorage;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,6 +59,9 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		if(!includeAllBaseData) {
+			objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
+		}
 		
 		String jsonString;
 		try {
@@ -69,6 +73,8 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		
 		jsonString = jsonString.substring(0, jsonString.length()-2);
 		jsonString = jsonString+","+getAdditionalJson(dataUnit)+"}";
+		
+		System.out.println(jsonString);
 		
 		return jsonString;
 	}
@@ -92,57 +98,56 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		objectData.millis = baseData.getTimeMilliseconds();
 		objectData.dateReadable = PamCalendar.formatDateTime2(objectData.millis, "yyyy MMMM dd HH:mm:ss.SSS", false);
 
-		if(this.includeAllBaseData) {
 			
 		
-			objectData.flagBitmap = baseData.getS1Contents();
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMENANOSECONDS) != 0) {
-				objectData.timeNanos = baseData.getTimeNanoseconds();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_CHANNELMAP) != 0) {
-				objectData.channelMap = baseData.getChannelBitmap();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_UID) != 0) {
-				objectData.UID = baseData.getUID();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_STARTSAMPLE) != 0) {
-				objectData.startSample = baseData.getStartSample();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_SAMPLEDURATION) != 0) {
-				objectData.sampleDuration = baseData.getSampleDuration();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_FREQUENCYLIMITS) != 0) {
-				double[] freq = baseData.getFrequency();
-				objectData.freqLimits = new Double[]{freq[0], freq[1]};
-				
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_MILLISDURATION) != 0) {
-				objectData.millisDuration = baseData.getMillisecondDuration();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMEDELAYSSECONDS) != 0) {
-				double[] delays = baseData.getTimeDelaysSeconds();
-				objectData.numTimeDelays = delays.length;
-				objectData.timeDelays = new Double[objectData.numTimeDelays];
-				for (int i=0; i<delays.length; i++) {
-					objectData.timeDelays[i] = delays[i];
-				}
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSEQUENCEMAP) != 0) {
-				objectData.sequenceMap = baseData.getSequenceBitmap();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASNOISE) != 0) {
-				objectData.noise = baseData.getNoiseBackground();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNAL) != 0) {
-				objectData.signal = baseData.getSignalSPL();
-			}
-			if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNALEXCESS) != 0) {
-				objectData.signalExcess = baseData.getSignalExcess();
-			}	
-			
-			// force the subclass to set the object type
-			setObjectType(dataUnit);
+		objectData.flagBitmap = baseData.getS1Contents();
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMENANOSECONDS) != 0) {
+			objectData.timeNanos = baseData.getTimeNanoseconds();
 		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_CHANNELMAP) != 0) {
+			objectData.channelMap = baseData.getChannelBitmap();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_UID) != 0) {
+			objectData.UID = baseData.getUID();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_STARTSAMPLE) != 0) {
+			objectData.startSample = baseData.getStartSample();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_SAMPLEDURATION) != 0) {
+			objectData.sampleDuration = baseData.getSampleDuration();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_FREQUENCYLIMITS) != 0) {
+			double[] freq = baseData.getFrequency();
+			objectData.freqLimits = new Double[]{freq[0], freq[1]};
+			
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_MILLISDURATION) != 0) {
+			objectData.millisDuration = baseData.getMillisecondDuration();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMEDELAYSSECONDS) != 0) {
+			double[] delays = baseData.getTimeDelaysSeconds();
+			objectData.numTimeDelays = delays.length;
+			objectData.timeDelays = new Double[objectData.numTimeDelays];
+			for (int i=0; i<delays.length; i++) {
+				objectData.timeDelays[i] = delays[i];
+			}
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSEQUENCEMAP) != 0) {
+			objectData.sequenceMap = baseData.getSequenceBitmap();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASNOISE) != 0) {
+			objectData.noise = baseData.getNoiseBackground();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNAL) != 0) {
+			objectData.signal = baseData.getSignalSPL();
+		}
+		if ((objectData.flagBitmap & DataUnitBaseData.S1_HASSIGNALEXCESS) != 0) {
+			objectData.signalExcess = baseData.getSignalExcess();
+		}	
+		
+		// force the subclass to set the object type
+		setObjectType(dataUnit);
+		
 		
 		// now add any fields specific to the subclass
 		addClassSpecificFields(dataUnit);
@@ -150,16 +155,14 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		// finally, add in the new fields used in the convertBinToJSON Matlab script
 		objectData.filePath = "Network Sender";
 		
-		if(this.includeAllBaseData) {
-			BinaryDataSource theBinarySource = dataUnit.getParentDataBlock().getBinaryDataSource();
-			if(theBinarySource!=null) {
-				objectData.moduleType = theBinarySource.getModuleType();
-				objectData.moduleName = theBinarySource.getModuleName();
-				objectData.streamName = theBinarySource.getStreamName();
-				objectData.moduleVersion = theBinarySource.getModuleVersion();
-				objectData.pamguardVersion = PamguardVersionInfo.version;
-				objectData.fileFormat = BinaryStore.getCurrentFileFormat();
-			}
+		BinaryDataSource theBinarySource = dataUnit.getParentDataBlock().getBinaryDataSource();
+		if(theBinarySource!=null) {
+			objectData.moduleType = theBinarySource.getModuleType();
+			objectData.moduleName = theBinarySource.getModuleName();
+			objectData.streamName = theBinarySource.getStreamName();
+			objectData.moduleVersion = theBinarySource.getModuleVersion();
+			objectData.pamguardVersion = PamguardVersionInfo.version;
+			objectData.fileFormat = BinaryStore.getCurrentFileFormat();
 		}
 	}
 	
