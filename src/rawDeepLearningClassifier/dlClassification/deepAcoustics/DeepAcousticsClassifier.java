@@ -63,6 +63,28 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 		}
 		return archiveModelWorker;
 	}
+	
+
+	@Override
+	public void prepModel() {
+		
+		//need to set the bounding box merger in the worker. 
+		float minOverlap = ((DeepAcousticParams) this.getDLParams()).minMergeOverlap; 
+		boolean mergeBoundingBoxes = ((DeepAcousticParams) this.getDLParams()).mergeOverlap;
+		
+		if (mergeBoundingBoxes) {
+			//set the minimum overlap threshold for merging bounding boxes
+			((DeepAcousticsWorker) getModelWorker()).setMinOverlapThreshold(minOverlap);
+		
+		} 
+		else {
+			//if not merging bounding boxes, set the threshold to 0 so that no boxes are merged.
+			((DeepAcousticsWorker) getModelWorker()).setMinOverlapThreshold(1.0f);
+		}
+
+		super.prepModel();
+
+	}
 
 
 	@Override
@@ -104,7 +126,14 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 
 					deepAcousticsPrediction.setStartSample(boxSamples);
 					
-					int boxSampleDuration = (int) (((double) deepAcousticsPrediction.getResult().getWidth())/imWidth * dataUnit.getSampleDuration());
+					double width = deepAcousticsPrediction.getResult().getWidth();
+					//there appears to be a bug in the deep acoustics model where the bounding box getx plus the width is larger than the image width.
+					if (deepAcousticsPrediction.getResult().getX() + deepAcousticsPrediction.getResult().getWidth() > imWidth) {
+						width = imWidth - deepAcousticsPrediction.getResult().getX();
+					}
+					
+					int boxSampleDuration = (int) (width/imWidth * dataUnit.getSampleDuration());
+										
 					deepAcousticsPrediction.setDuratioSamples(boxSampleDuration);
 					
 					//now set the correct frequency limits. 
@@ -114,9 +143,8 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 					deepAcousticsPrediction.setFreqLimits(new double[] { startFreq, startFreq - bandWidth});
 					
 //					System.out.println("DeepAcousticsClassifier: processModelResults boxStartSample "  + boxSamples + " boxSampleDuration " + boxSampleDuration + 
-//							" for segment " + dataUnit.getUID() + " with "  + dataUnit.getSampleDurationAsInt() + " samples from "  + dataUnit.getStartSample()); 
-					
-					
+//							" for segment " + dataUnit.getUID() + " with "  + dataUnit.getSampleDurationAsInt() + " samples from "  + dataUnit.getStartSample()
+//							+ " width " +  deepAcousticsPrediction.getResult().getWidth() + " x " + deepAcousticsPrediction.getResult().getX() ); 
 					
 					aSegmentResult.add(deepAcousticsPrediction);
 
@@ -135,8 +163,6 @@ public class DeepAcousticsClassifier extends ArchiveModelClassifier {
 //			System.out.println("DeepAcousticsClassifier: processModelResults returned with " + dataUnit.size() + " results for a segment.");
 //		}
 
-		
-		
 		return processedResults;
 	}
 

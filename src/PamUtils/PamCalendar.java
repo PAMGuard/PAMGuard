@@ -115,6 +115,10 @@ public class PamCalendar {
 		return System.currentTimeMillis() + timeCorrection;
 	}
 
+	public static long getSoundFileTimeInMillis() {
+		return soundFileTimeInMillis;
+	}
+
 	/**
 	 * 	a formatted time string
 	 */

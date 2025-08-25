@@ -239,8 +239,6 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 	private boolean groupDetections = false;
 
 
-	
-	
 	/**
 	 * Constructor for the DL Control.
 	 * 
@@ -520,6 +518,13 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// if cancel button is pressed then new params will be null.
 		if (newParams != null) {
 			updateParams(newParams);
+		}
+	}
+	
+	
+	public void settingsDialogChange() {
+		if (settingsDialog!=null) {
+			settingsDialog.pack();
 		}
 	}
 

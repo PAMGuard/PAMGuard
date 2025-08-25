@@ -595,6 +595,9 @@ public class DLModelSelectPane extends PamBorderPane {
 			//important to stop set a bound property exception. 
 			pathLabel.textProperty().unbind();
 			modelLoadIndicator.progressProperty().unbind();
+			
+			//repack the dialog so it fits the new settings
+			rawDLSettingsPane.getDLControl().settingsDialogChange();
 
 			updatePathLabel(this.getValue()); 
 		}

@@ -1005,7 +1005,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
-		//		System.out.println("Start system");
+		//System.out.println("FolderInputSystem.startSystem: Start system");
 		setFolderProgress();
 		return super.startSystem(daqControl);
 	}
@@ -1128,6 +1128,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			System.out.println("Daq setanal start time: no files to check against");
 			return false;
 		}
+		
 		System.out.printf("setAnalysisStarttTime: checking %d files for start time of %s\n", allFiles.size(), PamCalendar.formatDBDateTime(startTime));
 		/*
 		 * If the starttime is maxint then there is nothing to do, but we do need to set the file index

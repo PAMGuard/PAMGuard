@@ -5,6 +5,7 @@ import java.util.List;
 
 import PamDetection.RawDataUnit;
 import PamUtils.PamArrayUtils;
+import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.DataUnitBaseData;
@@ -690,7 +691,7 @@ public class DLClassifyProcess extends PamProcess {
 	 */
 	private synchronized DLDetection makeRawDLDetection(ArrayList<GroupedRawData> groupDataBuffer, ArrayList<PredictionResult> modelResult) {
 
-//		System.out.println("DLClassifyProcess: makeRawDLDetection: " + groupDataBuffer.size() + " data units, " + modelResult.size() + " model results");
+		//System.out.println("DLClassifyProcess: makeRawDLDetection: " + groupDataBuffer.size() + " data units, " + modelResult.size() + " model results");
 		
 		if (groupDataBuffer==null || groupDataBuffer.size()<=0) {
 			return null; 
@@ -763,7 +764,7 @@ public class DLClassifyProcess extends PamProcess {
 //				+ rawdata[0].length + " sampleDuration " + groupDataBuffer.get(0).getSampleDuration());
 
 		//Now we have the time limits of the predictions, check whether the raw data is within these limits.
-		if (rawdata[0].length!=(endSample-startSample)) {
+		if (rawdata[0].length!=(endSample-startSample)) { //only trim if we need to
 						//need to trim the raw data to the time limits of the data unit.
 			rawdata = trimRawData(rawdata, groupDataBuffer.get(0).getStartSample(),  startSample, endSample);
 		}
