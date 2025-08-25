@@ -40,7 +40,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	protected MqttAsyncClient mqttClient;
 	private MqttConnectOptions mqttOptions;
 	private IMqttToken connectToken;
-	private MqttClientPersistence persistence;
+	private CustomFilePersistence persistence;
 	
 	public NetworkSendParams networkSendParams;
 	public NetworkReceiveParams networkReceiveParams;
@@ -428,13 +428,17 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
         	System.out.println("Setting memory persistance directory to "+this.networkParams.persistenceDirectory);
         	persistence = new CustomFilePersistence(this.networkParams.persistenceDirectory);
         }else {
-        	persistence = new MemoryPersistence();
+        	//persistence = new MemoryPersistence();
         }
 	}
 	
 	private void generateMqttClient() throws Exception{
 		try {
-			mqttClient = new MqttAsyncClient(serverURI,mqttConnectionId,persistence);
+			if(this.persistence==null) {
+				mqttClient = new MqttAsyncClient(serverURI,mqttConnectionId);
+			}else {
+				mqttClient = new MqttAsyncClient(serverURI,mqttConnectionId,persistence);
+			}
 			mqttClient.setCallback(this);
 		} catch (MqttException e) {
 			e.printStackTrace();
