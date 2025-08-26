@@ -244,11 +244,9 @@ may not be null.
 		if (newAISUnit.staticData != null) {
 			System.out.println("Static data for "+newAISUnit.mmsiNumber);
 			if (this.staticData == null) {
-				System.out.println("The static data is new for "+newAISUnit.mmsiNumber);
 				this.staticData = newAISUnit.staticData;
 			}
 			else {
-				System.out.println("Going to merge static data for "+newAISUnit.mmsiNumber);
 				mergeStaticData(newAISUnit.staticData);
 			}
 		}

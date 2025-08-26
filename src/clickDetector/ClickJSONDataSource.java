@@ -10,7 +10,7 @@ public class ClickJSONDataSource extends JSONObjectDataSource<ClickJSONData> {
 	 * a ClickJSONData class
 	 */
 	public ClickJSONDataSource() {
-		super();
+		super(false);
 		objectData = new ClickJSONData();
 	}
 	
@@ -58,13 +58,15 @@ public class ClickJSONDataSource extends JSONObjectDataSource<ClickJSONData> {
 		// write out the wav data
 		double[][] waveData = cd.getWaveData();
 		if (waveData==null) return;
-		objectData.wave = new double[objectData.duration][objectData.nChan];
+		objectData.wave = waveData;
+		
+		/*objectData.wave = new double[objectData.duration][objectData.nChan];
 		for (int i = 0; i < objectData.duration; i++) {
 			for (int j = 0; j < objectData.nChan; j++) {
 				// copy over the wav data, but swap the order because that's what Matlab does
 				objectData.wave[i][j] = waveData[j][i];
 			}
-		}
+		}*/
 
 		
 	}

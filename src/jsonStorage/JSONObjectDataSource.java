@@ -73,9 +73,7 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		
 		jsonString = jsonString.substring(0, jsonString.length()-2);
 		jsonString = jsonString+","+getAdditionalJson(dataUnit)+"}";
-		
-		System.out.println(jsonString);
-		
+				
 		return jsonString;
 	}
 	

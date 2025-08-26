@@ -10,7 +10,7 @@ import jsonStorage.JSONObjectDataSource;
 public class OneBandJsonDataSource extends JSONObjectDataSource<OneBandJsonData>{
 	
 	public OneBandJsonDataSource() {
-		super();
+		super(false);
 		objectData = new OneBandJsonData();
 	}
 	
