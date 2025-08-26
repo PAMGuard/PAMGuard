@@ -19,6 +19,11 @@ public class WhistleJSONDataSource extends JSONObjectDataSource<WhistleJSONData>
 		objectData = new WhistleJSONData();
 	}
 
+	protected WhistleJSONData initializeObjectData() {
+		return new WhistleJSONData();
+
+	}
+	
 	
 	@Override
 	protected void setObjectType(PamDataUnit pamDataUnit) {

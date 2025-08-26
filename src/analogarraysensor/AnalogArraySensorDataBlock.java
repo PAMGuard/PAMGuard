@@ -10,7 +10,7 @@ public class AnalogArraySensorDataBlock extends PamDataBlock<AnalogArraySensorDa
 	public AnalogArraySensorDataBlock(String dataName, ArraySensorControl analogSensorControl, ArraySensorProcess arraySensorProcess) {
 		super(AnalogArraySensorDataUnit.class, dataName, arraySensorProcess, 0);
 		this.analogSensorControl = analogSensorControl;
-		setNaturalLifetime(600);
+		setNaturalLifetimeSeconds(600);
 		setMixedDirection(MIX_OUTOFDATABASE);
 	}
 

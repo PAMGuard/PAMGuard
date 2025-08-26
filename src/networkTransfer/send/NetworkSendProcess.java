@@ -94,10 +94,29 @@ public class NetworkSendProcess extends PamProcess {
 		}
 		return null;
 	}
+	
+	@Override 
+	public void updateData(PamObservable dataBlock, PamDataUnit dataUnit) {
+
+		try {
+			packAndSendData(dataBlock,dataUnit.cloneIfAllowed());
+		} catch (CloneNotSupportedException e) {
+			packAndSendData(dataBlock,dataUnit);
+		}
+	}
 
 	@Override
 	public void newData(PamObservable dataBlock, PamDataUnit dataUnit) {
 		
+		try {
+			packAndSendData(dataBlock,dataUnit.cloneIfAllowed());
+		} catch (CloneNotSupportedException e) {
+			packAndSendData(dataBlock,dataUnit);
+		}
+		
+	}
+	
+	private synchronized void packAndSendData(PamObservable dataBlock, PamDataUnit dataUnit) {
 		NetworkQueuedObject qo = null;
 		
 		int quickId = this.quickId;

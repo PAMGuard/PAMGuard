@@ -131,6 +131,7 @@ may not be null.
 	 * @return true if the message was decoded successfully
 	 */
 	public boolean decodeMessage() {
+		
 		// time to process the string ...
 		//		More updated useful information at http://gpsd.berlios.de/AIVDM.html
 		try {
@@ -143,7 +144,6 @@ may not be null.
 			messageId = bitData.getUnsignedInteger(0, 5);
 			mmsiNumber = bitData.getUnsignedInteger(8, 37);
 			AISPositionReport positionReport = null;
-
 			switch (messageId) {
 			case 1:
 			case 2:
@@ -242,10 +242,13 @@ may not be null.
 					LocContents.HAS_LATLONG | LocContents.HAS_RANGE);
 		}
 		if (newAISUnit.staticData != null) {
+			System.out.println("Static data for "+newAISUnit.mmsiNumber);
 			if (this.staticData == null) {
+				System.out.println("The static data is new for "+newAISUnit.mmsiNumber);
 				this.staticData = newAISUnit.staticData;
 			}
 			else {
+				System.out.println("Going to merge static data for "+newAISUnit.mmsiNumber);
 				mergeStaticData(newAISUnit.staticData);
 			}
 		}

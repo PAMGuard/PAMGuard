@@ -168,12 +168,12 @@ public class RockBlockProcess2 extends PamProcess implements ModuleStatusManager
 		super(rockBlockControl, null);
 		this.rockBlockControl = rockBlockControl;
 		this.outgoingMessages = new RockBlockOutgoingDataBlock(RockBlockOutgoingMessage.class, "RockBlock Outgoing Messages", this, 0);
-		outgoingMessages.setNaturalLifetime(600);
+		outgoingMessages.setNaturalLifetimeSeconds(600);
 		outgoingMessages.SetLogging(new RockBlockOutgoingLogger(outgoingMessages));
 		outgoingMessages.setShouldLog(true);
 		addOutputDataBlock(outgoingMessages);
 		this.incomingMessages = new RockBlockDataBlock<RockBlockIncomingMessage>(RockBlockIncomingMessage.class, "RockBlock Incoming Messages", this, 0);
-		incomingMessages.setNaturalLifetime(600);
+		incomingMessages.setNaturalLifetimeSeconds(600);
 		incomingMessages.SetLogging(new RockBlockIncomingLogger(incomingMessages));
 		incomingMessages.setShouldLog(true);
 		addOutputDataBlock(incomingMessages);

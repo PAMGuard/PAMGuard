@@ -6,12 +6,18 @@ import jsonStorage.JSONObjectDataSource;
 public class AISJsonDataSource extends JSONObjectDataSource<AISJsonData>{
 	
 	public AISJsonDataSource() {
-		super();
-		objectData = new AISJsonData();
+		super(false);
+		
+	}
+	
+	protected AISJsonData initializeObjectData() {
+		return new AISJsonData();
 	}
 
 	@Override
 	protected void addClassSpecificFields(PamDataUnit pamDataUnit) {
+				
+		//objectData.shouldIgnoreDataUnit = false;
 		
 		AISDataUnit aisUnit = (AISDataUnit) pamDataUnit;
 		
@@ -54,10 +60,10 @@ public class AISJsonDataSource extends JSONObjectDataSource<AISJsonData>{
 		}
 		name = name.replace("@", "");
 		while(name.contains("  ")) {
-			name.replace("  ", " ");
+			name = name.replace("  ", "");
 		}
 		if(name.endsWith(" ")) {
-			name = name.substring(0, name.length()-2);
+			name = name.substring(0, name.length()-1);
 		}
 		return name;
 	}

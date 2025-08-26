@@ -17,7 +17,7 @@ public class DepthProcess extends PamProcess {
 		addOutputDataBlock(depthDataBlock = new DepthDataBlock("Hydrophone Depth Data", depthControl, this));
 		getDepthDataBlock().SetLogging(new DepthSQLLogging(depthControl, getDepthDataBlock()));
 		getDepthDataBlock().setMixedDirection(PamDataBlock.MIX_OUTOFDATABASE);
-		getDepthDataBlock().setNaturalLifetime(10000);
+		getDepthDataBlock().setNaturalLifetimeSeconds(10000);
 	}
 
 	@Override

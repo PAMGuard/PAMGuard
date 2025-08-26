@@ -562,27 +562,28 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 				InputStreamReader fileIn = new InputStreamReader(instream);
 				BufferedReader reader = new BufferedReader(fileIn);
 				String nextLine;
-				long lastMilli = 0;
+				long lastMessageMillis = 0;
 				while(!stopActiveNMEAsource && !readFile) {
-					
+					Thread.sleep(500);
 				}
 				while (!stopActiveNMEAsource && (nextLine=reader.readLine())!=null) {
-					System.out.println(nextLine);
+					//System.out.println(nextLine);
 				    String[] tokens = nextLine.split(",", 2);
-				    long millis = Long.valueOf(tokens[0]);
-				    if(lastMilli!=0 && lastMilli<millis) {
-				    	//Thread.sleep(millis-lastMilli);
+				    long thisMessageMillis = Long.valueOf(tokens[0]);
+				    if(lastMessageMillis!=0 && lastMessageMillis<thisMessageMillis) {
+				    	long waitTime = thisMessageMillis-lastMessageMillis;
+				    	Thread.sleep(waitTime);
 				    }
-				    processNmeaStringWithTimestamp(millis,tokens[1]);
-				   // processNmeaString(new StringBuffer(tokens[1]));
-				    lastMilli = millis;
+				    //processNmeaStringWithTimestamp(thisMessageMillis,tokens[1]);
+				    processNmeaString(new StringBuffer(tokens[1]));
+				    lastMessageMillis = thisMessageMillis;
 				}
 				while(!stopActiveNMEAsource) {
 					
 				}
 				reader.close();
-			}catch(IOException   e) {
-				
+			}catch(IOException | InterruptedException   e) {
+				e.printStackTrace();
 			}
 			
 			stopActiveNMEAsource=false;

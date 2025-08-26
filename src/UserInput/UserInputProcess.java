@@ -48,7 +48,7 @@ public class UserInputProcess extends PamProcess {
 				new SymbolData(PamSymbolBase.interpretTextCode("v"),20,20,false,Color.red,Color.black),
 				true));
 		uiDataBlock.setChannelMap(0b1111111111111111);
-		uiDataBlock.setNaturalLifetime(3600*24); // natural lifetime 24 hours. 
+		uiDataBlock.setNaturalLifetimeSeconds(3600*24); // natural lifetime 24 hours. 
 		uiDataBlock.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
 
 		// PamModel.getPamModel().setGpsDataBlock(uiDataBlock);

@@ -79,10 +79,10 @@ public class QAGeneratorProcess extends QADataProcess {
 		super(qaControl, true);
 		this.qaControl = qaControl;
 
-		getTestsDataBlock().setNaturalLifetime(3600*24);
-		getSequenceDataBlock().setNaturalLifetime(3600);
+		getTestsDataBlock().setNaturalLifetimeSeconds(3600*24);
+		getSequenceDataBlock().setNaturalLifetimeSeconds(3600);
 		getSequenceDataBlock().setOverlayDraw(new SequenceOverlayDraw());
-		getSoundsDataBlock().setNaturalLifetime(3600);
+		getSoundsDataBlock().setNaturalLifetimeSeconds(3600);
 		
 		positionReferenceFinder = new PositionReferenceFinder(preferedReference, true);
 	}

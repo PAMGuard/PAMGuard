@@ -83,6 +83,7 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		return "\"addition\":\"null\"";
 	}
 	
+	protected abstract DataSource initializeObjectData();
 	
 	/**
 	 * Loads the fields of the JSONObjectData object with the parameters from the dataUnit.  First
@@ -92,6 +93,9 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	 * @param dataUnit
 	 */
 	private void setFields(PamDataUnit dataUnit) {
+		
+		objectData = initializeObjectData();
+		
 		DataUnitBaseData baseData = dataUnit.getBasicData();
 		
 		// transfer over the data common to all data unit types

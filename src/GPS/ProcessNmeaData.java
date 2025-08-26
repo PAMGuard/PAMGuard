@@ -98,7 +98,7 @@ public class ProcessNmeaData extends PamProcess {
 //			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
 //		}
 
-		gpsDataBlock.setNaturalLifetime(1);
+		gpsDataBlock.setNaturalLifetimeSeconds(1);
 		if (PamModel.getPamModel() != null) {
 			PamModel.getPamModel().setGpsDataBlock(gpsDataBlock);
 		}

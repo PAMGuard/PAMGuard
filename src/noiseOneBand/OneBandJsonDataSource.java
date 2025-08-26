@@ -1,15 +1,22 @@
 package noiseOneBand;
 
+
 import Array.ArrayManager;
 import Array.Streamer;
 import PamguardMVC.PamDataUnit;
 import jsonStorage.JSONObjectDataSource;
+
 
 public class OneBandJsonDataSource extends JSONObjectDataSource<OneBandJsonData>{
 	
 	public OneBandJsonDataSource() {
 		super();
 		objectData = new OneBandJsonData();
+	}
+	
+	protected OneBandJsonData initializeObjectData() {
+		return new OneBandJsonData();
+
 	}
 	
 	@Override

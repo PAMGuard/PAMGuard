@@ -1,5 +1,6 @@
 package networkTransfer.receive.status.base;
 
+
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import jsonStorage.JSONObjectDataSource;
@@ -21,6 +22,11 @@ public class NetReceiveJsonDataSource extends JSONObjectDataSource<NetReceiveJso
 		objectData.nBuoysRegistered = netUnit.getnBuoysRegistered();
 		objectData.pamguardRunState = netUnit.getPamguardRunState();
 		objectData.pamguardUptimeMillis = netUnit.getPamguardUptimeMillis();
+	}
+	
+	protected NetReceiveJsonData initializeObjectData() {
+		return new NetReceiveJsonData();
+
 	}
 
 	@Override

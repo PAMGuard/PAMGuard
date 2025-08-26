@@ -390,6 +390,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	 * @param dataUnit
 	 */
 	public void updateObservers(PamDataUnit dataUnit) {
+		System.out.println("Updating observers for du of type "+dataUnit.getParentDataBlock().getDataName());
 		int n = countObservers();
 		for (int i = 0; i < n; i++) {
 			getPamObserver(i).updateData(this, dataUnit);

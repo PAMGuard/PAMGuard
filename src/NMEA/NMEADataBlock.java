@@ -26,7 +26,7 @@ public class NMEADataBlock extends PamDataBlock<NMEADataUnit> {
 		 when the next scentence of that id arrives. But leave the timer running to delete them anyway
 		 after a minute.
 		*/
-		setNaturalLifetime(20);
+		setNaturalLifetimeSeconds(20);
 		//setNaturalLifetime(86400);
 	}
 	
@@ -205,7 +205,7 @@ public class NMEADataBlock extends PamDataBlock<NMEADataUnit> {
 		super.removeOldUnitsT(currentTimeMS);
 		int unitsRemoved = 0;
 		PamDataUnit pamUnit;
-		long firstWantedTime = currentTimeMS - this.naturalLifetime * 1000;
+		long firstWantedTime = currentTimeMS - this.getNaturalLifetimeSeconds() * 1000;
 		// go through the units in reverse order - that way when they are 
 		// deleted the indec of others will be OK.
 		for (int i = this.getUnitsCount()-1; i >= 0; i--) {

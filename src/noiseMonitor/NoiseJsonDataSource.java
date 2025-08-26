@@ -24,6 +24,11 @@ public class NoiseJsonDataSource extends JSONObjectDataSource<NoiseJsonData>{
 		objectData = new NoiseJsonData();
 	}
 	
+	protected NoiseJsonData initializeObjectData() {
+		return new NoiseJsonData();
+
+	}
+	
 	@Override
 	protected String getAdditionalJson(PamDataUnit dataUnit) {
 		if(bandNames==null) {

@@ -1726,4 +1726,9 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	public void setEmbryonic(boolean embryonic) {
 		this.embryonic = embryonic;
 	}
+	
+	public PamDataUnit cloneIfAllowed() throws CloneNotSupportedException{
+		return (PamDataUnit) this.clone();
+	}
+	
 }

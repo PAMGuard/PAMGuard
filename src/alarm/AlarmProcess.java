@@ -244,7 +244,7 @@ public class AlarmProcess extends PamProcess {
 			alarmCounter = new SimpleAlarmCounter(alarmControl, dataSource);
 		}
 		resetCount();
-		alarmDataBlock.setNaturalLifetime(alarmControl.alarmParameters.getHoldSeconds());
+		alarmDataBlock.setNaturalLifetimeSeconds(alarmControl.alarmParameters.getHoldSeconds());
 		if (alarmControl.alarmOfflineTask != null) {
 			alarmControl.alarmOfflineTask.setParentDataBlock(dataSource);
 		}

@@ -323,7 +323,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	}
 	
 	public void subscribeListener(String topic, IMqttMessageListener listener) throws MqttException {
-		mqttClient.subscribe(topic, 2, listener);
+		mqttClient.subscribe(topic, 1, listener);
 	}
 	
 	private String getBaseTransmitTopic() {
@@ -428,7 +428,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
         	System.out.println("Setting memory persistance directory to "+this.networkParams.persistenceDirectory);
         	persistence = new CustomFilePersistence(this.networkParams.persistenceDirectory);
         }else {
-        	//persistence = new MemoryPersistence();
+        	System.out.println("Failed to set client file persistance. There will be no persistance confifured for MQTT.");//persistence = new MemoryPersistence();
         }
 	}
 	

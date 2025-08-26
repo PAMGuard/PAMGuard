@@ -13,6 +13,11 @@ public class ClickJSONDataSource extends JSONObjectDataSource<ClickJSONData> {
 		super();
 		objectData = new ClickJSONData();
 	}
+	
+	protected ClickJSONData initializeObjectData() {
+		return new ClickJSONData();
+
+	}
 
 	
 	@Override

@@ -50,7 +50,7 @@ public class RoccaLoggingDataBlock extends PamDataBlock<RoccaLoggingDataUnit> {
 		super(RoccaLoggingDataUnit.class, "Rocca Whistle Stats", parentProcess, channelMap);
         this.roccaProcess = (RoccaProcess) parentProcess;
         //this.setNaturalLifetime(Integer.MAX_VALUE/1000);	
-        this.setNaturalLifetime(10);
+        this.setNaturalLifetimeSeconds(10);
     }
 
     /**

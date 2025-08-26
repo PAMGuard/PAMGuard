@@ -25,9 +25,7 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 	
 	public int stationId2;
 		
-	public int sendingFormat;
-		
-	
+	public int sendingFormat = NETWORKSEND_BYTEARRAY;	
 	
 	/**
 	 * Max number of queued Objects. 

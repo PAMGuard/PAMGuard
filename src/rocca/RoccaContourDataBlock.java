@@ -296,7 +296,7 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
 	public RoccaContourDataBlock(PamProcess parentProcess, int channelMap) {
 		super(RoccaContourDataUnit.class, "Rocca Contour", parentProcess, channelMap);
         this.roccaProcess = (RoccaProcess) parentProcess;
-        this.setNaturalLifetime(Integer.MAX_VALUE/1000);
+        this.setNaturalLifetimeSeconds(Integer.MAX_VALUE/1000);
         int[] spClassCount = roccaProcess.roccaControl.roccaSidePanel.getSpeciesClassCount();
         if (spClassCount != null) {
         	this.treeVotes = new double[spClassCount.length];
