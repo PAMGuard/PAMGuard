@@ -4,7 +4,7 @@ import PamUtils.PamCalendar;
 
 public class GeneralUptimeCommand extends ExtCommand{
 	
-	private final static String name = "GeneralUptime";
+	private final static String name = "generaluptime";
 
 	public GeneralUptimeCommand() {
 		super(name, true);
@@ -13,13 +13,19 @@ public class GeneralUptimeCommand extends ExtCommand{
 
 	@Override
 	public String execute(String command) {
-		if(PamController.PamController.getInstance().getPamStatus()!=PamController.PamController.PAM_RUNNING) {
+		try {
+			if(PamController.PamController.getInstance().getPamStatus()!=PamController.PamController.PAM_RUNNING) {
+				return "0";
+			}
+			long now = PamCalendar.getTimeInMillis();
+			long sessionStart = PamCalendar.getSessionStartTime();
+			long sessionRuntime = now-sessionStart;
+			return Long.toString(sessionRuntime);
+		}catch(Exception e) {
+			System.out.println("Caught exception attemping to return general uptime. Error: "+e.getMessage());
 			return "0";
 		}
-		long now = PamCalendar.getTimeInMillis();
-		long sessionStart = PamCalendar.getSessionStartTime();
-		long sessionRuntime = now-sessionStart;
-		return Long.toString(sessionRuntime);
+		
 	}
 
 }
