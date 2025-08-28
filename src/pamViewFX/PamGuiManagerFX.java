@@ -135,7 +135,12 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 	private Scene scene; 
 
-	private static PamGuiManagerFX instance; 
+	private static PamGuiManagerFX instance;
+
+	/*
+	 * The default padding for panes. 
+	 */
+	public static Insets defaultPadding = new Insets(5,5,5,5);
 
 	public PamGuiManagerFX(PamController pamController, Object stage) {
 

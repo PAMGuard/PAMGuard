@@ -1,5 +1,7 @@
 package pamViewFX.pamTask;
 
+import PamUtils.worker.PamWorkProgressMessage;
+
 /**
  * Simple implementation of PAMTaskUpdate which returns 100% by default. 
  * @author Jamie Macaulay
@@ -15,6 +17,12 @@ public class SimplePamTaskUpdate extends PamTaskUpdate {
 	
 	public SimplePamTaskUpdate(String name, int status) {
 		this.name=name;
+		this.status=status;
+	}
+	
+	
+	public SimplePamTaskUpdate(PamWorkProgressMessage message) {
+		if (message.textLines!=null && message.textLines.length>0) this.name=message.textLines[0];
 		this.status=status;
 	}
 

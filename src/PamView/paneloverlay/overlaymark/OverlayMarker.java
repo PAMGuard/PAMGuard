@@ -165,8 +165,8 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 		boolean wasMarking = nowMarking;
 		mouseIsDown = false;
 		
-		//System.out.println("OverlayMarker: Mouse released!: " + e.isPopupTrigger()); 
-
+//		System.out.println("OverlayMarker: Mouse released!: " + e.isPopupTrigger()); 
+		
 		if (e.isPopupTrigger()) {
 //			Debug.out.println("OverlayMark: Mouse released!!!"); 
 			//System.out.println("OverlayMark: Mouse released: show SWING pop up menu:"); 
@@ -372,6 +372,8 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 	 */
 	@Override
 	public boolean mouseClicked(MouseEvent e) {
+		
+		//System.out.println("OverlayMarker: Mouse Clicked: " + e.getClickCount() + " Current mark: " + this.currentMark + " class: " + this);
 
 		//might need to destroy a mark 
 		if (e.getClickCount() == 2 && currentMark != null) {

@@ -602,8 +602,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			recordButton=new PamButton("Process");
 //			recordButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CIRCLE, Color.LIMEGREEN, PamGuiManagerFX.iconSize));
 			recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, 30));
-			recordButton.getStyleClass().add("transparent-button");
-			recordButton.setStyle(" -fx-padding: 1 1 1 1");
+			//recordButton.getStyleClass().add("transparent-button");
+			recordButton.setStyle(" -fx-padding: 1 15 1 5");
 			
 			recordButton.setOnAction((action)->{
 				if (PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING){
