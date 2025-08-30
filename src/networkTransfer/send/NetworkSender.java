@@ -405,29 +405,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			}*/
 		}
 	}
-	
-	private class ConnectionResetTimer implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			timerCall();
-		}
-	}
-
-	public void timerCall() {
-		if(client.requireReconnect) {
-			System.out.println("Attempting to reinitialize client");
-			client.removeWarning();
-			client.disconnect();
-			client.additionalClose();
-			initializeClient();
-			runClient();
-		}
-	}
-	
-	public void runClientCheckTimer() {
-		Timer t = new Timer(20000, new ConnectionResetTimer());
-		t.start();
-	}
 
 	public String getStatus() {
 		if(client==null) {
