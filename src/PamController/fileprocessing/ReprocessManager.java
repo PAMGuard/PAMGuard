@@ -42,10 +42,11 @@ public class ReprocessManager {
 	public void startCheckingThread(Frame mainFrame, ReprocessManagerMonitor mon) {
 		CheckWorker checkWorker = new CheckWorker(mainFrame, mon);
 		checkWorker.execute();	
-		synchronized (synch) {
-			workDialog = new PamWorkDialog(mainFrame, 1, "Checking input files and existing output data");
-		}
 		if(PamGUIManager.getGUIType()!=PamGUIManager.NOGUI) {
+			synchronized (synch) {
+				workDialog = new PamWorkDialog(mainFrame, 1, "Checking input files and existing output data");
+			}	
+			
 			workDialog.setVisible(true);
 		}
 		
