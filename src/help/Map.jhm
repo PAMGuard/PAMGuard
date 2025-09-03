@@ -110,6 +110,8 @@
 
 <mapID target="visual_methods.loggerFormsHelp.docs.BEARING" url="visual_methods/loggerFormsHelp/docs/BEARING.html"/>
 
+<mapID target="overview.PamMasterHelp.docs.internalstorage" url="overview/PamMasterHelp/docs/internalstorage.html"/>
+
 <mapID target="sensors.analogarray.docs.analogarrayconfig" url="sensors/analogarray/docs/analogarrayconfig.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_ManagingQueue" url="localisation/difar/difarLocalisation/docs/difar_ManagingQueue.html"/>
