@@ -11,37 +11,37 @@ import wavFiles.xwav.XWavException;
 
 public class WavHeader {
 
-	
 	private int fmtTag;
-	
+
 	private short nChannels = 0, blockAlign = 0, bitsPerSample = 0;
-	
+
 	private int sampleRate = 0, bytesPerSec = 0;
-	
+
 	private boolean headerOk = false;
 
 	private long dataStart;
-	
+
 	private long dataSize;
-	
+
 	private ArrayList<WavHeadChunk> wavHeadChunks = new ArrayList<WavHeadChunk>();
 
 	private long headerSize;
 
 	private HarpHeader harpHeader;
-	
+
 	private static int formatWarnings = 0;
-	
-	
+
 	/**
-	 * Construct a blank Wav Header object, generally used when about to read a header from a file. 
+	 * Construct a blank Wav Header object, generally used when about to read a
+	 * header from a file.
 	 */
 	public WavHeader() {
 	}
-	
+
 	/**
-	 * Construct a WavHeader from a Java AudioFormat. 
-	 * @param audioFormat Java audio format. 
+	 * Construct a WavHeader from a Java AudioFormat.
+	 * 
+	 * @param audioFormat Java audio format.
 	 */
 	public WavHeader(AudioFormat audioFormat) {
 		this.fmtTag = 1;
@@ -49,15 +49,17 @@ public class WavHeader {
 		this.blockAlign = (short) audioFormat.getFrameSize();
 		this.bitsPerSample = (short) audioFormat.getSampleSizeInBits();
 		this.sampleRate = (int) audioFormat.getSampleRate();
-		this.bytesPerSec = audioFormat.getFrameSize()*sampleRate;
+		this.bytesPerSec = audioFormat.getFrameSize() * sampleRate;
 		this.headerOk = true;
 		this.dataStart = 0;
 		this.dataSize = 0;
 	}
+
 	/**
-	 * Read the header data from file. 
+	 * Read the header data from file.
+	 * 
 	 * @param windowsWavFile Windows file
-	 * @return true if header unpacked successfully. 
+	 * @return true if header unpacked successfully.
 	 */
 	public boolean readHeader(WindowsFile windowsWavFile) {
 
@@ -65,7 +67,7 @@ public class WavHeader {
 		if (windowsWavFile == null) {
 			return false;
 		}
-		
+
 		try {
 			windowsWavFile.seek(0);
 		} catch (IOException e1) {
@@ -92,14 +94,19 @@ public class WavHeader {
 				System.err.println("Not a valid RIFF file: " + windowsWavFile.getFile());
 				return false;
 			}
-			if (totalSize < 36) {
-				System.err.println("Not a valid RIFF file: " + windowsWavFile.getFile() + " - total size is too small: " + totalSize);
+			if (totalSize < 8) {
+				/**
+				 * RTSys files have written totalSize as 8, when it should be the total size of
+				 * the file - 8 ! See https://en.wikipedia.org/wiki/WAV
+				 */
+				System.err.println("Not a valid RIFF file: " + windowsWavFile.getFile() + " - total size is too small: "
+						+ totalSize);
 				return false;
 			}
 			wave = read4Chars(windowsWavFile);
 			while (true) {
-				// look for the fmt chunk and skip all other chunks in the 
-				// header. 
+				// look for the fmt chunk and skip all other chunks in the
+				// header.
 				filePointer = windowsWavFile.getFilePointer();
 				testChars = read4Chars(windowsWavFile);
 				testString = new String(testChars);
@@ -111,14 +118,16 @@ public class WavHeader {
 					// should now be at the start of the format section
 					fmtSize = windowsWavFile.readWinInt();
 					fmtEnd = windowsWavFile.getFilePointer() + fmtSize;
-					fmtTag =  windowsWavFile.readWinUShort();
+					fmtTag = windowsWavFile.readWinUShort();
 					if (fmtTag == 65534) {
 						/*
-						 * This seems to be a problem when files were created with the R writewave function
-						 * which inserts an invalid format tag. I'm getting it as 65534, but perhaps it's -2 as a signed ? 
+						 * This seems to be a problem when files were created with the R writewave
+						 * function which inserts an invalid format tag. I'm getting it as 65534, but
+						 * perhaps it's -2 as a signed ?
 						 */
 						if (formatWarnings++ < 2) {
-							System.out.printf("Unexpected WAV format %d in file header. Setting to default value\n", fmtTag);
+							System.out.printf("Unexpected WAV format %d in file header. Setting to default value\n",
+									fmtTag);
 						}
 						fmtTag = 1;
 					}
@@ -128,14 +137,13 @@ public class WavHeader {
 					blockAlign = (short) windowsWavFile.readWinShort();
 					bitsPerSample = (short) windowsWavFile.readWinShort();
 					long currPos = windowsWavFile.getFilePointer();
-					int toRead = (int) (fmtEnd-currPos);
+					int toRead = (int) (fmtEnd - currPos);
 					byte[] more = new byte[toRead];
 					windowsWavFile.read(more);
-					
+
 					windowsWavFile.seek(fmtEnd);
-					//			break;
-				}
-				else if (testString.equals("harp")) {
+					// break;
+				} else if (testString.equals("harp")) {
 					chunkSize = windowsWavFile.readWinInt();
 					headChunk = new byte[chunkSize];
 					windowsWavFile.read(headChunk);
@@ -147,15 +155,15 @@ public class WavHeader {
 					}
 					this.harpHeader = harpHeader;
 //					wavHeadChunks.add(new WavHeadChunk(testString, headChunk));
-				}
-				else {
+				} else {
 					/*
-					 * As an example, SCRIPPS HARP .x.wav files have a chunk 
-					 * in here called 'harp', (now dealt with above) an example of which has 29752
-					 * bytes data, beginning  'V2.64 D104NO01CHNMS ...'
-					 * The Tascam files have three additional chunks: 'bext', 'cue ', and 'LIST'
-					 * Possibly some info on bext at https://github.com/Zeugma440/atldotnet/blob/main/ATL/AudioData/IO/Helpers/BextTag.cs
-					 * It would appear that the date string is characters 320 - 329 and time is 330 - 337 (-1). Easy to unpack. 
+					 * As an example, SCRIPPS HARP .x.wav files have a chunk in here called 'harp',
+					 * (now dealt with above) an example of which has 29752 bytes data, beginning
+					 * 'V2.64 D104NO01CHNMS ...' The Tascam files have three additional chunks:
+					 * 'bext', 'cue ', and 'LIST' Possibly some info on bext at
+					 * https://github.com/Zeugma440/atldotnet/blob/main/ATL/AudioData/IO/Helpers/
+					 * BextTag.cs It would appear that the date string is characters 320 - 329 and
+					 * time is 330 - 337 (-1). Easy to unpack.
 					 * 
 					 */
 					chunkSize = windowsWavFile.readWinInt();
@@ -173,8 +181,7 @@ public class WavHeader {
 			dataSize = windowsWavFile.readWinInt();
 			dataSize = checkUintProblem(dataSize);
 			headerSize = dataStart = windowsWavFile.getFilePointer();
-			
-			
+
 		} catch (IOException e) {
 			System.err.println("Error reading header from file " + e.getMessage());
 			return false;
@@ -182,62 +189,61 @@ public class WavHeader {
 		headerOk = true;
 		return true;
 	}
-	
-	/**
-		 * Read the header data from file. 
-		 * @param windowsWavFile Windows file
-		 * @return true if header unpacked successfully. 
-		 */
-		public boolean writeHeader(WindowsFile windowsWavFile) {
-	
-			headerOk = false;
-			if (windowsWavFile == null) {
-				return false;
-			}
-			
-			try {
-				windowsWavFile.seek(0);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				return false;
-			}
-			int headerSize = 40;
-			boolean ok = false;
-			try {
-				ok &= write4Chars(windowsWavFile, "RIFF");
-				int totalSize = (int) (headerSize + dataSize);
-				windowsWavFile.writeWinInt(totalSize); // NEED TO BE TOTAL SIZE OF FILE - 4 FOR RIFF
-				ok &= write4Chars(windowsWavFile, "WAVE");
-				ok &= write4Chars(windowsWavFile, "fmt ");
-				// 16 bytes written so far. 
-				windowsWavFile.writeWinInt(16); // size of format chunk. 
-				windowsWavFile.writeWinShort(1); // PCM format, always 1. 
-				windowsWavFile.writeWinShort(nChannels);
-				windowsWavFile.writeWinInt(sampleRate);
-				windowsWavFile.writeWinInt(bytesPerSec);
-				windowsWavFile.writeWinShort(blockAlign);
-				windowsWavFile.writeWinShort(bitsPerSample);
-				// end of fmt section (16 bytes - 36 so far.)
-				ok &= write4Chars(windowsWavFile, "data");
-				windowsWavFile.writeWinInt((int) dataSize);
-				// 44 bytes written. Then follow the data ...
-				
 
-				dataStart = windowsWavFile.getFilePointer();
-				headerSize = (int) dataStart;
-				
-				
-			} catch (IOException e) {
-				System.err.println("Error writing WAV header to file " + e.getMessage());
-				headerOk = false;
-			}
-			headerOk = ok;
-			return headerOk;
+	/**
+	 * Read the header data from file.
+	 * 
+	 * @param windowsWavFile Windows file
+	 * @return true if header unpacked successfully.
+	 */
+	public boolean writeHeader(WindowsFile windowsWavFile) {
+
+		headerOk = false;
+		if (windowsWavFile == null) {
+			return false;
 		}
+
+		try {
+			windowsWavFile.seek(0);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		int headerSize = 40;
+		boolean ok = false;
+		try {
+			ok &= write4Chars(windowsWavFile, "RIFF");
+			int totalSize = (int) (headerSize + dataSize);
+			windowsWavFile.writeWinInt(totalSize); // NEED TO BE TOTAL SIZE OF FILE - 4 FOR RIFF
+			ok &= write4Chars(windowsWavFile, "WAVE");
+			ok &= write4Chars(windowsWavFile, "fmt ");
+			// 16 bytes written so far.
+			windowsWavFile.writeWinInt(16); // size of format chunk.
+			windowsWavFile.writeWinShort(1); // PCM format, always 1.
+			windowsWavFile.writeWinShort(nChannels);
+			windowsWavFile.writeWinInt(sampleRate);
+			windowsWavFile.writeWinInt(bytesPerSec);
+			windowsWavFile.writeWinShort(blockAlign);
+			windowsWavFile.writeWinShort(bitsPerSample);
+			// end of fmt section (16 bytes - 36 so far.)
+			ok &= write4Chars(windowsWavFile, "data");
+			windowsWavFile.writeWinInt((int) dataSize);
+			// 44 bytes written. Then follow the data ...
+
+			dataStart = windowsWavFile.getFilePointer();
+			headerSize = (int) dataStart;
+
+		} catch (IOException e) {
+			System.err.println("Error writing WAV header to file " + e.getMessage());
+			headerOk = false;
+		}
+		headerOk = ok;
+		return headerOk;
+	}
 
 	private long checkUintProblem(long totalSize) {
 		if (totalSize < 0) {
-			totalSize += (1L<<32);
+			totalSize += (1L << 32);
 		}
 		return totalSize;
 	}
@@ -249,7 +255,7 @@ public class WavHeader {
 		}
 		return chars;
 	}
-	
+
 	private boolean write4Chars(WindowsFile wfile, String chars) throws IOException {
 		byte[] bytes = chars.getBytes();
 		if (bytes.length != 4) {
@@ -258,13 +264,14 @@ public class WavHeader {
 		wfile.write(bytes);
 		return true;
 	}
-	
+
 	/**
-	 *  
-	 * @return all data from the header as an AudioFormat object. 
+	 * 
+	 * @return all data from the header as an AudioFormat object.
 	 */
 	public AudioFormat getAudioFormat() {
-		return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, sampleRate, bitsPerSample, nChannels, blockAlign, sampleRate, false);
+		return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, sampleRate, bitsPerSample, nChannels, blockAlign,
+				sampleRate, false);
 	}
 
 	/**
@@ -374,7 +381,7 @@ public class WavHeader {
 
 	/**
 	 * 
-	 * @return byte number for the start of the data. 
+	 * @return byte number for the start of the data.
 	 */
 	public long getDataStart() {
 		return dataStart;
@@ -393,19 +400,21 @@ public class WavHeader {
 	public long getDataSize() {
 		return dataSize;
 	}
-	
+
 	/**
-	 * Get the number of additional chunks in the wav header. 
-	 * @return the number of additional chunks in the wav header. 
+	 * Get the number of additional chunks in the wav header.
+	 * 
+	 * @return the number of additional chunks in the wav header.
 	 */
 	public int getNumHeadChunks() {
 		return wavHeadChunks.size();
 	}
-	
+
 	/**
-	 * Get a chunk from the wav header. 
+	 * Get a chunk from the wav header.
+	 * 
 	 * @param iChunk chunk number
-	 * @return Chunk read from wav header. 
+	 * @return Chunk read from wav header.
 	 */
 	public WavHeadChunk getHeadChunk(int iChunk) {
 		return wavHeadChunks.get(iChunk);
