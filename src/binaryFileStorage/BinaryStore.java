@@ -73,6 +73,7 @@ import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import pamScrollSystem.ViewLoadObserver;
+import pamViewFX.PamGuiManagerFX;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamguard.GlobalArguments;
 
@@ -99,7 +100,7 @@ PamSettingsSource, DataOutputStore {
 	public static final String indexFileType = "pgdx";
 
 	public static final String settingsFileType = "psfx";
-	
+
 	public static final String noiseFileType = "pgnf";
 
 	/**
@@ -108,7 +109,7 @@ PamSettingsSource, DataOutputStore {
 	 * the binary base data. 
 	 */
 	private static int CURRENT_FORMAT = 7;
-	
+
 	/**
 	 * Maximum format that can be understood by this build of PAMGuard.<br>
 	 * If a file is opened with a higher format, then PAMGuard will refuse to process 
@@ -127,23 +128,23 @@ PamSettingsSource, DataOutputStore {
 	private BinarySettingsStorage binarySettingsStorage;
 
 	public static final String defUnitType = "Binary Storage";
-	
+
 	public static final String defUnitName = "Binary Store";
-	
+
 	private DatagramManager datagramManager;
 
 	private DataMapSerialiser dataMapSerialiser;
-	
+
 	private boolean isNetRx;
 
 	private boolean storesOpen;
-	
+
 	//TODO- temp; for debug; 
 	private int nUnits=0;
-	
+
 	// arg name for global change to store name. 
 	public static final String GlobalFolderArg = "-binaryfolder";
-	
+
 	/**
 	 * The FX GUI for binary store
 	 */
@@ -157,7 +158,7 @@ PamSettingsSource, DataOutputStore {
 	private BackupInformation backupInformation;
 
 	private BinaryDataMapMaker dataMapMaker;
-	
+
 	public static int getCurrentFileFormat() { 
 		return CURRENT_FORMAT;
 	}
@@ -168,22 +169,22 @@ PamSettingsSource, DataOutputStore {
 	public static int getMaxUnderstandableFormat() {
 		return CURRENT_FORMAT;
 	}
-	
+
 	/**
 	 * Fixed constructor actions ...
 	 */
 	{
 		this.pamController = PamController.getInstance();
-		
+
 		addPamProcess(binaryStoreProcess = new BinaryStoreProcess(this));
-		
+
 		isNetRx = pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER;
 
 
 		PamSettingManager.getInstance().registerSettings(this);
-		
+
 		datagramManager = new DatagramManager(this);
-		
+
 		dataMapSerialiser = new DataMapSerialiser(this);
 
 		backupInformation = new BackupInformation(new BinaryBackupStream(this));
@@ -200,9 +201,9 @@ PamSettingsSource, DataOutputStore {
 	public BinaryStore(String unitName) {
 		// ignore the given unit name and always call it "Binary Store"
 		super(defUnitType, defUnitName);
-		
+
 		binarySettingsStorage = new BinarySettingsStorage(this);
-		
+
 	}
 
 	@Override
@@ -225,10 +226,21 @@ PamSettingsSource, DataOutputStore {
 
 	@Override
 	public void pamToStart() {
+		System.out.println("BinaryStore.pamToStart");
 		super.pamToStart();
+		System.out.println("BinaryStore.pamToStart 1");
+
 		prepareStores();
+		System.out.println("BinaryStore.pamToStart 2");
+
 		openStores();
+
+		System.out.println("BinaryStore.pamToStart 3");
+
 		binaryStoreProcess.checkFileTimer();
+
+		System.out.println("BinaryStore.pamToStart 4 ");
+
 	}
 
 	@Override
@@ -260,9 +272,9 @@ PamSettingsSource, DataOutputStore {
 	private void openStores() {
 		long dataTime = PamCalendar.getTimeInMillis();
 		long analTime = System.currentTimeMillis();
-		
-		//System.out.println("BinaryStore.OpenStore: Session start time: " + PamCalendar.formatDBDateTime(  PamCalendar.getSessionStartTime(), true) + " sound file time "+ PamCalendar.getSoundFileTimeInMillis()); 	
-		
+
+		System.out.println("BinaryStore.OpenStore: Session start time: " + PamCalendar.formatDBDateTime(  PamCalendar.getSessionStartTime(), true) + " sound file time "+ PamCalendar.getSoundFileTimeInMillis()); 	
+
 		BinaryOutputStream outputStream;
 		if (!checkOutputFolder()) {
 			storesOpen = false;
@@ -280,7 +292,7 @@ PamSettingsSource, DataOutputStore {
 	private boolean checkOutputFolder() {
 		return checkOutputFolder(binaryStoreSettings.getStoreLocation());
 	}
-	
+
 	private boolean checkOutputFolder(String folderPath) {
 		/*
 		 * Check the output folder exists and if it doesn't, then throw up the dialog to select a folder. 
@@ -290,14 +302,20 @@ PamSettingsSource, DataOutputStore {
 			return true;
 		}
 
-		BinaryStoreSettings newSettings = BinaryStorageDialog.showDialog(null, this);
+		BinaryStoreSettings newSettings = null;
+		if (PamGUIManager.isFX()) {
+			newSettings = binaryStoreGUIFX.showDialog(newSettings);
+		}
+		else {
+			newSettings = BinaryStorageDialog.showDialog(null, this);
+		}
 		if (newSettings != null) {
 			binaryStoreSettings = newSettings.clone();
 			folder = new File(folderPath);
 			FileFunctions.setNonIndexingBit(folder);
 			return folder.exists();
 		}
-		
+
 		return false;
 	}
 
@@ -377,15 +395,15 @@ PamSettingsSource, DataOutputStore {
 		return BinaryStoreSettings.serialVersionUID;
 	}
 
-//	@Override
-//	public String getUnitName() {
-//		return "Binary Store";
-//	}
-//
-//	@Override
-//	public String getUnitType() {
-//		return unitType;
-//	}
+	//	@Override
+	//	public String getUnitName() {
+	//		return "Binary Store";
+	//	}
+	//
+	//	@Override
+	//	public String getUnitType() {
+	//		return unitType;
+	//	}
 
 	/**
 	 * Get the name of the current storage folder and 
@@ -432,7 +450,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		return true;
 	}
-	
+
 	public boolean checkCommandLine() {
 		/*
 		 * check to see if there is a command line override of the currently stored folder name. 
@@ -480,7 +498,7 @@ PamSettingsSource, DataOutputStore {
 			System.err.println("Can't set binary store folder: " + e.getLocalizedMessage());
 			return false;
 		}
-		
+
 	}
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
@@ -508,7 +526,7 @@ PamSettingsSource, DataOutputStore {
 		settingsMenu.add(m);
 		return settingsMenu;
 	}
-	
+
 	protected void openBinaryFolder() {
 		File file = new File(binaryStoreSettings.getStoreLocation());
 		if (file.exists() == false || file.isDirectory() == false) {
@@ -520,7 +538,7 @@ PamSettingsSource, DataOutputStore {
 		} catch (IOException e1) {
 			System.out.println("Unable to open folder " + file);
 		}
-		
+
 	}
 
 	class DatagramOptions implements ActionListener {
@@ -537,7 +555,7 @@ PamSettingsSource, DataOutputStore {
 				datagramManager.showDatagramDialog(false);
 			}
 		}
-		
+
 	}
 
 	class BinaryStorageOptions implements ActionListener {
@@ -563,7 +581,7 @@ PamSettingsSource, DataOutputStore {
 						reOpenStores(BinaryFooter.END_UNKNOWN, PamCalendar.getTimeInMillis());
 					}
 				}
-				
+
 			}
 		}
 	}
@@ -592,7 +610,7 @@ PamSettingsSource, DataOutputStore {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	@Override
 	public int getNumSettings() {
 		if (binarySettingsStorage == null) {
@@ -629,14 +647,14 @@ PamSettingsSource, DataOutputStore {
 	}
 
 	private void doInitialStoreChecks(Window mainFrame) {
-//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-			makeInitialDataMap(mainFrame);
-//		}
-//		else if (isNetRx) {
-//			// act as though acquisition is about to start, i.e. open some stores. 
-//			pamToStart(); 
-//			binaryStoreProcess.pamStart();
-//		}
+		//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
+		makeInitialDataMap(mainFrame);
+		//		}
+		//		else if (isNetRx) {
+		//			// act as though acquisition is about to start, i.e. open some stores. 
+		//			pamToStart(); 
+		//			binaryStoreProcess.pamStart();
+		//		}
 	}
 
 	/**
@@ -668,155 +686,155 @@ PamSettingsSource, DataOutputStore {
 			}
 		}
 		//		if (SAILEnable.isEnable()) {
-//			unzipNewData();
-//		}
+		//			unzipNewData();
+		//		}
 		if (binarySettingsStorage != null) {
 			binarySettingsStorage.makeSettingsMap();
 		}
 		createOfflineDataMap(null);
 	}
 
-//	/**
-//	 * Automatically check the binary store folders for tar / zipped folders which will automatically
-//	 * be unpacked and their files copied to the binary data store. 
-//	This is now all done in a more general ZipUnpacker class which handles recordings as well as binary data
-//	 */
-//	private int unzipNewData() {
-//		FileList fileList = new FileList();
-//		String[] fileEnd = new String[1];
-//		fileEnd[0] = ".gz";
-//		ArrayList<File> files = fileList.getFileList(binaryStoreSettings.getStoreLocation(), fileEnd, true);
-//		if (files == null){ 
-//			return 0;
-//		}
-//		System.out.println(String.format("Found %d gz files", files.size()));
-//		for (File aFile:files) {
-//			File tarFile = unzipNewData(aFile);
-//			if (tarFile != null) {
-//				unTarNewData(tarFile);
-//			}
-//		}
-//		return files.size();
-//	}
-//
-//	/**
-//	 * Pull files out of a tar archive and add to binary data. 
-//	 * @param tarFile
-//	 */
-//	private int unTarNewData(File tarFile) {
-//		InputStream is;
-//		TarArchiveInputStream tarInputStream = null;
-//		try {
-//			is = new FileInputStream(tarFile);
-//		} catch (FileNotFoundException e) {
-//			System.out.println("Unable to find tar archive file: " + tarFile);
-//			return 0;
-//		}
-//		try {
-//			tarInputStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", is);
-//		} catch (ArchiveException e) {
-//			System.out.println("Unable to open tar input stream from file " + tarFile);
-//		}
-//		TarArchiveEntry entry = null; 
-//	    try {
-//			while ((entry = (TarArchiveEntry)tarInputStream.getNextEntry()) != null) {
-//				File nextFile = new File(binaryStoreSettings.getStoreLocation(), entry.getName());
-//			    if (entry.isDirectory()) {
-//			    	System.out.println("New directory: " + nextFile.getAbsolutePath());
-//			    	nextFile.mkdirs();
-//			    	continue;
-//			    }
-//			    else {
-//			    	if (nextFile.exists()) {
-//				    	System.out.println("New file already exists. Won't overwrite: " + nextFile.getAbsolutePath());
-//			    		continue; // file already exists. 
-//			    	}
-//			    	System.out.println("Unpack tar file: " + nextFile.getAbsolutePath());
-//			    	/*
-//			    	 *  check the path on the file name since none of the files seem to 
-//			    	 *  be being recognised as folders so don't fire the above isDirectory() 
-//			    	 */
-//			    	String folderName = nextFile.getPath();
-//			    	int lastSep = folderName.lastIndexOf('\\');
-//			    	if (lastSep > 0) {
-//			    		File folder = new File(folderName.substring(0, lastSep));
-//			    		if (folder.exists() == false) {
-//			    			folder.mkdirs();
-//			    		}
-//			    	}
-//			    	OutputStream fileStream = new FileOutputStream(nextFile);
-//			    	org.apache.commons.compress.utils.IOUtils.copy(tarInputStream, fileStream);
-//			    	fileStream.close();
-//			    }
-//			}
-//			tarInputStream.close();
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
-//	    try {
-//			tarInputStream.close();
-//		    is.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return 0;
-//	}
-//
-//	/**
-//	 * Unzip a single file and add to the binary data store. 
-//	 * @param aFile
-//	 */
-//	private File unzipNewData(File aFile) {
-//		String outName = aFile.getAbsolutePath();
-//		String binData = "binData-";
-//		int dateStart = outName.lastIndexOf(binData);
-//		if (dateStart < 0) {
-//			return null;
-//		}
-//		int lastDot = outName.lastIndexOf(".gz");
-//		if (lastDot < 0) {
-//			return null;
-//		}		
-//		outName = outName.substring(0, lastDot);
-//		File outFile = new File(outName);
-//		String dateStr = outName.substring(dateStart+binData.length());
-//		long fileDate = 0;
-//		try {
-//			fileDate = Long.valueOf(dateStr);
-//		}
-//		catch (NumberFormatException e) {
-//			System.err.println("Unable to find date in file name " + outName);
-//			return null;
-//		}
-//		if (fileDate <= binaryStoreSettings.lastZippedFileDate) {
-//			return null;
-//		}
-//		binaryStoreSettings.lastZippedFileDate = fileDate;
-//
-//		if (outFile.exists()) {
-//			return outFile;
-//		}
-//		
-//		try {
-//			InputStream is = new GZIPInputStream(new FileInputStream(aFile));
-//			FileOutputStream out = new FileOutputStream(outFile);
-//			byte[] buffer = new byte[1024];
-//			int bytesRead = 1;
-//			while(bytesRead > 0) {
-//				bytesRead = is.read(buffer);
-//				if (bytesRead > 0) {
-//					out.write(buffer, 0, bytesRead);
-//				}
-//			}
-//
-//			is.close();
-//			out.close();
-//		} catch (IOException e) {
-//			System.err.println("Error with gz file: " + e.getLocalizedMessage());
-//			return null;
-//		}
-//		return outFile;
-//	}
+	//	/**
+	//	 * Automatically check the binary store folders for tar / zipped folders which will automatically
+	//	 * be unpacked and their files copied to the binary data store. 
+	//	This is now all done in a more general ZipUnpacker class which handles recordings as well as binary data
+	//	 */
+	//	private int unzipNewData() {
+	//		FileList fileList = new FileList();
+	//		String[] fileEnd = new String[1];
+	//		fileEnd[0] = ".gz";
+	//		ArrayList<File> files = fileList.getFileList(binaryStoreSettings.getStoreLocation(), fileEnd, true);
+	//		if (files == null){ 
+	//			return 0;
+	//		}
+	//		System.out.println(String.format("Found %d gz files", files.size()));
+	//		for (File aFile:files) {
+	//			File tarFile = unzipNewData(aFile);
+	//			if (tarFile != null) {
+	//				unTarNewData(tarFile);
+	//			}
+	//		}
+	//		return files.size();
+	//	}
+	//
+	//	/**
+	//	 * Pull files out of a tar archive and add to binary data. 
+	//	 * @param tarFile
+	//	 */
+	//	private int unTarNewData(File tarFile) {
+	//		InputStream is;
+	//		TarArchiveInputStream tarInputStream = null;
+	//		try {
+	//			is = new FileInputStream(tarFile);
+	//		} catch (FileNotFoundException e) {
+	//			System.out.println("Unable to find tar archive file: " + tarFile);
+	//			return 0;
+	//		}
+	//		try {
+	//			tarInputStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", is);
+	//		} catch (ArchiveException e) {
+	//			System.out.println("Unable to open tar input stream from file " + tarFile);
+	//		}
+	//		TarArchiveEntry entry = null; 
+	//	    try {
+	//			while ((entry = (TarArchiveEntry)tarInputStream.getNextEntry()) != null) {
+	//				File nextFile = new File(binaryStoreSettings.getStoreLocation(), entry.getName());
+	//			    if (entry.isDirectory()) {
+	//			    	System.out.println("New directory: " + nextFile.getAbsolutePath());
+	//			    	nextFile.mkdirs();
+	//			    	continue;
+	//			    }
+	//			    else {
+	//			    	if (nextFile.exists()) {
+	//				    	System.out.println("New file already exists. Won't overwrite: " + nextFile.getAbsolutePath());
+	//			    		continue; // file already exists. 
+	//			    	}
+	//			    	System.out.println("Unpack tar file: " + nextFile.getAbsolutePath());
+	//			    	/*
+	//			    	 *  check the path on the file name since none of the files seem to 
+	//			    	 *  be being recognised as folders so don't fire the above isDirectory() 
+	//			    	 */
+	//			    	String folderName = nextFile.getPath();
+	//			    	int lastSep = folderName.lastIndexOf('\\');
+	//			    	if (lastSep > 0) {
+	//			    		File folder = new File(folderName.substring(0, lastSep));
+	//			    		if (folder.exists() == false) {
+	//			    			folder.mkdirs();
+	//			    		}
+	//			    	}
+	//			    	OutputStream fileStream = new FileOutputStream(nextFile);
+	//			    	org.apache.commons.compress.utils.IOUtils.copy(tarInputStream, fileStream);
+	//			    	fileStream.close();
+	//			    }
+	//			}
+	//			tarInputStream.close();
+	//		} catch (IOException e1) {
+	//			e1.printStackTrace();
+	//		}
+	//	    try {
+	//			tarInputStream.close();
+	//		    is.close();
+	//		} catch (IOException e) {
+	//			e.printStackTrace();
+	//		}
+	//		return 0;
+	//	}
+	//
+	//	/**
+	//	 * Unzip a single file and add to the binary data store. 
+	//	 * @param aFile
+	//	 */
+	//	private File unzipNewData(File aFile) {
+	//		String outName = aFile.getAbsolutePath();
+	//		String binData = "binData-";
+	//		int dateStart = outName.lastIndexOf(binData);
+	//		if (dateStart < 0) {
+	//			return null;
+	//		}
+	//		int lastDot = outName.lastIndexOf(".gz");
+	//		if (lastDot < 0) {
+	//			return null;
+	//		}		
+	//		outName = outName.substring(0, lastDot);
+	//		File outFile = new File(outName);
+	//		String dateStr = outName.substring(dateStart+binData.length());
+	//		long fileDate = 0;
+	//		try {
+	//			fileDate = Long.valueOf(dateStr);
+	//		}
+	//		catch (NumberFormatException e) {
+	//			System.err.println("Unable to find date in file name " + outName);
+	//			return null;
+	//		}
+	//		if (fileDate <= binaryStoreSettings.lastZippedFileDate) {
+	//			return null;
+	//		}
+	//		binaryStoreSettings.lastZippedFileDate = fileDate;
+	//
+	//		if (outFile.exists()) {
+	//			return outFile;
+	//		}
+	//		
+	//		try {
+	//			InputStream is = new GZIPInputStream(new FileInputStream(aFile));
+	//			FileOutputStream out = new FileOutputStream(outFile);
+	//			byte[] buffer = new byte[1024];
+	//			int bytesRead = 1;
+	//			while(bytesRead > 0) {
+	//				bytesRead = is.read(buffer);
+	//				if (bytesRead > 0) {
+	//					out.write(buffer, 0, bytesRead);
+	//				}
+	//			}
+	//
+	//			is.close();
+	//			out.close();
+	//		} catch (IOException e) {
+	//			System.err.println("Error with gz file: " + e.getLocalizedMessage());
+	//			return null;
+	//		}
+	//		return outFile;
+	//	}
 
 	/* (non-Javadoc)
 	 * @see PamController.OfflineDataSource#createDataMap()
@@ -848,10 +866,10 @@ PamSettingsSource, DataOutputStore {
 	class BinaryDataMapMaker extends SwingWorker<Integer, BinaryMapMakeProgress> {
 
 		private BinaryStore binaryStore;
-		
+
 		private BinaryStoreSettings viewerSettings;
-		
-		
+
+
 		/**
 		 * @param binaryStore
 		 */
@@ -866,11 +884,11 @@ PamSettingsSource, DataOutputStore {
 		protected Integer doInBackground() {
 			try {
 				if (isViewer) {
-//					for some reason, settings get reloaded before this gets to run which reverts it back to old settings. 
+					//					for some reason, settings get reloaded before this gets to run which reverts it back to old settings. 
 					binaryStore.binaryStoreSettings = viewerSettings;
 				}
 				ArrayList<PamDataBlock> streams = getStreamingDataBlocks(true);
-				
+
 				File serFile = new File(binaryStoreSettings.getStoreLocation() + FileParts.getFileSeparator() + "serialisedBinaryMap.data");
 				long serFileDate = Long.MAX_VALUE;
 				if (serFile != null && serFile.exists()) {
@@ -887,7 +905,7 @@ PamSettingsSource, DataOutputStore {
 					return null;
 				}
 				publish(new BinaryMapMakeProgress(BinaryMapMakeProgress.STATUS_COUNTING_FILES, null, 0, 0));
-				
+
 				List<File> fileList = listAllFiles();
 				if (fileList == null) {
 					return null;
@@ -901,12 +919,12 @@ PamSettingsSource, DataOutputStore {
 						publish(new BinaryMapMakeProgress(BinaryMapMakeProgress.STATUS_ANALYSING_FILES, 
 								fileList.get(i).toString(), nFiles, i));
 					}
-					
+
 					boolean killwhatever = false;
-//					if (fileList.get(i).getName().contains("Click_Detector_Click_Detector_Clicks_20140526_105200")) {
-//						System.out.println(fileList.get(i).getName());
-//						killwhatever = true;
-//					}
+					//					if (fileList.get(i).getName().contains("Click_Detector_Click_Detector_Clicks_20140526_105200")) {
+					//						System.out.println(fileList.get(i).getName());
+					//						killwhatever = true;
+					//					}
 					//				Thread.sleep(10);
 					/*
 					 * go through the real data files and check that each one is included in the map
@@ -940,10 +958,10 @@ PamSettingsSource, DataOutputStore {
 				}
 				// don't save the datamap here - need to wait until the datagrams have been created too. 
 				// always save in case the datagrams have changed. 
-//					publish(new BinaryMapMakeProgress(BinaryMapMakeProgress.STATUS_SERIALIZING, null, 0, 0));
-//					System.out.println(String.format("Added %d new files to data map. Total now %d", nNew, nFiles));
-//					dataMapSerialiser.saveDataMaps(binaryStore, streams, serFile);
-//				}
+				//					publish(new BinaryMapMakeProgress(BinaryMapMakeProgress.STATUS_SERIALIZING, null, 0, 0));
+				//					System.out.println(String.format("Added %d new files to data map. Total now %d", nNew, nFiles));
+				//					dataMapSerialiser.saveDataMaps(binaryStore, streams, serFile);
+				//				}
 
 				publish(new BinaryMapMakeProgress(BinaryMapMakeProgress.STATUS_IDLE, "Done", nStreams, nStreams));
 
@@ -970,9 +988,9 @@ PamSettingsSource, DataOutputStore {
 				PamController.getInstance().notifyTaskProgress(new BinaryMapMakeProgress(PamTaskUpdate.STATUS_DONE, "Done", 0, 0));
 			}
 			PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_OFFLINE_DATASTORE);
-//			System.out.println("BinaryDataMapMaker really done " + this);
+			//			System.out.println("BinaryDataMapMaker really done " + this);
 			dataMapMaker = null;
-			
+
 			getInegrityChecker().checkDataStore();
 		}
 
@@ -1010,7 +1028,7 @@ PamSettingsSource, DataOutputStore {
 			streams.get(i).addOfflineDataMap(dm);
 		}
 	}
-	
+
 	/**
 	 * This should get called when the map maker has completed and will check the status of all 
 	 * the datagrams. 
@@ -1025,16 +1043,16 @@ PamSettingsSource, DataOutputStore {
 		 *  still can't save the serialised data here since the datatram Manager is going
 		 *  to make the datagrams in a different thread so they won't be ready yet !  
 		 */
-		
+
 		if (dataMapSerialiser.isHasChanges()) {
 			AWTScheduler.getInstance().scheduleTask(new SaveDataMap());
 		}
 	}
-	
+
 	class SaveDataMap implements Runnable {
 		@Override
 		public void run() {
-//			System.out.println("Save changed serialised data map to " + dataMapSerialiser.getSerialisedFile().getAbsolutePath());
+			//			System.out.println("Save changed serialised data map to " + dataMapSerialiser.getSerialisedFile().getAbsolutePath());
 			dataMapSerialiser.saveDataMaps();
 		}
 	}
@@ -1051,43 +1069,43 @@ PamSettingsSource, DataOutputStore {
 		}
 	}
 
-//	/**
-//	 * Dump all the map data into a serialised file which can be easily read back 
-//	 * in next time PAMGAURD starts. That way, it will only be necessary to 
-//	 * unpack new data map points which should massively speed up data loading
-//	 * for large data sets. 
-//	 * @param streams
-//	 */
-//	public boolean serialiseDataMaps(ArrayList<PamDataBlock> streams) {
-//		File mapFile = new File(binaryStoreSettings.storeLocation + FileParts.getFileSeparator() + "serialisedBinaryMap.data");
-//		OutputStream os;
-//		try {
-//			os = new FileOutputStream(mapFile);
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//			return false;
-//		}
-//		try {
-//			ObjectOutputStream oos = new ObjectOutputStream(os);
-//			OfflineDataMap dm;
-//			Object o;
-//			for (int i = 0; i < streams.size(); i++) {
-//				dm = streams.get(i).getOfflineDataMap(this);
-//				if (dm == null) {
-//					continue;
-//				}
-//				oos.writeObject(streams.get(i).getDataName());
-////				o = ((BinaryOfflineDataMapPoint) dm.getMapPoints().get(0)).getBinaryHeader();
-////				o = dm.getMapPoints();
-//				oos.writeObject(dm.getMapPoints());
-//			}
-//			oos.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return false;
-//		}
-//		return true;
-//	}
+	//	/**
+	//	 * Dump all the map data into a serialised file which can be easily read back 
+	//	 * in next time PAMGAURD starts. That way, it will only be necessary to 
+	//	 * unpack new data map points which should massively speed up data loading
+	//	 * for large data sets. 
+	//	 * @param streams
+	//	 */
+	//	public boolean serialiseDataMaps(ArrayList<PamDataBlock> streams) {
+	//		File mapFile = new File(binaryStoreSettings.storeLocation + FileParts.getFileSeparator() + "serialisedBinaryMap.data");
+	//		OutputStream os;
+	//		try {
+	//			os = new FileOutputStream(mapFile);
+	//		} catch (FileNotFoundException e) {
+	//			e.printStackTrace();
+	//			return false;
+	//		}
+	//		try {
+	//			ObjectOutputStream oos = new ObjectOutputStream(os);
+	//			OfflineDataMap dm;
+	//			Object o;
+	//			for (int i = 0; i < streams.size(); i++) {
+	//				dm = streams.get(i).getOfflineDataMap(this);
+	//				if (dm == null) {
+	//					continue;
+	//				}
+	//				oos.writeObject(streams.get(i).getDataName());
+	////				o = ((BinaryOfflineDataMapPoint) dm.getMapPoints().get(0)).getBinaryHeader();
+	////				o = dm.getMapPoints();
+	//				oos.writeObject(dm.getMapPoints());
+	//			}
+	//			oos.close();
+	//		} catch (IOException e) {
+	//			e.printStackTrace();
+	//			return false;
+	//		}
+	//		return true;
+	//	}
 
 
 	/**
@@ -1108,8 +1126,8 @@ PamSettingsSource, DataOutputStore {
 
 		return fileList;
 	}
-	
-	
+
+
 	/**
 	 * List all the pgdf files in the binary storage folder with the passed prefix
 	 * 
@@ -1130,8 +1148,8 @@ PamSettingsSource, DataOutputStore {
 
 		return fileList;
 	}
-	
-	
+
+
 	/**
 	 * List all the index files in the binary storage folder
 	 * @return List of index files
@@ -1165,7 +1183,7 @@ PamSettingsSource, DataOutputStore {
 			bhf = readHeadAndFoot(file);
 		}
 		if (indexFile == null && bhf != null && bhf.binaryHeader != null) {
-//			writeMissingIndexFile(file, bhf);
+			//			writeMissingIndexFile(file, bhf);
 		}
 
 		return bhf;
@@ -1261,9 +1279,9 @@ PamSettingsSource, DataOutputStore {
 		for (int i = 0; i < nStreams; i++) {
 			aBlock = streams.get(i);
 			binaryDataSource = aBlock.getBinaryDataSource();
-//			System.out.printf("%s,%s,%s,%s,%s,%s\n", binaryDataSource.getModuleName(), binaryHeader.getModuleName(),
-//					binaryDataSource.getModuleType(), binaryHeader.getModuleType(),
-//					binaryDataSource.getStreamName(), binaryHeader.getStreamName());
+			//			System.out.printf("%s,%s,%s,%s,%s,%s\n", binaryDataSource.getModuleName(), binaryHeader.getModuleName(),
+			//					binaryDataSource.getModuleType(), binaryHeader.getModuleType(),
+			//					binaryDataSource.getStreamName(), binaryHeader.getStreamName());
 			if (binaryDataSource.getModuleName().equalsIgnoreCase(binaryHeader.getModuleName()) &&
 					binaryDataSource.getModuleType().equals(binaryHeader.getModuleType()) &&
 					binaryDataSource.getStreamName().equals(binaryHeader.getStreamName())){
@@ -1298,9 +1316,9 @@ PamSettingsSource, DataOutputStore {
 			return null;
 		}
 		BinaryHeader bh = new BinaryHeader();
-//		if (file.getAbsolutePath().contains("Click_Detector_Click_Detector_Clicks_20180823_100006.pgdf")) {
-//			System.out.println(file.getAbsolutePath());
-//		}
+		//		if (file.getAbsolutePath().contains("Click_Detector_Click_Detector_Clicks_20180823_100006.pgdf")) {
+		//			System.out.println(file.getAbsolutePath());
+		//		}
 		if (bh.readHeader(fileStream)) {
 			bhf.binaryHeader = bh;
 			fileFormat = bh.getHeaderFormat();
@@ -1311,7 +1329,7 @@ PamSettingsSource, DataOutputStore {
 		bhf.lastDataTime = bh.getDataDate();
 
 		BinaryFooter bf = new BinaryFooter();
-//		bhf.binaryFooter = bf;
+		//		bhf.binaryFooter = bf;
 		byte[] byteData;
 		int objectDataLength = 0;
 		int moduleVersion = 0;
@@ -1366,9 +1384,9 @@ PamSettingsSource, DataOutputStore {
 			e.printStackTrace();
 		}
 		if (bhf.binaryFooter == null) {
-//			bf.setnObjects(bhf.nDatas);
-//			bf.setDataDate(bhf.lastDataTime);
-//			bf.setAnalysisDate(System.currentTimeMillis());
+			//			bf.setnObjects(bhf.nDatas);
+			//			bf.setDataDate(bhf.lastDataTime);
+			//			bf.setAnalysisDate(System.currentTimeMillis());
 			//			bf.setFileEndReason(BinaryFooter.END_CRASHED);
 			bf = this.rebuildFileFooter(file);
 			if (bf == null) {
@@ -1385,7 +1403,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		return bhf;
 	}
-	
+
 	/**
 	 * Public version of {@link #readHeadAndFoot(File)} method
 	 * 
@@ -1404,10 +1422,10 @@ PamSettingsSource, DataOutputStore {
 	 * @return index file to go with the data file. 
 	 */
 	public File findIndexFile(File dataFile, boolean checkExists) {
-//		String filePath = dataFile.getAbsolutePath();
-//		// check that the last 4 characters are "pgdf"
-//		int pathLen = filePath.length();
-//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
+		//		String filePath = dataFile.getAbsolutePath();
+		//		// check that the last 4 characters are "pgdf"
+		//		int pathLen = filePath.length();
+		//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
 		File newFile = makeIndexFile(dataFile);
 		if (checkExists) {
 			if (!newFile.exists()) {
@@ -1424,10 +1442,10 @@ PamSettingsSource, DataOutputStore {
 	 * @return index file to go with the data file. 
 	 */
 	public File findNoiseFile(File dataFile, boolean checkExists) {
-//		String filePath = dataFile.getAbsolutePath();
-//		// check that the last 4 characters are "pgdf"
-//		int pathLen = filePath.length();
-//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
+		//		String filePath = dataFile.getAbsolutePath();
+		//		// check that the last 4 characters are "pgdf"
+		//		int pathLen = filePath.length();
+		//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
 		File newFile = swapFileType(dataFile, noiseFileType);
 		if (checkExists) {
 			if (!newFile.exists()) {
@@ -1436,22 +1454,22 @@ PamSettingsSource, DataOutputStore {
 		}
 		return newFile;
 	}
-	
+
 	/**
 	 * Create an index file (pgdx) name from a data file (pgdf) file name
 	 * @param dataFile data file name
 	 * @return index file name
 	 */
 	public File makeIndexFile(File dataFile) {
-//		String filePath = dataFile.getAbsolutePath();
-//		// should check that the last 4 characters are "pgdf", but don't 
-//		int pathLen = filePath.length();
-//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
-//		File newFile = new File(newPath);
-//		return newFile;
+		//		String filePath = dataFile.getAbsolutePath();
+		//		// should check that the last 4 characters are "pgdf", but don't 
+		//		int pathLen = filePath.length();
+		//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
+		//		File newFile = new File(newPath);
+		//		return newFile;
 		return swapFileType(dataFile, indexFileType);
 	}
-	
+
 	/**
 	 * Swap a file type from whatever is on the end of datafile
 	 * to newType
@@ -1469,24 +1487,24 @@ PamSettingsSource, DataOutputStore {
 		String newPath = filePath.substring(0, lastDot) + "." + newType;
 		return new File(newPath);
 	}
-	
-//	/**
-//	 * rebuild the index file based on the header and footer information 
-//	 * read from a pgdf file. 
-//	 * @param file pgdf file
-//	 * @param bhf header and footer information
-//	 */
-//	private void writeMissingIndexFile(File file, BinaryHeaderAndFooter bhf) {
-//		try {
-//			
-//			DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
-//			
-//			dos.close();
-//		}
-//		catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
+
+	//	/**
+	//	 * rebuild the index file based on the header and footer information 
+	//	 * read from a pgdf file. 
+	//	 * @param file pgdf file
+	//	 * @param bhf header and footer information
+	//	 */
+	//	private void writeMissingIndexFile(File file, BinaryHeaderAndFooter bhf) {
+	//		try {
+	//			
+	//			DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+	//			
+	//			dos.close();
+	//		}
+	//		catch (IOException e) {
+	//			e.printStackTrace();
+	//		}
+	//	}
 
 	/**
 	 * rewrite the index file. 
@@ -1499,7 +1517,7 @@ PamSettingsSource, DataOutputStore {
 		String fileName = dmp.getBinaryFile(this).getAbsolutePath();
 		String endBit = fileName.substring(fileName.length()-4);
 		String indexName = fileName.substring(0, fileName.length()-4) + "pgdx";
-//		System.out.println(fileName + " change to  " + indexName);
+		//		System.out.println(fileName + " change to  " + indexName);
 		File indexFile = new File(indexName);
 		return rewriteIndexFile(dataBlock, offlineDataMapPoint, indexFile);
 	}
@@ -1520,13 +1538,13 @@ PamSettingsSource, DataOutputStore {
 			return false;
 		}
 		BinaryOutputStream outputStream = new BinaryOutputStream(this, dataBlock);
-		
+
 		BinaryHeader header = dmp.getBinaryHeader();
 		BinaryFooter footer = dmp.getBinaryFooter();
 		ModuleHeader moduleHeader = dmp.getModuleHeader();
 		ModuleFooter moduleFooter = dmp.getModuleFooter();
 		Datagram datagram = dmp.getDatagram();
-		
+
 		if (header == null) {
 			return false; 
 			// can't do anything if there isn't at least a header file !
@@ -1534,7 +1552,7 @@ PamSettingsSource, DataOutputStore {
 
 		outputStream.openPGDFFile(indexFile);
 		outputStream.writeHeader(header.getDataDate(), header.getAnalysisDate());
-		
+
 		/*
 		 * Always write a module header. 
 		 */
@@ -1543,11 +1561,11 @@ PamSettingsSource, DataOutputStore {
 		if (moduleFooter != null) {
 			outputStream.writeModuleFooter(moduleFooter);
 		}
-		
+
 		if (datagram != null) {
 			outputStream.writeDatagram(datagram);
 		}
-		
+
 		/**
 		 * If the file crashed, then there is a strong possibility that the 
 		 * footer won't exist, so make one and flag it as crashed,
@@ -1595,7 +1613,7 @@ PamSettingsSource, DataOutputStore {
 	public boolean loadData(PamDataBlock dataBlock, OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
 		//TODO In principle, this should load a little data just before the main data start - hard to do with binary stores 
 		// though and primary need is for stuff from the database, so leave for now. 
-		
+
 		/**
 		 * First use the map to identify a list of files which will have data 
 		 * between these times. 
@@ -1606,8 +1624,8 @@ PamSettingsSource, DataOutputStore {
 		}
 		ArrayList<BinaryOfflineDataMapPoint> mapPoints = dataMap.getFileList(offlineDataLoadInfo.getStartMillis(), offlineDataLoadInfo.getEndMillis());
 		if (mapPoints.size() == 0) {
-//			System.out.println("No data to load from " + dataBlock.getDataName() + " between " +
-//					PamCalendar.formatDateTime(dataStart) + " and " + PamCalendar.formatDateTime(dataEnd));
+			//			System.out.println("No data to load from " + dataBlock.getDataName() + " between " +
+			//					PamCalendar.formatDateTime(dataStart) + " and " + PamCalendar.formatDateTime(dataEnd));
 			return true;
 		}
 		else {
@@ -1665,15 +1683,15 @@ PamSettingsSource, DataOutputStore {
 		PamDataUnit createdUnit;
 		int moduleVersion = 0;
 
-//				System.out.println(String.format("Loading data from file %s", mapPoint.getBinaryFile().getAbsolutePath()));
+		//				System.out.println(String.format("Loading data from file %s", mapPoint.getBinaryFile().getAbsolutePath()));
 		if (bh.getHeaderFormat() > getMaxUnderstandableFormat()) {
 			System.out.printf("File %s was created with a later version of PAMGuard using format %d\n", mapPoint.getBinaryFile(this), bh.getHeaderFormat());
 			System.out.printf("The maximum understood file version is %d. You must upgrade to a later PAMGuard version\n", getMaxUnderstandableFormat());
 			return false;
 		}
-		
+
 		boolean passedBad = false;
-		
+
 		BinaryObjectData binaryObjectData;
 		while ((binaryObjectData = inputStream.readNextObject(inputFormat)) != null) {
 			//			if (binaryObjectData.getObjectNumber() == 371){
@@ -1700,15 +1718,15 @@ PamSettingsSource, DataOutputStore {
 				dataSink.newDatagram(binaryObjectData);
 				break;
 			default:
-//				if (binaryObjectData.getDataUnitBaseData().getUID() == 115140821) {
-//					System.out.println("Last at " + PamCalendar.formatDBDateTime(binaryObjectData.getDataUnitBaseData().getTimeMilliseconds()));
-//					passedBad = true;
-////					break;
-//				}
+				//				if (binaryObjectData.getDataUnitBaseData().getUID() == 115140821) {
+				//					System.out.println("Last at " + PamCalendar.formatDBDateTime(binaryObjectData.getDataUnitBaseData().getTimeMilliseconds()));
+				//					passedBad = true;
+				////					break;
+				//				}
 				objectTime = binaryObjectData.getTimeMilliseconds();
-//				if (passedBad) {
-//								System.out.println(binaryObjectData.getDataUnitBaseData().getTimeMilliseconds());
-//				}
+				//				if (passedBad) {
+				//								System.out.println(binaryObjectData.getDataUnitBaseData().getTimeMilliseconds());
+				//				}
 				if (objectTime < dataStart) {
 					continue;
 				}
@@ -1717,7 +1735,7 @@ PamSettingsSource, DataOutputStore {
 					//							PamCalendar.formatDateTime(objectTime));
 					break;
 				}				
-				
+
 				/**
 				 * Shift channels for binary store
 				 */
@@ -1741,13 +1759,13 @@ PamSettingsSource, DataOutputStore {
 				 * the same base data that they were originally created with. 
 				 */
 				createdUnit.getBasicData().mergeBaseData(binaryObjectData.getDataUnitBaseData());
-				
+
 				if (createdUnit != null) {
 					createdUnit.setDataUnitFileInformation(
 							new DataUnitFileInformation(this, mapPoint.getBinaryFile(this), binaryObjectData.getObjectNumber()));
-					
+
 					unpackAnnotationData(bh.getHeaderFormat(), createdUnit, binaryObjectData, dataSink);
-					
+
 					if (!dataSink.newDataUnit(binaryObjectData, dataBlock, createdUnit)) {
 						return false;
 					}
@@ -1760,7 +1778,7 @@ PamSettingsSource, DataOutputStore {
 
 		return true;
 	}
-	
+
 	/**
 	 * Unpack annotation data. 
 	 * @param createdUnit
@@ -1768,7 +1786,7 @@ PamSettingsSource, DataOutputStore {
 	 * @param dataSink
 	 */
 	protected void unpackAnnotationData(int fileVersion, PamDataUnit createdUnit, BinaryObjectData binaryObjectData, BinaryDataSink dataSink) {
-		
+
 		//System.out.println("Hello annotation  " + binaryObjectData.getAnnotationDataLength());
 		if (binaryObjectData.getAnnotationDataLength() == 0) {
 			return;
@@ -1781,7 +1799,7 @@ PamSettingsSource, DataOutputStore {
 				int nextLength = dis.readShort();
 				String nextIdCode = dis.readUTF();
 				short nextVersion = dis.readShort();
-				
+
 				// 2020/05/13 changed next line from -6 to -8, to match BinaryDataSource.getPackedAnnotationData:
 				// line 294 dos.writeShort(abd.data.length + abd.shortIdCode.length() + 2 + 4 + 2);
 				// see comments just above line 294 for explanation of added numbers
@@ -1800,7 +1818,7 @@ PamSettingsSource, DataOutputStore {
 			return;
 		}		
 	}
-	
+
 	private DataAnnotationType<?> getAnnotationType(String idCode, BinaryDataSink dataSink) {
 		PamDataBlock parentDataBlock = null;
 		DataAnnotationType<?> annotationType = null;
@@ -1858,7 +1876,7 @@ PamSettingsSource, DataOutputStore {
 		@Override
 		public void newDatagram(BinaryObjectData binaryObjectData) {
 		}
-		
+
 	}
 
 	/**
@@ -1896,7 +1914,7 @@ PamSettingsSource, DataOutputStore {
 	 * @return true if file recreated OK, false otherwise. 
 	 */
 	private boolean saveData(File file, PamDataBlock pamDataBlock) {
-		
+
 		BinaryDataSource binarySource = pamDataBlock.getBinaryDataSource();
 		BinaryOutputStream outputStream = new BinaryOutputStream(this, pamDataBlock);
 		binarySource.setBinaryStorageStream(outputStream);
@@ -1939,7 +1957,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		inputFormat = binaryHeader.getHeaderFormat();
 		binaryHeader.setHeaderFormat(outputFormat);
-		
+
 		outputStream.writeHeader(binaryHeader.getDataDate(), binaryHeader.getAnalysisDate());
 		//		ModuleHeader mh = 
 		byte[] moduleHeaderData = binarySource.getModuleHeaderData();
@@ -1966,7 +1984,7 @@ PamSettingsSource, DataOutputStore {
 		long time2 =0;
 		//need to reset counter incase we have unsynced channels. 
 		int previousObjectType = Integer.MAX_VALUE;
-		
+
 		while((binaryObjectData = inputStream.readNextObject(inputFormat)) != null) {
 			switch(binaryObjectData.getObjectType()) {
 			case BinaryTypes.FILE_HEADER:
@@ -1985,9 +2003,9 @@ PamSettingsSource, DataOutputStore {
 				outputStream.storeData(BinaryTypes.BACKGROUND_DATA, binaryObjectData.getDataUnitBaseData(), binaryObjectData);
 				break;
 			default:// it's data !
-//				if (previousObjectType == BinaryTypes.FILE_HEADER) {
-//					System.out.printf("Writing data to file with no module header in %s\n", null)
-//				}
+				//				if (previousObjectType == BinaryTypes.FILE_HEADER) {
+				//					System.out.printf("Writing data to file with no module header in %s\n", null)
+				//				}
 				long t1=System.currentTimeMillis();
 				aDataUnit = storedUnitServer.findStoredUnit(binaryObjectData);
 				long t2=System.currentTimeMillis();
@@ -1999,9 +2017,9 @@ PamSettingsSource, DataOutputStore {
 					aDataUnit.getDataUnitFileInformation().setNeedsUpdate(false);
 					long t12=System.currentTimeMillis();
 					time2+=t12-t11;
-					
+
 					if (n%500==0){
-//						System.out.println("BinaryStore: "+n+" data units found in "+time+" ms and save in: "+time2+ "  "+nUnits+ " out of 500 saved without list reset " );
+						//						System.out.println("BinaryStore: "+n+" data units found in "+time+" ms and save in: "+time2+ "  "+nUnits+ " out of 500 saved without list reset " );
 						nUnits=0;
 						time=0;
 						time2=0;
@@ -2009,9 +2027,9 @@ PamSettingsSource, DataOutputStore {
 					n++;
 				}
 				else {
-//					if (n%500==0){
-//						System.out.println("BinaryStore: aDataUnit = null:");
-//					}
+					//					if (n%500==0){
+					//						System.out.println("BinaryStore: aDataUnit = null:");
+					//					}
 					aDataUnit = binarySource.sinkData(binaryObjectData, binaryHeader, oldModuleVersion);
 					if (aDataUnit == null) {
 						continue;
@@ -2025,10 +2043,10 @@ PamSettingsSource, DataOutputStore {
 
 			}
 			previousObjectType = binaryObjectData.getObjectType();
-		
+
 		}
-//		System.out.printf("Finished saving data units in %s ...\n", tempFile.getAbsolutePath());
-		
+		//		System.out.printf("Finished saving data units in %s ...\n", tempFile.getAbsolutePath());
+
 		byte[] moduleFooterData = binarySource.getModuleFooterData(); //saving (copying file)
 		outputStream.writeModuleFooter(moduleFooterData);
 
@@ -2123,7 +2141,7 @@ PamSettingsSource, DataOutputStore {
 			System.out.println("Save serialised binary data map");
 			dataMapSerialiser.saveDataMaps();
 		}
-		
+
 	}
 
 	/**
@@ -2160,20 +2178,20 @@ PamSettingsSource, DataOutputStore {
 				currentUnit = dataUnitIterator.next();
 			}
 		}
-		
+
 		/**
 		 * Finds a data unit which needs storing. 
 		 * @param binaryObjectData
 		 * @return
 		 */
 		public PamDataUnit findStoredUnit(BinaryObjectData binaryObjectData) {
-//			int[] lastPos=new int[PamConstants.MAX_CHANNELS]; 
+			//			int[] lastPos=new int[PamConstants.MAX_CHANNELS]; 
 			int maxSearchNumber=1000;
 			int millisOver=1000;
-			
+
 			if (binaryObjectData.getTimeMilliseconds()<(pamDataBlock.getFirstUnit().getTimeMilliseconds()-millisOver) || 
 					binaryObjectData.getTimeMilliseconds()>pamDataBlock.getLastUnit().getTimeMilliseconds()+millisOver) return null;
-			
+
 			/*
 			 * Often, if detections are saved on a large number of channels, they're not necessarily in chronological order. 
 			 * They are, however roughly in chronological order. The way this function works is to iterate through the binary file to try find the correct data unit. The class maintains it place in
@@ -2181,7 +2199,7 @@ PamSettingsSource, DataOutputStore {
 			 * a data unit will be missed. If this happens, reclassification etc will not be saved. The solution here is to try finding the unit in the remainder of the file- if it's not there try from the beginning.  
 			 */
 			if (currentUnit == null) {
-//				return null;
+				//				return null;
 				/*
 				 * Need to reset this. When loading data which didn't start at the beginning 
 				 * of a file, then when it comes to resave that file, the first clicks 
@@ -2198,11 +2216,11 @@ PamSettingsSource, DataOutputStore {
 			//now find the data unit; 
 			PamDataUnit foundUnit = null;
 			foundUnit=findDataUnit(binaryObjectData, null);
-			
+
 			if (n>maxSearchNumber){ 
 				n=100;
 			}
-		
+
 			for (int i=0; i<n+1; i++){
 				if (dataUnitIterator.hasPrevious()) dataUnitIterator.previous();
 				else break;
@@ -2210,15 +2228,15 @@ PamSettingsSource, DataOutputStore {
 			if (dataUnitIterator.hasNext()) {
 				currentUnit = dataUnitIterator.next();
 			}
-			
-			
-//			if (nUnits%100==0 && currentUnit!=null){
-//				System.out.println("n: " + n+"   "+ currentUnit.getDatabaseIndex());
-//			}
-			
+
+
+			//			if (nUnits%100==0 && currentUnit!=null){
+			//				System.out.println("n: " + n+"   "+ currentUnit.getDatabaseIndex());
+			//			}
+
 			//if the data unit has not been found it may be earlier or later in the list. Use brute force; reset the list iterator and iterate through until the unit is found. 
 			if (foundUnit==null){
-//				System.out.println("BinaryStores: Found unit is null; Resetting");
+				//				System.out.println("BinaryStores: Found unit is null; Resetting");
 				dataUnitIterator=pamDataBlock.getListIterator(0);
 				if (dataUnitIterator.hasNext()) {
 					currentUnit = dataUnitIterator.next();
@@ -2226,7 +2244,7 @@ PamSettingsSource, DataOutputStore {
 				foundUnit=findDataUnit(binaryObjectData, null);
 			}
 			else  nUnits++;
-	
+
 			//if the foundUnit==null it's not in the binary file- the binary file has been completely searched. Continue and return the unit if it needs updating. 
 			if (foundUnit != null) {
 				if (foundUnit.getDataUnitFileInformation().isNeedsUpdate()) {
@@ -2237,36 +2255,36 @@ PamSettingsSource, DataOutputStore {
 					return null;
 				}
 			}
-			
+
 			//the unit has not been found
 			return null;
 		}
-		
-		
+
+
 		private PamDataUnit findDataUnit(BinaryObjectData binaryObjectData, Integer maxNumber){
 			DataUnitFileInformation fileInfo;
 			PamDataUnit foundUnit = null;
 			n=0;
 			while (currentUnit != null) {
 				fileInfo = currentUnit.getDataUnitFileInformation();
-				
-//				System.out.println("IndexFile: "+fileInfo.getIndexInFile() + " ObjectNum: "+  binaryObjectData.getObjectNumber());
-//				System.out.println(fileInfo.getFile().equals(file));
+
+				//				System.out.println("IndexFile: "+fileInfo.getIndexInFile() + " ObjectNum: "+  binaryObjectData.getObjectNumber());
+				//				System.out.println(fileInfo.getFile().equals(file));
 				BinaryStore unitBinary = fileInfo.getBinaryStore();
 				boolean sameBinary = (unitBinary == null && BinaryStore.this.getClass() == BinaryStore.class) 
 						|| unitBinary == BinaryStore.this;
-				
+
 				if (sameBinary &&
 						fileInfo.getIndexInFile() == binaryObjectData.getObjectNumber() &&
 						fileInfo.getFile() != null && fileInfo.getFile().equals(file)) {
-					
+
 					if (currentUnit.getTimeMilliseconds() != binaryObjectData.getTimeMilliseconds()) {
 						System.out.println("Non matching time on stored object");
 						return null;
 					}
 					foundUnit = currentUnit;
 				}
-				
+
 				//if we reach the maximum number of iterations return null
 				if (dataUnitIterator.hasNext() && checkN(n, maxNumber)) {
 					currentUnit = dataUnitIterator.next();
@@ -2274,25 +2292,25 @@ PamSettingsSource, DataOutputStore {
 				else {
 					currentUnit = null;
 				}
-				
+
 				if (foundUnit!=null) {
 					lastPos=dataUnitIterator.nextIndex();
 					return foundUnit; 
 				}
 				n++;
 			}
-//			System.out.println("n...: "+n);
+			//			System.out.println("n...: "+n);
 			return null;
 		}
 	}
-	
+
 	private static boolean checkN(Integer n, Integer maxNumber){
 		if (maxNumber==null) return true;
 		if (n<=maxNumber) return true; 
 		return false;		
 	}
-	
-	
+
+
 
 	boolean reportError(String string) {
 		System.out.println(string);
@@ -2320,9 +2338,9 @@ PamSettingsSource, DataOutputStore {
 			File aFile;
 			while (iterator.hasNext()) {
 				aDataUnit = iterator.next();
-//				if (aDataUnit.getUpdateCount() > 0) {
-//					System.out.println(pamDataBlock.getDataName() + " update count " + aDataUnit.getUpdateCount());
-//				}
+				//				if (aDataUnit.getUpdateCount() > 0) {
+				//					System.out.println(pamDataBlock.getDataName() + " update count " + aDataUnit.getUpdateCount());
+				//				}
 				fileInfo = aDataUnit.getDataUnitFileInformation();
 				if (fileInfo == null) {
 					continue;
@@ -2347,7 +2365,7 @@ PamSettingsSource, DataOutputStore {
 				 * If it gets here it's a new file for our list. 
 				 */
 				lastFile = aFile;
-//				System.out.println("Binary store files to alter: " +aFile);
+				//				System.out.println("Binary store files to alter: " +aFile);
 				changedFiles.add(aFile);
 			}
 		}
@@ -2377,7 +2395,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		// run the garbage collector and try again ...
 		r.gc();
-		
+
 		totalMemory = r.totalMemory();
 		maxMemory = r.maxMemory();
 		freeMemory = r.freeMemory();
@@ -2387,7 +2405,7 @@ PamSettingsSource, DataOutputStore {
 		else if (freeMemory + totalMemory < maxMemory - minAmount) {
 			return true;
 		}
-		
+
 		// not enoughmemory, so throw a warning. 
 		JOptionPane.showMessageDialog(null, "System memory is getting low and no more " +
 				"\ndata can be loaded. Select a shorter load time for offline data", 
@@ -2395,7 +2413,7 @@ PamSettingsSource, DataOutputStore {
 
 		return false;
 	}
-	
+
 	/**
 	 * Convenience function to determine whether a data block is beiung written to binary files
 	 * @return only true if binary store is present and the data block subscribes to it.
@@ -2406,7 +2424,7 @@ PamSettingsSource, DataOutputStore {
 		if (hasBinaryStore) {
 			hasBinaryStore = pamDataBlock.getBinaryDataSource().isDoBinaryStore();
 		}
-		
+
 		if (hasBinaryStore && storageParameters.isStoreBinary(pamDataBlock, true)){
 			System.out.println("The PamControlledUnit "+pamDataBlock.getDataName()+ 
 					" subscribed to the Binary Store");
@@ -2423,7 +2441,7 @@ PamSettingsSource, DataOutputStore {
 		BinaryStore dbc = (BinaryStore) PamController.getInstance().findControlledUnit(BinaryStore.getBinaryUnitType());
 		return dbc;
 	}
-	
+
 	/**
 	 * Get the unit type for the binary store. 
 	 * @return the binary store unit type. 
@@ -2439,7 +2457,7 @@ PamSettingsSource, DataOutputStore {
 	public DatagramManager getDatagramManager() {
 		return datagramManager;
 	}
-	
+
 	/**
 	 * Reads the data objects in the passed file, and records the first/last UID, times and sample
 	 * numbers.  Uses the information to create a new BinaryFooter object, and then passes that
@@ -2455,7 +2473,7 @@ PamSettingsSource, DataOutputStore {
 		if (!inputStream.openFile(file)) {
 			return null;
 		}
-		
+
 		int fileFormat = -1;
 		BinaryHeader bh = inputStream.readHeader();
 		if (bh != null) {
@@ -2509,7 +2527,7 @@ PamSettingsSource, DataOutputStore {
 		catch (Exception e) {
 			System.out.println("Error reconstructing damaged file footer: " + e.getMessage());
 		}
-		
+
 		bf.setnObjects(objCount);
 		bf.setDataDate(dataDate);
 		bf.setLowestUID(firstUID);
@@ -2520,7 +2538,7 @@ PamSettingsSource, DataOutputStore {
 		inputStream.closeFile();
 		return bf;
 	}
-	
+
 	/**
 	 * Get the GUI for the PAMControlled unit. This has multiple GUI options 
 	 * which are instantiated depending on the view type. 
@@ -2578,7 +2596,7 @@ PamSettingsSource, DataOutputStore {
 					new BinaryStorageOptions((JFrame) getGuiFrame())));
 			return moduleStatus;
 		}
-		
+
 		return new ModuleStatus(ModuleStatus.STATUS_OK);
 	}
 
@@ -2586,7 +2604,7 @@ PamSettingsSource, DataOutputStore {
 	public BackupInformation getBackupInformation() {
 		return backupInformation;
 	}
-	
+
 	/**
 	 * Store noise in pgdf or pgnf files. 
 	 * @return where noise data are to be stored. 
@@ -2594,7 +2612,7 @@ PamSettingsSource, DataOutputStore {
 	public NoiseStoreType getNoiseStore() {
 		return binaryStoreSettings.getNoiseStoreType();
 	}
-	
+
 	@Override
 	public StoreStatus getStoreStatus(boolean getDetail) {
 		if (binaryStoreStatusFuncs == null) {
@@ -2620,7 +2638,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		return state;
 	}
-  
+
 	@Override
 	public String getDataLocation() {
 		return binaryStoreSettings.getStoreLocation();
@@ -2635,5 +2653,5 @@ PamSettingsSource, DataOutputStore {
 	public BinaryStoreProcess getBinaryStoreProcess() {
 		return binaryStoreProcess;
 	}
-	
+
 }
