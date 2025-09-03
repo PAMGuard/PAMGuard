@@ -226,20 +226,13 @@ PamSettingsSource, DataOutputStore {
 
 	@Override
 	public void pamToStart() {
-		System.out.println("BinaryStore.pamToStart");
 		super.pamToStart();
-		System.out.println("BinaryStore.pamToStart 1");
 
 		prepareStores();
-		System.out.println("BinaryStore.pamToStart 2");
 
 		openStores();
 
-		System.out.println("BinaryStore.pamToStart 3");
-
 		binaryStoreProcess.checkFileTimer();
-
-		System.out.println("BinaryStore.pamToStart 4 ");
 
 	}
 
