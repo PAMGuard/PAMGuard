@@ -206,7 +206,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFileButton.setOnAction( (action) ->{	                
 			selectFolder(false); 
 		});
-		browseFileButton.setTooltip(new Tooltip("Select a folder of files"));
+		browseFileButton.setTooltip(new Tooltip("Select a single or multiple files"));
 
 
 		browseFolderButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize));
@@ -215,7 +215,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFolderButton.setOnAction( (action) ->{	                
 			selectFolder(true);
 		});		
-		browseFolderButton.setTooltip(new Tooltip("Select a single file"));
+		browseFolderButton.setTooltip(new Tooltip("Select a folder"));
 
 
 		fileNames.prefHeightProperty().bind(browseFolderButton.heightProperty());
