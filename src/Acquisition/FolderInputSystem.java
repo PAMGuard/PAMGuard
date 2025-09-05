@@ -470,8 +470,13 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 		else {
 			//FX system
+			
 			PamWorker<FileListData<WavFileType>> worker = wavListWorker.makeFileListProcess(rootList, folderInputParameters.subFolders, true);
+			//pass the worker to the folder input pane so it can show progress.
 			folderInputPane.setFileWorker(worker);
+			
+			System.out.println("FolderInputSystem: Starting makeFileListProcess: " + worker);
+			
 			if (worker!=null) worker.start();
 		}
 
@@ -646,8 +651,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 */
 	public  void newFileList(FileListData<WavFileType> fileListData) {
 
-		//		System.out.printf("Wav list recieved with %d files after %d millis\n",
-		//				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+				System.out.printf("FolderInputSystem: Wav list recieved with %d files after %d millis\n",
+						fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
 		fileListData.sort();
 		allFiles = fileListData.getListCopy();
 
@@ -671,6 +676,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			//Hidden files should not be used in analysis...
 			try {
+				System.out.println("FolderInputSystem: Opening file for audio info: " + file.getName());
 				audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 				AudioFormat audioFormat = audioStream.getFormat();
 				fileSamples = audioStream.getFrameLength();

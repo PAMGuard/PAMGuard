@@ -19,11 +19,14 @@ import Acquisition.pamAudio.PamAudioSettingsPane;
 import Acquisition.pamAudio.WavAudioFile;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorkWrapper;
 import PamUtils.worker.PamWorker;
+import pamViewFX.PamGuiFX;
+import pamViewFX.PamGuiManagerFX;
 
 /**
  * Opens a .sud audio file.
@@ -114,15 +117,21 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 						
 			
 
-						SwingUtilities.invokeLater(() -> {
-							
-						worker.getPamWorkDialog().setLocation(worker.getPamWorkDialog().getX(), 
-									worker.getPamWorkDialog().getY() + 200);
-						worker.getPamWorkDialog().validate();
-						//System.out.println("Sud Audio Stream STARTED: " + soundFile.getName());
+						if (PamGUIManager.isFX()) {
+							//TODO implement FX blocking dialog
 							worker.start();
-						});
-						// this should block AWT thread but won't block if called on another thread..
+						}
+						else {
+							SwingUtilities.invokeLater(() -> {
+								
+							worker.getPamWorkDialog().setLocation(worker.getPamWorkDialog().getX(), 
+										worker.getPamWorkDialog().getY() + 200);
+							worker.getPamWorkDialog().validate();
+							//System.out.println("Sud Audio Stream STARTED: " + soundFile.getName());
+								worker.start();
+							});
+							// this should block AWT thread but won't block if called on another thread..
+						}
 					}
 
 					// this is only ever called if this function is called on another thread other

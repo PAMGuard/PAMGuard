@@ -206,7 +206,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFileButton.setOnAction( (action) ->{	                
 			selectFolder(false); 
 		});
-		browseFileButton.setTooltip(new Tooltip("Select a folder of files"));
+		browseFileButton.setTooltip(new Tooltip("Select a single or multiple files"));
 
 
 		browseFolderButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize));
@@ -215,7 +215,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFolderButton.setOnAction( (action) ->{	                
 			selectFolder(true);
 		});		
-		browseFolderButton.setTooltip(new Tooltip("Select a single file"));
+		browseFolderButton.setTooltip(new Tooltip("Select a folde of files"));
 
 
 		fileNames.prefHeightProperty().bind(browseFolderButton.heightProperty());
@@ -227,6 +227,9 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		progressBar.setMaxWidth(Double.POSITIVE_INFINITY);
 		progressBar.setPrefHeight(10);
 		progressBar.setVisible(false);
+		
+		progressLabel = new Label("Loading files...");
+		progressLabel.setVisible(false);
 
 		//table showing all the wav files
 		//		pamVBox.getChildren().add(createTablePane());
@@ -255,7 +258,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//
 		audioHolderloader = new PamBorderPane(); 
 		
-		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  createTablePane(), 
+		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  progressLabel, createTablePane(), 
 				fileDateText=new Label(), audioHolderloader, utilsLabel, createUtilsPane());
 
 		//allow users to check file headers in viewer mode. 
@@ -452,6 +455,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		currParams.recentFiles.remove(newFile);
 		currParams.recentFiles.add(0, newFile);
 		fillFileList(currParams);
+		this.table.getItems().clear();
 	}
 
 	/**
@@ -626,7 +630,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		}
 
 		progressBar.setVisible(false);
-
+		progressLabel.setVisible(false);
 		//		//folderInputSystem.interpretNewFile(newFile);
 		//		File[] selFiles = currParams.getSelectedFileFiles();
 		//		if (selFiles!=null && selFiles.length > 0) {
@@ -670,6 +674,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		if (worker==null) {
 			progressBar.progressProperty().unbind(); 
+			this.progressLabel.textProperty().unbind();
 			return; 
 		}
 
@@ -677,7 +682,10 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//must ensure this is on the FX thread
 		//Platform.runLater(()->{
 		this.progressBar.progressProperty().bind(worker.getPamWorkProgress().getProgressProperty()); 
+		this.progressLabel.textProperty().bind(worker.getPamWorkProgress().getMessageProperty());
 		progressBar.setVisible(true);
+		progressLabel.setVisible(true);
+
 
 		//}); 
 
