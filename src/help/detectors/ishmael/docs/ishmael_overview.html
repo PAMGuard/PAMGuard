@@ -1,0 +1,65 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Ishmael</title>
+</head>
+
+<body>
+
+	<h1>Ishmael</h1>
+	<h2>Ishmael Detectors Overview</h2>
+	<p>
+		PAMGuard contains three detectors ported from Dave Mellingers <a
+			href="https://repository.library.noaa.gov/view/noaa/11056/noaa_11056_DS1.pdf">Ishmael
+			software</a>.
+	</p>
+	<ol>
+		<li><a href="ishmael_energysum.html">Ishmael energy sum</a></li>
+		<li><a href="ishmael_speccorrelatoin.html">Ishmael
+				spectrogram correlation</a></li>
+		<li><a href="ishmael_matchedfilter.html">Ishmael matched
+				filter</a></li>
+	</ol>
+	<p>
+		These all have application with many different sound types and all
+		feature in the <a
+			href="https://www.pamguard.org/tutorials/getstarted.html">Getting
+			Started</a> PAMGuard tutorial.
+	</p>
+
+	<p>The three detectors vary in their specificity, that is how well
+		they must match the sound's your looking for to be of any use.</p>
+	<p>
+		The <a href="ishmael_energysum.html">energy sum</a> is the least
+		specific of any of the detectors, so will likely pick up any transient
+		sound that has energy in the frequency band of interest. Generally,
+		this detector will work at a very high false alarm rate, but can be
+		useful in screening out data to be further processed with other
+		classifiers.
+	</p>
+	<p>
+		The <a href="ishmael_matchedfilter.html">matched filter</a> is the
+		most specific and really only responds to sounds that exactly match
+		the 'kernel' sound that you've configured it with. Generally, this
+		detector is just too specific for most biological data.
+	</p>
+	<p>
+		The <a href="ishmael_speccorrelatoin.html">spectrogram correlation</a>
+		detector is a bit in the middle of the other two. It will pick out
+		sounds that match it reasonably well, but doesn't require the exact
+		match of the matched filter.
+	</p>
+	
+	<p>The best way to learn about these detectors is to try the <a
+			href="https://www.pamguard.org/tutorials/getstarted.html">Getting
+			Started</a> PAMGuard tutorial.</p>
+
+<br><br>
+	<p CLASS="nextLink">
+		<a href="ishmael_energysum.html">Next: Energy sum detector </a>
+	</p>
+	<br>
+	<br>
+</body>
+</html>
