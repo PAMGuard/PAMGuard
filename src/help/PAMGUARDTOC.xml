@@ -136,6 +136,8 @@
 
    <tocitem text="R, Matlab, Python " target="utilities.BinaryStore.docs.matlabandr" image="topic"/>
 
+   <tocitem text="Binary Store Update " target="utilities.BinaryStore.docs.binarystore_update" image="topic"/>
+
   </tocitem>
   <tocitem text="User Input ">
    <tocitem text="User Input Panel " target="utilities.userInputHelp.docs.userInput" image="topic"/>

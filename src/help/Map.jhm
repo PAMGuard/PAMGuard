@@ -520,6 +520,8 @@
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings" url="localisation/difar/difarLocalisation/docs/difar_CrossingBearings.html"/>
 
+<mapID target="utilities.BinaryStore.docs.binarystore_update" url="utilities/BinaryStore/docs/binarystore_update.html"/>
+
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_clickTabPanelDisplays" url="detectors/clickDetectorHelp/docs/ClickDetector_clickTabPanelDisplays.html"/>
 
 <mapID target="mapping.mapHelp.docs.mapInformationDisplayPanel" url="mapping/mapHelp/docs/mapInformationDisplayPanel.html"/>

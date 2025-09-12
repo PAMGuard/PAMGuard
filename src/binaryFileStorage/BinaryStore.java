@@ -507,7 +507,7 @@ PamSettingsSource, DataOutputStore {
 		});
 		settingsMenu.add(m);
 
-		if (isViewer && SMRUEnable.isEnable()) {
+		if (isViewer) {
 			binaryUpdater = getBinaryUpdater();
 			m = new JMenuItem("Update Old Binary Files ...");
 			m.setToolTipText("Update all binary files to the latest PAMGuard file format");
