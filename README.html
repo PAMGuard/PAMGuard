@@ -443,10 +443,33 @@ name="_Version_2.02.14_October"></a><a name="_2.02.15_December_2014"></a><a
 name="_Version_2.02.16_February"></a><a name="_Version_2.02.17_?????"></a><a
 name="_Version_2.02.18_????"></a>Version 2.02.18 ????</h1>
 
+<p class=MsoNormal><b>New Features</b></p>
+
+<p class=MsoNormal>Options in internal storage management to NOT delete all
+data from memory each time PAMGuard starts. <a
+href="https://www.pamguard.org/olhelp/overview/PamMasterHelp/docs/internalstorage.html">See
+online help</a>. This can be used to stop the map from clearing whenever the acquisition
+resets for unknown reasons. Also updated help for internal storage options.</p>
+
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
-<p class=MsoNormal>ROCCA: Fixed bug that caused contour tracking to crash if
-the contour was close to 0Hz or close to the Nyquist frequency.</p>
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/251">Issue
+251</a>: ROCCA: Fixed bug that caused contour tracking to crash if the contour
+was close to 0Hz or close to the Nyquist frequency.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/250">Issue
+250</a>: Ishmael energy sum and spectrogram correlation detectors not using
+correct min gap between detections. Now fixed. Also added <a
+href="https://www.pamguard.org/olhelp/detectors/ishmael/docs/ishmael_overview.html">help
+for Ishmael detectors</a>.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/249">Issue
+249</a>: Error in LTSA dialog. This was only causing the dialog to fail to
+update to the correct data source, not affecting detection. </p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/247">Issue
+247</a>: Make correct interpretation of invalid speed and heading values (given
+as 102.3knots and 360.0 degrees in the data) </p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -684,9 +707,9 @@ Visualiser, Audacity etc.)</p>
 <h2>Tethys Database</h2>
 
 <p class=MsoNormal>Many users will be aware that we're integrating an interface
-to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard.
-Some basic features are available for testing. If interested, please contact
-the PAMGuard support team. </p>
+to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard. Some
+basic features are available for testing. If interested, please contact the
+PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
@@ -780,11 +803,11 @@ and stop PamObserver Timer to</span></p>
 
 <p class=MsoNormal><span lang=EN-US>force release</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca
-spectrogram pop-up: Whistle and raw data were being cleared before the user had
-time to trace out the whistle, causing PAMGuard to throw an exception.&nbsp;
-Both were already being cleared when the pop-up window is closed, so no need to
-do it here.</span></p>
+<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca spectrogram
+pop-up: Whistle and raw data were being cleared before the user had time to
+trace out the whistle, causing PAMGuard to throw an exception.&nbsp; Both were
+already being cleared when the pop-up window is closed, so no need to do it
+here.</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>DIFAR Module</span></b><span lang=EN-US>:
 Bug crashing the module with null pointer errors fixed.</span></p>
@@ -886,10 +909,10 @@ processing.</span></p>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which
-generates random chirps between around 200 and 800Hz, roughly the frequency
-you'd expect sound from higher frequency baleen whales, such as humpbacks, to
-vocalise at. &nbsp;&nbsp;</span></p>
+<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which generates
+random chirps between around 200 and 800Hz, roughly the frequency you'd expect
+sound from higher frequency baleen whales, such as humpbacks, to vocalise at.
+&nbsp;&nbsp;</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Hiding tool tips. A menu item to
 permanently turn off all tool tips, or tap the Esc' key to turn them off for
@@ -1077,8 +1100,8 @@ font-family:"Times New Roman",serif'>&nbsp;</span></p>
 lang=EN-US> </span></p>
 
 <p class=MsoNormal>Bearing and Group 3D localization modules have been
-thoroughly tested and a number of bugs rectified. Documentation has been
-developed and is available in the online help. Further, a number of example
+thoroughly tested and a number of bugs rectified. Documentation has been developed
+and is available in the online help. Further, a number of example
 configurations have been generated, configuration files for these are available
 in the PAMGuard downloads area <a
 href="http://www.PAMGuard.org/downloads.php?cat_id=3">here</a>.</p>
@@ -1237,11 +1260,11 @@ understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
 Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
-<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
-(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
-should be compatible with this version, and vice-versa. PSF files generated in
-core releases (1.15.xx) can be loaded in this version, but will be converted to
-PSFX files when PAMGuard exits.</p>
+<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13 (release
+13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should be
+compatible with this version, and vice-versa. PSF files generated in core
+releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
+files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1469,8 +1492,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 lang=EN-US> </span>Add support for RS Aqua time format. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Add 15 minute data load option to viewer mode. </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Add 15 minute data load option to viewer mode. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1574,8 +1597,9 @@ lang=EN-US> </span>Bug 439. Can no longer access Spectrogram settings once
 you've selected a Click Detector as Mark Observer</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 440. Measurement Computing Cards not enumerating properly.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 440. Measurement Computing Cards not enumerating
+properly.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>9. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1855,10 +1879,10 @@ lang=EN-US> </span>Added adaptive noise filter to Ishmael Detectors.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Many upgrades to the Sound Playback module, including a
-high-pass filter, gain control, and the ability to mix wavefrom and envelope
-data together to listen to high-frequency clicks and dolphin whistles at the
-same time.</p>
+lang=EN-US> </span>Many upgrades to the Sound Playback module, including a high-pass
+filter, gain control, and the ability to mix wavefrom and envelope data
+together to listen to high-frequency clicks and dolphin whistles at the same
+time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2094,8 +2118,8 @@ off and the Basic Sweep Classifier is testing the amplitude range.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>11. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 393. Rocca module not calculating energy, duty cycle, and windowRMS
-values when manually picking contour points.</p>
+</span>Bug 393. Rocca module not calculating energy, duty cycle, and windowRMS values
+when manually picking contour points.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>12. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2115,9 +2139,9 @@ see new options in main menu.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added Matched Template Click Classifier. Classifies clicks
-based on an ideal template to match and a template to reject. An example of
-this is to classify beaked whale clicks in an environment with dolphin clicks.</p>
+lang=EN-US> </span>Added Matched Template Click Classifier. Classifies clicks based
+on an ideal template to match and a template to reject. An example of this is
+to classify beaked whale clicks in an environment with dolphin clicks.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2537,12 +2561,12 @@ PAMGuard help files (Localisation/Detection Group Localiser).</span></p>
 
 <h3><span lang=EN-US>Display Colours</span></h3>
 
-<p class=MsoNormal><span lang=EN-US>A new system for handling display colours has
-been implemented across all PAMGuard displays. This gives greater flexibility
-to the user to control how data units are shown. For instance, you might simply
-want to show clicks in blue and whistles in green. However, for clicks and
-whistles that have been assigned to a Detection Group, you may want to colour
-them by the colour assigned to the group. </span></p>
+<p class=MsoNormal><span lang=EN-US>A new system for handling display colours
+has been implemented across all PAMGuard displays. This gives greater
+flexibility to the user to control how data units are shown. For instance, you
+might simply want to show clicks in blue and whistles in green. However, for
+clicks and whistles that have been assigned to a Detection Group, you may want
+to colour them by the colour assigned to the group. </span></p>
 
 <h3><span lang=EN-US>Using Old PAMGuard Configurations</span></h3>
 
@@ -2587,10 +2611,10 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Added Copy-to-Clipboard button to Warning dialogs, to store error messages
-and stack trace information on the Windows clipboard. This information can then
-be easily pasted into emails, text documents, etc when contacting PAMGuard
-support.</p>
+</span>Added Copy-to-Clipboard button to Warning dialogs, to store error
+messages and stack trace information on the Windows clipboard. This information
+can then be easily pasted into emails, text documents, etc when contacting
+PAMGuard support.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2758,10 +2782,10 @@ with SoundTrap files. </span></p>
 <h1><a name="_Latest_Version_1.15.06"></a><span lang=EN-US>Version 1.15.06
 November 2016</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>This release contains bug fixes from
-release 1.15.05, mostly concerning the new target motion analysis methods. Bugs
-were found in several places in the system, affecting calculations using all
-three methods: Least Squares, 2D Simplex and 3D Simplex. To the best of our
+<p class=MsoNormal><span lang=EN-US>This release contains bug fixes from release
+1.15.05, mostly concerning the new target motion analysis methods. Bugs were
+found in several places in the system, affecting calculations using all three
+methods: Least Squares, 2D Simplex and 3D Simplex. To the best of our
 knowledge, all issues are now resolved. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
@@ -2860,8 +2884,8 @@ main click detector display. </span></p>
 <p class=MsoNormal><b><span lang=EN-US>Target Motion Analysis</span></b></p>
 
 <p class=MsoNormal><span lang=EN-US>A major piece of work has been undertaken
-to improve the Target Motion tracking with PAMGuard. Details are available in
-the online help. Users of the Click Detector will notice the following changes:</span></p>
+to improve the Target Motion tracking with PAMGuard. Details are available in the
+online help. Users of the Click Detector will notice the following changes:</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2909,9 +2933,9 @@ the future. </span></p>
 
 <p class=MsoNormal><i>Logger Form Design</i></p>
 
-<p class=MsoNormal>A GUI driven system for designing Logger forms has been released.
-Currently, this feature has no online help, but is reasonably intuitive
-compared to the old method of typing directly into the database. </p>
+<p class=MsoNormal>A GUI driven system for designing Logger forms has been
+released. Currently, this feature has no online help, but is reasonably
+intuitive compared to the old method of typing directly into the database. </p>
 
 <p class=MsoNormal><i><span lang=EN-US>Improved Number handling</span></i></p>
 
@@ -3186,13 +3210,13 @@ for details. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>GPS Loading into PAMGuard Viewer. This has been
-modified so that the rules governing GPS data collection and storage also apply
-when loading data from the database. For instance, if you've stored all GPS
-data, you've probably got a record every second in the database which can
-create memory overflows if you try to load a lot of data in the viewer. You can
-now tell PAMGuard to only load a data point every n seconds which will reduce
-the number of points loaded. Useful when making large scale overview maps of a
+</span><span lang=EN-US>GPS Loading into PAMGuard Viewer. This has been modified
+so that the rules governing GPS data collection and storage also apply when
+loading data from the database. For instance, if you've stored all GPS data,
+you've probably got a record every second in the database which can create
+memory overflows if you try to load a lot of data in the viewer. You can now
+tell PAMGuard to only load a data point every n seconds which will reduce the
+number of points loaded. Useful when making large scale overview maps of a
 survey. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4.</span><span
@@ -3294,8 +3318,8 @@ acquisition starts. Fixed. </p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>8.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 238. Viewer mode out of memory error. Have adjusted memory
-allocation to allow more memory for the database interface. Hopefully Fixed. </p>
+</span>Bug 238. Viewer mode out of memory error. Have adjusted memory allocation
+to allow more memory for the database interface. Hopefully Fixed. </p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-AU>9.</span><span lang=EN-AU style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3596,9 +3620,9 @@ audio output from high frequency data. See online help for details. </p>
 
 <p class=MsoNormal><i>Long Term Spectral Average</i> (Sound Processing Group)</p>
 
-<p class=MsoNormal>This module, developed by Douglas Gillespie, calculates the
-long term spectral average of audio data for a spectrogram display. See online
-help for details. </p>
+<p class=MsoNormal>This module, developed by Douglas Gillespie, calculates the long
+term spectral average of audio data for a spectrogram display. See online help
+for details. </p>
 
 <p class=MsoNormal><i>Echo Detector and Sperm Whale IPI Computation</i> (Beta
 only, Sound Measurements Group)</p>
@@ -3663,9 +3687,9 @@ horizon. </p>
 <p class=MsoNormal><i>Improved Filter Options</i></p>
 
 <p class=MsoNormal>Filter options (used as stand-alone filter modules and also
-within many other modules, such as the click detector and the Filtered Noise
-Measurement module) have been improved so that the user can specify arbitrarily
-shaped Finite Impulse Response filters (see online help for details). </p>
+within many other modules, such as the click detector and the Filtered Noise Measurement
+module) have been improved so that the user can specify arbitrarily shaped
+Finite Impulse Response filters (see online help for details). </p>
 
 <p class=MsoNormal><i>Radar Display</i></p>
 
@@ -3687,10 +3711,10 @@ whistle.</p>
      data. Was causing an exception when character input fields were cleared. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Click detector inter click
      interval display was not working in viewer mode. This has been rectified. </li>
- <li class=MsoNormal style='margin-bottom:0cm'>Configuration loading. This has
-     been rationalised since it was often confusing to users. It is now no
-     longer possible to change configurations once PAMGuard has been launched
-     and pressing 'Cancel' on the select dialog causes PAMGuard to exit. </li>
+ <li class=MsoNormal style='margin-bottom:0cm'>Configuration loading. This has been
+     rationalised since it was often confusing to users. It is now no longer
+     possible to change configurations once PAMGuard has been launched and
+     pressing 'Cancel' on the select dialog causes PAMGuard to exit. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Airgun display. If this was
      included in the PAMGuard model before the GPS module it would hang
      PAMGuard. This has been rectified. </li>
@@ -3773,9 +3797,9 @@ other data sources for the PAMGuard viewer. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Database</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Can now copy data from binary
-storage to the database offline for any module having both binary and database
-storage. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>Can now copy data from binary storage
+to the database offline for any module having both binary and database storage.
+</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access
 database (2007 and later *.accdb formats only).</p>
@@ -3868,9 +3892,9 @@ have implemented database storage for output of these modules. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Radar Display: A bug which stopped the radar display from correctly displaying
-bearings to whistles from arrays containing more than two hydrophone elements
-has been fixed. </p>
+</span>Radar Display: A bug which stopped the radar display from correctly
+displaying bearings to whistles from arrays containing more than two hydrophone
+elements has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4075,9 +4099,9 @@ the correct data stream. This has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Whistle classifier has some new features in the classifier training
-panel. It is also now possible to export training data files directly from
-binary data files. </p>
+</span>Whistle classifier has some new features in the classifier training panel.
+It is also now possible to export training data files directly from binary data
+files. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4309,8 +4333,8 @@ column was setting to zero. This is now fixed</p>
 
 <p class=MsoNormal>Ishmael Detectors</p>
 
-<p class=MsoNormal>Better rendering of detection boxes on spectrogram display
-and more meaningful names in spectrogram display menu.</p>
+<p class=MsoNormal>Better rendering of detection boxes on spectrogram display and
+more meaningful names in spectrogram display menu.</p>
 
 <p class=MsoNormal>Sound acquisition</p>
 
@@ -4409,16 +4433,16 @@ results in an approximate 30% speed improvement for that one module. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Sound playback when monitoring using a sound card (previously only
-possible with ASIO sound cards) but see warning in help file about sound card
+</span>Sound playback when monitoring using a sound card (previously only possible
+with ASIO sound cards) but see warning in help file about sound card
 synchronisation.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Wigner time-frequency plot for the click detector. Clicks are NOT
-automatically displayed in the Winger window as they are for the waveform and
-spectrum windows since the Wigner transformation is very time consuming. Clicks
-will be displayed if you select them with the mouse.</p>
+</span>Wigner time-frequency plot for the click detector. Clicks are NOT automatically
+displayed in the Winger window as they are for the waveform and spectrum
+windows since the Wigner transformation is very time consuming. Clicks will be
+displayed if you select them with the mouse.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
