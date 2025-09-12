@@ -1,6 +1,5 @@
 package Acquisition.layoutFX;
 
-import java.awt.GridBagConstraints;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +8,6 @@ import javax.sound.sampled.AudioFormat;
 
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.ToggleSwitch;
-import org.controlsfx.glyphfont.Glyph;
-
 import Acquisition.FileInputParameters;
 import Acquisition.FolderInputParameters;
 import Acquisition.FolderInputSystem;
@@ -40,7 +37,6 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import pamViewFX.PamGuiManagerFX;

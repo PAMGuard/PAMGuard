@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import org.jamdev.jpamutils.wavFiles.WavFile;
-
 import Acquisition.pamAudio.PamAudioFileFilter;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorker;
@@ -21,6 +19,19 @@ import wavFiles.xwav.HarpHeader;
  *
  */
 public class WavListWorker extends FileListWorker<WavFileType> {
+	
+	
+	/**
+	 * If true, load audio file information such as sample rate and number of channels when the file list is created. 
+	 */
+	public boolean loadAudioInfo = false;
+	
+	
+	/**
+	 * The wav file load listener
+	 */
+	private WavLoadListener loadListener = null;
+
 
 	public WavListWorker(FileListUser<WavFileType> fileListUser) {
 		super(fileListUser, new PamAudioFileFilter());
@@ -33,6 +44,11 @@ public class WavListWorker extends FileListWorker<WavFileType> {
 
 	@Override
 	public WavFileType createFile(File baseFile) {
+		WavFileType type = new WavFileType(baseFile);
+		
+		if (loadAudioInfo) {
+			type.getAudioInfo(loadListener);
+		}
 		return new WavFileType(baseFile); 
 	}
 
@@ -48,6 +64,8 @@ public class WavListWorker extends FileListWorker<WavFileType> {
 		}
 		return true;
 	}
+
+	
 
 	@Override
 	public void finaliseFileList(PamWorker<FileListData<WavFileType>> pamWorker,
@@ -109,5 +127,28 @@ public class WavListWorker extends FileListWorker<WavFileType> {
 		}
 		
 	}
+	
+	/**
+	 * Should we load audio file information such as sample rate and number of channels when the file list is created?	
+	 * @return - true if audio info will be loaded on every file.
+	 */
+	public boolean isLoadAudioInfo() {
+		return loadAudioInfo;
+	}
+
+	/**
+	 * Set whether audio file information such as sample rate and number of channels is loaded when the file list is created?	
+	 * Default is false;
+	 * @param loadAudioInfo - true to load audio info
+	 */
+	public void setLoadAudioInfo(boolean loadAudioInfo) {
+		this.loadAudioInfo = loadAudioInfo;
+	}
+
+	public void setWavLoadListener(WavLoadListener laodListener) {
+		this.loadListener = laodListener;
+	
+	}
+
 
 }

@@ -53,7 +53,7 @@ public class PamWorkerProgressFX  {
 		Platform.runLater(()->{
 			if (msg==null )return; 
 			if (msg.progress!=null) {
-				//System.out.println("PamWorkerProgressFX: Progress: " + (msg.progress/100.0)); 
+				//System.out.println("PamWorkerProgressFX: Progress: " + (msg.progress/100.0) + " " + this); 
 				progressProperty.setValue(msg.progress/100.0); 
 			}
 			if (msg.textLines!=null) {
