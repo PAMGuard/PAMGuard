@@ -355,6 +355,7 @@ PamSettingsSource {
 		synchronized (DBControl.class) {
 			try {
 				if (!connection.getConnection().getAutoCommit()) {
+//					System.out.println("Database commit");
 					connection.getConnection().commit();
 				}
 			} catch (SQLException e) {

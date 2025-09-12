@@ -1279,6 +1279,13 @@ public class AcquisitionProcess extends PamProcess {
 		}
 	}
 
+	@Override
+	public boolean isClearAtStart() {
+		// definitely always want to clear raw data at start, whatever about anything else. 
+		return true;
+	}
+
+
 
 
 

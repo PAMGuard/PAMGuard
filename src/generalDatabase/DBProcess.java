@@ -1355,6 +1355,9 @@ public class DBProcess extends PamProcess {
 		} else {
 			dbWriteErrors++;
 		}
+
+		dbCommitter.checkCommit(databaseControll.getConnection());
+		
 		return ok;
 	}
 
