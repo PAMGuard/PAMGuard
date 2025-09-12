@@ -59,6 +59,51 @@ public class AISPositionReport extends AISReport implements Serializable, Manage
 			break;
 		}
 	}
+	
+	/**
+	 * Get the know speed of the vessel. Generally, this is just the
+	 * speedoverground, but in the data unavailable case, this is set
+	 * to 102.3, in which case return 0, so avoid messing up interpolation 
+	 * on the map
+	 * @return
+	 */
+	public double getKnownSpeed() {
+		if (speedOverGround == 102.3) {
+			return 0;
+		}
+		else {
+			return speedOverGround;
+		}
+	}
+	/**
+	 * Get the speed as a string, return "Unknown" if it's set at 102.3
+	 * @return
+	 */
+	public String getSpeedString() {
+		if (speedOverGround == 102.3) {
+			return "Unavailable";
+		}
+		else if (speedOverGround == 102.2) {
+			return ">102.2";
+		}
+		else {
+			return String.format("%3.1f", speedOverGround);
+		}
+	}
+	
+	/**
+	 * Return COG string with degree symbol, or N/A if unavailable
+	 * @return
+	 */
+	public String getCOGString() {
+		if (courseOverGround >= 360) {
+			return "N/A";
+		}
+		else {
+			return String.format("%.1f\u00B0", courseOverGround);
+		}
+	}
+	
 	private boolean unpackAidToNavigationReport(NMEABitArray bitData) {
 		double longitude = bitData.getSignedInteger(164, 191) / 600000.;
 		double latitude = bitData.getSignedInteger(192, 218) / 600000.;

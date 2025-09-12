@@ -47,6 +47,7 @@ import PamModel.PamModel;
 import PamModel.PamProfiler;
 import PamUtils.PamCalendar;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import PamguardMVC.datakeeper.DataKeeper;
 import networkTransfer.receive.BuoyStatusDataUnit;
 
 /**
@@ -689,6 +690,19 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		return processName;
 	}
 
+	/**
+	 * Should all output data from this process be cleared at startup ? 
+	 * Default behaviour is to follow the global value in DataKeeper for real time. 
+	 * For file analysis, we need to avoid going back in time, so clear anyway !
+	 * @return
+	 */
+	public boolean isClearAtStart() {
+		if (PamCalendar.isSoundFile()) {
+			return true;
+		}
+		boolean cas = DataKeeper.getInstance().isClearAtStart();
+		return cas;
+	}
 
 	/**
 	 * Clears all data from all output data blocks of this process.
@@ -696,8 +710,21 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 * start of operations. Can be overridden in some classes
 	 * which don't want to delete existing data or they can set the 
 	 * clearAtStart flag in any data block. 
+	 * <br> will check the isClearAtStart flag to see if we really should clear data at start up
 	 */
 	public void clearOldData() {
+		boolean cas = isClearAtStart();
+		if (cas) {
+			doClearOldData();
+		}
+	}
+	
+	/**
+	 * Clears all data from all output data blocks of this process.
+	 * <br>Does not ask or check, so can bypass the behaviour of 
+	 * clearOldData(), which will check on the datakeeper option to clearatstart. 
+	 */
+	public void doClearOldData() {
 		for (int i = 0; i < outputDataBlocks.size(); i++) {
 			if (outputDataBlocks.get(i).isClearAtStart()) {
 				outputDataBlocks.get(i).clearAll();

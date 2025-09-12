@@ -1,53 +1,115 @@
 <html>
 <head>
-	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
-	<title>Difar Module</title>
+<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET"
+	type="text/css" />
+<title>Difar Module</title>
 </head>
 <body>
-<h1>DIFAR Localisation</h1>
+	<h1>DIFAR Localisation</h1>
 
-<h2>Using the DIFARGram Display</h2>
+	<h2>Using the DIFARGram Display</h2>
 
-<center><img alt="Picture of the DIFAR Localisation Displays" src="./images/DIFARLocalisationDisplays.png" /></center>
+	<center>
+		<img alt="Picture of the DIFAR Localisation Displays"
+			src="./images/DIFARLocalisationDisplays.png" />
+	</center>
 
-<p>When DIFAR clips are processed&nbsp;from the DIFAR queue, they are&nbsp;sent to the DIFAR Localisation display where they&nbsp;are first demultiplexed in order to separate out the signals from the three acoustic&nbsp;sensors. Depending on the bandwidth and frequency resolution, demultiplexing may takes several seconds to perform on a typical 10 &ndash; 30s long clip, longer on slow computers. Progress is shown in the top right of the DIFAR Localisation display.</p>
+	<p>When DIFAR clips are processed&nbsp;from the DIFAR queue, they
+		are&nbsp;sent to the DIFAR Localisation display where they&nbsp;are
+		first demultiplexed in order to separate out the signals from the
+		three acoustic&nbsp;sensors. Depending on the bandwidth and frequency
+		resolution, demultiplexing may takes several seconds to perform on a
+		typical 10 &ndash; 30s long clip, longer on slow computers. Progress
+		is shown in the top right of the DIFAR Localisation display.</p>
 
-<p>The Greeneridge demultiplexer has an inherent mechanism for determining whether a signal contains a correctly multiplexed DIFAR signal.&nbsp;Correct demodulation can only be achieved when the&nbsp;Greeneridge demultiplexer correctly locks onto the&nbsp;7.5 and 15kHz carrier signals. The lock status is also shown in the progress bar, which will be red if the signal is not locked. If the signal doesn&rsquo;t lock, then the clip should be discarded. NB: The AMMC demultiplexer does not presently contain any mechanism for determining whether a clip contains a correctly multiplexed DIFAR signal, thus&nbsp;when using the AMMC demultiplexer user experience and investigation of the directional signals may be required to determine whether the results of demodulation are sensible.</p>
+	<p>The Greeneridge demultiplexer has an inherent mechanism for
+		determining whether a signal contains a correctly multiplexed DIFAR
+		signal.&nbsp;Correct demodulation can only be achieved when
+		the&nbsp;Greeneridge demultiplexer correctly locks onto the&nbsp;7.5
+		and 15kHz carrier signals. The lock status is also shown in the
+		progress bar, which will be red if the signal is not locked. If the
+		signal doesn't lock, then the clip should be discarded. NB: The AMMC
+		demultiplexer does not presently contain any mechanism for determining
+		whether a clip contains a correctly multiplexed DIFAR signal,
+		thus&nbsp;when using the AMMC demultiplexer user experience and
+		investigation of the directional signals may be required to determine
+		whether the results of demodulation are sensible.</p>
 
-<p>The display shows the spectrogram of the processed&nbsp;clip on the left&nbsp;with the DIFARGram on the right. By default, the spectrogram is created from the decimated raw input data (i.e. the omnidirectional hydrophone). Right clicking on the spectrogram allows the operator to display the signals from any of the three demultiplexed signals (i.e. omnidirectional, north-south, and east-west directional signals).</p>
+	<p>The display shows the spectrogram of the processed&nbsp;clip on
+		the left&nbsp;with the DIFARGram on the right. By default, the
+		spectrogram is created from the decimated raw input data (i.e. the
+		omnidirectional hydrophone). Right clicking on the spectrogram allows
+		the operator to display the signals from any of the three
+		demultiplexed signals (i.e. omnidirectional, north-south, and
+		east-west directional signals).</p>
 
-<p>The DIFARGram is a colourmap of energy verses frequency and angle. There should be intense colour at the frequency of the selected sound and also at the angle from which the sound has arrived. To guide the eye a summary line is also displayed which shows the DIFARGram summed between the frequency limits of the clip. The summary line may be turned on and off by right clicking on the DIFARGram. The&nbsp;angle and frequency&nbsp;corresponding to&nbsp;the maximum energy are selected by default, and their values&nbsp;are&nbsp;shown&nbsp;as the <strong>Selection</strong> in the&nbsp;<strong>Info</strong>&nbsp;panel next to the DIFARGram.</p>
+	<p>
+		The DIFARGram is a colourmap of energy verses frequency and angle.
+		There should be intense colour at the frequency of the selected sound
+		and also at the angle from which the sound has arrived. To guide the
+		eye a summary line is also displayed which shows the DIFARGram summed
+		between the frequency limits of the clip. The summary line may be
+		turned on and off by right clicking on the DIFARGram. The&nbsp;angle
+		and frequency&nbsp;corresponding to&nbsp;the maximum energy are
+		selected by default, and their values&nbsp;are&nbsp;shown&nbsp;as the
+		<strong>Selection</strong> in the&nbsp;<strong>Info</strong>&nbsp;panel
+		next to the DIFARGram.
+	</p>
 
-<p>At this time, the bearing calculated for the clip&nbsp;will be displayed on the <a href="../../../mapping/mapHelp/docs/overview.html">PAMGuard map</a>.</p>
+	<p>
+		At this time, the bearing calculated for the clip&nbsp;will be
+		displayed on the <a href="../../../mapping/mapHelp/docs/overview.html">PAMGuard
+			map</a>.
+	</p>
 
-<h3>Buttons and Actions</h3>
+	<h3>Buttons and Actions</h3>
 
-<p>If the operator is happy with the selected maximum, they can simply press the <strong>Save</strong> button. If The <strong>Auto</strong> button is selected, the clip will save automatically after a short delay. Alternately the operator can click anywhere on the DIFARGram to select a different angle and frequency (in which case the bearing displayed on the map will immediately update).</p>
+	<p>
+		If the operator is happy with the selected maximum, they can simply
+		press the <strong>Save</strong> button. If The <strong>Auto</strong>
+		button is selected, the clip will save automatically after a short
+		delay. Alternately the operator can click anywhere on the DIFARGram to
+		select a different angle and frequency (in which case the bearing
+		displayed on the map will immediately update).
+	</p>
 
-<p><strong>Delete</strong> will permanently delete the clip. The clip can also be returned to the DIFAR queue by right clicking anywhere on the DIFARGram and selecting the appropriate menu item.</p>
+	<p>
+		<strong>Delete</strong> will permanently delete the clip. The clip can
+		also be returned to the DIFAR queue by right clicking anywhere on the
+		DIFARGram and selecting the appropriate menu item.
+	</p>
 
-<p>The <strong>Zoom Freq</strong> button causes both the spectrogram display and the DIFARGram to zoom in in frequency to slightly more than the frequency limits of the selected sound.</p>
+	<p>
+		The <strong>Zoom Freq</strong> button causes both the spectrogram
+		display and the DIFARGram to zoom in in frequency to slightly more
+		than the frequency limits of the selected sound.
+	</p>
 
-<p class="previousLink"><a href="difar_ManagingQueue.html">Previous: Managing the Queue</a></p>
+	<p class="previousLink">
+		<a href="difar_ManagingQueue.html">Previous: Managing the Queue</a>
+	</p>
 
-<p class="nextLink"><a href="difar_CrossingBearings.html">Next: Advanced Localisation (Crossed Bearings and Tracked Groups)</a></p>
+	<p class="nextLink">
+		<a href="difar_CrossingBearings.html">Next: Advanced Localisation
+			(Crossed Bearings and Tracked Groups)</a>
+	</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 
-<p>&nbsp;</p>
+	<p>&nbsp;</p>
 </body>
 </html>

@@ -138,4 +138,9 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	String getHelpPoint() {
+		return "detectors.ishmael.docs.ishmael_speccorrelation";
+	}
 }

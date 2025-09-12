@@ -110,4 +110,9 @@ public abstract class IshPaneFX extends SettingsPane<IshDetParams> {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public String getHelpPoint() {
+		return("detectors.ishmael.docs.ishmael_energysum");
+	}
+
 }

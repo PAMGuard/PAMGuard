@@ -40,6 +40,8 @@
 
 <mapID target="localisation.docs.localisation_overview" url="localisation/docs/localisation_overview.html"/>
 
+<mapID target="detectors.ishmael.docs.ishmael_overview" url="detectors/ishmael/docs/ishmael_overview.html"/>
+
 <mapID target="sound_processing.fftManagerHelp.docs.FFTEngine_Configuring" url="sound_processing/fftManagerHelp/docs/FFTEngine_Configuring.html"/>
 
 <mapID target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_setup" url="visual_methods/videoRangeHelp/docs/videoRange_Measuring_setup.html"/>
@@ -109,6 +111,8 @@
 <mapID target="overview.PamMasterHelp.docs.multipleDisplays" url="overview/PamMasterHelp/docs/multipleDisplays.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.BEARING" url="visual_methods/loggerFormsHelp/docs/BEARING.html"/>
+
+<mapID target="overview.PamMasterHelp.docs.internalstorage" url="overview/PamMasterHelp/docs/internalstorage.html"/>
 
 <mapID target="sensors.analogarray.docs.analogarrayconfig" url="sensors/analogarray/docs/analogarrayconfig.html"/>
 
@@ -231,6 +235,8 @@
 <mapID target="overview.PamMasterHelp.docs.mixedMode" url="overview/PamMasterHelp/docs/mixedMode.html"/>
 
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone" url="utilities/hydrophoneArrayManagerHelp/docs/Array_NewHydrophone.html"/>
+
+<mapID target="detectors.ishmael.docs.ishmael_speccorrelation" url="detectors/ishmael/docs/ishmael_speccorrelation.html"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_SavedFiles_contour" url="classifiers/roccaHelp/docs/rocca_SavedFiles.html#contour"/>
 
@@ -373,6 +379,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types" url="detectors/clickDetectorHelp/docs/offline_Reanalyse_click_types.html"/>
 
 <mapID target="sound_processing.beamformer.docs.Beamformer_Output_BF_OutputBeamogram" url="sound_processing/beamformer/docs/Beamformer_Output.html#BF_OutputBeamogram"/>
+
+<mapID target="detectors.ishmael.docs.ishmael_energysum" url="detectors/ishmael/docs/ishmael_energysum.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html"/>
 
@@ -663,6 +671,8 @@
 <mapID target="localisation.difar.difarLocalisation.docs.difar_PostProcessingTutorial__Toc396467168" url="localisation/difar/difarLocalisation/docs/difar_PostProcessingTutorial.html#_Toc396467168"/>
 
 <mapID target="utilities.listening.docs.Listening_Overview" url="utilities/listening/docs/Listening_Overview.html"/>
+
+<mapID target="detectors.ishmael.docs.ishmael_matchedfilter" url="detectors/ishmael/docs/ishmael_matchedfilter.html"/>
 
 <mapID target="sensors.cpod.docs.cpod" url="sensors/cpod/docs/cpod.html"/>
 

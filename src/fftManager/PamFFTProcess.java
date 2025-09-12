@@ -585,6 +585,13 @@ public class PamFFTProcess extends PamProcess {
 			}
 		}
 	}
+	
+	@Override
+	public boolean isClearAtStart() {
+		// definitely always want to clear FFT data at start, whatever about anything else. 
+		return true;
+	}
+
 
 //	@Override
 //	public boolean requestOfflineData(PamDataBlock dataBlock, long startMillis,

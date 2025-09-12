@@ -659,26 +659,21 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menuItem.setToolTipText("Show a graphical representation of modules and their interconnections");
 		fileMenu.add(menuItem);
 
-		if (!isViewer) {
-			fileMenu.add(DataKeeper.getInstance().getSwingMenuItem(frame));
-		}
-
 		menuItem = new JMenuItem("Multi-Threading ...");
 		menuItem.addActionListener(new MenuMultiThreading());
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
-
-		//		if (SMRUEnable.isEnable()) {
-		//			menuItem = new JMenuItem("Create Watchdod ...");
-		//			menuItem.addActionListener(new CreateWatchDog());
-		//			fileMenu.add(menuItem);
-		//		}
+		
+		if (!isViewer) {
+			fileMenu.add(DataKeeper.getInstance().getSwingMenuItem(frame));
+		}
 
 		fileMenu.addSeparator();
 
 		boolean needSeperator = false;
 
-		menuItem = new JMenuItem("Storage Options ...");
+		menuItem = new JMenuItem("External Data Storage ...");
+		menuItem.setToolTipText("Control data storage in the datbase and binary files");
 		menuItem.addActionListener(new StorageOptions(getGuiFrame()));
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);

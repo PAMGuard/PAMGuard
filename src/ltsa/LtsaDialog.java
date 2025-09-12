@@ -72,7 +72,7 @@ public class LtsaDialog extends PamDialog {
 	public boolean getParams() {
 		PamDataBlock dataBlock = sourcePanel.getSource();
 		if (dataBlock != null) {
-			ltsaParameters.dataSource = dataBlock.getDataName();
+			ltsaParameters.dataSource = dataBlock.getLongDataName();
 		}
 		else {
 			return showWarning("No data source selected");
