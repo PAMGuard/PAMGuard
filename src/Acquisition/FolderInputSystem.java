@@ -1057,22 +1057,6 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		this.audioFileFilter = audioFileFilter;
 	}
 
-	/****JavaFX bits***/
-
-	@Override
-	public DAQSettingsPane getDAQSpecificPane(AcquisitionPaneFX acquisitionPaneFX) {
-		if (folderInputPane==null) this.folderInputPane = new FolderInputPane(this, acquisitionPaneFX);
-		return folderInputPane;
-	}
-
-	/**
-	 * Called by AcquisitionDialog.SetParams so that the dialog node can update it's
-	 * fields.
-	 */
-	public void dialogFXSetParams() {
-		folderInputPane.setParams(folderInputParameters);
-	}
-
 	@Override
 	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 
@@ -1190,6 +1174,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		String bs = String.format("%d,%d,%d,%s", nFiles,currentFileIndex,generalStatus,currFile);
 		return bs;
 	}
+	
+	
 	/**
 	 * Extra options for the start menu
 	 * @param component
@@ -1249,4 +1235,22 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	public String getStartButtonToolTip() {
 		return "Press to start processing, or right click for more options";
 	}
+	
+	
+	/****JavaFX bits***/
+
+	@Override
+	public DAQSettingsPane getDAQSpecificPane(AcquisitionPaneFX acquisitionPaneFX) {
+		if (folderInputPane==null) this.folderInputPane = new FolderInputPane(this, acquisitionPaneFX);
+		return folderInputPane;
+	}
+
+	/**
+	 * Called by AcquisitionDialog.SetParams so that the dialog node can update it's
+	 * fields.
+	 */
+	public void dialogFXSetParams() {
+		folderInputPane.setParams(folderInputParameters);
+	}
+
 }

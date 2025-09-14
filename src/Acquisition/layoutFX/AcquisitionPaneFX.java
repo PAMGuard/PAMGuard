@@ -137,6 +137,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	 * Default spacing for VBox 
 	 */
 	private static double defaultHSpacing=5; 
+	
 
 	public AcquisitionPaneFX(AcquisitionControl aquisitionControl){
 		super(null);
@@ -167,6 +168,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//System.out.println("MAKE PANE: "  +  acquisitionParameters.getDaqSystemType());
 
 	} 
+
 	
 //	/**
 //	 * Create the advanced settings pane which can be accessed by DAQ panes if needed. 
@@ -251,6 +253,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 
 		//add listener
 		deviceTypes.setOnAction((value)->{
+			
 			systemPane.setCenter(null);
 			channelMappingHolder.setCenter(null);
 
@@ -531,7 +534,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//set specific panes for the current system 
 		showDAQSpecificPane(currentDaqSystem);
 		showHideChannelPane(currentDaqSystem);
-
+		showStatusBarPane(currentDaqSystem);
 		//newDeviceType();
 
 		setSampleRate(acquisitionParameters.sampleRate);
@@ -609,5 +612,20 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	public TextField getAdvancedLabel() {
 		return this.flipPane.getAdvLabel();
 	}
+	
+	/**
+	 * Set the status bar pane for the current DAQ system. This sits near the record button in the GUI.
+	 * @param currentDaqSystem2
+	 */
+	public void showStatusBarPane(DaqSystem currentDaqSystem2) {
+		System.out.println("SHOW status bar pane for: " + currentDaqSystem2.getSystemType() + " "+ currentDaqSystem2.getDAQSpecificPane(this));
+		//set up the status bar
+		PamGuiManagerFX pamGuiManager = PamGuiManagerFX.getInstance();
+		pamGuiManager.addStatusBarPane(statusBar);
+		
+	}
+
+	public class DAQStatusPaneFactory statusBar;
+	
 
 }

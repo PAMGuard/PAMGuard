@@ -26,8 +26,6 @@ import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorkWrapper;
 import PamUtils.worker.PamWorker;
 import PamUtils.worker.filelist.WavLoadListener;
-import pamViewFX.PamGuiFX;
-import pamViewFX.PamGuiManagerFX;
 
 /**
  * Opens a .sud audio file.
@@ -110,12 +108,12 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 						
 						try {
 							stream = new SudAudioFileReader(sudParams.zeroPad).getAudioInputStream(soundFile, (chunkHeader,  count)->{
-								System.out.println("Sud Map Progress: " + count + " " + loadListener);		
+								//System.out.println("Sud Map Progress: " + count + " " + loadListener);		
 								
 								//transfer sud map listener updates to the more generic wav load listener
 								String message = null;
 								if (count % 500 == 0) {
-									message = new String("Mapping " + count + " sud file chunks for " + soundFile.getName());
+									message = new String("Mapping " + String.format("%07d", count) + " sud file chunks for " + soundFile.getName());
 								}
 								if (count == -1) {
 									message = new String("Mapped sud file " + soundFile.getName());

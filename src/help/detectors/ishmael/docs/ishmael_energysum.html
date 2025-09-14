@@ -17,7 +17,7 @@
 		It can also be used as a first step for a more sophisticated
 		multi-step classification system.</p>
 
-	<h3>Adding the module</h3>
+	<h2>Adding the module</h2>
 	<p>
 		From the PAMGuard file menu select <b>Add Modules > Detectors >
 			Ishmael energy sum.</b>
@@ -28,7 +28,7 @@
 			(Spectrogram) Engine</a> as it's input.
 	</p>
 
-	<h3>Configure the module</h3>
+	<h2>Configure the module</h2>
 	<p>
 		From the PAMGuard Settings menu select <b>Ishmael energy sum
 			Settings ...</b> to open the dialog
@@ -39,6 +39,9 @@
 	</center>
 	</p>
 	<br>
+
+
+	<h3>Data source and channels</h3>
 	<p>Select the FFT data source. You should think carefully about 
 	the best FFT Length and FFT Hop to use based on the sample rate 
 	of your data and the type of sound you are trying to detect. 
@@ -51,9 +54,20 @@
 	to measure time delays between data on the different channels, but only if the 
 	hydrophones in each group are quite close together. </p> 
 
+	<h3>Energy Sum calculation</h3>
+	<p>The Ishmael Energy Sum, detector initially had a static threshold. This means that if the overall noise increased, e.g. due to weather or ship noise, many more sounds would pass over threshold resulting in more false positives. To remedy this, are two potential options,  the use of an "energy ratio" or  an “adaptive threshold” with additional options to smooth the ernergy sum output and/or use log scales. </p>
 
+	<h4>Use Energy Ratio</h4>
+	<p>When enabled the Ishmael detector peak is the ratio of the energy sum between two frequency bands. This can help in situtations when, for example, broadband noise triggers the detector. </p>
 
+	<h4>Use Adaptive Threshold</h4>
+	<p>The adaptive threshold tracks background noise ensuring that the threshold is always some number of dB above the background and thus significantly minimises false detections. The downside of this is that the relative sensitivity of the detector changes with background noise (i.e. the detection range changes with noise). The long filter defines the how noise is tracked - a lower number means a larger averaging window - typical value might be 0.00005. If there is a loud short sound then the adaptive noise filter will take  along time to decay back to normal. If the result reaches Spike Threshold current energy then noise exponentially decays </p>
 
+	<h4>Use Detector Smoothing</h4>
+	<p>Detector smoothing smooths the energy sum output so that small spikes do not trigger the detector - this is useful for longer sounds. A typical value might be 0.1</p>
+
+	<h4>Use Log Scale</h4>
+	<p>The energy sum is calculated from a log scale base ten scale - in other words the threshold values become units of dB</p>
 
 	<br>
 	<br>

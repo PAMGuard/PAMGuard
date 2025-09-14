@@ -6,6 +6,7 @@ import Acquisition.SoundCardSystem;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
@@ -119,6 +120,16 @@ public class SoundCardDAQPane extends DAQSettingsPane {
 	public void paneInitialized() {
 		// TODO Auto-generated method stub
 
+	}
+
+
+
+	@Override
+	public DAQStatusPaneFactory getStatusBarPane() {
+		//TODO
+		PamBorderPane p = new PamBorderPane();
+		p.setCenter(new Label("I am the the Sound Card DAQ status bar"));
+		return p;
 	}
 
 }

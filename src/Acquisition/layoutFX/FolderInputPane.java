@@ -149,6 +149,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	private ToggleButton mergeContigious;
 
 	private PamBorderPane audioHolderloader;
+	
+	public FolderStatusPaneFactory folderStatusPaneFactory = new FolderStatusPaneFactory();
 
 	//	/**
 	//	 * The folder input system. 
@@ -717,6 +719,22 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 			return true; 
 		}
 
+	}
+
+	@Override
+	public DAQStatusPaneFactory getStatusBarPane() {
+		//TODO
+		PamBorderPane p = new PamBorderPane();
+		p.setCenter(new Label("I am the Folder Input Pane DAQ status bar"));
+		return new FolderStatusPaneFactory();
+	}
+	
+	public class FolderStatusPaneFactory extends DAQStatusPaneFactory {
+		
+		public FolderStatusPaneFactory() {
+			super();
+		}
+		
 	}
 
 
