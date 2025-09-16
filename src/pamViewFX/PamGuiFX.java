@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 
 import org.controlsfx.control.ToggleSwitch;
 
+import Acquisition.layoutFX.PaneFactory;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamViewInterface;
@@ -782,13 +783,25 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	
 	/**
 	 * Add a pane to the tool bar of all tabs.
-	 * @param pane
+	 * @param paneFactory
 	 */
-	public void addToolBarPane(Pane pane) {
+	public void addToolBarPane(PaneFactory paneFactory) {
 		for (int i=0; i<this.getNumTabs(); i++){
-			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(pane);
+			//check that a pane factory of this type does not exist.
+			//TODO
+			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory.createPane());
 		}
 	}
+	
+
+	public void removeToolBarPane(PaneFactory statusPaneFactory) {
+		//TODO
+//		for (int i=0; i<this.getNumTabs(); i++){
+//			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory);
+//		}
+	}
+
+
 
 
 	@Override
@@ -888,7 +901,6 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	public void renameTab(String selectedItem, int tabIndex) {
 		//TODO
 	}
-
 
 
 

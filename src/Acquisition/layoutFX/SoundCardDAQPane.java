@@ -29,6 +29,8 @@ public class SoundCardDAQPane extends DAQSettingsPane {
 	 * The sound card system. 
 	 */
 	private SoundCardSystem soundCardSystem; 
+	
+	private DAQStatusPaneFactory statusBarPaneFactory = new SimpleStatusPaneFactory("This is  sound card DAQ");
 
 	public SoundCardDAQPane(SoundCardSystem soundCardSystem) {
 
@@ -122,14 +124,9 @@ public class SoundCardDAQPane extends DAQSettingsPane {
 
 	}
 
-
-
 	@Override
 	public DAQStatusPaneFactory getStatusBarPane() {
-		//TODO
-		PamBorderPane p = new PamBorderPane();
-		p.setCenter(new Label("I am the the Sound Card DAQ status bar"));
-		return p;
+		return statusBarPaneFactory;
 	}
 
 }

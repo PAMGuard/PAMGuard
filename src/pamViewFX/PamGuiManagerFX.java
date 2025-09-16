@@ -6,8 +6,7 @@ import java.util.Optional;
 
 import javax.swing.JFrame;
 
-import org.controlsfx.glyphfont.Glyph;
-
+import Acquisition.layoutFX.PaneFactory;
 import PamController.PAMControllerGUI;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
@@ -99,6 +98,10 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Reference to the PAMContorller
 	 */
 	private PamController pamController;
+	
+	
+	public  ArrayList<PaneFactory> toolBarPanes = new ArrayList<PaneFactory>();
+
 
 	/**
 	 * @return the primaryView
@@ -1047,7 +1050,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	}
 
 	/**
-	 * Set gui params. This should only be set during start up. 
+	 * Set GUI params. This should only be set during start up. 
 	 * @param pamGuiSettings - the GUI parameters. 
 	 */
 	private void setParams(PAMGuiFXSettings pamGuiSettings2) {
@@ -1061,18 +1064,46 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		return this.primaryStage;
 	}
 
-	
-	public void addStatusBarPane(PamBorderPane statusBar) {
-		//let's see if this works...
-		for (int i=0; i<this.stages.size(); i++) {
-			this.stages.get(i).addToolBarPane(statusBar);
+	/**
+	 * Add a new pane to the status bar. The status bar is located across the GUI and so 
+	 * a pane factory is used to create the pane in each window.
+	 * <p>
+	 * This will add the pane to all current windows and any future windows. If you wish to add to a specific window 
+	 * the get a reference to the tab and use tab.addToolBarPane(PaneFactory); 
+	 * @param statusPaneFactory - the pane factory which creates the pane. 
+	 */
+	public void addStatusBarPane(PaneFactory statusPaneFactory) {
+		if (!toolBarPanes.contains(statusPaneFactory)){
+			toolBarPanes.add(statusPaneFactory); 
+			//remove from all stages
+			for (int i=0; i<this.stages.size(); i++) {
+				this.stages.get(i).addToolBarPane(statusPaneFactory); 
+			}
 		}
+		else {
+			System.err.println("PamGuiManagerFX: Tool bar pane already exists");
+		}
+		
 		
 	}
 	
-	public void removeStatusBarPane(PamBorderPane statusBar) {
-		// TODO Auto-generated method stub
-		
+	
+	/**
+	 * Remove a status bar pane from all windows.
+	 * @param statusPaneFactory - the pane factory which creates the pane. 
+	 * @return true of the pane was removed, false if it was not found.
+	 */
+	public boolean removeStatusBarPane(PaneFactory statusPaneFactory) {
+		if (toolBarPanes.remove(statusPaneFactory)){
+			//remove from all stages
+			for (int i=0; i<this.stages.size(); i++) {
+				this.stages.get(i).removeToolBarPane(statusPaneFactory); 
+			}
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 
