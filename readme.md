@@ -19,7 +19,7 @@ PAMGuard fulfils two main requirements within marine bioacoustics
 PAMGuard is available on Windows and MacOS and can be downloaded from the [PAMGuard website](https://pamguard.org). Note that we are considering a Linux installer but it is not available at this time. 
 
 ## Quick start tutorial
-The easiest way to get started with PAMGuard is to work through our tutorials available at [www.pamguard.org/tutorials.html](https://www.pamguard.org/tutorials.html)
+The easiest way to get started with PAMGuard is to work through our tutorials available at [www.pamguard.org/tutorials](https://www.pamguard.org/tutorials.html)
 
 PAMGuard is a modular program with two modes; real-time and viewer. Typically a user will start with real-time model, either in the field collecting data or post processing sound files from a recorder. Once data are processed, users move on to viewer mode where data can be explored and further processed. 
 
