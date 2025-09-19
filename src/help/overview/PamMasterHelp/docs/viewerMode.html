@@ -6,76 +6,154 @@
 
 <body>
 
-<h1>PAMGuard</h1>
-<h2>PAMGuard Viewer</h2>
-<h3>Overview</h3>
-<p>
-The PAMGuard viewer can be used to view data stored in the  <a href="../../../utilities/generalDatabaseHelp/docs/database_database.html"> 
-PAMGuard database</a> and the <a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">binary storage system.</a></p> 
-<p>Some viewer operations, such as the spectrogram display also load and re-process small amounts of raw audio data 
-from sound files (if available). </p> 
+	<h1>PAMGuard</h1>
+	<h2>PAMGuard Viewer</h2>
+	<h3>Overview</h3>
+	<p>
+		The PAMGuard viewer can be used to view data stored in the <a
+			href="../../../utilities/generalDatabaseHelp/docs/database_database.html">
+			PAMGuard database</a> and the <a
+			href="../../../utilities/BinaryStore/docs/binarystore_overview.html">binary
+			storage system.</a>
+	</p>
+	<p>Some viewer operations, such as the spectrogram display also
+		load and re-process small amounts of raw audio data from sound files
+		(if available).</p>
 
-<h3>Starting PAMGuard Viewer</h3>
-<p>
-The PAMGuard viewer can be started from the shortcut to PAMGuard Viewer placed on your system when 
-you installed PAMGuard. 
-<p>
-If you are using one of the platform independent jar files, then run the jar file with the 
-program argument -v. For instance, 
-under Windows, the command line for starting PAMGuard Beta version 1.3.02 in viewer mode with 1 Gigabyte of memory 
-is: <br><br>
-<code>java -jar -mx4096m PAMGuardBeta_2_02_15.jar PAMGuard -v</code> 
+	<h3>Starting PAMGuard Viewer</h3>
+	<p>The PAMGuard viewer can be started from the shortcut to PAMGuard
+		Viewer placed on your system when you installed PAMGuard.
+	<p>
+		If you are using one of the platform independent jar files, then run
+		the jar file with the program argument -v. For instance, under
+		Windows, the command line for starting PAMGuard Beta version 1.3.02 in
+		viewer mode with 1 Gigabyte of memory is: <br> <br>
+		<code>java -jar -mx4096m PAMGuardBeta_2_02_15.jar PAMGuard -v</code>
+	<h3>Running PAMGuard Viewer</h3>
+	<p>When PAMGuard starts in Viewer mode, it will not ask for a psfx
+		file, but will instead ask for a database file to open. Normally, you
+		should select a database which was previously filled with data from
+		PAMGuard.</p>
 
+	<p>When running in normal mode, PAMGuard writes settings to a table
+		in the database and Viewer mode will read the settings back from the
+		database. This ensures that the PAMGuard configuration you are viewing
+		will be compatible with the data in the database.</p>
+	<p>
+		If data were collected using only <a
+			href="../../../utilities/BinaryStore/docs/binarystore_overview.html">Binary
+			Storage</a>, of the database is unavailable for some other reason, then
+		open a blank database and ignore any warning messages. This will
+		create a blank looking PAMGuard with no modules apart from the binary
+		store and <a href="../../../utilities/datamap/docs/datamap.html">Data
+			Map</a>. You can then import the correct settings from a psfx file to get
+		the correct settings into the viewer using the <b>File > Import
+			configuration ... </b> menu item.
+	</p>
 
-<h3>Running PAMGuard Viewer</h3>
-<p>When PAMGuard starts in Viewer mode, it will not ask for a psfx file, but will instead ask for 
-a database file to open. 
-Normally, you should select a database which was previously filled with data from PAMGuard. However, if data were
-collected using only <a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">Binary Storage</a>, then
-open a blank database and ignore any warning messages.   
-<p>
-When running in normal mode, PAMGuard writes settings to a table in the database and Viewer mode will 
-read the settings back from the database. 
-This ensures that the PAMGuard configuration you are viewing will be compatible with the data in the 
-database.</p>
+	<p>If you can't find the psfx file that was used to process the
+		data, look in the binary storage folder. Each time PAMGuard starts, it
+		writes a sopy of the psfx file into the binary storage folder for just
+		this situation !.</p>
+	<p>
+		As an absolute last resort, add the modules you need individually from
+		the <b>File > Add Modules ... </b> menu.
+	</p>
+	<p>
+		For more information on how to continue your analysis in Viewer mode
+		go to <a
+			href="../../../detectors/clickDetectorHelp/docs/offline_Overview.html">Click
+			Detector Viewer Overview</a>.
+	</p>
 
-<p>For more information on how to begin your analysis go to <a href="../../../detectors/clickDetectorHelp/docs/offline_Overview.html">Click Viewer Overview</a>.</p>
+	<h3>Data Scrolling</h3>
+	<p>It is not possible to load entire large data sets into the
+		Viewer since the program will run out of memory. On the other hand, it
+		is inefficient to continually be loading data for display whenever the
+		operator scrolls back or forth by a few seconds.</p>
+	<p>The PAMGuard viewer therefore uses a sophisticated double scroll
+		system in which an outer scroller controls the loading of data into
+		memory and an inner scroller moves through that data. For example,
+		when viewing clicks with the click detector, an operator will probably
+		want to load about 30 minutes of data at a time, but may only view
+		minutes or seconds of those loaded data as they make a detailed
+		analysis of the clicks.</p>
+	<p>Exactly which options are available on individual displays with
+		PAMGuard can vary. However, the functionality will generally be a
+		subset of that in the click detector:</p>
+	<br>
 
-<h3>Data Scrolling</h3>
-<p>It is not possible to load entire large data sets into the Viewer since the program will run out of memory. 
-On the other hand, it is inefficient to continually be loading data for display whenever the operator scrolls back or forth by a 
-few seconds. </p>
-<p>The PAMGuard viewer therefore uses a sophisticated double scroll system in which an outer scroller controls the loading of data into 
-memory and an inner scroller moves through that data. For example, when viewing clicks with the click detector, an operator will probably want to 
-load about 30 minutes of data at a time, but may only view minutes or seconds of those loaded data as they make a detailed analysis of the clicks.  </p> 
-<p>Exactly which options are available on individual displays with PAMGuard can vary. However, the functionality will generally be
-a subset of that in the click detector:</p><br>
+	<p>
+	<center>
+		<img src="./images/Scroller2.png" />
+	</center>
+	<br>
+	<br>
+	</p>
+	<p>The main part of the scroller (taking up most of the space on
+		the left) is an ordinary scroll bar which allows you to navigate
+		through loaded data. To the right are a pair of blue arrow buttons
+		with a downward arrow button between them. The blue buttons are used
+		to load the next section of data (e.g. to jump forward or backward
+		half an hour).</p>
+	<p>Click on the downward pointing arrow to display other options:</p>
+	<p>
+	<center>
+		<img src="./images/ScrollerOptions.png" />
+	</center>
+	<br>
+	<br>
+	</p>
+	<p>Options include the start time of the loaded data, the time
+		period of the loaded data, and the percentage movement forward or
+		backward when the blue arrows are pressed. (In the example above, 30
+		minutes of data are loaded, and there is a 75% step size, so the blue
+		arrows would move forward or backward by 22.5 minutes).</p>
+	<p>Right click on the downward arrow for an option to couple all
+		scrollers in all PAMGuard modules.</p>
 
-<p><center><img src="./images/Scroller.png"/>  </center><br><br>
-</p>
-<p>The main part of the scroller (taking up most of the space on the left) 
-is an ordinary scroll bar which allows you to navigate through loaded data. To the right are a pair of blue
-arrow buttons with a downward arrow button between them. The blue buttons are used to load the next section of data (e.g. to jump forward 
-or backward half an hour). </p>
-<p>Click on the downward pointing arrow to display other options: </p>
-<p><center>  <img src="./images/ScrollerOptions.png"/></center><br><br>
-</p>
-<p>Options include the start time of the loaded data, the time period of the loaded data and the percentage movement forward
-or backward when the blue arrows are pressed. (In the example above, 30 minutes of data are loaded, and there is a 75% step size, so the 
-blue arrows would move forward or backward by 22.5 minutes).</p>
-<p>Right click on the downward arrow for an option to couple all scrollers in all PAMGuard modules. </p>
+	<p>The number in the right hand box shows the duration of data
+		actually displayed in the window (120 seconds in the example). This
+		can be changed by typing a new number or by using the small up and
+		down arrow in the right of the edit box.</p>
 
-<p>The number in the right hand box shows the duration of data actually displayed in the window (120 seconds in the example). This can be changed by typing 
-a new number or by using the tiny up and down arrow in the right of the edit box.</p>
+	<h4>Play Button</h4>
+	<p>Pressing the play button will cause the scroll bar to advance
+		automatically, scrolling through the loaded data. Right click on the
+		button to select different play speeds.</p>
 
-<p>To assist in navigating through large data sets, the 
-<a href="../../../utilities/datamap/docs/datamap.html">Data Map</a>  will
-always be added to the PAMGuard model when operating in Viewer mode. </p>
+	<h4>Scroller coupling</h4>
+	<p>
+		If several displays are shown within the same <a
+			href="../../../displays/userDisplayHelp/docs/userDisplayPanel.html">User
+			display panel</a>, then their scrollers are automatically 'coupled'. That
+		is, if one scoller is moved, the others will also move.
+	</p>
+	<p>
+		Right clicking on the options button will give options to couple all
+		scrollers within PAMGuard, i.e. so that when you move a <a
+			href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">
+			spectrogram display</a> scroller, the click detector time display will
+		move with it.
+	</p>
 
-<br>
-<p CLASS="previousLink"><a href="normalMode.html">Previous: Normal Operation</a></p>
-<p CLASS="nextLink"><a href="mixedMode.html">Next: Mixed Mode Operation</a></p>
-<br><br><br>
+	<h4>Dataset navigation</h4>
+	<p>
+		To assist in navigating through large data sets, the <a
+			href="../../../utilities/datamap/docs/datamap.html">Data Map</a> will
+		always be added to the PAMGuard model when operating in Viewer mode.
+	</p>
+
+	<br>
+	<p CLASS="previousLink">
+		<a href="normalMode.html">Previous: Normal Operation</a>
+	</p>
+	<p CLASS="nextLink">
+		<a href="mixedMode.html">Next: Mixed Mode Operation</a>
+	</p>
+	<br>
+	<br>
+	<br>
 
 </body>
 </html>
