@@ -98,6 +98,8 @@ public class RWEDialog extends PamDialog {
 		
 		panel.add(BorderLayout.CENTER, tabbedPane);
 		setDialogComponent(panel);
+		
+		setHelpPoint("detectors.rwedge.docs.rwedgedetector");
 	}
 	
 	public static RWEParameters showDialog(Window frame, RWEControl rweControl) {

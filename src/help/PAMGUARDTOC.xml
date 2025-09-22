@@ -71,6 +71,8 @@
 
   <tocitem text="Mixed Mode operation " target="overview.PamMasterHelp.docs.mixedMode" image="topic"/>
 
+  <tocitem text="Clocks and Time " target="overview.PamMasterHelp.docs.pcclock" image="topic"/>
+
   <tocitem text="PAMGuard WatchDog " target="overview.PamMasterHelp.docs.PamdogHelp" image="topic"/>
 
  </tocitem>
@@ -471,6 +473,10 @@
    <tocitem text="SoundTrap Click Detector " target="detectors.clickDetectorHelp.docs.SoundTrapClickDetector" image="topic"/>
 
   </tocitem>
+  <tocitem text="Click Train Detector " target="detectors.ClickTrainDetector.docs.ClickTrainDetector">
+   <tocitem text="Overview " target="detectors.ClickTrainDetector.docs.ClickTrainDetector" image="topic"/>
+
+  </tocitem>
   <tocitem text="Whistle and Moan Detector ">
    <tocitem text="Overview " target="detectors.whistleMoanHelp.docs.whistleMoan_Overview" image="topic"/>
 
@@ -497,7 +503,7 @@
    <tocitem text="Whistle Detector Display " target="detectors.whistleDetectorHelp.docs.whistleDetector_Display" image="topic"/>
 
   </tocitem>
-  <tocitem text="Ishmael ">
+  <tocitem text="Ishmael Detectors ">
    <tocitem text="Ishmael " target="detectors.ishmael.docs.ishmael_overview" image="topic"/>
 
    <tocitem text="Energy Sum " target="detectors.ishmael.docs.ishmael_energysum" image="topic"/>
@@ -519,6 +525,14 @@
    <tocitem text="Removing a Likelihood Detector " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_RemoveModule" image="topic"/>
 
   </tocitem>
+  <tocitem text="Right Whale Edge Detector ">
+   <tocitem text="Overview " target="detectors.rwedge.docs.rwedgedetector" image="topic"/>
+
+   <tocitem text="Configuration " target="detectors.rwedge.docs.rweconfig" image="topic"/>
+
+   <tocitem text="Displays " target="detectors.rwedge.docs.rwedisplays" image="topic"/>
+
+  </tocitem>
   <tocitem text="Generalised Power Law (GPL) Detector ">
    <tocitem text="GPL Detector Overview " target="detectors.gpl.docs.gpldetector" image="topic"/>
 
@@ -537,10 +551,6 @@
    <tocitem text="Displays " target="detectors.gpl.docs.gpldisplays" image="topic"/>
 
    <tocitem text="Localisation " target="detectors.gpl.docs.localisation" image="topic"/>
-
-  </tocitem>
-  <tocitem text="Click Train Detector " target="detectors.ClickTrainDetector.docs.ClickTrainDetector">
-   <tocitem text="Overview " target="detectors.ClickTrainDetector.docs.ClickTrainDetector" image="topic"/>
 
   </tocitem>
  </tocitem>
@@ -703,6 +713,10 @@
    <tocitem text="Overview " target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview" image="topic"/>
 
    <tocitem text="Designing Forms " target="visual_methods.loggerFormsHelp.docs.designingForms" image="topic"/>
+
+   <tocitem text="Using Logger2000 forms " target="visual_methods.loggerFormsHelp.docs.oldLoggerForms" image="topic"/>
+
+   <tocitem text="Switching database " target="visual_methods.loggerFormsHelp.docs.loggerFormsMoving" image="topic"/>
 
   </tocitem>
  </tocitem>

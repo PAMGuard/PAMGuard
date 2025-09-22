@@ -1,0 +1,63 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Right Whale Edge Detector</title>
+</head>
+
+<body>
+
+	<h1>Right Whale Edge Detector</h1>
+
+	<h2>Adding and Configuring the Detector</h2>
+	<p>
+		The detector was designed to process data sampled at 2kHz, and then
+		pre-processed with an <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT</a>
+		with length 256 samples, with a 50% (128 sample) overlap. If your data
+		were not collected at 2kHz sample rate, then use a <a
+			href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator
+			module</a> to adjust the data sample rate.
+	</p>
+	<h3>Configure the FFT</h3>
+	<p>The ratio of the FFT length to the sample rate is important, since it sets the time
+	and frequency resolution of the spectrogram image that feeds the detector. A sample rate
+	of 2kHz these FFT settings give a frequency resolution of 7.8Hz and a time step of
+	64ms, which is ideal for detecting Right Whale upsweeps that are typically between 100
+	and 200Hz, and have a duration of 0.5 to 1.0s. </p>
+	
+	<h4>Noise Removal</h4>
+	<p>The <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT module</a> has
+			several options for noise reduction. The Right Whale Edge Detector uses just one of these:
+			the Gaussian Smoothing Kernel. It doesn't matter whether this is enabled or not in the FFT module
+			since the Right Whale Edge Detector will check if it's been run on the data, and implement it
+			anyway if it hasn't. </p>
+			
+	<h3>Configure the detector</h3>
+	<p>Once you've correctly configured the FFF open the Right Whale dialog from the Settings menu</p>
+	<p><center><img src="./images/rwconfig1.png"> <img src="./images/rwconfig2.png"></center> </p>
+	<h4>Data Source</h4>
+	<p>Select the correct FFT data source (you may have more than one) and 
+	which channels of data you want to process. These will be processed independently of one another. </p>
+	<h4>Parameters</h4>
+	<p>Generally the start and end frequencies for the search can be left at 0 and 1000 Hz, though you can set them 
+	a bit differently if you've interfering noise sources at very high or low frequencies. </p>
+	<p><b>Threshold</b> is the threshold in dB above which sounds are detected. The defaults is 6dB.</p>
+	<p><b>Apply down threshold</b> modifies the search algorithm from Gillespie 2004 slightly so that the outline of the sound 
+	is determined as the point where it drops the threhsold number of dB below the sounds maximum, rather than taking the outline
+	of the sound as any data threshold dB above the background. </p>
+	<p><b>Min Sound Type</b> is a quality flag to determine how "right whale like" a sound must be before 
+	it is recorded that can have a value between 1 and 12. 
+	Generally, only sounds with a sound type greater than 9 are likely to be from right whales, though you might
+	want to record lower quality sounds to check manually.</p> 
+	
+	
+			
+<br>
+	<p CLASS="nextLink"><a href="rwedetector.html">Previous: Overview</a></p>
+	<p CLASS="nextLink"><a href="rwedisplays.html">Next: Displays</a></p>
+			
+<br>
+</body>
+</html>

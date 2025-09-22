@@ -104,6 +104,8 @@
 
 <mapID target="overview.PamMasterHelp.docs.PamdogHelp" url="overview/PamMasterHelp/docs/PamdogHelp.html"/>
 
+<mapID target="detectors.rwedge.docs.rwedisplays" url="detectors/rwedge/docs/rwedisplays.html"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SchoolStatsFile" url="classifiers/roccaHelp/docs/rocca_Configure.html#rocca_SchoolStatsFile"/>
 
 <mapID target="localisation.docs.localisation_tdoa" url="localisation/docs/localisation_tdoa.html"/>
@@ -173,6 +175,8 @@
 <mapID target="utilities.SIDEModule.docs.SIDE_ReportMatrix" url="utilities/SIDEModule/docs/SIDE_ReportMatrix.html"/>
 
 <mapID target="visual_methods.videoRangeHelp.docs.videoRange_MeasureToShoreline" url="visual_methods/videoRangeHelp/docs/videoRange_MeasureToShoreline.html"/>
+
+<mapID target="detectors.rwedge.docs.rwedgedetector" url="detectors/rwedge/docs/rwedgedetector.html"/>
 
 <mapID target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Configuring" url="displays/radarDisplayHelp/docs/UserDisplay_Radar_Configuring.html"/>
 
@@ -343,6 +347,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_clickDetector" url="detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html"/>
 
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_betterClassification" url="detectors/clickDetectorHelp/docs/ClickDetector_betterClassification.html"/>
+
+<mapID target="detectors.rwedge.docs.rweconfig" url="detectors/rwedge/docs/rweconfig.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_medianfilter" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html#medianfilter"/>
 
@@ -628,6 +634,8 @@
 
 <mapID target="utilities.tethys.docs.tethys_module" url="utilities/tethys/docs/tethys_module.html"/>
 
+<mapID target="visual_methods.loggerFormsHelp.docs.loggerFormsMoving" url="visual_methods/loggerFormsHelp/docs/loggerFormsMoving.html"/>
+
 <mapID target="sound_processing.fftManagerHelp.docs.FFTEngine_Creating" url="sound_processing/fftManagerHelp/docs/FFTEngine_Creating.html"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal_clickremoval" url="sound_processing/fftManagerHelp/docs/noise_removal.html#clickremoval"/>
@@ -697,6 +705,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.offline_Tools" url="detectors/clickDetectorHelp/docs/offline_Tools.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_Configure" url="detectors/whistleMoanHelp/docs/whistleMoan_Configure.html"/>
+
+<mapID target="overview.PamMasterHelp.docs.pcclock" url="overview/PamMasterHelp/docs/pcclock.html"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules__Sensors" url="overview/PamMasterHelp/docs/modules.html#_Sensors"/>
 
