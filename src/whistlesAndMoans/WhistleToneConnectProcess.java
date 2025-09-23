@@ -425,7 +425,9 @@ public class WhistleToneConnectProcess extends PamProcess {
 		private RegionFragmenter regionFragmenter = new NullFragmenter(); 
 
 		private BearingLocaliser bearingLocaliser;
-		private int hydrophoneMap;
+		
+		private int[] hydrophoneList;
+		
 		private double maxDelaySeconds;
 
 		/**
@@ -440,7 +442,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 			this.iD = iD;
 			this.groupChannels = groupChannels;
 			// this next line gets updated to the correct map before any localisation takes place !
-			hydrophoneMap = groupChannels;
+//			hydrophoneMap = groupChannels;
 
 			this.firstChannel = PamUtils.getLowestChannel(groupChannels);
 			setConnectionType(connectType);
@@ -480,9 +482,10 @@ public class WhistleToneConnectProcess extends PamProcess {
 			}
 			// only create bearing localiser objects if we have a channel list manager and we're not dealing with sequence numbers
 			if (sourceData.getChannelListManager() != null && sourceData.getSequenceMapObject()==null) {
-				hydrophoneMap = sourceData.getChannelListManager().channelIndexesToPhones(groupChannels);
+				hydrophoneList = sourceData.getChannelListManager().channelMapToPhonesList(groupChannels);
+				int hydrophoneMap = PamUtils.makeChannelMap(hydrophoneList);
 				double timingError = Correlations.defaultTimingError(getSampleRate());
-				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(hydrophoneMap, timingError); 
+				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(hydrophoneList, timingError); 
 				maxDelaySeconds = ArrayManager.getArrayManager().getCurrentArray().getMaxPhoneSeparation(hydrophoneMap, PamCalendar.getTimeInMillis()) / 
 						ArrayManager.getArrayManager().getCurrentArray().getSpeedOfSound();
 			}
@@ -814,6 +817,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 				//					BearingLocAnnotation bla = new BearingLocAnnotation(bearingLocAnnotationType, anglesAndErrors);
 				//					newData.addDataAnnotation(bla);
 				//				}
+				int hydrophoneMap = PamUtils.makeChannelMap(hydrophoneList);
 				WhistleBearingInfo newLoc = new WhistleBearingInfo(newData, bearingLocaliser, 
 						hydrophoneMap, anglesAndErrors);
 				if (bearingLocaliser != null) {

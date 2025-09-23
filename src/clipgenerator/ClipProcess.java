@@ -350,9 +350,9 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		 */
 		// first work out which hydrophones are used by the clipDataUnit. 
 		// if they are the same as last time, then we're cool. 
-		int hydros = rawDataBlock.getChannelListManager().channelIndexesToPhones(clipDataUnit.getChannelBitmap());
+		int[] hydros = rawDataBlock.getChannelListManager().channelMapToPhonesList(clipDataUnit.getChannelBitmap());
 		// give up immediately if there is only one hydrophone
-		if (PamUtils.getNumChannels(hydros) < 2) {
+		if (hydros.length < 2) {
 			return false;
 		}
 		BearingLocaliser bearingLocaliser = buoyLocaliserManager.findBearingLocaliser(clipDataUnit);
@@ -366,16 +366,17 @@ public class ClipProcess extends SpectrogramMarkProcess {
 	 * where the max delay is < half the FFT length. 
 	 * @param clipDataUnit data unit to localise
 	 * @param bearingLocaliser bearing localiser converts delays to angle(s)
-	 * @param hydrophoneMap hydrophone map
+	 * @param hydrophoneList hydrophone map
 	 * @return true if a localisation was calculated. 
 	 */
-	private boolean localiseClip(ClipDataUnit clipDataUnit, BearingLocaliser bearingLocaliser, int hydrophoneMap) {
+	private boolean localiseClip(ClipDataUnit clipDataUnit, BearingLocaliser bearingLocaliser, int[] hydrophoneList) {
 		double[] delays = clipDelays.getDelays(clipDataUnit);
 		if (delays != null) {
 			for (int i = 0; i < delays.length; i++) {
 				delays[i] /= rawDataBlock.getSampleRate();
 			}
 			double[][] locData = bearingLocaliser.localise(delays, clipDataUnit.getTimeMilliseconds());
+			int hydrophoneMap = PamUtils.makeChannelMap(hydrophoneList);
 			if (locData != null) {
 				ClipLocalisation clipLoc = new ClipLocalisation(clipDataUnit, bearingLocaliser, hydrophoneMap, locData);
 				clipDataUnit.setLocalisation(clipLoc);
@@ -458,7 +459,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 
 		private BearingLocaliser bearingLocaliser;
 
-		private int hydrophoneMap;
+		private int[] hydrophoneMap;
 		
 		/**
 		 * @param dataBlock
@@ -475,7 +476,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 
 			if (rawDataBlock != null) {
 				int chanMap = decideChannelMap(rawDataBlock.getChannelMap());
-				hydrophoneMap = rawDataBlock.getChannelListManager().channelIndexesToPhones(chanMap);
+				hydrophoneMap = rawDataBlock.getChannelListManager().channelMapToPhonesList(chanMap);
 				double timingError = Correlations.defaultTimingError(getSampleRate());
 				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(hydrophoneMap, timingError); 
 			}
@@ -727,6 +728,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		 */
 		public synchronized BearingLocaliser findBearingLocaliser(PamDataUnit pamDataUnit) {
 			int channels = pamDataUnit.getChannelBitmap();
+//			int[] phones = getSourceDataBlock().
 			int hydros = rawDataBlock.getChannelListManager().channelIndexesToPhones(channels);
 			for (BearingLocaliser loc:bearingLocalisers) {
 				if (loc.getHydrophoneMap() == hydros) {
@@ -735,7 +737,8 @@ public class ClipProcess extends SpectrogramMarkProcess {
 			}
 			// if it get's here, then there isn't one available so create one
 			double timingError = Correlations.defaultTimingError(getSampleRate());
-			BearingLocaliser loc = BearingLocaliserSelector.createBearingLocaliser(hydros, timingError);
+			int[] phones = rawDataBlock.getChannelListManager().channelMapToPhonesList(channels);
+			BearingLocaliser loc = BearingLocaliserSelector.createBearingLocaliser(phones, timingError);
 			if (loc != null) {
 				bearingLocalisers.add(loc);
 			}

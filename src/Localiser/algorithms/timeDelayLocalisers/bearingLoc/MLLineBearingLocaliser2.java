@@ -21,6 +21,11 @@ public class MLLineBearingLocaliser2 extends MLGridBearingLocaliser2 {
 		// TODO Auto-generated constructor stub
 	}
 
+	public MLLineBearingLocaliser2(int[] hydrophoneList, long timMillis, double timingError) {
+		super(hydrophoneList, timMillis, timingError);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public int getLocalisationContents() {
 		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY | LocContents.HAS_AMBIGUITY;
