@@ -62,6 +62,7 @@ import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
 import landMarks.LandmarkControl;
+import mel.MelControl;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
 import ravendata.RavenControl;
@@ -617,6 +618,11 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Computes spectrograms of audio data");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html");
+		
+		mi = PamModuleInfo.registerControlledUnit(MelControl.class.getName(), MelControl.unitType);
+		mi.addDependency(new PamDependency(FFTDataUnit.class, PamFFTControl.class.getName()));
+		mi.setToolTipText("Computes mel-spectrograms of audio data");
+		mi.setModulesMenuGroup(processingGroup);
 
 		mi = PamModuleInfo.registerControlledUnit("Filters.FilterControl", "Filters (IIR and FIR)");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
@@ -624,7 +630,6 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(processingGroup);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 		mi.setHelpPoint("sound_processing/FiltersHelp/Docs/Filters_filters.html");
-
 
 		mi = PamModuleInfo.registerControlledUnit("decimator.DecimatorControl", "Decimator");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
@@ -764,16 +769,19 @@ final public class PamModel implements PamSettings {
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setToolTipText("Detects sounds with energy in a specific frequency band");
+		mi.setHelpPoint("detectors/ishmael/docs/ishmael_energysum.html");
 
 		mi = PamModuleInfo.registerControlledUnit("IshmaelDetector.SgramCorrControl", "Ishmael spectrogram correlation");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setToolTipText("Detects sounds matching a user defined 'shape' on a spectrogram");
 		mi.setModulesMenuGroup(detectorsGroup);
+		mi.setHelpPoint("detectors/ishmael/docs/ishmael_speccorrelation.html");
 
 		mi = PamModuleInfo.registerControlledUnit("IshmaelDetector.MatchFiltControl", "Ishmael matched filtering");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.setToolTipText("Detects sounds using a user defined matched filter");	
 		mi.setModulesMenuGroup(detectorsGroup);
+		mi.setHelpPoint("detectors/ishmael/docs/ishmael_matchedfilter.html");
 
 		mi = PamModuleInfo.registerControlledUnit("likelihoodDetectionModule.LikelihoodDetectionUnit", "Likelihood Detector" );
 		mi.addDependency( new PamDependency( RawDataUnit.class, "Acquisition.AcquisitionControl" ) );
@@ -785,6 +793,7 @@ final public class PamModel implements PamSettings {
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("Detects right whale upsweep calls");
 		mi.setModulesMenuGroup(detectorsGroup);	
+		mi.setHelpPoint("detectors/rwedge/docs/rwedgedetector.html");
 //		mi.setHidden(SMRUEnable.isEnable() == false);
 		
 		// remove GPL detector - too slow for real-time use
