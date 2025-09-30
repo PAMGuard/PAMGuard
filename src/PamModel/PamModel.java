@@ -623,6 +623,7 @@ final public class PamModel implements PamSettings {
 		mi.addDependency(new PamDependency(FFTDataUnit.class, PamFFTControl.class.getName()));
 		mi.setToolTipText("Computes mel-spectrograms of audio data");
 		mi.setModulesMenuGroup(processingGroup);
+		mi.setHelpPoint("sound_processing/mel/docs/mel_overview.html");
 
 		mi = PamModuleInfo.registerControlledUnit("Filters.FilterControl", "Filters (IIR and FIR)");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	

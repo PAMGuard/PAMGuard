@@ -108,6 +108,7 @@ public class MelDialog extends PamDialog {
 		c.gridx++;
 		cPanel.add(smallestStep, c);
 
+		setHelpPoint("sound_processing.mel.docs.mel_overview");
 		setDialogComponent(mainPanel);
 	}
 
