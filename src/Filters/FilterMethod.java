@@ -20,6 +20,9 @@
  */
 package Filters;
 
+import fftFilter.FFTFilter;
+import fftFilter.FFTFilterParams;
+
 /**
  * @author Doug Gillespie
  *         <p>
@@ -124,6 +127,8 @@ abstract public class FilterMethod {
 			return new FIRFilterMethod(sampleRate, filterParams);
 		case FIRARBITRARY:
 			return new FIRArbitraryFilter(sampleRate, filterParams);
+		case FFT:
+			return new FFTFilterMethod(sampleRate, filterParams);
 		}
 		
 		return new NullMethod(sampleRate, filterParams);

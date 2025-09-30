@@ -11,17 +11,21 @@
 	<h2>Overview</h2>
 	<br>
 
-	<p>Two main types of filter are available in PAMGuard. IIRF
-		(<b>Infinite Impulse Response</b>) Filters are generally preferred since they
-		are faster than the alternative FIR (<b>Finite Impulse Response</b>) filter
-		types. However there may be circumstances when you prefer to use an
-		FIR filter, particularly if an unusual filter response is required
-		(for instance, one mimicking the hearing response of an animal, or
-		with multiple 'notches' to remove noise).</p>
-		<p>Butterworth filters have a flat response over frequencies in the pass band, so are
-		preferred for any processes that will be making noise measurements downstream of the filter.</p>
-		<p>Chebyshev filters have a slightly better attenuation, but at the expense of some ripple
-		in the pass band.</p> 
+	<p>Two main types of filter are available in PAMGuard.</p>
+	<p>
+		IIRF (<b>Infinite Impulse Response</b>) Filters are generally
+		preferred since they are faster than the alternative FIR (<b>Finite
+			Impulse Response</b>) filter types.
+	</p>
+	<p>However there may be circumstances when you prefer to use an FIR
+		filter, particularly if an unusual filter response is required (for
+		instance, one mimicking the hearing response of an animal, or with
+		multiple 'notches' to remove noise).</p>
+	<p>Butterworth filters have a flat response over frequencies in the
+		pass band, so are preferred for any processes that will be making
+		noise measurements downstream of the filter.</p>
+	<p>Chebyshev filters have a slightly better attenuation, but at the
+		expense of some ripple in the pass band.</p>
 	<p>
 		Both types of filter can be configured from within PAMGuard's filter
 		design panel. This is used in the stand alone <a
@@ -38,10 +42,12 @@
 	<img alt="Filters Settings" src="Images/FiltersSettings.png">
 	<br>
 	<h3>Filter Type</h3>
-	<p>Select the type of filter, which can be one of: "None", 
-	"IIR <a href="http://en.wikipedia.org/wiki/Butterworth_filter">Butterworth</a>", 
-		"IIR <a href="http://en.wikipedia.org/wiki/Chebyshev_filter">Chebyshev</a>", "FIR Filter (Window Method)",
-		"Arbitrary FIR Filter".</p>
+	<p>
+		Select the type of filter, which can be one of: "None", "IIR <a
+			href="http://en.wikipedia.org/wiki/Butterworth_filter">Butterworth</a>",
+		"IIR <a href="http://en.wikipedia.org/wiki/Chebyshev_filter">Chebyshev</a>",
+		"FIR Filter (Window Method)", "Arbitrary FIR Filter", or "FFT Filter".
+	</p>
 
 	<h3>Filter Response</h3>
 	<p>For Butterworth, Chebychev and FIR Filters using the Window
@@ -71,9 +77,8 @@
 	<img alt="Filters Settings" src="Images/FIRArbitrary.png" />
 	<br>
 	<p>It's currently only possible to update this list by creating and
-	editing a text file, which should be a comma separated list of
-	frequencies and gains, e.g.
-	</p>
+		editing a text file, which should be a comma separated list of
+		frequencies and gains, e.g.</p>
 	0, -80
 	<br> 5000, -80
 	<br> 6000, -40
@@ -89,22 +94,31 @@
 	<p>Use the import button to import the values from your text file</p>
 	<br>
 	<h3>Bode Plot</h3>
-		<p>The filter dialog displays a bode plot (attenuation verses
-			frequency) for the chosen filter parameters. You can show this on either a logarithmic
-			of linear frequency scale. Double clicking the amplitude axis will change the range
-			of the amplitude scale. </p>
-		<br> 
+	<p>The filter dialog displays a bode plot (attenuation verses
+		frequency) for the chosen filter parameters. You can show this on
+		either a logarithmic of linear frequency scale. Double clicking the
+		amplitude axis will change the range of the amplitude scale.</p>
+	<br>
 	<h3>Pole-Zero or Impulse Response Plot</h3>
-	<p>In the lower left corner you will see either a plot of the filters Impulse Response, or a 
-	Pole-Zero plot (IIR Filters only). The Impulse response of a filter is the signal that will come out of a filter
-	if a single unit sample is input to the filter, i.e. a 1 followed by an infinite number of zeros. 
-	It is important to understand since it 
-	shows how a filter will distort a waveform, generally delaying it, and elongating it in time. Particularly for 
-	very short sounds, such as dolphin echolocation clicks, the waveform you see in the click detector may be a function 
-	of any filters you've included in the detector as much as it is a function of the sound coming out of the animal.</p>
-	<p><a ref="https://en.wikipedia.org/wiki/Pole%E2%80%93zero_plot">Pole Zero plots are a part of IIR Filter design, but 
-	understanding them is probably not important to most PAMGuard users.
-	When designiing IIR Filters, you can switch between pole-zero and impulse responde plots by right clicking on the display. </p>
-	<br><br>  
+	<p>In the lower left corner you will see either a plot of the
+		filters Impulse Response, or a Pole-Zero plot (IIR Filters only). The
+		Impulse response of a filter is the signal that will come out of a
+		filter if a single unit sample is input to the filter, i.e. a 1
+		followed by an infinite number of zeros. It is important to understand
+		since it shows how a filter will distort a waveform, generally
+		delaying it, and elongating it in time. Particularly for very short
+		sounds, such as dolphin echolocation clicks, the waveform you see in
+		the click detector may be a function of any filters you've included in
+		the detector as much as it is a function of the sound coming out of
+		the animal.</p>
+	<p>
+		<a ref="https://en.wikipedia.org/wiki/Pole%E2%80%93zero_plot">Pole
+			Zero plots are a part of IIR Filter design, but understanding them is
+			probably not important to most PAMGuard users. When designiing IIR
+			Filters, you can switch between pole-zero and impulse responde plots
+			by right clicking on the display. 
+	</p>
+	<br>
+	<br>
 </body>
 </html>
