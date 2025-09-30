@@ -41,6 +41,20 @@ public class MelFilterBank {
 		this.f_min = f_min;
 		this.f_max = f_max;
 		cacluateFilters();
+		
+		afExTest();
+	}
+
+	private void afExTest() {
+//		Test using  code from https://github.com/Subtitle-Synchronizer/jlibrosa/blob/master/src/main/java/com/jlibrosa/audio/process/AudioFeatureExtraction.java
+		AudioFeatureExtraction afe = new AudioFeatureExtraction();
+		afe.setSampleRate(sr);
+		afe.setN_mels(n_mels);
+		afe.setfMin(f_min);
+		afe.setfMax(f_max);
+		afe.setN_fft(n_fft);
+		double[][] melFilter = afe.melFilter();
+		System.out.println("test seems to give very similar values to Librosa");
 	}
 
 	private boolean cacluateFilters() {

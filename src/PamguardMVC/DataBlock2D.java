@@ -3,12 +3,17 @@ package PamguardMVC;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import dataPlotsFX.data.DataTypeInfo;
 
 abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDataBlock<Tunit> {
+	
+	private DataTypeInfo dataTypeInfo;
 
 	public DataBlock2D(Class unitClass, String dataName, PamProcess parentProcess, int channelMap) {
 		super(unitClass, dataName, parentProcess, channelMap);
+		dataTypeInfo = new DataTypeInfo(ParameterType.FREQUENCY, ParameterUnits.HZ);
 	}
 
 	/**
@@ -36,6 +41,14 @@ abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDat
 	 * @return the data's maximum value
 	 */
 	abstract public double getMaxDataValue();
+	
+	/**
+	 * Are the data on a log scale
+	 * @return true if log, default is false. 
+	 */
+	public boolean isLogScale() {
+		return false;
+	}
 	
 	/**
 	 * Get the scale units to display on axis, etc. 
