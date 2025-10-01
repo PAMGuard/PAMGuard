@@ -2688,6 +2688,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					directImagePos = getWidth();
 				}
 				//				System.out.println(" Panel " + String.valueOf(this.panelId) + " directImagePos = " + String.valueOf(directImagePos));
+				directDrawProjector.setLogScale(frequencyAxis.isLogScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 
@@ -2707,6 +2708,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				fillSpectrogramImage(g2d, this);
 
 				double millisPerBin = sampleRate / 1000. / sourceFFTDataBlock.getFftHop();
+				directDrawProjector.setLogScale(frequencyAxis.isLogScale());
 				spectrogramProjector.setScales(millisPerBin,
 						2. / sourceFFTDataBlock.getFftLength(), specImage.getWidth(),
 						specImage.getHeight());
@@ -2750,6 +2752,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 				drawMarkLabel(g);
 
+				directDrawProjector.setLogScale(frequencyAxis.isLogScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 

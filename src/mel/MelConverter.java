@@ -64,9 +64,17 @@ public class MelConverter {
 	 * @return
 	 */
 	public double[] melFromMag(double[] fftData) {
-		return melWithPower(fftData, power);
+		double[] mels = melWithPower(fftData, power);
+		scalePower(mels, 1./power);
+		return mels;
 	}
 	
+	public double[] melFromMagSq(double[] fftDataSq) {
+		double data[] = melWithPower(fftDataSq, power/2.);
+		scalePower(data, 1./power);
+		return data;
+	}
+
 	/**
 	 * Called from the mag or magsq functions to try to more efficiently 
 	 * handle powering up any data. 
@@ -115,8 +123,18 @@ public class MelConverter {
 		return mels;
 	}
 
-	public double[] melFromMagSq(double[] fftDataSq) {
-		return melWithPower(fftDataSq, power/2.);
+	/**
+	 * Raise all elements in data to given power
+	 * @param data
+	 * @param power
+	 */
+	private void scalePower(double[] data, double power) {
+		if (power == 1.) {
+			return;
+		}
+		for (int i = 0; i < data.length; i++) {
+			data[i] = Math.pow(data[i], power);
+		}
 	}
 	
 	public double[] melFromComplex(PamUtils.complex.ComplexArray complexArray) {

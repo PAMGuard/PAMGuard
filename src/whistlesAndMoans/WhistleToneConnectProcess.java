@@ -94,6 +94,8 @@ public class WhistleToneConnectProcess extends PamProcess {
 	
 	private long lastBackgroundTime = 0;
 
+	private FFTDataBlock trueSourceData;
+
 	public WhistleToneConnectProcess(WhistleMoanControl whitesWhistleControl) {
 		super(whitesWhistleControl, null);
 		this.whistleMoanControl = whitesWhistleControl;
@@ -205,6 +207,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 		
 		SpectrogramNoiseProcess snp = whistleMoanControl.getSpectrogramNoiseProcess();
 		setParentDataBlock(snp.getOutputDataBlock());
+		trueSourceData = snp.getSourceData();
 		if (whistleMoanControl.whistleToneParameters.getDataSource() == null) {
 			return;
 		}
@@ -480,9 +483,12 @@ public class WhistleToneConnectProcess extends PamProcess {
 			if (sourceData == null) {
 				return;
 			}
+			if (trueSourceData == null) {
+				trueSourceData = sourceData;
+			}
 			// only create bearing localiser objects if we have a channel list manager and we're not dealing with sequence numbers
-			if (sourceData.getChannelListManager() != null && sourceData.getSequenceMapObject()==null) {
-				hydrophoneList = sourceData.getChannelListManager().channelMapToPhonesList(groupChannels);
+			if (trueSourceData.getChannelListManager() != null && trueSourceData.getSequenceMapObject()==null) {
+				hydrophoneList = trueSourceData.getChannelListManager().channelMapToPhonesList(groupChannels);
 				int hydrophoneMap = PamUtils.makeChannelMap(hydrophoneList);
 				double timingError = Correlations.defaultTimingError(getSampleRate());
 				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(hydrophoneList, timingError); 
@@ -490,12 +496,15 @@ public class WhistleToneConnectProcess extends PamProcess {
 						ArrayManager.getArrayManager().getCurrentArray().getSpeedOfSound();
 			}
 			whistleDelays.prepareBearings();
-			searchBin1 = (int) (whistleMoanControl.whistleToneParameters.getMinFrequency() * 
-					sourceData.getFftLength() / getSampleRate());			
-			searchBin2 = (int) (whistleMoanControl.whistleToneParameters.getMaxFrequency(getSampleRate()) * 
-					sourceData.getFftLength() / getSampleRate());
-			searchBin1 = Math.max(0, Math.min(sourceData.getFftLength()/2, searchBin1));
-			searchBin2 = Math.max(0, Math.min(sourceData.getFftLength()/2, searchBin2));
+//			searchBin1 = (int) (whistleMoanControl.whistleToneParameters.getMinFrequency() * 
+//					sourceData.getFftLength() / getSampleRate());			
+//			searchBin2 = (int) (whistleMoanControl.whistleToneParameters.getMaxFrequency(getSampleRate()) * 
+//					sourceData.getFftLength() / getSampleRate());
+			WhistleToneParameters whistleParams = whistleMoanControl.whistleToneParameters;
+			searchBin1 = (int) trueSourceData.value2bin(whistleParams.getMinFrequency(), firstChannel);
+			searchBin2 = (int) trueSourceData.value2bin(whistleParams.getMaxFrequency(getSampleRate()), firstChannel);
+			searchBin1 = Math.max(0, Math.min(trueSourceData.getDataWidth(firstChannel)-1, searchBin1));
+			searchBin2 = Math.max(0, Math.min(trueSourceData.getDataWidth(firstChannel)-1, searchBin2));
 		}
 
 		/**

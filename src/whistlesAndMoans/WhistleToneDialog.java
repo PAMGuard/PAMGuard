@@ -21,6 +21,7 @@ import PamController.PamController;
 import PamView.dialog.GroupedSourcePanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamguardMVC.DataBlock2D;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import cepstrum.CepstrumProcess;
@@ -57,6 +58,12 @@ public class WhistleToneDialog extends PamDialog {
 		JPanel p = new JPanel(new BorderLayout());
 		sourcePanel = new GroupedSourcePanel(this, "Source of FFT data", FFTDataUnit.class, true, true, true);
 		p.add(BorderLayout.NORTH, sourcePanel.getPanel());
+		sourcePanel.addSelectionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sourceSelection();
+			}
+		});
 		
 		JPanel d = new JPanel();
 		d.setBorder(new TitledBorder("Connections"));
@@ -171,12 +178,16 @@ public class WhistleToneDialog extends PamDialog {
 		whistleToneParameters = null;
 	}
 
+	protected void sourceSelection() {
+		checkFrequencyRange();
+	}
+
 	private void setParams() {
 //		sourcePanel.setSource(whistleToneParameters.dataSource);
 //		sourcePanel.setChannelList(whistleToneParameters.channelList);
 		sourcePanel.setParams(whistleToneParameters);
-		minFreq.setText(String.format("%.0f", whistleToneParameters.getMinFrequency()));
-		maxFreq.setText(String.format("%.0f", whistleToneParameters.
+		minFreq.setText(String.format("%.1f", whistleToneParameters.getMinFrequency()));
+		maxFreq.setText(String.format("%.1f", whistleToneParameters.
 				getMaxFrequency(whistleMoanControl.getWhistleToneProcess().getSampleRate())));
 		if (whistleToneParameters.getConnectType() == 8) {
 			connectType.setSelectedIndex(1);
@@ -191,7 +202,36 @@ public class WhistleToneDialog extends PamDialog {
 		removeStubs.setSelected(!whistleToneParameters.keepShapeStubs);
 		spectrogramNoiseDialogPanel.setParams(whistleToneParameters.getSpecNoiseSettings());
 		
+		checkFrequencyRange();
 		enableControls();
+	}
+	
+	/**
+	 * Check frequency range and insert sensible values if the current ones
+	 * are outside the range. 
+	 */
+	private void checkFrequencyRange() {
+		PamDataBlock dataBlock = sourcePanel.getSource();
+		if (dataBlock instanceof DataBlock2D == false) {
+			return;
+		}
+		DataBlock2D db2d = (DataBlock2D) dataBlock;
+		double minF = db2d.getMinDataValue();
+		double maxF = db2d.getMaxDataValue();
+		double minV = 0, maxV = 0;
+		try {
+			 minV = Double.valueOf(minFreq.getText());
+		}
+		catch (NumberFormatException ex) {}try {
+			 maxV = Double.valueOf(maxFreq.getText());
+		}
+		catch (NumberFormatException ex) {}
+		if (minV < minF) {
+			minFreq.setText(String.format("%3.1f", minF));
+		}
+		if (maxV > maxF || maxV <= 0) {
+			maxFreq.setText(String.format("%3.1f", maxF));
+		}
 	}
 	
 	@Override
@@ -202,7 +242,7 @@ public class WhistleToneDialog extends PamDialog {
 		if (whistleToneParameters.getChanOrSeqBitmap() == 0) {
 			return showWarning("You must select at least one detection channel");
 		}
-		try {
+		try {			
 			whistleToneParameters.setMinFrequency(Double.valueOf(minFreq.getText()));
 			whistleToneParameters.setMaxFrequency(Double.valueOf(maxFreq.getText()));
 			whistleToneParameters.minLength = Integer.valueOf(minLength.getText());

@@ -18,6 +18,7 @@ public class MelDataBlock extends FFTDataBlock {
 		this.melControl = melControl;
 		this.melProcess = parentProcess;
 		dataTypeInfo = new DataTypeInfo(ParameterType.FREQUENCY, ParameterUnits.HZ);
+		setLogScale(true);
 	}
 
 	@Override
@@ -49,10 +50,6 @@ public class MelDataBlock extends FFTDataBlock {
 		return dataTypeInfo;
 	}
 
-	@Override
-	public boolean isLogScale() {
-		return true;
-	}
 
 
 

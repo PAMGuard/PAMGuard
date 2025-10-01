@@ -49,6 +49,8 @@ public class DirectDrawProjector extends GeneralProjector<Coordinate3d> {
 	private double timeRangeMillis;
 
 	private boolean isViewer;
+	
+	private boolean isLogScale;
 
 	public DirectDrawProjector(SpectrogramDisplay spectrogramDisplay, int panelId) {
 
@@ -109,8 +111,33 @@ public class DirectDrawProjector extends GeneralProjector<Coordinate3d> {
 		if (x < 0) {
 			x += displayWidth;
 		}
-		double y = displayHeight - (freqHz- frequencyRange[0]) * yPixsPerHz;
+		double y = freq2y(freqHz);
 		return new Coordinate3d(x, y);
+	}
+	
+	private double freq2y(double fHz) {
+		double y = 0;
+		if (isLogScale) {
+			y = displayHeight - displayHeight * (Math.log(fHz/frequencyRange[0])/Math.log(frequencyRange[1]/frequencyRange[0]));
+		}
+		else {
+			y = displayHeight - (fHz- frequencyRange[0]) * yPixsPerHz;
+		}
+		return y;
+	}
+	
+	private double y2freq(double yPix) {
+		double hz = 0;
+		if (isLogScale) {
+			double yRel = (displayHeight - yPix)/displayHeight;
+			yRel *= Math.log(frequencyRange[1]/frequencyRange[0]);
+			yRel = Math.exp(yRel);
+			hz = yRel * frequencyRange[0];
+		}
+		else {
+			hz = (displayHeight-yPix)/yPixsPerHz + frequencyRange[0];
+		}
+		return hz;		
 	}
 	
 
@@ -131,7 +158,7 @@ public class DirectDrawProjector extends GeneralProjector<Coordinate3d> {
 		if (timeMillis < xStartMillis) {
 			timeMillis += timeRangeMillis;
 		}
-		double freqHz = (displayHeight-y)/yPixsPerHz + frequencyRange[0];
+		double freqHz = y2freq(y);
 		return new Coordinate3d(timeMillis, freqHz);
 	}
 	/**
@@ -157,6 +184,18 @@ public class DirectDrawProjector extends GeneralProjector<Coordinate3d> {
 	 */
 	public int getPanelId() {
 		return panelId;
+	}
+	/**
+	 * @return the isLogScale
+	 */
+	public boolean isLogScale() {
+		return isLogScale;
+	}
+	/**
+	 * @param isLogScale the isLogScale to set
+	 */
+	public void setLogScale(boolean isLogScale) {
+		this.isLogScale = isLogScale;
 	}
 
 }

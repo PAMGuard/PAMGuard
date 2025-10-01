@@ -51,6 +51,39 @@ abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDat
 	}
 	
 	/**
+	 * Convert a bin to a value. e.g. a fft bin to a frequency
+	 * @param bin bin number, e.g. pos in fft. 
+	 * @param sequenceNumnber (channel)
+	 * @return data value
+	 */
+	public double bin2Value(double bin, int sequenceNumber) {
+		if (isLogScale()) {
+			double c = Math.log(getMaxDataValue()/getMinDataValue())/getDataWidth(sequenceNumber);
+			return getMinDataValue() * Math.exp(bin*c);
+		}
+		else {
+			return (bin / getDataWidth(sequenceNumber)) * (getMaxDataValue()-getMinDataValue()) + getMinDataValue(); 
+		}
+	}
+	
+	/**
+	 * convert a data value to a bin
+	 * @param value data value
+	 * @param sequenceNumber (channel)
+	 * @return bin within data (can exceed limits if too large !)
+	 */
+	public double value2bin(double value, int sequenceNumber) {
+		if (isLogScale()) {
+			double c = Math.log(getMaxDataValue()/getMinDataValue())/getDataWidth(sequenceNumber);
+			return Math.log(value/getMinDataValue())/c;
+		}
+		else {
+			double v = (value - getMinDataValue()) / (getMaxDataValue()-getMinDataValue()) * getDataWidth(sequenceNumber);
+			return v;
+		}
+	}
+	
+	/**
 	 * Get the scale units to display on axis, etc. 
 	 * @return data type information.
 	 */
