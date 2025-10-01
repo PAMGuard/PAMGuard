@@ -29,7 +29,7 @@ public abstract class DAQSettingsPane<T> extends SettingsPane<T>{
 	 * Returns a pane to be added to the status bar of the acquisition pane. 
 	 * @return
 	 */
-	public abstract DAQStatusPaneFactory getStatusBarPane();
+	public abstract DAQStatusPaneFactory getStatusBarFactory();
 		
 
 }

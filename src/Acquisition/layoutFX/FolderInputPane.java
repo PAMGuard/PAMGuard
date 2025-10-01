@@ -722,7 +722,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	}
 
 	@Override
-	public DAQStatusPaneFactory getStatusBarPane() {
+	public DAQStatusPaneFactory getStatusBarFactory() {
 		return folderStatusPaneFactory;
 	}
 

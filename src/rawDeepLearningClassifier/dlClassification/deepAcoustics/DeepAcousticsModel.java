@@ -2,6 +2,7 @@ package rawDeepLearningClassifier.dlClassification.deepAcoustics;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.json.JSONObject;
 import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
 import ai.djl.inference.Predictor;
+import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslateException;
 import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveModel;
 
@@ -70,9 +72,20 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	 * @param jsonPath The path to the JSON file.
 	 * @return The loaded DeepAcousticsNetwork.
 	 */
-	private DeepAcousticsNetwork loadDeepAcousticNetwork(String jsonPath) {
+	private  DeepAcousticsNetwork loadDeepAcousticNetwork(String jsonPath) {
+		return loadDeepAcousticNetwork(jsonPath, this.getInputShape());
+	}
 
-		String jsonString  = DLTransformsParser.readJSONString(new File(this.getAudioReprFile()));
+	/**
+	 * Load the DeepAcousticsNetwork from the JSON file that is associated with the model. This adds
+	 * some extra information on anchor boxes that is not in the generalised JSON format. 
+	 * 
+	 * @param jsonPath The path to the JSON file.
+	 * @return The loaded DeepAcousticsNetwork.
+	 */
+	private static DeepAcousticsNetwork loadDeepAcousticNetwork(String jsonPath, Shape inputShape) {
+
+		String jsonString  = DLTransformsParser.readJSONString(new File(jsonPath));
 
 		JSONObject mainObject = new JSONObject(jsonString);
 
@@ -88,18 +101,36 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 			double[] anchorBox;
 			for (int i = 0; i < dataArray.length(); i++) {
 				JSONArray innerArray = dataArray.getJSONArray(i);
-				anchorBox = new double[innerArray.length()];
-				for (int j = 0; j < innerArray.length(); j++) {
-					anchorBox[j] = innerArray.getDouble(j);
+				
+				if (innerArray.get(0) instanceof BigDecimal) {
+					//backwards compatibility where there was a single 2D array of anchor boxes
+					anchorBox = new double[innerArray.length()];
+					for (int j = 0; j < innerArray.length(); j++) {
+						anchorBox[j] = innerArray.getDouble(j);
+					}
+					anchorBoxes.add(new double[][] {anchorBox});
 				}
-				anchorBoxes.add(new double[][] {anchorBox});
+				
+				else {
+					//updated format with multiple sets of anchor boxes
+					double[][] multiAnchorBox = new double[innerArray.length()][];
+					for (int j = 0; j < innerArray.length(); j++) {
+						JSONArray boxArray = innerArray.getJSONArray(j);
+						anchorBox = new double[boxArray.length()];
+						for (int k = 0; k < boxArray.length(); k++) {
+							anchorBox[k] = boxArray.getDouble(i);
+						}
+						multiAnchorBox[j] = anchorBox;
+					}
+					anchorBoxes.add(multiAnchorBox);
+				}
+				
 			}
 			
 			//Print out some results
 			//System.out.println("Anchor boxes: " + anchorBoxes.size() + " " + anchorBoxes.get(0).length + " " + anchorBoxes.get(0)[0].length);
 			
-			DeepAcousticsNetwork network = new DeepAcousticsNetwork(this.getInputShape(), anchorBoxes);
-			
+			DeepAcousticsNetwork network = new DeepAcousticsNetwork(inputShape, anchorBoxes);
 			
 			return network;
 		}
@@ -108,6 +139,8 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 		return null;
 
 	}
+	
+
 
 	/**
 	 * Run the model with the given spectrogram image input.
@@ -160,6 +193,17 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	}
 
 
+	public static void main(String[] args) {
+		//Test the DeepAcousticsNetwork loadDeepAcousticNetwork(String jsonPath) function
+		//String jsonPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/deepAcoustics/DarkNet_Whistles/ModelExports/Test_TFSavedModel_DarkNet_250404/deepAcoustics.pdtf";
+		String jsonPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/deepAcoustics/TinyT_Multi_Species/ModelExports/Test_TFSavedModel_MCTinywFix_250912/deepAcoustics.pdtf";
+		try {
+			DeepAcousticsNetwork network = loadDeepAcousticNetwork(jsonPath, new Shape(-1,288,288,3));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
 }

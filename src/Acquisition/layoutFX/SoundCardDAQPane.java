@@ -125,7 +125,7 @@ public class SoundCardDAQPane extends DAQSettingsPane {
 	}
 
 	@Override
-	public DAQStatusPaneFactory getStatusBarPane() {
+	public DAQStatusPaneFactory getStatusBarFactory() {
 		return statusBarPaneFactory;
 	}
 

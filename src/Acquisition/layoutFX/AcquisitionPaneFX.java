@@ -621,7 +621,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		System.out.println("SHOW status bar pane for: " + currentDaqSystem2.getSystemType() + " "+ currentDaqSystem2.getDAQSpecificPane(this));
 		//set up the status bar
 		PamGuiManagerFX pamGuiManager = PamGuiManagerFX.getInstance();
-		pamGuiManager.addStatusBarPane(currentDaqSystem2.getDAQSpecificPane(this).getStatusBarPane());
+		pamGuiManager.addStatusBarPane(currentDaqSystem2.getDAQSpecificPane(this).getStatusBarFactory());
 		
 	}
 
