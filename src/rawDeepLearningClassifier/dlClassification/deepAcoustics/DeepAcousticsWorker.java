@@ -75,6 +75,7 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 
 			long time1 = System.currentTimeMillis();
 
+			//System.out.println("DeepAcousticsWorker: Running model on " + transformedDataStack4D.length + " " + transformedDataStack4D[0].length + "x" + transformedDataStack4D[0][0].length + "x" + transformedDataStack4D[0][0][0].length + " input images.");
 
 			List<DeepAcousticResultArray> modelResults = getDeepAcousticsModel().runModel(transformedDataStack4D);
 

@@ -409,8 +409,14 @@ public abstract class DLTransformImage extends PamBorderPane{
 				return false;
 			}
 			//				System.out.println("TRANSFROM IMAGE 1: " + currentTransform.getDLTransformType() + " index: " + i + " " + ((WaveTransform) currentTransform).getWaveData().getSampleAmplitudes().length);
+			
+			
 			currentTransform = getDLTransforms().get(i).transformData(currentTransform);
-			//				System.out.println("TRANSFROM IMAGE 2: " + currentTransform.getDLTransformType() + " index: " + i + " " + transformschoiceBox.getSelectionModel().getSelectedIndex() + " " + currentTransform);
+//			if (currentTransform instanceof FreqTransform)	{
+//				System.out.println("TRANSFROM IMAGE 1: " + currentTransform.getDLTransformType() + " index: " + i + " " + ((FreqTransform) currentTransform).getSpecTransfrom().getReal().length + " " + ((FreqTransform) currentTransform).getSpecTransfrom().getReal()[0].length);
+//			}
+
+//						System.out.println("TRANSFROM IMAGE 2: " + currentTransform.getDLTransformType() + " index: " + i + " " + transformschoiceBox.getSelectionModel().getSelectedIndex() + " " + currentTransform);
 		}
 
 		if (currentTransform instanceof FreqTransform) {

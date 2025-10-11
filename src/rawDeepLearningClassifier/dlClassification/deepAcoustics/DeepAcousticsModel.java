@@ -94,6 +94,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 			JSONObject modelObject = mainObject.getJSONObject("model_info"); 
 
 			JSONArray dataArray = modelObject.getJSONArray("anchorboxes");
+			
 
 			// You can choose to store it in a 2D array of a specific type
 			ArrayList<double[][]> anchorBoxes = new ArrayList<double[][]>();
@@ -127,6 +128,7 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 				
 			}
 			
+					
 			//Print out some results
 			//System.out.println("Anchor boxes: " + anchorBoxes.size() + " " + anchorBoxes.get(0).length + " " + anchorBoxes.get(0)[0].length);
 			
@@ -183,9 +185,9 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	 */
 	private static float[][][] colourSizeImage(float[][] dataF) {
 		//NEED TO COLOURISE SPECTROGRAM TO MAKE IT A 3D INPUT
-		float[][][] dataF3 = new float[160][160][3];
-		for (int i=0; i<160; i++) {
-			for (int j=0; j<160; j++) {
+		float[][][] dataF3 = new float[dataF.length][dataF[0].length][3];
+		for (int i=0; i<dataF.length; i++) {
+			for (int j=0; j<dataF[0].length; j++) {
 				dataF3[j][i] = new float[] {dataF[i][j],dataF[i][j],dataF[i][j]};
 			}
 		}

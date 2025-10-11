@@ -162,12 +162,12 @@ public class DataTransformPaneFactory {
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Block size ", "Bins ", "Slope "},  new String[]{"pixels", "", ""}, 2); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, 500000,  1); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0, 500000,  1);
-			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   0.1);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(2, 0.0, 500000.0,   0.1);
 			break;
 		case CLAHE2:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Clip limit ", "alpha "},  new String[]{"", ""}, 2); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   0.1); 
-			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   0.1);
 			break;
 		case FFT:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"FFT length"},  new String[]{"samples"}); 
