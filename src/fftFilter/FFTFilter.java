@@ -3,6 +3,7 @@ package fftFilter;
 import java.util.Arrays;
 
 import Filters.Filter;
+import PamUtils.PamArrayUtils;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
@@ -17,6 +18,8 @@ public class FFTFilter implements Filter {
 	private float sampleRate;
 
 	private int currentFFTLength;
+	
+	private boolean removeMean;
 	
 	public FFTFilter(FFTFilterParams fftFilterParams, float sampleRate) {
 		setParams(fftFilterParams, sampleRate);
@@ -49,10 +52,18 @@ public class FFTFilter implements Filter {
 
 		int len = inputData.length;
 		int fftLen = 1<<PamUtils.log2(len);
-		if (currentFFTLength != fftLen) {
+		if (doubleFFT_1D == null || currentFFTLength != fftLen) {
 			currentFFTLength = fftLen;
 			doubleFFT_1D = new DoubleFFT_1D(fftLen);
 		}
+		
+		double mean = 0;
+		if (removeMean) {
+			mean = PamArrayUtils.mean(inputData);
+			inputData = Arrays.copyOf(inputData, inputData.length);
+			PamArrayUtils.add(inputData, -mean);
+		}
+		
 		double[] complexData = Arrays.copyOf(inputData, fftLen*2);
 //		doubleFFT_1D.realForward(fftData);
 		doubleFFT_1D.realForwardFull(complexData);
@@ -116,6 +127,13 @@ public class FFTFilter implements Filter {
 		j = 0;
 		for (int i = 0; i < len; i++, j+=2) {
 			outputData[i] = complexData[j];
+		}
+		if (mean != 0) {
+			switch(fftFilterParams.filterBand) {
+			case BANDSTOP:
+			case LOWPASS:
+				PamArrayUtils.add(outputData, mean);
+			}
 		}
 	}
 	
@@ -317,6 +335,20 @@ public class FFTFilter implements Filter {
 	public double runFilter(double aData) {
 		// can't do this with fft filtering, since data need to be in blocks. 
 		return Double.NaN;
+	}
+
+	/**
+	 * @return the removeMean
+	 */
+	public boolean isRemoveMean() {
+		return removeMean;
+	}
+
+	/**
+	 * @param removeMean the removeMean to set
+	 */
+	public void setRemoveMean(boolean removeMean) {
+		this.removeMean = removeMean;
 	}
 
 }

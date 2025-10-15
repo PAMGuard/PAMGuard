@@ -458,6 +458,9 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 					g2.setStroke(dashed);
 
 					for (int iChan = 0; iChan < eventLineData.length; iChan++) {
+						if (eventLineData[iChan] == null) {
+							continue; // fix bug report Liz F 3/10/2025. 
+						}
 						scaledData = new double[eventLineData[iChan].length];
 						for (int i = 0; i < scaledData.length; i++) {
 							scaledData[i] = r.getHeight()-amplitudeAxis.getPosition(eventLineData[iChan][i]*scale);

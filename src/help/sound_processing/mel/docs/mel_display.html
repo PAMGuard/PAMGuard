@@ -1,0 +1,42 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Mel Spectrogram</title>
+</head>
+
+<body>
+
+	<h1>Mel Spectrogram</h1>
+	<h2>Displays</h2>
+	<p>
+		The Mel Spectrogram data can display on a normal <a
+			href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">Spectrogram
+			Display</a>.
+	<p>The example below shows dolphin whistles on both a normal
+		Spectrogram Display using the FFT data and also the display of the Mel
+		Spectrogram data.</p>
+	<p>
+		<img src="images/meldisplay.png">
+	</p>
+	<h2>Detectors and other modules</h2>
+	<p>
+		Our long term goal is that the Mel spectrogram data could be fed into
+		any detector that would normally take FFT data. However, many
+		detectors will need code updates to support this. Currently only the <a
+			href="../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
+			and Moan detector</a> has been tested with Mel Spectrogram input.
+	</p>
+
+	<p>
+		Also note that phase information is lost when calculating the Mel
+		Spectrogram, so Mel Spectrogram data are not suitable for localisation
+		tasks based on <a
+			href="../../../localisation/docs/localisation_tdoa.html">Time
+			Difference of Arrival</a> measurements. <br>
+	<p CLASS="prevLink">
+		<a href="mel_config.html">Previous: Mel Spectrogram Configuration</a>
+	</p>
+	<br>
+</body>
+</html>

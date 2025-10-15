@@ -450,7 +450,7 @@ public class SourcePanel implements ActionListener{
 	
 	/**
 	 * 
-	 * @return the source data block name, or null if nothing selected. 
+	 * @return the source data block long data name, or null if nothing selected. 
 	 */
 	public String getSourceName() {
 		PamDataBlock source = getSource();
