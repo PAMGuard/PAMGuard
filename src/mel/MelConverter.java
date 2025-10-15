@@ -69,6 +69,14 @@ public class MelConverter {
 		return mels;
 	}
 	
+	/**
+	 * Calculate mel spectrogram of squared FFT data. This is slightly quicker since
+	 * it just needs the mag^2 of the complex FFT data without a need to take a sqrt. 
+	 * Though a sqrt will probably still need to be performed to return the mel 
+	 * spectrogram on a linear scale at the end. 
+	 * @param fftDataSq
+	 * @return
+	 */
 	public double[] melFromMagSq(double[] fftDataSq) {
 		double data[] = melWithPower(fftDataSq, power/2.);
 		scalePower(data, 1./power);
