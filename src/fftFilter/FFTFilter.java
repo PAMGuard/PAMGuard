@@ -52,6 +52,94 @@ public class FFTFilter implements Filter {
 
 		int len = inputData.length;
 		int fftLen = 1<<PamUtils.log2(len);
+		fftLen = len;
+		if (fftLen < len) {
+			fftLen*=2; // make sure it's big enough
+		}
+		if (doubleFFT_1D == null || currentFFTLength != fftLen) {
+			currentFFTLength = fftLen;
+			doubleFFT_1D = new DoubleFFT_1D(fftLen);
+		}
+		
+		double mean = 0;
+		if (removeMean) {
+			mean = PamArrayUtils.mean(inputData);
+			inputData = Arrays.copyOf(inputData, inputData.length);
+			PamArrayUtils.add(inputData, -mean);
+		}
+		
+		double[] complexData = Arrays.copyOf(inputData, fftLen);
+
+		doubleFFT_1D.realForward(complexData);
+		/*
+		 * Do the filtering on the first half of the FFT only.
+		 * N.B. the array is real and imaginary pairs, so will have to 
+		 * operate on 2* the number of elements and double a lot of bin numbers. 
+		 */
+		int bin1, bin2;
+		switch(fftFilterParams.filterBand) {
+		case HIGHPASS:
+			bin1 = getFFTBin(fftFilterParams.highPassFreq, fftLen, sampleRate);
+			for (int i = 0; i < bin1*2; i++) {
+				complexData[i] = 0;
+			}
+			break;
+		case LOWPASS:
+			bin1 = getFFTBin(fftFilterParams.lowPassFreq, fftLen, sampleRate);
+			for (int i = bin1*2; i < fftLen; i++) {
+				complexData[i] = 0;
+			}
+			break;
+		case BANDPASS:
+			bin1 = getFFTBin(Math.min(fftFilterParams.highPassFreq, fftFilterParams.lowPassFreq), fftLen, sampleRate);
+			for (int i = 0; i < bin1*2; i++) {
+				complexData[i] = 0;
+			}
+			bin1 = getFFTBin(Math.max(fftFilterParams.highPassFreq, fftFilterParams.lowPassFreq), fftLen, sampleRate);
+			for (int i = bin1*2; i < fftLen; i++) {
+				complexData[i] = 0;
+			}
+			break;
+		case BANDSTOP:
+			bin1 = getFFTBin(Math.min(fftFilterParams.highPassFreq, fftFilterParams.lowPassFreq), fftLen, sampleRate);
+			bin2 = getFFTBin(Math.max(fftFilterParams.highPassFreq, fftFilterParams.lowPassFreq), fftLen, sampleRate);
+			for (int i = bin1*2; i < bin2*2; i++) {
+				complexData[i] = 0;
+			}
+		}
+		/*
+		 * Then do the inverse transform which will return a real result
+		 */
+		doubleFFT_1D.realInverse(complexData, true);
+		
+		/**
+		 * And copy that into the output data. 
+		 */
+		for (int i = 0; i < len; i++) {
+			outputData[i] = complexData[i];
+		}
+		if (mean != 0) {
+//			switch(fftFilterParams.filterBand) {
+//			case BANDSTOP:
+//			case LOWPASS:
+				PamArrayUtils.add(outputData, mean);
+//				break;
+//			}
+		}
+	}
+
+	/**
+	 * Old version
+	 * @param inputData
+	 * @param outputData
+	 */
+	public synchronized void runFilterFullforward(double[] inputData, double[] outputData) {
+
+		int len = inputData.length;
+		int fftLen = 1<<PamUtils.log2(len);
+		if (fftLen < len) {
+			fftLen*=2; // make sure it's big enough
+		}
 		if (doubleFFT_1D == null || currentFFTLength != fftLen) {
 			currentFFTLength = fftLen;
 			doubleFFT_1D = new DoubleFFT_1D(fftLen);

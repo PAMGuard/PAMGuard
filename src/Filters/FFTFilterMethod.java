@@ -69,7 +69,7 @@ public class FFTFilterMethod extends FilterMethod {
 	public Filter createFilter(int channel) {
 		FFTFilterParams fftFiltParams = new FFTFilterParams(getFilterParams());
 		FFTFilter fftFilter = new FFTFilter(fftFiltParams, (float) getSampleRate());
-		fftFilter.setRemoveMean(true);
+		fftFilter.setRemoveMean(false);
 		return fftFilter;
 	}
 
