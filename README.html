@@ -459,7 +459,9 @@ online help</a>. This can be used to stop the map from clearing whenever the
 acquisition resets for unknown reasons. Also updated help for internal storage
 options.</p>
 
-<p class=MsoNormal>New module to compute a Mel spectrogram</p>
+<p class=MsoNormal>New module to compute a <a
+href="https://www.pamguard.org/olhelp/sound_processing/mel/docs/mel_overview.html">Mel
+spectrogram</a></p>
 
 <p class=MsoNormal>FFT Filter option in <a
 href="https://www.pamguard.org/olhelp/sound_processing/FiltersHelp/Docs/Filters_filters.html">Filters
@@ -471,7 +473,10 @@ Store</a> option to update all binary files to the latest version. This can be
 useful if you want to open old binary files with the latest versions of the <a
 href="https://www.pamguard.org/matlabandr.html">Matlab, R, and Python libraries</a>.</p>
 
-<p class=MsoNormal><b>Bug Fixes</b></p>
+<p class=MsoNormal><b>Bug Fixes / minor enhancements </b></p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/258">Issue
+258</a>: Improved error reporting from database and binary store modules</p>
 
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/255">Issue
 255</a>: Fixed bug causing occasional crash in click spectrum display. </p>
@@ -501,8 +506,6 @@ changes are used in bearing localisers. </p>
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/247">Issue
 247</a>: Make correct interpretation of invalid speed and heading values (given
 as 102.3knots and 360.0 degrees in the data) </p>
-
-<p class=MsoNormal>&nbsp;</p>
 
 <h1>Version 2.02.17 June 2025</h1>
 
@@ -678,8 +681,8 @@ difference between the highest and second-highest votes.</p>
 
 <h2>Bug Fixes</h2>
 
-<p class=MsoNormal>Ishmael Matched Filter detector. Improved correlation
-algorithm to use correct data normalisation (and a faster FFT). </p>
+<p class=MsoNormal>Ishmael Matched Filter detector. Improved correlation algorithm
+to use correct data normalisation (and a faster FFT). </p>
 
 <p class=MsoNormal>Ishamel detector graphics. Improved graphics (spectrogram
 plugins) to work when scrolling the spectrogram and to have better automatic
@@ -817,8 +820,8 @@ were not showing correctly in Viewer mode. Now fixed</span></p>
 <p class=MsoNormal><span lang=EN-US>Data selectors for plotting on map were not
 working, also fixed</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Bearing localizer running offline was not
-correctly saving updated bearings to the database. Now fixed. </span></p>
+<p class=MsoNormal><span lang=EN-US>Bearing localizer running offline was not correctly
+saving updated bearings to the database. Now fixed. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>ROCCA Classifier fixes</span></b></p>
 
@@ -1005,8 +1008,8 @@ classifier was being trimmed. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Documentation</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>Comprehensive help file including description
-of the algorithm, screen grabs and examples.</span></p>
+<p class=MsoNormal><span lang=EN-US>Comprehensive help file including
+description of the algorithm, screen grabs and examples.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Bug fixes</span></p>
 
@@ -1017,8 +1020,8 @@ of the algorithm, screen grabs and examples.</span></p>
 <p class=MsoNormal><span lang=EN-US>Help documentation for Matched Click
 Classifier</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Database logging of offline tasks (such as click
-re-classification, bearing calculation, etc.)</span></p>
+<p class=MsoNormal><span lang=EN-US>Database logging of offline tasks (such as
+click re-classification, bearing calculation, etc.)</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Data selector for Whistle Classifier module</span></p>
 
@@ -1752,9 +1755,9 @@ be compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Java 12 is better at handling Windows scaling issues on high-DPI
-displays. Beyond that, users should not notice much of a difference between
-this version and previous beta releases.</p>
+lang=EN-US> </span>Java 12 is better at handling Windows scaling issues on
+high-DPI displays. Beyond that, users should not notice much of a difference
+between this version and previous beta releases.</p>
 
 <!-- ************************************************************************************************************************** --><!-- ************************************************************************************************************************** -->
 
@@ -2785,8 +2788,8 @@ November 2016</span></h1>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>1.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 307. Unpacker for Sound trap dwv files was not working
-correctly. This is now fixed. </span></p>
+</span><span lang=EN-US>Bug 307. Unpacker for Sound trap dwv files was not
+working correctly. This is now fixed. </span></p>
 
 <h1><a name="_Latest_Version_1.15.07"></a><span lang=EN-US>Version 1.15.07
 November 2016</span></h1>
@@ -2909,8 +2912,8 @@ lang=EN-US>3.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times N
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>4.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 290. Click bearings on spectrogram display plug in were
-reversed if the first hydrophone was behind the second hydrophone in the
+</span><span lang=EN-US>Bug 290. Click bearings on spectrogram display plug in
+were reversed if the first hydrophone was behind the second hydrophone in the
 configuration. This is now fixed so that it displays the same bearings as the
 main click detector display. </span></p>
 
@@ -2922,10 +2925,10 @@ the online help. Users of the Click Detector will notice the following changes:<
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>There is now a choice of least squares and Simplex
-based algorithms for real-time animal tracking. The improved algorithms also
-provide better error information both for display on the map and for storage in
-the database. </span></p>
+</span><span lang=EN-US>There is now a choice of least squares and Simplex based
+algorithms for real-time animal tracking. The improved algorithms also provide
+better error information both for display on the map and for storage in the
+database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3055,10 +3058,10 @@ GUI instead. This has been Fixed.</p>
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>8.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Bug 280. Recorder control option to automatically restart recording were
-causing confusion. It was working in that the recorder would return to its previous
-state, but it was sometimes difficult for users to set it so that recording
-would always start as soon as PAMGuard started. More sensible and easy to
-understand options have been developed in a new options dialog.</p>
+causing confusion. It was working in that the recorder would return to its
+previous state, but it was sometimes difficult for users to set it so that
+recording would always start as soon as PAMGuard started. More sensible and
+easy to understand options have been developed in a new options dialog.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>9.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3707,9 +3710,9 @@ normal operation, but with slightly different display settings. </p>
 
 <p class=MsoNormal><i>Spectrogram Display</i></p>
 
-<p class=MsoNormal>A system of sliders for setting the frequency and amplitude ranges
-of the spectrogram display has been implemented. Click the grey button on the
-top right corner of the spectrogram display '&nbsp; </p>
+<p class=MsoNormal>A system of sliders for setting the frequency and amplitude
+ranges of the spectrogram display has been implemented. Click the grey button
+on the top right corner of the spectrogram display '&nbsp; </p>
 
 <p class=MsoNormal><i>Video Range Module</i></p>
 
@@ -3931,8 +3934,8 @@ elements has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Database Speed: A substantial rewriting of some of the indexing methods
-in the database module has led to a significant increase in the speed at which
+</span>Database Speed: A substantial rewriting of some of the indexing methods in
+the database module has led to a significant increase in the speed at which
 data are written to the database (orders of magnitude for large databases).
 This is having a significant impact on the overall reliability of the software.
 Other changes have increased the speed (again by orders of magnitude) at which
@@ -4535,9 +4538,9 @@ display correctly and amplitude scale updates after scale parameter changes. </p
 
 <p class=MsoNormal><b>Speed improvement</b>. </p>
 
-<p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT library
-which gives a factor 2 speed improvement compared to previous FFT methods used
-in PAMGuard</p>
+<p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT
+library which gives a factor 2 speed improvement compared to previous FFT
+methods used in PAMGuard</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -4676,10 +4679,10 @@ online help. </p>
 <p class=MsoNormal><b>PAMGuard Mixed Mode operation</b></p>
 
 <p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with
-GPS data reloaded from a database so that detected sounds may be correctly
-localised. Multiple display frames - enables PAMGuard GUI to be split into
-multiple display windows, displayed on multiple monitors if desired. Enables
-the operator to simultaneously view the map and the click detector for example,
+GPS data reloaded from a database so that detected sounds may be correctly localised.
+Multiple display frames - enables PAMGuard GUI to be split into multiple
+display windows, displayed on multiple monitors if desired. Enables the
+operator to simultaneously view the map and the click detector for example,
 which is much &nbsp;easier than continually moving between multiple tabs. </p>
 
 <p class=MsoNormal><b>Documentation</b></p>
@@ -4787,8 +4790,8 @@ acquisition.&nbsp; </p>
 <p class=MsoNormal>Speed up of graphics, particularly regarding large
 quantities of gps track &nbsp;data</p>
 
-<p class=MsoNormal>National Instruments cards with names &gt; 20 characters
-long are now correctly &nbsp;recognised. </p>
+<p class=MsoNormal>National Instruments cards with names &gt; 20 characters long
+are now correctly &nbsp;recognised. </p>
 
 <p class=MsoNormal><b>Help File Updates</b></p>
 
@@ -5021,11 +5024,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal><b>Multithreading</b></p>
 
-<p class=MsoNormal>PAMGuard now processes data in each module in a different processing
-thread. This allows PAMGuard to use both processor cores on dual or multi core
-processor machines. However, multithreading may still cause instability in some
-modules. An option is therefore accessible from the main Detection menu to
-enable and disable multithreading. </p>
+<p class=MsoNormal>PAMGuard now processes data in each module in a different
+processing thread. This allows PAMGuard to use both processor cores on dual or
+multi core processor machines. However, multithreading may still cause
+instability in some modules. An option is therefore accessible from the main
+Detection menu to enable and disable multithreading. </p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -5195,8 +5198,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoNormal>&nbsp;</p>
 
 <p class=MsoNormal><a name="_Toc312065304"></a><a name="_Toc312063949"></a><span
-class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 -
-PAMGuard starts two releases, core and beta release</span></span>, </p>
+class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 - PAMGuard
+starts two releases, core and beta release</span></span>, </p>
 
 <p class=MsoNormal>this is the beta release</p>
 

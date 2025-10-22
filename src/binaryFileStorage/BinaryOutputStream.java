@@ -26,7 +26,7 @@ import warnings.RepeatWarning;
  */
 public class BinaryOutputStream {
 
-	private static RepeatWarning repeatWarning;
+	private RepeatWarning repeatWarning;
 
 	private PamDataBlock parentDataBlock;
 
@@ -57,7 +57,7 @@ public class BinaryOutputStream {
 	private BinaryOfflineDataMapPoint currentDataMapPoint;
 	
 	private int lastObjectType = Integer.MIN_VALUE;
-
+	
 	public BinaryOutputStream(BinaryStore binaryStore,
 			PamDataBlock parentDataBlock) {
 		super();
@@ -180,7 +180,8 @@ public class BinaryOutputStream {
 			dataOutputStream = new DataOutputStream(new BufferedOutputStream(fileOutputStream = new 
 					FileOutputStream(outputFile)));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 		
@@ -208,7 +209,8 @@ public class BinaryOutputStream {
 			try {
 				noiseOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(noiseFile)));
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				noiseOutputStream = null;
 				return false;
 			}
@@ -268,7 +270,8 @@ public class BinaryOutputStream {
 			try {
 				dataOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				ok = false;
 			}
 			dataOutputStream = null;
@@ -277,7 +280,8 @@ public class BinaryOutputStream {
 			try {
 				noiseOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				ok = false;
 			}
 		}
@@ -360,7 +364,8 @@ public class BinaryOutputStream {
 				outputStream.write(headerData);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 
@@ -424,7 +429,8 @@ public class BinaryOutputStream {
 				outputStream.write(footerData);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 		lastObjectType = BinaryTypes.MODULE_FOOTER;
@@ -580,10 +586,10 @@ public class BinaryOutputStream {
 	 * Report stream error counts. 
 	 * @param e
 	 */
-	private static synchronized void reportStreamError(IOException e) {
+	private synchronized void reportStreamError(IOException e) {
 		// TODO Auto-generated method stub
 		if (repeatWarning == null) {
-			repeatWarning = new RepeatWarning("Binary Output Stream");
+			repeatWarning = new RepeatWarning("Binary Output Stream " + parentDataBlock.getDataName());
 		}
 		repeatWarning.showWarning(e, 2);
 	}
@@ -601,7 +607,7 @@ public class BinaryOutputStream {
 			opStream = new DataOutputStream(new BufferedOutputStream(new 
 					FileOutputStream(indexFile)));
 		} catch (FileNotFoundException e) {
-			System.err.println("Error creating index file: " + e.getMessage());
+			reportStreamError(e);
 			return false;
 		}
 
@@ -620,7 +626,8 @@ public class BinaryOutputStream {
 		try {
 			opStream.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 		}
 
 		return true;

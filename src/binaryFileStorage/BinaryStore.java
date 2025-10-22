@@ -76,6 +76,7 @@ import dataMap.OfflineDataMapPoint;
 import pamScrollSystem.ViewLoadObserver;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamguard.GlobalArguments;
+import warnings.RepeatWarning;
 
 /**
  * The binary store will work very much like the database in that it 
@@ -160,6 +161,8 @@ PamSettingsSource, DataOutputStore {
 	private BinaryDataMapMaker dataMapMaker;
 
 	private BinaryUpdater binaryUpdater;
+	
+	private RepeatWarning repeatWarning;
 
 	public static int getCurrentFileFormat() { 
 		return CURRENT_FORMAT;
@@ -2496,6 +2499,10 @@ PamSettingsSource, DataOutputStore {
 
 	boolean reportError(String string) {
 		System.out.println(string);
+		if (repeatWarning == null) {
+			repeatWarning = new RepeatWarning(getUnitName(), 50, 20);
+		}
+		repeatWarning.showWarning(string, 2);
 		return false;
 	}
 
