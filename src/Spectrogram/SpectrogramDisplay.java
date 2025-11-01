@@ -1385,6 +1385,17 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 	}
 
+	/**
+	 * Is the axis set to log frequency scale ? Be null aware !
+	 * @return
+	 */
+	private boolean isLogFreqScale() {
+		PamAxis fa = frequencyAxis;
+		if (fa == null) {
+			return false;
+		}
+		return fa.isLogScale();
+	}
 
 	void newScrollPosition() {
 		if (spectrogramPanels == null) {
@@ -2688,7 +2699,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					directImagePos = getWidth();
 				}
 				//				System.out.println(" Panel " + String.valueOf(this.panelId) + " directImagePos = " + String.valueOf(directImagePos));
-				directDrawProjector.setLogScale(frequencyAxis.isLogScale());
+				directDrawProjector.setLogScale(isLogFreqScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 
@@ -2708,7 +2719,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				fillSpectrogramImage(g2d, this);
 
 				double millisPerBin = sampleRate / 1000. / sourceFFTDataBlock.getFftHop();
-				directDrawProjector.setLogScale(frequencyAxis.isLogScale());
+				directDrawProjector.setLogScale(isLogFreqScale());
 				spectrogramProjector.setScales(millisPerBin,
 						2. / sourceFFTDataBlock.getFftLength(), specImage.getWidth(),
 						specImage.getHeight());
@@ -2752,7 +2763,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 				drawMarkLabel(g);
 
-				directDrawProjector.setLogScale(frequencyAxis.isLogScale());
+				directDrawProjector.setLogScale(isLogFreqScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 
