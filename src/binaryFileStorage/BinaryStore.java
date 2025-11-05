@@ -64,6 +64,7 @@ import annotation.handler.AnnotationHandler;
 import backupmanager.BackupInformation;
 import binaryFileStorage.backup.BinaryBackupStream;
 import binaryFileStorage.checker.BinaryIntegrityChecker;
+import binaryFileStorage.checker.BinaryUpdater;
 import binaryFileStorage.layoutFX.BinaryStoreGUIFX;
 
 //import com.mysql.jdbc.NdbLoadBalanceExceptionChecker;
@@ -73,9 +74,9 @@ import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import pamScrollSystem.ViewLoadObserver;
-import pamViewFX.PamGuiManagerFX;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamguard.GlobalArguments;
+import warnings.RepeatWarning;
 
 /**
  * The binary store will work very much like the database in that it 
@@ -159,6 +160,10 @@ PamSettingsSource, DataOutputStore {
 
 	private BinaryDataMapMaker dataMapMaker;
 
+	private BinaryUpdater binaryUpdater;
+	
+	private RepeatWarning repeatWarning;
+
 	public static int getCurrentFileFormat() { 
 		return CURRENT_FORMAT;
 	}
@@ -227,13 +232,9 @@ PamSettingsSource, DataOutputStore {
 	@Override
 	public void pamToStart() {
 		super.pamToStart();
-
 		prepareStores();
-
 		openStores();
-
 		binaryStoreProcess.checkFileTimer();
-
 	}
 
 	@Override
@@ -265,9 +266,6 @@ PamSettingsSource, DataOutputStore {
 	private void openStores() {
 		long dataTime = PamCalendar.getTimeInMillis();
 		long analTime = System.currentTimeMillis();
-
-		System.out.println("BinaryStore.OpenStore: Session start time: " + PamCalendar.formatDBDateTime(  PamCalendar.getSessionStartTime(), true) + " sound file time "+ PamCalendar.getSoundFileTimeInMillis()); 	
-
 		BinaryOutputStream outputStream;
 		if (!checkOutputFolder()) {
 			storesOpen = false;
@@ -295,13 +293,7 @@ PamSettingsSource, DataOutputStore {
 			return true;
 		}
 
-		BinaryStoreSettings newSettings = null;
-		if (PamGUIManager.isFX()) {
-			newSettings = binaryStoreGUIFX.showDialog(newSettings);
-		}
-		else {
-			newSettings = BinaryStorageDialog.showDialog(null, this);
-		}
+		BinaryStoreSettings newSettings = BinaryStorageDialog.showDialog(null, this);
 		if (newSettings != null) {
 			binaryStoreSettings = newSettings.clone();
 			folder = new File(folderPath);
@@ -503,12 +495,12 @@ PamSettingsSource, DataOutputStore {
 		settingsMenu.add(m);
 
 		if (isViewer || SMRUEnable.isEnable()) {
-			m = new JMenuItem("Datagram options ...");
+			m = new JMenuItem("Datagram Options ...");
 			m.addActionListener(new DatagramOptions(parentFrame));
 			settingsMenu.add(m);
 		}
 
-		m = new JMenuItem("Open binary folder");
+		m = new JMenuItem("Open Binary Folder ...");
 		m.setToolTipText("Open folder in Explorer");
 		m.addActionListener(new ActionListener() {
 			@Override
@@ -517,7 +509,28 @@ PamSettingsSource, DataOutputStore {
 			}
 		});
 		settingsMenu.add(m);
+
+		if (isViewer) {
+			binaryUpdater = getBinaryUpdater();
+			m = new JMenuItem("Update Old Binary Files ...");
+			m.setToolTipText("Update all binary files to the latest PAMGuard file format");
+			m.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					binaryUpdater.showDialog();
+				}
+			});
+			settingsMenu.add(m);
+		}
+
 		return settingsMenu;
+	}
+
+	private BinaryUpdater getBinaryUpdater() {
+		if (binaryUpdater == null) {
+			binaryUpdater = new BinaryUpdater(this);
+		}
+		return binaryUpdater;
 	}
 
 	protected void openBinaryFolder() {
@@ -2120,6 +2133,185 @@ PamSettingsSource, DataOutputStore {
 		return true;
 	}
 
+	/**
+	 * Update a binary file, by reading it all in, and writing it all out again in the
+	 * latest format. 
+	 * @param dataBlock
+	 * @param srcFile
+	 * @param dstFile
+	 * @param b 
+	 * @return
+	 */
+	public boolean updateBinaryFile(PamDataBlock pamDataBlock, BinaryOfflineDataMapPoint mapPoint, 
+			File srcFile, File dstFile, boolean createIndexFile) {
+
+		BinaryDataSource binarySource = pamDataBlock.getBinaryDataSource();
+		BinaryOutputStream outputStream = new BinaryOutputStream(this, pamDataBlock);
+		binarySource.setBinaryStorageStream(outputStream);
+		File tempFile = new File(dstFile.getAbsolutePath() + ".tmp");
+		/*
+		 * Check the path (subfolder) of the binary output. 
+		 */
+		File dstFolder = tempFile.getParentFile();
+		if (dstFolder.exists() == false) {
+			dstFolder.mkdirs();
+		}
+
+		BinaryInputStream inputStream = new BinaryInputStream(this, pamDataBlock);
+
+		BinaryHeader binaryHeader;
+		BinaryFooter binaryFooter;
+		ModuleHeader mh = null;
+		ModuleFooter mf = null;
+		BinaryObjectData binaryObjectData;
+		int oldModuleVersion = binarySource.getModuleVersion();
+		int inputFormat = CURRENT_FORMAT;
+		int outputFormat = CURRENT_FORMAT;
+
+		if (!outputStream.openPGDFFile(tempFile)) {
+			return reportError("Unable to open temp output file for rewriting " + 
+					tempFile.getAbsolutePath()); 
+		}
+
+		if (!inputStream.openFile(srcFile)) {
+			return reportError("Unable to open data file for rewriting " + 
+					srcFile.getAbsolutePath()); 
+		}
+		/**
+		 * Read the header from the main file, then write to the temp file. 
+		 * The appropriate module will handle the Module Header since this
+		 * may change. 
+		 */
+		binaryHeader = inputStream.readHeader();
+		if (binaryHeader == null) {
+			return reportError("Unable to read header from " +
+					srcFile.getAbsolutePath());
+		}
+		if (binaryHeader.getHeaderFormat() > getMaxUnderstandableFormat()) {
+			System.out.printf("File %s was created with a later version of PAMGuard using format %d\n", srcFile, binaryHeader.getHeaderFormat());
+			System.out.printf("The maximum understood file version is %d. You must upgrade to a later PAMGuard version\n", getMaxUnderstandableFormat());
+			return false;
+		}
+		inputFormat = binaryHeader.getHeaderFormat();
+		binaryHeader.setHeaderFormat(outputFormat);
+
+		outputStream.writeHeader(binaryHeader.getDataDate(), binaryHeader.getAnalysisDate());
+		//		ModuleHeader mh = 
+		byte[] moduleHeaderData = binarySource.getModuleHeaderData();
+		outputStream.writeModuleHeader(moduleHeaderData);
+
+
+		PamDataUnit aDataUnit;
+		int n=0;
+		long time = 0;
+		long time2 =0;
+		//need to reset counter incase we have unsynced channels. 
+		int previousObjectType = Integer.MAX_VALUE;
+
+		while((binaryObjectData = inputStream.readNextObject(inputFormat)) != null) {
+			switch(binaryObjectData.getObjectType()) {
+			case BinaryTypes.FILE_HEADER:
+				break;
+			case BinaryTypes.FILE_FOOTER:
+				break;
+			case BinaryTypes.MODULE_HEADER:
+				mh = binarySource.sinkModuleHeader(binaryObjectData, binaryHeader);
+				oldModuleVersion = binaryObjectData.getVersionNumber();
+				break;
+			case BinaryTypes.MODULE_FOOTER:
+				break;
+			case BinaryTypes.DATAGRAM:
+				break;
+			case BinaryTypes.BACKGROUND_DATA:
+				outputStream.storeData(BinaryTypes.BACKGROUND_DATA, binaryObjectData.getDataUnitBaseData(), binaryObjectData);
+				break;
+			default:// it's data !
+				//			if (previousObjectType == BinaryTypes.FILE_HEADER) {
+				//				System.out.printf("Writing data to file with no module header in %s\n", null)
+				//			}
+				long t1=System.currentTimeMillis();
+				//				if (n%500==0){
+				//					System.out.println("BinaryStore: aDataUnit = null:");
+				//				}
+				aDataUnit = binarySource.sinkData(binaryObjectData, binaryHeader, oldModuleVersion);
+				if (aDataUnit == null) {
+					continue;
+				}
+				aDataUnit.getBasicData().mergeBaseData(binaryObjectData.getDataUnitBaseData());
+				unpackAnnotationData(binaryHeader.getHeaderFormat(), aDataUnit, binaryObjectData, null);
+				binarySource.saveData(aDataUnit);
+				n++;
+				//					outputStream.storeData(binaryObjectData);
+
+			}
+			previousObjectType = binaryObjectData.getObjectType();
+
+		}
+		//	System.out.printf("Finished saving data units in %s ...\n", tempFile.getAbsolutePath());
+
+		byte[] moduleFooterData = binarySource.getModuleFooterData(); //saving (copying file)
+		outputStream.writeModuleFooter(moduleFooterData);
+
+		binaryFooter = inputStream.getBinaryFooter();
+		if (binaryFooter == null) {
+			outputStream.writeFooter(inputStream.getLastObjectTime(), binaryHeader.getAnalysisDate(),
+					BinaryFooter.END_CRASHED);
+		}
+		else {
+			outputStream.writeFooter(binaryFooter.getDataDate(), binaryFooter.getAnalysisDate(), 
+					binaryFooter.getFileEndReason());
+		}
+		outputStream.closeFile();
+		inputStream.closeFile();
+
+		/*
+		 * Now file final stage - copy the temp file in place of the 
+		 * original file. This may be the same file, in which case it needs to be
+		 * replaced, or it might be in a new folder, in which case dstfile just needs renamed. 
+		 */
+		boolean sameFile = srcFile.equals(dstFile);
+		if (sameFile) {
+			// delete the original file. 
+			boolean deletedOld = false;
+			try {
+				deletedOld = srcFile.delete();
+			}
+			catch (SecurityException e) {
+				System.out.println("Error deleting old pgdf file: " + srcFile.getAbsolutePath());
+				e.printStackTrace();
+			}
+		}
+
+		boolean renamedNew = false;
+		/*
+		 *  then rename the dst file from it's temp to it's final, which may or may not have been
+		 *  the source file, which will have been deleted if they were the same.  
+		 */		
+		try {
+			renamedNew = tempFile.renameTo(dstFile);
+		}
+		catch (SecurityException e) {
+			System.out.println("Error renaming new pgdf file: " + tempFile.getAbsolutePath() + 
+					" to " + dstFile.getAbsolutePath());
+			e.printStackTrace();
+		}
+		if (!renamedNew) {
+			return reportError(String.format("Unable to rename %s to %s", 
+					tempFile.getAbsolutePath(), dstFile.getAbsolutePath()));
+		}
+		else {
+			tempFile.delete();
+		}
+
+		if (createIndexFile) {
+			File indexFile = findIndexFile(dstFile, false);
+			outputStream.createIndexFile(indexFile, mapPoint);
+		}
+
+
+		return true;
+	}
+
 	/* (non-Javadoc)
 	 * @see PamController.PamControlledUnit#pamClose()
 	 */
@@ -2307,6 +2499,10 @@ PamSettingsSource, DataOutputStore {
 
 	boolean reportError(String string) {
 		System.out.println(string);
+		if (repeatWarning == null) {
+			repeatWarning = new RepeatWarning(getUnitName(), 50, 20);
+		}
+		repeatWarning.showWarning(string, 2);
 		return false;
 	}
 

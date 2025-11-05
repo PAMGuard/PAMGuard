@@ -56,6 +56,8 @@ import generalDatabase.pamCursor.PamCursor;
 import pamScrollSystem.LoadQueueProgressData;
 import pamScrollSystem.ViewLoadObserver;
 import qa.QASoundDataUnit;
+import warnings.PamWarning;
+import warnings.RepeatWarning;
 
 /**
  * 
@@ -139,6 +141,8 @@ public abstract class SQLLogging {
 	private boolean canView = false;
 
 	private boolean loadViewData = false;
+	
+	private RepeatWarning repeatWarning;
 
 	protected SuperDetLogging superDetLogging;
 
@@ -380,6 +384,7 @@ public abstract class SQLLogging {
 	public synchronized boolean logData(PamConnection con, PamDataUnit dataUnit, PamDataUnit superDetection) {
 
 		if (con == null) {
+			showWarning("No database connection");
 			return false;
 		}
 		//		if (dataUnit instanceof QASoundDataUnit && superDetection == null) {
@@ -391,6 +396,7 @@ public abstract class SQLLogging {
 
 		PamCursor pamCursor = loggingCursorFinder.getCursor(con, pamTableDefinition);
 		if (pamCursor == null) {// null for oodb
+			showWarning("Database cursor error");
 			return false;
 		}
 
@@ -405,9 +411,11 @@ public abstract class SQLLogging {
 		
 		if (newIndex > 0) { // logging was OK
 			dataUnit.clearUpdateCount();
+			clearWarning();
 			return true;
 		}
 		else {
+			showWarning("Error logging data " + dataUnit.toString());
 			return false;
 		}
 
@@ -447,6 +455,7 @@ public abstract class SQLLogging {
 		//		System.out.printf("ReLog data unit %s with super det %s\n", dataUnit, superDetection);
 
 		if (con == null) {
+			showWarning("No database connection");
 			return false;
 		}
 		if (dataUnit.getDatabaseIndex() <= 0) {
@@ -481,6 +490,10 @@ public abstract class SQLLogging {
 
 		if (logOK) {
 			dataUnit.clearUpdateCount();
+			clearWarning();
+		}
+		else {
+			showWarning("Error logging data");
 		}
 		
 		return logOK;
@@ -2232,10 +2245,11 @@ public abstract class SQLLogging {
 			s.execute(sqlString);
 			s.close();
 		} catch (SQLException e) {
-			System.out.println("Delete sub detection failed with " + sqlString);
+			showWarning(sqlString + " failed: " + e.getMessage());
 //			e.printStackTrace();
 			return false;
 		}
+		clearWarning();
 		return true;
 	}
 
@@ -2255,13 +2269,32 @@ public abstract class SQLLogging {
 			s.execute(sqlString);
 			s.close();
 		} catch (SQLException e) {
-			System.out.println("Delete failed with " + sqlString);
-			e.printStackTrace();
+			showWarning(sqlString + " failed: " + e.getMessage());
 			return false;
 		}
+		clearWarning();
 		return true;
 	}
 
+	/**
+	 * show a warning in the warning system part of the status bar
+	 * Try to do something clever to count up similar types of warning. 
+	 * @param title
+	 * @param message
+	 */
+	private void showWarning(String message) {
+		if (repeatWarning == null) {
+			String tit = String.format("Database error table %s", getTableDefinition().tableName);
+			repeatWarning = new RepeatWarning(tit, 50, 5);
+		}
+		repeatWarning.showWarning(message, 2);
+	}
+	
+	private void clearWarning() {
+		if (repeatWarning != null) {
+			repeatWarning.clearWarning();
+		}
+	}
 
 	/**
 	 * find the super detection for this sub detection. 

@@ -650,7 +650,7 @@ public class PamCalendar {
 	}
 
 	/**
-	 * Format date in format "yyyyMMdd" using GMT as the time zone
+	 * Format date in format "yyyyMMdd" using UTC as the time zone
 	 * @param timeMillis
 	 * @return
 	 */
@@ -978,7 +978,7 @@ public class PamCalendar {
 		Date dt = unpackUnknownDateString(numstr);
 		if (dt != null) {
 			Calendar cl = Calendar.getInstance();
-			cl.setTimeZone(TimeZone.getTimeZone("GMT"));
+			cl.setTimeZone(TimeZone.getTimeZone("UTC"));
 			cl.setTime(dt);
 			return cl.getTimeInMillis();
 		}
@@ -1024,7 +1024,7 @@ j:				for (int j = 0; j < formats.length; j++) {
 					//Now see if DateFormat can parse it.
 					try {
 						SimpleDateFormat df = new SimpleDateFormat(fmt);
-						df.setTimeZone(TimeZone.getTimeZone("GMT"));
+						df.setTimeZone(TimeZone.getTimeZone("UTC"));
 						Date d = df.parse(str);  //throws ParseException if no match
 //						setLastFormat("Auto \"" + fmt + "\"");
 						return d;     /////////////////////////////////found one!
@@ -1132,7 +1132,7 @@ j:				for (int j = 0; j < formats.length; j++) {
 		c.setTimeZone(getDisplayTimeZone(useLocal));
 		Date date = new Date(c.getTimeInMillis());
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		String dateStr = format.format(date) + "_GMT";
+		String dateStr = format.format(date) + "_UTC";
 		return dateStr;
 	}
 

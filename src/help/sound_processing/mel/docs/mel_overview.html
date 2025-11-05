@@ -1,0 +1,39 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Mel Spectrogram</title>
+</head>
+
+<body>
+
+	<h1>Mel Spectrogram</h1>
+	<h2>Overview</h2>
+	<p>A Mel Spectrogram is similar to an ordinary spectrogram, but on
+		a logarithmic frequency scale. This tends to make frequency bins at
+		low frequencies 'larger' and at high frequencies 'smaller' on a
+		display.</p>
+	<p>
+		The PAMGuard Mel Spectrogram module is a pure Java implementation of
+		the popular Python <a
+			href="https://librosa.org/doc/main/generated/librosa.feature.melspectrogram.html">librosa
+			melspectrogram</a> function, though the PAMGuard implementation only
+		works of incoming FFT data, not raw audio data.
+	</p>
+
+	<h2>Adding the module</h2>
+	<p>
+		To add a Mel Spectrogram module to PAMGuard, first add a <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
+			module</a>, then from the <b>File>Add Modules>Sound processing</b> menu
+			select <b>Mel Spectrogram</b>, give the module a name and it will be added to your 
+			configuration. </p>
+			
+			<br>
+	<p CLASS="nextLink">
+		<a href="mel_config.html">Next: Mel Spectrogram Configuration</a>
+	</p>
+
+	<br>
+</body>
+
+</html>

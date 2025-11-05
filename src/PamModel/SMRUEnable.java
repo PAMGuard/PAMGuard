@@ -12,6 +12,11 @@ public class SMRUEnable {
 	
 	public static final int meygenGoodBitmap = 0xFFFFFBF;
 	
+	/**
+	 * Bodge for Meygen17 data to exclude bad channel
+	 * @param channelMap
+	 * @return
+	 */
 	public static final int getGoodChannels(int channelMap) {
 		if (meygen17) {
 			return channelMap & meygenGoodBitmap;

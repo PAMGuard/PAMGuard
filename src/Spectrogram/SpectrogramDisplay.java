@@ -447,16 +447,25 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		if (spectrogramParameters == null || sourceFFTDataBlock == null) {
 			return;
 		}
-		freqBinRange[0] = (int) Math
-				.floor(spectrogramParameters.frequencyLimits[0]
+		double[] freqLimits = spectrogramParameters.frequencyLimits;
+		double freqStart = 0;
+		int nBins = sourceFFTDataBlock.getDataWidth(0);
+		if (sourceFFTDataBlock != null) {
+			freqStart = sourceFFTDataBlock.getMinDataValue();
+			freqLimits[0] = Math.max((double) freqLimits[0], sourceFFTDataBlock.getMinDataValue());
+			freqLimits[1] = Math.min((double) freqLimits[1], sourceFFTDataBlock.getMaxDataValue());
+		}
+		freqBinRange[0] = (int) Math.floor((spectrogramParameters.frequencyLimits[0]-freqStart)
 						* sourceFFTDataBlock.getFftLength() / sampleRate);
-		freqBinRange[1] = (int) Math
-				.ceil(spectrogramParameters.frequencyLimits[1]
-						* sourceFFTDataBlock.getFftLength() / sampleRate);
+		freqBinRange[1] = (int) Math.ceil((spectrogramParameters.frequencyLimits[1]-freqStart)
+				* sourceFFTDataBlock.getFftLength() / sampleRate);
+		if (sourceFFTDataBlock != null) {
+			freqBinRange[1] = Math.min(freqBinRange[1], sourceFFTDataBlock.getDataWidth(0));
+		}
 		for (int i = 0; i < 2; i++) {
 			freqBinRange[i] = Math.min(Math.max(freqBinRange[i], 0),
 					sourceFFTDataBlock.getFftLength() / 2 - 1);
-			freqBinDisplayRange[1-i] = sourceFFTDataBlock.getFftLength()/2-freqBinRange[i];
+			freqBinDisplayRange[1-i] = nBins-freqBinRange[i];
 			//			freqBinDisplayRange[i] = freqBinRange[i];
 		}
 	}
@@ -785,7 +794,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		if (sourceFFTDataBlock == null) {
 			return 1;
 		}
-		return sourceFFTDataBlock.getFftLength()/2;
+		return sourceFFTDataBlock.getDataWidth(0);
 	}
 
 	/**
@@ -841,6 +850,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 	}
 
 	private void setAxisLimits() {
+		if (sourceFFTDataBlock == null) {
+			return;
+		}
 		if (frequencyAxis != null && spectrogramParameters != null) {
 			freqAxisScale = 1.;
 			if (spectrogramParameters.frequencyLimits[1] > 2000) {
@@ -864,7 +876,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					if (maxV < 1) {
 						freqAxisScale = 0.001;
 					}
-					frequencyAxis.setRange(minV, maxV/freqAxisScale);
+					frequencyAxis.setRange(minV/freqAxisScale, maxV/freqAxisScale);
 				}
 			}
 			else {
@@ -872,6 +884,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				frequencyAxis.setRange(spectrogramParameters.frequencyLimits[0]/freqAxisScale,
 						spectrogramParameters.frequencyLimits[1]/freqAxisScale);
 			}
+			frequencyAxis.setLogScale(sourceFFTDataBlock.isLogScale());
 		}
 	}
 
@@ -1372,6 +1385,17 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 	}
 
+	/**
+	 * Is the axis set to log frequency scale ? Be null aware !
+	 * @return
+	 */
+	private boolean isLogFreqScale() {
+		PamAxis fa = frequencyAxis;
+		if (fa == null) {
+			return false;
+		}
+		return fa.isLogScale();
+	}
 
 	void newScrollPosition() {
 		if (spectrogramPanels == null) {
@@ -2675,6 +2699,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					directImagePos = getWidth();
 				}
 				//				System.out.println(" Panel " + String.valueOf(this.panelId) + " directImagePos = " + String.valueOf(directImagePos));
+				directDrawProjector.setLogScale(isLogFreqScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 
@@ -2694,6 +2719,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				fillSpectrogramImage(g2d, this);
 
 				double millisPerBin = sampleRate / 1000. / sourceFFTDataBlock.getFftHop();
+				directDrawProjector.setLogScale(isLogFreqScale());
 				spectrogramProjector.setScales(millisPerBin,
 						2. / sourceFFTDataBlock.getFftLength(), specImage.getWidth(),
 						specImage.getHeight());
@@ -2737,6 +2763,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 				drawMarkLabel(g);
 
+				directDrawProjector.setLogScale(isLogFreqScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.18</version>
+  <version>2.02.17fc</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -55,8 +55,8 @@
 		<!-- The Linux profile creates a DMG package for installing PAMGuard on
 		Linux Ubuntu based systems-->
 		<!--Note: There is a Maven bug/feature when using profiles when the plugin order is messed up and seemingly quite random. 
-		In PAMGuard it essential that the shade plugin is called before the linux plugin. Therefore  call 
-		the package phase using mvn clean install where the jdeb package has been put in the install phase. Note that although a deb file can be created in Windows it
+		In PAMGuard it essential that the shade plugin is called before the linux plugin. Therefore explicately call 
+		the package phase using mvn package shade:shade jdeb:jdeb. Note that although a deb file can be created in Windows it
 		will not have the correct JavaFX libraries and therefore will not work when riun -->
 		<profile>
 			<id>linux-profile</id>
@@ -74,7 +74,7 @@
 						<version>1.11</version>
 						<executions>
 							<execution>
-								<phase>install</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>jdeb</goal>
 								</goals>
@@ -178,7 +178,6 @@
 									src/Resources/PamguardIcon2.icns</CFBundleIconFile>
 								<CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
 								<CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-								<NSMicrophoneUsageDescription>Microphone is needed to enable soundcard access for Sound Acquisition module</NSMicrophoneUsageDescription>
 								<CFBundleURLTypes>
 									<string>msa</string>
 								</CFBundleURLTypes>
@@ -1210,7 +1209,7 @@
 		<dependency>
 			<groupId>org.pamguard</groupId>
 			<artifactId>x3</artifactId>
-			<version>2.3.2</version>
+			<version>2.3.0</version>
 		</dependency>
 
 

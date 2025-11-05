@@ -81,6 +81,9 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 		AISPositionReport positionReport = newUnit.getPositionReport();
 		if (positionReport != null) {
 			LatLong refPos = MasterReferencePoint.getLatLong();
+			if (refPos == null) { // very occasional error if AIS arrives before first GPS.
+				return true;
+			}
 			range = refPos.distanceToMetres(positionReport.latLong);
 //			System.out.println(String.format("Range to %d is %3.1fkm",
 //					newUnit.mmsiNumber, range/1000));

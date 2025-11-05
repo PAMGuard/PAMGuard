@@ -39,7 +39,6 @@ import java.util.TimeZone;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
@@ -133,7 +132,6 @@ public class Pamguard {
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
-		
 
 		// set up the system to output to both a log file and the console window.  Also
 		// set up a monitor to check for the size of the folder every hour - if it gets

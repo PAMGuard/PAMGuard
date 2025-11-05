@@ -105,7 +105,7 @@ public class SpectrogramParamsDialog extends PamDialog implements ActionListener
 
 	private FFTDataBlock fftBlock;
 
-	private float defaultMinFreq, defaultMaxFreq;
+	private double defaultMinFreq, defaultMaxFreq;
 	
 	private PluginPanel pluginPanel;
 	
@@ -511,8 +511,8 @@ public class SpectrogramParamsDialog extends PamDialog implements ActionListener
 		if (fftBlock == null) {
 			return;
 		}
-		defaultMinFreq = 0;
-		defaultMaxFreq = fftBlock.getSampleRate() / 2;
+		defaultMinFreq = fftBlock.getMinDataValue();
+		defaultMaxFreq = fftBlock.getMaxDataValue();
 
 		nPanels.setText(String.format("%d", spectrogramParameters.nPanels)); //Xiao Yan Deng commented
 //		System.out.println("SpectrogramParameterDialog.java->fillSourcePanelData()numChannel:"+numChannel);

@@ -409,7 +409,9 @@ public class ClickBinaryDataSource extends BinaryDataSource {
 				}
 				if (bearingLocaliser == null) {
 					// this should be called with hydrophone map, not channel map. 
-					bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(channelMap, 0);
+					// this should never happen, since handles in 
+					int[] simpleMap = PamUtils.getChannelArray(channelMap);
+					bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(simpleMap, 0);
 				}
 				clickLocalisation.setSubArrayType(bearingLocaliser.getArrayType());
 				clickLocalisation.setArrayAxis(bearingLocaliser.getArrayAxis());

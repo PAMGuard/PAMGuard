@@ -31,6 +31,8 @@ public class FFTDataBlock extends DataBlock2D<FFTDataUnit> {
 	private double windowGain = 1.0;
 	
 	private static DataTypeInfo dataTypeInfo = new DataTypeInfo(ParameterType.FREQUENCY, ParameterUnits.HZ);
+	
+	private boolean logScale;
 
 	public FFTDataBlock(String dataName,
 			PamProcess parentProcess, int channelMap, int fftHop, int fftLength) {
@@ -195,6 +197,19 @@ public class FFTDataBlock extends DataBlock2D<FFTDataUnit> {
 		el.setAttribute("FFTLength", String.format("%d", getFftLength()));
 		el.setAttribute("FFTHop", String.format("%d", getFftHop()));
 		return el;
+	}
+
+
+	@Override
+	public boolean isLogScale() {
+		return logScale;
+	}
+
+	/**
+	 * @param logSpectrogram the logSpectrogram to set
+	 */
+	public void setLogScale(boolean logScale) {
+		this.logScale = logScale;
 	}
 
 

@@ -382,28 +382,33 @@ PAMGuardBeta_ViewerMode.exe):</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<p class=MsoNormal><em><b><span style='font-family:"Cambria",serif;font-style:
-normal'><a href="#_Version_2.02.18_????">Version 2.02.18 ???? 2025&nbsp;</a></span></b></em></p>
+<p class=MsoNormal style='line-height:115%'><em><b><span style='font-size:12.0pt;
+line-height:115%;font-family:"Cambria",serif;font-style:normal'><a
+href="#_Version_2.02.18_????">Version 2.02.18 ???? 2025&nbsp;</a></span></b></em></p>
 
-<p class=MsoNormal><em><b><u><span style='font-size:12.0pt;font-family:"Cambria",serif;
-font-style:normal'><a href="#_Version_2.02.17_?????">Version 2.02.17 June
-2025&nbsp;</a></span></u></b></em></p>
+<p class=MsoNormal style='line-height:115%'><em><b><u><span style='font-size:
+12.0pt;line-height:115%;font-family:"Cambria",serif;font-style:normal'><a
+href="#_Version_2.02.17_?????">Version 2.02.17 June 2025&nbsp;</a></span></u></b></em></p>
 
-<h2><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
-normal'><a href="#_Version_2.02.16_February">Version 2.02.16 March 2025&nbsp;</a></span></em></h2>
+<h2 style='line-height:115%'><em><span style='font-size:12.0pt;line-height:
+115%;font-family:"Cambria",serif;font-style:normal'><a
+href="#_Version_2.02.16_February">Version 2.02.16 March 2025&nbsp;</a></span></em></h2>
 
-<h2><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
-normal'><a href="#_2.02.15_December_2014">Version 2.02.15 December 2024</a></span></em></h2>
+<h2 style='line-height:115%'><em><span style='font-size:12.0pt;line-height:
+115%;font-family:"Cambria",serif;font-style:normal'><a
+href="#_2.02.15_December_2014">Version 2.02.15 December 2024</a></span></em></h2>
 
-<h2>&nbsp;</h2>
+<h2 style='line-height:115%'><span style='font-size:12.0pt;line-height:115%'>&nbsp;</span></h2>
 
-<p class=MsoNormal><b><u><span style='font-size:12.0pt;font-family:"Cambria",serif'><a
+<p class=MsoNormal style='line-height:115%'><b><u><span style='font-size:12.0pt;
+line-height:115%;font-family:"Cambria",serif'><a
 href="#_Version_2.02.14_October">Version 2.02.14 October 2024</a></span></u></b></p>
 
-<h1><a name="_LATEST_VERSION_2.02.03"></a><a name="_VERSION_2.02.07_January"></a><a
-name="_Latest_Version_2.02.10"></a><em><span style='font-size:12.0pt;
-font-family:"Cambria",serif;font-style:normal'><a href="#_Version_2.02.11_April">Version
-2.02.13 August 2024</a></span></em></h1>
+<h1 style='line-height:115%'><a name="_LATEST_VERSION_2.02.03"></a><a
+name="_VERSION_2.02.07_January"></a><a name="_Latest_Version_2.02.10"></a><em><span
+style='font-size:12.0pt;line-height:115%;font-family:"Cambria",serif;
+font-style:normal'><a href="#_Version_2.02.11_April">Version 2.02.13 August
+2024</a></span></em></h1>
 
 <h1><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
 normal'><a href="#_Version_2.02.10_January">Version 2.02.10 January 2024</a></span></em></h1>
@@ -443,12 +448,64 @@ name="_Version_2.02.14_October"></a><a name="_2.02.15_December_2014"></a><a
 name="_Version_2.02.16_February"></a><a name="_Version_2.02.17_?????"></a><a
 name="_Version_2.02.18_????"></a>Version 2.02.18 ????</h1>
 
-<p class=MsoNormal><b>Bug Fixes</b></p>
+<p class=MsoNormal>Update to Java version 25</p>
 
-<p class=MsoNormal>ROCCA: Fixed bug that caused contour tracking to crash if
-the contour was close to 0Hz or close to the Nyquist frequency.</p>
+<p class=MsoNormal><b>New Features</b></p>
 
-<p class=MsoNormal>&nbsp;</p>
+<p class=MsoNormal>Options in internal storage management to NOT delete all
+data from memory each time PAMGuard starts. <a
+href="https://www.pamguard.org/olhelp/overview/PamMasterHelp/docs/internalstorage.html">See
+online help</a>. This can be used to stop the map from clearing whenever the
+acquisition resets for unknown reasons. Also updated help for internal storage
+options.</p>
+
+<p class=MsoNormal>New module to compute a <a
+href="https://www.pamguard.org/olhelp/sound_processing/mel/docs/mel_overview.html">Mel
+spectrogram</a></p>
+
+<p class=MsoNormal>FFT Filter option in <a
+href="https://www.pamguard.org/olhelp/sound_processing/FiltersHelp/Docs/Filters_filters.html">Filters
+Module</a></p>
+
+<p class=MsoNormal><a
+href="https://www.pamguard.org/olhelp/utilities/BinaryStore/docs/binarystore_overview.html">Binary
+Store</a> option to update all binary files to the latest version. This can be
+useful if you want to open old binary files with the latest versions of the <a
+href="https://www.pamguard.org/matlabandr.html">Matlab, R, and Python libraries</a>.</p>
+
+<p class=MsoNormal><b>Bug Fixes / minor enhancements </b></p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/258">Issue
+258</a>: Improved error reporting from database and binary store modules</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/255">Issue
+255</a>: Fixed bug causing occasional crash in click spectrum display. </p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/254">Issue
+254</a>: AIS Error. Fix bug occurring when AIS data arrive before first GPS
+Position</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/251">Issue
+251</a>: ROCCA: Fixed bug that caused contour tracking to crash if the contour
+was close to 0Hz or close to the Nyquist frequency.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/250">Issue
+250</a>: Ishmael energy sum and spectrogram correlation detectors not using
+correct min gap between detections. Now fixed. Also added <a
+href="https://www.pamguard.org/olhelp/detectors/ishmael/docs/ishmael_overview.html">help
+for Ishmael detectors</a>.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/249">Issue
+249</a>: Error in LTSA dialog. This was only causing the dialog to fail to
+update to the correct data source, not affecting detection. </p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/248">Issue
+248</a>: Mapping of hydrophones. Hopefully now fixed so that hydrophone mapping
+changes are used in bearing localisers. </p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/247">Issue
+247</a>: Make correct interpretation of invalid speed and heading values (given
+as 102.3knots and 360.0 degrees in the data) </p>
 
 <h1>Version 2.02.17 June 2025</h1>
 
@@ -624,8 +681,8 @@ difference between the highest and second-highest votes.</p>
 
 <h2>Bug Fixes</h2>
 
-<p class=MsoNormal>Ishmael Matched Filter detector. Improved correlation
-algorithm to use correct data normalisation (and a faster FFT). </p>
+<p class=MsoNormal>Ishmael Matched Filter detector. Improved correlation algorithm
+to use correct data normalisation (and a faster FFT). </p>
 
 <p class=MsoNormal>Ishamel detector graphics. Improved graphics (spectrogram
 plugins) to work when scrolling the spectrogram and to have better automatic
@@ -763,8 +820,8 @@ were not showing correctly in Viewer mode. Now fixed</span></p>
 <p class=MsoNormal><span lang=EN-US>Data selectors for plotting on map were not
 working, also fixed</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Bearing localizer running offline was not
-correctly saving updated bearings to the database. Now fixed. </span></p>
+<p class=MsoNormal><span lang=EN-US>Bearing localizer running offline was not correctly
+saving updated bearings to the database. Now fixed. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>ROCCA Classifier fixes</span></b></p>
 
@@ -1312,8 +1369,9 @@ lang=EN-US> </span>Added new system of scrolling to data in Spectrogram, using
 CTRL+arrow keys to move to previous/next displayed data unit. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Implemented new Effort Monitoring System to track on/off-effort information </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Implemented new Effort Monitoring System to track
+on/off-effort information </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1469,8 +1527,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 lang=EN-US> </span>Add support for RS Aqua time format. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Add 15 minute data load option to viewer mode. </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Add 15 minute data load option to viewer mode. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1574,8 +1632,9 @@ lang=EN-US> </span>Bug 439. Can no longer access Spectrogram settings once
 you've selected a Click Detector as Mark Observer</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 440. Measurement Computing Cards not enumerating properly.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 440. Measurement Computing Cards not enumerating
+properly.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>9. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2135,14 +2194,15 @@ leave them in the psf or get rid of them. Duplicate settings are ignored by
 PAMGuard, but can cause the psf file to grow large over time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-New features in PAMGuard Beta mean that psf files created with new versions are
-not compatible wth earlier versions and all configuration data may be lost if
-an attempt is made to open newly created psf files with older versions. We have
-therefore changed the file extension of psf files to .psfx in new Beta
-releases. Beta releases will still load the older psf files, but when the
-configuration is saved, the original psf file will remain untouched and data
-will be written to a psfx file with the same directory and name.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>New features in PAMGuard Beta mean that psf files created
+with new versions are not compatible wth earlier versions and all configuration
+data may be lost if an attempt is made to open newly created psf files with
+older versions. We have therefore changed the file extension of psf files to
+.psfx in new Beta releases. Beta releases will still load the older psf files,
+but when the configuration is saved, the original psf file will remain
+untouched and data will be written to a psfx file with the same directory and
+name.</p>
 
 <!-- ************************************************************************************************************************** -->
 
@@ -2537,12 +2597,12 @@ PAMGuard help files (Localisation/Detection Group Localiser).</span></p>
 
 <h3><span lang=EN-US>Display Colours</span></h3>
 
-<p class=MsoNormal><span lang=EN-US>A new system for handling display colours has
-been implemented across all PAMGuard displays. This gives greater flexibility
-to the user to control how data units are shown. For instance, you might simply
-want to show clicks in blue and whistles in green. However, for clicks and
-whistles that have been assigned to a Detection Group, you may want to colour
-them by the colour assigned to the group. </span></p>
+<p class=MsoNormal><span lang=EN-US>A new system for handling display colours
+has been implemented across all PAMGuard displays. This gives greater
+flexibility to the user to control how data units are shown. For instance, you
+might simply want to show clicks in blue and whistles in green. However, for
+clicks and whistles that have been assigned to a Detection Group, you may want
+to colour them by the colour assigned to the group. </span></p>
 
 <h3><span lang=EN-US>Using Old PAMGuard Configurations</span></h3>
 
@@ -2587,10 +2647,10 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Added Copy-to-Clipboard button to Warning dialogs, to store error messages
-and stack trace information on the Windows clipboard. This information can then
-be easily pasted into emails, text documents, etc when contacting PAMGuard
-support.</p>
+</span>Added Copy-to-Clipboard button to Warning dialogs, to store error
+messages and stack trace information on the Windows clipboard. This information
+can then be easily pasted into emails, text documents, etc when contacting
+PAMGuard support.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2865,10 +2925,10 @@ the online help. Users of the Click Detector will notice the following changes:<
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>There is now a choice of least squares and Simplex
-based algorithms for real-time animal tracking. The improved algorithms also
-provide better error information both for display on the map and for storage in
-the database. </span></p>
+</span><span lang=EN-US>There is now a choice of least squares and Simplex based
+algorithms for real-time animal tracking. The improved algorithms also provide
+better error information both for display on the map and for storage in the
+database. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2909,9 +2969,9 @@ the future. </span></p>
 
 <p class=MsoNormal><i>Logger Form Design</i></p>
 
-<p class=MsoNormal>A GUI driven system for designing Logger forms has been released.
-Currently, this feature has no online help, but is reasonably intuitive
-compared to the old method of typing directly into the database. </p>
+<p class=MsoNormal>A GUI driven system for designing Logger forms has been
+released. Currently, this feature has no online help, but is reasonably
+intuitive compared to the old method of typing directly into the database. </p>
 
 <p class=MsoNormal><i><span lang=EN-US>Improved Number handling</span></i></p>
 
@@ -3868,14 +3928,14 @@ have implemented database storage for output of these modules. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Radar Display: A bug which stopped the radar display from correctly displaying
-bearings to whistles from arrays containing more than two hydrophone elements
-has been fixed. </p>
+</span>Radar Display: A bug which stopped the radar display from correctly
+displaying bearings to whistles from arrays containing more than two hydrophone
+elements has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Database Speed: A substantial rewriting of some of the indexing methods
-in the database module has led to a significant increase in the speed at which
+</span>Database Speed: A substantial rewriting of some of the indexing methods in
+the database module has led to a significant increase in the speed at which
 data are written to the database (orders of magnitude for large databases).
 This is having a significant impact on the overall reliability of the software.
 Other changes have increased the speed (again by orders of magnitude) at which
@@ -4619,10 +4679,10 @@ online help. </p>
 <p class=MsoNormal><b>PAMGuard Mixed Mode operation</b></p>
 
 <p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with
-GPS data reloaded from a database so that detected sounds may be correctly
-localised. Multiple display frames - enables PAMGuard GUI to be split into
-multiple display windows, displayed on multiple monitors if desired. Enables
-the operator to simultaneously view the map and the click detector for example,
+GPS data reloaded from a database so that detected sounds may be correctly localised.
+Multiple display frames - enables PAMGuard GUI to be split into multiple
+display windows, displayed on multiple monitors if desired. Enables the
+operator to simultaneously view the map and the click detector for example,
 which is much &nbsp;easier than continually moving between multiple tabs. </p>
 
 <p class=MsoNormal><b>Documentation</b></p>
@@ -4730,8 +4790,8 @@ acquisition.&nbsp; </p>
 <p class=MsoNormal>Speed up of graphics, particularly regarding large
 quantities of gps track &nbsp;data</p>
 
-<p class=MsoNormal>National Instruments cards with names &gt; 20 characters
-long are now correctly &nbsp;recognised. </p>
+<p class=MsoNormal>National Instruments cards with names &gt; 20 characters long
+are now correctly &nbsp;recognised. </p>
 
 <p class=MsoNormal><b>Help File Updates</b></p>
 
@@ -5138,8 +5198,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoNormal>&nbsp;</p>
 
 <p class=MsoNormal><a name="_Toc312065304"></a><a name="_Toc312063949"></a><span
-class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 -
-PAMGuard starts two releases, core and beta release</span></span>, </p>
+class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 - PAMGuard
+starts two releases, core and beta release</span></span>, </p>
 
 <p class=MsoNormal>this is the beta release</p>
 

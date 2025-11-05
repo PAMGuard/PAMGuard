@@ -76,10 +76,7 @@ public class FilterDialogPanel implements ActionListener {
 
 	private float sampleRate;
 
-	private String[] filterNames = { "None", "IIR Butterworth", "IIR Chebyshev", 
-			"FIR Filter (Window Method)", "Arbitrary FIR Filter"};
-
-	private JComboBox filterTypes;
+	private JComboBox<FilterType> filterTypes;
 
 	private JRadioButton highPass;
 
@@ -222,33 +219,39 @@ public class FilterDialogPanel implements ActionListener {
 	}
 
 	private void enableControls() {
-		int filterType = filterTypes.getSelectedIndex();
-		boolean haveFilter = filterType > 0;
+		FilterType filterType = (FilterType) filterTypes.getSelectedItem();
+		if (filterType == null) {
+			filterType = FilterType.NONE;
+		}
+		boolean haveFilter = filterType != null;
 		lowPass.setEnabled(haveFilter);
 		highPass.setEnabled(haveFilter);
 		bandPass.setEnabled(haveFilter);
 		bandStop.setEnabled(haveFilter);
 		highCut.setEnabled(!lowPass.isSelected() & haveFilter);
 		lowCut.setEnabled(!highPass.isSelected() & haveFilter);
-		order.setEnabled(haveFilter);
-		passbandRipple.setEnabled(haveFilter & filterType >=2);
+		order.setEnabled(filterType.hasOrder());
+		passbandRipple.setEnabled(filterType.hasRipple());
 		logScale.setEnabled(haveFilter);
 		linScale.setEnabled(haveFilter);
 		plotButton.setEnabled(haveFilter);
 		switch (filterType) {
-		case 2:
+		case CHEBYCHEV:
 			rippleLabel.setText("Pass band ripple ");
 			break;
-		case 3:
-		case 4:
+		case FIRARBITRARY:
+		case FIRWINDOW:
 			rippleLabel.setText("Gamma  ");
 			break;
+			default:
+				rippleLabel.setText(" ");
 		}
-		boolean isArb = filterType == 4;
+		boolean isArb = filterType == FilterType.FIRARBITRARY;
 		normalPanel.setVisible(!isArb);
 		arbPanel.setVisible(isArb);
 	}
 
+	
 
 	void repaintAll() {
 		bodeGraph.repaint();
@@ -267,7 +270,7 @@ public class FilterDialogPanel implements ActionListener {
 
 		SettingsPanel() {
 
-			filterTypes = new JComboBox(filterNames);
+			filterTypes = new JComboBox(FilterType.values());
 			highPass = new JRadioButton("High Pass");
 			bandPass = new JRadioButton("Band Pass");
 			bandStop = new JRadioButton("Band Stop");
@@ -468,26 +471,33 @@ public class FilterDialogPanel implements ActionListener {
 		if (filterParams == null) {
 			filterParams = new FilterParams();
 		}
-		switch (filterParams.filterType) {
-		case NONE:
-			filterTypes.setSelectedIndex(0);
-			break;
-		case BUTTERWORTH:
-			filterTypes.setSelectedIndex(1);
-			break;
-		case CHEBYCHEV:
-			filterTypes.setSelectedIndex(2);
-			break;
-		case FIRWINDOW:
-			if (filterNames.length > 3) {
-				filterTypes.setSelectedIndex(3);
-			}
-			break;
-		case FIRARBITRARY:
-			if (filterNames.length > 4) {
-				filterTypes.setSelectedIndex(4);
-			}
+		if (filterParams.filterType != null) {
+			filterTypes.setSelectedItem(filterParams.filterType);
 		}
+//		switch (filterParams.filterType) {
+//		case NONE:
+//			filterTypes.setSelectedIndex(0);
+//			break;
+//		case BUTTERWORTH:
+//			filterTypes.setSelectedIndex(1);
+//			break;
+//		case CHEBYCHEV:
+//			filterTypes.setSelectedIndex(2);
+//			break;
+//		case FIRWINDOW:
+//			if (filterNames.length > 3) {
+//				filterTypes.setSelectedIndex(3);
+//			}
+//			break;
+//		case FIRARBITRARY:
+//			if (filterNames.length > 4) {
+//				filterTypes.setSelectedIndex(4);
+//			}
+//		case FFT:
+//			if (filterNames.length > 5) {
+//				filterTypes.setSelectedIndex(5);
+//			}
+//		}
 		switch (filterParams.filterBand) {
 		case HIGHPASS:
 			highPass.setSelected(true);
@@ -580,16 +590,24 @@ public class FilterDialogPanel implements ActionListener {
 
 
 	void setRippleParam() {
-		int filtType = filterTypes.getSelectedIndex();
-		switch(filtType) {
-		case 2:
-			passbandRipple.setText(String.format("%3.1f", filterParams.passBandRipple));
-			break;
-		case 3:
-		case 4:
-			passbandRipple.setText(String.format("%3.1f", filterParams.chebyGamma));
-			break;
+		FilterType filtType = (FilterType) filterTypes.getSelectedItem();
+		if (filtType != null) {
+			if (filtType.hasRipple()) {
+				passbandRipple.setText(String.format("%3.1f", filterParams.passBandRipple));
+			}
+//			if (filtType.hasOrder()) {
+//				filter
+//			}
 		}
+//		switch(filtType) {
+//		case 2:
+//			passbandRipple.setText(String.format("%3.1f", filterParams.passBandRipple));
+//			break;
+//		case 3:
+//		case 4:
+//			passbandRipple.setText(String.format("%3.1f", filterParams.chebyGamma));
+//			break;
+//		}
 	}
 
 	public void cancelButtonPressed() {
@@ -602,16 +620,20 @@ public class FilterDialogPanel implements ActionListener {
 
 	public boolean getParams() {
 		try {
-			if (filterTypes.getSelectedIndex() == 0)
-				filterParams.filterType = FilterType.NONE;
-			else if (filterTypes.getSelectedIndex() == 1)
-				filterParams.filterType = FilterType.BUTTERWORTH;
-			else if (filterTypes.getSelectedIndex() == 2)
-				filterParams.filterType = FilterType.CHEBYCHEV;
-			else if (filterTypes.getSelectedIndex() == 3)
-				filterParams.filterType = FilterType.FIRWINDOW;
-			else if (filterTypes.getSelectedIndex() == 4)
-				filterParams.filterType = FilterType.FIRARBITRARY;
+//			if (filterTypes.getSelectedIndex() == 0)
+//				filterParams.filterType = FilterType.NONE;
+//			else if (filterTypes.getSelectedIndex() == 1)
+//				filterParams.filterType = FilterType.BUTTERWORTH;
+//			else if (filterTypes.getSelectedIndex() == 2)
+//				filterParams.filterType = FilterType.CHEBYCHEV;
+//			else if (filterTypes.getSelectedIndex() == 3)
+//				filterParams.filterType = FilterType.FIRWINDOW;
+//			else if (filterTypes.getSelectedIndex() == 4)
+//				filterParams.filterType = FilterType.FIRARBITRARY;
+//			else if (filterTypes.getSelectedIndex() == 5) {
+//				filterParams.filterType = FilterType.FFT;
+//			}
+			filterParams.filterType = (FilterType) filterTypes.getSelectedItem();
 
 			if (highPass.isSelected())
 				filterParams.filterBand = FilterBand.HIGHPASS;
@@ -1331,6 +1353,7 @@ public class FilterDialogPanel implements ActionListener {
 
 	public void setSampleRate(float sampleRate) {
 		this.sampleRate = sampleRate;
+		repaintAll();
 	}
 
 	public FilterParams getFilterParams() {

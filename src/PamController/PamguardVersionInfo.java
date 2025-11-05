@@ -27,18 +27,18 @@ public class PamguardVersionInfo {
 	 * work with.
 	 */
 	static public final String minJavaVersion = "11.00";
-	static public final String maxJavaVersion = "23.99.99";
+	static public final String maxJavaVersion = "25.99.99";
 
 	/**
 	 * Version number, major version.minorversion.sub-release. Note: can't go higher
 	 * than sub-release 'f'
 	 */
-	static public final String version = "2.02.17e";
+	static public final String version = "2.02.17fc";
 
 	/**
 	 * Release date
 	 */
-	static public final String date = "September 2025";
+	static public final String date = "November 2025";
 
 //	/**
 //	 * Release type - Beta or Core
