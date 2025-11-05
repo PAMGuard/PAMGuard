@@ -57,6 +57,7 @@ import cepstrum.CepstrumControl;
 import clickDetector.ClickDetection;
 import dataMap.DataMapControl;
 import detectiongrouplocaliser.DetectionGroupControl;
+import detectionview.DVControl;
 import effortmonitor.EffortControl;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
@@ -563,6 +564,10 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Creates an empty display panel which the user can add spectrograms and other displays to");		
 		mi.setModulesMenuGroup(displaysGroup);
 		mi.setHelpPoint("displays/userDisplayHelp/docs/userDisplayPanel.html");
+		
+		mi = PamModuleInfo.registerControlledUnit(DVControl.class.getName(), DVControl.unitType);
+		mi.setToolTipText(DVControl.unitTip);
+		mi.setModulesMenuGroup(displaysGroup);
 
 		mi = PamModuleInfo.registerControlledUnit("localTime.LocalTime", "Local Time");		
 		mi.setToolTipText("Shows local time on the display");
