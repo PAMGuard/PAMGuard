@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 
@@ -17,6 +18,8 @@ import clipgenerator.clipDisplay.ClipDisplayDecorations;
 import clipgenerator.clipDisplay.ClipDisplayParent;
 import clipgenerator.clipDisplay.ClipDisplayProvider;
 import clipgenerator.clipDisplay.ClipDisplayUnit;
+import detectionview.swing.DVClipDecorations;
+import detectionview.swing.DVClipDisplayProvider;
 import detectionview.swing.DVDialog;
 import rawDeepLearningClassifier.swing.DLClipDisplayProvider;
 import userDisplay.UserDisplayControl;
@@ -35,6 +38,8 @@ public class DVControl extends PamControlledUnit implements PamSettings, ClipDis
 	private DVProcess dvProcess;
 	
 	private DVParameters dvParameters = new DVParameters();
+	
+	private ArrayList<DVObserver> dvObservers = new ArrayList();
 
 	public DVControl(String unitName) {
 		super(unitType, unitName);
@@ -43,7 +48,7 @@ public class DVControl extends PamControlledUnit implements PamSettings, ClipDis
 		
 		PamSettingManager.getInstance().registerSettings(this);
 
-		UserDisplayControl.addUserDisplayProvider(new ClipDisplayProvider(this, getUnitName() + " display"));
+		UserDisplayControl.addUserDisplayProvider(new DVClipDisplayProvider(this, getUnitName() + " display"));
 	}
 
 	@Override
@@ -74,8 +79,7 @@ public class DVControl extends PamControlledUnit implements PamSettings, ClipDis
 
 	@Override
 	public ClipDisplayDecorations getClipDecorations(ClipDisplayUnit clipDisplayUnit) {
-		// TODO Auto-generated method stub
-		return null;
+		return new DVClipDecorations(this, clipDisplayUnit);
 	}
 
 	@Override
@@ -110,6 +114,55 @@ public class DVControl extends PamControlledUnit implements PamSettings, ClipDis
 			dvProcess.setupProcess();
 			
 		}
+	}
+
+	/**
+	 * Add an observer for data and configuration change notifications
+	 * @param dvObserver
+	 */
+	public void addObserver(DVObserver dvObserver) {
+		dvObservers.add(dvObserver);
+	}
+	
+	/**
+	 * Remove an observer for data and configuration change notifications
+	 * @param dvObserver
+	 */
+	public boolean removeObserver(DVObserver dvObserver) {
+		return dvObservers.remove(dvObserver);
+	}
+	
+	/**
+	 * Notify observers that there has been a data update. 
+	 * @param updateType
+	 */
+	public void updateDataObs(int updateType) {
+		for (DVObserver obs : dvObservers) {
+			obs.updateData(updateType);
+		}
+	}
+
+	/**
+	 * Notify observers that there has been a configuration update
+	 * @param updateType
+	 */
+	public void updateConfigObs() {
+		for (DVObserver obs : dvObservers) {
+			obs.updateConfig();
+		}
+	}
+	
+	public void updateLoadProgressObs(LoadProgress loadProgress) {
+		for (DVObserver obs : dvObservers) {
+			obs.loadProgress(loadProgress);
+		}
+	}
+
+	/**
+	 * @return the dvProcess
+	 */
+	public DVProcess getDvProcess() {
+		return dvProcess;
 	}
 
 

@@ -44,6 +44,7 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorder;
 import PamView.panel.PamPanel;
+import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamProcess;
 import clipgenerator.ClipControl;
 
@@ -70,6 +71,7 @@ public class DisplayControlPanel {
 	private JLabel viewerStart, viewerEnd;
 	private ClipDisplayParent clipDisplayParent;
 	private JCheckBox newClipsLast;
+	private ScrollPaneAddon scrollButtons;
 	public DisplayControlPanel(ClipDisplayParent clipDisplayParent,
 			ClipDisplayPanel clipDisplayPanel) {
 		super();
@@ -165,21 +167,21 @@ public class DisplayControlPanel {
 			GridBagConstraints c = new PamGridBagContraints();
 			historyPanel.setLayout(new GridBagLayout());
 			
-			ScrollPaneAddon sco = new ScrollPaneAddon(clipDisplayPanel.getScrollPane(), clipDisplayParent.getDisplayName(),
+			scrollButtons = new ScrollPaneAddon(clipDisplayPanel.getScrollPane(), clipDisplayParent.getDisplayName(),
 					AbstractPamScrollerAWT.HORIZONTAL, 1000, 3600*1000, true);
-			sco.addDataBlock(clipDisplayParent.getClipDataBlock());
+			scrollButtons.addDataBlock(clipDisplayParent.getClipDataBlock());
 			c.gridwidth = 1;
 			c.gridx = 1;
 			c.fill = GridBagConstraints.NONE;
-			PamDialog.addComponent(historyPanel, sco.getButtonPanel(), c);
+			PamDialog.addComponent(historyPanel, scrollButtons.getButtonPanel(), c);
 			c.gridx = 0;
 			c.gridy++;
-			PamDialog.addComponent(historyPanel, new PamLabel("Start: ", JLabel.LEFT), c);
+			PamDialog.addComponent(historyPanel, new PamLabel("Start: ", JLabel.RIGHT), c);
 			c.gridx++;
 			PamDialog.addComponent(historyPanel, viewerStart = new PamLabel("1970-01-01 12:00:00"), c);
 			c.gridx = 0;
 			c.gridy++;
-			PamDialog.addComponent(historyPanel, new PamLabel("End: ", JLabel.LEFT), c);
+			PamDialog.addComponent(historyPanel, new PamLabel("End: ", JLabel.RIGHT), c);
 			c.gridx++;
 			PamDialog.addComponent(historyPanel, viewerEnd = new PamLabel("1970-01-01 12:00:00"), c);
 			
@@ -188,7 +190,7 @@ public class DisplayControlPanel {
 //			historyPanel.add(viewerStart = new PamLabel("1970-01-01 12:00:00"));
 //			historyPanel.add(new PamLabel("End"));
 //			historyPanel.add(viewerEnd = new PamLabel("1970-01-01 12:00:00"));
-			sco.addObserver(new ScrollObserver());
+			scrollButtons.addObserver(new ScrollObserver());
 			
 		}
 		controlPanel.add(historyPanel);
@@ -302,8 +304,8 @@ public class DisplayControlPanel {
 			long start = pamScroller.getMinimumMillis();
 			long end = pamScroller.getMaximumMillis();
 			if (viewerStart != null) {
-				viewerStart.setText(PamCalendar.formatDateTime(start));
-				viewerEnd.setText(PamCalendar.formatDateTime(end));
+				viewerStart.setText(PamCalendar.formatDBDateTime(start));
+				viewerEnd.setText(PamCalendar.formatDBDateTime(end));
 			}
 			clipDisplayPanel.newViewerTimes(start, end);
 		}
@@ -314,7 +316,6 @@ public class DisplayControlPanel {
 			
 		}
 
-		
 	}
 	
 	/**
@@ -486,6 +487,13 @@ public class DisplayControlPanel {
 			currValue.setText(String.format("Max Niquist X%3.2f", super.getValue()));
 		}
 		
+	}
+
+	/**
+	 * @return the scrollButtons
+	 */
+	public ScrollPaneAddon getScrollButtons() {
+		return scrollButtons;
 	}
 
 

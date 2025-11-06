@@ -320,9 +320,10 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 	public void newViewerTimes(long start, long end) {
 		removeAllClips();
-		ListIterator<ClipDataUnit> it = clipDisplayParent.getClipDataBlock().getListIterator(0);
-		while (it.hasNext()) {
-			ClipDataUnit cdu = it.next();
+//		ListIterator<ClipDataUnit> it = clipDisplayParent.getClipDataBlock().getListIterator(0);
+		ArrayList<ClipDataUnit> clipUnits = clipDisplayParent.getClipDataBlock().getDataCopy();
+		for (ClipDataUnit cdu : clipUnits) {
+//			ClipDataUnit cdu = it.next();
 			long clipTime = cdu.getTimeMilliseconds();
 			if (clipTime >= start && clipTime <= end){
 				newDataUnit(cdu);
@@ -945,6 +946,13 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 				clipDisplayUnit.setBorderColour();
 			}
 		}
+	}
+
+	/**
+	 * @return the displayControlPanel
+	 */
+	public DisplayControlPanel getDisplayControlPanel() {
+		return displayControlPanel;
 	}
 
 }
