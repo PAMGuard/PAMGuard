@@ -47,6 +47,7 @@ import PamguardMVC.dataSelector.DataSelectorChangeListener;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.ClipProcess;
+import soundPlayback.ClipPlayback;
 
 /**
  * Clip display panel. Can be incorporated into a tab panel or stand alone in 
@@ -533,7 +534,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 	 * Play the clip (called from mouse double click)
 	 * @param clipDataUnit
 	 */
-	private void playClip(ClipDataUnit clipDataUnit) {
+	public void playClip(ClipDataUnit clipDataUnit) {
 		if (clipDataUnit == null) {
 			return;
 		}
@@ -543,6 +544,9 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		if (process instanceof ClipProcess) {
 			ClipProcess clipProc = (ClipProcess) process;
 			clipProc.playClip(clipDataUnit);
+		}
+		else {
+			ClipPlayback.getInstance().playClip(clipDataUnit.getRawData(), clipDataUnit.getParentDataBlock().getSampleRate(), true);
 		}
 	}
 

@@ -10,6 +10,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataUnavailableException;
+import PamguardMVC.dataOffline.OfflineDataLoading;
 
 public class DVLoader {
 
@@ -135,6 +136,10 @@ public class DVLoader {
 //		raw.loadViewerData(t1, t2, null);
 		double[][] rawData = null;
 		try {
+			OfflineDataLoading<RawDataUnit> oldl = raw.getOfflineDataLoading();
+			if (oldl != null) {
+				oldl.clearRequestingObservers();
+			}
 			RawDataUnit[] loadedData = raw.getAvailableSamples(t1-1000, t2-t1+2000, aData.getChannelBitmap(), true);
 			rawData = raw.getSamplesForMillis(t1, t2-t1, aData.getChannelBitmap());
 		}
@@ -161,9 +166,11 @@ public class DVLoader {
 
 		@Override
 		protected Integer doInBackground() throws Exception {
+//			System.out.println("DV Loading started");
 			loading = true;
 			Integer ans = doLoad(this);
 			loading = false;
+//			System.out.println("DV Loading ended");
 			return ans;
 		}
 

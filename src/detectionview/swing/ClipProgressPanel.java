@@ -1,6 +1,7 @@
 package detectionview.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -8,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 import detectionview.DVControl;
 import detectionview.DVObserver;
@@ -69,9 +71,15 @@ public class ClipProgressPanel implements DVObserver {
 			str += String.format(", %d fails", loadProgress.getnFails());
 		}
 		progress.setString(str);
+		progress.setForeground(Color.BLACK);
 		
 		if (loadProgress.getLoadState() == loadProgress.LOAD_DONE) {
-			mainPanel.setVisible(false);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					mainPanel.setVisible(false);
+				}
+			});
 		}
 		else {
 			mainPanel.setVisible(true);

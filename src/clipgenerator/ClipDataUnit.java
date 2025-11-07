@@ -31,7 +31,11 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	
 	public long triggerMilliseconds;
 
-	private double[][] rawData;
+//	private double[][] rawData;
+	
+	private short[][] int16Data;
+	
+	private double int16Max;
 	
 	/**
 	 * Reference to the data unit that triggered the clip
@@ -67,7 +71,7 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		this.triggerMilliseconds = triggerMilliseconds;
 		this.fileName = fileName;
 		this.triggerName = triggerName;
-		this.rawData = rawData;
+		this.setRawData(rawData);
 		if (this.fileName == null) {
 			this.fileName = "";
 		}
@@ -297,11 +301,61 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	}
 	
 	/**
+	 * Compress the double data into int16 to save memory
+	 * @param rawData
+	 */
+	private void compressData(double[][] rawData) {
+		if (rawData == null || rawData.length == 0) {
+			int16Data = null;
+			return;
+		}
+		int nc = rawData.length;
+		int ns = rawData[0].length;
+		double min = 0, max = 0;
+		double v;
+		for (int c = 0; c < nc; c++) {
+			for (int s = 0; s < ns; s++) {
+				v = rawData[c][s];
+				min = Math.min(min, v);
+				max = Math.max(max, v);
+			}
+		}
+		int16Max = Math.max(Math.abs(min), max);
+		double scale = 32727./int16Max;
+		int16Data = new short[nc][ns];
+		for (int c = 0; c < nc; c++) {
+			for (int s = 0; s < ns; s++) {
+				int16Data[c][s] = (short) Math.round(rawData[c][s]*scale);
+			}
+		}
+	}
+	
+	/**
+	 * @return the rawData
+	 */
+	public double[][] getRawData() {
+		if (int16Data == null) {
+			return null;
+		}
+		int nc = int16Data.length;
+		int ns = int16Data[0].length;
+		double[][] rawData = new double[nc][ns];
+		double scale = int16Max/32767.;
+		for (int c = 0; c < nc; c++) {
+			for (int s = 0; s < ns; s++) {
+				rawData[c][s] = (double) int16Data[c][s]*scale;
+			}
+		}
+		return rawData;
+	}
+
+	/**
 	 * Get all the wave data into an array. 
 	 * @return the wave data or null if it can't be found. 
 	 */
 	@Override
 	public double[][] getWaveData() {
+		double[][] rawData = getRawData();
 		if (rawData != null) {
 			return rawData;
 		}
@@ -331,7 +385,7 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	 * @return the sample rate of original wave data or null if it can't be found. 
 	 */
 	protected Float getSampleRate() {
-		if (rawData != null) {
+		if (getRawData() != null && getParentDataBlock() != null) {
 			return getParentDataBlock().getSampleRate();
 //			return PamController.getInstance().getRawDataBlock(triggerName).getSampleRate();
 		}
@@ -435,17 +489,11 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	}
 
 	/**
-	 * @return the rawData
-	 */
-	public double[][] getRawData() {
-		return rawData;
-	}
-
-	/**
 	 * @param rawData the rawData to set
 	 */
 	public void setRawData(double[][] rawData) {
-		this.rawData = rawData;
+//		this.rawData = rawData;
+		compressData(rawData);
 	}
 
 	/**

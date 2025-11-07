@@ -517,7 +517,7 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	 * Clear all requesting observers from the list. Stops them 
 	 * all adding up and everything getting everything !
 	 */
-	private void clearRequestingObservers() {
+	public void clearRequestingObservers() {
 		if (requestingObservers != null) {
 			requestingObservers.clear();
 		}
