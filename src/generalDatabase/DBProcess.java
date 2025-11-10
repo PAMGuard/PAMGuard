@@ -1271,6 +1271,13 @@ public class DBProcess extends PamProcess {
 	}
 
 	public void updateProcessList() {
+		if (getPamControlledUnit().getPamConfiguration() != PamController.getInstance().getPamConfiguration()) {
+			/*
+			 * Normally the DB subsribes to everything, but if it's the external configuration we 
+			 * don't want it to since it won't have opened a database and shouldn't do anything. 
+			 */
+			return;
+		}
 		ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDataBlocks();
 		PamDataBlock dataBlock;
 		for (int i = 0; i < dataBlocks.size(); i++) {
