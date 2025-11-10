@@ -186,17 +186,20 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 		if (moreFiles == null) {
 			return;
 		}
+		
 		for (int i = 0; i < moreFiles.length; i++) {
 			if (moreFiles[i].isDirectory()) {
 				addFiles(pamWorker, newFileList, moreFiles[i]);
 			}
 			else {
 				T newFile = createFile(moreFiles[i]);
-				eachFileTask(newFile);
-				newFileList.addFile(newFile);
-				Debug.out.println("Adding file " + newFile.getAbsolutePath());
-				if (i%10 == 0) {
-					sayProgress(pamWorker, newFileList, folder);
+				if ( eachFileTask(newFile)) {
+					newFileList.addFile(newFile);
+					Debug.out.println("Adding file " + newFile.getAbsolutePath());
+					if (i%10 == 0) {
+						sayProgress(pamWorker, newFileList, folder);
+					}
+
 				}
 			}
 		}

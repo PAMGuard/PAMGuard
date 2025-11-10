@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=PAMGuard
 Comment=Application for passive acoustic monitoring v1
-Exec=java -jar  -Xmx4g -Xms512m -Dsun.java2d.uiScale=2 -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true /usr/share/pamguard/Pamguard -c
+Exec=java -jar  -Xmx8g -Xms512m -Dsun.java2d.uiScale=2 -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true /usr/share/pamguard/Pamguard -c
 Icon=/usr/share/pamguard/PAMGuardIcon2.png
 Terminal=true
 Type=Application

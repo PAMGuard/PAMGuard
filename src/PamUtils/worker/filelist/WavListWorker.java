@@ -54,6 +54,8 @@ public class WavListWorker extends FileListWorker<WavFileType> {
 
 	@Override
 	public boolean eachFileTask(WavFileType aFile) {
+		//Check this is not a hidden file. 
+		if (aFile.isHidden()) return false;
 		return super.eachFileTask(aFile);
 	}
 
