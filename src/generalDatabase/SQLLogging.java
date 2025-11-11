@@ -384,7 +384,7 @@ public abstract class SQLLogging {
 	public synchronized boolean logData(PamConnection con, PamDataUnit dataUnit, PamDataUnit superDetection) {
 
 		if (con == null) {
-			showWarning("No database connection");
+			showWarning("LogData: No database connection");
 			return false;
 		}
 		//		if (dataUnit instanceof QASoundDataUnit && superDetection == null) {
@@ -455,7 +455,7 @@ public abstract class SQLLogging {
 		//		System.out.printf("ReLog data unit %s with super det %s\n", dataUnit, superDetection);
 
 		if (con == null) {
-			showWarning("No database connection");
+			showWarning("reLogData: No database connection");
 			return false;
 		}
 		if (dataUnit.getDatabaseIndex() <= 0) {

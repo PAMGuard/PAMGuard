@@ -38,6 +38,7 @@ import java.util.TimeZone;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -127,7 +128,15 @@ public class Pamguard {
 			//			}
 			//			PamColors.getInstance().setColors();
 		} catch (Exception e) { 
-			e.printStackTrace();
+			System.out.println("Unable to load lookAndFeel: " + e.getMessage());
+//			e.printStackTrace();
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+			}
 		}
 
 		int runMode = PamController.RUN_NORMAL;
