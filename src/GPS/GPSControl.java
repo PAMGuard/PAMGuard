@@ -16,6 +16,8 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.positionreference.PositionReference;
+import PamUtils.PlatformInfo;
+import PamUtils.PlatformInfo.OSType;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import warnings.PamWarning;
@@ -40,9 +42,9 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 	
 	//viewer functionality;
 	private ImportGPSData importGPSData;
-	ImportGPSParams gpsImportParams= new ImportGPSParams(); 
 	
-	
+	ImportGPSParams gpsImportParams = new ImportGPSParams(); 
+		
 	public static final String gpsUnitType = "GPS Acquisition";
 	
 	private PamWarning gpsTimeWarning;
@@ -185,14 +187,17 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
-		"The Global time settings do not require administrator privilidges<p><p>" +
-					"Press OK to proceed anyway to old GPS clock setting method</html>";
-			int ans = WarnOnce.showWarning(parentFrame, "System clock updating", message, WarnOnce.OK_CANCEL_OPTION);
-			if (ans == WarnOnce.OK_OPTION) {
-				GPSParameters newP = UpdateClockDialog.showDialog(parentFrame, gpsControl, gpsParameters, false);
-				gpsParameters = newP.clone();
+			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+				String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
+						"The Global time settings do not require administrator privilidges<p><p>" +
+						"Press OK to proceed anyway to old GPS clock setting method</html>";
+				int ans = WarnOnce.showWarning(parentFrame, "System clock updating", message, WarnOnce.OK_CANCEL_OPTION);
+				if (ans == WarnOnce.CANCEL_OPTION) {
+					return;
+				}
 			}
+			GPSParameters newP = UpdateClockDialog.showDialog(parentFrame, gpsControl, gpsParameters, false);
+			gpsParameters = newP.clone();
 		}
 	}
 	@Override

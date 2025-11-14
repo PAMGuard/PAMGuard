@@ -42,30 +42,31 @@ import warnings.WarningSystem;
  */
 public class UpdateClockDialog extends JDialog implements ActionListener, PamObserver {
 
-	static UpdateClockDialog singleInstance;
+	private static UpdateClockDialog singleInstance;
 	
-	JTextField pcTime, gpsTime;
+	private JTextField pcTime, gpsTime;
 	
-	JButton setButton, cancelButton;
+	private JButton setButton, cancelButton;
 	
-	JCheckBox setAlways;
+	private JCheckBox setAlways;
 	
-	static GPSParameters gpsParameters;
+	private GPSParameters gpsParameters;
 	
-	GPSControl gpsControl;
+	private GPSControl gpsControl;
 	
-	boolean setOnNextString;
+	private boolean setOnNextString;
 	
-	Calendar nmeaCalendar;
+	private Calendar nmeaCalendar;
 	
 	private static int clockSets;
 	
-	boolean autoUpdate;
+	private boolean autoUpdate;
 	
-	int newDataCount = 0;
+	private int newDataCount = 0;
 	
-	private UpdateClockDialog(Frame parentFrame) {
+	private UpdateClockDialog(Frame parentFrame, GPSControl gpsControl) {
 		super(parentFrame, "Set PC Clock");
+		this.gpsControl = gpsControl;
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
 		p.setBorder(new EmptyBorder(10,10,5,10));
@@ -121,23 +122,22 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 	 * @return updated NMEA Parameters, or null if the cancel button was pressed
 	 */
 	static public GPSParameters showDialog(Frame parentFrame, GPSControl gpsControl, GPSParameters gpsParameters, boolean autoUpdate) {
-		UpdateClockDialog.gpsParameters = gpsParameters;//.clone();
-		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
-			singleInstance = new UpdateClockDialog(parentFrame);
+		if (singleInstance == null || singleInstance.getOwner() != parentFrame || singleInstance.gpsControl != gpsControl) {
+			singleInstance = new UpdateClockDialog(parentFrame, gpsControl);
 		}
 		
 		if (!AdminTools.isAdmin()) {
 			JOptionPane.showMessageDialog(singleInstance, "The PC Clock can only be set automatically if you run PAMGuard as Administrator", 
 					"Warning", JOptionPane.ERROR_MESSAGE);
 		}
-		
+
+		singleInstance.gpsParameters = gpsParameters;//.clone();
 		singleInstance.autoUpdate = autoUpdate;
 		singleInstance.setModal(!autoUpdate); // bodge it so it doens't halt program execution during auto update
 		singleInstance.setAlwaysOnTop(autoUpdate);
-		singleInstance.gpsControl = gpsControl;
 		singleInstance.newDataCount = 0;
 		singleInstance.setVisible(true);
-		return UpdateClockDialog.gpsParameters;
+		return singleInstance.gpsParameters;
 	}
 
 	@Override
@@ -293,13 +293,14 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 		nmeaCalendar.set(year, currTime.getMonth(), currTime.getDate(), hour, minute, (int) second);
 		gpsTime.setText(PamCalendar.formatDateTime(nmeaCalendar.getTimeInMillis()));
 		tellTime(); // so they move together.
+		long timeMillis = nmeaCalendar.getTimeInMillis();
 		
 
 		if (setOnNextString) {
 			// go ahead and update the clock.
 //			System.setProperties()
 //			Calendar.getInstance().
-			setTimeNow(nmeaCalendar);
+			setTimeNow(nmeaCalendar.getTimeInMillis());
 			setButton.setEnabled(false);
 			setOnNextString = false;
 		}
@@ -358,7 +359,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 			// go ahead and update the clock.
 //			System.setProperties()
 //			Calendar.getInstance().
-			setTimeNow(nmeaCalendar);
+			setTimeNow(nmeaCalendar.getTimeInMillis());
 			setButton.setEnabled(false);
 			setOnNextString = false;
 		}
@@ -377,7 +378,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 	}
 	
 
-	private void setTimeNow(Calendar nmeaCalendar) {
+	private void setTimeNow(long nmeaCalendar) {
 		if (!SystemTiming.setSystemTime(nmeaCalendar)) {
 			String msg =  "The PC Clock can only be set automatically if you run PAMGuard as Administrator";
 			JOptionPane.showMessageDialog(singleInstance, msg, 
@@ -387,7 +388,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 			WarningSystem.getWarningSystem().addWarning(newWarning);
 		}
 		else {
-			System.out.println(String.format("PC Clock updated to " + PamCalendar.formatDateTime(nmeaCalendar.getTimeInMillis())));
+			System.out.println(String.format("PC Clock updated to " + PamCalendar.formatDateTime(nmeaCalendar)));
 		}
 	}
 	@Override
