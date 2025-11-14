@@ -392,6 +392,9 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			return;
 		}
 		masterList = deploymentOverview.getMasterList(getTethysControl());
+		if (masterList == null) {
+			return;
+		}
 		displayPeriods = masterList.getCompoundPeriods(deploymentHandler.getDeploymentExportOptions());
 		tableModel.fireTableDataChanged();
 		//		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
