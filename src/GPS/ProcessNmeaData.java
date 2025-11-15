@@ -24,6 +24,7 @@ import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamGUIManager;
 import PamController.status.BaseProcessCheck;
 import PamModel.PamModel;
 import PamModel.SMRUEnable;
@@ -45,9 +46,7 @@ import warnings.WarningSystem;
  * block, selects just the interesting stuff in the GPRMC string and creates a
  * new data block with the string data unpacked into more usable doubles.
  */
-public class ProcessNmeaData extends PamProcess {
-
-
+public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 
 	private GPSDataBlock gpsDataBlock;
 
@@ -64,6 +63,12 @@ public class ProcessNmeaData extends PamProcess {
 	private PamWarning badGpsString; 
 	
 	private BaseProcessCheck processCheck;
+
+	private GPSClockUpdater gpsClockUpdater;
+
+	public GPSClockUpdater getGpsClockUpdater() {
+		return gpsClockUpdater;
+	}
 
 	/**
 	 * @param pamControlledUnit
@@ -86,6 +91,9 @@ public class ProcessNmeaData extends PamProcess {
 
 		//allNmeaData.addObserver(this);
 		findNMEADataBlock();
+		
+		gpsClockUpdater = new GPSClockUpdater(gpsControl, this);
+		gpsClockUpdater.addObserver(this);
 
 		addOutputDataBlock((gpsDataBlock = new GPSDataBlock(this)));
 		if (!gpsControl.isGpsMaster()) {
@@ -184,12 +192,19 @@ public class ProcessNmeaData extends PamProcess {
 			if (gpsData.isDataOk()) {
 
 				newUnit = new GpsDataUnit(nmeaData.getTimeMilliseconds(), gpsData);
+				
+				gpsClockUpdater.newGPSData(newUnit);
 
 				if (gpsController.doAutoClockUpdate) {
 					gpsController.doAutoClockUpdate = false;
-					UpdateClockDialog.showDialog(null, gpsController, gpsController.gpsParameters, true);
+					if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+						gpsClockUpdater.updateOnNext();
+					}
+					else {
+						UpdateClockDialog.showDialog(null, gpsController, gpsController.gpsParameters, true);
+					}
 				}
-
+				
 				//				newUnit.data = gpsData;
 				if (!wantDataUnit(newUnit)) {
 					return;
@@ -333,6 +348,22 @@ public class ProcessNmeaData extends PamProcess {
 
 	public GpsLogger getGpsLogger() {
 		return gpsLogger;
+	}
+
+	@Override
+	public void clockUpdated(boolean success, long timeMillis, String message) {
+		if (success) {
+			System.out.printf("PC Clock sucessfully updated to %s UTC\n", PamCalendar.formatDBDateTime(timeMillis, true));
+		}
+		else {
+			System.out.println("PC Clock update failed");
+		}
+	}
+
+	@Override
+	public void newTime(long timeMillis) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

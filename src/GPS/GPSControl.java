@@ -38,6 +38,9 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 	
 	private ProcessNmeaData gpsProcess;
 	
+	public ProcessNmeaData getGpsProcess() {
+		return gpsProcess;
+	}
 	protected ProcessHeadingData headingProcess;
 	
 	//viewer functionality;
