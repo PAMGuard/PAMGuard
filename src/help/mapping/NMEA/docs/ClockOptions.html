@@ -6,57 +6,91 @@
 
 <body>
 
-<h1>NMEA</h1>
+	<h1>NMEA</h1>
 
-<h2>Update PC Clock</h2>
+	<h2>Update PC Clock</h2>
 
-<p><center><b>Note that for this function to work on Windows platforms it is necessary to change
-some of the Windows security settings. See below for details. </b></center></p>
+	<p>
+	<center>
+		<b>Note that for this function to work on Windows platforms it is
+			necessary to change some of the Windows security settings. See below
+			for details. </b>
+	</center>
+	</p>
 
-<p><br>
-  Accurate timing is critical to many survey and mitigation exercises. </p>
-<p>
-All timing within PAMGuard uses the Universal Time Code (equivalent to GMT) which is read
-from the PC clock. <p>
-The PC Clock can be set from the GPS, which receives an accurate time stamp
-from satellites.  <p>
-Select the menu <em><strong>Detection>GPS>Update PC Clock</strong></em> to open the dialog
-<p>
-<img src="images/Updateclock.png"/><br><br>
+	<p>
+		<br> Accurate timing is critical to many survey and mitigation
+		exercises.
+	</p>
+	<p>All timing within PAMGuard uses the Universal Time Code
+		(equivalent to GMT) which is read from the PC clock.
+	<p>The PC Clock can be set from the GPS, which receives an accurate
+		time stamp from satellites.
+	<p>
+		Select the menu <em><strong>Detection>GPS>Update PC
+				Clock</strong></em> to open the dialog
+	<p>
+		<img src="images/Updateclock.png" /><br>
+		<br> The upper text area shows the current PC time. When GPS data
+		are received, the correct time will be printed in the lower text area
+		and you are given the option of setting the PC clock from the GPS
+		data.
+	<p>
+		Check <strong>"Auto set on PAMGuard start-up"</strong> and the PC
+		clock will automatically be set from the GPS each time PAMGuard
+		starts. Time Zones
+	<h3></h3>
+	<p>Note that PAMGuard sets and reads the PC clock in such as way
+		that the local time, (for instance, as shown in the Windows task bar)
+		may show a time different to UTC as governed by the time zone and
+		daylight savings settings of your computer. Don't worry - this is
+		perfectly normal. The correct UTC time as used by PAMGuard is clearly
+		visible on the GUI display. Setting the PC clock by hand from the
+		control panel is likely to set the incorrect UTC in the machine.</p>
 
-The upper text area shows the current PC time. When GPS data are received, the correct time
-will be printed in the lower text area and you are given the option of setting the PC clock from 
-the GPS data. 
-<p>
-Check <strong>"Auto set on PAMGuard start-up"</strong> and the PC clock will automatically be set
-from the GPS each time PAMGuard starts.
-<h3>Time Zones</h3>
-<p>Note that PAMGuard sets and reads the PC clock in such as way that the local time, 
-  (for instance, as shown in the Windows task bar) may show a time different to UTC as governed
-  by the time zone and daylight savings settings of your computer. Don't worry - this is perfectly normal.
-  The correct UTC time as used by PAMGuard is clearly visible on the GUI display. Setting the PC clock by hand 
-  from the control panel is likely to set the incorrect UTC in the machine.</p>
-  
-<h3>Windows Security Settings</h3>
-<p>Since Windows 10, it has not been possible to automatically update the PC clock from 
-PAMGuard unless you make some small changes to the Windows security settings. This needs to 
-be done by someone with Administrator privileges on the PC, but only needs to be done once.</p>
-<p>These instructions are based on those at <a href="https://www.fortect.com/windows-optimization-tips/fixed-non-admin-users-cant-change-time-zone-in-windows-11/">
-Fortect Windows Optimization tips</a>.</p>
+	<h3>Windows Security Settings</h3>
+	<p>Since Windows 10, it has not been possible to automatically
+		update the PC clock from PAMGuard unless you make some small changes
+		to the Windows security settings. This needs to be done by someone
+		with Administrator privileges on the PC, but only needs to be done
+		once.</p>
+	<p>
+		These instructions are based on those at <a
+			href="https://www.fortect.com/windows-optimization-tips/fixed-non-admin-users-cant-change-time-zone-in-windows-11/">
+			Fortect Windows Optimization tips</a>.
+	</p>
 
-<ol>
-<li><p>Open the Local Security Policy confuguration by typing secpol, or local security policy in the Windows task bar.</p>
-<p><img src="images/security1.png"></p><li>
-<li><p>Go into <em>Local Policies</em> <em>User Rights Assignment</em> and double click on <em>Change the system time.</em></p>
-<p><img src="images/security2.png"></p></li>
-<li><p>Where is says <em>Enter object names to select</em>, type <em>Users</em>.</p></li>
-<li><p>Click on <em>Check Names</em> (optional) and <em>OK</em>
-<li><p>Click OK again to close the Local Security Policy manager.</p></li>
-<li><p>Restart your computer for the changes to take effect</p></li>
-</ol>
-  
-<p>&nbsp;</p>
-<p> <a href="ConfiguringGPS.html">Previous: Configuring GPS</a></p>
-<br><br><br>
+	<ol>
+		<li><p>Open the Local Security Policy configuration by typing
+				'secpol', or 'local security policy' in the Windows task bar.</p>
+			<p>
+				<img src="images/security1.png">
+			</p>
+		</li>
+		<li><p>
+				Go into <em>Local Policies</em> <em>User Rights Assignment</em> and
+				double click on <em>Change the system time.</em>
+			</p>
+			<p>
+				<img src="images/security2.png">
+			</p></li>
+		<li><p>
+				Where is says <em>Enter object names to select</em>, type <em>Users</em>.
+			</p></li>
+		<li><p>
+				Click on <em>Check Names</em> (optional) and <em>OK</em>.
+			</p></li>
+		<li><p>Click OK again to close the Local Security Policy
+				manager.</p></li>
+		<li><p>Restart your computer for the changes to take effect.</p></li>
+	</ol>
+
+	<p>&nbsp;</p>
+	<p>
+		<a href="ConfiguringGPS.html">Previous: Configuring GPS</a>
+	</p>
+	<br>
+	<br>
+	<br>
 </body>
 </html>

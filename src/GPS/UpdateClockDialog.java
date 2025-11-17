@@ -121,7 +121,7 @@ public class UpdateClockDialog extends PamDialog implements ActionListener, Cloc
 		setButton.setText("Set Now");
 		cancelButton = getCancelButton();
 		setButton.addActionListener(this);
-
+		cancelButton.setText("Close");
 		p.add(BorderLayout.CENTER, timePanel);
 //		p.add(BorderLayout.SOUTH, okPanel);
 		
