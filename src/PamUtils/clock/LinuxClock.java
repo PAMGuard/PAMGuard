@@ -35,10 +35,10 @@ public class LinuxClock extends OSClock {
 		return true;
 	}
 
-	@Override
-	protected long getProcessCPUTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+//	@Override
+//	protected long getProcessCPUTime() {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
 
 }

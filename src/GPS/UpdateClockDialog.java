@@ -24,7 +24,11 @@ import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.AdminTools;
 import PamUtils.PamCalendar;
+import PamUtils.PlatformInfo;
 import PamUtils.SystemTiming;
+import PamUtils.PlatformInfo.OSType;
+import PamView.dialog.PamDialog;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
@@ -41,7 +45,9 @@ import warnings.WarningSystem;
  * @author Doug Gillespie
  *
  */
-public class UpdateClockDialog extends JDialog implements ActionListener, ClockUpdateObserver {
+public class UpdateClockDialog extends PamDialog implements ActionListener, ClockUpdateObserver {
+
+	private static final long serialVersionUID = 1L;
 
 	private static UpdateClockDialog singleInstance;
 	
@@ -70,12 +76,12 @@ public class UpdateClockDialog extends JDialog implements ActionListener, ClockU
 //	private int newDataCount = 0;
 	
 	private UpdateClockDialog(Frame parentFrame, GPSControl gpsControl) {
-		super(parentFrame, "Set PC Clock");
+		super(parentFrame, "Set PC Clock", false);
 		this.gpsControl = gpsControl;
 		this.gpsProcess = gpsControl.getGpsProcess();
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
-		p.setBorder(new EmptyBorder(10,10,5,10));
+//		p.setBorder(new EmptyBorder(10,10,5,10));
 		
 		int textLen = 15;
 		
@@ -104,23 +110,28 @@ public class UpdateClockDialog extends JDialog implements ActionListener, ClockU
 		
 		timePanel.add(setAlways = new JCheckBox("Auto set on Pamguard start-up"));
 		
-		JPanel okPanel = new JPanel();
-		okPanel.add(setButton = new JButton(" Set Now "));
-		okPanel.setEnabled(false);
-		getRootPane().setDefaultButton(setButton);
-		okPanel.add(cancelButton = new JButton("Close"));
-		//getContentPane().add(BorderLayout.SOUTH, okPanel);
+//		JPanel okPanel = new JPanel();
+//		okPanel.add(setButton = new JButton(" Set Now "));
+//		okPanel.setEnabled(false);
+//		getRootPane().setDefaultButton(setButton);
+//		okPanel.add(cancelButton = new JButton("Close"));
+//		//getContentPane().add(BorderLayout.SOUTH, okPanel);
+//		cancelButton.addActionListener(this);
+		setButton = getOkButton();
+		setButton.setText("Set Now");
+		cancelButton = getCancelButton();
 		setButton.addActionListener(this);
-		cancelButton.addActionListener(this);
 
 		p.add(BorderLayout.CENTER, timePanel);
-		p.add(BorderLayout.SOUTH, okPanel);
+//		p.add(BorderLayout.SOUTH, okPanel);
 		
-		setContentPane(p);
+//		setContentPane(p);
+		setDialogComponent(p);
 		
+		setHelpPoint("mapping.NMEA.docs.ClockOptions");
 
 		pack();
-		setLocation(300, 200);
+//		setLocation(300, 200);
 		this.setModal(true);
 		this.setResizable(false);
 		//this.setAlwaysOnTop(true);
@@ -146,13 +157,25 @@ public class UpdateClockDialog extends JDialog implements ActionListener, ClockU
 
 		singleInstance.gpsParameters = gpsParameters;//.clone();
 		singleInstance.autoUpdate = autoUpdate;
-		singleInstance.setModal(!autoUpdate); // bodge it so it doens't halt program execution during auto update
-		singleInstance.setAlwaysOnTop(autoUpdate);
+//		singleInstance.setModal(!autoUpdate); // bodge it so it doens't halt program execution during auto update
+//		singleInstance.setAlwaysOnTop(autoUpdate);
 //		singleInstance.newDataCount = 0;
 		singleInstance.setVisible(true);
 		return singleInstance.gpsParameters;
 	}
-
+	private void setParams() {
+		
+	}
+	@Override
+	public boolean getParams() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public void cancelButtonPressed() {
+		// TODO Auto-generated method stub
+		
+	}
 	@Override
 	public void setVisible(boolean b) {
 		NMEADataBlock nmeaDataBlock = gpsControl.getNMEADataBlock();
@@ -454,15 +477,37 @@ public class UpdateClockDialog extends JDialog implements ActionListener, ClockU
 		if (success) {
 			updatedAt.setText(String.format("Updated %s", PamCalendar.formatDBDateTime(timeMillis, false)));
 			if (autoUpdate) {
-				closeDown = 3;
+				closeDown = 4;
 			}
 			lastUpdate = timeMillis;
 			autoUpdate = false;
 		}
 		else {
 			updatedAt.setText("Update failed");
+			showFailWarning();
 		}
 	}
+	
+	private void showFailWarning() {
+		String tit = "Clock update failed";
+		String msg;
+		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+			msg = "<html>To update the PC clock, you must make adjustments to the Windows security settings<br>" +
+			"See the PAMGuard help for details</html>";
+		}
+		else if (PlatformInfo.calculateOS() == OSType.LINUX) {
+			msg = "<html>Unknown failure on Linux. Contact PAMGuard support</html>";
+		}
+		else if (PlatformInfo.calculateOS() == OSType.MACOSX) {
+			msg = "Automatic clock updates are not currently supported on Mac OSX";
+		}
+		else {
+		    String osName = System.getProperty("os.name").toLowerCase();
+			msg = "Automatic clock updates are not currently supported on " + osName;
+		}
+		WarnOnce.showWarning(this, tit, msg, WarnOnce.WARNING_MESSAGE);
+	}
+	
 	@Override
 	public void newTime(long timeMillis) {
 		tellTime(gpsTime, timeMillis, timeMillis-System.currentTimeMillis());
@@ -483,5 +528,12 @@ public class UpdateClockDialog extends JDialog implements ActionListener, ClockU
 	}
 	private void enableControls(boolean b) {
 		setButton.setEnabled(b);
+	}
+	
+
+	@Override
+	public void restoreDefaultSettings() {
+		// TODO Auto-generated method stub
+		
 	}
 }

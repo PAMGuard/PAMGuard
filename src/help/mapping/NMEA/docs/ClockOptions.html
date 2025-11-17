@@ -10,8 +10,8 @@
 
 <h2>Update PC Clock</h2>
 
-<p><center><b>Note that this function is no longer available on most systems unless PAMGuard is run with 
-Administrator rights</b></center></p>
+<p><center><b>Note that for this function to work on Windows platforms it is necessary to change
+some of the Windows security settings. See below for details. </b></center></p>
 
 <p><br>
   Accurate timing is critical to many survey and mitigation exercises. </p>
@@ -22,7 +22,7 @@ The PC Clock should be set from the GPS, which receives an accurate time stamp
 from satellites.  <p>
 Select the menu <em><strong>Detection>GPS>Update PC Clock</strong></em> to open the dialog
 <p>
-<img alt="Update Clock" src="images/Updateclock.png"/><br><br>
+<img src="images/Updateclock.png"/><br><br>
 
 The upper text area shows the current PC time. When GPS data are received, the correct time
 will be printed in the lower text area and you are given the option of setting the PC clock from 
@@ -36,6 +36,15 @@ from the GPS each time PAMGuard starts.
   by the time zone and daylight savings settings of your computer. Don't worry - this is perfectly normal.
   The correct UTC time as used by PAMGuard is clearly visible on the GUI display. Setting the PC clock by hand 
   from the control panel is likely to set the incorrect UTC in the machine.</p>
+  
+<h4>Windows Security Settings</h4>
+<p>Since Windows 10, it has not been possible to automatically update the PC clock from 
+PAMGuard unless you make some small changes to the Windows security settings. This needs to 
+be done by someone with Administrator privileges on the PC, but only needs to be done once.</p>
+<p>These instructions are based on those at <a href="https://www.fortect.com/windows-optimization-tips/fixed-non-admin-users-cant-change-time-zone-in-windows-11/">
+Fortect Windows Optimization tips</a>.</p>
+<p>
+  
 <p>&nbsp;</p>
 <p> <a href="ConfiguringGPS.html">Previous: Configuring GPS</a></p>
 <br><br><br>

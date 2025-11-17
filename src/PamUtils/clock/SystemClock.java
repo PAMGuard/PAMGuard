@@ -32,14 +32,14 @@ public class SystemClock {
 		}
 		return singleInstance;
 	}
-	public long getProcessCPUTime() {
-		if (osClock == null) {
-			return -1;
-		}
-		else {
-			return osClock.getProcessCPUTime();
-		}
-	}
+//	public long getProcessCPUTime() {
+//		if (osClock == null) {
+//			return -1;
+//		}
+//		else {
+//			return osClock.getProcessCPUTime();
+//		}
+//	}
 	
 	public boolean setSystemTime(long timeMilliseconds) {
 		if (osClock == null) {

@@ -22,6 +22,6 @@ public abstract class OSClock {
 	 * Get the process CPU elapsed time. 
 	 * @return
 	 */
-	protected abstract long getProcessCPUTime();
+//	protected abstract long getProcessCPUTime();
 	
 }

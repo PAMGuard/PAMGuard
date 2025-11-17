@@ -215,7 +215,7 @@ public class MLGridBearingLocaliser2 implements BearingLocaliser {
 		catch (Exception e) {
 			return;
 		}
-		long nanosStart = SystemTiming.getProcessCPUTime();
+//		long nanosStart = SystemTiming.getProcessCPUTime();
 		PamVector pairVector, pairErrorVector, bearingVector, pV0, pV1;
 		bearingVector = new PamVector();
 		double theta, phi;
@@ -254,7 +254,7 @@ public class MLGridBearingLocaliser2 implements BearingLocaliser {
 				}
 			}
 		}
-		long nanoEnd = SystemTiming.getProcessCPUTime();
+//		long nanoEnd = SystemTiming.getProcessCPUTime();
 //		System.out.println(String.format("LUT Creation time %3.2f microseconds", (nanoEnd-nanosStart)/1000.));
 		
 		initialiseLLLut();

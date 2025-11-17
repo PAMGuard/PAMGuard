@@ -131,7 +131,6 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 		menuItem.addActionListener(new UpdateClock(parentFrame));
 		subMenu.add(menuItem);
 		
-
 		return subMenu;
 	}
 
@@ -190,15 +189,20 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
-				String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
-						"The Global time settings do not require administrator privilidges<p><p>" +
-						"Press OK to proceed anyway to old GPS clock setting method</html>";
-				int ans = WarnOnce.showWarning(parentFrame, "System clock updating", message, WarnOnce.OK_CANCEL_OPTION);
-				if (ans == WarnOnce.CANCEL_OPTION) {
-					return;
-				}
-			}
+//			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+			/**
+			 * This is no longer relevant since we've found a way to get round Windows security and allow
+			 * clock updates again. A different warning will be issued if the clock update fails, directing
+			 * people to the help pages. 
+			 */
+//				String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
+//						"The Global time settings do not require administrator privilidges<p><p>" +
+//						"Press OK to proceed anyway to old GPS clock setting method</html>";
+//				int ans = WarnOnce.showWarning(parentFrame, "System clock updating", message, WarnOnce.OK_CANCEL_OPTION);
+//				if (ans == WarnOnce.CANCEL_OPTION) {
+//					return;
+//				}
+//			}
 			GPSParameters newP = UpdateClockDialog.showDialog(parentFrame, gpsControl, gpsParameters, false);
 			gpsParameters = newP.clone();
 		}

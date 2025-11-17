@@ -44,7 +44,6 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.status.ProcessCheck;
 import PamModel.PamModel;
-import PamModel.PamProfiler;
 import PamUtils.PamCalendar;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.datakeeper.DataKeeper;
@@ -122,7 +121,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 */
 	boolean isExternalProcess = true; 
 
-	PamProfiler.CPUUsageSnapshot startCPUSnapShot, endCPUSnapShot;
+//	PamProfiler.CPUUsageSnapshot startCPUSnapShot, endCPUSnapShot;
 	
 	private long cpuUsage;
 	private long lastCPUCheckTime = System.currentTimeMillis();
