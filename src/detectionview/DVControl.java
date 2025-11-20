@@ -6,12 +6,15 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamguardMVC.PamDataBlock;
+import annotation.handler.AnnotationHandler;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.clipDisplay.ClipDisplayDecorations;
@@ -96,15 +99,25 @@ public class DVControl extends PamControlledUnit implements PamSettings, ClipDis
 	}
 
 	@Override
-	public JMenuItem createDisplayMenu(Frame parentFrame) {
-		JMenuItem menuItem = new JMenuItem(getUnitName() + " settings ...");
+	public JMenuItem createDetectionMenu(Frame parentFrame) {
+		JMenu menu = new JMenu(this.getUnitName() + " settings ...");
+		JMenuItem menuItem = new JMenuItem("Configuration ...");
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				showSettingsDialog(parentFrame);
 			}
 		});
-		return menuItem;
+		menu.add(menuItem);
+		// see if we've got annotation types to add to the menu.
+		PamDataBlock detBlock = dvProcess.getDetectorDataBlock();
+		if (detBlock != null) {
+			AnnotationHandler annotationHandler = detBlock.getAnnotationHandler();
+			if (annotationHandler != null) {
+//				menu.add(annotationHandler.)
+			}
+		}
+		return menu;
 	}
 
 	protected void showSettingsDialog(Frame parentFrame) {

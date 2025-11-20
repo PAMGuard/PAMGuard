@@ -3,6 +3,8 @@ package detectionview;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
+import annotation.handler.AnnotationHandler;
+import annotation.userforms.UserFormAnnotationType;
 
 public class DVProcess extends PamguardMVC.PamProcess {
 	
@@ -15,6 +17,8 @@ public class DVProcess extends PamguardMVC.PamProcess {
 	private PamDataBlock detectorDataBlock;
 	
 	private DVLoader dvLoader;
+
+	private AnnotationHandler annotationHandler;
 
 	public DVProcess(DVControl dvControl) {
 		super(dvControl, null);
@@ -73,9 +77,22 @@ public class DVProcess extends PamguardMVC.PamProcess {
 			inputRawData.addInstantObserver(this);
 		}
 		
+		sortAnnotationHandler();
 		
 		dvControl.updateConfigObs();
 		return super.prepareProcessOK();
+	}
+
+	private void sortAnnotationHandler() {
+		annotationHandler = detectorDataBlock.getAnnotationHandler();
+		if (annotationHandler == null) {
+			annotationHandler = new AnnotationHandler(detectorDataBlock);
+		}
+		// make sure the annotation handler has some basic types of annotator
+		// for manual annotation
+		if (annotationHandler.findAnnotationType(UserFormAnnotationType.class) == null) {
+			annotationHandler.addAnnotationType(new UserFormAnnotationType(detectorDataBlock));
+		}
 	}
 
 	@Override
