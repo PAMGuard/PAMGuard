@@ -399,6 +399,10 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	public void updateDataUnit(long updateTime) {
 		updateCount++;
 		this.lastUpdateTime = updateTime;
+		DataUnitFileInformation finf = getDataUnitFileInformation();
+		if (finf != null) {
+			finf.setNeedsUpdate(true);
+		}
 	}
 
 	/**

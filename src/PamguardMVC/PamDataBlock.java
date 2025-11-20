@@ -1389,6 +1389,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public void updatePamData(Tunit pamDataUnit, long updateTimeMillis) {
 		pamDataUnit.updateDataUnit(updateTimeMillis);
 		setChanged();
+		
 		if (!isOffline && !pamDataUnit.isEmbryonic()) {
 			/*
 			 * Save it if it't not been saved already or we're saving updates. 
