@@ -1404,7 +1404,7 @@ final public class PamModel implements PamSettings {
 						
 						// instantiate the plugin control class using the custom class loader
 						try {
-							File classFile = new File(pf.getJarFile());		
+//							File classFile = new File(pf.getJarFile());		
 							//URLClassLoader cl = new URLClassLoader(new URL[]{classFile.toURI().toURL()});
 //							mi = PamModuleInfo.registerControlledUnit(pf.getClassName(), pf.getDescription(),cl);
 							mi = PamModuleInfo.registerControlledUnit(pf.getClassName(), pf.getDescription(),classLoader);
