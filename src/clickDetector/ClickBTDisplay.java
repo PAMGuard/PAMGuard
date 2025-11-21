@@ -2357,7 +2357,6 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 
 
-
 	/**
 	 * Creates the pop up menu for the bearing time display. The pop up menu will change depending on a number of factors, whether in offline mode, if the selected near or on a click or in whitespace, if the sleected click 
 	 * is part of an invent or if localiser modules have been created. 
@@ -2372,11 +2371,26 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		if (isView) {
 			/**
-			 * Bit of  aporblem here - need to have some sort of event mark to 
-			 * pass into the menu items. 
+			 * Bit of a porblem here - need to have some sort of event mark to 
+			 * pass into the menu items. But we only want to do this if there is an event mark 
+			 * on the data, so need to look at the zoomer. 
 			 */
 			OverlayMark oMark = new OverlayMark(btMarker, btPlot, null, 0, btMarker.getProjector().getParameterTypes(), null);
 			if (clickControl.getClicksOffline().addBTMenuItems(menu, oMark, this, false, clickedClick)>0) {
+				menu.addSeparator();
+			}
+			
+			/**
+			 * Add the additional menu items to classify all clicks in a mark. 
+			 */
+			ArrayList<ClickDetection> markClicks = getMarkedClickClicks();
+			if (markClicks != null && markClicks.size() > 0) {
+//				 add menu items to mark a whole load of clicks. 
+				menuItem = new JMenuItem("Classify marked clicks");
+				menuItem.setToolTipText("Re-run automatic classification on marked clicks");
+				menuItem.addActionListener(new ClassifyClick(markClicks));
+				menu.add(menuItem);
+				addClickClassifierOption(menu, markClicks);
 				menu.addSeparator();
 			}
 
@@ -2385,10 +2399,10 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			 */
 			if (clickedClick != null) {
 
-				menuItem = new JMenuItem("Classify Click");
+				menuItem = new JMenuItem("Classify click");
+				menuItem.setToolTipText("Re-run automatic classification on this click");
 				menuItem.addActionListener(new ClassifyClick(clickedClick));
 				menu.add(menuItem);
-
 
 				addClickClassifierOption(menu, clickedClick);
 				menu.addSeparator();
@@ -2527,15 +2541,31 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 	}
 
-
 	/**
 	 * Creates options in the menu to force clicks to be classified as a particular species.
 	 */
 	private void addClickClassifierOption(JPopupMenu menu, ClickDetection detection){
+		ArrayList<ClickDetection> asList = new ArrayList();
+		asList.add(detection);
+		addClickClassifierOption(menu, asList);
+	}
+
+	/**
+	 * Creates options in the menu to force clicks to be classified as a particular species.
+	 */
+	private void addClickClassifierOption(JPopupMenu menu, ArrayList<ClickDetection> detection){
 		JMenuItem mi;
-		JMenu subMenu=new 	JMenu("Classify as...");
+		boolean many = detection.size() > 1;
+		JMenu subMenu;
+		if (many) {
+			subMenu = new JMenu("Classify marked clicks as...");
+		}
+		else {
+			subMenu = new JMenu("Classify click as...");
+		}
 
 		mi=new JMenuItem("Classify as Unclassified");
+		mi.setToolTipText("Clear classification of this click");
 		mi.addActionListener(new ForceClassifyClick(detection, (byte) 0));
 		subMenu.add(mi);
 
@@ -2546,11 +2576,28 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		for (int i=0; i<clickControl.getClickIdentifier().getCodeList().length; i++){
 
 			if (i==0){
-				mi=new JMenuItem("Classify as "+ clickControl.getClickIdentifier().getSpeciesList()[i]);
+				if (many) {
+					mi=new JMenuItem("Classify marked clicks as "+ clickControl.getClickIdentifier().getSpeciesList()[i]);
+					mi.setToolTipText("Set classification of selected clicks to " + 
+							clickControl.getClickIdentifier().getSpeciesList()[i]);
+				}
+				else {
+					mi=new JMenuItem("Classify click as "+ clickControl.getClickIdentifier().getSpeciesList()[i]);
+					mi.setToolTipText("Set classification of this click to " + 
+							clickControl.getClickIdentifier().getSpeciesList()[i]);
+				}
 				menu.add(mi);
 			}
 			else{ 
 				mi=new JMenuItem( clickControl.getClickIdentifier().getSpeciesList()[i]);
+				if (many) {
+					mi.setToolTipText("Set classification of selected clicks to " + 
+							clickControl.getClickIdentifier().getSpeciesList()[i]);
+				}
+				else {
+					mi.setToolTipText("Set classification of this click to " + 
+							clickControl.getClickIdentifier().getSpeciesList()[i]);
+				}
 				subMenu.add(mi);
 			}
 
@@ -2570,13 +2617,22 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 */
 	private class ClassifyClick implements ActionListener {
 
-		private ClickDetection click;
+		private ArrayList<ClickDetection> clicks;
 
 		public ClassifyClick(ClickDetection click) {
 			super();
-			this.click = click;
-			click.getDataUnitFileInformation().setNeedsUpdate(true);
+			clicks = new ArrayList<>();
+			clicks.add(click);
+//			click.getDataUnitFileInformation().setNeedsUpdate(true);
 
+		}
+
+		/**
+		 * @param clicks
+		 */
+		public ClassifyClick(ArrayList<ClickDetection> clicks) {
+			super();
+			this.clicks = clicks;
 		}
 
 		@Override
@@ -2586,9 +2642,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				return;
 			}
 
-			ClickIdInformation idInfo = clickIdentifier.identify(click);
-			click.setClickType((byte)idInfo.clickType);
-			click.getDataUnitFileInformation().setNeedsUpdate(true);
+			for (ClickDetection click: clicks) {
+				ClickIdInformation idInfo = clickIdentifier.identify(click);
+				click.setClickType((byte)idInfo.clickType);
+				click.getParentDataBlock().updatePamData(click, System.currentTimeMillis());
+				click.getDataUnitFileInformation().setNeedsUpdate(true);
+			}
 			repaintTotal();
 		}
 	}
@@ -2600,20 +2659,23 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 */
 	private class ForceClassifyClick implements ActionListener {
 
-		private ClickDetection click;
+		private ArrayList<ClickDetection> clickList;
 		private byte code;
 
-		public ForceClassifyClick(ClickDetection click, byte code) {
+		public ForceClassifyClick(ArrayList<ClickDetection> clickList, byte code) {
 			super();
-			this.click = click;
+			this.clickList = clickList;
 			this.code = code;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if (click==null) return;
-			click.setClickType((byte) code);
+			if (clickList==null) return;
+			for (ClickDetection aClick : clickList) {
+				aClick.setClickType((byte) code);
+				aClick.getParentDataBlock().updatePamData(aClick, System.currentTimeMillis());
+			}
 			repaintTotal();
 		}
 	}
@@ -3910,6 +3972,10 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		if (zoomer == null) {
 			return;
 		}
+		if (zoomer.getTopMostShape() == null) {
+			// added 2025-11-20 to get an empty list when there is no mark. 
+			return;
+		}
 		PamDataBlock<ClickDetection> cdb = clickControl.getClickDataBlock();
 		ListIterator<ClickDetection> clickIterator = getPlottableClicksIterator(0);
 		ClickDetection click;
@@ -3920,6 +3986,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			}
 			markedClicks.add(click);
 		}
+//		System.out.printf("Number of clicks in mark is %d of %d\n", markedClicks.size(), cdb.getUnitsCount());
 	}
 
 	/**
@@ -3929,6 +3996,24 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	public ArrayList<PamDataUnit> getMarkedClicks() {
 
 		return markedClicks;
+	}
+	
+	/**
+	 * horrible mess of types. Get the marked clicks that are actually
+	 * click detections
+	 * @return
+	 */
+	public ArrayList<ClickDetection> getMarkedClickClicks() {
+		if (markedClicks == null) {
+			return null;
+		}
+		ArrayList<ClickDetection> clickClicks = new ArrayList<>();
+		for (PamDataUnit aUnit : markedClicks) {
+			if (aUnit instanceof ClickDetection) {
+				clickClicks.add((ClickDetection) aUnit);
+			}
+		}
+		return clickClicks;
 	}
 
 	/**

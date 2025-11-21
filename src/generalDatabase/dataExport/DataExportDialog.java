@@ -150,7 +150,7 @@ public class DataExportDialog extends PamDialog implements DataFilterChangeListe
 //		TableColumn tableColumn = tableHeader.getColumnModel().getColumn(icol);
 		DataFilter dataFilter = findDataFilter(tableModel.getColumnName(iCol));
 		if (pamConnection == null) {
-			System.out.println("No database connection");
+			System.out.println("DataExportDialog:headingMouseMoved() No database connection");
 			return;
 		}
 		if (dataFilter != null) {
@@ -196,7 +196,7 @@ public class DataExportDialog extends PamDialog implements DataFilterChangeListe
 		boolean needAnd = false;
 		String newClause;
 		if (pamConnection == null) {
-			System.out.println("No database connection");
+			System.out.println("DataExportDialog:getQueryClause() No database connection");
 			return null;
 		}
 		for (DataFilter dataFilter:dataFilters) {

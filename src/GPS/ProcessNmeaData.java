@@ -20,10 +20,13 @@
  */
 package GPS;
 
+import javax.swing.SwingUtilities;
+
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamGUIManager;
 import PamController.status.BaseProcessCheck;
 import PamModel.PamModel;
 import PamModel.SMRUEnable;
@@ -45,9 +48,7 @@ import warnings.WarningSystem;
  * block, selects just the interesting stuff in the GPRMC string and creates a
  * new data block with the string data unpacked into more usable doubles.
  */
-public class ProcessNmeaData extends PamProcess {
-
-
+public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 
 	private GPSDataBlock gpsDataBlock;
 
@@ -55,15 +56,21 @@ public class ProcessNmeaData extends PamProcess {
 
 	private GpsLogger gpsLogger;
 
-//	private String wantedString = "$GPRMC";
+	//	private String wantedString = "$GPRMC";
 
 	private GpsDataUnit previousUnit = null;
-	
+
 	private MagneticVariation magneticVariation;
-	
+
 	private PamWarning badGpsString; 
-	
+
 	private BaseProcessCheck processCheck;
+
+	private GPSClockUpdater gpsClockUpdater;
+
+	public GPSClockUpdater getGpsClockUpdater() {
+		return gpsClockUpdater;
+	}
 
 	/**
 	 * @param pamControlledUnit
@@ -77,26 +84,29 @@ public class ProcessNmeaData extends PamProcess {
 		super(gpsControl, null);
 
 		this.gpsController = gpsControl;
-		
+
 		badGpsString = new PamWarning(gpsControl.getUnitName(), "Bad GPS String", 1);
 		badGpsString.setWarningTip("<html>Occasional bad strings are perfectly normal.<br>"
-				                       + "If they persist, check your antenna connection.</html>");
+				+ "If they persist, check your antenna connection.</html>");
 
 		setProcessName("GPS data selection");
 
 		//allNmeaData.addObserver(this);
 		findNMEADataBlock();
 
+		gpsClockUpdater = new GPSClockUpdater(gpsControl, this);
+		gpsClockUpdater.addObserver(this);
+
 		addOutputDataBlock((gpsDataBlock = new GPSDataBlock(this)));
 		if (!gpsControl.isGpsMaster()) {
 			gpsDataBlock.setOverlayDraw(new GPSOverlayGraphics(gpsControl));
 			gpsDataBlock.setPamSymbolManager(new StandardSymbolManager(gpsDataBlock, GPSOverlayGraphics.defSymbol, false));
 		}
-		
-		
-//		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
-//			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
-//		}
+
+
+		//		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+		//			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
+		//		}
 
 		gpsDataBlock.setNaturalLifetime(1);
 		if (PamModel.getPamModel() != null) {
@@ -107,9 +117,9 @@ public class ProcessNmeaData extends PamProcess {
 		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER || SMRUEnable.isEnableDecimus()) {
 			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
 		}
-		
+
 		magneticVariation = MagneticVariation.getInstance();
-		
+
 		processCheck = new BaseProcessCheck(this, NMEADataUnit.class, 0.2, 0.2);
 		processCheck.setNeverIdle(true);
 		processCheck.setInputAveraging(5);
@@ -119,12 +129,12 @@ public class ProcessNmeaData extends PamProcess {
 	}
 
 	boolean findNMEADataBlock() {
-		
+
 		PamDataBlock newDataBlock = null;
 		if (!gpsController.isGpsMaster()) {
 			return false;
 		}
-		
+
 		newDataBlock = PamController.getInstance().getDataBlockByLongName(gpsController.gpsParameters.nmeaSource);
 		if (newDataBlock == null) {
 			newDataBlock = PamController.getInstance().getDataBlock(NMEADataUnit.class, 0);
@@ -159,7 +169,7 @@ public class ProcessNmeaData extends PamProcess {
 	@Override
 	public void noteNewSettings() {
 		findNMEADataBlock();
-//		setWantedString();
+		//		setWantedString();
 		double minRate = Math.max(.2, 1./gpsController.gpsParameters.readInterval);
 		processCheck.getOutputCounter().setMinRate(minRate);
 	}
@@ -177,7 +187,7 @@ public class ProcessNmeaData extends PamProcess {
 		StringBuffer nmeaString = nmeaData.getCharData();
 		String stringId = NMEADataBlock.getSubString(nmeaString, 0);
 
-//		if (stringId.equalsIgnoreCase(wantedString)) {
+		//		if (stringId.equalsIgnoreCase(wantedString)) {
 		if (gpsController.wantString(stringId)) {
 			gpsData = new GpsData(nmeaString, gpsController.gpsParameters.mainString); // GpsData constructor which
 			// unpacks the string.
@@ -185,20 +195,33 @@ public class ProcessNmeaData extends PamProcess {
 
 				newUnit = new GpsDataUnit(nmeaData.getTimeMilliseconds(), gpsData);
 
+				gpsClockUpdater.newGPSData(newUnit);
+
 				if (gpsController.doAutoClockUpdate) {
 					gpsController.doAutoClockUpdate = false;
-					UpdateClockDialog.showDialog(null, gpsController, gpsController.gpsParameters, true);
+					if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+						gpsClockUpdater.updateOnNext();
+					}
+					else {
+						SwingUtilities.invokeLater(new Runnable() {
+							// invoke later or it will lock the thread. 
+							@Override
+							public void run() {
+								UpdateClockDialog.showDialog(null, gpsController, gpsController.gpsParameters, true);		
+							}
+						});
+					}
 				}
 
 				//				newUnit.data = gpsData;
 				if (!wantDataUnit(newUnit)) {
 					return;
 				}
-				
+
 				double magVar = magneticVariation.getVariation(newUnit.getGpsData());
 				newUnit.getGpsData().setMagneticVariation(magVar);
-//				System.out.println(String.format("Magnetic variation = %3.1f", magVar));
-				
+				//				System.out.println(String.format("Magnetic variation = %3.1f", magVar));
+
 				// if it gets this far, see if there is any true or magnetic
 				// heading data from the last 4 seconds to add.
 				ProcessHeadingData phd = gpsController.headingProcess;
@@ -217,7 +240,7 @@ public class ProcessNmeaData extends PamProcess {
 
 				gpsDataBlock.addPamData(newUnit);
 				gpsController.checkGPSTime(newUnit);
-//				MasterReferencePoint.setRefLatLong(newUnit.getGpsData(), "Latest GPS Data");
+				//				MasterReferencePoint.setRefLatLong(newUnit.getGpsData(), "Latest GPS Data");
 				previousUnit = newUnit;
 			}
 			else {
@@ -225,7 +248,7 @@ public class ProcessNmeaData extends PamProcess {
 				badGpsString.setWarningMessage(msg);
 				badGpsString.setEndOfLife(PamCalendar.getTimeInMillis() + 6000);
 				WarningSystem.getWarningSystem().addWarning(badGpsString);
-//				System.out.println(msg);
+				//				System.out.println(msg);
 			}
 		}
 	}
@@ -254,7 +277,7 @@ public class ProcessNmeaData extends PamProcess {
 			return true;
 		case GPSParameters.READ_TIMER:
 			if ((newUnit.getTimeMilliseconds() - previousUnit.getTimeMilliseconds()) / 1000 >=
-				gpsController.gpsParameters.readInterval) {
+			gpsController.gpsParameters.readInterval) {
 				previousUnit = newUnit;
 				return true;
 			}
@@ -263,7 +286,7 @@ public class ProcessNmeaData extends PamProcess {
 			}
 		case GPSParameters.READ_DYNAMIC:
 			if ((newUnit.getTimeMilliseconds() - previousUnit.getTimeMilliseconds()) / 1000 >=
-				gpsController.gpsParameters.readInterval) {
+			gpsController.gpsParameters.readInterval) {
 				previousUnit = newUnit;
 				return true;
 			}
@@ -315,13 +338,13 @@ public class ProcessNmeaData extends PamProcess {
 		super.clearOldData();
 	}
 
-//	public String getWantedString() {
-//		return wantedString;
-//	}
-//	
-//	public void setWantedString() {
-//		wantedString = gpsController.getWantedString();
-//	}
+	//	public String getWantedString() {
+	//		return wantedString;
+	//	}
+	//	
+	//	public void setWantedString() {
+	//		wantedString = gpsController.getWantedString();
+	//	}
 
 	public GPSControl getGpsController() {
 		return gpsController;
@@ -334,5 +357,21 @@ public class ProcessNmeaData extends PamProcess {
 	public GpsLogger getGpsLogger() {
 		return gpsLogger;
 	}
-	
+
+	@Override
+	public void clockUpdated(boolean success, long timeMillis, String message) {
+		if (success) {
+			System.out.printf("PC Clock sucessfully updated to %s UTC\n", PamCalendar.formatDBDateTime(timeMillis, true));
+		}
+		else {
+			System.out.println("PC Clock update failed");
+		}
+	}
+
+	@Override
+	public void newTime(long timeMillis) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

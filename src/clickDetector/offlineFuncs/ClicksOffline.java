@@ -183,6 +183,7 @@ public class ClicksOffline {
 			}
 			
 			menuItem  = new JMenuItem("Label click ...");
+			menuItem.setToolTipText("Label click as being part of an event");
 			menuItem.addActionListener(new LabelClicks(overlayMark, singleDataUnit));
 			menu.add(menuItem);
 			nMenuItems++;
@@ -203,6 +204,7 @@ public class ClicksOffline {
 				nMenuItems++;
 			}
 			menuItem  = new JMenuItem("Label clicks (Ctrl+L) ...");
+			menuItem.setToolTipText("Label clicks as being part of an event");
 			menuItem.addActionListener(new LabelClicks(overlayMark, markedClicks));
 			menu.add(menuItem);
 			nMenuItems++;

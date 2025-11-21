@@ -42,24 +42,31 @@ abstract public class PamView implements PamViewInterface {
 	 * Frame for main window associated with this view (i.e a PamGUI).
 	 */
 	protected JFrame frame;
-	
+
 	private int frameNumber;
-		
+
 
 	public PamView(PamControllerInterface pamControllerInterface,
 			PamModel pamModelInterface, int frameNumber) {
 		this.pamControllerInterface = pamControllerInterface;
 		this.pamModelInterface = pamModelInterface;
 		this.frameNumber = frameNumber;
-		
+
 		// Start the JavaFX thread and tell it to stay open, even if the JavaFX window is closed.  If this parameter
 		// is not set, the JavaFX thread will stop if the fx display is closed, and it won't restart again
 		// even when another fx display is created - which causes Pamguard to lock up.  This problem and
 		// solution are detailed here: https://stackoverflow.com/questions/25193198/prevent-javafx-thread-from-dying-with-jfxpanel-swing-interop
 		// Note that for this to work, Platform.exit() needs to be called when Pamguard exits, to force the JavaFX thread to close.  That
 		// was added into the shutDownPamguard() method below.
-		FXInitialiser.initialise();
-		Platform.setImplicitExit(false);
+		try {
+			FXInitialiser.initialise();
+			Platform.setImplicitExit(false);
+		}
+		catch(Exception e) {
+			System.out.println("Unable to initialise Java FX");
+			System.out.println("FX Based displays and dialogs will not work in this PAMGuard installation");
+//			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -68,9 +75,9 @@ abstract public class PamView implements PamViewInterface {
 	 */
 	@Override
 	abstract public void showControlledUnit(PamControlledUnit pamControlledUnit);
-	
+
 	abstract public void renameControlledUnit(PamControlledUnit pamControlledUnit);
-	
+
 	abstract public String getViewName();
 
 
@@ -87,6 +94,6 @@ abstract public class PamView implements PamViewInterface {
 	public void setFrameNumber(int frameNumber) {
 		this.frameNumber = frameNumber;
 	}
-	
+
 
 }

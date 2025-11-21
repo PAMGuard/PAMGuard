@@ -266,7 +266,7 @@ public class PamCalendar {
 	 * @return formatted String
 	 */
 	public static String formatLocalDateTime(Date date) {
-		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
+		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 		return df.format(date);
 	}
 

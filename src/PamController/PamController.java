@@ -792,7 +792,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public void shutDownPamguard() {
 		// force close the javaFX thread (because it won't close by itself - see
 		// Platform.setImplicitExit(false) in constructor
-		Platform.exit();
+		try {
+			Platform.exit();
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 
 		// terminate the JVM
 		System.exit(getPamStatus());
