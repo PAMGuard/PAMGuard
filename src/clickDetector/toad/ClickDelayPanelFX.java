@@ -1,5 +1,7 @@
 package clickDetector.toad;
 
+import javax.swing.SwingUtilities;
+
 import PamController.SettingsPane;
 import clickDetector.ClickControl;
 import clickDetector.ClickParameters;
@@ -33,7 +35,9 @@ public class ClickDelayPanelFX extends SettingsPane<ClickParameters>{
 	}
 	
 	private void clickTimingSettings() {
-		ClickDelayDialog.showDialog(clickControl.getGuiFrame(), clickControl);
+		
+		//TODO - convert to FX dialog
+		SwingUtilities.invokeLater(() ->ClickDelayDialog.showDialog(clickControl.getGuiFrame(), clickControl));
 	}
 
 	@Override
