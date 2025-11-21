@@ -31,7 +31,7 @@ public abstract class DLModelWorker<T> {
 	/**
 	 * The maximum allowed queue size;
 	 */
-	public final static int MAX_QUEUE_SIZE = 10 ; 
+	public final static int MAX_QUEUE_SIZE = 10; 
 
 	/**
 	 * The model transforms for the data. 

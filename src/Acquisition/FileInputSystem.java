@@ -52,6 +52,7 @@ import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioFileManager;
 import PamController.DataInputStore;
 import PamController.InputStoreInfo;
+import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -66,6 +67,7 @@ import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import pamguard.GlobalArguments;
+import soundPlayback.PlaybackControl;
 import warnings.PamWarning;
 
 //import org.kc7bfi.jflac.FLACDecoder;
@@ -105,6 +107,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	protected AcquisitionControl acquisitionControl;
 
+	/**
+	 * The number of samples in each data block read from the file. This is passed to downstream processes as a single data unit. 
+	 */
 	protected int blockSamples = 4800;
 
 	protected PamProgressBar fileProgress = new PamProgressBar(PamProgressBar.defaultColor);
@@ -784,7 +789,28 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		acquisitionControl.getDaqProcess().setSampleRate(sampleRate = audioFormat.getSampleRate(), true);
 		//		System.out.println("Audio sample rate set to " + sampleRate);
 
-		blockSamples = Math.max((int) sampleRate / 10, 1000); // make sure the
+		/**
+		 * We have a few situations here. We want processed data to be smooth but we don't want tiny blocks that might reduce processing 
+		 */
+		
+		//first is there a playback control
+		PamControlledUnit playBackControl = PamController.getInstance().findControlledUnit(PlaybackControl.PLAYBACK_TYPE_STRING);
+		
+		blockSamples = Math.max((int) sampleRate / 10, 500);
+		if (playBackControl != null) {
+			//if no control
+			PlaybackControl pbc = (PlaybackControl) playBackControl;
+			double pbcSpeed = pbc.getPlaybackParameters().getPlaybackSpeed();
+			boolean pbcChannels = pbc.getPlaybackParameters().channelBitmap>0;
+		
+			
+			if (pbcChannels && pbcSpeed < 8.0) {
+				//if there are channels selected and pbcSpeed is low then lower the block size for smooth playback
+				blockSamples = (int) (sampleRate/10); 
+			}
+
+		}
+		
 		// block has at
 		// least 1000 samples
 		acquisitionControl.getDaqProcess().setNumChannels(nChannels);

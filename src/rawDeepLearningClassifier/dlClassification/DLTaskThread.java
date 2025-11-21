@@ -11,7 +11,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
- * Creates a que for grouped data units for classiifcation. 
+ * Creates a que for grouped data units for classification. 
  * @author Jamie Macaulay
  *
  */

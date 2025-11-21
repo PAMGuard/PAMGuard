@@ -40,6 +40,8 @@ import soundPlayback.swing.PlaybackSidePanel;
 public class PlaybackControl extends PamControlledUnit implements PamSettings {
 
 	public static final int DEFAULT_OUTPUT_RATE = 48000;
+	
+	public static final String PLAYBACK_TYPE_STRING = "Sound Playback";
 
 	protected PlaybackParameters playbackParameters = new PlaybackParameters();
 	
@@ -72,7 +74,7 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 	
 	public PlaybackControl(String unitName) {
 		
-		super("Sound Playback", unitName);
+		super(PLAYBACK_TYPE_STRING, unitName);
 		
 		filePlayback = new FilePlayback(this);
 		
