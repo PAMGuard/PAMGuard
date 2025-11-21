@@ -1,6 +1,10 @@
 package group3dlocaliser.grouper.dialog;
 
 
+import javax.swing.SwingUtilities;
+
+import com.formdev.flatlaf.util.SwingUtils;
+
 import PamController.SettingsPane;
 import PamUtils.PamArrayUtils;
 import PamView.GroupedSourceParameters;
@@ -151,7 +155,11 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 		if (currentDataSelector == null) {
 			return;
 		}
-		currentDataSelector.showSelectDialog(getAWTWindow());
+		
+		//TODO - sometimes this is FX - sometimes Swing - need to standardise
+		//Crashes on macOS if Swing dialog called from FX thread so needed to add SwingUtils.invokeLater\
+		
+		SwingUtilities.invokeLater(() -> currentDataSelector.showSelectDialog(getAWTWindow()));
 	}
 	
 	private void enableControls() {
