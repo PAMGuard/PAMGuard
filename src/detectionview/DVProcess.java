@@ -5,6 +5,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import annotation.handler.AnnotationHandler;
 import annotation.userforms.UserFormAnnotationType;
+import detectionview.annotate.DVAnnotationWrapper;
 
 public class DVProcess extends PamguardMVC.PamProcess {
 	
@@ -18,7 +19,7 @@ public class DVProcess extends PamguardMVC.PamProcess {
 	
 	private DVLoader dvLoader;
 
-	private AnnotationHandler annotationHandler;
+	private DVAnnotationWrapper annotationHandler;
 
 	public DVProcess(DVControl dvControl) {
 		super(dvControl, null);
@@ -77,22 +78,25 @@ public class DVProcess extends PamguardMVC.PamProcess {
 			inputRawData.addInstantObserver(this);
 		}
 		
-		sortAnnotationHandler();
+		sortAnnotationHandler(detectorDataBlock);
 		
 		dvControl.updateConfigObs();
 		return super.prepareProcessOK();
 	}
 
-	private void sortAnnotationHandler() {
-		annotationHandler = detectorDataBlock.getAnnotationHandler();
-		if (annotationHandler == null) {
-			annotationHandler = new AnnotationHandler(detectorDataBlock);
+	private void sortAnnotationHandler(PamDataBlock detectorDataBlock) {
+		if (annotationHandler == null || annotationHandler.getPamDataBlock() != detectorDataBlock) {
+			annotationHandler = new DVAnnotationWrapper(detectorDataBlock.getAnnotationHandler(), dvControl, detectorDataBlock);
 		}
-		// make sure the annotation handler has some basic types of annotator
-		// for manual annotation
-		if (annotationHandler.findAnnotationType(UserFormAnnotationType.class) == null) {
-			annotationHandler.addAnnotationType(new UserFormAnnotationType(detectorDataBlock));
-		}
+//		annotationHandler = detectorDataBlock.getAnnotationHandler();
+//		if (annotationHandler == null) {
+//			annotationHandler = new AnnotationHandler(detectorDataBlock);
+//		}
+//		// make sure the annotation handler has some basic types of annotator
+//		// for manual annotation
+//		if (annotationHandler.findAnnotationType(UserFormAnnotationType.class) == null) {
+//			annotationHandler.addAnnotationType(new UserFormAnnotationType(detectorDataBlock));
+//		}
 	}
 
 	@Override
@@ -127,6 +131,13 @@ public class DVProcess extends PamguardMVC.PamProcess {
 	 */
 	public PamDataBlock getDetectorDataBlock() {
 		return detectorDataBlock;
+	}
+
+	/**
+	 * @return the annotationHandler
+	 */
+	public DVAnnotationWrapper getAnnotationHandler() {
+		return annotationHandler;
 	}
 
 }

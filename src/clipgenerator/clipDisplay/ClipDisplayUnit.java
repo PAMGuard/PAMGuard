@@ -638,4 +638,10 @@ public class ClipDisplayUnit extends PamPanel {
 	public ClipDisplayPanel getClipDisplayPanel() {
 		return clipDisplayPanel;
 	}
+	/**
+	 * @return the triggerDataUnit
+	 */
+	public PamDataUnit getTriggerDataUnit() {
+		return triggerDataUnit;
+	}
 }

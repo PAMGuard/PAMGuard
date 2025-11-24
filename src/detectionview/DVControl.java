@@ -21,6 +21,7 @@ import clipgenerator.clipDisplay.ClipDisplayDecorations;
 import clipgenerator.clipDisplay.ClipDisplayParent;
 import clipgenerator.clipDisplay.ClipDisplayProvider;
 import clipgenerator.clipDisplay.ClipDisplayUnit;
+import detectionview.annotate.DVAnnotationWrapper;
 import detectionview.swing.DVClipDecorations;
 import detectionview.swing.DVClipDisplayProvider;
 import detectionview.swing.DVDialog;
@@ -110,11 +111,12 @@ public class DVControl extends PamControlledUnit implements PamSettings, ClipDis
 		});
 		menu.add(menuItem);
 		// see if we've got annotation types to add to the menu.
-		PamDataBlock detBlock = dvProcess.getDetectorDataBlock();
-		if (detBlock != null) {
-			AnnotationHandler annotationHandler = detBlock.getAnnotationHandler();
-			if (annotationHandler != null) {
-//				menu.add(annotationHandler.)
+		
+		DVAnnotationWrapper anHand = getDvProcess().getAnnotationHandler();
+		if (anHand != null) {
+			JMenuItem moreMenu = anHand.getDialogMenuItem(parentFrame);
+			if (moreMenu != null) {
+				menu.add(moreMenu);
 			}
 		}
 		return menu;
