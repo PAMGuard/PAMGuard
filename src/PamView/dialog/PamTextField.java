@@ -64,7 +64,7 @@ public class PamTextField extends JTextField implements ColorManaged {
 	/*
 	 * **********************************
 	 */
-	public static final PamColor defaultColor = PamColor.PlOTWINDOW;
+	public static final PamColor defaultColor = PamColor.EDITCTRL;
 	private PamColor selectedColor = defaultColor;
 	
 	public PamColor getDefaultColor() {
