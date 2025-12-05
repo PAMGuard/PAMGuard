@@ -51,9 +51,10 @@ public class SettingsButton extends JButton implements ColorManaged {
 	public SettingsButton(String text) {
 		super(text, makeIcon());
 	}
+	
 	@Override
 	public PamColor getColorId() {
-		return colourManage ? PamColor.BORDER : null;
+		return colourManage ? PamColor.BUTTONFACE : null;
 	}
 	
 	@Override

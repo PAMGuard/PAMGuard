@@ -568,6 +568,7 @@ final public class PamModel implements PamSettings {
 		mi = PamModuleInfo.registerControlledUnit(DVControl.class.getName(), DVControl.unitType);
 		mi.setToolTipText(DVControl.unitTip);
 		mi.setModulesMenuGroup(displaysGroup);
+		mi.setHidden(SMRUEnable.isDevEnable() == false);
 
 		mi = PamModuleInfo.registerControlledUnit("localTime.LocalTime", "Local Time");		
 		mi.setToolTipText("Shows local time on the display");

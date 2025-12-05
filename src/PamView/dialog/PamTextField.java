@@ -82,7 +82,9 @@ public class PamTextField extends JTextField implements ColorManaged {
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
-		this.setForeground(PamColors.getInstance().getColor(PamColor.AXIS));
+		Color fg = PamColors.getInstance().getColor(PamColor.AXIS);
+		this.setForeground(fg);
+		this.setCaretColor(fg);
 	}
 
 }

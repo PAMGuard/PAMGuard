@@ -6,6 +6,7 @@ import java.text.Format;
 import javax.swing.JFormattedTextField;
 
 import PamView.ColorManaged;
+import PamView.PamColors;
 import PamView.PamColors.PamColor;
 
 public class PamFormattedTextField extends JFormattedTextField implements ColorManaged {
@@ -66,9 +67,13 @@ public class PamFormattedTextField extends JFormattedTextField implements ColorM
 		return PamColor.EDITCTRL;
 	}
 
+
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
+		Color fg = PamColors.getInstance().getColor(PamColor.AXIS);
+		this.setForeground(fg);
+		this.setCaretColor(fg);
 	}
 
 }
