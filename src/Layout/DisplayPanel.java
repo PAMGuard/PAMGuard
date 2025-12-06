@@ -20,6 +20,7 @@ import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
+import PamguardMVC.PamDataBlock;
 
 
 /**
@@ -379,5 +380,14 @@ abstract public class DisplayPanel {
 	 */
 	public void prepareImage() {
 		
+	}
+	
+	/**
+	 * Get a datablock that will be added to a viewer scroller so that 
+	 * data get loaded inviewer mode 
+	 * @return
+	 */
+	public PamDataBlock getViewerDataBlock() {
+		return null;
 	}
 }

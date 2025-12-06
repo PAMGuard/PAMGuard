@@ -632,4 +632,16 @@ public class ClipDisplayUnit extends PamPanel {
 		setHighlight(!isHighlight());
 		return isHighlight();
 	}
+	/**
+	 * @return the clipDisplayPanel
+	 */
+	public ClipDisplayPanel getClipDisplayPanel() {
+		return clipDisplayPanel;
+	}
+	/**
+	 * @return the triggerDataUnit
+	 */
+	public PamDataUnit getTriggerDataUnit() {
+		return triggerDataUnit;
+	}
 }

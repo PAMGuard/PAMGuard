@@ -182,8 +182,8 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		}
 		else if (desiredSample != pamDataUnit.getStartSample()) {
 			// don't add this data unit since its probably out of synch
-			System.out.println(String.format("Sample %d channel %d in %s out of synch - expected sample %d, previously got %d",
-					pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample, prevChannelSample[thisChannel]));
+//			System.out.println(String.format("Sample %d channel %d in %s out of synch - expected sample %d, previously got %d",
+//					pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample, prevChannelSample[thisChannel]));
 //			return; add the data anyway, may get back into synch !!!! 
 		}
 		prevChannelSample[thisChannel] = pamDataUnit.getStartSample();

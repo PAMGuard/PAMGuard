@@ -363,7 +363,8 @@ public class PamHelp {
 //		addHelpSet("videoRangeHelp/VideoRangeHelp.hs");
 		
 		// get a list of plugins and add their helpsets
-		List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
+		PamModel pamModel = ((PamModel) PamController.getInstance().getModelInterface());
+		List<PamPluginInterface> pluginList = pamModel.getPluginList();
 		
 		// only continue if there were plugins
 		if (!pluginList.isEmpty()) {
@@ -397,7 +398,7 @@ public class PamHelp {
 		}
 		
 		// get a list of external daq systems and add their helpsets
-		List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
+		List<DaqSystemInterface> daqList = pamModel.getDaqList();
 		
 		// only continue if there were external daq systems
 		if (!daqList.isEmpty()) {
@@ -410,9 +411,19 @@ public class PamHelp {
 	
 				// set up a URL to point to the helpset file inside the jar
 				try {
-			        //URL helpSetLoc = new URL("jar:file:\\C:\\Users\\SCANS\\workspace\\Pamguard_MikeBranch\\plugins\\TestPlugin.jar!/TestPlugin/PluginHelp.hs"); this one worked - passed argument should match
-					URL helpSetLoc = new URL("jar:file:" + File.separator + daqList.get(i).getJarFile()+"!/"+daqList.get(i).getHelpSetName());
-					addPluginHelpSet(helpSetLoc);
+					String pluginJar = daqList.get(i).getJarFile();
+					URL helpSetLoc;
+					if (pluginJar != null) {
+						//URL helpSetLoc = new URL("jar:file:\\C:\\Users\\SCANS\\workspace\\Pamguard_MikeBranch\\plugins\\TestPlugin.jar!/TestPlugin/PluginHelp.hs"); this one worked - passed argument should match
+						helpSetLoc = new URL("jar:file:" + File.separator + daqList.get(i).getJarFile()+"!/"+daqList.get(i).getHelpSetName());
+						addPluginHelpSet(helpSetLoc);
+					}
+					else {
+						// this used when developing plugins and they are not actually in a jar file yet, rather they
+						// have just been manually added to the list of available plugins. 
+						String hsN = daqList.get(i).getHelpSetName();
+						addHelpSet(hsN);
+					}
 				} catch (MalformedURLException e) {
 					System.err.println("Error generating URL for help set " + daqList.get(i).getHelpSetName());
 					System.err.println(e.getMessage());
@@ -420,6 +431,7 @@ public class PamHelp {
 			}
 		}
 	}
+	
 	
 	/**
 	 * Add a plugin module helpset to the master help.  This method differs from addHelpSet in
@@ -458,10 +470,15 @@ public class PamHelp {
 		try {
 			HelpSet dum = new HelpSet();
 			dum.setTitle("Test Item");
-			dum.add(new HelpSet(PamHelp.class.getClassLoader(),ClassLoader.getSystemResource(helpsetName)));
+//			helpsetName = "WindowsSound/help/WinSoundHelp.hs";
+			URL url = ClassLoader.getSystemResource(helpsetName);
+			ClassLoader cl = PamHelp.class.getClassLoader();
+			HelpSet helpSet = new HelpSet(cl,url);
+			dum.add(helpSet);
 			hs.add(dum);
 		}catch (HelpSetException e) {
 			System.err.println("Error loading help set " + helpsetName);
+//			System.err.println(e.getMessage());
 			return false;
 		}
 		return true;

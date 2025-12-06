@@ -132,7 +132,7 @@ public class UpdateClockDialog extends PamDialog implements ActionListener, Cloc
 
 		pack();
 //		setLocation(300, 200);
-		this.setModal(true);
+//		this.setModal(true);
 		this.setResizable(false);
 		//this.setAlwaysOnTop(true);
 
@@ -484,7 +484,13 @@ public class UpdateClockDialog extends PamDialog implements ActionListener, Cloc
 		}
 		else {
 			updatedAt.setText("Update failed");
-			showFailWarning();
+			SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					showFailWarning();
+				}
+			});
 		}
 	}
 	

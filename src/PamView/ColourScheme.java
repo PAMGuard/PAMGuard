@@ -7,12 +7,13 @@ import java.util.Hashtable;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import PamView.PamColors.PamColor;
 
 public class ColourScheme implements Serializable, Cloneable {
 
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	
 	public static final String DAYSCHEME = "Day";
 
@@ -246,6 +247,7 @@ public class ColourScheme implements Serializable, Cloneable {
 //		TitledBorder tb = new TitledBorder(" ");
 //		Color c = tb.getTitleColor();
 		put(PamColor.TITLEBORDER, Color.WHITE);		
+		put(PamColor.EDITCTRL, Color.WHITE);
 		
 		makeWhaleColours(colourBlind);
 //		whaleColors[14] = new Color(135,67,10); //??
@@ -322,6 +324,7 @@ public class ColourScheme implements Serializable, Cloneable {
 		scheme.put(PamColor.GPSTRACK, Color.GRAY);
 		scheme.put(PamColor.LATLINE, new Color(218, 142, 180));
 		scheme.put(PamColor.LONLINE, new Color(150, 150, 200));	
+		scheme.put(PamColor.EDITCTRL, new Color(255,255,255));
 		return scheme;
 	}
 	
@@ -338,6 +341,7 @@ public class ColourScheme implements Serializable, Cloneable {
 		scheme.put(PamColor.GPSTRACK, Color.GRAY);
 		scheme.put(PamColor.LATLINE, new Color(210, 210, 210));
 		scheme.put(PamColor.LONLINE, new Color(210, 210, 210));		
+		scheme.put(PamColor.EDITCTRL, new Color(255,255,255));
 		return scheme;
 	}
 	
@@ -355,6 +359,7 @@ public class ColourScheme implements Serializable, Cloneable {
 		scheme.whaleColors[1] = new Color(255, 255, 255);
 		scheme.put(PamColor.TITLEBORDER, Color.RED);		
 		scheme.put(PamColor.BUTTONFACE, new Color(28,28,28));
+		scheme.put(PamColor.EDITCTRL, new Color(64,64,64));
 		return scheme;
 	}
 

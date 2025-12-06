@@ -225,9 +225,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	/**
 	 * Used in offline analysis when data are being reloaded. this list gets used to
-	 * distribute data being loaded from upstream processes.
+	 * distribute data being loaded from upstream processes. No it doesn't. 
+	 * All handled in the OfflineDataLoading
 	 */
-	private Vector<PamObserver> requestingObservers;
+//	private Vector<PamObserver> requestingObservers;
 
 	/**
 	 * Natural lifetime of data in seconds.
@@ -4485,6 +4486,13 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		else {
 			return config;
 		}
+	}
+
+	/**
+	 * @return the offlineDataLoading
+	 */
+	public OfflineDataLoading<Tunit> getOfflineDataLoading() {
+		return offlineDataLoading;
 	}
 
 }

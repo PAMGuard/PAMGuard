@@ -410,10 +410,10 @@ public class PamFFTProcess extends PamProcess {
 						}
 						catch (ArrayIndexOutOfBoundsException e) {
 							//						e.printStackTrace();
-							System.err.printf("%s.newData: %s Store %s (was %s) iC: %d of %d iF: %d of %d\n", 
-									this.getPamControlledUnit().getUnitName(), e.getMessage(), 
-									oldStores[chanList[iC]], oldStores[chanList[iC]],
-									iC, chanList.length, iF, n);
+//							System.err.printf("%s.newData: %s Store %s (was %s) iC: %d of %d iF: %d of %d\n", 
+//									this.getPamControlledUnit().getUnitName(), e.getMessage(), 
+//									oldStores[chanList[iC]], oldStores[chanList[iC]],
+//									iC, chanList.length, iF, n);
 						}
 						//					outputData.addPamData(null);
 					}

@@ -1,10 +1,13 @@
 package loggerForms;
 
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 
 import PamView.ColorManaged;
+import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.panel.PamTabbedPane;
 
@@ -67,6 +70,16 @@ public class LoggerSubTabbedPane extends PamTabbedPane /*JTabbedPane*/ implement
 	@Override
 	public PamColor getColorId() {
 		return defaultColor;
-	}
+	}	
 	
+	@Override
+	public void setBackground(Color bg) {
+		super.setBackground(bg);
+		Container p = super.getParent();
+		if (p != null) {
+			p.setBackground(bg);
+		}
+		
+	}
+
 }
