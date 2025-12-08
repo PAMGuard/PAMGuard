@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
 import PamUtils.complex.ComplexArray;
+import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
@@ -28,7 +29,8 @@ public abstract class MaskedFFTProcess extends PamProcess {
 	private boolean prepOk = false;
 
 	// buffer incoming FFT units (cloned) until we have bufferSeconds worth
-	private final LinkedList<FFTDataUnit> buffer = new LinkedList<>();
+	private final LinkedList<FFTDataUnit>[] buffer = new LinkedList[PamConstants.MAX_CHANNELS];
+
 	private int unitsToBuffer = 0;
 
 	// single-thread executor reused for processing batches
@@ -47,6 +49,10 @@ public abstract class MaskedFFTProcess extends PamProcess {
 		
 	
 		setParentDataBlock(parentDataBlock);
+		
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[i] = new LinkedList<FFTDataUnit>();
+		}
 
 		// create output FFTDataBlock; defaults will be updated when prepareProcess() runs
 		maskedFFTDataBlock = new FFTDataBlock("Masked FFT", this, 0, 1, 256);
@@ -94,15 +100,18 @@ public abstract class MaskedFFTProcess extends PamProcess {
 
 		List<FFTDataUnit> batchToProcess = null;
 		synchronized (buffer) {
-			buffer.add(clonedUnit);
+			int channelMap = PamUtils.PamUtils.getSingleChannel(clonedUnit.getChannelBitmap());
+			
+			
+			buffer[channelMap].add(clonedUnit); //add the data unit to the correct channels buffer. 
 			if (unitsToBuffer <= 0) {
 				// fallback to at least 1 if unitsToBuffer not yet computed
 				unitsToBuffer = 1;
 			}
-			if (buffer.size() >= unitsToBuffer) {
+			if (buffer[channelMap].size() >= unitsToBuffer) {
 				// copy buffer into batch and clear
-				batchToProcess = new ArrayList<>(buffer);
-				buffer.clear();
+				batchToProcess = new ArrayList<>(buffer[channelMap]);
+				buffer[channelMap].clear();
 			}
 		}
 
@@ -146,7 +155,7 @@ public abstract class MaskedFFTProcess extends PamProcess {
 	public void prepareProcess() {
 		super.prepareProcess();
 		
-		System.out.println("MaskedFFTProcess: preparing process");
+		//System.out.println("MaskedFFTProcess: preparing process");
 		
 		params = control.getDeepWhistleParameters();
 		
@@ -154,9 +163,6 @@ public abstract class MaskedFFTProcess extends PamProcess {
 		
 		
 		setParentDataBlock(inputFFTData);
-		
-		//init the mask
-		this.mask.initMask();
 		
 		
 		if (inputFFTData == null) {
@@ -186,6 +192,15 @@ public abstract class MaskedFFTProcess extends PamProcess {
 				t.setDaemon(true);
 				return t;
 			});
+		}
+		
+		
+		//init the mask - this may contain complex model
+		boolean mask = this.mask.initMask();
+		if (!mask) {
+			System.err.println("MaskedFFTProcess: failed to initialize FFT mask");
+			prepOk = false;
+			return;
 		}
 
 		prepOk = true;
@@ -233,5 +248,19 @@ public abstract class MaskedFFTProcess extends PamProcess {
 	public void setMask(PamFFTMask mask) {
 		this.mask = mask;
 	}
+
+	public MaskedFFTParamters getMaskFFTParams() {
+		return this.control.getParameters();
+	}
+	
+	/**
+	 * Get the number of FFT units that are buffered before processing.
+	 * @return the number of FFT data units to buffer before processing. 
+	 */
+	public int getUnitsToBuffer() {
+		return unitsToBuffer;
+		
+	}
+
 
 }

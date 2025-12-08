@@ -1,12 +1,22 @@
 package deepWhistle;
 
+/**
+ * Process class for DeepWhistle which inludes the ability to use different types of deep learning based masks
+ * 
+ * @author Jamie Macaulay
+ */
 public class DeepWhistleProcess extends MaskedFFTProcess {
 	
 	
+	/**
+	 * Reference to the DeepWhistleMask used in this process.
+	 */
+	private DeepWhistleMask deepWhisltleMask;
+
 
 	public DeepWhistleProcess(DeepWhistleControl control) {
 		super(control);
-		// TODO Auto-generated constructor stub
+		this.setMask(deepWhisltleMask = new DeepWhistleMask(this));
 	}
 	
 	
@@ -18,6 +28,9 @@ public class DeepWhistleProcess extends MaskedFFTProcess {
 		
 		
 	}
+
+
+
 	
 	
 

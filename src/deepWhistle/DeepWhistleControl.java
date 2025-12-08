@@ -5,76 +5,74 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
 import PamController.PamSettingManager;
-import PamController.PamSettings;
 import PamController.SettingsPane;
-import PamView.dialog.PamDialog;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
-import rawDeepLearningClassifier.RawDLParams;
-import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
+
 
 /**
- * Control class for DeepWhistle module (initial masking-only implementation).
+ * Control class for DeepWhistle module 
+ * 
+ * @author Jamie Macaulay
  */
-public class DeepWhistleControl extends PamControlledUnit implements PamSettings {
+public class DeepWhistleControl extends  MaskedFFTControl {
 
-    public static String unitType = "Deep Whistle Mask";
+	public static String unitType = "Deep Whistle Mask";
 
-    private MaskedFFTProcess process;
-    
-    private MaskedFFTParamters parameters = new MaskedFFTParamters();
+	private MaskedFFTProcess process;
 
 	private PamDialogFX2AWT<MaskedFFTParamters> settingsDialog;
 
 	private DeepWhistleSettingsPane settingsPane;
 
-    public DeepWhistleControl(String unitName) {
-        super(unitType, unitName);
-        process = new DeepWhistleProcess(this);
-        addPamProcess(process);
-        PamSettingManager.getInstance().registerSettings(this);
-        updateParams( parameters);
-    }
+	private DeepWhistleParamters parameters = new DeepWhistleParamters();
 
-    @Override
-    public Serializable getSettingsReference() {
-        return parameters;
-    }
+	public DeepWhistleControl(String unitName) {
+		super(unitType, unitName);
+		process = new DeepWhistleProcess(this);
+		addPamProcess(process);
+		PamSettingManager.getInstance().registerSettings(this);
+		updateParams( parameters);
+	}
 
-    @Override
-    public long getSettingsVersion() {
-        return MaskedFFTParamters.serialVersionUID;
-    }
 
-    @Override
-    public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
-        parameters = (MaskedFFTParamters) pamControlledUnitSettings.getSettings();
-        return true;
-    }
+	@Override
+	public Serializable getSettingsReference() {
+		return parameters;
+	}
 
-    @Override
-    public JMenuItem createDetectionMenu(Frame parentFrame) {
-        JMenuItem menuItem = new JMenuItem(this.getUnitName() + " settings ...");
-        menuItem.addActionListener((e) -> showSettings(parentFrame));
-        return menuItem;
-    }
+	@Override
+	public long getSettingsVersion() {
+		return MaskedFFTParamters.serialVersionUID;
+	}
 
-    protected void showSettings(Frame parentFrame) {
-        // For the initial implementation we don't provide an AWT dialog.
-        // A JavaFX settings pane will be implemented separately; this method can
-        // be updated later to open an AWT dialog that wraps the FX pane if needed.
-    	showSettingsDialog( parentFrame);
-    }
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		parameters = (DeepWhistleParamters) pamControlledUnitSettings.getSettings();
+		return true;
+	}
 
-    public MaskedFFTParamters getDeepWhistleParameters() {
-        return parameters;
-    }
-    
-    //----------------- GUI Stuff ----------------//
-    
+	@Override
+	public JMenuItem createDetectionMenu(Frame parentFrame) {
+		JMenuItem menuItem = new JMenuItem(this.getUnitName() + " settings ...");
+		menuItem.addActionListener((e) -> showSettings(parentFrame));
+		return menuItem;
+	}
+
+	protected void showSettings(Frame parentFrame) {
+		// For the initial implementation we don't provide an AWT dialog.
+		// A JavaFX settings pane will be implemented separately; this method can
+		// be updated later to open an AWT dialog that wraps the FX pane if needed.
+		showSettingsDialog( parentFrame);
+	}
+
+	public MaskedFFTParamters getDeepWhistleParameters() {
+		return parameters;
+	}
+
+	//----------------- GUI Stuff ----------------//
+
 	/**
 	 * Get the settings pane.
 	 * 
@@ -85,7 +83,7 @@ public class DeepWhistleControl extends PamControlledUnit implements PamSettings
 		if (this.settingsPane == null) {
 			settingsPane = new DeepWhistleSettingsPane(this);
 		}
-		
+
 		return settingsPane;
 	}
 
@@ -103,7 +101,7 @@ public class DeepWhistleControl extends PamControlledUnit implements PamSettings
 			settingsDialog.setResizable(true);
 		}
 		MaskedFFTParamters newParams = settingsDialog.showDialog(parameters); 
-		
+
 		System.out.println("DeepWhistleControl: showSettingsDialog: newParams = " + newParams);
 
 		// if cancel button is pressed then new params will be null.
@@ -121,5 +119,20 @@ public class DeepWhistleControl extends PamControlledUnit implements PamSettings
 
 		this.process.prepareProcess();
 	}
+
+
+	@Override
+	public MaskedFFTParamters getParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setParameters(MaskedFFTParamters parameters) {
+		// TODO Auto-generated method stub
+
+	}
+
 
 }

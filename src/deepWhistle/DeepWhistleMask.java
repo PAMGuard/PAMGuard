@@ -18,6 +18,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.types.Shape;
+import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 
 public class DeepWhistleMask implements PamFFTMask {
@@ -25,30 +26,42 @@ public class DeepWhistleMask implements PamFFTMask {
 	/**
 	 * FFT length used in the model
 	 */
-	private MaskedFFTProcess maksedFFTProcess;
+	private DeepWhistleProcess maksedFFTProcess;
 
-	public DeepWhistleMask(MaskedFFTProcess maksedFFTProcess) {
+	public DeepWhistleMask(DeepWhistleProcess maksedFFTProcess) {
 		this.maksedFFTProcess = maksedFFTProcess;
 	}
 
 	Predictor<float[][], float[]> specPredictor;
 	//TEMP
-	String modelPath = "/Users/jdjm/Dropbox/PAMGuard_dev/Deep_Learning/deepWhistle/DWC-I.pt"; 
+	String modelPath = "/Users/jdjm/Dropbox/PAMGuard_dev/Deep_Learning/deepWhistle/DWC-I.pt";
+	private DeepWhistleInfo modelInfo; 
 
 
 	@Override
 	public boolean initMask() {
 		
-		DeepWhistleInfo modelInfo = new DeepWhistleInfo(0, 0, 0, 0, 0);
+		if (specPredictor!=null) {
+			//already initialised
+			specPredictor.close();
+		}
 		
-		double sampleRate = 20000.; //TEMP get from FFT params
+		
+		FFTDataBlock fftDataBlock = maksedFFTProcess.getInputFFTData();
+		int fftLen = fftDataBlock.getFftLength();
+		int fftHop = fftDataBlock.getFftHop();
 
-		specPredictor =  loadPyTorchdeepWhistleModel(modelPath,  fftLen,  fftNum);
+		MaskedFFTParamters fftParams = this.maksedFFTProcess.getMaskFFTParams();
+
+		specPredictor =  loadPyTorchdeepWhistleModel(modelPath,  fftLen,  maksedFFTProcess.getUnitsToBuffer());
 
 		if (specPredictor == null) {
 			System.err.println("DeepWhistleMask: failed to load deepWhistle model from "+modelPath);
 			return false;
 		}
+		
+		 modelInfo = new DeepWhistleInfo(fftLen, fftHop, 5000.0f , 50000.0f , (float) fftParams.bufferSeconds);		
+
 
 		return true;
 	}
