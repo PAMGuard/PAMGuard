@@ -665,6 +665,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 		System.out.printf("FolderInputSystem: Wav list recieved with %d files after %d millis\n",
 				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+		
 		fileListData.sort();
 		allFiles = fileListData.getListCopy();
 
@@ -673,6 +674,10 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 		//set the date of the first file.
 		setFileDateText();
+		
+		//set the number of files
+		setFileNumberText();
+
 
 		//set any bespoke options for the files to be loaded.
 		setFileOptionPanel();
@@ -716,6 +721,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			});
 		}
 	}
+
+
 
 	/**
 	 * Fudge function so that the RonaInputsystem can always fudge the number
@@ -767,6 +774,14 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			fileDateStrip.setDate(fileTime);
 			fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
 		}
+	}
+	
+	/**
+	 * Set the number of files that have been loaded
+	 * @param fileListData
+	 */
+	private void setFileNumberText() {
+			fileDateStrip.setNfiles(allFiles);		
 	}
 
 	@Override

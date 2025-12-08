@@ -33,6 +33,13 @@ public abstract class MaskedFFTProcess extends PamProcess {
 
 	// single-thread executor reused for processing batches
 	private ExecutorService executor;
+	
+	/**
+	 * Default mask implementation (does nothing). Either subclass and set
+	 * a different maks or set a new mask via setMask().
+	 */
+	private PamFFTMask mask = new DummyFFTMask();
+
 
 	public MaskedFFTProcess(DeepWhistleControl control) {
 		super(control, null);
@@ -106,7 +113,7 @@ public abstract class MaskedFFTProcess extends PamProcess {
 				executor.submit(() -> {
 					List<FFTDataUnit> processed = null;
 					try {
-						processed = processBatch(batch);
+						processed = applyMask(batch);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 						return;
@@ -147,6 +154,11 @@ public abstract class MaskedFFTProcess extends PamProcess {
 		
 		
 		setParentDataBlock(inputFFTData);
+		
+		//init the mask
+		this.mask.initMask();
+		
+		
 		if (inputFFTData == null) {
 			System.err.println("MaskedFFTProcess: no input FFT data block found: " + params.dataSourceName);
 			prepOk = false;
@@ -194,53 +206,32 @@ public abstract class MaskedFFTProcess extends PamProcess {
 	 * FFTDataUnit objects (typically the same objects with their ComplexArray modified
 	 * or replaced).
 	 */
-	protected List<FFTDataUnit> processBatch(List<FFTDataUnit> batch) {
-		
-		//System.out.println("MaskedFFTProcess: processing batch of size START "+batch.get(0).getFftData().getReal(0));
-
-		//perform the processing
-		ComplexArray out = batch.get(0).getFftData();
-		if (out == null) {
-			System.err.println("MaskedFFTProcess: no FFT data in first unit of batch");
-			return null;
-		}
-
-		double[][] mask = getMask(out.length(), batch.size());
-
-		//now apply the mask to each unit
-		for (int i = 0; i < batch.size(); i++) {
-			out = batch.get(i).getFftData();
-			if (out == null) {
-				System.err.println("MaskedFFTProcess: no FFT data in unit "+i+" of batch");
-				continue;
-			}
-			for (int j = 0; j < out.length(); j++) {
-				
-				//to apply a mask must multiply both real and imaginary parts by the mask value
-				double re = out.getReal(j) * mask[i][j];
-				out.setReal(j, re);
-				double im = out.getImag(j) * mask[i][j];
-				out.setImag(j, im);
-			}
-						
-		}
-		
-		//System.out.println("MaskedFFTProcess: processing batch of size DONE "+batch.get(0).getFftData().getReal(0));
-
-		
-		return batch;
+	protected List<FFTDataUnit> applyMask(List<FFTDataUnit> batch) {
+		return this.mask.applyMask(batch);
 	}
 
-	/**
-	 * Return a mask array of length n. Default is all ones. Subclasses can override.
-	 */
-	public abstract double[][] getMask(int n, int m);
 
 	/**
 	 * @return the input FFT data block
 	 */
 	public FFTDataBlock getInputFFTData() {
 		return inputFFTData;
+	}
+	
+	/**
+	 * Get the Mask used to process the FFT data.
+	 * @return
+	 */	
+	public PamFFTMask getMask() {
+		return mask;
+	}
+
+	/**
+	 * Set the Mask used to process the FFT data.
+	 * @param mask
+	 */
+	public void setMask(PamFFTMask mask) {
+		this.mask = mask;
 	}
 
 }
