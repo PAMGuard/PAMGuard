@@ -123,8 +123,7 @@ public class DeepWhistleControl extends  MaskedFFTControl {
 
 	@Override
 	public MaskedFFTParamters getParameters() {
-		// TODO Auto-generated method stub
-		return null;
+		return parameters;
 	}
 
 

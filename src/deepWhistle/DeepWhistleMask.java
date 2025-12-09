@@ -8,9 +8,7 @@ import java.util.List;
 
 import org.jamdev.jdl4pam.deepWhistle.DeepWhistleTest.DeepWhistleInfo;
 import org.jamdev.jdl4pam.deepWhistle.SpectrumTranslator;
-import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
-import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 
@@ -95,6 +93,17 @@ public class DeepWhistleMask implements PamFFTMask {
 	
 		return dlTransformParamsArr; 
 	}
+	
+	/**
+	 * Set the FFT data into the transforms. 
+	 * @return
+	 */
+	public ArrayList<DLTransfromParams> setFFTData(List<FFTDataUnit> batch, ArrayList<DLTransfromParams> transforms){
+		return null;
+	}
+	
+	
+	
 
 	@Override
 	public List<FFTDataUnit> applyMask(List<FFTDataUnit> batch) {
