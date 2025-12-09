@@ -645,10 +645,18 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean prepareInputFile() {
 
 		currentFile = getCurrentFile();
-		if (currentFile == null) {
-			System.out.println("The current file was null");
+		if (currentFile == null || currentFile.exists() == false) {
+			String warning;
+			if (currentFile == null) {
+				warning = "No sound input file has been selected";
+			}
+			else {
+				warning = "The sound file " + currentFile.getAbsolutePath() + " does not exist";
+			}
+			WarnOnce.showWarning(acquisitionControl.getGuiFrame(),  "Sound Acquisition system", warning, WarnOnce.WARNING_MESSAGE);
 			return false;
 		}
+		
 //		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
 		try {

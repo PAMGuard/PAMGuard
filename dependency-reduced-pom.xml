@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.17fc</version>
+  <version>2.02.17fe</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -113,7 +113,6 @@
                 <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
                 <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
                 <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-                <NSMicrophoneUsageDescription>Microphone is needed to enable soundcard access for Sound Acquisition module</NSMicrophoneUsageDescription>
                 <CFBundleURLTypes>
                   <string>msa</string>
                 </CFBundleURLTypes>

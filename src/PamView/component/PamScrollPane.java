@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 
 import PamView.ColorManaged;
 import PamView.PamColors.PamColor;
@@ -32,6 +33,24 @@ public class PamScrollPane extends JScrollPane implements ColorManaged {
 	@Override
 	public PamColor getColorId() {
 		return PamColor.BORDER;
+	}
+
+	@Override
+	public void setBackground(Color bg) {
+		super.setBackground(bg);
+		JViewport vp = getViewport();
+		if (vp != null) {
+			vp.setBackground(bg);
+		}
+	}
+
+	@Override
+	public void setForeground(Color fg) {
+		super.setForeground(fg);
+		JViewport vp = getViewport();
+		if (vp != null) {
+			vp.setForeground(fg);
+		}
 	}
 	
 //	@Override

@@ -1234,25 +1234,41 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 	 * and also sets up the range spinner
 	 */
 	private void setupViewScroller() {
-		if (viewerScroller == null) {
+		// store as local variable so it doesn't get nulled in a different thread. 
+		PamScroller vs = viewerScroller;
+		if (vs == null) {
 			return;
 		}
 		long visibleMillis = (long)(spectrogramParameters.displayLength * 1000);
-		viewerScroller.setVisibleMillis(visibleMillis);
-		viewerScroller.setBlockIncrement(visibleMillis * 9 / 10);
-		viewerScroller.setUnitIncrement(visibleMillis * 1 / 10);
+		vs.setVisibleMillis(visibleMillis);
+		vs.setBlockIncrement(visibleMillis * 9 / 10);
+		vs.setUnitIncrement(visibleMillis * 1 / 10);
 
 		if (sourceFFTDataBlock != null) {
 			// now depending on the hop set the minimum step size for the viewerscroller
-			if (viewerScroller != null) {
-				PamScrollerData scrollerData = viewerScroller.getScrollerData();
-				// default step size is only 1000 millis. for LTSA data we want to make
-				// this a LOT longer. 
-				double hopSeconds = sourceFFTDataBlock.getFftHop() / sourceFFTDataBlock.getSampleRate();
-				int minStep = (int) Math.max(1, hopSeconds * 1000);
-				scrollerData.setStepSizeMillis(minStep);
+			PamScrollerData scrollerData = vs.getScrollerData();
+			// default step size is only 1000 millis. for LTSA data we want to make
+			// this a LOT longer. 
+			double hopSeconds = sourceFFTDataBlock.getFftHop() / sourceFFTDataBlock.getSampleRate();
+			int minStep = (int) Math.max(1, hopSeconds * 1000);
+			scrollerData.setStepSizeMillis(minStep);
+		}
+		
+		/**
+		 * And add observing data required by plugins to the scroller. 
+		 */
+		synchronized(displayPanels) {
+			int nD = displayPanels.size();
+			for (int i = 0; i < nD; i++) {
+				DisplayPanel dp = displayPanels.get(i);
+				PamDataBlock dataBlock = dp.getViewerDataBlock();
+				if (dataBlock == null) {
+					continue;
+				}
+				vs.addDataBlock(dataBlock);
 			}
 		}
+
 
 		requestFFTData();
 

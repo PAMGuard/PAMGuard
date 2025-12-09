@@ -47,6 +47,7 @@ import PamguardMVC.dataSelector.DataSelectorChangeListener;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.ClipProcess;
+import soundPlayback.ClipPlayback;
 
 /**
  * Clip display panel. Can be incorporated into a tab panel or stand alone in 
@@ -320,9 +321,10 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 	public void newViewerTimes(long start, long end) {
 		removeAllClips();
-		ListIterator<ClipDataUnit> it = clipDisplayParent.getClipDataBlock().getListIterator(0);
-		while (it.hasNext()) {
-			ClipDataUnit cdu = it.next();
+//		ListIterator<ClipDataUnit> it = clipDisplayParent.getClipDataBlock().getListIterator(0);
+		ArrayList<ClipDataUnit> clipUnits = clipDisplayParent.getClipDataBlock().getDataCopy();
+		for (ClipDataUnit cdu : clipUnits) {
+//			ClipDataUnit cdu = it.next();
 			long clipTime = cdu.getTimeMilliseconds();
 			if (clipTime >= start && clipTime <= end){
 				newDataUnit(cdu);
@@ -532,7 +534,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 	 * Play the clip (called from mouse double click)
 	 * @param clipDataUnit
 	 */
-	private void playClip(ClipDataUnit clipDataUnit) {
+	public void playClip(ClipDataUnit clipDataUnit) {
 		if (clipDataUnit == null) {
 			return;
 		}
@@ -542,6 +544,9 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		if (process instanceof ClipProcess) {
 			ClipProcess clipProc = (ClipProcess) process;
 			clipProc.playClip(clipDataUnit);
+		}
+		else {
+			ClipPlayback.getInstance().playClip(clipDataUnit.getRawData(), clipDataUnit.getParentDataBlock().getSampleRate(), true);
 		}
 	}
 
@@ -945,6 +950,13 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 				clipDisplayUnit.setBorderColour();
 			}
 		}
+	}
+
+	/**
+	 * @return the displayControlPanel
+	 */
+	public DisplayControlPanel getDisplayControlPanel() {
+		return displayControlPanel;
 	}
 
 }

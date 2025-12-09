@@ -326,7 +326,7 @@ public class AnnotationHandler {
 
 
 	/**
-	 * Create a menu for simultaneusly annotating many data units at once. 
+	 * Create a menu for simultaneously annotating many data units at once. 
 	 * @param menuParent
 	 * @param mousePosition
 	 * @param dataUnits

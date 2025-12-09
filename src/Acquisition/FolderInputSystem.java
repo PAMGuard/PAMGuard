@@ -54,6 +54,7 @@ import PamUtils.worker.filelist.WavListUser;
 import PamUtils.worker.filelist.WavListWorker;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
+import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import PamguardMVC.debug.Debug;
@@ -165,6 +166,11 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	@Override
 	public boolean prepareInputFile() {
 		boolean ans = false;
+		if (allFiles == null || allFiles.size() == 0) {
+			WarnOnce.showWarning(acquisitionControl.getGuiFrame(), "Sound Files Warning",
+					"No sound input files have been found in location " + folderInputParameters.getMostRecentFile(), WarnOnce.WARNING_MESSAGE);
+			return false;
+		}
 		// allow for the file to be corrupt. 
 		while (currentFileIndex < allFiles.size()) {
 			ans = super.prepareInputFile();

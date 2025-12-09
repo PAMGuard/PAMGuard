@@ -301,8 +301,8 @@ public class GlobalMedium {
 		switch (currentMedium) {
 		case Air:
 			//dB re 20uPa
-			ampScales[0]  = 60; 
-			ampScales[1]  = 140; 
+			ampScales[0]  = 0; 
+			ampScales[1]  = 80; 
 			return ampScales; 
 		case Water:
 			//dB re 1uPa

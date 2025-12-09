@@ -3,6 +3,7 @@ package soundPlayback;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -47,6 +48,9 @@ public class ClipPlayback {
 	 */
 	public boolean playClip(double[][] clipData, float sampleRate, boolean autoScale) {
 		// will really have to rethread this, since we don't want this to block. 
+		if (clipData.length > 2) {
+			clipData = Arrays.copyOf(clipData, 2);
+		}
 		PlayWorker playWorker = new PlayWorker(clipData, sampleRate, autoScale);
 		playWorker.execute();
 		

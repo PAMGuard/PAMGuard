@@ -108,7 +108,8 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 		PamguardMetaData newData = MetaDataDialog.showDialog(parentFrame, pamguardMetaData);
 		if (newData != null) {
 			this.pamguardMetaData = newData;
-			// send around a notification ? 
+			this.pamguardMetaData.setLastModified(System.currentTimeMillis());
+			// send around a notification 
 			PamController.getInstance().notifyModelChanged(PamController.PROJECT_META_UPDATE);
 		}
 	}

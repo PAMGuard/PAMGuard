@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -113,11 +114,6 @@ public class PamTabbedPane extends JTabbedPane implements ColorManaged {
 		}
 	}
 
-
-
-
-
-
 	public PamTabbedPane(PamControllerInterface pamControllerInterface, PamGui pamGui) {
 		super();
 		this.pamControllerInterface = pamControllerInterface;
@@ -126,6 +122,8 @@ public class PamTabbedPane extends JTabbedPane implements ColorManaged {
 		this.setOpaque(true);
 		
 		this.addMouseListener(new TabPaneMouse());
+		
+		setUI(new PamTabbedPaneUI());
 
 		//tab dragging code
 		final DragSourceListener dsl = new DragSourceListener() {
@@ -229,6 +227,17 @@ public class PamTabbedPane extends JTabbedPane implements ColorManaged {
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
+//		setOpaque(false);
+		int nC = this.getComponentCount();
+		for (int i = 0; i < nC; i++) {
+			Component comp = this.getComponent(i);
+			comp.setBackground(bg);
+		}
+		Container p = this.getParent();
+		if (p != null) {
+			p.setBackground(bg);
+		}
+		
 		Color fg = PamColors.getInstance().getColor(PamColor.AXIS);
 		this.setForeground(fg);
 		for (int i = 0; i < getTabCount(); i++) {
@@ -491,10 +500,6 @@ public class PamTabbedPane extends JTabbedPane implements ColorManaged {
 	public void setTabsDrag(boolean b) {
 		this.allowDrag=b;
 	}
-
-
-
-
 
 
 
