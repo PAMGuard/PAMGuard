@@ -11,6 +11,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.codehaus.plexus.util.FileUtils;
 
 import Acquisition.sud.SudAudioFile;
+import PamUtils.worker.filelist.WavLoadListener;
 
 /**
  * Central class for opening sound files.
@@ -97,7 +98,8 @@ public class PamAudioFileManager {
 		//System.out.println("Sound Extension: " + soundExtension + " File extension: " + extension);
 		return (soundExtension.equals(extension) || soundExtension.equals("." + extension));
 	}
-
+	
+	
 	/**
 	 * Open an audio input stream. If the file is a Wav file, then it will attempt
 	 * to read the file with PAMGuards bespoke audio stream reader. This includes
@@ -112,6 +114,23 @@ public class PamAudioFileManager {
 	 * @throws IOException
 	 */
 	public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
+		return getAudioInputStream(file, null);
+	}
+
+	/**
+	 * Open an audio input stream. If the file is a Wav file, then it will attempt
+	 * to read the file with PAMGuards bespoke audio stream reader. This includes
+	 * support for wav files which are > 2GByte in size and also works for floating
+	 * point 32 bit files (which the Java one doesn't). If that fails, or if its not
+	 * a wav file, then the standard java AudioInputStream is used.
+	 * 
+	 * @param file file to open
+	 * @return a new audio input stream
+	 * @throws UnsupportedAudioFileException thrown if it can't understand the audio
+	 *                                       format.
+	 * @throws IOException
+	 */
+	public AudioInputStream getAudioInputStream(File file, WavLoadListener loadListener) throws UnsupportedAudioFileException, IOException {
 		// if (file != null && isWavFile(file) && file.length() > largeFileSize) {
 		if (file.exists() == false) {
 			System.err.println("PamAudioFileManager: the input file was null");
@@ -123,7 +142,7 @@ public class PamAudioFileManager {
 //			System.out.println(file.getName() + "   " + pamAudioFileTypes.get(i).getName()); 
 			if (isExtension(file, pamAudioFileTypes.get(i))) {
 				//System.out.println("Get stream for: " +pamAudioFileTypes.get(i).getName()); 
-				stream = pamAudioFileTypes.get(i).getAudioStream(file);
+				stream = pamAudioFileTypes.get(i).getAudioStream(file, loadListener);
 				if (pamAudioFileTypes != null) {
 					break;
 				}
@@ -133,8 +152,7 @@ public class PamAudioFileManager {
 		if (stream == null) {
 			// have a punt at opening as a default audiostream
 			//System.out.println("Try default stream for: " +file.getName() ); 
-
-			stream = new WavAudioFile().getAudioStream(file);
+			stream = new WavAudioFile().getAudioStream(file, loadListener);
 		}
 
 		if (stream == null) {
@@ -197,5 +215,6 @@ public class PamAudioFileManager {
 	public WavAudioFile getRawFileLoader() {
 		return rawFileLoader; 
 	}
+
 
 }

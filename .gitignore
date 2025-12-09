@@ -144,3 +144,4 @@ dependency-reduced-pom.xml
 .settings/org.eclipse.core.resources.prefs
 .classpath
 .settings/org.eclipse.jdt.core.prefs
+dependency-reduced-pom.xml

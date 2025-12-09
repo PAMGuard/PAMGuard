@@ -17,6 +17,7 @@ import org.pamguard.x3.sud.SudAudioInputStream;
 import Acquisition.offlineFuncs.AquisitionLoadPoint;
 import PamDetection.RawDataUnit;
 import PamUtils.worker.filelist.WavFileType;
+import PamUtils.worker.filelist.WavLoadListener;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamConstants;
 //import PamUtils.CPUMonitor;
@@ -296,7 +297,7 @@ public class WavAudioFile implements PamAudioFileLoader {
 	 */
 	private boolean openSoundFile(File soundFile) {
 
-		audioInputStream = getAudioStream(soundFile);
+		audioInputStream = getAudioStream(soundFile, null);
 		if (audioInputStream == null) return false;
 		audioFormat = audioInputStream.getFormat();
 
@@ -305,7 +306,7 @@ public class WavAudioFile implements PamAudioFileLoader {
 
 
 	@Override
-	public AudioInputStream getAudioStream(File soundFile) {
+	public AudioInputStream getAudioStream(File soundFile,  WavLoadListener loadListener) {
 		if (soundFile.exists() == false || soundFile.length()<44) return null;
 		if (soundFile != null && isSoundFile(soundFile)) {
 			try {

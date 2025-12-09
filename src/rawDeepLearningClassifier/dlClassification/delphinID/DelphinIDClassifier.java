@@ -108,7 +108,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	}
 
 	@Override
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
+	public ArrayList<ArrayList<? extends PredictionResult>> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
 
 		//add an extra test to see if the detection pre count has passed. 
 		

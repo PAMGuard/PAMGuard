@@ -123,5 +123,24 @@ public class OrcaSpotModelResult implements PredictionResult {
 	}
 
 
+	@Override
+	public double[] getFreqLimits() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long getStartSample() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getSampleDuration() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
 }
 

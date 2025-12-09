@@ -4,7 +4,6 @@ import java.awt.Window;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,10 +12,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.sound.sampled.AudioFormat.Encoding;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -27,19 +22,10 @@ import javax.swing.SwingWorker;
 //import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 //import org.kc7bfi.jflac.util.ByteData;
 
-import org.jflac.FLACDecoder;
-import org.jflac.PCMProcessor;
-import org.jflac.metadata.Metadata;
-import org.jflac.metadata.StreamInfo;
-import org.jflac.sound.spi.FlacAudioFileReader;
-import org.jflac.util.ByteData;
-
 import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import pamScrollSystem.ViewLoadObserver;
 import PamController.AWTScheduler;
-import PamController.DataInputStore;
 import PamController.DataStoreInfoHolder;
 import PamController.InputStoreInfo;
 import PamController.OfflineDataStore;
@@ -50,11 +36,8 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamDetection.RawDataUnit;
 import PamUtils.worker.PamWorkMonitor;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 
 /**
  * Functionality for handling data from files offline.

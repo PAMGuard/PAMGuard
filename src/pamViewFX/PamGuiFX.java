@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 
 import org.controlsfx.control.ToggleSwitch;
 
+import Acquisition.layoutFX.PaneFactory;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamViewInterface;
@@ -428,6 +429,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 */
 	public class ToolBarPane extends PamBorderPane {
 		
+		Node runIcon = PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, 30);
+		Node stopIcon = PamGlyphDude.createPamIcon("mdi2p-pause", Color.BLACK, 30);
 		
 		/**
 		 * Record/batch process button. In real time starts/stops data acquisition. In viewer mode
@@ -596,26 +599,25 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		 * @return
 		 */
 		private Pane createRealTimeControls() {
-			
+		
+
 			//create record and play buttons. 
 			PamHBox playControls=new PamHBox();
 			recordButton=new PamButton("Process");
 //			recordButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CIRCLE, Color.LIMEGREEN, PamGuiManagerFX.iconSize));
-			recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, 30));
-			recordButton.getStyleClass().add("transparent-button");
-			recordButton.setStyle(" -fx-padding: 1 1 1 1");
+			recordButton.setGraphic(runIcon);
+			//recordButton.getStyleClass().add("transparent-button");
+			recordButton.setStyle(" -fx-padding: 1 15 1 5");
 			
 			recordButton.setOnAction((action)->{
 				if (PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING){
 					PamController.getInstance().pamStop();
-					pamGuiManagerFX.setPamRunning(false);
-//					recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, PamGuiManagerFX.iconSize));
+					//recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, PamGuiManagerFX.iconSize));
 
 				}
 				else {
 					PamController.getInstance().pamStart();
-					pamGuiManagerFX.setPamRunning(true);
-//					recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", Color.DARKGRAY, PamGuiManagerFX.iconSize));
+					//recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", Color.DARKGRAY, PamGuiManagerFX.iconSize));
 				}
 			});
 
@@ -663,6 +665,17 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		 */
 		public Button getRecordButton(){
 			return recordButton; 
+		}
+		
+		public void setRecordButtonState(boolean running) {
+			if (running) {
+				recordButton.setGraphic(stopIcon);
+				recordButton.setText("Pause");
+			}
+			else {
+				recordButton.setGraphic(runIcon);
+				recordButton.setText("Process");
+			}
 		}
 		
 		/**
@@ -745,14 +758,50 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 
 	@Override
 	public void pamStarted() {
-		this.pamGuiManagerFX.pamStarted();
-		
+		//System.out.println("PAMGUIFX: Pam started");
+		 setRecordbuttonState(true);
 	}
 
 	@Override
 	public void pamEnded() {
-		this.pamGuiManagerFX.pamEnded();		
+		//System.out.println("PAMGUIFX: Pam ended");
+		 setRecordbuttonState(false);
+;	
 	}
+	
+	/**
+	 * Set the state of the record button in all tabs.
+	 * @param running - true if PAMGuard is running
+	 */
+	public void setRecordbuttonState(boolean running) {
+		for (int i=0; i<this.getNumTabs(); i++){
+			this.getTab(i).getContentToolbar().setRecordButtonState(running);
+		}
+	}
+	
+	
+	/**
+	 * Add a pane to the tool bar of all tabs.
+	 * @param paneFactory
+	 */
+	public void addToolBarPane(PaneFactory paneFactory) {
+		for (int i=0; i<this.getNumTabs(); i++){
+			//check that a pane factory of this type does not exist.
+			//TODO
+			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory.createPane());
+		}
+	}
+	
+
+	public void removeToolBarPane(PaneFactory statusPaneFactory) {
+		//TODO
+//		for (int i=0; i<this.getNumTabs(); i++){
+//			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory);
+//		}
+	}
+
+
+
 
 	@Override
 	public void modelChanged(int changeType) {
@@ -851,4 +900,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	public void renameTab(String selectedItem, int tabIndex) {
 		//TODO
 	}
+
+
+
 }

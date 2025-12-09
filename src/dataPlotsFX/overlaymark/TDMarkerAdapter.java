@@ -2,15 +2,9 @@ package dataPlotsFX.overlaymark;
 
 import java.util.List;
 
-import javax.swing.JPopupMenu;
-
-import PamView.GeneralProjector.ParameterType;
-import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamView.paneloverlay.overlaymark.OverlayMark;
-import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarkProviders;
-import PamView.paneloverlay.overlaymark.OverlayMarker;
 import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import detectiongrouplocaliser.DetectionGroupSummary;
@@ -20,7 +14,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.paint.Color;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 

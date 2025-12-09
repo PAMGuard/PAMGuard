@@ -15,7 +15,7 @@ public class StandardPrediction implements PredictionResult {
 	/**
 	 * The time in millis
 	 */
-	long timeMillis = -1L; 
+	private long timeMillis = -1L; 
 
 	/**
 	 * Create a result for the Sound Spot classifier. 
@@ -36,8 +36,22 @@ public class StandardPrediction implements PredictionResult {
 	/**
 	 * Analysis time in seconds. 
 	 */
-	public double analysisTime=0; 
+	public double analysisTime=0;
+
+	/**
+	 * Frequency limits of the prediction result. Use for bounding boxes. 
+	 * Can be null if not set. 
+	 */
+	private double[] freqLimits; 
+
+
+	private int durationSamples = -1; //duration in samples, can be -1 if not set.
+
 	
+	private long startSample = -1L; //start sample, can be -1 if not set.
+	
+	
+
 
 	/**
 	 * Constructor for a typical generic prediciton. 
@@ -121,5 +135,44 @@ public class StandardPrediction implements PredictionResult {
 	public void setTimeMillis(long timeMillis) {
 		this.timeMillis = timeMillis;
 	}
+
+
+	@Override
+	public int getSampleDuration() {
+		return durationSamples;
+	}
+
+
+	@Override
+	public double[] getFreqLimits() {
+		return freqLimits;
+	}
+	
+	/**
+	 * Set the frequency limits of the prediction result. 
+	 * @param freqLimits - the frequency limits of the prediction result.
+	 */
+	public void setFreqLimits(double[] freqLimits) {
+		this.freqLimits = freqLimits;
+	}
+
+	/**
+	 * Set the duration in millis. 
+	 * @param durationMillis - the duration in millis. 
+	 */
+	public void setDuratioSamples(int durationMillis) {
+		this.durationSamples = durationMillis;
+	}
+
+
+	public void setStartSample(Long startSample) {
+		this.startSample = startSample;
+	}
+	
+
+	public long getStartSample() {
+		return startSample;
+	}
+
 
 }

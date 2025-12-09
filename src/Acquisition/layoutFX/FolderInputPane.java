@@ -1,6 +1,5 @@
 package Acquisition.layoutFX;
 
-import java.awt.GridBagConstraints;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +8,6 @@ import javax.sound.sampled.AudioFormat;
 
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.ToggleSwitch;
-import org.controlsfx.glyphfont.Glyph;
-
 import Acquisition.FileInputParameters;
 import Acquisition.FolderInputParameters;
 import Acquisition.FolderInputSystem;
@@ -40,7 +37,6 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import pamViewFX.PamGuiManagerFX;
@@ -154,6 +150,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 	private PamBorderPane audioHolderloader;
 
+	public DAQStatusPaneFactory folderStatusPaneFactory = new SimpleStatusPaneFactory("This is folder input DAQ");
+
 	//	/**
 	//	 * The folder input system. 
 	//	 * @param folderInputSystem - the folder system. 
@@ -206,7 +204,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFileButton.setOnAction( (action) ->{	                
 			selectFolder(false); 
 		});
-		browseFileButton.setTooltip(new Tooltip("Select a folder of files"));
+		browseFileButton.setTooltip(new Tooltip("Select a single or multiple files"));
 
 
 		browseFolderButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize));
@@ -215,7 +213,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFolderButton.setOnAction( (action) ->{	                
 			selectFolder(true);
 		});		
-		browseFolderButton.setTooltip(new Tooltip("Select a single file"));
+		browseFolderButton.setTooltip(new Tooltip("Select a folde of files"));
 
 
 		fileNames.prefHeightProperty().bind(browseFolderButton.heightProperty());
@@ -227,6 +225,9 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		progressBar.setMaxWidth(Double.POSITIVE_INFINITY);
 		progressBar.setPrefHeight(10);
 		progressBar.setVisible(false);
+
+		progressLabel = new Label("Loading files...");
+		progressLabel.setVisible(false);
 
 		//table showing all the wav files
 		//		pamVBox.getChildren().add(createTablePane());
@@ -245,17 +246,17 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		fileDateStrip=new FileDataDialogStripFX(folderInputSystem.getAquisitionControl().getFileDate()); 
 		fileDateStrip.setMaxWidth(Double.MAX_VALUE);
 		fileDateStrip.prefWidthProperty().bind(pamVBox.widthProperty());
-		
-		
+
+
 		fixWavPane = new CheckWavHeadersPane(folderInputSystem); 
-		
+
 		Label utilsLabel=new Label("Sound file utilities");
 		PamGuiManagerFX.titleFont2style(utilsLabel);
-		
+
 		//
 		audioHolderloader = new PamBorderPane(); 
-		
-		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  createTablePane(), 
+
+		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  progressLabel, createTablePane(), 
 				fileDateText=new Label(), audioHolderloader, utilsLabel, createUtilsPane());
 
 		//allow users to check file headers in viewer mode. 
@@ -275,19 +276,19 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		return pamVBox; 		
 	}		
-	
-	
+
+
 	/**
 	 * Create
 	 * @return
 	 */
 	private Pane createUtilsPane() {
-		
+
 		PamHBox hBox = new PamHBox();
 		hBox.setSpacing(5);
 		hBox.setAlignment(Pos.CENTER_LEFT);
-		
-		
+
+
 		//Time stamp pane
 		PamButton time = new PamButton("Time stamps"); 
 		time.setPrefWidth(UTIL_BUTTON_WIDTH);
@@ -297,12 +298,12 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 			acquisitionPaneFX.getAdvancedLabel().setText("File Time Stamps");
 			acquisitionPaneFX.getFlipPane().flipToBack();
 		});
-		
+
 		acquisitionPaneFX.getFlipPane().flipFrontProperty().addListener((obsVal, oldVal, newVal)->{
 			this.fileDateStrip.getAdvDatePane().getParams();
 		});
 
-		
+
 		PamButton wavFix = new PamButton("Fix wav"); 
 		wavFix.setPrefWidth(UTIL_BUTTON_WIDTH);
 		wavFix.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-settings", PamGuiManagerFX.iconSize));
@@ -312,13 +313,13 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 			fixWavPane.setParams();
 			acquisitionPaneFX.getFlipPane().flipToBack();
 		});
-		
+
 		mergeContigious = new ToggleButton("Merge files");
 		mergeContigious.setPrefWidth(UTIL_BUTTON_WIDTH);
 		mergeContigious.setGraphic(PamGlyphDude.createPamIcon("mdi2s-set-merge", PamGuiManagerFX.iconSize));
 
 		hBox.getChildren().addAll(time, wavFix, mergeContigious);
-		
+
 		return hBox;
 	}
 
@@ -371,7 +372,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		return new PamBorderPane(table); 
 	}
 
-	
+
 	/**
 	 * Open a dialog to select either a folder or a list of files. 
 	 * @param folderDir - true to use directory chooser, false to use multiple file chooser. 
@@ -419,7 +420,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		for (int i=0; i<filesArr.length; i++) {
 			filesArr[i] = files.get(i); 
 		}
-		
+
 		folderInputSystem.getFolderInputParameters().setSelectedFiles(filesArr);
 		folderInputSystem.makeSelFileList();
 		//		folderInputSystem.makeSelFileList(folderInputSystem.getFolderInputParameters().getSelectedFiles());
@@ -452,6 +453,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		currParams.recentFiles.remove(newFile);
 		currParams.recentFiles.add(0, newFile);
 		fillFileList(currParams);
+		this.table.getItems().clear();
 	}
 
 	/**
@@ -514,11 +516,11 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//				return false; 
 		//			}
 		//		}
-		
+
 		folderInputParameters.mergeFiles = mergeContigious.isSelected();
-		
+
 		folderInputParameters.subFolders = this.subFolders.isSelected(); 
-		
+
 		return folderInputParameters; 
 	}
 
@@ -530,15 +532,15 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		//fill the file list. 
 		fillFileList(currParams); 
-		
+
 		if (table.getItems()==null || table.getItems().size()==0) {
 			folderInputSystem.makeSelFileList();
 		}
-		
+
 		fileDateStrip.setFileList(table.getItems()); 
-		
+
 		mergeContigious.setSelected(currParams.mergeFiles);
-		
+
 	}
 
 
@@ -605,7 +607,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		this.table.getItems().addAll(fileList);
 
 		fileDateStrip.setFileList(fileList); 
-		
+
 		//set any bespoke options for the files to be laoded. 
 		setFileOptionPane(fileList);
 
@@ -626,20 +628,20 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		}
 
 		progressBar.setVisible(false);
-
+		progressLabel.setVisible(false);
 		//		//folderInputSystem.interpretNewFile(newFile);
 		//		File[] selFiles = currParams.getSelectedFileFiles();
 		//		if (selFiles!=null && selFiles.length > 0) {
 		//			fileDateStrip.setDate(folderInputSystem.getFileStartTime(selFiles[0]));
 		//		}
 	}
-	
-	
+
+
 	/**
 	 * Set bespoke options for certain file types. 
 	 */
 	public void setFileOptionPane(ObservableList<WavFileType> fileList) {
-		
+
 		audioHolderloader.setCenter(null);
 
 		if (fileList.size() > 0) {
@@ -670,6 +672,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		if (worker==null) {
 			progressBar.progressProperty().unbind(); 
+			this.progressLabel.textProperty().unbind();
 			return; 
 		}
 
@@ -677,7 +680,10 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//must ensure this is on the FX thread
 		//Platform.runLater(()->{
 		this.progressBar.progressProperty().bind(worker.getPamWorkProgress().getProgressProperty()); 
+		this.progressLabel.textProperty().bind(worker.getPamWorkProgress().getMessageProperty());
 		progressBar.setVisible(true);
+		progressLabel.setVisible(true);
+
 
 		//}); 
 
@@ -689,14 +695,14 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	public void setParams() {		
 		//set the parameters for the dialog. 
 		this.setParams(folderInputSystem.getFolderInputParameters());
-		
-		
+
+
 	}
 
 	@Override
 	public boolean getParams() {
 		FolderInputParameters params = this.getParams(folderInputSystem.getFolderInputParameters());
-		
+
 		//get bespoke paramters from selected audio loaders. Note these are global and so are not part
 		//of the folder input system
 		ArrayList<PamAudioFileLoader> loaders = PamAudioFileManager.getInstance().getAudioFileLoaders();
@@ -706,13 +712,18 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 				loader.getSettingsPane().getParams();
 			}
 		}
-		
+
 		if (params == null) return false;
 		else {
 			this.folderInputSystem.setFolderInputParameters(params);
 			return true; 
 		}
 
+	}
+
+	@Override
+	public DAQStatusPaneFactory getStatusBarFactory() {
+		return folderStatusPaneFactory;
 	}
 
 

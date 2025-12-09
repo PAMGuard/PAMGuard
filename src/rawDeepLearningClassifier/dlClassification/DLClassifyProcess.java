@@ -8,23 +8,15 @@ import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
-import PamView.PamDetectionOverlayGraphics;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import binaryFileStorage.DataUnitFileInformation;
-import clipgenerator.ClipProcess;
-import pamScrollSystem.AbstractScrollManager;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.RawDLParams;
-import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
-import rawDeepLearningClassifier.layoutFX.DLGraphics;
 import rawDeepLearningClassifier.logging.DLAnnotation;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
-import rawDeepLearningClassifier.logging.DLGroupDetectionLogging;
-import rawDeepLearningClassifier.logging.DLGroupSubLogging;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import rawDeepLearningClassifier.segmenter.SegmenterDataBlock;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
@@ -41,6 +33,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
  * @author Jamie Macaulay
  *
  */
+@SuppressWarnings("rawtypes")
 public class DLClassifyProcess extends PamProcess {
 
 
@@ -130,7 +123,7 @@ public class DLClassifyProcess extends PamProcess {
 		dlGroupDetectionDataBlock.setNaturalLifetimeMillis(600*1000); //keep this data for a while.
 		dlGroupDetectionDataBlock.addDataAnnotationType(dlAnnotationType);
 		dlGroupDetectionDataBlock.setCanClipGenerate(true); 
-		
+
 
 		classificationBuffer =  new ArrayList<PamDataUnit>(); 
 
@@ -141,6 +134,7 @@ public class DLClassifyProcess extends PamProcess {
 	/**
 	 * Setup the classification process. 
 	 */
+	@SuppressWarnings("unchecked")
 	private void setupClassifierProcess() {
 
 		//System.out.println("Setup raw deep learning classiifer process: "); 
@@ -242,8 +236,8 @@ public class DLClassifyProcess extends PamProcess {
 
 			}
 		}
-		
-		
+
+
 		//				System.out.println("New raw data in: chan: " + PamUtils.getSingleChannel(pamRawData.getChannelBitmap()) + 
 		//						" Size: " +  pamRawData.getSampleDuration() + " first sample: " + rawDataUnit.getRawData()[0][0] 
 		//								+ "Parent UID: " + rawDataUnit.getParentDataUnit().getUID());
@@ -253,19 +247,20 @@ public class DLClassifyProcess extends PamProcess {
 	/**
 	 * Run a model for which the input is a detection group. 
 	 */
+	@SuppressWarnings("unchecked")
 	private synchronized void runDetectionGroupModel() {
 		if (classificationBuffer.size()<=0) return; 
 		ArrayList<PamDataUnit> classificationBufferTemp = (ArrayList<PamDataUnit>) classificationBuffer.clone(); 
 
-		ArrayList<? extends PredictionResult> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
-		
+		ArrayList<ArrayList<? extends PredictionResult>> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
+
 		//System.out.println("MODEL RESULTS: " + modelResults); 
 
 		for (int i=0; i<classificationBufferTemp.size(); i++) {
 
 			if (modelResults!=null && modelResults.get(i)!=null) {
-
-				newDetectionGroupResult(classificationBufferTemp.get(i),  modelResults.get(i));
+				//detection groups never have more than one result
+				newDetectionGroupResult(classificationBufferTemp.get(i),  modelResults.get(i).get(0));
 			}
 		}
 
@@ -285,12 +280,12 @@ public class DLClassifyProcess extends PamProcess {
 		//System.out.println("Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
 		//add to the model result. 
 		this.dlModelResultDataBlock.addPamData(dlDataUnit);
-		
-//		System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
-//		//Now generate a detection of a decision threshold is reacheed. 
-//		if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
-//			System.out.println("DELPHINID - we have a positive detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
-//		}
+
+		//		System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
+		//		//Now generate a detection of a decision threshold is reacheed. 
+		//		if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
+		//			System.out.println("DELPHINID - we have a positive detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
+		//		}
 
 		//need to implement multiple groups. 
 		for (int i=0; i<getSourceParams().countChannelGroups(); i++) {
@@ -302,7 +297,7 @@ public class DLClassifyProcess extends PamProcess {
 					//buffer has reached a maximum size. In that case the data is saved. 
 					groupDetectionBuffer[i].add((SegmenterDetectionGroup) detectionGroup); 
 					modelResultDataBuffer[i].add(modelResult); 
-					
+
 					if (groupDetectionBuffer[i].size()>=dlControl.getDLParams().maxMergeHops) {
 						//need to save the data unit and clear the unit. 
 						DLGroupDetection dlDetection  = makeGroupDLDetection(groupDetectionBuffer[i], modelResultDataBuffer[i]); 
@@ -354,13 +349,13 @@ public class DLClassifyProcess extends PamProcess {
 		List<PamDataUnit> dataUnits = new ArrayList<PamDataUnit>();
 		//work out the time limits from the different segments - super safe here assuming they could be oiut of order. 
 		for (int i=0; i<groupDetections.size() ; i++) {
-			
-//			System.out.println("SEGMENT " + i + "  " + "  "  + groupDetections.get(i).getUID() + "  " +  PamCalendar.formatDateTime(groupDetections.get(i).getTimeMilliseconds()) 
-//			+ " channel: " + groupDetections.get(i).getChannelBitmap() +  " n det: " + groupDetections.get(i).getSubDetectionsCount()); 
+
+			//			System.out.println("SEGMENT " + i + "  " + "  "  + groupDetections.get(i).getUID() + "  " +  PamCalendar.formatDateTime(groupDetections.get(i).getTimeMilliseconds()) 
+			//			+ " channel: " + groupDetections.get(i).getChannelBitmap() +  " n det: " + groupDetections.get(i).getSubDetectionsCount()); 
 
 			//work out the frequency limits based on the data units
 			for (int j=0; j<groupDetections.get(i).getSubDetectionsCount(); j++) {
-				
+
 				if (groupDetections.get(i).getSubDetection(j).getTimeMilliseconds()<timeMillis) {
 					timeMillis = groupDetections.get(i).getSubDetection(j).getTimeMilliseconds();
 					startSample =  groupDetections.get(i).getSubDetection(j).getStartSample();
@@ -369,7 +364,7 @@ public class DLClassifyProcess extends PamProcess {
 				if (groupDetections.get(i).getSubDetection(j).getEndTimeInMilliseconds()>endTimeMillis) {
 					endTimeMillis = groupDetections.get(i).getSubDetection(j).getEndTimeInMilliseconds();
 				}
-				
+
 				freq = groupDetections.get(i).getSubDetection(j).getFrequency();
 				if (freq[0]<minFreq) {
 					minFreq = freq[0];
@@ -383,13 +378,13 @@ public class DLClassifyProcess extends PamProcess {
 
 		}
 
-//		System.out.println("MAKE DL GROUP DETECTION " + groupDetections.size() + " segements " + " freq: "
-//		+ minFreq + "  " + maxFreq + " time: " + PamCalendar.formatDateTime(timeMillis) + " duration: " + (endTimeMillis-timeMillis));
-		
+		//		System.out.println("MAKE DL GROUP DETECTION " + groupDetections.size() + " segements " + " freq: "
+		//		+ minFreq + "  " + maxFreq + " time: " + PamCalendar.formatDateTime(timeMillis) + " duration: " + (endTimeMillis-timeMillis));
+
 		DLGroupDetection dlgroupDetection = new DLGroupDetection(timeMillis, groupDetections.get(0).getChannelBitmap(), startSample,  (endTimeMillis-timeMillis), dataUnits); 
 		dlgroupDetection.setFrequency(new double[] {minFreq, maxFreq});
 		addDLAnnotation(dlgroupDetection, predictedResults); 
-				
+
 		return dlgroupDetection;
 	}
 
@@ -402,13 +397,36 @@ public class DLClassifyProcess extends PamProcess {
 		if (classificationBuffer.size()<=0) return; 
 
 		//run the deep learning algorithm 
+		@SuppressWarnings("unchecked")
 		ArrayList<GroupedRawData> classificationBufferTemp = (ArrayList<GroupedRawData>) classificationBuffer.clone(); 
-		ArrayList<? extends PredictionResult> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
+		
+		/**
+		 * Run the model. This will return a list of model results which are USUALLY
+		 * same size as the classification buffer i.e. one result for each input to the
+		 * model. However, if the model is some sort of, for example, object detection
+		 * model then the model results may be smaller or larger then the input data.
+		 */
+		ArrayList<ArrayList<? extends PredictionResult>> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
 
 		if (modelResults==null) {
-			return; //there has been a problem
+			//there has either been a problem or we are in real time mode 
+			//and the model is now running on a different thread. It will return the results.
+			return; 
 		}
+		
+		newRawModelResults(modelResults, classificationBufferTemp);
 
+	}
+	
+	
+	/**
+	 * Process <i>results</i> from the model. This is called by the runRawModel method and processes all results from a single run of the model - this 
+	 * may include multiple data units that have been passed to the model at once to increase efficiency.
+	 * @param modelResults - the model results. This is an array of model results, one for each input to the model.
+	 * @param classificationBufferTemp - the classification buffer which contains the raw data units that were passed to the model.
+	 */
+	protected void newRawModelResults(ArrayList<ArrayList<? extends PredictionResult>> modelResults, ArrayList<GroupedRawData> classificationBufferTemp) {
+		//this is called by the model to process the results. 
 		for (int i=0; i<classificationBufferTemp.size(); i++) {
 			if (modelResults.get(i)!=null) {
 				//if the model is null there may be a buffer on a different thread 
@@ -490,7 +508,9 @@ public class DLClassifyProcess extends PamProcess {
 		DLDataUnit dlDataUnit = new DLDataUnit(pamDataUnit.getTimeMilliseconds(), pamDataUnit.getChannelBitmap(), 
 				pamDataUnit.getStartSample(), pamDataUnit.getSampleDuration(), modelResult); 
 
-
+		//TODO  need to add frequency and sample information to the data unit. 
+		
+		
 		dlDataUnit.setFrequency(new double[] {0, dlControl.getDLClassifyProcess().getSampleRate()/2});
 		dlDataUnit.setDurationInMilliseconds(pamDataUnit.getDurationInMilliseconds()); 
 
@@ -499,21 +519,27 @@ public class DLClassifyProcess extends PamProcess {
 
 
 	/**
-	 * Create a data unit form a model result. This is called whenever data passes a prediction threshold.
+	 * Create a data unit from a model result. This is called whenever data passes a prediction threshold.
 	 * 
 	 * @param modelResult - the model result. 
 	 * @param pamRawData - the raw data unit which the model result came from. 
 	 */
-	public void newRawModelResult(PredictionResult modelResult, GroupedRawData pamRawData) {
+	public void newRawModelResult(List<? extends PredictionResult> modelResult, GroupedRawData pamRawData) {
 
 		//the model result may be null if the classifier uses a new thread. 
 
-		//System.out.println("New segment: parent UID: " + pamRawData.getParentDataUnit().getUID() + " Prediciton: " + modelResult.getPrediction()[0]+ "  " + getSourceParams().countChannelGroups());
+//		System.out.println("DLClassifyProcess: New newRawModelResult: startSample " + pamRawData.getStartSample() + " No. prediction results: " + modelResult.size()+ "  " + getSourceParams().countChannelGroups());
 
 		//create a new data unit - always add to the model result section. 
-		DLDataUnit dlDataUnit =  predictionToDataUnit(pamRawData,  modelResult);
+		DLDataUnit dlDataUnit;
+		List<DLDataUnit> dlDataUnits = new ArrayList<DLDataUnit>();
+		for (PredictionResult result: modelResult) {
+			if (result==null) continue; 
+			dlDataUnit =  predictionToDataUnit(pamRawData,  result);
+			dlDataUnits.add(dlDataUnit); //here
+			this.dlModelResultDataBlock.addPamData(dlDataUnit); //here
+		}
 
-		this.dlModelResultDataBlock.addPamData(dlDataUnit); //here
 
 		//need to implement multiple groups. 
 		for (int i=0; i<getSourceParams().countChannelGroups(); i++) {
@@ -535,33 +561,35 @@ public class DLClassifyProcess extends PamProcess {
 				 */
 				if (pamRawData.getParentDataUnit() instanceof RawDataUnit) {
 
-					/****Make our own data units****/
-					if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
-						//if the model result has a binary classification then it is added to the data buffer unless the data
-						//buffer has reached a maximum size. In that case the data is saved. 
-						groupRawDataBuffer[i].add(pamRawData); 
-						modelResultDataBuffer[i].add(modelResult); 
-						if (groupRawDataBuffer[i].size()>=dlControl.getDLParams().maxMergeHops) {
-							//need to save the data unit and clear the unit. 
+					for (int j=0; j<dlDataUnits.size(); j++) {
+						/****Make our own data units****/
+						if (dlDataUnits.get(j).getPredicitionResult().isBinaryClassification()) {
+							//if the model result has a binary classification then it is added to the data buffer unless the data
+							//buffer has reached a maximum size. In that case the data is saved. 
+							groupRawDataBuffer[i].add(pamRawData); 
+							modelResultDataBuffer[i].add(modelResult.get(j)); 
+							if (groupRawDataBuffer[i].size()>=dlControl.getDLParams().maxMergeHops) {
+								//need to save the data unit and clear the unit. 
+								DLDetection dlDetection  = makeRawDLDetection(groupRawDataBuffer[i], modelResultDataBuffer[i]); 
+								clearBuffer(i);
+								if (dlDetection!=null) {
+									this.dlDetectionDataBlock.addPamData(dlDetection);
+	
+								}
+							}
+	
+						}
+						else {
+							//no binary classification thus the data unit is complete and buffer must be saved. 
 							DLDetection dlDetection  = makeRawDLDetection(groupRawDataBuffer[i], modelResultDataBuffer[i]); 
-							clearBuffer(i);
+							clearBuffer(i) ;
 							if (dlDetection!=null) {
 								this.dlDetectionDataBlock.addPamData(dlDetection);
-
+								//							System.out.println("Amplitude: " + dlDetection.getAmplitudeDB()  
+								//							+ "  " + dlDetection.getMeasuredAmplitudeType());
 							}
+	
 						}
-
-					}
-					else {
-						//no binary classification thus the data unit is complete and buffer must be saved. 
-						DLDetection dlDetection  = makeRawDLDetection(groupRawDataBuffer[i], modelResultDataBuffer[i]); 
-						clearBuffer(i) ;
-						if (dlDetection!=null) {
-							this.dlDetectionDataBlock.addPamData(dlDetection);
-							//							System.out.println("Amplitude: " + dlDetection.getAmplitudeDB()  
-							//							+ "  " + dlDetection.getMeasuredAmplitudeType());
-						}
-
 					}
 				}
 				else {
@@ -584,7 +612,7 @@ public class DLClassifyProcess extends PamProcess {
 								}
 							}
 							else {
-//								System.out.println("Save click annotation to " + lastParentDataUnit[i].getUID()); 
+								//								System.out.println("Save click annotation to " + lastParentDataUnit[i].getUID()); 
 								addDLAnnotation(lastParentDataUnit[i],modelResultDataBuffer[i]); 
 								clearBuffer(i); 
 							}
@@ -592,7 +620,7 @@ public class DLClassifyProcess extends PamProcess {
 					}
 					lastParentDataUnit[i]=pamRawData.getParentDataUnit();
 					groupRawDataBuffer[i].add(pamRawData); 
-					modelResultDataBuffer[i].add(modelResult); 
+					modelResultDataBuffer[i].addAll(modelResult); 
 					//System.out.println("Buffer click annotation to " + lastParentDataUnit[i].getUID() + " " + groupDataBuffer[i].size()); 
 				}
 			}
@@ -617,7 +645,7 @@ public class DLClassifyProcess extends PamProcess {
 	 * 
 	 */
 	public void forceRunClassifier(PamDataUnit dataUnit) {
-		
+
 		//System.out.println("CLASSIFICATION BUFFER: " + classificationBuffer.size());
 
 		if (this.classificationBuffer.size()>0) {
@@ -663,6 +691,8 @@ public class DLClassifyProcess extends PamProcess {
 	 */
 	private synchronized DLDetection makeRawDLDetection(ArrayList<GroupedRawData> groupDataBuffer, ArrayList<PredictionResult> modelResult) {
 
+		//System.out.println("DLClassifyProcess: makeRawDLDetection: " + groupDataBuffer.size() + " data units, " + modelResult.size() + " model results");
+		
 		if (groupDataBuffer==null || groupDataBuffer.size()<=0) {
 			return null; 
 		}
@@ -673,7 +703,7 @@ public class DLClassifyProcess extends PamProcess {
 		double[][] rawdata = new double[PamUtils.getNumChannels(groupDataBuffer.get(0).getChannelBitmap())]
 				[dlControl.getDLParams().sampleHop*(groupDataBuffer.size()-1) + dlControl.getDLParams().rawSampleSize]; 
 
-		//copy all data into a new data buffer making sure to compensate for hop size.  
+		//copy all data into a new data buffer making sure to compensate for hop size. 
 		for (int i=0; i<groupDataBuffer.size(); i++) {
 
 			int copyLen = dlControl.getDLParams().sampleHop; 
@@ -687,20 +717,114 @@ public class DLClassifyProcess extends PamProcess {
 			}
 		}
 
-		DataUnitBaseData basicData  = groupDataBuffer.get(0).getBasicData().clone(); 
-		basicData.setMillisecondDuration(1000.*rawdata[0].length/this.sampleRate);
-		basicData.setSampleDuration((long) (groupDataBuffer.size()*dlControl.getDLParams().rawSampleSize));
+		// Now have all the raw data.
+		// In MOST cases, the groupDataBuffer and modelResult will be the same size, in
+		// which case, it's simply a case of settings the raw data
+		// to the new dcata unit. However, in some cases, such as an object detector,
+		// the time limits of the data unit may be different from the raw data and
+		// therefore the raw data needs to be trimmed to the time limits of the data
+		// unit.
+		long startSample = Long.MAX_VALUE;
+		long startMillis = Long.MAX_VALUE;
+		long endSample = Long.MIN_VALUE;
+		double[] freqLims = null;
 		
+		for (int i=0; i<modelResult.size(); i++) {
+			//iterate through the model results and find the time and frequency limits
+			if (modelResult.get(i).getStartSample()<startSample) {
+				startSample = modelResult.get(i).getStartSample();
+			}
+			
+			if (modelResult.get(i).getTimeMillis()<startMillis) {
+				startMillis = modelResult.get(i).getTimeMillis();
+			}
+
+			if (modelResult.get(i).getStartSample()+modelResult.get(i).getSampleDuration()>endSample) {
+				endSample = modelResult.get(i).getStartSample()+modelResult.get(i).getSampleDuration(); 
+			}
+
+			if (modelResult.get(i).getFreqLimits()!=null) {
+				if (freqLims==null) {
+					freqLims = modelResult.get(i).getFreqLimits().clone();
+				}
+				else {
+					if (modelResult.get(i).getFreqLimits()[0]<freqLims[0]) {
+						freqLims[0] = modelResult.get(i).getFreqLimits()[0];
+					}
+					if (modelResult.get(i).getFreqLimits()[1]>freqLims[1]) {
+						freqLims[1] = modelResult.get(i).getFreqLimits()[1];
+					}
+				}
+			}
+
+		}
+		
+//		System.out.println("DLClassifyProcess: makeRawDLDetection 2: " + groupDataBuffer.get(0).getUID() + "  " + 
+//				PamCalendar.formatDateTime2(startMillis, "dd MMM yyyy HH:mm:ss.SSS", false) + "  " + groupDataBuffer.size()+ "  " 
+//				+ rawdata[0].length + " sampleDuration " + groupDataBuffer.get(0).getSampleDuration());
+
+		//Now we have the time limits of the predictions, check whether the raw data is within these limits.
+		if (rawdata[0].length!=(endSample-startSample)) { //only trim if we need to
+						//need to trim the raw data to the time limits of the data unit.
+			rawdata = trimRawData(rawdata, groupDataBuffer.get(0).getStartSample(),  startSample, endSample);
+		}
+
+		DataUnitBaseData basicData  = groupDataBuffer.get(0).getBasicData().clone(); 
+
+
+		
+		basicData.setTimeMilliseconds(startMillis); 
+		basicData.setMillisecondDuration(((double) rawdata[0].length)/getSampleRate()*1000);
+		
+		basicData.setSampleDuration((long) (groupDataBuffer.size()*dlControl.getDLParams().rawSampleSize));
 
 		//		System.out.println("Model result: " + modelResult.size()); 
 		DLDetection dlDetection = new DLDetection(basicData, rawdata, getSampleRate()); 
 		addDLAnnotation(dlDetection,modelResult); 
-		dlDetection.setFrequency(new double[] {0, this.getSampleRate()/2});
+
+		//System.out.println("DLClassifyProcess: freqLims: " + freqLims + " sample rate: " + this.getSampleRate());
+		if (freqLims==null) {
+			//set default frequency limits
+			dlDetection.setFrequency(new double[] {0, this.getSampleRate()/2});
+		}
+		else {
+			//set frequency limits from model results
+			dlDetection.setFrequency(freqLims);
+		}
 
 		//create the data unit
 		return dlDetection; 
 	}
 
+
+	/**
+	 * Trim the raw data to the target start and end sample. 
+	 * @param rawdata - the raw data to trim.
+	 * @param rawStartSample - the start sample of the raw data.
+	 * @param targetStartSample - the target start sample.
+	 * @param targetEndSample - the target end sample.
+	 * @return trimmed raw data.
+	 */
+	private double[][] trimRawData(double[][] rawdata, long rawStartSample, long targetStartSample, long targetEndSample) {
+
+		//trime the rawdata which starts at rawStartSample to the target start and end sample
+		int startOffset = (int) (targetStartSample-rawStartSample);
+		int endOffset = (int) (targetEndSample-rawStartSample);
+		
+//		System.out.println("DLClassifyProcess: Trim raw data: " + rawStartSample + " targetStartSample: " + targetStartSample + " targetEndSample " 
+//		+ targetEndSample + " startOffset: " + startOffset + " endOffset: " + endOffset + "  " + (int) (targetEndSample-targetStartSample+1));
+
+		double[][] trimmedData = new double[rawdata.length][];
+		for (int i=0; i<rawdata.length; i++) {
+			trimmedData[i] = new double[(int) (targetEndSample-targetStartSample+1)];
+
+			System.arraycopy(rawdata[i], startOffset, trimmedData[i], 0, 
+					trimmedData[i].length);
+		}
+		
+		return trimmedData;
+
+	}
 
 	/**
 	 * Get the result with the highest score. 
@@ -789,7 +913,6 @@ public class DLClassifyProcess extends PamProcess {
 				runDetectionGroupModel(); //any other data units. 
 			}
 		}
-
 		//21/11/2022 - it seems like this causes a memory leak when models are reopened and closed every file...
 		//this.dlControl.getDLModel().closeModel(); 
 	}

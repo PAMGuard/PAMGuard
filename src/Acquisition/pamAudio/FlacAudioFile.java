@@ -20,6 +20,7 @@ import org.jflac.util.ByteData;
 
 import Acquisition.offlineFuncs.AquisitionLoadPoint;
 import PamDetection.RawDataUnit;
+import PamUtils.worker.filelist.WavLoadListener;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -59,7 +60,7 @@ public class FlacAudioFile implements PamAudioFileLoader {
 	}
 
 	@Override
-	public AudioInputStream getAudioStream(File soundFile) {
+	public AudioInputStream getAudioStream(File soundFile, WavLoadListener loadListener) {
 		if (soundFile != null && isFlacFile(soundFile)) {
 			try {
 				return new FlacAudioFileReader().getAudioInputStream(soundFile);

@@ -14,7 +14,7 @@ import PamModel.parametermanager.PrivatePamParameterData;
  * 
  * Parameters for the energy sum detectors.
  *  
- * @author Dave Mellinger and Hisham Qayum
+ * @author Dave Mellinger, Hisham Qayum and Jamie Macaulay
  */
 public class EnergySumParams extends IshDetParams implements Serializable, Cloneable, ManagedParameters {
 
