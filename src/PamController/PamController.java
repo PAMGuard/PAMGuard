@@ -1346,6 +1346,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @param startTime
 	 */
 	private void checkReprocessManager(boolean saveSettings, long startTime) {
+		if(PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			return;
+		}
 		ReprocessMon mon = new ReprocessMon(saveSettings, startTime);
 		ReprocessManager reprocessManager = new ReprocessManager();
 //		boolean goonthen = reprocessManager.checkOutputDataStatus();
