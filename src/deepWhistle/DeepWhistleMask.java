@@ -8,14 +8,26 @@ import java.util.List;
 
 import org.jamdev.jdl4pam.deepWhistle.DeepWhistleTest.DeepWhistleInfo;
 import org.jamdev.jdl4pam.deepWhistle.SpectrumTranslator;
+import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
+import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
+
+import PamUtils.complex.ComplexArray;
+
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
+import org.jamdev.jdl4pam.utils.DLUtils;
+import org.jamdev.jpamutils.JamArr;
+import org.jamdev.jpamutils.spectrogram.ComplexArrayD;
+import org.jamdev.jpamutils.spectrogram.SpecTransform;
+import org.jamdev.jpamutils.spectrogram.Spectrogram;
 
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.translate.TranslateException;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 
@@ -31,9 +43,22 @@ public class DeepWhistleMask implements PamFFTMask {
 	}
 
 	Predictor<float[][], float[]> specPredictor;
+	
 	//TEMP
 	String modelPath = "/Users/jdjm/Dropbox/PAMGuard_dev/Deep_Learning/deepWhistle/DWC-I.pt";
-	private DeepWhistleInfo modelInfo; 
+	
+	/**
+	 * Model info
+	 */
+	private DeepWhistleInfo modelInfo;
+
+	/**
+	 * List of the transform parameters used in pre-processing
+	 */
+	private ArrayList<DLTransfromParams> transformParams;
+
+	private ArrayList<DLTransform> transforms; 
+	
 
 
 	@Override
@@ -50,15 +75,27 @@ public class DeepWhistleMask implements PamFFTMask {
 		int fftHop = fftDataBlock.getFftHop();
 
 		MaskedFFTParamters fftParams = this.maksedFFTProcess.getMaskFFTParams();
-
-		specPredictor =  loadPyTorchdeepWhistleModel(modelPath,  fftLen,  maksedFFTProcess.getUnitsToBuffer());
+		specPredictor =  loadPyTorchdeepWhistleModel(modelPath,  87,  maksedFFTProcess.getUnitsToBuffer());
 
 		if (specPredictor == null) {
 			System.err.println("DeepWhistleMask: failed to load deepWhistle model from "+modelPath);
 			return false;
 		}
 		
-		 modelInfo = new DeepWhistleInfo(fftLen, fftHop, 5000.0f , 50000.0f , (float) fftParams.bufferSeconds);		
+		//define some model info
+		modelInfo = new DeepWhistleInfo(fftLen, fftHop, 5000.0f , 50000.0f , (float) fftParams.bufferSeconds);		
+		
+		
+		//create the transforms
+		transformParams = createTrasnforms( modelInfo);
+		transforms =	DLTransformsFactory.makeDLTransforms(transformParams); 
+		
+		//now work out what the input shape for the model is going to be. 
+		
+		
+		
+		
+
 
 
 		return true;
@@ -83,7 +120,6 @@ public class DeepWhistleMask implements PamFFTMask {
 		//transforms
 		//Then do a min mac normalisation
 		//	dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECTROGRAM, 1024,512)); 
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECTROGRAM, modelInfo.fftLen, modelInfo.fftHop)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECFREQTRIM, modelInfo.minFreq, modelInfo.maxFreq)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPEC_LOG10));
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPEC_ADD, 2.1));
@@ -107,8 +143,87 @@ public class DeepWhistleMask implements PamFFTMask {
 
 	@Override
 	public List<FFTDataUnit> applyMask(List<FFTDataUnit> batch) {
-		// TODO Auto-generated method stub
-		return null;
+		//System.out.println("MaskedFFTProcess: processing batch of size START "+batch.get(0).getFftData().getReal(0));
+		org.jamdev.jpamutils.spectrogram.ComplexArray[] fftDataArr = new org.jamdev.jpamutils.spectrogram.ComplexArray[batch.size()];
+		
+		for (int i = 0; i < batch.size(); i++) {
+			fftDataArr[i] = convertComplexArray(batch.get(i).getFftData());
+		}
+		
+		//TODO
+		Spectrogram spectrogram = new Spectrogram(fftDataArr, 193 , 768, 96000);
+
+				
+		((FreqTransform) transforms.get(0)).setSpecTransfrom(new SpecTransform(spectrogram));
+		double[][] dataT3 = 	((FreqTransform) transforms.get(0)).getSpecTransfrom().getTransformedData();
+
+		System.out.println(" Spectrogram size: " + dataT3.length + " x " + dataT3[0].length);
+
+
+		DLTransform transform = transforms.get(0); 
+		for (int i=0; i<transforms.size(); i++) {
+			System.out.println("Transform " + i + ": " + transforms.get(i).getDLTransformType().getJSONString());
+			
+			double[][] dataT = ((FreqTransform) transform).getSpecTransfrom().getTransformedData();
+			System.out.println(" Data shape: " + dataT.length + " x " + dataT[0].length);
+			
+			transform = transforms.get(i).transformData(transform); 
+		}
+		
+		float[][] dataF =  DLUtils.toFloatArray(((FreqTransform) transform).getSpecTransfrom().getTransformedData());
+		
+		//run the example data
+		float[][] modelResults = null;
+				
+		modelResults = runPyTorchDeepWhislte(specPredictor, dataF); 
+		
+		//get the mask from the model results
+		double[][] mask = JamArr.floatToDouble(modelResults);
+
+		//perform the processing
+		ComplexArray out = batch.get(0).getFftData();
+		if (out == null) {
+			System.err.println("MaskedFFTProcess: no FFT data in first unit of batch");
+			return null;
+		}
+
+
+		//now apply the mask to each unit
+		for (int i = 0; i < batch.size(); i++) {
+			out = batch.get(i).getFftData();
+			if (out == null) {
+				System.err.println("MaskedFFTProcess: no FFT data in unit "+i+" of batch");
+				continue;
+			}
+			for (int j = 0; j < out.length(); j++) {
+
+				//to apply a mask must multiply both real and imaginary parts by the mask value
+				double re = out.getReal(j) * mask[i][j];
+				out.setReal(j, re);
+				double im = out.getImag(j) * mask[i][j];
+				out.setImag(j, im);
+			}
+
+		}
+
+		//System.out.println("MaskedFFTProcess: processing batch of size DONE "+batch.get(0).getFftData().getReal(0));
+		return batch;
+	}
+
+	/**
+	 * Convert from PamUtils complex array to jpamutils complex array
+	 * @param fftData - the PamUtils complex array
+	 * @return the jpamutils complex array
+	 */
+	private org.jamdev.jpamutils.spectrogram.ComplexArray convertComplexArray(ComplexArray fftData) {
+		org.jamdev.jpamutils.spectrogram.ComplexArray complexArr = new org.jamdev.jpamutils.spectrogram.ComplexArray(fftData.length()*2);
+		//System.out.println("DeepWhistleMask: convertComplexArray: length = " + fftData.length());
+		for (int i=0; i<fftData.length(); i++) {
+			complexArr.setReal(i, fftData.getReal(i));
+			complexArr.setImag(i, fftData.getImag(i));
+		}
+	
+		return complexArr;
 	}
 
 
@@ -121,6 +236,9 @@ public class DeepWhistleMask implements PamFFTMask {
 	 */
 	public static Predictor<float[][], float[]>  loadPyTorchdeepWhistleModel(String modelPathS, long fftLen, long fftNum) {
 
+		System.out.println("Loading deepWhistle model: " + fftLen + " FFT length, " + fftNum + " no. FFT");
+		
+		
 		Path modelPath = Paths.get(modelPathS); 
 
 		//get the parent
@@ -158,6 +276,39 @@ public class DeepWhistleMask implements PamFFTMask {
 		} 
 
 		return null;
+	}
+	
+	
+
+	/**
+	 * Simple function which loads up the deep PyTorch whistle model and then runs it on completely random data
+	 */
+	public static float[][] runPyTorchDeepWhislte(Predictor<float[][], float[]> specPredictor, float[][] spectrogram) {
+
+		System.out.println("Begin deepWhistle prediction: " + spectrogram.length + " x " +  spectrogram[0].length + " no. FFT");
+		float[] output;
+		try {
+			
+			float[][] input =JamArr.transposeMatrix(spectrogram);
+
+			long start = System.currentTimeMillis();
+
+			output = specPredictor.predict(input);
+
+			float[][] confMap = JamArr.to2D(output,  input[0].length);
+
+			long end = System.currentTimeMillis();
+
+			System.out.println("End deepWhistle prediction: " + spectrogram.length + " in " + (end-start) + " millis");
+
+			return JamArr.transposeMatrix(confMap);
+
+		} catch (TranslateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null; 
 	}
 
 
