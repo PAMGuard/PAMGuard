@@ -189,6 +189,14 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		timer.start();
 		activeNMEAsource.start();
 	}
+	
+	public void makeEmptyThread() {
+		timer.stop();
+		activeNMEAsource = null;
+		activeNMEAsource = new Thread(new EmptyThread());
+		timer.start();
+		activeNMEAsource.start();
+	}
 
 	public void makeSerialThread() {
 		//System.out.println("OK making a serial thread");
@@ -288,8 +296,13 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 		
 		stopNMEASource();
+		
+		if(runMode == PamController.RUN_NETWORKRECEIVER) {
+			//makeEmptyThread();
+			return;
+		}
 
-		if(sourceType == NmeaSources.SERIAL){
+		else if(sourceType == NmeaSources.SERIAL){
 			makeSerialThread();
 		}else if(sourceType == NmeaSources.UDP){
 			if (nmeaControl.nmeaParameters.multicast)
@@ -551,6 +564,23 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 //		}
 //
 //	}
+	
+	class EmptyThread implements Runnable {
+
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					Thread.sleep(20000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		
+	}
 
 	class TimestampFileThread implements Runnable {
 
@@ -890,8 +920,10 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	private class SignalTimerAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (System.currentTimeMillis() - lastSigTime > 10000) {
-				restartNMEA();
+			if(PamController.getInstance().getRunMode()!=PamController.RUN_NETWORKRECEIVER) {
+				if (System.currentTimeMillis() - lastSigTime > 10000) {
+					restartNMEA();
+				}
 			}
 		}
 	}
@@ -907,7 +939,15 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 	@Override
 	public ModuleStatus getStatus() {
+		
 		ModuleStatus status = processCheck.getStatus();
+		
+		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+			status.setStatus(ModuleStatus.STATUS_OK);
+			return status;
+		}
+		
+		
 		
 		if (status.getStatus() == ModuleStatus.STATUS_OK && nmeaControl.nmeaParameters.sourceType == NmeaSources.SIMULATED) {
 			status.setStatus(ModuleStatus.STATUS_WARNING);

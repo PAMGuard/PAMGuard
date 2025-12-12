@@ -242,7 +242,6 @@ may not be null.
 					LocContents.HAS_LATLONG | LocContents.HAS_RANGE);
 		}
 		if (newAISUnit.staticData != null) {
-			System.out.println("Static data for "+newAISUnit.mmsiNumber);
 			if (this.staticData == null) {
 				this.staticData = newAISUnit.staticData;
 			}

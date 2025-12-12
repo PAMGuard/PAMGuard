@@ -38,7 +38,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	private String serverURI;
 	private String mqttConnectionId;
 	
-	protected MqttAsyncClient mqttClient;
+	private MqttAsyncClient mqttClient;
 	private MqttConnectOptions mqttOptions;
 	private IMqttToken connectToken;
 	private MqttDefaultFilePersistence memoryPersistence;
@@ -73,7 +73,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 			System.out.println("Network receive station id "+this.mqttConnectionId);
 		}
 		requireReconnect = false;
-		this.configureClient(networkParams);
+		//this.configureClient(networkParams);
 	}
 	
 	private static File rememberKey = Paths.get(Pamguard.getSettingsFolder(),"mqttStation.txt").toFile();
@@ -119,14 +119,15 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	
 	@Override
 	public int getQueueLength() {
-		if(this.mqttClient==null) {
+		return 0;
+		/*if(this.mqttClient==null) {
 			return -1;
 		}
 		try {
 			return this.mqttClient.getInFlightMessageCount();
 		}catch(NullPointerException e) {
 			return -1;
-		}
+		}*/
 	}
 
 	@Override
@@ -430,6 +431,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 			throw new ClientConnectFailedException("Must wait for previous instance to finish connecting before connecting again.");
 		}
 		try {
+			//this.mqttClient.disconnectForcibly();
 			this.mqttClient.close(true);
 		} catch (MqttException e) {
 			this.setWarning("Couldn't override existing client: "+e.getMessage(),2);

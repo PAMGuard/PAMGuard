@@ -112,7 +112,11 @@ public class NoiseLogging extends SQLLogging {
 		int nMeasures = bandData[0].length;
 		for (int iB = 0; iB < nBands; iB++) {
 			for (int i = 0; i < nMeasures; i++) {
-				bandItems[iBandItem++].setValue(bandData[iB][i]);
+				iBandItem++;
+				if(iBandItem>=bandItems.length) {
+					break;
+				}
+				bandItems[iBandItem].setValue(bandData[iB][i]);
 			}
 		}
 	}
