@@ -3,7 +3,10 @@ package tethys;
 import java.util.List;
 
 import PamController.PamControlledUnit;
+import PamController.PamController;
 import PamController.PamguardVersionInfo;
+import PamController.soundMedium.GlobalMedium;
+import PamController.soundMedium.GlobalMediumManager;
 import PamModel.PamPluginInterface;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
@@ -68,6 +71,10 @@ abstract public class CollectionHandler {
 
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		dataProvider.getEffortKinds(pDeployment, effortKinds, exportParams);
+		
+		GlobalMediumManager mm = PamController.getInstance().getGlobalMediumManager();
+		double dbRef = GlobalMedium.getdBreference(mm.getCurrentMedium());
+		effort.setIntensityReferenceUPa(dbRef);
 
 
 		return effort;
