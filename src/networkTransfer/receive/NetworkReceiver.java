@@ -396,7 +396,11 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 	 */
 	public  NetworkObject interpretPamData(NetworkObject receivedData, BuoyStatusDataUnit buoyStatusDataUnit) {
 		
-		PamDataBlock dataBlock = rxDataBlockMap.get(receivedData.getDataType2());		
+		PamDataBlock dataBlock = rxDataBlockMap.get(receivedData.getDataType2());
+		if(dataBlock==null) {
+			System.out.println("Received data of unknown type: "+receivedData.getDataType2()+". Make sure that you have a module on the base station for each of the modules you have for the CABs");
+			return null;
+		}
 		BinaryDataSource dataSource = dataBlock.getBinaryDataSource();
 		PamProcess parentProcess = dataBlock.getParentProcess();
 		// we'll want to see if we can find the latest acquisition status data unit. 

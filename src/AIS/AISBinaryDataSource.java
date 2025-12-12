@@ -119,12 +119,18 @@ public class AISBinaryDataSource extends BinaryDataSource {
 		AISDataUnit aisDataUnit = new AISDataUnit(binaryObjectData.getTimeMilliseconds(),
 				charData, fillBits);
 		if (aisDataUnit.decodeMessage()) {
-			aisDataBlock.addAISData(aisDataUnit);
-			return null; // stop PAMGUARD from adding the same data again
-			/**
-			 * A consequence of this is that the data unit will not have any file information
-			 * attached to it - but OK since these data will never be resaved. 
-			 */
+			
+			if(PamController.PamController.getInstance().getRunMode()==PamController.PamController.RUN_NETWORKRECEIVER) {
+				return aisDataUnit;
+			}else {
+				aisDataBlock.addAISData(aisDataUnit);
+			
+				return null; // stop PAMGUARD from adding the same data again
+				/**
+				 * A consequence of this is that the data unit will not have any file information
+				 * attached to it - but OK since these data will never be resaved. 
+				 */
+			}
 		}
 		else {
 			return null;
