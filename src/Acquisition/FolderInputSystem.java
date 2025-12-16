@@ -777,8 +777,10 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long fileTime = getFileStartTime(getCurrentFile());
 			//			fileDateText.setText(PamCalendar.formatDateTime(fileTime));
 			getDialogPanel(); // make sure it's created
-			fileDateStrip.setDate(fileTime);
-			fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
+			if (fileDateStrip != null) {
+				fileDateStrip.setDate(fileTime);
+				fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
+			}
 		}
 	}
 	
@@ -787,7 +789,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 * @param fileListData
 	 */
 	private void setFileNumberText() {
+		if (fileDateStrip != null) {
 			fileDateStrip.setNfiles(allFiles);		
+		}
 	}
 
 	@Override
