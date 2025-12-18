@@ -25,6 +25,7 @@ import javax.swing.border.TitledBorder;
 import PamView.PamGui;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamAlignmentPanel;
 
 public class FileDateDialog extends PamDialog {
@@ -82,7 +83,7 @@ public class FileDateDialog extends PamDialog {
 		c.gridx = 0;
 		c.gridwidth = 2;
 		String text = "<html>Use # to replace all non-date numeric charcters. Count carefully!<br>" +
-		"e.g. to get a date from a file 1677738025.180912065628.d24.d8.wav use <br>###########yyMMddhhmmss########</html>";
+		"e.g. to get a date from a file 1677738025.180912065628.d24.d8.wav use <br>###########yyMMddHHmmss########</html>";
 		soundTrapDate.add(new JLabel(text, JLabel.LEFT),c);
 		c.gridy++;
 		text = "<html><body style='width: 350px'>" + 
@@ -256,6 +257,21 @@ public class FileDateDialog extends PamDialog {
 		}
 		standardFileDateSettings.setForcedDateFormat(custDate);
 		standardFileDateSettings.setUseBespokeFormat(manualFormat.isSelected());
+		if (manualFormat.isSelected()) {
+			if (custDate == null) {
+				return showWarning("If you intend to use a user defined date format, then you must specify the format to use");
+			}
+			// and do a check to see if hh is in the string. If it is, they should probably be using HH
+			if (custDate.contains("hh")) {
+				String msg = "<html>Your custom date format contains 'hh' for hours. 'hh' is a 12 hour format, meaning that file times may be misinterpreted."
+						+ "<br><br>It's likely thta you meant to use 'HH' for 24 hour time format."
+						+ "<br><br>Press Cancel to edit the date format, or Ok to continue with 'hh'.</html>";
+				int ans = WarnOnce.showWarning(this, "Custom date format warning", msg, WarnOnce.OK_CANCEL_OPTION);
+				if (ans == WarnOnce.CANCEL_OPTION) {
+					return false;
+				}
+			}
+		}
 		
 		standardFileDateSettings.setDateTimeFormatToUse(customDateTimeFormat.getText());
 		
