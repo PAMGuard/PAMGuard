@@ -681,8 +681,6 @@ public class DetectionsHandler extends CollectionHandler {
 		detections.getEffort().setEnd(TethysTimeFuncs.xmlGregCalFromMillis(audioEnd));
 	}
 
-
-
 	/**
 	 * Run some checks on the Detections document prior to submission. <br>
 	 * Currently, is is just a check that the detections are within the effort times.   

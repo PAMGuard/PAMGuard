@@ -473,7 +473,15 @@ Store</a> option to update all binary files to the latest version. This can be
 useful if you want to open old binary files with the latest versions of the <a
 href="https://www.pamguard.org/matlabandr.html">Matlab, R, and Python libraries</a>.</p>
 
+<p class=MsoNormal>Tethys output for One band Filtered noise measurements</p>
+
+<p class=MsoNormal>Support for DeepAcoustics AI models</p>
+
 <p class=MsoNormal><b>Bug Fixes / minor enhancements </b></p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/279">Issue
+279</a>: Problems with user specified date formats. Improved help file and
+issue warning if a 12 hour time format is specified. </p>
 
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/273">Issue
 273</a>: Fixed (or improved) night mode display for logger forms. </p>
@@ -769,14 +777,14 @@ Visualiser, Audacity etc.)</p>
 <h2>Tethys Database</h2>
 
 <p class=MsoNormal>Many users will be aware that we're integrating an interface
-to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard. Some
-basic features are available for testing. If interested, please contact the
-PAMGuard support team. </p>
+to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard.
+Some basic features are available for testing. If interested, please contact
+the PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
-<p class=MsoNormal>Linking clicks to offline clicks table. We had a database
-that had become corrupted so added code to relink offline clicks to their
+<p class=MsoNormal>Linking clicks to offline clicks table. We had a database that
+had become corrupted so added code to relink offline clicks to their
 corresponding clicks from binary data. </p>
 
 <p class=MsoNormal>Drawing non-acoustic data: Data that were not associated
@@ -900,10 +908,10 @@ name of the folder containing the files.</p>
 
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>Time zone displays: Fixed some bugs associated
-with options to have PAMGuard display times in local time, rather than UTC.
-This was affecting times typed into the scroll bars of displays which were
-reading local time, even when set to use UTC. </span></p>
+<p class=MsoNormal><span lang=EN-US>Time zone displays: Fixed some bugs
+associated with options to have PAMGuard display times in local time, rather
+than UTC. This was affecting times typed into the scroll bars of displays which
+were reading local time, even when set to use UTC. </span></p>
 
 <h1><a name="_Version_2.02.08_May"></a><span lang=EN-US>Version 2.02.08 May
 2023</span></h1>
@@ -1316,11 +1324,10 @@ name="_Latest_Beta_Version_2.01.05"></a><span lang=EN-US>&nbsp;</span></p>
 
 <h1><span lang=EN-US>Version 2.01.05 October 2020</span></h1>
 
-<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release
-(1.15.xx), PAMGuard Version 2 contains major updates. You should read and
-understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
-Version 2.00.10</a> before proceeding with installation and use of this
-version.</b></p>
+<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release (1.15.xx),
+PAMGuard Version 2 contains major updates. You should read and understand the
+notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a>
+before proceeding with installation and use of this version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
 (release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
@@ -1850,8 +1857,8 @@ lang=EN-US> </span>Updates to the Ishmael detectors.</p>
 <h1><a name="_Latest_Beta_Version_2.00.16"></a><span lang=EN-US>Beta Version
 2.00.16 May 2019</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -1969,8 +1976,8 @@ components, but we're working on that.</p>
 <h1><a name="_Latest_Beta_Version_2.00.15"></a><span lang=EN-US>Beta Version
 2.00.15 January 2019</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -2754,14 +2761,14 @@ January 2017</span></h1>
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><span lang=EN-US>Bug 306. Certain methods have been querying
-AcousticDataUnit.getDuration and expecting to receive a response in
-milliseconds. However, getDuration actually returns the number of samples.
-&nbsp;This has been corrected. </span></p>
+AcousticDataUnit.getDuration and expecting to receive a response in milliseconds.
+However, getDuration actually returns the number of samples. &nbsp;This has
+been corrected. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Plug-Ins</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard is
-how plug-ins are managed. PAMGuard now has the ability to dynamically load
+<p class=MsoNormal><span lang=EN-US>A major change in this version of PAMGuard
+is how plug-ins are managed. PAMGuard now has the ability to dynamically load
 plug-in modules (saved as jar files) at runtime. This will greatly simplify the
 process of testing and distributing newly developed modules, since only a small
 jar file will be required rather than a new bespoke PAMGuard installation.</span></p>
@@ -2770,15 +2777,14 @@ jar file will be required rather than a new bespoke PAMGuard installation.</span
 unchanged, in most cases simply requiring the addition of an interface class.
 &nbsp;Instructions for the development of new modules utilizing the plug-in
 system can be found <a href="http://www.PAMGuard.org/16_HowtomakePlug-Ins.html"
-scheme can be found>here</a>. &nbsp;Plug-in modules can be downloaded from the PAMGuard
-website here, but developers are encouraged to host and maintain their own
-modules.</span></p>
+scheme can be found>here</a>. &nbsp;Plug-in modules can be downloaded from the
+PAMGuard website here, but developers are encouraged to host and maintain their
+own modules.</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Modules of interest to the general PAM
-community will remain as part of the core PAMGuard installation. However,
-specialized modules which are useful to only a small number of users have been
-removed and are available as a separate download. The following modules have
-been removed:</span></p>
+<p class=MsoNormal><span lang=EN-US>Modules of interest to the general PAM community
+will remain as part of the core PAMGuard installation. However, specialized
+modules which are useful to only a small number of users have been removed and
+are available as a separate download. The following modules have been removed:</span></p>
 
 <p class=MsoListParagraph style='margin-left:43.5pt;text-indent:-25.5pt'>1.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2997,9 +3003,9 @@ the future. </span></p>
 
 <p class=MsoNormal><i>Logger Form Design</i></p>
 
-<p class=MsoNormal>A GUI driven system for designing Logger forms has been
-released. Currently, this feature has no online help, but is reasonably
-intuitive compared to the old method of typing directly into the database. </p>
+<p class=MsoNormal>A GUI driven system for designing Logger forms has been released.
+Currently, this feature has no online help, but is reasonably intuitive
+compared to the old method of typing directly into the database. </p>
 
 <p class=MsoNormal><i><span lang=EN-US>Improved Number handling</span></i></p>
 
@@ -3300,8 +3306,8 @@ fixed. </span></p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>2.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 247. Fixed Landmark display. Landmarks were not displaying
-in the viewer. This is now fixed. </span></p>
+</span><span lang=EN-US>Bug 247. Fixed Landmark display. Landmarks were not
+displaying in the viewer. This is now fixed. </span></p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-US>3.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3408,9 +3414,9 @@ database so you will also need a database module in your configuration. &nbsp;</
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>2.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>A new system for important warning messages has been implemented. Warnings
-such as failure to connect to the GPS or a database error will now appear at
-the top of the main PAMGuard display. </p>
+</span>A new system for important warning messages has been implemented.
+Warnings such as failure to connect to the GPS or a database error will now
+appear at the top of the main PAMGuard display. </p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>3.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3702,8 +3708,8 @@ of sperm whale clicks. (No help available)</p>
 <p class=MsoNormal><i>Hydrophone Configuration</i></p>
 
 <p class=MsoNormal>The hydrophone configuration system within PAMGuard has been
-substantially rewritten, partly so that it can support multiple remote buoys (e.g.
-DIFAR buoys) each of which needs to be localised individually. As a
+substantially rewritten, partly so that it can support multiple remote buoys
+(e.g. DIFAR buoys) each of which needs to be localised individually. As a
 consequence, the layout of the Array Manager dialog will appear somewhat
 different. Details are available in the online help. </p>
 
@@ -3794,8 +3800,8 @@ whistle.</p>
      forms which did not display correctly in 'night' mode. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Bug fix in simulator. No longer
      stops or fails to start generating sounds. </li>
- <li class=MsoNormal style='margin-bottom:0cm'>Bug in calculated spectrum levels
-     if data were decimated (<a
+ <li class=MsoNormal style='margin-bottom:0cm'>Bug in calculated spectrum
+     levels if data were decimated (<a
      href="http://sourceforge.net/p/PAMGuard/bugs/187/">http://sourceforge.net/p/PAMGuard/bugs/187/</a>)
      . Did not affect band level calculations. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Bug in noise band monitor.
@@ -3956,9 +3962,9 @@ have implemented database storage for output of these modules. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Radar Display: A bug which stopped the radar display from correctly displaying
-bearings to whistles from arrays containing more than two hydrophone elements
-has been fixed. </p>
+</span>Radar Display: A bug which stopped the radar display from correctly
+displaying bearings to whistles from arrays containing more than two hydrophone
+elements has been fixed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4402,8 +4408,8 @@ and more meaningful names in spectrogram display menu.</p>
 
 <p class=MsoNormal>Sound acquisition</p>
 
-<p class=MsoNormal>When not using NI or AISO cards PAMAGUARD acquires sound
-using javax.sound which only supports two channels. Max number of channels now
+<p class=MsoNormal>When not using NI or AISO cards PAMAGUARD acquires sound using
+javax.sound which only supports two channels. Max number of channels now
 specified as 2 rather than undefined.</p>
 
 <p class=MsoNormal>Serial Comms</p>
@@ -4487,8 +4493,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>This results in a major speed up of data exchange between modules and can
-lead to a x4 improvement in overall performance. </p>
+</span>This results in a major speed up of data exchange between modules and
+can lead to a x4 improvement in overall performance. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4680,10 +4686,10 @@ loaded. Now issues a warning message to the terminal and does not crash. </p>
 
 <p class=MsoNormal>National Instruments DAQ support (Windows 32 bit JVM Only)</p>
 
-<p class=MsoNormal>The National Instruments interface has now been comprehensively
-rewritten and is now stable. One or more NI data acquisition devices can be
-used to acquire high speed data on multiple channels. See the PAMGuard help
-file for details. </p>
+<p class=MsoNormal>The National Instruments interface has now been
+comprehensively rewritten and is now stable. One or more NI data acquisition
+devices can be used to acquire high speed data on multiple channels. See the
+PAMGuard help file for details. </p>
 
 <p class=MsoNormal><b>Performance Tests</b></p>
 
@@ -4801,16 +4807,16 @@ Utilities. This will not affect how existing settings files are loaded. </p>
 
 <p class=MsoNormal><b>Multi-screen environments.</b></p>
 
-<p class=MsoNormal>In previous versions, if PAMGuard was configured in a
-multiscreen environment and is then run on a single screen, it was possible
-that the display would not appear. PAMGuard now checks screen dimensions at
-start up and ensures that the main display is visible. Consequently, program
-start-up takes slightly longer than previously. </p>
+<p class=MsoNormal>In previous versions, if PAMGuard was configured in a multiscreen
+environment and is then run on a single screen, it was possible that the
+display would not appear. PAMGuard now checks screen dimensions at start up and
+ensures that the main display is visible. Consequently, program start-up takes
+slightly longer than previously. </p>
 
 <p class=MsoNormal><b>Outstanding bugs</b></p>
 
-<p class=MsoNormal>The patch panel is known to crash if output channel numbers from
-the patch panel a higher than the highest input channel number of the data
+<p class=MsoNormal>The patch panel is known to crash if output channel numbers
+from the patch panel a higher than the highest input channel number of the data
 acquisition.&nbsp; </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>

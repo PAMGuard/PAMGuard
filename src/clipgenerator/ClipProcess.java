@@ -143,7 +143,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 					break;
 				case RawDataUnavailableException.DATA_ALREADY_DISCARDED:
 				case RawDataUnavailableException.INVALID_CHANNEL_LIST:
-//					System.out.println("Clip error : " + clipErr);
+					System.out.println("Clip error : " + clipErr + " " + clipRequest.toString());
 					li.remove();
 					break;
 				case RawDataUnavailableException.DATA_NOT_ARRIVED:
@@ -520,7 +520,8 @@ public class ClipProcess extends SpectrogramMarkProcess {
 				rawData = rawDataBlock.getSamples(rawStart, (int) (rawEnd-rawStart), channelMap);
 			}
 			catch (RawDataUnavailableException e) {
-				System.out.println(e.getMessage());
+				// this can be OK, since if it's a "not yet arrived" it will try again,so don't print the error here. 
+//				System.out.println("Clip process" + e.getMessage());
 				return e.getDataCause();
 			}
 			if (rawData==null) {
@@ -673,6 +674,17 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		protected ClipBlockProcess clipBlockProcess;
 		
 		protected PamDataUnit dataUnit;
+
+		@Override
+		public String toString() {
+			try {
+			return String.format("Clip request from %s samples %d for %d", 
+					dataUnit.getParentDataBlock().getDataName(), dataUnit.getStartSample(), dataUnit.getSampleDuration());
+			}
+			catch (Exception e) {
+				return "Clip request from " + dataUnit.toString();
+			}
+		}
 
 	}
 	

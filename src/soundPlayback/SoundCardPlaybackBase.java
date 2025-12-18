@@ -97,8 +97,14 @@ public class SoundCardPlaybackBase {
 		if (deviceNumber >= mixerinfos.size() || deviceNumber < 0) {
 			deviceNumber = 0;// reset to default device. 
 		}
-		Mixer.Info thisMixerInfo = mixerinfos.get(deviceNumber);
-		currentMixer = AudioSystem.getMixer(thisMixerInfo);
+		try {
+			Mixer.Info thisMixerInfo = mixerinfos.get(deviceNumber);
+			currentMixer = AudioSystem.getMixer(thisMixerInfo);
+		}
+		catch (Exception e) {
+			System.out.println("SoundCardPlayback unable to open device " + deviceNumber);
+			return false;
+		}
 		if (currentMixer.getSourceLineInfo().length <= 0){
 			currentMixer.getLineInfo();
 			return false;
