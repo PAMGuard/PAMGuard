@@ -184,6 +184,7 @@
 								<JVMVersion>21+</JVMVersion>
 								<JVMArguments>
 									<string>-c</string>
+									<string>-Xmx8192m</string>
 								</JVMArguments>
 								<NSAppSleepDisabled>true</NSAppSleepDisabled>
 							</plist>
