@@ -17,7 +17,6 @@ import PamUtils.complex.ComplexArray;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
-import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.JamArr;
 import org.jamdev.jpamutils.spectrogram.SpecTransform;
@@ -30,11 +29,13 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.translate.TranslateException;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import us.hebi.matlab.mat.format.Mat5;
-import us.hebi.matlab.mat.format.Mat5File;
-import us.hebi.matlab.mat.types.Matrix;
 
 public class DeepWhistleMask implements PamFFTMask {
+
+	/**
+	 * Default mask value for frequencies outside the trimmed range
+	 */
+	private static final double DEFUALT_MASK_VALUE = 0;
 
 	/**
 	 * FFT length used in the model
@@ -86,24 +87,70 @@ public class DeepWhistleMask implements PamFFTMask {
 		int fftHop = fftDataBlock.getFftHop();
 
 		MaskedFFTParamters fftParams = this.maksedFFTProcess.getMaskFFTParams();
-		specPredictor =  loadPyTorchdeepWhistleModel(modelPath,  88,  maksedFFTProcess.getUnitsToBuffer());
+		
+		//define some model info
+		modelInfo = new DeepWhistleInfo(fftLen, fftHop, 5000.0f , 50000.0f , (float) fftParams.bufferSeconds);		
+
+		//create the transforms
+		transformParams = createTrasnforms( modelInfo);
+		transforms =	DLTransformsFactory.makeDLTransforms(transformParams); 
+		
+		//we need to work out the size of the input to the model - this is defined by the number of FFTs buffered
+		long[] modelShape = getModelShape(); 
+		System.out.println("DeepWhistleMask: model input shape: " + modelShape[0] + " x " + modelShape[1] + " x " + modelShape[2] + " x " + modelShape[3]);
+		
+		specPredictor =  loadPyTorchdeepWhistleModel(modelPath,   modelShape[3],  maksedFFTProcess.getUnitsToBuffer());
 
 		if (specPredictor == null) {
 			System.err.println("DeepWhistleMask: failed to load deepWhistle model from "+modelPath);
 			return false;
 		}
 
-		//define some model info
-		modelInfo = new DeepWhistleInfo(fftLen, fftHop, 5000.0f , 50000.0f , (float) fftParams.bufferSeconds);		
-
-
-		//create the transforms
-		transformParams = createTrasnforms( modelInfo);
-		transforms =	DLTransformsFactory.makeDLTransforms(transformParams); 
-
 		//now work out what the input shape for the model is going to be. 
 
 		return true;
+	}
+	
+	
+	/**
+	 * Get the model input shape. The model is expecting input of shape [1, 1, freqBins, timeSteps] but we are unsure of the freqBins as they
+	 * depend on the frequency trimming step, samplerate etc. So we need to work this out here based on the transforms that have ben set for the 
+	 * model 
+	 * @return the model input shape
+	 */
+	private long[] getModelShape() {
+		
+		//get the number of FFT's
+		int numFFT = maksedFFTProcess.getUnitsToBuffer();
+
+		//create a spectrogram with dummy data to work out the size after transforms
+		org.jamdev.jpamutils.spectrogram.ComplexArray[] fftDataArr = new org.jamdev.jpamutils.spectrogram.ComplexArray[numFFT];
+
+		for (int i = 0; i < numFFT; i++) {
+			fftDataArr[i] = dummyComplexArray(getFFTLength());
+		}
+
+		FreqTransform freqTransform = transformFFTBatch(fftDataArr);
+		
+		float[][] dataF =  DLUtils.toFloatArray(freqTransform.getSpecTransfrom().getTransformedData());
+		
+		return new long[] {1, 1, dataF.length, dataF[0].length};
+		
+	}
+
+	/**
+	 * Create a dummy complex array with all values set to 1.0 + 0.0j
+	 * @param fftLength - the length of the FFT
+	 * @return the dummy complex array
+	 */
+	private org.jamdev.jpamutils.spectrogram.ComplexArray dummyComplexArray(int fftLength) {
+		org.jamdev.jpamutils.spectrogram.ComplexArray complexArr = new org.jamdev.jpamutils.spectrogram.ComplexArray(fftLength);
+		//System.out.println("DeepWhistleMask: convertComplexArray: length = " + fftData.length());
+		for (int i=0; i<fftLength; i++) {
+			complexArr.setReal(i, 1.0);
+			complexArr.setImag(i, 0.0);
+		}
+		return complexArr;
 	}
 
 
@@ -135,27 +182,46 @@ public class DeepWhistleMask implements PamFFTMask {
 		return dlTransformParamsArr; 
 	}
 
-	/**
-	 * Set the FFT data into the transforms. 
-	 * @return
-	 */
-	public ArrayList<DLTransfromParams> setFFTData(List<FFTDataUnit> batch, ArrayList<DLTransfromParams> transforms){
-		return null;
+	private float getSampleRate() {
+		return maksedFFTProcess.getInputFFTData().getSampleRate();
 	}
-
-
-
-
-	@Override
-	public List<FFTDataUnit> applyMask(List<FFTDataUnit> batch) {
-		//System.out.println("MaskedFFTProcess: processing batch of size START "+batch.get(0).getFftData().getReal(0));
+	
+	private int getFFTHop() {
+		return maksedFFTProcess.getInputFFTData().getFftHop();
+	}
+	
+	private int getFFTLength() {
+		return maksedFFTProcess.getInputFFTData().getFftLength();
+	}
+	
+	
+	/**
+	 * Transform a batch of FFT data units into the model input format
+	 * @param batch - the batch of FFT data units
+	 * @return the frequency transform containing the transformed data
+	 */
+	private FreqTransform transformFFTBatch(List<FFTDataUnit> batch) {		
+		//this is a bit clunky - we need to convert from PamUtils complex array to jpamutils complex array. We cannot use a PamUtils complex 
+		//array in jpam because it is independent of PAMGuard and so cannot reference PamGuard classes.
 		org.jamdev.jpamutils.spectrogram.ComplexArray[] fftDataArr = new org.jamdev.jpamutils.spectrogram.ComplexArray[batch.size()];
 
 		for (int i = 0; i < batch.size(); i++) {
 			fftDataArr[i] = convertComplexArray(batch.get(i).getFftData());
 		}
 
-		Spectrogram spectrogram = new Spectrogram(fftDataArr, 193 , 768, 96000);
+		return transformFFTBatch(fftDataArr);
+	}
+	
+	/**
+	 * Transform a batch of FFT data units into the model input format
+	 * @param fftDataArr - the batch of FFT data units as jpamutils complex arrays
+	 * @return the frequency transform containing the transformed data
+	 */
+	private FreqTransform transformFFTBatch(org.jamdev.jpamutils.spectrogram.ComplexArray[] fftDataArr) {
+		
+//		Spectrogram spectrogram = new Spectrogram(fftDataArr, 193 , 768, 96000);
+		
+		Spectrogram spectrogram = new Spectrogram(fftDataArr, getFFTLength() , getFFTHop(), getSampleRate());
 
 		((FreqTransform) transforms.get(0)).setSpecTransfrom(new SpecTransform(spectrogram));
 		//set the frequency limits
@@ -175,9 +241,22 @@ public class DeepWhistleMask implements PamFFTMask {
 			transform = transforms.get(i).transformData(transform); 
 		}
 
-		double[] freqLimits=((FreqTransform) transform).getFreqlims();
+		return ((FreqTransform) transform);
+	}
+	
+	
+	
 
-		float[][] dataF =  DLUtils.toFloatArray(((FreqTransform) transform).getSpecTransfrom().getTransformedData());
+	
+	@Override
+	public List<FFTDataUnit> applyMask(List<FFTDataUnit> batch) {
+		
+		//transform the batch of FFT data units into the model input format
+		FreqTransform freqTransform = transformFFTBatch(batch);
+		
+		double[] freqLimits=freqTransform.getFreqlims(); 
+
+		float[][] dataF =  DLUtils.toFloatArray(freqTransform.getSpecTransfrom().getTransformedData());
 
 //		/*** Temporarily saving stuff to mat file for debugging ***/
 //		if (count<deepWhistleMatFile.getMaxNumStruct()) {
@@ -221,6 +300,12 @@ public class DeepWhistleMask implements PamFFTMask {
 			for (int j = 0; j < out.length(); j++) {
 
 				double maskVal = getMaskValueForBin(j, out.length(), sampleRate/2.0, mask[i], freqLims);
+				
+				if (maskVal>0.3) {
+					maskVal = 1.0;
+				} else {
+					maskVal = 0.0;
+				}
 
 				//to apply a mask must multiply both real and imaginary parts by the mask value
 				double re = out.getReal(j) * maskVal;
@@ -236,21 +321,22 @@ public class DeepWhistleMask implements PamFFTMask {
 
 
 	/**
-	 * Get the mask value for a given FFT bin by mapping to the frequency trimmed mask
+	 * Get the mask value for a given FFT bin by mapping to the trimmed frequency mask
 	 * @param j - the FFT bin index
-	 * @param sampleRate - the sample rate of the data
-	 * @param mask - the frequency trimmed mask for the current time slice
+	 * @param len - the total number of FFT bins
+	 * @param nyquist - the nyquist frequency (sample rate / 2)
+	 * @param mask - the trimmed frequency mask
 	 * @param freqLims - the frequency limits used in trimming
+	 * @return the mask value for this bin
 	 */
 	private double getMaskValueForBin(int j, int len, double nyquist, double[] mask, double[] freqLims) {
 
 		//get the frequency for this bin
 		double binFreq = ((double) j)/len * (nyquist);
-
-		//System.out.println("Bin " + j + " freq: " + binFreq + " freqLims: " + freqLims[0] + " - " + freqLims[1]);
+		double centerFreq = binFreq + (nyquist/len)/2.0;
 
 		//check if this frequency is within the trimmed limits
-		if (binFreq < freqLims[0] || binFreq > freqLims[1]) {
+		if (centerFreq < freqLims[0] || centerFreq > freqLims[1]) {
 			return getDefaultMaskValue();
 		}
 
@@ -258,10 +344,12 @@ public class DeepWhistleMask implements PamFFTMask {
 		//the frequency lies between two frequent bins in the trimmed mask - find those bins
 
 		//the fraction along the trimmed frequency range
-		double percent = (binFreq - freqLims[0])/(freqLims[1]-freqLims[0]);
+		double percent = (centerFreq - freqLims[0])/(freqLims[1]-freqLims[0]);
 
-		int minIndex = (int) Math.floor(percent * (mask.length-1));
-		int maxIndex = (int) Math.ceil(percent * (mask.length-1));
+		//FIXME - some sorti of indexing going on here - need to check carefully
+		int minIndex = (int) Math.floor(percent * (mask.length-1))+3;
+		int maxIndex = (int) Math.ceil(percent * (mask.length-1))+3;
+		
 
 		//	System.out.println("MinIndex: " + minIndex + " MaxIndex: " + maxIndex);
 
@@ -274,11 +362,15 @@ public class DeepWhistleMask implements PamFFTMask {
 			double freqMin = freqLims[0] + ((double) minIndex)/(mask.length-1) * (freqLims[1]-freqLims[0]);
 			double freqMax = freqLims[0] + ((double) maxIndex)/(mask.length-1) * (freqLims[1]-freqLims[0]);
 
-			double weightMax = (binFreq - freqMin)/(freqMax - freqMin);
+			double weightMax = (centerFreq - freqMin)/(freqMax - freqMin);
 			double weightMin = 1.0 - weightMax;
 
-			//			return weightMin * mask [minIndex] + weightMax * mask [maxIndex];
-			return mask[minIndex];
+			return weightMin * mask [minIndex] + weightMax * mask [maxIndex];
+//			if (mask[minIndex]>0.5) {
+//				System.out.println("Bin " + j + " freq: " + binFreq + " freqLims: " + freqLims[0] + " - " + freqLims[1] + " maskLen " + mask.length + " MinIndex: " + minIndex + " MaxIndex: " + maxIndex);
+//			}
+			
+//			return mask[maxIndex];
 		}
 
 	}
@@ -288,8 +380,7 @@ public class DeepWhistleMask implements PamFFTMask {
 	 * @return the default mask value
 	 */
 	private double getDefaultMaskValue() {
-		//TODO
-		return 1;
+		return DEFUALT_MASK_VALUE;
 	}
 
 
@@ -367,7 +458,7 @@ public class DeepWhistleMask implements PamFFTMask {
 	 */
 	public static float[][] runPyTorchDeepWhislte(Predictor<float[][], float[]> specPredictor, float[][] spectrogram) {
 
-		System.out.println("Begin deepWhistle prediction: " + spectrogram.length + " x " +  spectrogram[0].length + " no. FFT");
+		//System.out.println("Begin deepWhistle prediction: " + spectrogram.length + " x " +  spectrogram[0].length + " no. FFT");
 		float[] output;
 		try {
 
@@ -381,7 +472,7 @@ public class DeepWhistleMask implements PamFFTMask {
 
 			long end = System.currentTimeMillis();
 
-			System.out.println("End deepWhistle prediction: " + spectrogram.length + " in " + (end-start) + " millis");
+			//System.out.println("End deepWhistle prediction: " + spectrogram.length + " in " + (end-start) + " millis");
 
 			return JamArr.transposeMatrix(confMap);
 
