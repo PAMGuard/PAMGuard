@@ -63,6 +63,10 @@ public class NoiseControl extends PamControlledUnit implements PamSettings {
 		
 		sortBandEdges();
 	}
+	
+	public NoiseTabPanel getNoiseTabPanel() {
+		return this.noiseTabPanel;
+	}
 
 	@Override
 	public JMenuItem createDetectionMenu(Frame parentFrame) {

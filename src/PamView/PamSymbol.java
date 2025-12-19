@@ -322,6 +322,26 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 			drawScaledPolygon(g2d, pt, 3, halfWidth, halfHeight, trlx, trly,
 					fill, fillColor, lineColor);
 			break;
+			
+		case SYMBOL_CAB:
+			//pt.y += halfWidth+2;
+			double bottomWidth = halfWidth*2/3;
+			double legx = bottomWidth/4;
+			double legy = halfHeight*10/12;
+			drawScaledPolygon(g2d, pt, 3, bottomWidth, halfHeight, sqx, sqy,fill, fillColor, lineColor);
+			pt.y -= (halfWidth);
+			drawScaledPolygon(g2d, pt, 3, halfWidth, halfHeight*7/12, sqx, sqy,fill, fillColor, lineColor);
+			g2d.setPaint(lineColor);
+			pt.y += (halfHeight*2);
+			pt.x -= bottomWidth/2;
+			g2d.drawLine(pt.x, pt.y, (int) (pt.x - legx), (int) (pt.y + legy));
+			pt.x += bottomWidth;
+			g2d.drawLine(pt.x, pt.y, (int) (pt.x + legx), (int) (pt.y + legy));
+			pt.x += legx;
+			pt.y += legy;
+			g2d.drawLine(pt.x, pt.y, (int) (pt.x -( 2*legx+bottomWidth)), pt.y);
+			break;
+		
 		case SYMBOL_PENTAGRAM:
 			drawScaledPolygon(g2d, pt, 5, halfWidth, halfHeight, pentx, penty,
 					fill, fillColor, lineColor);
@@ -552,6 +572,8 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 			return "Pentagram";
 		case SYMBOL_HEXAGRAM:
 			return "Hexagram";
+		case SYMBOL_CAB:
+			return "CAB";
 		}
 
 		return super.toString();
@@ -577,6 +599,7 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 		case SYMBOL_TRIANGLER:
 		case SYMBOL_PENTAGRAM:
 		case SYMBOL_HEXAGRAM:
+		case SYMBOL_CAB:
 			return true;
 		}
 

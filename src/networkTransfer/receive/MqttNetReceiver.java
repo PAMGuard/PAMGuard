@@ -7,7 +7,17 @@ import java.util.HashMap;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 
+import Array.ArrayManager;
+import Array.HydrophoneLocator;
+import Array.HydrophoneLocators;
+import Array.LocatorSettings;
+import Array.StraightHydrophoneLocatorSystem;
+import Array.Streamer;
+import Array.StreamerDataBlock;
+import GPS.GpsData;
+import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import networkTransfer.NetworkObject;
@@ -92,25 +102,15 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 			}
 			return 0;
 		}
-
-		@Override
-		public void messageArrived(String topic, MqttMessage message) throws Exception {
-			String[] topicLevels = topic.split("/");
-			boolean hasRouterMessage = false;
-			for(String topiclevel:topicLevels) {
-				if(!topiclevel.equals("router")) {
-					hasRouterMessage = true;
-				}
-			}
-			if(!hasRouterMessage) {
-				return;
-			}
-			String routerVar = topicLevels[topicLevels.length-1];
+		
+		
+		public void handleRouterMessage(String routerVar, MqttMessage message, int pbIdInteger) {
+			
 			if(!routerVar.equals("signal") && !routerVar.equals("wan")) {
 				return;
 			}
 			
-			BuoyStatusDataUnit buoyStatusDataUnit = netReceiver.findBuoyStatusDataUnit(getId(topic), getId(topic), true);
+			BuoyStatusDataUnit buoyStatusDataUnit = netReceiver.findBuoyStatusDataUnit(pbIdInteger, pbIdInteger, true);
 			buoyStatusDataUnit.setLastCommsPing(System.currentTimeMillis());
 			if(routerVar.equals("signal")) {
 				try {
@@ -131,6 +131,69 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 				
 			}
 			buoyStatusDataBlock.updatePamData(buoyStatusDataUnit, PamCalendar.getTimeInMillis());
+		}
+
+		@Override
+		public void messageArrived(String topic, MqttMessage message) throws Exception {
+			String[] topicLevels = topic.split("/");
+			int pbIdInteger = getId(topic);
+			boolean hasRouterMessage = false;
+			for(String topiclevel:topicLevels) {
+				if(!topiclevel.equals("router")) {
+					hasRouterMessage = true;
+				}
+			}
+			if(hasRouterMessage) {
+				String routerVar = topicLevels[topicLevels.length-1];
+				handleRouterMessage(routerVar,message,pbIdInteger);
+			}
+			
+			if(message.toString().contains("latitude") && message.toString().contains("longitude")) {
+				handleFullStatusMessage(pbIdInteger,message);
+			}
+			
+		}
+		
+		private void handleFullStatusMessage(int pbIdInteger, MqttMessage message) {
+			BuoyStatusDataUnit buoyStatusDataUnit = netReceiver.findBuoyStatusDataUnit(pbIdInteger, pbIdInteger, true);
+
+			String hasFixString = getJsonValue(message.toString(),"hasFix");
+			boolean hasFix = hasFixString.equalsIgnoreCase("true");
+			if(hasFix) {
+				String latString = getJsonValue(message.toString(),"latitude");
+				double lat = Double.valueOf(latString);
+				String lonString = getJsonValue(message.toString(),"longitude");
+				double lon = -1*Double.valueOf(lonString);
+				LatLong pos = new LatLong(lat,lon);
+				GpsData buoyPos = new GpsData(pos);
+				buoyStatusDataUnit.setGpsData(PamCalendar.getTimeInMillis(), buoyPos);
+			}
+			
+			JSONObject messageJson = new JSONObject(message.toString());
+			JSONObject telebuoyStatus = messageJson.getJSONObject("telebuoyStatus");		
+			double power = telebuoyStatus.getDouble("houdingPower");
+			double temperatureC = telebuoyStatus.getDouble("temperatureC");
+			double humidityPercent = telebuoyStatus.getDouble("humidityPercent");
+			double supplyVoltage = telebuoyStatus.getDouble("supplyVoltage");
+			
+			buoyStatusDataUnit.setHousingMeasurements(supplyVoltage,power,temperatureC,humidityPercent);
+			
+			buoyStatusDataBlock.updatePamData(buoyStatusDataUnit, PamCalendar.getTimeInMillis());
+
+		}
+		
+		private String getJsonValue(String fullJson, String key) {
+			int keyIndex = fullJson.indexOf(key);
+			String jsonStartingAtKey = fullJson.substring(keyIndex-1);
+			int colonIndex = jsonStartingAtKey.indexOf(':');
+			String jsonStartingAtVal = jsonStartingAtKey.substring(colonIndex+1);
+			boolean valueIsJsonObject = jsonStartingAtVal.replaceAll(" ", "").startsWith("{");
+			if(valueIsJsonObject) {
+				int valueEndIdx = jsonStartingAtVal.indexOf("}");
+				return jsonStartingAtVal.substring(1,valueEndIdx);
+			}
+			int endValIdx = jsonStartingAtVal.indexOf(',');
+			return jsonStartingAtVal.substring(0, endValIdx);
 		}
 		
 	}

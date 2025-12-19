@@ -71,7 +71,11 @@ public class AISBinaryDataSource extends BinaryDataSource {
 			dos.writeInt(aisDataUnit.mmsiNumber);
 			dos.writeShort(aisDataUnit.fillBits);
 			dos.writeUTF(aisDataUnit.charData);
-			dos.writeUTF(aisDataUnit.aisChannel);
+			if(aisDataUnit.aisChannel!=null) {
+				dos.writeUTF(aisDataUnit.aisChannel);
+			}else {
+				dos.writeUTF("1");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
