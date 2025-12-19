@@ -120,7 +120,7 @@ public class AISGraphics extends PamDetectionOverlayGraphics {
 			positionReport = aisDataUnit.findPositionReport(now);
 		}
 		if (positionReport.timeMilliseconds < now - aisParameters.tailLength * 60 * 1000) {
-			return null;
+			//return null;
 		}
 
 		aisGPSPosition.setLatitude(positionReport.getLatitude());
