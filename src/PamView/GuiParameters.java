@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class GuiParameters implements Serializable, Cloneable {
 
-	static final long serialVersionUID = 1;
+	static final long serialVersionUID = 2L;
 	
 	/**
 	 * The currently select tab

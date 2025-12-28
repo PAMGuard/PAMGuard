@@ -793,25 +793,13 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			fileDateStrip.setNfiles(allFiles);		
 		}
 	}
-	
-	/**
-	 * Set the number of files that have been loaded
-	 * @param fileListData
-	 */
-	private void setFileNumberText() {
-			fileDateStrip.setNfiles(allFiles);		
-	}
+
 
 	@Override
 	public String getSystemType() {
 		return sysType;
 	}
 
-	@Override
-	public String getUnitName() {
-		//		return "File Folder Analysis";
-		return acquisitionControl.getUnitName();
-	}
 
 	@Override
 	public String getUnitType() {
