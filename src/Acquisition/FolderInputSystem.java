@@ -794,16 +794,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 	}
 
+
 	@Override
 	public String getSystemType() {
 		return sysType;
 	}
 
-	@Override
-	public String getUnitName() {
-		//		return "File Folder Analysis";
-		return acquisitionControl.getUnitName();
-	}
 
 	@Override
 	public String getUnitType() {
