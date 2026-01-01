@@ -814,6 +814,15 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setToolTipText("Click Detector module for Soundtrap detector data only");
 //		mi.setHidden(isViewer == false);
+		
+		
+		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
+		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
+		mi.setToolTipText("AI used to enhance whistle detection");
+		mi.setHidden(!SMRUEnable.isEnable());
+		mi.setModulesMenuGroup(detectorsGroup);	
+//		mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
+
 
 //		mi = PamModuleInfo.registerControlledUnit("WorkshopDemo.WorkshopController", "Workshop Demo Detector");
 //		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));

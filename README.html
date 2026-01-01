@@ -473,8 +473,16 @@ Store</a> option to update all binary files to the latest version. This can be
 useful if you want to open old binary files with the latest versions of the <a
 href="https://www.pamguard.org/matlabandr.html">Matlab, R, and Python libraries</a>.</p>
 
+<p class=MsoNormal>Tethys output for One band Filtered noise measurements</p>
+
+<p class=MsoNormal>Support for DeepAcoustics AI models</p>
+
 <p class=MsoNormal><b>Bug Fixes / minor enhancements </b></p>
 
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/279">Issue
+279</a>: Problems with user specified date formats. Improved help file and
+issue warning if a 12 hour time format is specified. </p>
+  
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/273">Issue
 273</a>: Fixed (or improved) night mode display for logger forms. </p>
 
@@ -494,6 +502,14 @@ recording data. Now fixed. </p>
 265</a>: Clock setting from GPS. This has not worked for a number of years due
 to Windows security settings. A work around has now been found and documented
 in the help files.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/pull/261">Issue
+261</a>: Restore choseable symbols for swing spectrogram displays of DL
+detection data</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/260">Issue
+260</a>: Issue popup warning in sound acquisition when no sound files are
+present. </p>
 
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/258">Issue
 258</a>: Improved error reporting from database and binary store modules</p>
@@ -597,7 +613,7 @@ annotations, species codes can be taken from the logger form. </p>
 <p class=MsoNormal>Made export of data (Calibrations, Deployments, Detections,
 and Localisations) available as Offline tasks. This is not useful when running
 Tethys on a single dataset, since all tasks can be easily performed using
-�Export� buttons on the main Tethys interface. However, this change means that
+Export buttons on the main Tethys interface. However, this change means that
 these export tasks become available to the <a
 href="https://www.pamguard.org/plugins/batchprocessor.html">batch processor</a>
 (Version 2.0 or above) which can be used to export data from multiple similar
@@ -747,8 +763,8 @@ continually reset them. </p>
 project information to store with your data. See menu item Settings/Project
 information.</p>
 
-<p class=MsoNormal>Effort' management system. New map options allow colouring
-of track line by effort' from various other modules. This is currently the
+<p class=MsoNormal>ÂEffort' management system. New map options allow colouring
+of track line by Âeffort' from various other modules. This is currently the
 acquisition system (so the track will change colour when PAMGuard is running),
 the binary store system (likely the same as the acquisition) or data from
 Logger forms. This system will be extended to other modules in the near future.
@@ -767,8 +783,8 @@ the PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
-<p class=MsoNormal>Linking clicks to offline clicks table. We had a database
-that had become corrupted so added code to relink offline clicks to their
+<p class=MsoNormal>Linking clicks to offline clicks table. We had a database that
+had become corrupted so added code to relink offline clicks to their
 corresponding clicks from binary data. </p>
 
 <p class=MsoNormal>Drawing non-acoustic data: Data that were not associated
@@ -939,14 +955,14 @@ the first two characters of the string name may be. </span></p>
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
 <p class=MsoNormal><span lang=EN-US>Use of localization sensor and orientation
-data for static hydrophones had a bug whereby it would continually forget'
+data for static hydrophones had a bug whereby it would continually Âforget'
 angle offsets applied to static hydrophones in viewer mode. This is now fixed. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event
 selection options even if no species classification options are in place. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fixed Landmarks: Earlier versions were
-losing' these every time PAMGuard started or new data were loaded in viewer
+Âlosing' these every time PAMGuard started or new data were loaded in viewer
 mode. Now fixed. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>ROCCA: Fixed (another) memory leak which
@@ -969,7 +985,7 @@ you'd expect sound from higher frequency baleen whales, such as humpbacks, to
 vocalise at. &nbsp;&nbsp;</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Hiding tool tips. A menu item to
-permanently turn off all tool tips, or tap the Esc' key to turn them off for 6
+permanently turn off all tool tips, or tap the ÂEsc' key to turn them off for 6
 seconds if they are getting in the way, particularly when trying to interact
 with displays using the mouse. </span></p>
 
@@ -1054,7 +1070,7 @@ audio files. </span></p>
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
 <p class=MsoNormal><span lang=EN-US>Soundtrap DWV import. Will now generate
-binary files even if DWV file doesn't exist (which is correct behavior in
+binary files even if DWV file doesnÂ't exist (which is correct behavior in
 quiet conditions when no clicks were detected). </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Spectrogram. Changes to stop occasional
@@ -1089,7 +1105,7 @@ running in real time. Added template names based on file names. </p>
 <p class=MsoNormal>#13 Merging files when offline processing file folders: Had
 an error introduced in last release which caused it to fail to recognise gaps
 between files, meaning that some output data (i.e. after a gap) would have an
-incorrect time stamp. This did not affect data if the merge contiguous files'
+incorrect time stamp. This did not affect data if the Âmerge contiguous files'
 option was not selected. </p>
 
 <p class=MsoNormal>#14 Logger forms data were not plotting correctly. This was
@@ -1285,7 +1301,7 @@ included in a future release. </p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>17. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
 lang=EN-US> </span>An implementation of the Generalized Power Law Detector,
-developed by Tyler Helble ([Helble et al., A generalized power-law detection
+developed by Tyler Helble ([Helble et al., ÂA generalized power-law detection
 algorithm for humpback whale vocalizations', The Journal of the Acoustical
 Society of America, vol. 131, no. 4, pp. 2682-2699, 2012) is now available. For
 details, see the online help </p>
@@ -1307,11 +1323,10 @@ name="_Latest_Beta_Version_2.01.05"></a><span lang=EN-US>&nbsp;</span></p>
 
 <h1><span lang=EN-US>Version 2.01.05 October 2020</span></h1>
 
-<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release
-(1.15.xx), PAMGuard Version 2 contains major updates. You should read and
-understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
-Version 2.00.10</a> before proceeding with installation and use of this
-version.</b></p>
+<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release (1.15.xx),
+PAMGuard Version 2 contains major updates. You should read and understand the
+notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a>
+before proceeding with installation and use of this version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
 (release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
@@ -1841,8 +1856,8 @@ lang=EN-US> </span>Updates to the Ishmael detectors.</p>
 <h1><a name="_Latest_Beta_Version_2.00.16"></a><span lang=EN-US>Beta Version
 2.00.16 May 2019</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -1960,8 +1975,8 @@ components, but we're working on that.</p>
 <h1><a name="_Latest_Beta_Version_2.00.15"></a><span lang=EN-US>Beta Version
 2.00.15 January 2019</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -2582,7 +2597,7 @@ UID's are also added to PAMGuard database tables. </span></p>
 viewer they will automatically be converted. For safety, the original binary
 files will not be overwritten and the new data will be placed in a new folder
 on your computer with the same path as the old data, but suffixed with
-_WithUID', e.g. if your binary data were previously stored in the folder
+Â_WithUID', e.g. if your binary data were previously stored in the folder
 C:\MySurvey\binarydata the new data will be written to
 C:\MySurvey\binarydata_WithUID. </span></p>
 
@@ -2745,9 +2760,9 @@ January 2017</span></h1>
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><span lang=EN-US>Bug 306. Certain methods have been querying
-AcousticDataUnit.getDuration and expecting to receive a response in
-milliseconds. However, getDuration actually returns the number of samples.
-&nbsp;This has been corrected. </span></p>
+AcousticDataUnit.getDuration and expecting to receive a response in milliseconds.
+However, getDuration actually returns the number of samples. &nbsp;This has
+been corrected. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Plug-Ins</span></b></p>
 
@@ -2765,11 +2780,11 @@ scheme can be found>here</a>. &nbsp;Plug-in modules can be downloaded from the
 PAMGuard website here, but developers are encouraged to host and maintain their
 own modules.</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Modules of interest to the general PAM
-community will remain as part of the core PAMGuard installation. However,
-specialized modules which are useful to only a small number of users have been
-removed and are available as a separate download. The following modules have
-been removed:</span></p>
+
+<p class=MsoNormal><span lang=EN-US>Modules of interest to the general PAM community
+will remain as part of the core PAMGuard installation. However, specialized
+modules which are useful to only a small number of users have been removed and
+are available as a separate download. The following modules have been removed:</span></p>
 
 <p class=MsoListParagraph style='margin-left:43.5pt;text-indent:-25.5pt'>1.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2988,9 +3003,9 @@ the future. </span></p>
 
 <p class=MsoNormal><i>Logger Form Design</i></p>
 
-<p class=MsoNormal>A GUI driven system for designing Logger forms has been
-released. Currently, this feature has no online help, but is reasonably
-intuitive compared to the old method of typing directly into the database. </p>
+<p class=MsoNormal>A GUI driven system for designing Logger forms has been released.
+Currently, this feature has no online help, but is reasonably intuitive
+compared to the old method of typing directly into the database. </p>
 
 <p class=MsoNormal><i><span lang=EN-US>Improved Number handling</span></i></p>
 
@@ -3709,9 +3724,9 @@ module. </p>
 
 <p class=MsoNormal><i>Sound Recorder Module</i></p>
 
-<p class=MsoNormal>Now supports writing 8 and 24 bit as well as 16 bit files.
-Also writes data to dated sub folders, starting a new folder each day (UTC).
-Also provides additional information on disk space on the main display panel.
+<p class=MsoNormal>Now supports writing 8 and 24 bit as well as 16 bit files. Also
+writes data to dated sub folders, starting a new folder each day (UTC). Also
+provides additional information on disk space on the main display panel.
 Millisecond time is also now included in the output file names. </p>
 
 <p class=MsoNormal><i>Datagram Options</i></p>
@@ -4393,8 +4408,8 @@ and more meaningful names in spectrogram display menu.</p>
 
 <p class=MsoNormal>Sound acquisition</p>
 
-<p class=MsoNormal>When not using NI or AISO cards PAMAGUARD acquires sound
-using javax.sound which only supports two channels. Max number of channels now
+<p class=MsoNormal>When not using NI or AISO cards PAMAGUARD acquires sound using
+javax.sound which only supports two channels. Max number of channels now
 specified as 2 rather than undefined.</p>
 
 <p class=MsoNormal>Serial Comms</p>
@@ -4792,11 +4807,11 @@ Utilities. This will not affect how existing settings files are loaded. </p>
 
 <p class=MsoNormal><b>Multi-screen environments.</b></p>
 
-<p class=MsoNormal>In previous versions, if PAMGuard was configured in a
-multiscreen environment and is then run on a single screen, it was possible
-that the display would not appear. PAMGuard now checks screen dimensions at
-start up and ensures that the main display is visible. Consequently, program
-start-up takes slightly longer than previously. </p>
+<p class=MsoNormal>In previous versions, if PAMGuard was configured in a multiscreen
+environment and is then run on a single screen, it was possible that the
+display would not appear. PAMGuard now checks screen dimensions at start up and
+ensures that the main display is visible. Consequently, program start-up takes
+slightly longer than previously. </p>
 
 <p class=MsoNormal><b>Outstanding bugs</b></p>
 
@@ -5217,8 +5232,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoNormal>&nbsp;</p>
 
 <p class=MsoNormal><a name="_Toc312065304"></a><a name="_Toc312063949"></a><span
-class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 -
-PAMGuard starts two releases, core and beta release</span></span>, </p>
+class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 - PAMGuard
+starts two releases, core and beta release</span></span>, </p>
 
 <p class=MsoNormal>this is the beta release</p>
 

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.17fe</version>
+  <version>2.02.17ffa</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -56,8 +56,8 @@
 		Linux Ubuntu based systems-->
 		<!--Note: There is a Maven bug/feature when using profiles when the plugin order is messed up and seemingly quite random. 
 		In PAMGuard it essential that the shade plugin is called before the linux plugin. Therefore explicately call 
-		the package phase using mvn package shade:shade jdeb:jdeb. Note that although a deb file can be created in Windows it
-		will not have the correct JavaFX libraries and therefore will not work when riun -->
+		the package phase using mvnclean package shade:shade org.vafer:jdeb:jdeb. Note that although a deb file can be created in Windows it
+		will not have the correct JavaFX libraries and therefore will not work when run -->
 		<profile>
 			<id>linux-profile</id>
 			<activation>
@@ -71,69 +71,65 @@
 					<plugin>
 						<artifactId>jdeb</artifactId>
 						<groupId>org.vafer</groupId>
-						<version>1.11</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>jdeb</goal>
-								</goals>
-								<configuration>
-									<controlDir>${basedir}/build/deb</controlDir>
-									<dataSet>
-										<data>
-											<!--TODO-really the jar file should be named properly but thos would mean we would 
+						<version>1.14</version>
+						<!--When calling jdeb directly from maven then the control part of the configuration needs to be here
+						for reasons not fully understood. -->
+						<configuration>
+							<controlDir>${basedir}/build/deb/control</controlDir>
+							<dataSet>
+								<data>
+									<!--TODO-really the jar file should be named properly but thos would mean we would 
 				                            have to change the name in the desktop file too. For now create a link to the jar file
 				                            with correct version number-->
-											<src>
-												${project.build.directory}/${project.build.finalName}.jar</src>
-											<type>file</type>
-											<mapper>
-												<type>perm</type>
-												<prefix>/usr/share/pamguard</prefix>
-											</mapper>
-										</data>
-										<data>
-											<src>${basedir}/liblinux</src>
-											<type>directory</type>
-											<includes>*.txt</includes>
-											<includes>*.so</includes>
-											<mapper>
-												<type>perm</type>
-												<prefix>
-													/usr/share/pamguard/liblinux</prefix>
-											</mapper>
-										</data>
-										<data>
-											<src>
-												${basedir}/build/deb/PAMGuardIcon2.png</src>
-											<type>file</type>
-											<mapper>
-												<type>perm</type>
-												<prefix>/usr/share/pamguard</prefix>
-											</mapper>
-										</data>
-										<!---THe desktop file will create a PAMGuard icon in the applications tray-->
-										<data>
-											<src>
-												${basedir}/build/deb/pamguard.desktop</src>
-											<type>file</type>
-											<mapper>
-												<type>perm</type>
-												<prefix>/usr/share/applications</prefix>
-											</mapper>
-										</data>
-										<!---Create a link which is just called Pamguard. This means the .desktop file does not need
+									<src>
+										${project.build.directory}/${project.build.finalName}.jar</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>/usr/share/pamguard</prefix>
+									</mapper>
+								</data>
+								<data>
+									<src>${basedir}/liblinux</src>
+									<type>directory</type>
+									<includes>*.txt</includes>
+									<includes>*.so</includes>
+									<mapper>
+										<type>perm</type>
+										<prefix>
+											/usr/share/pamguard/liblinux</prefix>
+									</mapper>
+								</data>
+								<data>
+									<src>
+										${basedir}/build/deb/PAMGuardIcon2.png</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>/usr/share/pamguard</prefix>
+									</mapper>
+								</data>
+								<!---THe desktop file will create a PAMGuard icon in the applications tray-->
+								<data>
+									<src>
+										${basedir}/build/deb/pamguard.desktop</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>/usr/share/applications</prefix>
+									</mapper>
+								</data>
+								<!---Create a link which is just called Pamguard. This means the .desktop file does not need
 			                            to be altered depending on the build name-->
-										<data>
-											<type>link</type>
-											<linkName>
-												/usr/share/pamguard/Pamguard</linkName>
-											<linkTarget>
-												/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
-											<symlink>true</symlink>
-										</data>
-										<!--<data>
+								<data>
+									<type>link</type>
+									<linkName>
+										/usr/share/pamguard/Pamguard</linkName>
+									<linkTarget>
+										/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
+									<symlink>true</symlink>
+								</data>
+								<!--<data>
 			                                <src>${project.basedir}/build/deb/set-java-property.sh</src>
 			                                <type>file</type>
 			                				<mapper>
@@ -142,13 +138,20 @@
 			                                    <filemode>755</filemode>
 			                                </mapper>
 			                            </data>-->
-									</dataSet>
-								</configuration>
+							</dataSet>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jdeb</goal>
+								</goals>
+
 							</execution>
 						</executions>
 					</plugin>
 				</plugins>
-				</build>
+			</build>
 		</profile>
 
 		<!-- The MacOS profile creates a DMG package for installing PAMGuard on MacOS-->
@@ -184,6 +187,7 @@
 								<JVMVersion>21+</JVMVersion>
 								<JVMArguments>
 									<string>-c</string>
+									<string>-Xmx8192m</string>
 								</JVMArguments>
 								<NSAppSleepDisabled>true</NSAppSleepDisabled>
 							</plist>
@@ -1209,7 +1213,7 @@
 		<dependency>
 			<groupId>org.pamguard</groupId>
 			<artifactId>x3</artifactId>
-			<version>2.3.0</version>
+			<version>2.3.2</version>
 		</dependency>
 
 

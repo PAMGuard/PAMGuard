@@ -5,7 +5,6 @@ import java.util.Optional;
 import PamController.SettingsPane;
 import binaryFileStorage.BinaryStore;
 import binaryFileStorage.BinaryStoreSettings;
-import javafx.stage.Stage;
 import pamViewFX.PamControlledGUIFX;
 import pamViewFX.fxNodes.pamDialogFX.PamSettingsDialogFX;
 

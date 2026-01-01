@@ -214,7 +214,7 @@ public class SourcePaneFX extends PamBorderPane {
 		channelPanel.setSpacing(5);
 		
 		if (isHasChannels()) {
-			channelLabel = new Label("ChannelS");
+			channelLabel = new Label("Channels");
 			//PamGuiManagerFX.titleFont2style(channelLabel);
 //			channelLabel.setFont(PamGuiManagerFX.titleFontSize2);
 			comboBoxPane.getChildren().add(channelLabel);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.sound.sampled.AudioInputStream;
 
+import PamUtils.worker.filelist.WavLoadListener;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import dataMap.filemaps.OfflineFileServer;
@@ -36,7 +37,7 @@ public interface PamAudioFileLoader {
 	 * Get the audio stream for the file
 	 * @return the audio input stream. 
 	 */
-	public AudioInputStream getAudioStream(File soundFile);
+	public AudioInputStream getAudioStream(File soundFile, WavLoadListener loadListener);
 
 	/**
 	 * Load a section of audio data. 
@@ -53,6 +54,7 @@ public interface PamAudioFileLoader {
 	 * @return settings pane for audio loader - can be null. 
 	 */
 	public PamAudioSettingsPane getSettingsPane();
+
 
 	
 

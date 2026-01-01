@@ -1,11 +1,15 @@
 package propagation;
 
+import java.util.Random;
+
 import PamUtils.LatLong;
 import pamMaths.PamVector;
 
 public class LogLawPropagation implements PropagationModel {
 
 	private double attenuationRate = 20;
+	
+	private Random random = new Random();
 
 	public LogLawPropagation(double attenuationRate) {
 		super();
@@ -37,11 +41,14 @@ public class LogLawPropagation implements PropagationModel {
 	public boolean setLocations(LatLong hydrophoneLatLong,
 		LatLong sourceLatLong, double speedOfSound) {
 
+		double posErr = 0;
+		double sosErr = 0;
+		speedOfSound += sosErr * random.nextGaussian();
 		/** 
 		 * work out the vector pointing from the source to the hydrophone
 		 */
-		double xDist = sourceLatLong.distanceToMetresX(hydrophoneLatLong);
-		double yDist = sourceLatLong.distanceToMetresY(hydrophoneLatLong);
+		double xDist = sourceLatLong.distanceToMetresX(hydrophoneLatLong) + posErr * random.nextGaussian();
+		double yDist = sourceLatLong.distanceToMetresY(hydrophoneLatLong) + posErr * random.nextGaussian();
 		double zDist = hydrophoneLatLong.getHeight() - sourceLatLong.getHeight();
 		pointingVector[0] = new PamVector(xDist, yDist, zDist);
 

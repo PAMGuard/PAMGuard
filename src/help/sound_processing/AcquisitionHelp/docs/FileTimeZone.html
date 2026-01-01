@@ -15,36 +15,43 @@ and time information from a file name. Characters (a-z) and be stripped automati
 the second and third '.' characters and that the rest of the name should be ignored.</p> 
 <p>To define your own file format, select 'User defined date format' then in the format field, enter a set of characters that will tell PAMGuard
 how to unpack the information.</p> 
+
 <p>For every character in the file name that is NOT part of the date, enter the # character. The number of # must exactly match 
 the number of characters preceding the date part of the name. Leading and trailing non numeric characters will also be stripped automatically 
-after characters corresponding to a # have been removed. 
-<br>For the date section, Java lays down strict rules for how each character should be represented details of 
-which are <a href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html">here</a> and below. 
-Note that most of these are case sensitive, e.g. MM is for month and mm is for minute. 
+after characters corresponding to a # have been removed.</p> 
 
+<p>For the date section, Java lays down strict rules for how each character should be represented details of 
+which are <a href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html">here</a> and below. 
+Note that most of these are case sensitive. </p>
+
+<p>When entering a data format, be very careful. For instance 'hh' will be interpreted as a 12 hour time format, which 
+will lead to errors. 'HH' is the correct character sequence for 24 hour time. Also be very careful of the difference between
+'MM' for month and 'mm' for minutes, and between lower case 'ss' for seconds and upper case 'SSS' for milliseconds.</p>
+ 
+<p>The table below shows all available format specifiers. The ones you're most likely to use are highlighted in bold type</p>
 
 <table>
 <tr><th>Letter</th> 	<th>Date or Time Component</th> 	<th>Presentation</th> 	<th>Examples</th></tr>
 <tr><td>G</td> <td>Era designator</td> <td>	Text</td> <td>AD</td></tr>
-<tr><td>y</td> <td>Year</td> <td>	Year</td> <td>1996; 96</td></tr>
+<tr><td><b>y</b></td> <td><b>Year</b></td> <td>	<b>Year</b></td> <td><b>1996; 96</b></td></tr>
 <tr><td>Y</td> <td>Week year</td> <td>	Year</td> <td>2009; 09</td></tr>
-<tr><td>M</td> <td>Month in year (context sensitive)</td> <td>Month</td> <td>	July; Jul; 07</td></tr>
+<tr><td><b>M</b></td> <td><b>Month in year (context sensitive)</b></td> <td><b>Month</b></td> <td>	<b>July; Jul; 07</b></td></tr>
 <tr><td>L</td> <td>Month in year (standalone form)</td> <td>Month</td> <td>	July; Jul; 07</td></tr>
 <tr><td>w</td> <td>Week in year</td> <td>Number</td> <td>27</td></tr>
 <tr><td>W</td> <td>Week in month</td> <td>Number</td> <td>2</td></tr>
 <tr><td>D</td> <td>Day in year</td> <td>Number</td> <td>189</td></tr>
-<tr><td>d</td> <td>Day in month</td> <td>Number</td> <td>10</td></tr>
+<tr><td><b>d</b></td> <td><b>Day in month</b></td> <td><b>Number</b></td> <td><b>10</b></td></tr>
 <tr><td>F</td> <td>Day of week in month</td> <td>Number</td> <td>2</td></tr>
 <tr><td>E</td> <td>Day name in week</td> <td>Text</td> <td>Tuesday; Tue</td></tr>
 <tr><td>u</td> <td>Day number of week (1 = Monday, ..., 7 = Sunday)</td> <td>Number</td> <td>	1</td></tr>
 <tr><td>a</td> <td>Am/pm marker</td> <td>Text</td> <td>	PM</td></tr>
-<tr><td>H</td> <td>Hour in day (0-23)</td> <td>Number</td> <td>0</td></tr>
+<tr><td><b>H</b></td> <td><b>Hour in day (0-23)</b></td> <td><b>Number</b></td> <td><b>0</b></td></tr>
 <tr><td>k</td> <td>Hour in day (1-24)</td> <td>Number</td> <td>24</td></tr>
 <tr><td>K</td> <td>Hour in am/pm (0-11)</td> <td>Number</td> <td>0</td></tr>
 <tr><td>h</td> <td>Hour in am/pm (1-12)</td> <td>Number</td> <td>12</td></tr>
-<tr><td>m</td> <td>Minute in hour</td> <td>	Number</td> <td>30</td></tr>
-<tr><td>s</td> <td>Second in minute</td> <td>	Number</td> <td>55</td></tr>
-<tr><td>S</td> <td>Millisecond</td> <td>	Number</td> <td>978</td></tr>
+<tr><td><b>m</b></td> <td><b>Minute in hour</b></td> <td>	<b>Number</b></td> <td><b>30</b></td></tr>
+<tr><td><b>s</b></td> <td><b>Second in minute</b></td> <td><b>Number</b></td> <td><b>55</b></td></tr>
+<tr><td><b>S</b></td> <td><b>Millisecond</b></td> <td><b>Number</b></td> <td><b>978</b></td></tr>
 <tr><td>z</td> <td>Time zone</td> <td>	General time zone</td> <td>Pacific Standard Time; PST; GMT-08:00</td></tr>
 <tr><td>Z</td> <td>Time zone</td> <td>	RFC 822 time zone</td> <td>-0800</td></tr>
 <tr><td>X</td> <td>Time zone</td> <td>	ISO 8601 time zone</td> <td>-08; -0800; -08:00</td></tr>

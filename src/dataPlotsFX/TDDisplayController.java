@@ -94,7 +94,7 @@ public class TDDisplayController extends UserDisplayControlFX {
 	@Override
 	public void notifyModelChanged(int type){
 //		System.out.println("---------------------------------" ); 
-		System.out.println("TDisplayController: flag: " + type); 
+		//System.out.println("TDisplayController: flag: " + type); 
 		super.notifyModelChanged(type);
 		switch (type){
 		case PamControllerInterface.INITIALIZATION_COMPLETE:

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.controlsfx.control.RangeSlider;
-import org.controlsfx.control.decoration.Decorator;
-import org.controlsfx.control.decoration.GraphicDecoration;
-import org.controlsfx.control.decoration.StyleClassDecoration;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
@@ -23,7 +20,9 @@ import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
@@ -34,7 +33,6 @@ import pamViewFX.fxNodes.sliders.ColourRangeSlider;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 import pamViewFX.fxPlotPanes.PlotPane;
-import pamViewFX.validator.PamValidator;
 import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSound;
 import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory;
 import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
@@ -66,7 +64,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 	/**
 	 * Choice box to select which transform to preview. 
 	 */
-	private ChoiceBox<DLTransform> transformschoiceBox; 
+	private ComboBox<DLTransform> transformschoiceBox; 
 
 	/**
 	 * Example sound factory. 
@@ -144,7 +142,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 		}); 
 
 		//create choice box for time slider.
-		transformschoiceBox	 = new ChoiceBox<DLTransform>(); 
+		transformschoiceBox	 = new ComboBox<DLTransform>(); 
 		transformschoiceBox.valueProperty().addListener((obsval, oldval, newval)->{
 			updateTransformImage();
 			//			calcTimeBins(transformsR);
@@ -152,6 +150,21 @@ public abstract class DLTransformImage extends PamBorderPane{
 		});
 		transformschoiceBox.setConverter(new DLTransformConverter());
 		transformschoiceBox.setPrefWidth(170); 
+		
+		
+//		
+//		 // Use a CellFactory to control the display
+//		transformschoiceBox.setCellFactory(param -> new ListCell<DLTransform>() {
+//            @Override
+//            protected void updateItem(DLTransform item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (empty || item == null) {
+//                    setText(null);
+//                } else {
+//                    setText(item.getName());
+//                }
+//            }
+//        });
 
 		plotPane.getPlotCanvas().widthProperty().addListener((obsval, oldval, newval)->{
 			plotPane.repaint();
@@ -187,7 +200,8 @@ public abstract class DLTransformImage extends PamBorderPane{
 			updateExampleSound(newval); 
 		});
 		speciesChoiceBox.getSelectionModel().select(0);
-		speciesChoiceBox.setPrefWidth(170); 
+		speciesChoiceBox.setPrefWidth(150); 
+		
 
 		PamHBox hBox = new PamHBox(); 
 		hBox.setAlignment(Pos.CENTER_RIGHT);
@@ -369,7 +383,6 @@ public abstract class DLTransformImage extends PamBorderPane{
 
 		setErrorMessage(null); 
 
-
 		if  (this.exampleSound==null) {
 			System.err.println("DLTRanfromImage.updateTransformImage: the example sound is null"); 
 			return false; 
@@ -386,16 +399,24 @@ public abstract class DLTransformImage extends PamBorderPane{
 
 		int i = 0;
 		String errCheck;
+		
+		int selectedIndex = transformschoiceBox.getSelectionModel().getSelectedIndex();
 		//update all the transforms with the transformed data
-		for (i=0; i<transformschoiceBox.getSelectionModel().getSelectedIndex()+1; i++) {
+		for (i=0; i<selectedIndex+1; i++) {
 			errCheck = checkTransform(getDLTransforms().get(i), currentTransform);
 			if (errCheck!=null) {
 				setErrorMessage("Error in " + getDLTransforms().get(i).getDLTransformType() + " - " + errCheck); 
 				return false;
 			}
 			//				System.out.println("TRANSFROM IMAGE 1: " + currentTransform.getDLTransformType() + " index: " + i + " " + ((WaveTransform) currentTransform).getWaveData().getSampleAmplitudes().length);
+			
+			
 			currentTransform = getDLTransforms().get(i).transformData(currentTransform);
-			//				System.out.println("TRANSFROM IMAGE 2: " + currentTransform.getDLTransformType() + " index: " + i + " " + ((WaveTransform) currentTransform).getWaveData().getSampleAmplitudes().length);
+//			if (currentTransform instanceof FreqTransform)	{
+//				System.out.println("TRANSFROM IMAGE 1: " + currentTransform.getDLTransformType() + " index: " + i + " " + ((FreqTransform) currentTransform).getSpecTransfrom().getReal().length + " " + ((FreqTransform) currentTransform).getSpecTransfrom().getReal()[0].length);
+//			}
+
+//						System.out.println("TRANSFROM IMAGE 2: " + currentTransform.getDLTransformType() + " index: " + i + " " + transformschoiceBox.getSelectionModel().getSelectedIndex() + " " + currentTransform);
 		}
 
 		if (currentTransform instanceof FreqTransform) {
@@ -574,7 +595,6 @@ public abstract class DLTransformImage extends PamBorderPane{
 			break;
 		default:
 			break;
-
 		}
 		return error;
 	}
@@ -594,11 +614,16 @@ public abstract class DLTransformImage extends PamBorderPane{
 
 			if (specImage!=null) {
 				//work out how to paint with time slider settings. 
+				WritableImage image = specImage.getRawSpecImage();
+				if (specImage.getRawSpecImage()==null) {
+					//something has gone wrong with the image
+					setErrorMessage("Error creating spectrogram image. Check the transforms and example sound.");
+				}
 
-				double x1 = (timeSlider.getLowValue()/(timeSlider.getMax()-timeSlider.getMin()))*specImage.getRawSpecImage().getWidth();
-				double x2 = (timeSlider.getHighValue()/(timeSlider.getMax()-timeSlider.getMin()))*specImage.getRawSpecImage().getWidth();
+				double x1 = (timeSlider.getLowValue()/(timeSlider.getMax()-timeSlider.getMin()))*image.getWidth();
+				double x2 = (timeSlider.getHighValue()/(timeSlider.getMax()-timeSlider.getMin()))*image.getWidth();
 
-				getPlotCanvas().getGraphicsContext2D().drawImage(specImage.getRawSpecImage(), x1, 0, x2-x1, specImage.getRawSpecImage().getHeight(),  0, 0, 
+				getPlotCanvas().getGraphicsContext2D().drawImage(image, x1, 0, x2-x1, image.getHeight(),  0, 0, 
 						getPlotCanvas().getWidth(), getPlotCanvas().getHeight());
 
 			}

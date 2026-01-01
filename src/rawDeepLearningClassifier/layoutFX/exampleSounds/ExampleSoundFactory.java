@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors; 
 
-import simulatedAcquisition.sounds.SimSignal;
-
 /**
  * The example sound factory
  * @author Jamie Macaulay 
@@ -28,7 +26,7 @@ public class ExampleSoundFactory {
 
 	    SPERM_WHALE("Sperm Whale (Physeter macrocephalus)", ExampleSoundCategory.ODONTOCETES_CLICKS),
 	    
-	    DOLPHIN("Dolphin (Delphinid)", ExampleSoundCategory.ODONTOCETES_CLICKS),
+	    DOLPHIN("Dolphin click (Delphinid)", ExampleSoundCategory.ODONTOCETES_CLICKS),
 	    
 	    BEAKED_WHALE("Beaked Whale (Ziphiidae)", ExampleSoundCategory.ODONTOCETES_CLICKS),
 		
@@ -38,9 +36,11 @@ public class ExampleSoundFactory {
 		
 		MINKE_WHALE("Minke Whale (Balaenoptera spp.)", ExampleSoundCategory.MYSTICETES),
 				
-		HUMPBACK_WHALE("Humpback whale (Megaptera novaeangliae) ", ExampleSoundCategory.MYSTICETES),
+		HUMPBACK_WHALE("Humpback whale (Megaptera novaeangliae)", ExampleSoundCategory.MYSTICETES),
 
-		BLUE_WHALE("Blue whale (Balaenoptera musculus) ", ExampleSoundCategory.MYSTICETES);
+		BLUE_WHALE("Blue whale (Balaenoptera musculus)", ExampleSoundCategory.MYSTICETES),
+		
+		DOLPHIN_WHISTLE("Dolphin whistle (Delphinid)", ExampleSoundCategory.OCONTOCETES_TONAL);
 
 	    private final String text;
 	    
@@ -87,8 +87,7 @@ public class ExampleSoundFactory {
 				  .filter(c -> c.getCategory().equals(category))
 				  .collect(Collectors.toList());
 		
-		return resultSet;
-		
+		return resultSet;		
 	}
 
 	/**
@@ -271,6 +270,10 @@ public class ExampleSoundFactory {
 			break;
 		case BLUE_WHALE:
 			path = getClass().getResource("/Resources/exampleSounds/Blue_whale.wav"); 
+			exampleSound = new SimpleExampleSound(path); 			
+			break;
+		case DOLPHIN_WHISTLE:
+			path = getClass().getResource("/Resources/exampleSounds/dolphin_whistle.wav"); 
 			exampleSound = new SimpleExampleSound(path); 			
 			break;
 		default:

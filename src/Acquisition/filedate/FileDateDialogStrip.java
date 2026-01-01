@@ -3,6 +3,7 @@ package Acquisition.filedate;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,8 +22,8 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import PamUtils.PamCalendar;
+import PamUtils.worker.filelist.WavFileType;
 import PamView.component.PamSettingsIconButton;
-import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
 
 /**
@@ -50,13 +51,26 @@ public class FileDateDialogStrip {
 	
 	private ArrayList<FileDateObserver> observers = new ArrayList<>();
 
+	/**
+	 * Shows the number of files that have been loaded
+	 */
+	private JLabel numberFilesLabel;
+	
+	/**
+	 * The previous color of the number of files label. This not a nice way to do
+	 * things but is quite hard in Swing to get the default color.
+	 */
+	private Color previousLabelTextCol = null;
+
+
 	public FileDateDialogStrip(FileDate fileDate, Window parent) {
 		this.fileDate = fileDate;
 		this.parent = parent;
 		settingsButton = new JButton(settingsIcon);
 		formatLabel = new JLabel(" ");
 		fileTime = new JTextField(20); 
-		
+		numberFilesLabel  = new JLabel(" ");
+		previousLabelTextCol = numberFilesLabel.getForeground();
 		
 		mainPanel = new JPanel(new BorderLayout());
 		
@@ -74,10 +88,17 @@ public class FileDateDialogStrip {
 		c.gridx++;
 		PamPanel.addComponent(centPanel, settingsButton, c);
 		
-		//keep the lable below the text box
+		//keep the label below the text box
 		c.gridx = 1; 
+		
+		FlowLayout flowLayout = new FlowLayout( FlowLayout.CENTER, 5, 5);
+		PamPanel formatPanel = new PamPanel(flowLayout);
+		formatPanel.add(formatLabel);
+		formatPanel.add(numberFilesLabel);
 	
-		PamPanel.addComponent(centPanel, formatLabel, c);
+		c.gridwidth=2;
+		PamPanel.addComponent(centPanel, formatPanel, c);
+	
 		
 		mainPanel.add(BorderLayout.WEST, centPanel);
 		
@@ -140,5 +161,33 @@ public class FileDateDialogStrip {
 	
 	public boolean removeObserver(FileDateObserver observer) {
 		return observers.remove(observer);
+	}
+
+
+	public void setNfiles(String format) {
+		numberFilesLabel.setText(format);
+	}
+
+
+	/**
+	 * Set the number of files label
+	 * @param allFiles - a list of available files
+	 */
+	public void setNfiles(ArrayList<WavFileType> allFiles) {
+		
+		if (allFiles == null || allFiles.size() == 0) {
+			//make the label red to indicate no files found.
+			if (previousLabelTextCol == null) {
+				previousLabelTextCol = numberFilesLabel.getForeground();
+			}
+			
+			numberFilesLabel.setText("No files found");
+			numberFilesLabel.setForeground(Color.RED);
+		}
+		else {
+			//reset to normal color and show number of files.
+			numberFilesLabel.setText(allFiles.size() + (allFiles.size() > 1 ? " files" : " file"));
+			if (previousLabelTextCol!=null) numberFilesLabel.setForeground(previousLabelTextCol); 
+		}
 	}
 }

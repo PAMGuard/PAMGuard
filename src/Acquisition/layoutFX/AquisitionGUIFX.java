@@ -5,7 +5,10 @@ import Acquisition.AcquisitionParameters;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.SettingsPane;
+import javafx.scene.layout.Pane;
 import pamViewFX.PamControlledGUIFX;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxNodes.PamBorderPane;
 
 /**
  * FX GUI for the SoundAquisition module. 
@@ -23,6 +26,7 @@ public class AquisitionGUIFX extends PamControlledGUIFX {
 	 * Reference to the Sound Aquisition control. 
 	 */
 	private AcquisitionControl aquisitionControl;
+	
 
 	public AquisitionGUIFX(AcquisitionControl aquisitionControl) {
 		this.aquisitionControl=aquisitionControl; 
@@ -34,9 +38,12 @@ public class AquisitionGUIFX extends PamControlledGUIFX {
 			acquisitionPane=new AcquisitionPaneFX(aquisitionControl);
 		}
 		acquisitionPane.setParams(aquisitionControl.getAcquisitionParameters());
+
+		
 		return acquisitionPane;
 	}
 	
+
 
 	/**
 	 * This is called whenever a settings pane is closed. If a pamControlledUnit has

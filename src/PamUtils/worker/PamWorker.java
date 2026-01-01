@@ -147,6 +147,7 @@ public class PamWorker<T> {
 		@Override
 		protected void process(List<PamWorkProgressMessage> chunks) {
 			for (PamWorkProgressMessage msg:chunks) {
+				//System.out.println("PamWorker: msg: " + msg.textLines[0] +  " progress: " + msg.progress +   " " + this);
 				if (pamWorkDialog!=null) {
 					pamWorkDialog.update(msg);
 				}

@@ -152,6 +152,10 @@ public class BinaryStoreSettingsPaneFX extends SettingsPane<BinaryStoreSettings>
 
 	@Override
 	public void setParams(BinaryStoreSettings input) {
+		if (input == null) {
+			System.err.println("The binary store settings are null");
+			return;
+		}
 		binaryStoreSettings=input.clone();
 //		
 		storageLocation.setFolderName(binaryStoreSettings.getStoreLocation());

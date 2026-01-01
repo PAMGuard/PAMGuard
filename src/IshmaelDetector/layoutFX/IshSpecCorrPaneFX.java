@@ -11,13 +11,13 @@ import PamController.SettingsPane;
  * @author Jamie Macaulay 
  *
  */
-public class IshSpecCorrelationPaneFX extends IshPaneFX {
+public class IshSpecCorrPaneFX extends IshPaneFX {
 
-	private  SpecCorrelationPane specCorrelationPane;
+	private  SpecCorrPane specCorrelationPane;
 
 	private SgramCorrControl specIshDetControl; 
 
-	public IshSpecCorrelationPaneFX(SgramCorrControl specIshDetControl) {
+	public IshSpecCorrPaneFX(SgramCorrControl specIshDetControl) {
 		super(specIshDetControl);
 		this.specIshDetControl=specIshDetControl; 
 		// TODO Auto-generated constructor stub
@@ -26,7 +26,7 @@ public class IshSpecCorrelationPaneFX extends IshPaneFX {
 	@Override
 	public SettingsPane<IshDetParams> getDetectorPane() {
 		if (specCorrelationPane==null) {
-			specCorrelationPane= new SpecCorrelationPane(specIshDetControl); 
+			specCorrelationPane= new SpecCorrPane(specIshDetControl); 
 		}
 		return specCorrelationPane;
 	}

@@ -2,12 +2,10 @@ package PamUtils.worker.filelist;
 
 import java.io.File;
 
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
 import Acquisition.pamAudio.PamAudioFileManager;
-import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamGUIManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -57,10 +55,11 @@ public class WavFileType extends File {
 	public WavFileType(File baseFile) {
 		super(baseFile.getAbsolutePath());
 		
-		//this is a temporary hack as FX GUI uses the audioformat. Not neat. 
-		if (PamGUIManager.isFX()) {
-			this.setAudioInfo(getAudioFormat(baseFile));
-		}
+//		//this is a temporary hack as FX GUI uses the audioformat. Not neat. 
+//		if (PamGUIManager.isFX()) {
+//			System.out.println("WavFileType: Getting AudioFormat for " + baseFile.getName());
+//			this.setAudioInfo(getAudioFormat(baseFile));
+//		}
 	}
 
 	/**
@@ -76,8 +75,16 @@ public class WavFileType extends File {
 	 * @return the audioInfo
 	 */
 	public AudioFormat getAudioInfo() {
+		return getAudioInfo(null);
+	}
+	
+	
+	/**
+	 * @return the audioInfo
+	 */
+	public AudioFormat getAudioInfo(WavLoadListener loadListener) {
 		if (audioInfo == null) {
-			audioInfo = getAudioFormat();
+			audioInfo = getAudioFormat(loadListener);
 		}
 		return audioInfo;
 	}
@@ -86,17 +93,17 @@ public class WavFileType extends File {
 	 * Get the audio format. 
 	 * @return the audio format.
 	 */
-	private AudioFormat getAudioFormat() {
-		return getAudioFormat(this);
+	private AudioFormat getAudioFormat(WavLoadListener loadListener) {
+		return getAudioFormat(this,loadListener );
 	}
 	
 	/**
 	 * Get the audio format. 
 	 * @return the audio format.
 	 */
-	public AudioFormat getAudioFormat(File file) {
+	public AudioFormat getAudioFormat(File file, WavLoadListener loadListener) {
 		try {
-			AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
+			AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file, loadListener);
 			if (audioStream == null) {
 				return null;
 			}
@@ -121,6 +128,7 @@ public class WavFileType extends File {
 		}
 		return null;
 	}
+	
 
 	/**
 	 * Get the duration of the sound file in seconds
@@ -230,5 +238,7 @@ public class WavFileType extends File {
 		String thatN = oth.getName();
 		return thisN.compareTo(thatN);
 	}
+
+
 
 }

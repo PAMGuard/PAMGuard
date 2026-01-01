@@ -23,7 +23,9 @@ public class DatagramScaleInformation {
 	/**
 	 * @param minValue
 	 * @param maxValue
+	 * @param units
 	 * @param logScale
+	 * @param displayType (PLOT_3D or PLOT_2D)
 	 */
 	public DatagramScaleInformation(double minValue, double maxValue, String units, 
 			boolean logScale, int displayType) {

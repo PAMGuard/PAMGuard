@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import IshmaelDetector.layoutFX.IshSpecCorrelationPaneFX;
+import IshmaelDetector.layoutFX.IshSpecCorrPaneFX;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
@@ -34,7 +34,7 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 	/**
 	 * Settings pane for the Ishamel Correlation (should be in a Swing GUI class but here for now). 
 	 */
-	private IshSpecCorrelationPaneFX settingsPane;
+	private IshSpecCorrPaneFX settingsPane;
 
 	public SgramCorrControl(String unitName) {
 		super("Spectrogram Correlation Detector", unitName, new SgramCorrParams());
@@ -80,17 +80,17 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 
 	@Override
 	public void showParamsDialog1(Frame parentFrame) {
-		SgramCorrParams newParams =
-			SgramCorrParamsDialog.showDialog2(parentFrame, (SgramCorrParams)ishDetParams);
+//		SgramCorrParams newParams =
+//			SgramCorrParamsDialog.showDialog2(parentFrame, (SgramCorrParams)ishDetParams);
 		
-//		//the FX GUI is new and shiny but a little complicated to get working with Swing. 
-//		if (settingsDialog == null || parentFrame != settingsDialog.getOwner()) {
-//			IshSpecCorrelationPaneFX setPane = getSettingsPane();
-//			settingsDialog = new PamDialogFX2AWT<IshDetParams>(parentFrame, setPane, false);
-//			settingsDialog.setResizable(false);
-//		}
+		//the FX GUI is new and shiny but a little complicated to get working with Swing. 
+		if (settingsDialog == null || parentFrame != settingsDialog.getOwner()) {
+			IshSpecCorrPaneFX setPane = getSettingsPane();
+			settingsDialog = new PamDialogFX2AWT<IshDetParams>(parentFrame, setPane, false);
+			settingsDialog.setResizable(false);
+		}
 //		
-//		EnergySumParams newParams = (EnergySumParams) settingsDialog.showDialog(ishDetParams);
+		SgramCorrParams newParams = (SgramCorrParams) settingsDialog.showDialog(ishDetParams);
 //		
 		installNewParams(parentFrame, newParams);
 	}
@@ -99,9 +99,9 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 	 * Get the settings pane. 
 	 * @return the settings pane. 
 	 */
-	public IshSpecCorrelationPaneFX getSettingsPane(){
+	public IshSpecCorrPaneFX getSettingsPane(){
 		if (this.settingsPane==null){
-			settingsPane= new IshSpecCorrelationPaneFX(this); 
+			settingsPane= new IshSpecCorrPaneFX(this); 
 		}
 		return settingsPane; 
 	}

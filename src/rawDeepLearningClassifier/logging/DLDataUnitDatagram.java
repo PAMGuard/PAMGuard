@@ -35,7 +35,9 @@ public class DLDataUnitDatagram implements DatagramProvider {
 		
 		if (dlDataUnit.getPredicitionResult().getPrediction()!=null) {
 			for (int i=0; i<dlDataUnit.getPredicitionResult().getPrediction().length; i++) {
-				dataGramLine[i] += (float) dlDataUnit.getPredicitionResult().getPrediction()[i]; 
+				if (i<dataGramLine.length) {
+					dataGramLine[i] += (float) dlDataUnit.getPredicitionResult().getPrediction()[i]; 
+				}
 			}
 		}
 
