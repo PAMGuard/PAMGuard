@@ -47,9 +47,9 @@ public class DVAnnotationWrapper extends OneStopAnnotationHandler {
 		if (exHandler == null) {
 			return;
 		}
-		if (exHandler.findAnnotationType(UserFormAnnotationType.class) == null) {
-			exHandler.addAnnotationType(new UserFormAnnotationType(getPamDataBlock()));
-		}
+//		if (exHandler.findAnnotationType(UserFormAnnotationType.class) == null) {
+//			exHandler.addAnnotationType(new UserFormAnnotationType(getPamDataBlock()));
+//		}
 		
 	}
 

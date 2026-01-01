@@ -3003,6 +3003,10 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			else {
 				directDrawProjector.setPamSymbolChooser(null);
 			}
+			boolean cont = usedDataBlock.getOverlayDraw().preDrawAnything(g, usedDataBlock, directDrawProjector);
+			if (cont == false) {
+				return;
+			}
 			try {
 				//				System.out.println("Unlocked" + usedDataBlock.getDataName());
 				iterator = usedDataBlock.getListIterator(PamDataBlock.ITERATOR_END);

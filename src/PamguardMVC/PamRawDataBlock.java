@@ -71,7 +71,15 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		if (pamDataUnits.isEmpty())
 			return 0;
 		int n = super.removeOldUnitsT(getLastUnitMillis());
+//		System.out.printf("%d units removed from %s in removeOldUnitsT\n", n, getLongDataName());
 //		checkIntegrity();
+		return n;
+	}
+
+	@Override
+	protected int removeOldUnitsS(long mastrClockSample) {
+		int n = super.removeOldUnitsS(mastrClockSample);
+//		System.out.printf("%d units removed from %s in removeOldUnitsS\n", n, getLongDataName());
 		return n;
 	}
 
@@ -224,7 +232,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				// try to load some data !
 				if (parentProcess != null) {
 					this.clearAll();
-					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 1);
+					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 20);
 				}
 			}
 		}
@@ -642,6 +650,20 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	public DCFilter getDcFilter() {
 		return dcFilter;
 	}
+
+	@Override
+	public void clearAll() {
+//		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//		System.out.printf("ClearAll() in %s called from %s\n", getLongDataName(), stack[2].toString());
+		super.clearAll();
+	}
+
+	@Override
+	public void clearAll(boolean andDownStream) {
+//		System.out.printf("ClearAll(%s) called in %s\n", Boolean.valueOf(andDownStream).toString(), getLongDataName());
+		super.clearAll(andDownStream);
+	}
+
 
 
 

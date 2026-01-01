@@ -89,6 +89,7 @@ public class DVLoader {
 		}
 		/**
 		 * will need to add data selectors to this sometime soon. 
+		 * Also, only load data within the time limits for this display. 
 		 */
 		ArrayList<PamDataUnit> data = detectorData.getDataCopy();
 		int nUnits = data.size();
@@ -140,6 +141,7 @@ public class DVLoader {
 			if (oldl != null) {
 				oldl.clearRequestingObservers();
 			}
+//			rawData = raw.getSamplesForMillis(t1-1000, t2-t1+2000, aData.getChannelBitmap());
 			RawDataUnit[] loadedData = raw.getAvailableSamples(t1-1000, t2-t1+2000, aData.getChannelBitmap(), true);
 			rawData = raw.getSamplesForMillis(t1, t2-t1, aData.getChannelBitmap());
 		}

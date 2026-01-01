@@ -114,8 +114,10 @@ public class PamFFTWorker {
 						if (store == null) {
 							continue;
 						}
-						FFTDataUnit fftDataUnit = store.tempData.get(i);
-						fftDataBlock.addPamData(fftDataUnit);
+						if (store.tempData.size() > i) {
+							FFTDataUnit fftDataUnit = store.tempData.get(i);
+							fftDataBlock.addPamData(fftDataUnit);
+						}
 					}
 				}
 				// now clear the stores

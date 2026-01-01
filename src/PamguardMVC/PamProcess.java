@@ -953,7 +953,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 //		if (getParentDataBlock() == null) {
 //			return PamDataBlock.REQUEST_NO_DATA;
 //		}
-		return getOfflineData(new OfflineDataLoadInfo(this, endUser, startMillis, endMillis, loadKeepLayers-1, true));
+		return getOfflineData(new OfflineDataLoadInfo(this, endUser, startMillis, endMillis, loadKeepLayers, true));
 	}
 	
 	

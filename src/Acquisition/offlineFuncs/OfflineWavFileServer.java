@@ -263,8 +263,8 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			return false; 
 		}
 		
-		return audioFile.loadAudioData(this, dataBlock, offlineLoadDataInfo, loadObserver); 
-		
+		boolean ans = audioFile.loadAudioData(this, dataBlock, offlineLoadDataInfo, loadObserver); 
+		return ans;
 	}
 
 }

@@ -72,10 +72,13 @@ public class DVProcess extends PamguardMVC.PamProcess {
 		setParentDataBlock(detectorDataBlock);
 		
 		PamRawDataBlock newInput = (PamRawDataBlock) dvControl.getPamConfiguration().getDataBlockByLongName(params.rawDataName);
-		if (newInput != inputRawData && inputRawData != null) {
-			inputRawData.deleteObserver(this);
+		if (newInput != null) {
+			if (inputRawData != null) {
+				inputRawData.deleteObserver(this);
+			}
 			inputRawData = newInput;
 			inputRawData.addInstantObserver(this);
+			setSampleRate(inputRawData.getSampleRate(), true);
 		}
 		
 		sortAnnotationHandler(detectorDataBlock);
@@ -86,7 +89,12 @@ public class DVProcess extends PamguardMVC.PamProcess {
 
 	private void sortAnnotationHandler(PamDataBlock detectorDataBlock) {
 		if (annotationHandler == null || annotationHandler.getPamDataBlock() != detectorDataBlock) {
-			annotationHandler = new DVAnnotationWrapper(detectorDataBlock.getAnnotationHandler(), dvControl, detectorDataBlock);
+			if (detectorDataBlock.getAnnotationHandler() != null) {
+				annotationHandler = new DVAnnotationWrapper(detectorDataBlock.getAnnotationHandler(), dvControl, detectorDataBlock);
+			}
+			else {
+				annotationHandler = null;
+			}
 		}
 //		annotationHandler = detectorDataBlock.getAnnotationHandler();
 //		if (annotationHandler == null) {
@@ -138,6 +146,16 @@ public class DVProcess extends PamguardMVC.PamProcess {
 	 */
 	public DVAnnotationWrapper getAnnotationHandler() {
 		return annotationHandler;
+	}
+
+	@Override
+	public void setSampleRate(float sampleRate, boolean notify) {
+		if (inputRawData != null) {
+			super.setSampleRate(inputRawData.getSampleRate(), false);
+		}
+		else {
+			super.setSampleRate(sampleRate, notify);
+		}
 	}
 
 }

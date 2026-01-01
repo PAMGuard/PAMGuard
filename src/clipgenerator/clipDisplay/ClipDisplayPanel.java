@@ -47,6 +47,7 @@ import PamguardMVC.dataSelector.DataSelectorChangeListener;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.ClipProcess;
+import pamScrollSystem.ScrollPaneAddon;
 import soundPlayback.ClipPlayback;
 
 /**
@@ -126,6 +127,8 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		
 		PamDataBlock<ClipDataUnit> dataBlock = clipDisplayParent.getClipDataBlock();
 		if (dataBlock != null) {
+			// this sets the display panel sample rate, which might be 
+			// incorrect. 
 			dataBlock.addObserver(new ClipObserver());
 		}
 
@@ -205,6 +208,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
+//			clipDisplayParent.ge
 			newSampleRate(sampleRate);
 		}
 
@@ -243,7 +247,10 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		synchronized (unitsPanel.getTreeLock()) {
 			//TODO: Add logic to sort by time of (manual) selection, clip start time, and maybe by hydrophone 
 			if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-				unitsPanel.add(clipDisplayUnit.getComponent(), -1);
+				// see if we're actually in the time for this. 
+				if (shouldDisplayClip(clipDisplayUnit)) {
+					unitsPanel.add(clipDisplayUnit.getComponent(), -1);
+				}
 			}
 			else {
 				unitsPanel.add(clipDisplayUnit.getComponent(), clipDisplayParameters.newClipOrder);
@@ -255,6 +262,21 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 			removeOldClips();
 			updatePanel();
 		}
+	}
+
+	private boolean shouldDisplayClip(ClipDisplayUnit clipDisplayUnit) {
+		if (isViewer == false) {
+			return true;
+		}
+		ScrollPaneAddon scrollButts = displayControlPanel.getScrollButtons();
+		if (scrollButts == null) {
+			return true;
+		}
+		long maxMillis = scrollButts.getMaximumMillis();
+		long minMillis = scrollButts.getMinimumMillis();
+		ClipDataUnit clipUnit = clipDisplayUnit.getClipDataUnit();
+		long t = clipUnit.getTimeMilliseconds();
+		return t>=minMillis && t <= maxMillis;
 	}
 
 	/**
@@ -464,7 +486,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		updatePanelLater();
 	}
 
-	private void newSampleRate(float sampleRate) {
+	protected void newSampleRate(float sampleRate) {
 		this.setSampleRate(sampleRate);
 	}
 

@@ -5,6 +5,7 @@ import PamUtils.Coordinate3d;
 import PamUtils.PamCoordinate;
 import PamView.GeneralProjector;
 //import gov.nasa.worldwind.render.ScreenCreditController;
+import PamView.HoverData;
 
 /**
  * Spectrgoram projector for drawing directly onto the spectrogram display. 
@@ -196,6 +197,11 @@ public class DirectDrawProjector extends GeneralProjector<Coordinate3d> {
 	 */
 	public void setLogScale(boolean isLogScale) {
 		this.isLogScale = isLogScale;
+	}
+	@Override
+	public synchronized void addHoverData(HoverData hoverData) {
+		hoverData.setSubPlotNumber(panelId);
+		super.addHoverData(hoverData);
 	}
 
 }
