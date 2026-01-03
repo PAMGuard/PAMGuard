@@ -66,7 +66,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 	protected ClipDisplayParameters clipDisplayParameters = new ClipDisplayParameters();
 	
-	private ClipDisplayProjector clipDisplayProjector;
+//	private ClipDisplayProjector clipDisplayProjector;
 	
 	private ClipDisplayMarker clipDisplayMarker;
 
@@ -101,7 +101,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		clipFont = new Font("Arial", Font.PLAIN, 10);
 		displayPanel = new ClipMainPanel(new BorderLayout());
 
-		clipDisplayProjector = new ClipDisplayProjector(this);
+//		clipDisplayProjector = new ClipDisplayProjector(this);
 		
 		unitsPanel = new PamPanel(clipLayout = new ClipLayout(FlowLayout.LEFT));
 		unitsPanel.addMouseListener(unitsMouse = new UnitsMouse());
@@ -141,17 +141,17 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 //		selectedClips = new ArrayList<>();
 		
 		clipDisplayMarker = new ClipDisplayMarker(this);
-//		clipDisplayMarker.addObserver(new ClipMarkObserver());
-		OverlayMarkProviders.singleInstance().addProvider(clipDisplayMarker);
+//		clipDisplayMarker.addObserver(new ClipMarkObserver()); // not this
+//		OverlayMarkProviders.singleInstance().addProvider(clipDisplayMarker); // restore this to use this feature when debugged
 //		OverlayMarkerManager.
 	}
 
-	/**
-	 * @return the clipDisplayProjector
-	 */
-	public ClipDisplayProjector getClipDisplayProjector() {
-		return clipDisplayProjector;
-	}
+//	/**
+//	 * @return the clipDisplayProjector
+//	 */
+//	public ClipDisplayProjector getClipDisplayProjector() {
+//		return clipDisplayProjector;
+//	}
 	
 //	private class ClipMarkObserver implements OverlayMarkObserver {
 //
@@ -979,6 +979,13 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 	 */
 	public DisplayControlPanel getDisplayControlPanel() {
 		return displayControlPanel;
+	}
+
+	/**
+	 * @return the clipDisplayMarker
+	 */
+	public ClipDisplayMarker getClipDisplayMarker() {
+		return clipDisplayMarker;
 	}
 
 }

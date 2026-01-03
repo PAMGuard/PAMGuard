@@ -554,7 +554,9 @@ public class ClipDisplayUnit extends PamPanel {
 				showPopupMenu(e);
 				return;
 			}
+			clipDisplayPanel.getClipDataProjector().setClipStart(clipDataUnit.getTimeMilliseconds());
 			clipDisplayPanel.mousePressed(e, ClipDisplayUnit.this);
+			clipDisplayPanel.getClipDisplayMarker().mousePressed(e);
 		}
 
 		@Override
@@ -564,6 +566,7 @@ public class ClipDisplayUnit extends PamPanel {
 				return;
 			}
 			clipDisplayPanel.mouseReleased(e, ClipDisplayUnit.this);
+			clipDisplayPanel.getClipDisplayMarker().mouseReleased(e);
 		}
 
 		@Override
@@ -572,24 +575,30 @@ public class ClipDisplayUnit extends PamPanel {
 				showPopupMenu(e);
 				return;
 			}
+			clipDisplayPanel.getClipDataProjector().setCurrentClickedUnit(ClipDisplayUnit.this);
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				clipDisplayPanel.mouseClicked(e, ClipDisplayUnit.this);
 			}
+			clipDisplayPanel.getClipDisplayMarker().mouseClicked(e);
 //			toggleHighlight();
 		}
 		
-//		@Override
-//		public void mouseDragged(MouseEvent e) {
-//		}
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			clipDisplayPanel.getClipDisplayMarker().mouseDragged(e);
+		}
 
-//		@Override
-//		public void mouseEntered(MouseEvent e) {
-////			clipDisplayPanel.selectClip(theUnit);
-//		}
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			clipDisplayPanel.getClipDataProjector().setClipStart(clipDataUnit.getTimeMilliseconds());
+			clipDisplayPanel.getClipDisplayMarker().mouseEntered(e);
+//			clipDisplayPanel.selectClip(theUnit);
+		}
 
-//		@Override
-//		public void mouseMoved(MouseEvent e) {
-//		}
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			clipDisplayPanel.getClipDisplayMarker().mouseMoved(e);
+		}
 	}
 
 //	/**
