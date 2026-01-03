@@ -37,10 +37,10 @@ public class AnalogDevicesManager implements PamSettings {
 		if (analogPlugins == null) {
 			PluginLoader<AnalogDevicePlugin> pluginLoader = new PluginLoader<>(AnalogDevicePlugin.class);
 			analogPlugins = pluginLoader.findPlugins();
-			if (analogPlugins != null) {
-				for (AnalogDevicePlugin dev : analogPlugins) {
-					availableTypes.add(dev.createAnalogDevice(this, settingsNameProvider, sensorUser));
-				}
+		}
+		if (analogPlugins != null) {
+			for (AnalogDevicePlugin dev : analogPlugins) {
+				availableTypes.add(dev.createAnalogDevice(this, settingsNameProvider, sensorUser));
 			}
 		}
 		PamSettingManager.getInstance().registerSettings(this);
