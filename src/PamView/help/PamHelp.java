@@ -61,6 +61,7 @@ import javax.swing.UIManager;
 import Acquisition.DaqSystemInterface;
 import PamController.PamController;
 import PamController.PamGUIManager;
+import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamPluginInterface;
 import PamModel.SMRUEnable;
@@ -108,6 +109,12 @@ public class PamHelp {
 	private final String defaultMixedId = "overview.PamMasterHelp.docs.mixedMode";
 	
 	private String helpLocURL;
+	
+	private static ArrayList<CommonPluginInterface> otherPlugins = new ArrayList<>();
+	
+	public static void addOtherPluginHelp(CommonPluginInterface plugin) {
+		otherPlugins.add(plugin);
+	}
 	
 	private String getDefaultId() {
 		PamController pc = PamController.getInstance();
@@ -428,6 +435,27 @@ public class PamHelp {
 					System.err.println("Error generating URL for help set " + daqList.get(i).getHelpSetName());
 					System.err.println(e.getMessage());
 				}
+			}
+		}
+		
+		for (CommonPluginInterface plugin: otherPlugins) {
+			try {
+				String pluginJar = plugin.getJarFile();
+				URL helpSetLoc;
+				if (pluginJar != null) {
+					//URL helpSetLoc = new URL("jar:file:\\C:\\Users\\SCANS\\workspace\\Pamguard_MikeBranch\\plugins\\TestPlugin.jar!/TestPlugin/PluginHelp.hs"); this one worked - passed argument should match
+					helpSetLoc = new URL("jar:file:" + File.separator + plugin.getJarFile()+"!/"+plugin.getHelpSetName());
+					addPluginHelpSet(helpSetLoc);
+				}
+				else {
+					// this used when developing plugins and they are not actually in a jar file yet, rather they
+					// have just been manually added to the list of available plugins. 
+					String hsN = plugin.getHelpSetName();
+					addHelpSet(hsN);
+				}
+			} catch (MalformedURLException e) {
+				System.err.println("Error generating URL for help set " + plugin.getHelpSetName());
+				System.err.println(e.getMessage());
 			}
 		}
 	}

@@ -55,7 +55,7 @@ public class AnalogDialogPanel implements PamDialogPanel {
 	protected void changeDeviceType() {
 		String dev = (String) deviceType.getSelectedItem();
 		selectedType = analogDevicesManager.findDeviceType(dev);
-		if (selectedTypePanel != null) {
+		if (selectedTypePanel != null && selectedTypePanel.getDialogComponent() != null) {
 			mainPanel.remove(selectedTypePanel.getDialogComponent());
 		}
 		if (selectedType == null) {

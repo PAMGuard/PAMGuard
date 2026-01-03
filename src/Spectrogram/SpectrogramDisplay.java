@@ -3199,8 +3199,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				return null;
 			}
 			if (viewerMode) {
-				String moreStr = 
-						directDrawProjector.getHoverText(mouseEvent.getPoint());
+				String moreStr = directDrawProjector.getHoverText(mouseEvent.getPoint(), panelId);
 				if (moreStr != null) {
 					str += "<p>" + moreStr;
 				}
