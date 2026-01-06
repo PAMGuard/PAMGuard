@@ -64,4 +64,24 @@ public class DVClipDisplayPanel extends ClipDisplayPanel implements DVObserver {
 		super.newViewerTimes(start, end);
 	}
 
+	@Override
+	protected void newSampleRate(float sampleRate) {
+		if (dvControl != null) {
+			sampleRate = dvControl.getDvProcess().getSampleRate();
+		}
+		super.newSampleRate(sampleRate);
+	}
+
+	@Override
+	public float getSampleRate() {
+		if (dvControl != null) {
+			return dvControl.getDvProcess().getSampleRate();
+		}
+		else {
+			return super.getSampleRate();
+		}
+	}
+
+
+
 }

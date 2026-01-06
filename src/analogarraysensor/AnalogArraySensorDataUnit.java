@@ -47,7 +47,13 @@ public class AnalogArraySensorDataUnit extends PamDataUnit implements Array.sens
 			}
 			return head;
 		case HEIGHT:
-			return -getFieldVal(0);
+			Double h = getFieldVal(0);
+			if (h == null) {
+				return null;
+			}
+			else {
+				return -h;
+			}
 		case PITCH:
 			return getFieldVal(1);
 		case ROLL:

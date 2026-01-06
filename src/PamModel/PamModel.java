@@ -112,7 +112,7 @@ final public class PamModel implements PamSettings {
 	/**
 	 * Name of subfolder containing Pamguard plugin modules
 	 */
-	private static final String pluginsFolder = "plugins"; 
+	public static final String pluginsFolder = "plugins"; 
 	
 	/**
 	 * Name of plugin currently being loaded.  "none" indicates we are not currently loading any plugins
@@ -1550,20 +1550,6 @@ final public class PamModel implements PamSettings {
 		this.pluginBeingLoaded="none";
 	}
 	
-	
-	public class PluginClassloader extends URLClassLoader {
-
-	    public PluginClassloader(URL[] urls, ClassLoader parent) {
-	        super(urls, parent);
-	    }
-
-	    @Override
-		public void addURL(URL url) {
-	        super.addURL(url);
-	    }
-	}
-
-
 	public PluginClassloader getClassLoader() {
 		return classLoader;
 	}

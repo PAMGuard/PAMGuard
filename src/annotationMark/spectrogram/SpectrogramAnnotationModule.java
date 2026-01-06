@@ -311,7 +311,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		}
 
 	}
-	class SpecMarkObserver implements SpectrogramMarkObserver {
+	private class SpecMarkObserver implements SpectrogramMarkObserver {
 
 		private MarkDataUnit existingUnit;
 		private int dragEdge;

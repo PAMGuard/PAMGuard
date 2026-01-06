@@ -47,6 +47,7 @@ import PamguardMVC.dataSelector.DataSelectorChangeListener;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.ClipProcess;
+import pamScrollSystem.ScrollPaneAddon;
 import soundPlayback.ClipPlayback;
 
 /**
@@ -65,7 +66,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 	protected ClipDisplayParameters clipDisplayParameters = new ClipDisplayParameters();
 	
-	private ClipDisplayProjector clipDisplayProjector;
+//	private ClipDisplayProjector clipDisplayProjector;
 	
 	private ClipDisplayMarker clipDisplayMarker;
 
@@ -100,7 +101,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		clipFont = new Font("Arial", Font.PLAIN, 10);
 		displayPanel = new ClipMainPanel(new BorderLayout());
 
-		clipDisplayProjector = new ClipDisplayProjector(this);
+//		clipDisplayProjector = new ClipDisplayProjector(this);
 		
 		unitsPanel = new PamPanel(clipLayout = new ClipLayout(FlowLayout.LEFT));
 		unitsPanel.addMouseListener(unitsMouse = new UnitsMouse());
@@ -126,6 +127,8 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		
 		PamDataBlock<ClipDataUnit> dataBlock = clipDisplayParent.getClipDataBlock();
 		if (dataBlock != null) {
+			// this sets the display panel sample rate, which might be 
+			// incorrect. 
 			dataBlock.addObserver(new ClipObserver());
 		}
 
@@ -138,17 +141,17 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 //		selectedClips = new ArrayList<>();
 		
 		clipDisplayMarker = new ClipDisplayMarker(this);
-//		clipDisplayMarker.addObserver(new ClipMarkObserver());
-		OverlayMarkProviders.singleInstance().addProvider(clipDisplayMarker);
+//		clipDisplayMarker.addObserver(new ClipMarkObserver()); // not this
+//		OverlayMarkProviders.singleInstance().addProvider(clipDisplayMarker); // restore this to use this feature when debugged
 //		OverlayMarkerManager.
 	}
 
-	/**
-	 * @return the clipDisplayProjector
-	 */
-	public ClipDisplayProjector getClipDisplayProjector() {
-		return clipDisplayProjector;
-	}
+//	/**
+//	 * @return the clipDisplayProjector
+//	 */
+//	public ClipDisplayProjector getClipDisplayProjector() {
+//		return clipDisplayProjector;
+//	}
 	
 //	private class ClipMarkObserver implements OverlayMarkObserver {
 //
@@ -205,6 +208,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
+//			clipDisplayParent.ge
 			newSampleRate(sampleRate);
 		}
 
@@ -243,7 +247,10 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		synchronized (unitsPanel.getTreeLock()) {
 			//TODO: Add logic to sort by time of (manual) selection, clip start time, and maybe by hydrophone 
 			if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-				unitsPanel.add(clipDisplayUnit.getComponent(), -1);
+				// see if we're actually in the time for this. 
+				if (shouldDisplayClip(clipDisplayUnit)) {
+					unitsPanel.add(clipDisplayUnit.getComponent(), -1);
+				}
 			}
 			else {
 				unitsPanel.add(clipDisplayUnit.getComponent(), clipDisplayParameters.newClipOrder);
@@ -255,6 +262,21 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 			removeOldClips();
 			updatePanel();
 		}
+	}
+
+	private boolean shouldDisplayClip(ClipDisplayUnit clipDisplayUnit) {
+		if (isViewer == false) {
+			return true;
+		}
+		ScrollPaneAddon scrollButts = displayControlPanel.getScrollButtons();
+		if (scrollButts == null) {
+			return true;
+		}
+		long maxMillis = scrollButts.getMaximumMillis();
+		long minMillis = scrollButts.getMinimumMillis();
+		ClipDataUnit clipUnit = clipDisplayUnit.getClipDataUnit();
+		long t = clipUnit.getTimeMilliseconds();
+		return t>=minMillis && t <= maxMillis;
 	}
 
 	/**
@@ -464,7 +486,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		updatePanelLater();
 	}
 
-	private void newSampleRate(float sampleRate) {
+	protected void newSampleRate(float sampleRate) {
 		this.setSampleRate(sampleRate);
 	}
 
@@ -957,6 +979,13 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 	 */
 	public DisplayControlPanel getDisplayControlPanel() {
 		return displayControlPanel;
+	}
+
+	/**
+	 * @return the clipDisplayMarker
+	 */
+	public ClipDisplayMarker getClipDisplayMarker() {
+		return clipDisplayMarker;
 	}
 
 }

@@ -7,6 +7,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.SettingsNameProvider;
+import PamModel.PluginLoader;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import analoginput.brainboxes.BrainBoxDevices;
@@ -25,12 +26,23 @@ public class AnalogDevicesManager implements PamSettings {
 	private AnalogDeviceType activeDevice;
 	
 	private ArrayList<AnalogInputObserver> inputObservers = new ArrayList<>();
+	
+	private static ArrayList<AnalogDevicePlugin> analogPlugins;
 
 	public AnalogDevicesManager(SettingsNameProvider settingsNameProvider, AnalogSensorUser sensorUser) {
 		this.settingsNameProvider = settingsNameProvider;
 		this.sensorUser = sensorUser;
 		availableTypes.add(new MCCAnalogDevices(this, settingsNameProvider, sensorUser));
 		availableTypes.add(new BrainBoxDevices(this, settingsNameProvider, sensorUser));
+		if (analogPlugins == null) {
+			PluginLoader<AnalogDevicePlugin> pluginLoader = new PluginLoader<>(AnalogDevicePlugin.class);
+			analogPlugins = pluginLoader.findPlugins();
+		}
+		if (analogPlugins != null) {
+			for (AnalogDevicePlugin dev : analogPlugins) {
+				availableTypes.add(dev.createAnalogDevice(this, settingsNameProvider, sensorUser));
+			}
+		}
 		PamSettingManager.getInstance().registerSettings(this);
 		UserDisplayControl.addUserDisplayProvider(new AnalogDiagnosticsDisplayProvider(this));
 	}

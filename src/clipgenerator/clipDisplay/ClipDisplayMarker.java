@@ -6,6 +6,7 @@ import java.util.List;
 
 import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.OverlayMark;
+import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarker;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
@@ -18,7 +19,7 @@ public class ClipDisplayMarker extends OverlayMarker {
 	private ClipDisplayUnit firstClickedUnit;
 
 	public ClipDisplayMarker(ClipDisplayPanel clipDisplayPanel) {
-		super(clipDisplayPanel, 0, null);
+		super(clipDisplayPanel, 0, clipDisplayPanel.getClipDataProjector());
 		this.clipDisplayPanel = clipDisplayPanel;
 	}
 
@@ -100,6 +101,11 @@ public class ClipDisplayMarker extends OverlayMarker {
 		}
 		
 		return clipDataUnits;
+	}
+
+	@Override
+	public boolean canMark(OverlayMarkObserver markObserver) {
+		return super.canMark(markObserver);
 	}
 
 

@@ -31,6 +31,8 @@ import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import PamguardMVC.dataOffline.OfflineDataLoading;
+import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.AbstractScrollManager;
 
 /**
@@ -1196,7 +1198,11 @@ public class AcquisitionProcess extends PamProcess {
 		if (acquisitionControl.getOfflineFileServer() == null) {
 			return PamDataBlock.REQUEST_NO_DATA;
 		}
-		if (acquisitionControl.getOfflineFileServer().loadData(getRawDataBlock(), offlineLoadDataInfo, null)) {
+		OfflineFileServer fileServer = acquisitionControl.getOfflineFileServer();
+		PamRawDataBlock rawDataBlock = getRawDataBlock();
+		OfflineDataLoading<RawDataUnit> olDataLoading = rawDataBlock.getOfflineDataLoading();
+		olDataLoading.setCurrentOfflineLoadKeep(true);
+		if (fileServer.loadData(rawDataBlock, offlineLoadDataInfo, null)) {
 			return PamDataBlock.REQUEST_DATA_LOADED;
 		}
 		else {
