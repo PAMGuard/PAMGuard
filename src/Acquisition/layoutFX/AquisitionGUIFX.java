@@ -2,6 +2,7 @@ package Acquisition.layoutFX;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
+import Acquisition.DaqSystem;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.SettingsPane;
@@ -30,6 +31,18 @@ public class AquisitionGUIFX extends PamControlledGUIFX {
 
 	public AquisitionGUIFX(AcquisitionControl aquisitionControl) {
 		this.aquisitionControl=aquisitionControl; 
+		
+		//set the DAQ specific pane on start up. 
+		setDaqSpecificPane();
+		
+	}
+	
+	private void setDaqSpecificPane() {
+		DaqSystem currentDaqSystem = aquisitionControl.findDaqSystem(aquisitionControl.getAcquisitionParameters().getDaqSystemType()); 
+		getSettingsPane();
+		PamGuiManagerFX pamGuiManager = PamGuiManagerFX.getInstance();
+		pamGuiManager.addStatusBarPane(currentDaqSystem.getDAQSpecificPane(acquisitionPane).getStatusBarFactory());
+		
 	}
 
 	@Override

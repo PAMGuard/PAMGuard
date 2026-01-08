@@ -42,9 +42,6 @@ public class DeepWhistleMask implements PamFFTMask {
 	 */
 	private DeepWhistleProcess maksedFFTProcess;
 
-	public DeepWhistleMask(DeepWhistleProcess maksedFFTProcess) {
-		this.maksedFFTProcess = maksedFFTProcess;
-	}
 
 	Predictor<float[][], float[]> specPredictor;
 
@@ -69,6 +66,12 @@ public class DeepWhistleMask implements PamFFTMask {
 	public String matFilePath = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/silbido/pamguard_input_example.mat";
 
 	int count = 0;
+	
+	
+	public DeepWhistleMask(DeepWhistleProcess maksedFFTProcess) {
+		this.maksedFFTProcess = maksedFFTProcess;
+	}
+
 
 	@Override
 	public boolean initMask() {
@@ -77,7 +80,7 @@ public class DeepWhistleMask implements PamFFTMask {
 			//already initialised
 			specPredictor.close();
 		}
-
+//
 //		deepWhistleMatFile = new DeepWhistleMatFile();
 //		deepWhistleMatFile.initMatFile();
 //		count = 0;
@@ -174,7 +177,8 @@ public class DeepWhistleMask implements PamFFTMask {
 		//	dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECTROGRAM, 1024,512)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECFREQTRIM, modelInfo.minFreq, modelInfo.maxFreq)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPEC_LOG10));
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPEC_ADD, 2.5));
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPEC_ADD, 2.1));
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPEC_PRODUCT, 2));
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECCLAMP, 0, 6.));
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECNORMALISE_MINIMAX, 0, 6)); 
 
@@ -227,7 +231,7 @@ public class DeepWhistleMask implements PamFFTMask {
 		//set the frequency limits
 		((FreqTransform) transforms.get(0)).setFreqlims(new double[] {0.0, maksedFFTProcess.getInputFFTData().getSampleRate()/2.0});
 
-		double[][] dataT3 = ((FreqTransform) transforms.get(0)).getSpecTransfrom().getTransformedData();
+		// double[][] dataT3 = ((FreqTransform) transforms.get(0)).getSpecTransfrom().getTransformedData();
 
 		//		System.out.println(" Spectrogram size: " + dataT3.length + " x " + dataT3[0].length);
 
@@ -301,9 +305,13 @@ public class DeepWhistleMask implements PamFFTMask {
 
 				double maskVal = getMaskValueForBin(j, out.length(), sampleRate/2.0, mask[i], freqLims);
 				
-				if (maskVal>0.3) {
-					maskVal = 1.0;
-				} else {
+//				if (maskVal>0.3) {
+//					maskVal = 1.0;
+//				} else {
+//					maskVal = 0.0;
+//				}
+				
+				if (maskVal<this.maksedFFTProcess.getDeepWhistleParameters().confidenceThreshold) {
 					maskVal = 0.0;
 				}
 
@@ -346,9 +354,9 @@ public class DeepWhistleMask implements PamFFTMask {
 		//the fraction along the trimmed frequency range
 		double percent = (centerFreq - freqLims[0])/(freqLims[1]-freqLims[0]);
 
-		//FIXME - some sorti of indexing going on here - need to check carefully
-		int minIndex = (int) Math.floor(percent * (mask.length-1))+3;
-		int maxIndex = (int) Math.ceil(percent * (mask.length-1))+3;
+		//FIXME - some sorting of indexing going on here - need to check carefully
+		int minIndex = (int) Math.floor(percent * (mask.length-1));
+		int maxIndex = (int) Math.ceil(percent * (mask.length-1));
 		
 
 		//	System.out.println("MinIndex: " + minIndex + " MaxIndex: " + maxIndex);

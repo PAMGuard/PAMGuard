@@ -17,8 +17,14 @@ public class SimpleStatusPaneFactory extends DAQStatusPaneFactory {
 	}
 
 	@Override
-	public Pane createPane() {
-		return new PamBorderPane(new Label(text));
+	public PaneFactoryPane createPane() {
+		PaneFactoryPane pane =  new PaneFactoryPane(this);
+		pane.setCenter(new Label(text));
+		return pane;
+	}
+	
+	public String getPaneFactoryName(){
+		return "Simple Status Pane Factory";
 	}
 	
 }
