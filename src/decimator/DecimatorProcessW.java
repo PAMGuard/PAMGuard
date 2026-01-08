@@ -8,10 +8,12 @@ import Filters.FilterParams;
 import Filters.FilterType;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 
 /**
  * New decimator processe, based on the DecimatorWorker class
@@ -144,6 +146,30 @@ public class DecimatorProcessW extends PamProcess {
 	@Override
 	public ArrayList getCompatibleDataUnits(){
 		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
+	}
+	
+	
+	@Override
+	public int getOfflineData(OfflineDataLoadInfo offlineLoadDataInfo) {
+		setupProcess();
+		prepareProcess();
+		pamStart();
+		if (decimatorControl.getOfflineFileServer() == null) {
+			return PamDataBlock.REQUEST_NO_DATA;
+		}
+		/*
+		 * if offline files are not requested, continue to ask up the chain - there may
+		 * be data in an upstream process which can still be decimated as normal. 
+		 */
+		if (!decimatorControl.getOfflineFileServer().getOfflineFileParameters().enable) {
+			return super.getOfflineData(offlineLoadDataInfo);
+		}
+		if (decimatorControl.getOfflineFileServer().loadData(getOutputDataBlock(), offlineLoadDataInfo, null)) {
+			return PamDataBlock.REQUEST_DATA_LOADED;
+		}
+		else {
+			return PamDataBlock.REQUEST_NO_DATA;
+		}
 	}
 
 }
