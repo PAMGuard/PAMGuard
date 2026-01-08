@@ -79,7 +79,10 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 
 	/*
 	 * Can we make a mark ? This is a default behaviour - ctrl is down 
-	 * and there is at least one observer, but this coul dbe overridden. 
+	 * and there is at least one observer, but this could be overridden.
+	 * Be aware that the default behaviour requires ctrl down, which automatically 
+	 * pushes it to be a polygon mark, so override if you want your marker to 
+	 * use rectangles.  
 	 */
 	public boolean isCanMark(MouseEvent e) {
 		if (!e.isControlDown()) return false;
@@ -133,9 +136,11 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 		//can;t have polygons starting all over the place or else a nightmare. m
 		if (e.getClickCount()>=2 || e.isControlDown()){
 			//System.out.println("Begin a polygon mark!");
-			this.getCurrentMark().setMarkType(OverlayMarkType.POLYGON);
+			currentMark.setMarkType(OverlayMarkType.POLYGON);
 		}
-		else this.getCurrentMark().setMarkType(OverlayMarkType.RECTANGLE);
+		else {
+			currentMark.setMarkType(OverlayMarkType.RECTANGLE);
+		}
 
 		updateObservers(OverlayMarkObserver.MARK_START, e, currentMark);
 		WarningSystem.getWarningSystem().addWarning(markWarning);
@@ -177,12 +182,15 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 				return true;
 			};
 		}
-		if (getCurrentMark() == null) {
+		OverlayMark currMark = getCurrentMark();
+		if (currMark == null) {
+			nowMarking = false;
 			return false;
 		}
-		if (getCurrentMark().getMarkType() == OverlayMarkType.RECTANGLE && isNowMarking()) {
+		if (currMark.getMarkType() == OverlayMarkType.RECTANGLE && isNowMarking()) {
 			completeMark(e);
 		}
+		nowMarking = false;
 		return wasMarking;
 	}
 	
@@ -521,6 +529,7 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 		nowMarking = false;
 		WarningSystem.getWarningSystem().removeWarning(markWarning);
 		if (currentMark == null || currentMark.getCoordinates().size() <= 1) {
+			updateObservers(OverlayMarkObserver.MARK_CANCELLED, e, currentMark);
 			return false;
 		}
 		updateObservers(OverlayMarkObserver.MARK_END, e, currentMark);
@@ -786,7 +795,50 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 		return this.markWarning;
 	}
 
+	/**
+	 * Get string interpretation of mark states sent to observers. 
+	 * @param markState
+	 * @return as string
+	 */
+	public static String markStateString(int markState) {
+		switch(markState) {
+		case OverlayMarkObserver.MARK_START:
+			return "Mark Start";
+		case OverlayMarkObserver.MARK_END:
+			return "Mark End";
+		case OverlayMarkObserver.MARK_CANCELLED:
+			return "Mark Cancelled";
+		case OverlayMarkObserver.MARK_UPDATE:
+			return "Mark Update";
+		case OverlayMarkObserver.MOUSE_CLICK:
+			return "Mark Mouse Click";
+		}
+		return "Unknown Mark state";
+	}
+	
+	/**
+	 * Get an informative string for the info sent to a mark obsever. Can use useful when debugging
+	 * observers. 
+	 * @param markStatus
+	 * @param mouseEvent
+	 * @param overlayMarker
+	 * @param overlayMark
+	 * @return
+	 */
+	public static String getMarkStatusString(int markStatus, MouseEvent mouseEvent, OverlayMarker overlayMarker, OverlayMark overlayMark) {
+		Double x = null, y = null;
+		if (mouseEvent != null) {
+			x = mouseEvent.getX();
+			y = mouseEvent.getY();
+		}
+		String str = String.format("%s, Position (%s,%s), marker: %s, Mark %s", markStateString(markStatus), x,y, overlayMarker, overlayMark);
+		return str;
+	}
 
+	@Override
+	public String toString() {
+		return getMarkerName();
+	}
 
 
 

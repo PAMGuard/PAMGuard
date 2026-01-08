@@ -1459,7 +1459,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		synchronized (synchronizationLock) {
 			//			if (isdebug()) {
 			//				Debug.out.println("Removing data unit " + aDataUnit);
-			//			}
+			//			
+			aDataUnit.setDeleted(true);
 			boolean rem = pamDataUnits.remove(aDataUnit);
 			if (!rem) {
 				return false;

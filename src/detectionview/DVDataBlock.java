@@ -1,5 +1,8 @@
 package detectionview;
 
+import java.util.ListIterator;
+
+import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 
 /**
@@ -18,5 +21,5 @@ public class DVDataBlock extends ClipDisplayDataBlock<DVDataUnit> {
 		super(DVDataUnit.class, dvControl.getUnitName() + " clips", dvProcess, channelMap);
 	}
 
-
+	
 }

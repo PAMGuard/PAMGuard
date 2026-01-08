@@ -114,6 +114,12 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	private int databaseUpdateOf;
 	
 	/**
+	 * Mark the unit as deleted. May have want to send an update notification 
+	 * with this dataunit even after it's been deleted, so displays can update, etc. 
+	 */
+	private boolean deleted;
+	
+	/**
 	 * Information about the binary file the data unit is stored in
 	 * so that it can be resaved. 
 	 */
@@ -1729,5 +1735,19 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 */
 	public void setEmbryonic(boolean embryonic) {
 		this.embryonic = embryonic;
+	}
+
+	/**
+	 * @return the deleted
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	/**
+	 * @param deleted the deleted to set
+	 */
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 }

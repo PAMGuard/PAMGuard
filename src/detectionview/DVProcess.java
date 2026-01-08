@@ -2,6 +2,8 @@ package detectionview;
 
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamObservable;
 import PamguardMVC.PamRawDataBlock;
 import annotation.handler.AnnotationHandler;
 import annotation.userforms.UserFormAnnotationType;
@@ -157,5 +159,36 @@ public class DVProcess extends PamguardMVC.PamProcess {
 			super.setSampleRate(sampleRate, notify);
 		}
 	}
+
+	@Override
+	public void newData(PamObservable o, PamDataUnit arg) {
+		// will get called when a new unit is created. 
+		// should make a new DV display unit and insert it into the correct place.
+		if (dvControl.isViewer()) {
+			dvLoader.createNew(arg);
+		}
+	}
+
+	@Override
+	public void updateData(PamObservable o, PamDataUnit pamDataUnit) {
+		// there is a possibility that the unit is now marked as deleted, in which case
+		// remove it from displays. Otherwise consider updating the time range of the specified
+		// display. 
+		if (dvControl.isViewer()) {
+			// find the current dvDataUnit. 
+			DVDataUnit dvDataUnit = dvDataBlock.findDataForTrigger(pamDataUnit);
+			if (dvDataUnit == null) {
+				return; // consider creating with a call to dvLoader.createNew ?????
+			}
+			if (pamDataUnit.isDeleted()) {
+				dvDataBlock.remove(dvDataUnit);
+				dvDataBlock.updateObservers(dvDataUnit);
+//				dvDataBlock.updatePamData(dvDataUnit, System.currentTimeMillis());
+			}
+		}
+		
+	}
+	
+	
 
 }

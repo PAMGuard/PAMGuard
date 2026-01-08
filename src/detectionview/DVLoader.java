@@ -101,7 +101,7 @@ public class DVLoader {
 				break;
 			}
 			try {
-				boolean ok = createDateClip(aData);
+				boolean ok = (createDataClip(aData) != null);
 				if (ok) {
 					nDone++;
 				}
@@ -125,11 +125,11 @@ public class DVLoader {
 	 * @param aData 
 	 * @return true if data found and unit created. 
 	 */
-	private boolean createDateClip(PamDataUnit aData) {
+	private DVDataUnit createDataClip(PamDataUnit aData) {
 		DVParameters params = dvControl.getDvParameters();
 		PamRawDataBlock raw = dvProcess.getRawSourceDataBlock();
 		if (raw == null) {
-			return false;
+			return null;
 		}
 		float fs = raw.getSampleRate();
 		long t1 = aData.getTimeMilliseconds() - (long) (params.preSeconds * 1000.);
@@ -161,7 +161,7 @@ public class DVLoader {
 		 */
 		DVDataUnit dvDataUnit = new DVDataUnit(t1, aData.getTimeMilliseconds(), startSamp, (int) nSamp, aData.getChannelBitmap(), null, aData.getParentDataBlock().getDataName(), rawData, fs);
 		dvProcess.getDvDataBlock().addPamData(dvDataUnit);
-		return rawData != null;
+		return dvDataUnit;
 	}
 
 	private class LoadWorker extends SwingWorker<Integer, LoadProgress> {
@@ -198,6 +198,19 @@ public class DVLoader {
 			}
 		}
 
+	}
+
+	/**
+	 * Called when a new data unit is created. May have to restrict to viewer mode ? 
+	 * @param arg
+	 */
+	public void createNew(PamDataUnit arg) {
+		// TODO Auto-generated method stub
+		DVDataUnit dvDataUnit = createDataClip(arg);
+		if (dvDataUnit != null) {
+			dvProcess.getDvDataBlock().addPamData(dvDataUnit);
+			dvProcess.getDvDataBlock().notifyObservers(dvDataUnit);
+		}
 	}
 
 }

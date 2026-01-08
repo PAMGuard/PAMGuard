@@ -31,6 +31,7 @@ import PamUtils.PamUtils;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.PamSymbol;
+import PamView.PanelOverlayDraw;
 import PamView.panel.CornerLayout;
 import PamView.panel.CornerLayoutContraint;
 import PamView.panel.PamPanel;
@@ -109,6 +110,7 @@ public class ClipDisplayUnit extends PamPanel {
 //		axisPanel.addMouseMotionListener(imageMouse);
 		imagePanel = new ImagePanel(new BorderLayout());
 		imagePanel.addMouseListener(imageMouse);
+		imagePanel.addMouseMotionListener(imageMouse);
 //		imagePanel.addMouseListener(imageMouse);
 //		imagePanel.addMouseMotionListener(imageMouse);
 		JLayeredPane layeredPane = new LayeredPane();
@@ -401,9 +403,14 @@ public class ClipDisplayUnit extends PamPanel {
 			}
 			ClipDataProjector proj = clipDisplayPanel.getClipDataProjector();
 			PamDataBlock dataBlock = triggerDataUnit.getParentDataBlock();
+			PanelOverlayDraw overlayDraw = dataBlock.getOverlayDraw();
 			if (dataBlock == null || dataBlock.canDraw(proj) == false) {
 				return;
 			}
+			if (overlayDraw != null) {
+				overlayDraw.preDrawAnything(g, dataBlock, proj);
+			}
+			proj.clearHoverList();
 			proj.setClipStart(clipDataUnit.getTimeMilliseconds());
 			dataBlock.drawDataUnit(g, triggerDataUnit, proj);
 			
@@ -545,32 +552,43 @@ public class ClipDisplayUnit extends PamPanel {
 	 */
 	class ImageMouse extends MouseAdapter {
 		
+		/**
+		 * These get picked up on the outer panel, but not the inner one. Dammit!
+		 */
 		public ImageMouse() {
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+//			System.out.println("Mouse pressed " + e.toString());
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
 			}
 			clipDisplayPanel.getClipDataProjector().setClipStart(clipDataUnit.getTimeMilliseconds());
 			clipDisplayPanel.mousePressed(e, ClipDisplayUnit.this);
-			clipDisplayPanel.getClipDisplayMarker().mousePressed(e);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mousePressed(e);
+				imagePanel.repaint();
+			}
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+//			System.out.println("Mouse released " + e.toString());
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
 			}
 			clipDisplayPanel.mouseReleased(e, ClipDisplayUnit.this);
-			clipDisplayPanel.getClipDisplayMarker().mouseReleased(e);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseReleased(e);
+			}
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+//			System.out.println("Mouse clicked " + e.toString());
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
@@ -579,25 +597,37 @@ public class ClipDisplayUnit extends PamPanel {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				clipDisplayPanel.mouseClicked(e, ClipDisplayUnit.this);
 			}
-			clipDisplayPanel.getClipDisplayMarker().mouseClicked(e);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseClicked(e);
+			}
 //			toggleHighlight();
 		}
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			clipDisplayPanel.getClipDisplayMarker().mouseDragged(e);
+//			System.out.println("Mouse dragged " + e.toString());
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseDragged(e);
+			}
+			imagePanel.repaint();
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
+//			System.out.println("Mouse entered " + e.toString());
 			clipDisplayPanel.getClipDataProjector().setClipStart(clipDataUnit.getTimeMilliseconds());
-			clipDisplayPanel.getClipDisplayMarker().mouseEntered(e);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseEntered(e);
+			}
 //			clipDisplayPanel.selectClip(theUnit);
 		}
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			clipDisplayPanel.getClipDisplayMarker().mouseMoved(e);
+//			System.out.println("Mouse moved " + e.toString());
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseMoved(e);
+			}
 		}
 	}
 

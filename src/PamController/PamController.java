@@ -372,6 +372,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * modules will have received INITIALISATION_COMPLETE and should be good to run
 	 */
 	private void creationComplete() {
+		
+		MarkRelationships.getInstance().subscribeAllMarkers();
+		
 		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {
 			if (getRunMode() == RUN_NORMAL) {
 				startLater(); // may as well give AWT time to loop it's queue once more

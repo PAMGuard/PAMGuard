@@ -41,7 +41,9 @@ public class DVClipDisplayPanel extends ClipDisplayPanel implements DVObserver {
 	@Override
 	public void updateConfig() {
 		ScrollPaneAddon scrollButtons = getDisplayControlPanel().getScrollButtons();
-		scrollButtons.removeAllDataBlocks();
+		if (scrollButtons != null) {
+			scrollButtons.removeAllDataBlocks();			
+		}
 		PamDataBlock detBlock = dvControl.getDvProcess().getDetectorDataBlock();
 		if (detBlock != null) {
 			scrollButtons.addDataBlock(detBlock);

@@ -355,4 +355,5 @@ public class OverlayMark {
 	public boolean isHidden() {
 		return hidden;
 	}
+	
 }
