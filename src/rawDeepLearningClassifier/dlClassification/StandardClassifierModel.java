@@ -129,6 +129,41 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			workerThread.getQueue().add(groupedRawData);
 		}
 		return null;
+		
+		
+//		
+//		/**
+//		 * If a sound file is being analysed then classifier can go as slow as it wants. if used in real time
+//		 * then there is a buffer with a maximum queue size. 
+//		 */
+//		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
+//			//run the model 
+//			@SuppressWarnings("unchecked")
+//			List<StandardPrediction> modelResult = (List<StandardPrediction>) getDLWorker().runModel(groupedRawData, 
+//					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
+//			
+//			if (modelResult==null) {
+//				dlClassifierWarning.setWarningMessage(getName() + " deep learning model returned null");
+//				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
+//				return null;
+//			}
+//			
+//			//add time stamps and class names to the model results.
+//			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
+//			
+//	
+//			return modelResults; //returns to the classifier. 
+//		}
+//		else {
+//			//REAL TIME - when using a sound card. 
+//			//add to a buffer if in real time. 
+//			if (workerThread.getQueue().size()>DLModelWorker.MAX_QUEUE_SIZE) {
+//				//we are not doing well - clear the buffer
+//				workerThread.getQueue().clear();
+//			}
+//			workerThread.getQueue().add(groupedRawData);
+//		}
+//		return null;
 	}
 	
 	
@@ -301,17 +336,32 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		public void newDLResult(ArrayList<StandardPrediction> modelResult,
 				ArrayList<? extends PamDataUnit> groupedRawData) {
 
-			if (modelResult==null) {
+			if (modelResult == null) {
 				dlClassifierWarning.setWarningMessage(getName() + " deep learning model returned null");
 				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
-				return ;
+				return;
 			}
 
-			//add time stamps and class names to the model results.
-			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
+			// add time stamps and class names to the model results.
 
-			//process the raw model results
-			dlControl.getDLClassifyProcess().newRawModelResults(modelResults, (ArrayList<GroupedRawData>) groupedRawData);
+			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData,
+					modelResult);
+
+			if (dlControl.isGroupDetections()) {
+
+				for (int i = 0; i < groupedRawData.size(); i++) {
+					if (modelResults != null && modelResults.get(i) != null) {
+						// detection groups never have more than one result
+						dlControl.getDLClassifyProcess().newDetectionGroupResult(groupedRawData.get(i),
+								modelResults.get(i).get(0));
+					}
+				}
+				
+			} else {
+				// process the raw model results
+				dlControl.getDLClassifyProcess().newRawModelResults(modelResults,
+						(ArrayList<GroupedRawData>) groupedRawData);
+			}
 
 		}
 

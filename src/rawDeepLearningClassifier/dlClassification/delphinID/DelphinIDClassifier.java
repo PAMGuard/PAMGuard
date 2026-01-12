@@ -60,7 +60,8 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	@Override
 	public void prepModel() {
 		super.prepModel();
-		//set group detections to true. 
+		
+		//set group detections to true - very important
 		getDLControl().setGroupDetections(true);
 	}
 

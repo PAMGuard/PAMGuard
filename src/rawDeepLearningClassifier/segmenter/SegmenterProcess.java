@@ -232,7 +232,7 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	public void newData(PamDataUnit pamRawData) {
 
-//		System.out.println("New data for segmenter: " + pamRawData + "  isGroup: " + dlControl.isGroupDetections()); 
+		//System.out.println("New data for segmenter: " + pamRawData + "  isGroup: " + dlControl.isGroupDetections()); 
 
 		if (!dlControl.getDLParams().useDataSelector || dlControl.getDataSelector().scoreData(pamRawData)>0) {	
 

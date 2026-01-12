@@ -149,6 +149,12 @@ public class DecimatorProcessW extends PamProcess {
 	}
 	
 	
+	/**
+	 * Get offline data for the given time range. Note that this was added as of
+	 * version 2.02.18 because the decimator module wss not showing data from DECIMATED 
+	 * wav files (but was fine from the full frequency files when loaded from the parent Sound Acquistion
+	 * module)
+	 */
 	@Override
 	public int getOfflineData(OfflineDataLoadInfo offlineLoadDataInfo) {
 		setupProcess();

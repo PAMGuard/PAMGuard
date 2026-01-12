@@ -255,6 +255,12 @@ public class DLClassifyProcess extends PamProcess {
 		ArrayList<ArrayList<? extends PredictionResult>> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
 
 		//System.out.println("MODEL RESULTS: " + modelResults); 
+		
+		if (modelResults==null) {
+			//there has either been a problem or we are in real time mode 
+			//and the model is now running on a different thread. It will return the results itself to new model results
+			return; 
+		}
 
 		for (int i=0; i<classificationBufferTemp.size(); i++) {
 
@@ -273,7 +279,7 @@ public class DLClassifyProcess extends PamProcess {
 	 * @param detectionGroup - the detection group.
 	 * @param modelResult the model result
 	 */
-	private void newDetectionGroupResult(PamDataUnit detectionGroup, PredictionResult modelResult) {
+	protected void newDetectionGroupResult(PamDataUnit detectionGroup, PredictionResult modelResult) {
 
 		DLDataUnit dlDataUnit =  predictionToDataUnit(detectionGroup, modelResult);
 
@@ -378,8 +384,8 @@ public class DLClassifyProcess extends PamProcess {
 
 		}
 
-		//		System.out.println("MAKE DL GROUP DETECTION " + groupDetections.size() + " segements " + " freq: "
-		//		+ minFreq + "  " + maxFreq + " time: " + PamCalendar.formatDateTime(timeMillis) + " duration: " + (endTimeMillis-timeMillis));
+				System.out.println("MAKE DL GROUP DETECTION " + groupDetections.size() + " segements " + " freq: "
+				+ minFreq + "  " + maxFreq + " time: " + PamCalendar.formatDateTime(timeMillis) + " duration: " + (endTimeMillis-timeMillis));
 
 		DLGroupDetection dlgroupDetection = new DLGroupDetection(timeMillis, groupDetections.get(0).getChannelBitmap(), startSample,  (endTimeMillis-timeMillis), dataUnits); 
 		dlgroupDetection.setFrequency(new double[] {minFreq, maxFreq});
@@ -410,7 +416,7 @@ public class DLClassifyProcess extends PamProcess {
 
 		if (modelResults==null) {
 			//there has either been a problem or we are in real time mode 
-			//and the model is now running on a different thread. It will return the results.
+			//and the model is now running on a different thread. It will return the results itself to new model results
 			return; 
 		}
 		
