@@ -156,7 +156,7 @@ public class Pamguard {
 
 //		TimeZone.setDefault(PamCalendar.defaultTimeZone);
 
-		System.out.println("**********************************************************");
+		System.out.println("\n**********************************************************");
 		// print out the entire command line
 		if (args != null && args.length > 0) {
 			System.out.printf("Command line options: ");

@@ -89,7 +89,9 @@ public abstract class BinaryDataSource {
 	 * 
 	 * @return Stream version name to be stored in the 
 	 * Module Specific Control structure
+	 * <br>Never used. Use getModuleVersion
 	 */
+	@Deprecated 
 	public abstract int getStreamVersion();
 
 	/**

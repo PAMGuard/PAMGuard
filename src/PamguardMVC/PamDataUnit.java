@@ -88,7 +88,10 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 */
 	private PamDataBlock<T> parentDataBlock;
 	
-//	public GpsDataUnit gpsDataUnit;
+//	/**
+//	 * Daq source info passed around from raw data units, for info only. 
+//	 */
+//	private DaqSourceInfo daqSourceInfo;
 
 
 	
@@ -1750,4 +1753,18 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
+
+//	/**
+//	 * @return the daqSourceInfo
+//	 */
+//	public DaqSourceInfo getDaqSourceInfo() {
+//		return daqSourceInfo;
+//	}
+//
+//	/**
+//	 * @param daqSourceInfo the daqSourceInfo to set
+//	 */
+//	public void setDaqSourceInfo(DaqSourceInfo daqSourceInfo) {
+//		this.daqSourceInfo = daqSourceInfo;
+//	}
 }

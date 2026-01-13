@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
-import detectionview.DVDataUnit;
 
 /**
  * Really basic class for clip data blocks, which can be used by the 

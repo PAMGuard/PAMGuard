@@ -57,7 +57,6 @@ import cepstrum.CepstrumControl;
 import clickDetector.ClickDetection;
 import dataMap.DataMapControl;
 import detectiongrouplocaliser.DetectionGroupControl;
-import detectionview.DVControl;
 import effortmonitor.EffortControl;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
@@ -565,10 +564,11 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(displaysGroup);
 		mi.setHelpPoint("displays/userDisplayHelp/docs/userDisplayPanel.html");
 		
-		mi = PamModuleInfo.registerControlledUnit(DVControl.class.getName(), DVControl.unitType);
-		mi.setToolTipText(DVControl.unitTip);
-		mi.setModulesMenuGroup(displaysGroup);
-		mi.setHidden(SMRUEnable.isDevEnable() == false);
+		// moved this to be a plugin for now
+//		mi = PamModuleInfo.registerControlledUnit(DVControl.class.getName(), DVControl.unitType);
+//		mi.setToolTipText(DVControl.unitTip);
+//		mi.setModulesMenuGroup(displaysGroup);
+//		mi.setHidden(SMRUEnable.isDevEnable() == false);
 
 		mi = PamModuleInfo.registerControlledUnit("localTime.LocalTime", "Local Time");		
 		mi.setToolTipText("Shows local time on the display");

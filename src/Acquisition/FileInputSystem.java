@@ -1014,11 +1014,12 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			long ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
 			currentAnalysisTime = ms + (long) (newSamples * 1000L / sampleRate);
 			RawDataUnit newDataUnit = null;
+//			DaqSourceInfo sourceInfo = new DaqSourceInfo(getSystemName(), totalSamples);
 			for (int ichan = 0; ichan < nChannels; ichan++) {
 
 				newDataUnit = new RawDataUnit(ms, 1 << (ichan+channelOffset), totalSamples, newSamples);
 				newDataUnit.setRawData(doubleData[ichan]);
-
+//				newDataUnit.setDaqSourceInfo(sourceInfo);
 				newDataUnits.addNewData(newDataUnit);
 
 				// GetOutputDataBlock().addPamData(pamDataUnit);
@@ -1087,6 +1088,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			 * File should have been opened in the constructor so just read it
 			 * in in chunks and pass to datablock
 			 */
+			DaqSourceInfo sourceInfo;
 			int blockSize = blockSamples * audioFormat.getFrameSize();
 			int bytesRead = 0;
 			byte[] byteArray = new byte[blockSize];
@@ -1149,11 +1151,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
 //					currentAnalysisTime = ms;
 					currentAnalysisTime = ms + (long) (newSamples * 1000L / sampleRate); // get ms of last sample for this. 
+//					sourceInfo = new DaqSourceInfo(getSystemName(), (double) totalSamples / sampleRate);
 
 					for (int ichan = 0; ichan < nChannels; ichan++) {
 
 						newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
 						newDataUnit.setRawData(doubleData[ichan]);
+//						newDataUnit.setDaqSourceInfo(sourceInfo);
 
 						if (1000*(readFileSamples/sampleRate)<fileInputParameters.skipStartFileTime) {
 							// zero the data. Skipping it causes all the timing to screw up

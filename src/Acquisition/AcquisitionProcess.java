@@ -688,6 +688,11 @@ public class AcquisitionProcess extends PamProcess {
 			newDataUnit = new RawDataUnit(unitMillis,
 					threadDataUnit.getChannelBitmap(), threadDataUnit.getStartSample(),
 					threadDataUnit.getSampleDuration());
+//			DaqSourceInfo sourceInfo = threadDataUnit.getDaqSourceInfo();
+//			if (sourceInfo == null) {
+//				sourceInfo = new DaqSourceInfo(runningSystem.getSystemName(), threadDataUnit.getStartSample() / getSampleRate());
+//			}
+//			newDataUnit.setDaqSourceInfo(sourceInfo);
 			/*
 			 *  check the bits if it's 24 bit data to see that it really is returning 24 bit
 			 *  data and not scaled up 16 bit data. 

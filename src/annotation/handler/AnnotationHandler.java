@@ -337,7 +337,7 @@ public class AnnotationHandler {
 	 * @param dataUnits
 	 * @return
 	 */
-	private List<JMenuItem> getMultiUnitMenuItems(DataMenuParent menuParent, Point mousePosition,
+	public List<JMenuItem> getMultiUnitMenuItems(DataMenuParent menuParent, Point mousePosition,
 			PamDataUnit[] dataUnits) {
 		List<DataAnnotationType<?>> usedAnnots = getUsedAnnotationTypes();
 		if (usedAnnots == null) {
@@ -384,7 +384,7 @@ public class AnnotationHandler {
 	 * @param pamDataUnit
 	 * @return
 	 */
-	private List<JMenuItem> getSingleUnitMenuItems(DataMenuParent menuParent, Point mousePosition, PamDataUnit pamDataUnit) {
+	public List<JMenuItem> getSingleUnitMenuItems(DataMenuParent menuParent, Point mousePosition, PamDataUnit pamDataUnit) {
 		List<DataAnnotationType<?>> usedAnnots = getUsedAnnotationTypes();
 		if (usedAnnots == null) {
 			return null;
