@@ -310,7 +310,7 @@ public class AcquisitionProcess extends PamProcess {
 //	}
 
 	private long simpleSamplesToMilliseconds(long samples) {
-		return (long) (samples * 1000. / sampleRate) + PamCalendar.getSessionStartTime();
+		return (long) (samples * 1000. / getSampleRate()) + PamCalendar.getSessionStartTime();
 	}
 
 	/**

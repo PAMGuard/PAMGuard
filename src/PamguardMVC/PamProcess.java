@@ -105,7 +105,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	/**
 	 * The sample rate of the process. 
 	 */
-	protected float sampleRate;
+	private float sampleRate;
 
 	// private PamDataUnit lastUsedUnit;
 	protected String processName;
@@ -386,6 +386,9 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		// notify all output data blocks that there is a new sample rate
+//		if (Math.round(sampleRate) == 9600) {
+//			System.out.printf("Sample rate in %s set to 9600\n", getProcessName());
+//		}
 		this.sampleRate = sampleRate;
 		if (notify && outputDataBlocks != null) {
 			for (int i = 0; i < outputDataBlocks.size(); i++) {

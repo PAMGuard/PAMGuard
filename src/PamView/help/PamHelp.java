@@ -31,7 +31,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.help.DefaultHelpBroker;
 import javax.help.HelpSet;
@@ -110,11 +113,11 @@ public class PamHelp {
 	
 	private String helpLocURL;
 	
-	private static ArrayList<CommonPluginInterface> otherPlugins = new ArrayList<>();
-	
-	public static void addOtherPluginHelp(CommonPluginInterface plugin) {
-		otherPlugins.add(plugin);
-	}
+//	private static ArrayList<CommonPluginInterface> otherPlugins = new ArrayList<>();
+//	
+//	public static void addOtherPluginHelp(CommonPluginInterface plugin) {
+//		otherPlugins.add(plugin);
+//	}
 	
 	private String getDefaultId() {
 		PamController pc = PamController.getInstance();
@@ -371,12 +374,12 @@ public class PamHelp {
 		
 		// get a list of plugins and add their helpsets
 		PamModel pamModel = ((PamModel) PamController.getInstance().getModelInterface());
-		List<PamPluginInterface> pluginList = pamModel.getPluginList();
+		List<CommonPluginInterface> pluginList = pamModel.getPluginList();
 		
 		// only continue if there were plugins
 		if (!pluginList.isEmpty()) {
 			for (int i=0; i<pluginList.size(); i++) {
-				
+				CommonPluginInterface plugin = pluginList.get(i);
 				// if the plugin does not have a helpset, continue to the next plugin
 				if (pluginList.get(i).getHelpSetName()==null) {
 					continue;
@@ -388,14 +391,28 @@ public class PamHelp {
 					String pluginJar = pluginList.get(i).getJarFile();
 					URL helpSetLoc;
 					if (pluginJar != null) {
-						helpSetLoc = new URL("jar:file:" + File.separator + pluginList.get(i).getJarFile()+"!/"+pluginList.get(i).getHelpSetName());
+						String helpName = checkHelpsetName(plugin.getJarFile(), plugin.getHelpSetName());
+						if (helpName == null) {
+							continue;
+						}
+						if (helpName.equals(plugin.getHelpSetName()) == false) {
+							System.out.printf("Fix help name in %s from %s to %s\n", plugin.getJarFile(), plugin.getHelpSetName(), helpName);
+						}
+						helpSetLoc = new URL("jar:file:" + File.separator + plugin.getJarFile()+"!/"+helpName);
 						addPluginHelpSet(helpSetLoc);
 					}
 					else {
 						// this used when developing plugins and they are not actually in a jar file yet, rather they
 						// have just been manually added to the list of available plugins. 
 						String hsN = pluginList.get(i).getHelpSetName();
-						addHelpSet(hsN);
+//						Class<? extends CommonPluginInterface> c = plugin.getClass();
+						if (!addHelpSet(hsN)) {
+//							String newN = checkHelpsetName(hsN);
+//							newN = "WinSoundHelp.hs";
+//							if (newN != null && !newN.equals(hsN)) {
+//								addHelpSet(hsN);
+//							}
+						}
 					}
 				} catch (MalformedURLException e) {
 					System.err.println("Error generating URL for help set " + pluginList.get(i).getHelpSetName());
@@ -404,60 +421,71 @@ public class PamHelp {
 			}
 		}
 		
-		// get a list of external daq systems and add their helpsets
-		List<DaqSystemInterface> daqList = pamModel.getDaqList();
-		
-		// only continue if there were external daq systems
-		if (!daqList.isEmpty()) {
-			for (int i=0; i<daqList.size(); i++) {
-				
-				// if the plugin does not have a helpset, continue to the next plugin
-				if (daqList.get(i).getHelpSetName()==null) {
-					continue;
-				}
-	
-				// set up a URL to point to the helpset file inside the jar
-				try {
-					String pluginJar = daqList.get(i).getJarFile();
-					URL helpSetLoc;
-					if (pluginJar != null) {
-						//URL helpSetLoc = new URL("jar:file:\\C:\\Users\\SCANS\\workspace\\Pamguard_MikeBranch\\plugins\\TestPlugin.jar!/TestPlugin/PluginHelp.hs"); this one worked - passed argument should match
-						helpSetLoc = new URL("jar:file:" + File.separator + daqList.get(i).getJarFile()+"!/"+daqList.get(i).getHelpSetName());
-						addPluginHelpSet(helpSetLoc);
-					}
-					else {
-						// this used when developing plugins and they are not actually in a jar file yet, rather they
-						// have just been manually added to the list of available plugins. 
-						String hsN = daqList.get(i).getHelpSetName();
-						addHelpSet(hsN);
-					}
-				} catch (MalformedURLException e) {
-					System.err.println("Error generating URL for help set " + daqList.get(i).getHelpSetName());
-					System.err.println(e.getMessage());
+	}
+
+	/**
+	 * Check the helpset name for a plugin that's being loaded during development. 
+	 * This may be impossible to actually do ! 
+	 * @param hsN
+	 * @return
+	 */
+	private String checkHelpsetName(String hsN) {
+		if (hsN == null ) {
+			return null;
+		}
+		try {
+			String currLoc = new File(".").getCanonicalPath();
+			currLoc = System.getProperty("java.class.path");
+			String[] paths = currLoc.split(File.pathSeparator);
+			for (int i = 0; i < paths.length; i++) {
+				if (paths[i].contains("WindowsSound")) {
+					System.out.println(paths[i]);
 				}
 			}
+//			ClassLoader.
+			System.out.println(currLoc);
 		}
-		
-		for (CommonPluginInterface plugin: otherPlugins) {
-			try {
-				String pluginJar = plugin.getJarFile();
-				URL helpSetLoc;
-				if (pluginJar != null) {
-					//URL helpSetLoc = new URL("jar:file:\\C:\\Users\\SCANS\\workspace\\Pamguard_MikeBranch\\plugins\\TestPlugin.jar!/TestPlugin/PluginHelp.hs"); this one worked - passed argument should match
-					helpSetLoc = new URL("jar:file:" + File.separator + plugin.getJarFile()+"!/"+plugin.getHelpSetName());
-					addPluginHelpSet(helpSetLoc);
-				}
-				else {
-					// this used when developing plugins and they are not actually in a jar file yet, rather they
-					// have just been manually added to the list of available plugins. 
-					String hsN = plugin.getHelpSetName();
-					addHelpSet(hsN);
-				}
-			} catch (MalformedURLException e) {
-				System.err.println("Error generating URL for help set " + plugin.getHelpSetName());
-				System.err.println(e.getMessage());
+		catch (Exception e) {
+			return null;
+		}
+		return null;
+	}
+
+	/**
+	 * Check the helpset name for a helpset burried in a plugin jar file. 
+	 * @param jarFileName
+	 * @param exName
+	 * @return
+	 */
+	private String checkHelpsetName(String jarFileName, String exName) {
+		try {
+		JarFile jarFile = new JarFile(jarFileName);
+		Enumeration<JarEntry> e = jarFile.entries();
+		// cycle through the jar file.  Load all classes found and test all interfaces on every class
+		if (exName != null) {
+			File exF = new File(exName);
+			exName = exF.getName();
+		}
+		while (e.hasMoreElements()) {
+			JarEntry je = e.nextElement();
+			if(je.isDirectory() || !je.getName().endsWith(".hs")){
+				continue;
 			}
+			if (exName != null) {
+				if (je.getName().endsWith(exName)) {
+					return je.getName();
+				}
+			}
+			else {
+				return je.getName();
+			}
+//			System.out.printf("Help %s for %s found in %s\n", je.getName(), pf.getHelpSetName(), jarFile.getName());
 		}
+		}
+		catch (Exception e) {
+		}
+		return exName;
+		
 	}
 	
 	
@@ -505,7 +533,7 @@ public class PamHelp {
 			dum.add(helpSet);
 			hs.add(dum);
 		}catch (HelpSetException e) {
-			System.err.println("Error loading help set " + helpsetName);
+			System.err.println("Error loading help set " + helpsetName + ": " + e.getMessage());
 //			System.err.println(e.getMessage());
 			return false;
 		}

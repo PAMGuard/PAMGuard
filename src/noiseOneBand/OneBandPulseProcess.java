@@ -116,7 +116,7 @@ public class OneBandPulseProcess extends PamProcess {
 					// start a pulse
 					peakMax = rms;
 					pulseOn = true;
-					pulseSEL = Math.pow(10., rms/10.)*newUnit.getSampleDuration()/sampleRate;
+					pulseSEL = Math.pow(10., rms/10.)*newUnit.getSampleDuration()/getSampleRate();
 					pulseP2P = newUnit.getPeakPeak();
 					pulse02P = newUnit.getZeroPeak();
 					pulseEnd = pulseStart = newUnit.getTimeMilliseconds();
@@ -141,7 +141,7 @@ public class OneBandPulseProcess extends PamProcess {
 				}
 				else {
 					// continue the pulse
-					pulseSEL += Math.pow(10., rms/10.)*newUnit.getSampleDuration()/sampleRate;
+					pulseSEL += Math.pow(10., rms/10.)*newUnit.getSampleDuration()/getSampleRate();
 					pulseP2P = Math.max(pulseP2P, newUnit.getPeakPeak());
 					pulse02P = Math.max(pulse02P, newUnit.getZeroPeak());
 					pulseEnd = newUnit.getTimeMilliseconds();
