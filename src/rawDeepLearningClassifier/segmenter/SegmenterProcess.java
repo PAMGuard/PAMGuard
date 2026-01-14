@@ -373,7 +373,7 @@ public class SegmenterProcess extends PamProcess {
 				}
 			}
 			
-//			System.out.println("SAVE GROUP SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. whistles: " 
+//			System.out.println("SAVE GROUP SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. dets: " 
 //			+ segmenterDetectionGroup[index].getSubDetectionsCount() + " " + PamCalendar.formatDateTime(segmenterDetectionGroup[index].getSegmentStartMillis()) + "  " 
 //					+ segmenterDetectionGroup[index]);
 			//save the data unit to the data block
@@ -397,10 +397,10 @@ public class SegmenterProcess extends PamProcess {
 
 	private boolean detectionInSegment(PamDataUnit dataUnit, long segStart, long segEnd) {
 		//TODO - this is going to fail for very small segments. 
-		long whistleStart 	= dataUnit.getTimeMilliseconds();
-		long whistleEnd 	= whistleStart + dataUnit.getDurationInMilliseconds().longValue();
+		long detectionStart 	= dataUnit.getTimeMilliseconds();
+		long detectionEnd 	= detectionStart + dataUnit.getDurationInMilliseconds().longValue();
 
-		if ((whistleStart>=segStart && whistleStart<segEnd) || ((whistleEnd>=segStart && whistleEnd<segEnd))){
+		if ((detectionStart>=segStart && detectionStart<segEnd) || ((detectionEnd>=segStart && detectionEnd<segEnd))){
 			//some part of the whistle is in the segment. 
 //			System.out.println("Whsitle in segment: " + whistleStart + "  " + whistleEnd);
 			return true;

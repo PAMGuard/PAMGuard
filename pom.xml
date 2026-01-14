@@ -588,7 +588,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
-			<version>0.0.59f</version>
+			<version>1.0.0</version>
 			<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
 			<!--<exclusions>
 				<exclusion>
@@ -603,7 +603,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jdl4pam</artifactId>
-			<version>0.0.99f</version>
+			<version>1.0.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->

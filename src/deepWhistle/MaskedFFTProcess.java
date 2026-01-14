@@ -9,6 +9,7 @@ import java.util.concurrent.RejectedExecutionException;
 
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamConstants;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
@@ -300,4 +301,13 @@ public abstract class MaskedFFTProcess extends PamProcess {
     public int getMaxPendingBatches() {
         return maxPendingBatches;
     }
+    
+    /**
+	 * Get the output masked FFT data block.
+	 * 
+	 * @return the masked FFT data block.
+     */
+	protected  PamDataBlock getMaskedFFTDataBlock() {
+		return maskedFFTDataBlock;
+	}
 }

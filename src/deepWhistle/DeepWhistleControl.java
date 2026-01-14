@@ -8,6 +8,10 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.SettingsPane;
+import dataPlots.data.TDDataProviderRegister;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.spectrogramPlotFX.FFTPlotProvider;
+import fftManager.newSpectrogram.SpectrogramPlotProvider;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 
 
@@ -34,6 +38,9 @@ public class DeepWhistleControl extends  MaskedFFTControl {
 		addPamProcess(process);
 		PamSettingManager.getInstance().registerSettings(this);
 		updateParams( parameters);
+		
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(new FFTPlotProvider(this, process.getMaskedFFTDataBlock()));
+
 	}
 
 

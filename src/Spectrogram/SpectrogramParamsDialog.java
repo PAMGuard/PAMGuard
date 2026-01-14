@@ -864,13 +864,13 @@ public class SpectrogramParamsDialog extends PamDialog implements ActionListener
 			return showWarning("Invalid source data block " + sourcePanel.getSource());
 		}
 
-		int ch;
+		Integer ch;
 		try {
 			spectrogramParameters.nPanels = dialogSourcePanel.getNumPanels();
 			for (int i = 0; i < Math.min(spectrogramParameters.nPanels, currentNumPanels); i++) {
 				ch = (Integer) panelChannelList[i].getSelectedItem();
 //				ch = Integer.valueOf(str);
-				spectrogramParameters.channelList[i] = ch;
+				if (ch!=null) spectrogramParameters.channelList[i] = ch;
 			}
 
 			spectrogramParameters.frequencyLimits[0] = Double.valueOf(
