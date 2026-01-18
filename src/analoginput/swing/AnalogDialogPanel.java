@@ -43,7 +43,9 @@ public class AnalogDialogPanel implements PamDialogPanel {
 		JPanel topPanel = new JPanel(new BorderLayout());
 		topPanel.add(BorderLayout.NORTH, new JLabel("Device type ..."));
 		topPanel.add(BorderLayout.SOUTH, deviceType = new JComboBox<>());
-		mainPanel.add(BorderLayout.NORTH, topPanel);		System.out.println("Changing device type ...");
+		mainPanel.add(BorderLayout.NORTH, topPanel);
+		
+		//System.out.println("Changing device type ...");
 
 		deviceType.addActionListener(new ActionListener() {
 			@Override

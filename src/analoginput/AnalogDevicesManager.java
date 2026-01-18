@@ -32,7 +32,10 @@ public class AnalogDevicesManager implements PamSettings {
 	public AnalogDevicesManager(SettingsNameProvider settingsNameProvider, AnalogSensorUser sensorUser) {
 		this.settingsNameProvider = settingsNameProvider;
 		this.sensorUser = sensorUser;
-		availableTypes.add(new MCCAnalogDevices(this, settingsNameProvider, sensorUser));
+		if (System.getProperty("os.name").startsWith("Win")){ //TODO - more elegent fix here fior windows native 
+			//libs would be good 
+			availableTypes.add(new MCCAnalogDevices(this, settingsNameProvider, sensorUser));
+		}
 		availableTypes.add(new BrainBoxDevices(this, settingsNameProvider, sensorUser));
 		if (analogPlugins == null) {
 			PluginLoader<AnalogDevicePlugin> pluginLoader = new PluginLoader<>(AnalogDevicePlugin.class);
