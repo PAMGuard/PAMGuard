@@ -184,13 +184,13 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 		}
 		OverlayMark currMark = getCurrentMark();
 		if (currMark == null) {
-			nowMarking = false;
+//			nowMarking = false; // don't do this or it kills polygon marks. 
 			return false;
 		}
 		if (currMark.getMarkType() == OverlayMarkType.RECTANGLE && isNowMarking()) {
 			completeMark(e);
+			nowMarking = false;
 		}
-		nowMarking = false;
 		return wasMarking;
 	}
 	

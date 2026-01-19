@@ -262,7 +262,7 @@ public class ClipDisplayUnit extends PamPanel {
 			}
 		}
 		
-		clipDisplayPanel.addPopupMenuItems(popupMenu, e);
+		int nAdded = clipDisplayPanel.addPopupMenuItems(popupMenu, e);
 		
 		PamSymbolChooser symbolChooser = clipDisplayPanel.getSymbolChooser();
 		if (symbolChooser instanceof StandardSymbolChooser) {
