@@ -2,6 +2,7 @@ package decimator;
 
 import java.util.Arrays;
 
+import Acquisition.DaqSourceInfo;
 import Filters.Filter;
 import Filters.FilterBand;
 import Filters.FilterMethod;
@@ -37,6 +38,7 @@ public class DecimatorWorker {
 	private double outputRate;
 	private Interpolator[] interpolators;
 	private DecimatorParams decimatorParams;
+//	private DaqSourceInfo[] daqSourceInfos;
 
 	/**
 	 * Make a decimator worker with given filter params, channel map and input and output rates. 
@@ -95,6 +97,7 @@ public class DecimatorWorker {
 		outputData = new double[highestChan+1][];
 		outputStartMillis = new long[highestChan+1];
 		interpolators = new Interpolator[highestChan+1];
+//		daqSourceInfos = new DaqSourceInfo[highestChan+1];
 		double fs = Math.max(inputRate, outputRate);
 		for (int i = 0; i <= highestChan; i++) {
 			if ((1<<i & channelMap) == 0) {
@@ -171,13 +174,17 @@ public class DecimatorWorker {
 		int nOutSamps;
 		if (outputData[chan] == null) {
 			/*
-			 * number of output samples is sounded up so that one inputData always fits into 
+			 * number of output samples is rounded up so that one inputData always fits into 
 			 * one output decimated data. However, there will be rare occasions when this function returns null 
 			 * 
 			 */
 			nOutSamps = (int) Math.ceil(inputData.getSampleDuration() * outputRate / inputRate);
 			outputData[chan] = new double[nOutSamps];
 			outputStartMillis[chan] = inputData.getTimeMilliseconds();
+//			DaqSourceInfo si = inputData.getDaqSourceInfo();
+//			if (si != null) {
+//				daqSourceInfos[chan] = new DaqSourceInfo(si.getSourceName(), si.getSeconds());
+//			}
 		}
 		else {
 			nOutSamps = outputData[chan].length;
@@ -192,8 +199,13 @@ public class DecimatorWorker {
 				if (putSample[chan] == nOutSamps) {
 					retUnit = new RawDataUnit(outputStartMillis[chan], inputData.getChannelBitmap(), totalPutSamples[chan]-nOutSamps, nOutSamps);
 					retUnit.setRawData(outputData[chan], true);
+//					retUnit.setDaqSourceInfo(daqSourceInfos[chan]);
 					outputData[chan] = new double[nOutSamps];
 					outputStartMillis[chan] = inputData.getTimeMilliseconds() + (long) (pickSample[chan] / inputRate * 1000.);
+//					DaqSourceInfo ds = inputData.getDaqSourceInfo();
+//					if (ds != null) {
+//						daqSourceInfos[chan] = ds.copy(ds.getSeconds() + pickSample[chan] / inputRate); 
+//					}
 					putSample[chan] = 0;
 				}
 				pickSample[chan] += inputRate / outputRate;

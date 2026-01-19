@@ -22,7 +22,9 @@ import javax.swing.SwingWorker;
 public class ClipPlayback {
 
 	private static ClipPlayback singleInstance;
-	
+
+	private volatile Clip currentClip;
+		
 	private ClipPlayback() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -40,7 +42,35 @@ public class ClipPlayback {
 	}
 	
 	/**
+	 * Is it currently playing
+	 * @return
+	 */
+	public boolean isPlaying() {
+		Clip cClip = currentClip;
+		if (cClip == null) {
+			return false;
+		}
+		return cClip.isActive();
+	}
+	
+	/**
+	 * Stop any currently active clip. 
+	 * @return
+	 */
+	public boolean stopPlayback() {
+		Clip cClip = currentClip;
+		if (cClip == null || cClip.isActive() == false) {
+			return false;
+		}
+		cClip.stop();
+		cClip.close();
+		return true;
+	}
+	
+	/**
 	 * Play one or two channels of audio data back through the default sound card. 
+	 * no control over speed, i.e. doesn't use playback speed controls (could change this ? )
+	 * <br> Will stop playback of any currently playing clips first. 
 	 * @param clipData one or two channels of audio data. 
 	 * @param sampleRate playback sample rate
 	 * @param autoScale if true, will autoscale the data to full range of system (i.e. max val will be 32767). 
@@ -48,6 +78,9 @@ public class ClipPlayback {
 	 */
 	public boolean playClip(double[][] clipData, float sampleRate, boolean autoScale) {
 		// will really have to rethread this, since we don't want this to block. 
+		
+		stopPlayback(); // stop any current playback first. 
+		
 		if (clipData.length > 2) {
 			clipData = Arrays.copyOf(clipData, 2);
 		}
@@ -62,7 +95,6 @@ public class ClipPlayback {
 		private double[][] clipData;
 		private float sampleRate;
 		private boolean autoScale;
-		private Clip currentClip;
 		private AudioFormat audioFormat;
 
 		public PlayWorker(double[][] clipData, float sampleRate, boolean autoScale) {
@@ -102,6 +134,12 @@ public class ClipPlayback {
 				e.printStackTrace();
 			}
 			return null;
+		}
+
+		@Override
+		protected void done() {
+			// TODO Auto-generated method stub
+			super.done();
 		}
 		
 	}

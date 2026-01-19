@@ -70,14 +70,17 @@ public class ClipDisplayMarker extends OverlayMarker {
 		
 	}
 
-	@Override
-	public OverlayMark getCurrentMark() {
-		ArrayList<ClipDisplayUnit> currentHighlights = clipDisplayPanel.getHighlightedUnits();
-		if (currentHighlights == null || currentHighlights.size() == 0) {
-			return null;
-		}
-		return new ClipDisplayMark(this, currentHighlights);
-	}
+//	@Override
+	/*
+	 * Reall bad ! Replaces the existing mark with a different one and everything goes wrong !
+	 */
+//	public OverlayMark getCurrentMark() {
+//		ArrayList<ClipDisplayUnit> currentHighlights = clipDisplayPanel.getHighlightedUnits();
+//		if (currentHighlights == null || currentHighlights.size() == 0) {
+//			return null;
+//		}
+//		return new ClipDisplayMark(this, currentHighlights);
+//	}
 
 	@Override
 	public List<PamDataUnit> getSelectedMarkedDataUnits(OverlayMark overlayMark, MarkDataSelector markDataSelector) {
@@ -106,6 +109,12 @@ public class ClipDisplayMarker extends OverlayMarker {
 	@Override
 	public boolean canMark(OverlayMarkObserver markObserver) {
 		return super.canMark(markObserver);
+	}
+
+	@Override
+	public boolean isCanMark(javafx.scene.input.MouseEvent e) {
+		if (getObserverCount() == 0) return false;
+		return true;
 	}
 
 

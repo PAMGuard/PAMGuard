@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import PamController.status.ModuleStatus;
 import PamController.status.ModuleStatusManager;
 import PamController.status.ProcessCheck;
+import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.PamPluginInterface;
@@ -927,13 +928,14 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * @return plugin detail, or null if it's not a plugin. 
 	 */
 	public PamPluginInterface getPlugin() {
-		List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
+		List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginType(PamPluginInterface.class);
 		if (pluginList == null) {
 			return null;
 		}
-		for (PamPluginInterface plugin : pluginList) {
-			if (plugin.getClassName().equals(this.getClass().getName())) {
-				return plugin;
+		for (CommonPluginInterface plugin : pluginList) {
+			PamPluginInterface pf = (PamPluginInterface) plugin;
+			if (pf.getClassName().equals(this.getClass().getName())) {
+				return pf;
 			}
 		}
 		return null;

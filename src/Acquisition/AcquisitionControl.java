@@ -57,6 +57,7 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.RawInputControlledUnit;
+import PamModel.CommonPluginInterface;
 import PamModel.SMRUEnable;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
@@ -767,13 +768,14 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	public void loadExternalDaqSystems() {
 
 		// get a list of plugins
-		List<DaqSystemInterface> daqList = PamController.getInstance().getModelInterface().getDaqList();
+		List<CommonPluginInterface> daqList = PamController.getInstance().getModelInterface().getPluginType(DaqSystemInterface.class);
 
 		// if there are no plugins, return
 		if (daqList.isEmpty()) {
 			return;
 		}
-		for (DaqSystemInterface dsi : daqList ) {
+		for (CommonPluginInterface cpi : daqList) {
+			DaqSystemInterface dsi = (DaqSystemInterface) cpi;
 			registerDaqSystem(dsi.createDAQControl(this));
 		}
 	}

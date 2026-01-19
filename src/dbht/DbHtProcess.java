@@ -91,7 +91,7 @@ public class DbHtProcess extends PamProcess {
 			return;
 		}
 		FIRArbitraryFilter faf = new FIRArbitraryFilter(sr, null);
-		faf.setResponse(params.getFilterFrequencies(sampleRate), params.getFilterGains(sr), 
+		faf.setResponse(params.getFilterFrequencies(getSampleRate()), params.getFilterGains(sr), 
 				params.filterLogOrder, params.chebyGamma);
 		int nTap = faf.calculateFilter();
 		if (nTap == 0) {

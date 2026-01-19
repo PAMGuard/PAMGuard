@@ -110,7 +110,7 @@ public class OneBandProcess extends PamProcess {
 //		faf.calculateFilter();
 		int chanMap = rawSourceDataBlock.getChannelMap();
 		measureDataBlock.setChannelMap(chanMap);
-		FilterMethod filterMethod = FilterMethod.createFilterMethod(sampleRate, params.getFilterParams());
+		FilterMethod filterMethod = FilterMethod.createFilterMethod(getSampleRate(), params.getFilterParams());
 		Filter noiseFilter;
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
 			if ((1<<i & chanMap) == 0) {

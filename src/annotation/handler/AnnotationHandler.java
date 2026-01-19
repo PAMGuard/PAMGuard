@@ -185,13 +185,18 @@ public class AnnotationHandler {
 	 * @return menu item. 
 	 */
 	public JMenuItem createAnnotationEditMenu(PamDataUnit dataUnit) {
-		JMenu menuItem = new JMenu("Edit/Update annotations ...");
+		JMenuItem menuItem = new JMenu("Edit/Update annotations ...");
 		List<DataAnnotationType<?>> usedAnnotations = getUsedAnnotationTypes();
 
 		for (DataAnnotationType an:usedAnnotations) {
 			JMenuItem subItem = new JMenuItem(an.getAnnotationName());
 			subItem.addActionListener(new EditAnnotationHandler(dataUnit, an));
-			menuItem.add(subItem);
+			if (usedAnnotations.size() > 1) {
+				menuItem.add(subItem);
+			}
+			else {
+				menuItem = subItem;
+			}
 		}
 
 		return menuItem;
@@ -332,7 +337,7 @@ public class AnnotationHandler {
 	 * @param dataUnits
 	 * @return
 	 */
-	private List<JMenuItem> getMultiUnitMenuItems(DataMenuParent menuParent, Point mousePosition,
+	public List<JMenuItem> getMultiUnitMenuItems(DataMenuParent menuParent, Point mousePosition,
 			PamDataUnit[] dataUnits) {
 		List<DataAnnotationType<?>> usedAnnots = getUsedAnnotationTypes();
 		if (usedAnnots == null) {
@@ -379,7 +384,7 @@ public class AnnotationHandler {
 	 * @param pamDataUnit
 	 * @return
 	 */
-	private List<JMenuItem> getSingleUnitMenuItems(DataMenuParent menuParent, Point mousePosition, PamDataUnit pamDataUnit) {
+	public List<JMenuItem> getSingleUnitMenuItems(DataMenuParent menuParent, Point mousePosition, PamDataUnit pamDataUnit) {
 		List<DataAnnotationType<?>> usedAnnots = getUsedAnnotationTypes();
 		if (usedAnnots == null) {
 			return null;

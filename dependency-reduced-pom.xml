@@ -33,60 +33,60 @@
           <plugin>
             <groupId>org.vafer</groupId>
             <artifactId>jdeb</artifactId>
-            <version>1.11</version>
+            <version>1.14</version>
             <executions>
               <execution>
                 <phase>package</phase>
                 <goals>
                   <goal>jdeb</goal>
                 </goals>
-                <configuration>
-                  <controlDir>${basedir}/build/deb</controlDir>
-                  <dataSet>
-                    <data>
-                      <src>${project.build.directory}/${project.build.finalName}.jar</src>
-                      <type>file</type>
-                      <mapper>
-                        <type>perm</type>
-                        <prefix>/usr/share/pamguard</prefix>
-                      </mapper>
-                    </data>
-                    <data>
-                      <src>${basedir}/liblinux</src>
-                      <type>directory</type>
-                      <includes>*.txt</includes>
-                      <includes>*.so</includes>
-                      <mapper>
-                        <type>perm</type>
-                        <prefix>/usr/share/pamguard/liblinux</prefix>
-                      </mapper>
-                    </data>
-                    <data>
-                      <src>${basedir}/build/deb/PAMGuardIcon2.png</src>
-                      <type>file</type>
-                      <mapper>
-                        <type>perm</type>
-                        <prefix>/usr/share/pamguard</prefix>
-                      </mapper>
-                    </data>
-                    <data>
-                      <src>${basedir}/build/deb/pamguard.desktop</src>
-                      <type>file</type>
-                      <mapper>
-                        <type>perm</type>
-                        <prefix>/usr/share/applications</prefix>
-                      </mapper>
-                    </data>
-                    <data>
-                      <type>link</type>
-                      <linkName>/usr/share/pamguard/Pamguard</linkName>
-                      <linkTarget>/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
-                      <symlink>true</symlink>
-                    </data>
-                  </dataSet>
-                </configuration>
               </execution>
             </executions>
+            <configuration>
+              <controlDir>${basedir}/build/deb/control</controlDir>
+              <dataSet>
+                <data>
+                  <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/pamguard</prefix>
+                  </mapper>
+                </data>
+                <data>
+                  <src>${basedir}/liblinux</src>
+                  <type>directory</type>
+                  <includes>*.txt</includes>
+                  <includes>*.so</includes>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/pamguard/liblinux</prefix>
+                  </mapper>
+                </data>
+                <data>
+                  <src>${basedir}/build/deb/PAMGuardIcon2.png</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/pamguard</prefix>
+                  </mapper>
+                </data>
+                <data>
+                  <src>${basedir}/build/deb/pamguard.desktop</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/applications</prefix>
+                  </mapper>
+                </data>
+                <data>
+                  <type>link</type>
+                  <linkName>/usr/share/pamguard/Pamguard</linkName>
+                  <linkTarget>/usr/share/pamguard/${project.build.finalName}.jar</linkTarget>
+                  <symlink>true</symlink>
+                </data>
+              </dataSet>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -119,6 +119,7 @@
                 <JVMVersion>21+</JVMVersion>
                 <JVMArguments>
                   <string>-c</string>
+                  <string>-Xmx8192m</string>
                 </JVMArguments>
                 <NSAppSleepDisabled>true</NSAppSleepDisabled>
               </plist>

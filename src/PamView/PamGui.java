@@ -849,9 +849,9 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		 * Michael Oswald
 		 * 2016/09/30
 		 */
-		List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
-		List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
-		if (!pluginList.isEmpty() || !daqList.isEmpty()) {
+		List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
+//		List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
+		if (!pluginList.isEmpty()) {
 			JMenu subPluginsMenu= new JMenu("About Plugins");
 			//subPluginsMenu.addMouseListener(new menuArrayListener(menu));
 
@@ -863,14 +863,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 					subPluginsMenu.add(menuItem);
 				}
 			}
-			if (!daqList.isEmpty()) {
-				for (int i=0; i<daqList.size(); i++) {
-					menuItem = new JMenuItem(daqList.get(i).getDefaultName());
-					menuItem.addActionListener(new menuPlugin());
-					menuItem.setActionCommand(daqList.get(i).getDefaultName());
-					subPluginsMenu.add(menuItem);
-				}
-			}
+			
 			menu.add(subPluginsMenu);
 		}
 
@@ -1476,19 +1469,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			// figure out which plugin was selected.  The plugin default name was saved as the action command
 			// when the menu item was created, so loop through the plugin list and the daq list looking for the
 			// match.  When found, cast to the generic CommonPluginInterface and call the dialog
-			List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
-			List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
+			List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
 			if (!pluginList.isEmpty()) {
 				for (int i=0; i<pluginList.size(); i++) {
 					if (pluginList.get(i).getDefaultName().equals(ev.getActionCommand())) {
 						AboutPluginDisplay.showDialog(frame, ((CommonPluginInterface) pluginList.get(i)));
-					}
-				}
-			}
-			if (!daqList.isEmpty()) {
-				for (int i=0; i<daqList.size(); i++) {
-					if (daqList.get(i).getDefaultName().equals(ev.getActionCommand())) {
-						AboutPluginDisplay.showDialog(frame, ((CommonPluginInterface) daqList.get(i)));
 					}
 				}
 			}

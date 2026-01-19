@@ -118,12 +118,18 @@ PamSettingsSource {
 	}
 
 	protected boolean addDatabaseSystem(DBSystem dbSystem) {
+		try {
 		if (dbSystem.hasDriver()) {
 			databaseSystems.add(dbSystem);
 		}
 		else {
 			System.out.println(String.format("%s Database system is unavailable on this platform", 
 					dbSystem.getSystemName()));
+			return false;
+		}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;
