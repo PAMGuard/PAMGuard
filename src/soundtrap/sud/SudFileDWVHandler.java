@@ -266,7 +266,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 	}
 
 	private void dwvEffort(long javaMillis, boolean isStart) {
-		System.out.printf("DWV Effort %s at %s\n", isStart ? "Start" : "End", PamCalendar.formatDBDateTime(javaMillis));
+//		System.out.printf("DWV Effort %s at %s\n", isStart ? "Start" : "End", PamCalendar.formatDBDateTime(javaMillis));
 	}
 
 	private void processClickChunk(int chunkID, Chunk sudChunk) {

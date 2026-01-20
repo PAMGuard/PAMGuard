@@ -250,13 +250,15 @@ PamSettingsSource {
 				System.out.println("Database system     : " + databaseSystem.getSystemName());
 				DatabaseMetaData metaData = connection.getConnection().getMetaData();
 				System.out.println("Driver              : " + metaData.getDriverName());
-				System.out.println("ANSI92EntryLevelSQL : " + metaData.supportsANSI92EntryLevelSQL());
-				System.out.println("Keywords            : " + metaData.getSQLKeywords());
-				System.out.println("Add Column          : " + metaData.supportsAlterTableWithAddColumn());
-				System.out.println("Auto Commit         : " + connection.getConnection().getAutoCommit());
-				System.out.println("Updatable resultset : " + metaData.supportsResultSetConcurrency(
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_UPDATABLE));
+				if (SMRUEnable.isEnable()) {
+					System.out.println("ANSI92EntryLevelSQL : " + metaData.supportsANSI92EntryLevelSQL());
+					System.out.println("Keywords            : " + metaData.getSQLKeywords());
+					System.out.println("Add Column          : " + metaData.supportsAlterTableWithAddColumn());
+					System.out.println("Auto Commit         : " + connection.getConnection().getAutoCommit());
+					System.out.println("Updatable resultset : " + metaData.supportsResultSetConcurrency(
+							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_UPDATABLE));
+				}
 			}
 			catch (SQLException ex) {
 
