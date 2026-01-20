@@ -72,25 +72,6 @@ public class DeepWhistleMask implements PamFFTMask {
 		this.maksedFFTProcess = maksedFFTProcess;
 	}
 
-	/**
-	 * Model info
-	 */
-	private DeepWhistleInfo modelInfo;
-
-	/**
-	 * List of the transform parameters used in pre-processing
-	 */
-	private ArrayList<DLTransfromParams> transformParams;
-
-	private ArrayList<DLTransform> transforms;
-
-	//For saving debug info
-	private DeepWhistleMatFile deepWhistleMatFile;
-
-	public String matFilePath = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/silbido/pamguard_input_example.mat";
-
-	int count = 0;
-
 	@Override
 	public boolean initMask() {
 

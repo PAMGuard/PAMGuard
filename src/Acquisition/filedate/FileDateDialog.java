@@ -7,6 +7,10 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TimeZone;
 
 import javax.swing.BoxLayout;
@@ -34,13 +38,13 @@ public class FileDateDialog extends PamDialog {
 	
 	private StandardFileDateSettings standardFileDateSettings;
 	
-	private JComboBox<String> timeZones;
+	private JComboBox<String> offlineTimeZone;
 	
 	private JCheckBox daylightSaving;
 	
 	private JTextField additionalOffset;
 
-	private String[] timeZoneIds;
+	private ArrayList<TimeZone> timeZones = new ArrayList<>();
 	
 	private JPanel soundTrapDate;
 
@@ -106,24 +110,27 @@ public class FileDateDialog extends PamDialog {
 		
 		tzPanel.setBorder(new CompoundBorder(new TitledBorder("Time Zone"), new EmptyBorder(0, 10, 0, 0)));
 		
-		timeZones = new JComboBox<>();
-		timeZoneIds = TimeZone.getAvailableIDs();
-		TimeZone tz;
-		String tzStr;
-		for (int i = 0; i < timeZoneIds.length; i++) {
-			tz = TimeZone.getTimeZone(timeZoneIds[i]);
-			if (tz.getRawOffset() < 0) {
-				tzStr = String.format("UTC%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
-			}
-			else {
-				tzStr = String.format("UTC+%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
-			}
-			timeZones.addItem(tzStr);
-		}
+		offlineTimeZone = new JComboBox<>();
+		fillTimeZones();
+//		zones = TimeZone.getAvailableIDs();
+		
+		
+//		TimeZone tz;
+//		String tzStr;
+//		for (int i = 0; i < zones.length; i++) {
+//			tz = TimeZone.getTimeZone(zones[i]);
+//			if (tz.getRawOffset() < 0) {
+//				tzStr = String.format("UTC%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
+//			}
+//			else {
+//				tzStr = String.format("UTC+%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
+//			}
+//			offlineTimeZone.addItem(tzStr);
+//		}
 		daylightSaving = new JCheckBox("Use daylight saving");
 		
 		c.gridx = c.gridy = 0;
-		tzPanel.add(timeZones, c);
+		tzPanel.add(offlineTimeZone, c);
 		c.gridy++;
 		tzPanel.add(daylightSaving, c);
 //		mainPanel.add(BorderLayout.NORTH, tzPanel);
@@ -191,6 +198,47 @@ public class FileDateDialog extends PamDialog {
 		setDialogComponent(mainPanel);
 	}
 	
+	private void fillTimeZones() {
+		String[] zones = TimeZone.getAvailableIDs();	
+//		zones = TimeZone.
+		timeZones = new ArrayList<>();
+		String tzStr;
+		TimeZone tz;
+		for (int i = 0; i < zones.length; i++) {
+//			TimeZone tz = TimeZone.getTimeZone(zones[i]);
+			try {
+			tz = TimeZone.getTimeZone(ZoneId.of(zones[i]));
+			}
+			catch (Exception e) {
+				continue;
+			}
+			if (tz == null) {
+				continue;
+			}
+			timeZones.add(tz);
+		}
+		Collections.sort(timeZones, new Comparator<TimeZone>() {
+			@Override
+			public int compare(TimeZone o1, TimeZone o2) {
+				return o2.getRawOffset()-o1.getRawOffset();
+			}
+		});
+		int offs;
+		for (int i = 0; i < timeZones.size(); i++) {
+			tz = timeZones.get(i);
+			String id =  tz.getID();
+			String displayName =  tz.getDisplayName();
+			offs = tz.getRawOffset();
+			if (tz.getRawOffset() < 0) {
+				tzStr = String.format("UTC%3.1f %s (%s)", (double)offs/3600000., id,  displayName);
+			}
+			else {
+				tzStr = String.format("UTC+%3.1f %s (%s)", (double)offs/3600000., id, displayName);
+			}
+			offlineTimeZone.addItem(tzStr);
+		}
+	}
+	
 	public static StandardFileDateSettings showDialog(Window parentFrame, StandardFileDateSettings standardFileDateSettings, boolean allowCustomFormats) {
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new FileDateDialog(parentFrame);
@@ -205,7 +253,7 @@ public class FileDateDialog extends PamDialog {
 	private void setParams() {
 		int idInd = getIdIndex(standardFileDateSettings.getTimeZoneName());
 		if (idInd >= 0) {
-			timeZones.setSelectedIndex(idInd);
+			offlineTimeZone.setSelectedIndex(idInd);
 		}
 		autoFormat.setSelected(standardFileDateSettings.isUseBespokeFormat() == false);
 		manualFormat.setSelected(standardFileDateSettings.isUseBespokeFormat());
@@ -219,12 +267,18 @@ public class FileDateDialog extends PamDialog {
 	}
 	
 	private int getIdIndex(String tzId) {
-		if (tzId == null) {
-			tzId = "UTC";
-		}
-		for (int i = 0; i < timeZoneIds.length; i++) {
-			if (tzId.equals(timeZoneIds[i])) {
-				return i;
+//		if (tzId == null) {
+//			tzId = "UTC";
+//		}
+//		for (int i = 0; i < zones.length; i++) {
+//			if (tzId.equals(zones[i])) {
+//				return i;
+//			}
+//		}
+		for (int i = 0; i < timeZones.size(); i++) {
+			if (timeZones.get(i).getID().equals(tzId)) {
+				offlineTimeZone.setSelectedIndex(i);
+				break;
 			}
 		}
 		return -1;
@@ -232,11 +286,11 @@ public class FileDateDialog extends PamDialog {
 
 	@Override
 	public boolean getParams() {
-		int idInd = timeZones.getSelectedIndex();
+		int idInd = offlineTimeZone.getSelectedIndex();
 		if (idInd < 0) {
 			return showWarning("You must select a time zone");
 		}
-		TimeZone tz = TimeZone.getTimeZone(timeZoneIds[idInd]);
+		TimeZone tz = timeZones.get(idInd);
 		if (tz == null) {
 			return showWarning("The time zone you have selected does not exist");
 		}
