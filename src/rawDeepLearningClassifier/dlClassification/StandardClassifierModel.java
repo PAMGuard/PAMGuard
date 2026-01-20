@@ -45,7 +45,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * The  worker thread has a buffer so that Standard models can be run
 	 * in real time without slowing down the rest of PAMGaurd. 
 	 */
-	private TaskThread workerThread;
+	private StandardDLTaskThread workerThread;
 
 	/**
 	 * Makes a binary decision on whether a prediction result should go on
@@ -80,7 +80,9 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		 * If a sound file is being analysed then classifier can go as slow as it wants. If used in real time
 		 * then there is a buffer with a maximum queue size. 
 		 */
-		if (dlControl.isViewer()) {
+		if (dlControl.isViewer() || dlControl.isGroupDetections()) {
+			
+//			System.out.println("----StandardClassifierModel: Running model in viewer or group detections mode.");
 			//run the model 
 			@SuppressWarnings("unchecked")
 			List<StandardPrediction> modelResult = (List<StandardPrediction>) getDLWorker().runModel(groupedRawData, 
@@ -105,7 +107,11 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				System.out.println(getName() + " deep learning model queue size exceeded: " + workerThread.getQueue().size());
 
 				if (PamCalendar.isSoundFile() && !forceQueue) {
-					//we are analysing a sound file so just wait until the queue has space. 
+					//we are analysing a sound file so just wait until the queue has space. Note that we
+					//could just put sound data in real time model into the viewer if satement above but
+					//this results in a very "jerky" spectrogram - putting on a thread means the processing can take place 
+					//without stopping the spectrogram updating every xx seconds if the user sets the processing speed to be
+					//slower than the model takes to run. 
 					int count =0 ; 
 					while (workerThread.getQueue().size()>getMaxQueueSize()) {
 						try {
@@ -129,6 +135,41 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			workerThread.getQueue().add(groupedRawData);
 		}
 		return null;
+		
+		
+//		
+//		/**
+//		 * If a sound file is being analysed then classifier can go as slow as it wants. if used in real time
+//		 * then there is a buffer with a maximum queue size. 
+//		 */
+//		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
+//			//run the model 
+//			@SuppressWarnings("unchecked")
+//			List<StandardPrediction> modelResult = (List<StandardPrediction>) getDLWorker().runModel(groupedRawData, 
+//					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
+//			
+//			if (modelResult==null) {
+//				dlClassifierWarning.setWarningMessage(getName() + " deep learning model returned null");
+//				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
+//				return null;
+//			}
+//			
+//			//add time stamps and class names to the model results.
+//			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
+//			
+//	
+//			return modelResults; //returns to the classifier. 
+//		}
+//		else {
+//			//REAL TIME - when using a sound card. 
+//			//add to a buffer if in real time. 
+//			if (workerThread.getQueue().size()>DLModelWorker.MAX_QUEUE_SIZE) {
+//				//we are not doing well - clear the buffer
+//				workerThread.getQueue().clear();
+//			}
+//			workerThread.getQueue().add(groupedRawData);
+//		}
+//		return null;
 	}
 	
 	
@@ -182,8 +223,14 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		//just incase group detections has been enabled
 		getDLControl().setGroupDetections(false);
 
-		getDLWorker().prepModel(getDLParams(), dlControl);
-
+		
+		try {
+			getDLWorker().prepModel(getDLParams(), dlControl);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 		if (getDLWorker().isModelNull()) {
 			dlClassifierWarning.setWarningMessage("There is no loaded " + getName() + " classifier model. " + getName() + " disabled.");
@@ -198,7 +245,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				workerThread.stopTaskThread();
 			}
 
-			workerThread = new TaskThread(getDLWorker());
+			workerThread = new StandardDLTaskThread(getDLWorker());
 			workerThread.setPriority(Thread.MAX_PRIORITY);
 			workerThread.start();
 		}
@@ -291,9 +338,9 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * @author Jamie Macaulay 
 	 *
 	 */
-	public class TaskThread extends DLTaskThread {
+	public class StandardDLTaskThread extends DLTaskThread {
 
-		public TaskThread(DLModelWorker dlWorker) {
+		public StandardDLTaskThread(DLModelWorker dlWorker) {
 			super(dlWorker);
 		}
 
@@ -301,17 +348,35 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		public void newDLResult(ArrayList<StandardPrediction> modelResult,
 				ArrayList<? extends PamDataUnit> groupedRawData) {
 
-			if (modelResult==null) {
+			if (modelResult == null) {
 				dlClassifierWarning.setWarningMessage(getName() + " deep learning model returned null");
 				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
-				return ;
+				return;
 			}
 
-			//add time stamps and class names to the model results.
-			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
+			// add time stamps and class names to the model results.
 
-			//process the raw model results
-			dlControl.getDLClassifyProcess().newRawModelResults(modelResults, (ArrayList<GroupedRawData>) groupedRawData);
+			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData,
+					modelResult);
+			
+			//when this thread has been used the runModel function the the DLClassifyProcess returns null so we have to
+			//send ensure the results are sent to the correct functions here. 
+
+			if (dlControl.isGroupDetections()) {
+
+				for (int i = 0; i < groupedRawData.size(); i++) {
+					if (modelResults != null && modelResults.get(i) != null) {
+						// detection groups never have more than one result
+						dlControl.getDLClassifyProcess().newDetectionGroupResult(groupedRawData.get(i),
+								modelResults.get(i).get(0));
+					}
+				}
+				
+			} else {
+				// process the raw model results
+				dlControl.getDLClassifyProcess().newRawModelResults(modelResults,
+						(ArrayList<GroupedRawData>) groupedRawData);
+			}
 
 		}
 

@@ -8,11 +8,13 @@ import javax.swing.JFrame;
 import org.controlsfx.control.ToggleSwitch;
 
 import Acquisition.layoutFX.PaneFactory;
+import Acquisition.layoutFX.PaneFactory.PaneFactoryPane;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamViewInterface;
 import dataModelFX.DataModelPaneFX;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -113,6 +115,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 * True if the pane is showing. 
 	 */
 	private boolean showingLoadMode;
+
+	private ObservableList<Node> children;
 
 
 	/**
@@ -784,16 +788,42 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 * Add a pane to the tool bar of all tabs.
 	 * @param paneFactory
 	 */
-	public void addToolBarPane(PaneFactory paneFactory) {
+	public boolean addStatusBarPane(PaneFactory paneFactory) {
+		
+		System.out.println("PamGuiFX: addToolBarPane: adding pane factory " + paneFactory.getPaneFactoryName());
+		
+		boolean statusPaneAdded=false;
 		for (int i=0; i<this.getNumTabs(); i++){
 			//check that a pane factory of this type does not exist.
-			//TODO
-			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory.createPane());
+			children = this.getTab(i).getContentToolbar().getCenterHBox().getChildren();
+			
+			boolean add=true;
+			//we want to searc h through all the children in the pane and see if they were created by the same factory.
+			//If so, don't add another. 
+			for (int j=0; j<children.size(); j++) {
+				if (children.get(j) instanceof PaneFactoryPane) {
+					PaneFactory factory = ((PaneFactoryPane) children.get(j)).getFactoryRef();
+					if (factory.equals(paneFactory)) {
+						//pane factory of this instance already exists- do not add another. 
+						add = false;
+					}
+				}
+			}
+			
+			if (add) {
+				this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory.createPane());
+				statusPaneAdded= add;
+			}
+			
 		}
+		
+		//return true if at least one pane was added.
+		return statusPaneAdded;
+
 	}
 	
 
-	public void removeToolBarPane(PaneFactory statusPaneFactory) {
+	public void removeStatusBarPane(PaneFactory statusPaneFactory) {
 		//TODO
 //		for (int i=0; i<this.getNumTabs(); i++){
 //			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory);

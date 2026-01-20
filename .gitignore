@@ -145,3 +145,4 @@ dependency-reduced-pom.xml
 .classpath
 .settings/org.eclipse.jdt.core.prefs
 dependency-reduced-pom.xml
+src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/blue_whale_24/audio_repr_pg.json

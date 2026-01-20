@@ -44,6 +44,9 @@ public class AnalogDialogPanel implements PamDialogPanel {
 		topPanel.add(BorderLayout.NORTH, new JLabel("Device type ..."));
 		topPanel.add(BorderLayout.SOUTH, deviceType = new JComboBox<>());
 		mainPanel.add(BorderLayout.NORTH, topPanel);
+		
+		//System.out.println("Changing device type ...");
+
 		deviceType.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -53,6 +56,7 @@ public class AnalogDialogPanel implements PamDialogPanel {
 	}
 
 	protected void changeDeviceType() {
+//		System.out.println("Changing device type ...");
 		String dev = (String) deviceType.getSelectedItem();
 		selectedType = analogDevicesManager.findDeviceType(dev);
 		if (selectedTypePanel != null && selectedTypePanel.getDialogComponent() != null) {
@@ -62,11 +66,18 @@ public class AnalogDialogPanel implements PamDialogPanel {
 			return;
 		}
 		selectedTypePanel = selectedType.getDevicePanel();
+//		System.out.println("Changing device type ... panel " + selectedTypePanel);
+
 		if (selectedTypePanel != null) {
 			mainPanel.add(BorderLayout.CENTER, selectedTypePanel.getDialogComponent());
 			selectedTypePanel.setParams();
-			pamDialog.pack();
 		}
+		else {
+			mainPanel.add(BorderLayout.CENTER, new JPanel());
+		}
+		mainPanel.revalidate();
+		pamDialog.revalidate();
+		pamDialog.pack();
 	}
 
 	@Override

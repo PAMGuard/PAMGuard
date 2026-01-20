@@ -17,6 +17,7 @@ import PamUtils.worker.PamWorkDialog;
 import PamUtils.worker.PamWorkMonitor;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamView.dialog.warn.WarnOnce;
+import generalDatabase.DBControlUnit;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamViewFX.pamTask.SimplePamTaskUpdate;
 import pamguard.GlobalArguments;
@@ -186,6 +187,12 @@ public class ReprocessManager {
 		
 		boolean deleteOK = deleteOldData(choiceSummary, choice);
 		
+		// Commit the database - this is important to make sure that any deletions are saved before we start reprocessing.
+		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+		if (dbControl != null) {
+			dbControl.commitChanges();
+		}
+		
 		return true;
 		
 	}
@@ -234,6 +241,7 @@ public class ReprocessManager {
 			DataOutputStore offlineStore = (DataOutputStore) aPCU;
 			ok &= offlineStore.deleteDataFrom(deleteFrom);
 		}
+		
 		return ok;
 	}
 

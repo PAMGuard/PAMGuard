@@ -1075,14 +1075,16 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	public void addStatusBarPane(PaneFactory statusPaneFactory) {
 		if (!toolBarPanes.contains(statusPaneFactory)){
 			toolBarPanes.add(statusPaneFactory); 
-			//remove from all stages
-			for (int i=0; i<this.stages.size(); i++) {
-				this.stages.get(i).addToolBarPane(statusPaneFactory); 
-			}
+			
 		}
-		else {
-			System.err.println("PamGuiManagerFX: Tool bar pane already exists");
+		//add to all stages - this will add to all tabs in each stage but will not duplicate if already exists.
+		for (int i=0; i<this.stages.size(); i++) {
+			this.stages.get(i).addStatusBarPane(statusPaneFactory); 
 		}
+		
+//		else {
+//			System.err.println("PamGuiManagerFX: Tool bar pane already exists");
+//		}
 		
 		
 	}
@@ -1097,7 +1099,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		if (toolBarPanes.remove(statusPaneFactory)){
 			//remove from all stages
 			for (int i=0; i<this.stages.size(); i++) {
-				this.stages.get(i).removeToolBarPane(statusPaneFactory); 
+				this.stages.get(i).removeStatusBarPane(statusPaneFactory); 
 			}
 			return true;
 		}

@@ -114,7 +114,6 @@ public class MarkOverlayDraw extends PanelOverlayDraw {
 			c = mark.getCoordinate(i);
 			Coordinate3d c3d = generalProjector.getCoord3d(c);
 			if (c3d == null) {
-				generalProjector.getCoord3d(c);
 				return null;
 			}
 			p = c3d.getXYPoint();

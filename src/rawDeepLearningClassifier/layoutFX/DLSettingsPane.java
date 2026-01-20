@@ -6,19 +6,19 @@ import org.controlsfx.control.PopOver;
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
-import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
@@ -75,12 +75,12 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	/**
 	 * The window length spinner for the segmenter process
 	 */
-	private PamSpinner<Integer> windowLength;
+	private DLPamSpinner<Integer> windowLength;
 
 	/**
 	 * The hop length for the segmenter progress. 
 	 */
-	private PamSpinner<Integer> hopLength;
+	private DLPamSpinner<Integer> hopLength;
 
 	/**
 	 * The pane in which the classiifer pane sits. 
@@ -127,10 +127,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private String currentClassifierModel;
 
+	private PamValidator validator;
+
 
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
+		 validator = new PamValidator();
 		//		Button newButton=new Button("Test");
 		//		newButton.setOnAction((action)-> {
 		//			pane.layout();
@@ -145,6 +148,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		mainPane.setCenter(createDLPane());
 		mainPane.setPadding(new Insets(5,5,5,5));
 
+		//bit messy but have to set different sizes for FX and Swing due to differences in how they handle sizing.
 		if (!PamGUIManager.isFX()){
 			mainPane.setMinHeight(430);
 			mainPane.setMaxWidth(MAX_WIDTH);
@@ -152,6 +156,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
 		dlWarningDialog = new DLWarningDialog(this); 
+		
+
 
 		//mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS()); 
 
@@ -213,21 +219,32 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//add to the main pane
 		vBox.getChildren().add(segmenterPane);
 
-		windowLength = new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
+		windowLength = new DLPamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
 		windowLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		windowLength.setEditable(true);
 		windowLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
 			setSegInfoLabel(); 
 		});
 
-		hopLength =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
+		hopLength =    new DLPamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
 		hopLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		hopLength.setEditable(true);
 		hopLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
 			setSegInfoLabel(); 
 		});
+		
+		 validator.createCheck()
+         .dependsOn(("hop_length" + this), hopLength.valueProperty())
+         .withMethod(c -> {
+           if (hopLength.getValue()>windowLength.valueProperty().get()) {
+	              c.error("The hop length cannot be greater than the segment length.");
+           }
+         })
+         .decorates(hopLength)
+         .immediate();
 
-		reMergeSeg =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 1,  1); 
+		//re-merge segments spinner - the minimum value should be 1 which means no re-merging.
+		reMergeSeg =    new PamSpinner<Integer>(1, Integer.MAX_VALUE, 1,  1); 
 		reMergeSeg.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		reMergeSeg.setEditable(true);
 
@@ -327,7 +344,11 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 			text = String.format("Window %.3f s Hop: %.3f s", windowLenS, hopLengthS); 
 		}
-		infoLabel.setText(text);
+		
+		//just incase this is not called from the FX thread
+		Platform.runLater(()->{
+			infoLabel.setText(text);
+		});
 	}
 
 	/**
@@ -436,8 +457,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			//now check the source requirements for the model and set the source list accordingly.
 			//For example, if the model requires a specific type of data then set the source list to that type.
 			if (modelSelectPane.currentClassifierModel!=null) {
+				setSourceList(modelSelectPane.currentClassifierModel); //this should be above setParams so that the classifier sets the correct sample rate
 				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
-				setSourceList(modelSelectPane.currentClassifierModel);
 			}
 			else {
 				classifierPane.setCenter(null); 
@@ -459,10 +480,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private void setSourceList(DLClassiferModel currentClassifierModel) {
 		
+		PamDataBlock currentSource = sourcePane.getSource();
+		
 		//we don't want to set the source list again and gain if the model has changed. 
 		if (currentClassifierModel==null) {
 			setDefaultSourceList();
 			currentAllowedDataTypes=null;
+			sourcePane.setSourceIndex(0); //select the first source by default
 			return;
 		}
 		
@@ -489,6 +513,20 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//something has gone wrong but at least have sound acquisition for  sample rate.  
 		if  (sourcePane.getSourceCount()<=0) {
 			setDefaultSourceList();
+		}
+		
+		
+		//now find whether the current source is still valid.
+		if (currentSource!=null) {
+			for (int i=0; i<sourcePane.getSourceCount(); i++) {
+				if (sourcePane.getSource(i)==currentSource) {
+					sourcePane.setSourceIndex(i);
+					return;
+				}
+			}
+		}
+		else {
+			sourcePane.setSourceIndex(0); //select the first source by default
 		}
 	}
 	
@@ -530,9 +568,19 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			return null;
 		}
 		
+		//check the source pane validator
 		if (sourcePane.getChannelValidator().containsErrors()) {
 			Platform.runLater(()->{
 				String content = PamValidator.list2String(sourcePane.getChannelValidator().getValidationResult().getMessages()); 
+				dlWarningDialog.showWarning(content); 
+			}); 
+			return null;
+		}
+		
+		//check this panes validator
+		if (validator.containsErrors()) {
+			Platform.runLater(()->{
+				String content = PamValidator.list2String(validator.getValidationResult().getMessages()); 
 				dlWarningDialog.showWarning(content); 
 			}); 
 			return null;
@@ -706,7 +754,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//System.out.println("Set the segment length: " + defaultSegmentLen + " sR " + sR);
 
 		//automatically set the default segment length. 
-		getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue((int) (sR*defaultSegmentLen/1000.));
+		getSegmentLenSpinner().getValueFactory().setValue((int) (sR*defaultSegmentLen/1000.));
 	}
 
 	/**
@@ -718,7 +766,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 		//automatically set the default segment length. 
-		getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) (sR*hopLength/1000.));
+		getHopLenSpinner().getValueFactory().setValue((int) (sR*hopLength/1000.));
 	}
 
 
@@ -727,6 +775,58 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		
 	}
 
+	
+	class DLPamSpinner<T> extends PamSpinner<T>{
+		
+		public DLPamSpinner() {
+			super();
+			// TODO Auto-generated constructor stub
+		}
+
+		public DLPamSpinner(double min, double max, double initialValue, double amountToStepBy) {
+			super(min, max, initialValue, amountToStepBy);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DLPamSpinner(double min, double max, double initialValue) {
+			super(min, max, initialValue);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DLPamSpinner(int min, int max, int initialValue, int amountToStepBy) {
+			super(min, max, initialValue, amountToStepBy);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DLPamSpinner(int min, int max, int initialValue) {
+			super(min, max, initialValue);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DLPamSpinner(ObservableList<T> arg0) {
+			super(arg0);
+			// TODO Auto-generated constructor stub
+		}
+
+		public DLPamSpinner(SpinnerValueFactory<T> arg0) {
+			super(arg0);
+			// TODO Auto-generated constructor stub
+		}
+
+		/**
+		 * Save the time in seconds as this does not chage with sample rate
+		 */
+		private double timeSeconds; 
+		
+		public double getTimeSeconds() {
+			return timeSeconds;
+		}
+
+		public void setTimeSeconds(double timeSeconds) {
+				this.timeSeconds = timeSeconds;
+		}
+		
+	}
 
 
 

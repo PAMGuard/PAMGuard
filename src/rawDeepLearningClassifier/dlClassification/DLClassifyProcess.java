@@ -204,16 +204,21 @@ public class DLClassifyProcess extends PamProcess {
 	 */
 	@Override
 	public void newData(PamObservable obs, PamDataUnit pamRawData) {
-		//System.out.println("NEW SEGMENTER DATA: " +  PamCalendar.formatDateTime2(pamRawData.getTimeMilliseconds(), "dd MMM yyyy HH:mm:ss.SSS", false) + "  " + pamRawData.getUID() + "  " + pamRawData.getChannelBitmap() + " " + pamRawData);
+//		System.out.println("NEW SEGMENTER DATA: " +  PamCalendar.formatDateTime2(pamRawData.getTimeMilliseconds(), "dd MMM yyyy HH:mm:ss.SSS", false)
+//		+ "  " + pamRawData.getUID() + "  " + pamRawData.getChannelBitmap() + " " + pamRawData.getUID());
 
 		//if grouped data then just run the classifier on the group - do not try and create a buffer. 
 		if (pamRawData instanceof SegmenterDetectionGroup) {
-			if (classificationBuffer.size()>=1) {
+			//note that the segmenter will not send empty groups to the process
+			classificationBuffer.add(pamRawData);
+			
+//			SegmenterDetectionGroup sdg = (SegmenterDetectionGroup) pamRawData;
+//			System.out.println("NEW group SEGMENTER DATA: " +  PamCalendar.formatDateTime2(sdg.getSegmentStartMillis(), "dd MMM yyyy HH:mm:ss.SSS", false)
+//			+ "  " + pamRawData.getUID() +" sub detections: " + sdg.getSubDetectionsCount());
+
+			if (classificationBuffer.size()>=1) { //bit redundant but keep in case we change the buffer size later
 				runDetectionGroupModel(); 
 				classificationBuffer.clear(); 
-			}
-			else {
-				classificationBuffer.add(pamRawData);
 			}
 		}
 
@@ -255,6 +260,12 @@ public class DLClassifyProcess extends PamProcess {
 		ArrayList<ArrayList<? extends PredictionResult>> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
 
 		//System.out.println("MODEL RESULTS: " + modelResults); 
+		
+		if (modelResults==null) {
+			//there has either been a problem or we are in real time mode 
+			//and the model is now running on a different thread. It will return the results itself to new model results
+			return; 
+		}
 
 		for (int i=0; i<classificationBufferTemp.size(); i++) {
 
@@ -273,15 +284,15 @@ public class DLClassifyProcess extends PamProcess {
 	 * @param detectionGroup - the detection group.
 	 * @param modelResult the model result
 	 */
-	private void newDetectionGroupResult(PamDataUnit detectionGroup, PredictionResult modelResult) {
+	void newDetectionGroupResult(PamDataUnit detectionGroup, PredictionResult modelResult) {
 
 		DLDataUnit dlDataUnit =  predictionToDataUnit(detectionGroup, modelResult);
 
-		//System.out.println("Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
+//		System.out.println("newDetectionGroupResult: Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
 		//add to the model result. 
 		this.dlModelResultDataBlock.addPamData(dlDataUnit);
 
-		//		System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
+		//System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
 		//		//Now generate a detection of a decision threshold is reacheed. 
 		//		if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
 		//			System.out.println("DELPHINID - we have a positive detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
@@ -291,6 +302,13 @@ public class DLClassifyProcess extends PamProcess {
 		for (int i=0; i<getSourceParams().countChannelGroups(); i++) {
 
 			if (PamUtils.hasChannel(getSourceParams().getGroupChannels(i), PamUtils.getLowestChannel(detectionGroup.getChannelBitmap()))) {
+				
+				//now we may have to check that the group segment is continuous with the last one. If not we need to save the buffer first.
+				if (!isGroupContiguous((SegmenterDetectionGroup) detectionGroup, i)) {
+					//need to save the data unit and clear the unit. 
+					saveGroupDetection(i);
+				}
+
 				/****Make our own data units****/
 				if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
 					//if the model result has a binary classification then it is added to the data buffer unless the data
@@ -299,25 +317,54 @@ public class DLClassifyProcess extends PamProcess {
 					modelResultDataBuffer[i].add(modelResult); 
 
 					if (groupDetectionBuffer[i].size()>=dlControl.getDLParams().maxMergeHops) {
+						//System.out.println("DELPHINID - save the detection 1 " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
 						//need to save the data unit and clear the unit. 
-						DLGroupDetection dlDetection  = makeGroupDLDetection(groupDetectionBuffer[i], modelResultDataBuffer[i]); 
-						clearBuffer(i);
-						if (dlDetection!=null) {
-							this.dlGroupDetectionDataBlock.addPamData(dlDetection);
-						}
+						saveGroupDetection(i);
 					}
 				}
 				else {
+					//System.out.println("DELPHINID - save the detection 2: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
 					//no binary classification thus the data unit is complete and buffer must be saved. 
-					DLGroupDetection dlDetection  = makeGroupDLDetection(groupDetectionBuffer[i], modelResultDataBuffer[i]); 
-					clearBuffer(i) ;
-					if (dlDetection!=null) {
-						this.dlGroupDetectionDataBlock.addPamData(dlDetection);
-						//							System.out.println("Amplitude: " + dlDetection.getAmplitudeDB()  
-						//							+ "  " + dlDetection.getMeasuredAmplitudeType());
-					}
+					saveGroupDetection(i);
 				}
 			}
+		}
+	}
+	
+	private boolean isGroupContiguous(SegmenterDetectionGroup detectionGroup, int i) {
+		if (groupDetectionBuffer[i] == null || groupDetectionBuffer[i].size() == 0) {
+			//no buffer so always contiguous
+			return true;
+		}
+		
+		//so we have at least one segment in the buffer. Check whether the new segment is contiguous with the last one.
+		
+		long timeMillis1 = groupDetectionBuffer[i].getLast().getSegmentStartMillis();
+		long timeMillis2 = detectionGroup.getSegmentStartMillis();
+		
+		//now, does this fall within the max gap time?
+		long expectedMillis2 = (long) (timeMillis1 + ((double) (dlControl.getDLParams().sampleHop)/this.getSampleRate())*1000.);
+		
+		//we set the time gap max to one to account for rounding errors.
+		if (Math.abs(expectedMillis2 - timeMillis2) <= 1) {
+			//contiguous
+			return true;
+		}
+		
+		return false;
+	}
+
+	
+
+	/**
+	 * Save the current group detection data and clear the buffers for channel group i. 
+	 * @param i - the channel group index. 
+	 */
+	private void saveGroupDetection(int i) {
+		DLGroupDetection dlDetection  = makeGroupDLDetection(groupDetectionBuffer[i], modelResultDataBuffer[i]); 
+		clearBuffer(i) ;
+		if (dlDetection!=null) {
+			this.dlGroupDetectionDataBlock.addPamData(dlDetection);
 		}
 	}
 
@@ -350,8 +397,8 @@ public class DLClassifyProcess extends PamProcess {
 		//work out the time limits from the different segments - super safe here assuming they could be oiut of order. 
 		for (int i=0; i<groupDetections.size() ; i++) {
 
-			//			System.out.println("SEGMENT " + i + "  " + "  "  + groupDetections.get(i).getUID() + "  " +  PamCalendar.formatDateTime(groupDetections.get(i).getTimeMilliseconds()) 
-			//			+ " channel: " + groupDetections.get(i).getChannelBitmap() +  " n det: " + groupDetections.get(i).getSubDetectionsCount()); 
+//						System.out.println("SEGMENT " + i + "  " + "  "  + groupDetections.get(i).getUID() + "  " +  PamCalendar.formatDateTime(groupDetections.get(i).getTimeMilliseconds()) 
+//						+ " channel: " + groupDetections.get(i).getChannelBitmap() +  " n det: " + groupDetections.get(i).getSubDetectionsCount()); 
 
 			//work out the frequency limits based on the data units
 			for (int j=0; j<groupDetections.get(i).getSubDetectionsCount(); j++) {
@@ -378,8 +425,8 @@ public class DLClassifyProcess extends PamProcess {
 
 		}
 
-		//		System.out.println("MAKE DL GROUP DETECTION " + groupDetections.size() + " segements " + " freq: "
-		//		+ minFreq + "  " + maxFreq + " time: " + PamCalendar.formatDateTime(timeMillis) + " duration: " + (endTimeMillis-timeMillis));
+//				System.out.println("MAKE DL GROUP DETECTION " + groupDetections.size() + " segements " + " freq: "
+//				+ minFreq + "  " + maxFreq + " time: " + PamCalendar.formatDateTime(timeMillis) + " duration: " + (endTimeMillis-timeMillis));
 
 		DLGroupDetection dlgroupDetection = new DLGroupDetection(timeMillis, groupDetections.get(0).getChannelBitmap(), startSample,  (endTimeMillis-timeMillis), dataUnits); 
 		dlgroupDetection.setFrequency(new double[] {minFreq, maxFreq});
@@ -410,7 +457,7 @@ public class DLClassifyProcess extends PamProcess {
 
 		if (modelResults==null) {
 			//there has either been a problem or we are in real time mode 
-			//and the model is now running on a different thread. It will return the results.
+			//and the model is now running on a different thread. It will return the results itself to new model results
 			return; 
 		}
 		
@@ -899,7 +946,10 @@ public class DLClassifyProcess extends PamProcess {
 	@Override
 	public void pamStart() {
 		//		System.out.println("PREP MODEL:");
+		
+		//warnings and try/catch etc. are handled within the prep model function.
 		this.dlControl.getDLModel().prepModel(); 
+	
 	}
 
 	@Override

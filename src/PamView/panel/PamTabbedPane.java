@@ -123,7 +123,7 @@ public class PamTabbedPane extends JTabbedPane implements ColorManaged {
 		
 		this.addMouseListener(new TabPaneMouse());
 		
-		setUI(new PamTabbedPaneUI());
+		//setUI(new PamTabbedPaneUI());
 
 		//tab dragging code
 		final DragSourceListener dsl = new DragSourceListener() {

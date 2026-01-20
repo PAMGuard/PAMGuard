@@ -874,5 +874,20 @@ public class SourcePaneFX extends PamBorderPane {
 	public void clearSourceTypeList() {
 		this.sourceType.clear();
 	}
+	
+	/**
+	 * Get the source data block at index i in the source list. 
+	 * @param i - index
+	 * @return the data block at index i, or null if index is out of range. 
+	 */
+	public PamDataBlock getSource(int i) {
+		List<PamDataBlock> dataBlocks  = getSourceDataBlocks() ;
+		if (i<0 || i>=dataBlocks.size()) {
+			System.err.println("SourcePaneFX: getSource index out of range: " + i);
+			return null;
+		}
+		return dataBlocks.get(i);
+	}
+
 
 }

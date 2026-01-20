@@ -287,7 +287,6 @@ public abstract class SuperDetLogging extends SQLLogging {
 
 	@Override
 	public boolean deleteData(PAMSelectClause pvp) {
-		boolean ok = super.deleteData(pvp);
 		PamConnection con = DBControlUnit.findConnection();
 		if (con == null) {
 			return false;
@@ -312,6 +311,9 @@ public abstract class SuperDetLogging extends SQLLogging {
 				e.printStackTrace();
 			}
 		}
+		
+		boolean ok = super.deleteData(pvp);
+
 		return ok;
 	}
 	
