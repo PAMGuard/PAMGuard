@@ -810,7 +810,6 @@ final public class PamModel implements PamSettings {
 		mi = PamModuleInfo.registerControlledUnit("soundtrap.STClickControl", "SoundTrap Click Detector");
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setToolTipText("Click Detector module for Soundtrap detector data only");
-
 		//		mi.setHidden(isViewer == false);
 
 
