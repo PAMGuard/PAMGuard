@@ -20,6 +20,7 @@ import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.engine.EngineException;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguModelWorker;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
@@ -39,7 +40,7 @@ public class KooguDLClassifierTest {
 		
 
 		//relative paths to the resource folders.
-		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/blue_whale_24.kgu";
+		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/blue_whale_24.zip";
 		String relWavPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/20190527_190000.wav";
 		String relMatPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/rawScores_20190527_190000.mat";
 		
@@ -58,12 +59,8 @@ public class KooguDLClassifierTest {
 //			e.printStackTrace();
 //		} 
 		
-		// Note: Had a good few hours of trouble because the koogu model was saved as
-		// blue_whale_24.kgu.zip. This led to some very very strange behaviour with
-		// loading the model - for example it would load successfully but then fail when
-		// trying to run inference and also the shape would be wrong. I used the command 
-		// mv blue_whale_24.kgu.zip blue_whale_24.kgu in terminal to rename the file and all is now good.
-		
+		// 2026-01-19 Note: Had a good few hours of trouble with the Koogu model seemingly randomly loading wrong. Cannot figure why this is happening.
+		//Giving up for now...maybe need to try resaving the model in a later TF version. 
 		runKooguClassifier( relModelPath,  relWavPath,  relMatPath);
 	}
 	
