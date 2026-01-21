@@ -348,6 +348,14 @@
    <tocitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal" image="topic"/>
 
   </tocitem>
+  <tocitem text="Mel Spectrogram ">
+   <tocitem text="Overview " target="sound_processing.mel.docs.mel_overview" image="topic"/>
+
+   <tocitem text="Configuring " target="sound_processing.mel.docs.mel_config" image="topic"/>
+
+   <tocitem text="Displays " target="sound_processing.mel.docs.mel_display" image="topic"/>
+
+  </tocitem>
   <tocitem text="Filters (IIR and FIR) ">
    <tocitem text="Overview " target="sound_processing.FiltersHelp.Docs.Filters_filters" image="topic"/>
 

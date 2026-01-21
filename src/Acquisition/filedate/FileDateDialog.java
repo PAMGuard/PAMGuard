@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.swing.BoxLayout;
@@ -26,6 +27,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import PamUtils.time.TimeZoneComboBox;
+import PamUtils.time.TimeZonePanel;
 import PamView.PamGui;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
@@ -38,14 +41,10 @@ public class FileDateDialog extends PamDialog {
 	
 	private StandardFileDateSettings standardFileDateSettings;
 	
-	private JComboBox<String> offlineTimeZone;
-	
-	private JCheckBox daylightSaving;
+	private TimeZonePanel timeZonePanel;
 	
 	private JTextField additionalOffset;
 
-	private ArrayList<TimeZone> timeZones = new ArrayList<>();
-	
 	private JPanel soundTrapDate;
 
 	private boolean allowCustomFormats;
@@ -59,7 +58,6 @@ public class FileDateDialog extends PamDialog {
 	private FileDateDialog(Window parentFrame) {
 		super(parentFrame, "File Date Settings", true);
 		
-//		JPanel mainPanel = new JPanel(new BorderLayout(5,5));
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		GridBagConstraints gbcmp = new PamGridBagContraints();
@@ -104,38 +102,11 @@ public class FileDateDialog extends PamDialog {
 //		mainPanel.add(BorderLayout.SOUTH, mPanel);
 		gbcmp.gridy++;
 		mainPanel.add(mPanel, gbcmp);
-		
-		JPanel tzPanel = new PamAlignmentPanel(new GridBagLayout(), BorderLayout.WEST);
-		c = new PamGridBagContraints();
-		
-		tzPanel.setBorder(new CompoundBorder(new TitledBorder("Time Zone"), new EmptyBorder(0, 10, 0, 0)));
-		
-		offlineTimeZone = new JComboBox<>();
-		fillTimeZones();
-//		zones = TimeZone.getAvailableIDs();
-		
-		
-//		TimeZone tz;
-//		String tzStr;
-//		for (int i = 0; i < zones.length; i++) {
-//			tz = TimeZone.getTimeZone(zones[i]);
-//			if (tz.getRawOffset() < 0) {
-//				tzStr = String.format("UTC%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
-//			}
-//			else {
-//				tzStr = String.format("UTC+%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
-//			}
-//			offlineTimeZone.addItem(tzStr);
-//		}
-		daylightSaving = new JCheckBox("Use daylight saving");
-		
-		c.gridx = c.gridy = 0;
-		tzPanel.add(offlineTimeZone, c);
-		c.gridy++;
-		tzPanel.add(daylightSaving, c);
-//		mainPanel.add(BorderLayout.NORTH, tzPanel);
+
+		timeZonePanel = new TimeZonePanel("Time Zone", true, true, true);
+
 		gbcmp.gridx = gbcmp.gridy = 0;
-		mainPanel.add(tzPanel, gbcmp);
+		mainPanel.add(new PamAlignmentPanel(timeZonePanel.getComponent(), BorderLayout.WEST, true));
 		
 		JPanel aPanel = new PamAlignmentPanel(new GridBagLayout(), BorderLayout.WEST);
 		c = new PamGridBagContraints();
@@ -147,9 +118,7 @@ public class FileDateDialog extends PamDialog {
 		aPanel.add(additionalOffset);
 		c.gridx++;
 		aPanel.add(new JLabel(" Seconds ", JLabel.LEFT));
-//		JPanel lPanel = new JPanel(new BorderLayout());
-//		lPanel.add(BorderLayout.WEST, aPanel);
-//		mainPanel.add(BorderLayout.CENTER, lPanel);
+
 		gbcmp.gridy++;
 		mainPanel.add(aPanel, gbcmp);
 
@@ -161,9 +130,7 @@ public class FileDateDialog extends PamDialog {
 		ovPanel.add(new JLabel("Override time from file and force current PC time ", JLabel.RIGHT));
 		c.gridx++;
 		ovPanel.add(forcePCTime = new JCheckBox());
-//		JPanel forcePanel = new JPanel(new BorderLayout());
-//		forcePanel.add(BorderLayout.WEST, ovPanel);
-//		mainPanel.add(BorderLayout.CENTER, forcePanel);
+
 		gbcmp.gridy++;
 		mainPanel.add(ovPanel, gbcmp);
 
@@ -198,46 +165,6 @@ public class FileDateDialog extends PamDialog {
 		setDialogComponent(mainPanel);
 	}
 	
-	private void fillTimeZones() {
-		String[] zones = TimeZone.getAvailableIDs();	
-//		zones = TimeZone.
-		timeZones = new ArrayList<>();
-		String tzStr;
-		TimeZone tz;
-		for (int i = 0; i < zones.length; i++) {
-//			TimeZone tz = TimeZone.getTimeZone(zones[i]);
-			try {
-			tz = TimeZone.getTimeZone(ZoneId.of(zones[i]));
-			}
-			catch (Exception e) {
-				continue;
-			}
-			if (tz == null) {
-				continue;
-			}
-			timeZones.add(tz);
-		}
-		Collections.sort(timeZones, new Comparator<TimeZone>() {
-			@Override
-			public int compare(TimeZone o1, TimeZone o2) {
-				return o2.getRawOffset()-o1.getRawOffset();
-			}
-		});
-		int offs;
-		for (int i = 0; i < timeZones.size(); i++) {
-			tz = timeZones.get(i);
-			String id =  tz.getID();
-			String displayName =  tz.getDisplayName();
-			offs = tz.getRawOffset();
-			if (tz.getRawOffset() < 0) {
-				tzStr = String.format("UTC%3.1f %s (%s)", (double)offs/3600000., id,  displayName);
-			}
-			else {
-				tzStr = String.format("UTC+%3.1f %s (%s)", (double)offs/3600000., id, displayName);
-			}
-			offlineTimeZone.addItem(tzStr);
-		}
-	}
 	
 	public static StandardFileDateSettings showDialog(Window parentFrame, StandardFileDateSettings standardFileDateSettings, boolean allowCustomFormats) {
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
@@ -251,13 +178,10 @@ public class FileDateDialog extends PamDialog {
 	}
 
 	private void setParams() {
-		int idInd = getIdIndex(standardFileDateSettings.getTimeZoneName());
-		if (idInd >= 0) {
-			offlineTimeZone.setSelectedIndex(idInd);
-		}
+		timeZonePanel.setTimeZone(standardFileDateSettings.getTimeZoneName());
 		autoFormat.setSelected(standardFileDateSettings.isUseBespokeFormat() == false);
 		manualFormat.setSelected(standardFileDateSettings.isUseBespokeFormat());
-		daylightSaving.setSelected(standardFileDateSettings.isAdjustDaylightSaving());
+		timeZonePanel.setUseDaylightSaving(standardFileDateSettings.isAdjustDaylightSaving());
 		forcePCTime.setSelected(standardFileDateSettings.isForcePCTime());
 		additionalOffset.setText(String.format("%5.3f", (double) standardFileDateSettings.getAdditionalOffsetMillis() / 1000.));
 		customDateTimeFormat.setText(standardFileDateSettings.getForcedDateFormat());
@@ -265,37 +189,12 @@ public class FileDateDialog extends PamDialog {
 		enableContols();
 		this.pack();
 	}
-	
-	private int getIdIndex(String tzId) {
-//		if (tzId == null) {
-//			tzId = "UTC";
-//		}
-//		for (int i = 0; i < zones.length; i++) {
-//			if (tzId.equals(zones[i])) {
-//				return i;
-//			}
-//		}
-		for (int i = 0; i < timeZones.size(); i++) {
-			if (timeZones.get(i).getID().equals(tzId)) {
-				offlineTimeZone.setSelectedIndex(i);
-				break;
-			}
-		}
-		return -1;
-	}
 
 	@Override
 	public boolean getParams() {
-		int idInd = offlineTimeZone.getSelectedIndex();
-		if (idInd < 0) {
-			return showWarning("You must select a time zone");
-		}
-		TimeZone tz = timeZones.get(idInd);
-		if (tz == null) {
-			return showWarning("The time zone you have selected does not exist");
-		}
+		TimeZone tz = timeZonePanel.getTimeZone();
 		standardFileDateSettings.setTimeZoneName(tz.getID());
-		standardFileDateSettings.setAdjustDaylightSaving(daylightSaving.isSelected());
+		standardFileDateSettings.setAdjustDaylightSaving(timeZonePanel.isUseDaylightSaving());
 		standardFileDateSettings.setForcePCTime(forcePCTime.isSelected());
 		
 		try {

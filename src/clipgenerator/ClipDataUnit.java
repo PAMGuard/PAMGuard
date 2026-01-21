@@ -278,8 +278,14 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		return fastFFT;
 	}
 	
-	AcquisitionProcess findDaqProcess() {
+	protected AcquisitionProcess findDaqProcess() {
+//		sourceProcess = getParentDataBlock().
+		try {
 			return (AcquisitionProcess) getParentDataBlock().getSourceProcess();
+		}
+		catch (ClassCastException e) {
+			return null;
+		}
 	}
 	
 	

@@ -6,8 +6,10 @@ import java.awt.TextArea;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.swing.ButtonGroup;
@@ -25,9 +27,8 @@ import PamView.dialog.PamGridBagContraints;
 public class TimeZoneDisplayDialog extends PamDialog {
 	
 	private JRadioButton useUTC, usePC, useOther;
-	private JComboBox<String> timeZones;
+	private TimeZoneComboBox timeZones;
 	private JLabel pcTimeZone;
-	private String[] timeZoneIds;
 	private TimeDisplayParameters timeDisplayParameters;
 //	private TimeZone thisTimeZone;
 	private int utcTZIndex, pcTZIndex;
@@ -52,7 +53,7 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		tzPanel.add(useOther = new JRadioButton("Other"), c);
 		c.gridx++;
 		c.gridwidth = 2;
-		tzPanel.add(timeZones = new JComboBox<>(), c);
+		tzPanel.add(timeZones = new TimeZoneComboBox(), c);
 		c.gridwidth = 3;
 		c.gridy++;
 		c.gridx = 0;
@@ -66,27 +67,27 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		bg.add(usePC);
 		bg.add(useOther);
 
-		TimeZone pcTimeZone = TimeZone.getDefault();
-		timeZoneIds = TimeZone.getAvailableIDs();
-		Arrays.sort(timeZoneIds, new TimeZoneComparator());
-		TimeZone tz;
-		String tzStr;
-		for (int i = 0; i < timeZoneIds.length; i++) {
-			tz = TimeZone.getTimeZone(timeZoneIds[i]);
-			if (timeZoneIds[i].equals(PamCalendar.defaultTimeZone.getID())) {
-				utcTZIndex = i;
-			}
-			if (timeZoneIds[i].equals(pcTimeZone.getID())) {
-				pcTZIndex = i;
-			}
-			if (tz.getRawOffset() < 0) {
-				tzStr = String.format("UTC%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
-			}
-			else {
-				tzStr = String.format("UTC+%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
-			}
-			timeZones.addItem(tzStr);
-		}
+//		TimeZone pcTimeZone = TimeZone.getDefault();
+//		Set<String> timeZoneIds = ZoneId.getAvailableZoneIds();
+//		Arrays.sort(timeZoneIds, new TimeZoneComparator());
+//		TimeZone tz;
+//		String tzStr;
+//		for (int i = 0; i < timeZoneIds.length; i++) {
+//			tz = TimeZone.getTimeZone(timeZoneIds[i]);
+//			if (timeZoneIds[i].equals(PamCalendar.defaultTimeZone.getID())) {
+//				utcTZIndex = i;
+//			}
+//			if (timeZoneIds[i].equals(pcTimeZone.getID())) {
+//				pcTZIndex = i;
+//			}
+//			if (tz.getRawOffset() < 0) {
+//				tzStr = String.format("UTC%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
+//			}
+//			else {
+//				tzStr = String.format("UTC+%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
+//			}
+//			timeZones.addItem(tzStr);
+//		}
 		
 		ButtonChanged bc = new ButtonChanged();
 		useUTC.addActionListener(bc);
@@ -141,18 +142,9 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		if (timeZone == null) {
 			return;
 		}
-		int ind = findTimeZoneIndex(timeZone);
-		timeZones.setSelectedIndex(ind);
+		timeZones.setTimeZone(timeZone);
 	}
 
-	private int findTimeZoneIndex(TimeZone timeZone) {
-		for (int i = 0; i < timeZoneIds.length; i++) {
-			if (timeZoneIds[i].equals(timeZone.getID())) {
-				return i;
-			}
-		}
-		return 0;
-	}
 
 	public void enableControls() {
 		timeZones.setEnabled(useOther.isSelected());
@@ -174,7 +166,13 @@ public class TimeZoneDisplayDialog extends PamDialog {
 			if (tzInd < 0) {
 				return showWarning("You must select a time zone from the drop down list");
 			}
-			timeDisplayParameters.timeZone = TimeZone.getTimeZone(timeZoneIds[tzInd]);
+			TimeZone selZone = timeZones.getTimeZone();
+			if (selZone == null) {
+				timeDisplayParameters.timeZone = null;
+			}
+			else {
+				timeDisplayParameters.timeZone = selZone;
+			}
 		}
 		return timeDisplayParameters.timeZone != null;
 	}
