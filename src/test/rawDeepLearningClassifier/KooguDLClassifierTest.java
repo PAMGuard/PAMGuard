@@ -77,9 +77,9 @@ public class KooguDLClassifierTest {
 		//prep the model - all setting are included within the model
 		kooguWorker.prepModel(genericModelParams, null);
 		
-		String modelPath = kooguWorker.getModel().getLastModelPath();
+		//String modelPath = kooguWorker.getModel().getLastModelPath();
 		
-		System.out.println("Model actually loaded from: " + modelPath);
+		//System.out.println("Model actually loaded from: " + modelPath);
 		
 		System.out.println(genericModelParams);
 		System.out.println("seglen: " +  genericModelParams.defaultSegmentLen + " no. transforms: " + genericModelParams.dlTransfromParams);
