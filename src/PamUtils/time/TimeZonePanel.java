@@ -39,17 +39,17 @@ public class TimeZonePanel {
 		mainPanel.add(timeZoneComboBox, c);
 		c.gridy++;
 		c.gridwidth = 1;
-		if (showDefault) {
-			JButton defBut = new JButton("Default");
-			defBut.addActionListener(new SetZone(TimeZone.getDefault()));
-			defBut.setToolTipText("Set to regional defulat time zone");
-			mainPanel.add(defBut, c);
-			c.gridx++;
-		}
 		if (showSetUTC) {
 			JButton defBut = new JButton("UTC");
 			defBut.addActionListener(new SetZone(PamCalendar.defaultTimeZone));
 			defBut.setToolTipText("Set to UTC (Universal Coordinated Time / Zulu)");
+			mainPanel.add(defBut, c);
+			c.gridx++;
+		}
+		if (showDefault) {
+			JButton defBut = new JButton("Local");
+			defBut.addActionListener(new SetZone(TimeZone.getDefault()));
+			defBut.setToolTipText("Set to regional defulat time zone");
 			mainPanel.add(defBut, c);
 			c.gridx++;
 		}
