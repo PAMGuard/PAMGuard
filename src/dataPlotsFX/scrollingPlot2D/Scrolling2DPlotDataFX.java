@@ -1173,7 +1173,7 @@ public class Scrolling2DPlotDataFX {
 	 * @param value data value
 	 * @return bin number
 	 */
-	double valueToBin(double value) {
+	public double valueToBin(double value) {
 		double val = (double) dataWidth * (value-dataBlock2D.getMinDataValue()) / (dataBlock2D.getMaxDataValue()-dataBlock2D.getMinDataValue());
 		return dataWidth-val;
 	}
@@ -1183,7 +1183,7 @@ public class Scrolling2DPlotDataFX {
 	 * @param bin bin number
 	 * @return data value
 	 */
-	double binToValue(double bin) {
+	public double binToValue(double bin) {
 		bin = dataWidth - bin;
 		return bin / (double) dataWidth * (dataBlock2D.getMaxDataValue()-dataBlock2D.getMinDataValue()) + dataBlock2D.getMinDataValue();
 	}
