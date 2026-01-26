@@ -48,25 +48,6 @@ public class DeepWhistleMask implements PamFFTMask {
 	//TEMP
 	String modelPath = "/Users/jdjm/Dropbox/PAMGuard_dev/Deep_Learning/deepWhistle/DWC-I.pt";
 
-	/**
-	 * Model info
-	 */
-	private DeepWhistleInfo modelInfo;
-
-	/**
-	 * List of the transform parameters used in pre-processing
-	 */
-	private ArrayList<DLTransfromParams> transformParams;
-
-	private ArrayList<DLTransform> transforms;
-
-	//For saving debug info
-	private DeepWhistleMatFile deepWhistleMatFile;
-
-	public String matFilePath = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/silbido/pamguard_input_example.mat";
-
-	int count = 0;
-	
 	
 	public DeepWhistleMask(DeepWhistleProcess maksedFFTProcess) {
 		this.maksedFFTProcess = maksedFFTProcess;
