@@ -56,7 +56,7 @@
 		Linux Ubuntu based systems-->
 		<!--Note: There is a Maven bug/feature when using profiles when the plugin order is messed up and seemingly quite random. 
 		In PAMGuard it essential that the shade plugin is called before the linux plugin. Therefore explicately call 
-		the package phase using mvnclean package shade:shade org.vafer:jdeb:jdeb. Note that although a deb file can be created in Windows it
+		the package phase using -mvn clean package shade:shade org.vafer:jdeb:jdeb. Note that although a deb file can be created in Windows it
 		will not have the correct JavaFX libraries and therefore will not work when run -->
 		<profile>
 			<id>linux-profile</id>
@@ -102,7 +102,7 @@
 								</data>
 								<data>
 									<src>
-										${basedir}/build/deb/PAMGuardIcon2.png</src>
+										${basedir}/build/deb/control/PAMGuardIcon2.png</src>
 									<type>file</type>
 									<mapper>
 										<type>perm</type>
@@ -112,7 +112,7 @@
 								<!---THe desktop file will create a PAMGuard icon in the applications tray-->
 								<data>
 									<src>
-										${basedir}/build/deb/pamguard.desktop</src>
+										${basedir}/build/deb/control/pamguard.desktop</src>
 									<type>file</type>
 									<mapper>
 										<type>perm</type>
