@@ -3204,7 +3204,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			ClickDetection click = null;
 			ClickDetection prevPlottedClick = null;
-			PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
+			//PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 
 			if (zoomer != null) {
 				zoomer.paintShape(g, this, true);
@@ -3215,11 +3215,13 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (clickCopy.size() == 0) {
 				return;
 			}
-			ListIterator<ClickDetection> clickIterator = clickCopy.listIterator(clickCopy.size()-1);
-
+			
+			//note the iterator strats off the end of the list and works backwards 
+			ListIterator<ClickDetection> clickIterator = clickCopy.listIterator(clickCopy.size());
+			
 //			synchronized (clickData.getSynchLock()) {
-//
-//				ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
+//			ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
+			int count=0; 
 				while (clickIterator.hasPrevious()) {
 					click = clickIterator.previous();
 					if (shouldPlot(prevPlottedClick)){
