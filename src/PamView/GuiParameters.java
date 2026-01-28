@@ -35,6 +35,7 @@ public class GuiParameters implements Serializable, Cloneable {
 	 * very annoying when they cover controls you want to use!
 	 */
 	private boolean hideAllToolTips = false;
+
 	
 
 	/* (non-Javadoc)

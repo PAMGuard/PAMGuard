@@ -523,7 +523,7 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 		PamView pamView = getPamView();
 		if (pamView != null && PamGui.class.isAssignableFrom(pamView.getClass())) {
 			PamGui pamGui = (PamGui) pamView;
-			pamGui.ShowTabSpecificSettings();
+			pamGui.showTabSpecificSettings();
 		}
 
 		formsMonitor.rebuiltForms();
