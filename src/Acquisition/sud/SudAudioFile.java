@@ -147,10 +147,14 @@ public class SudAudioFile extends WavAudioFile implements PamSettings {
 									"Mapping sud file: " + soundFile.getName());
 
 							SwingUtilities.invokeLater(() -> {
-
-								worker.getPamWorkDialog().setLocation(worker.getPamWorkDialog().getX(), 
-										worker.getPamWorkDialog().getY() + 200);
-								worker.getPamWorkDialog().validate();
+								
+								//prevent the dialog from stealing focus from the main PAMGUI or indeed other programs
+								//because the dialog appears so often the focus stealing can be very annoying
+								worker.getPamWorkDialog().setAutoRequestFocus(false);
+								
+//								worker.getPamWorkDialog().setLocation(worker.getPamWorkDialog().getX(), 
+//										worker.getPamWorkDialog().getY() + 200);
+//								worker.getPamWorkDialog().validate();
 								//System.out.println("Sud Audio Stream STARTED: " + soundFile.getName());
 								worker.start();
 							});

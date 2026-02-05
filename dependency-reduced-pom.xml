@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.17ffb</version>
+  <version>2.02.17ffc</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -64,7 +64,7 @@
                   </mapper>
                 </data>
                 <data>
-                  <src>${basedir}/build/deb/PAMGuardIcon2.png</src>
+                  <src>${basedir}/build/deb/control/PAMGuardIcon2.png</src>
                   <type>file</type>
                   <mapper>
                     <type>perm</type>
@@ -72,7 +72,7 @@
                   </mapper>
                 </data>
                 <data>
-                  <src>${basedir}/build/deb/pamguard.desktop</src>
+                  <src>${basedir}/build/deb/control/pamguard.desktop</src>
                   <type>file</type>
                   <mapper>
                     <type>perm</type>

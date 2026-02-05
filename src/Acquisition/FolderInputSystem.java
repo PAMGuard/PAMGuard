@@ -476,7 +476,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 		else {
 			//FX system
-			wavListWorker.setLoadAudioInfo(true); //need to load sample rate for each file because FX GUI wants this to showe in table.
+			wavListWorker.setLoadAudioInfo(true); //need to load sample rate for each file because FX GUI wants this to show in table.
 
 
 			PamWorker<FileListData<WavFileType>> worker = wavListWorker.makeFileListProcess(rootList, folderInputParameters.subFolders, true);
