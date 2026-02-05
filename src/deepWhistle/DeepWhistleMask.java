@@ -48,11 +48,6 @@ public class DeepWhistleMask implements PamFFTMask {
 	//TEMP
 	String modelPath = "/Users/jdjm/Dropbox/PAMGuard_dev/Deep_Learning/deepWhistle/DWC-I.pt";
 
-	
-	public DeepWhistleMask(DeepWhistleProcess maksedFFTProcess) {
-		this.maksedFFTProcess = maksedFFTProcess;
-	}
-
 	/**
 	 * Model info
 	 */
