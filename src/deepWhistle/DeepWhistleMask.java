@@ -71,6 +71,11 @@ public class DeepWhistleMask implements PamFFTMask {
 	public String matFilePath = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/silbido/pamguard_input_example.mat";
 
 	int count = 0;
+	
+	
+	public DeepWhistleMask(DeepWhistleProcess maksedFFTProcess) {
+		this.maksedFFTProcess = maksedFFTProcess;
+	}
 
 	@Override
 	public boolean initMask() {

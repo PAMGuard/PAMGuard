@@ -669,8 +669,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 */
 	public  void newFileList(FileListData<WavFileType> fileListData) {
 
-		System.out.printf("FolderInputSystem: Wav list recieved with %d files after %d millis\n",
-				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+//		System.out.printf("FolderInputSystem: Wav list recieved with %d files after %d millis\n",
+//				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
 		
 		fileListData.sort();
 		allFiles = fileListData.getListCopy();
@@ -1152,7 +1152,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			return false;
 		}
 
-		System.out.printf("setAnalysisStarttTime: checking %d files for start time of %s\n", allFiles.size(), PamCalendar.formatDBDateTime(startTime));
+//		System.out.printf("setAnalysisStarttTime: checking %d files for start time of %s\n", allFiles.size(), PamCalendar.formatDBDateTime(startTime));
 		/*
 		 * If the starttime is maxint then there is nothing to do, but we do need to set the file index
 		 * correctly to not over confuse the batch processing system.

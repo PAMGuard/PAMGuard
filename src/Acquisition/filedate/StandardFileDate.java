@@ -146,7 +146,8 @@ public class StandardFileDate implements FileDate, PamSettings {
 			return 0;
 		}
 		else {
-			return time + settings.getTimeOffset(time);
+			long offset = settings.getTimeOffset(time);
+			return time + offset;
 		}
 	}
 	

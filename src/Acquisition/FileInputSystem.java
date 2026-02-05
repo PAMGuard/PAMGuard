@@ -665,7 +665,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				audioStream.close();
 			}
 
-			System.out.println("FileInputSystem: - prepareInputFile");
+//			System.out.println("FileInputSystem: - prepareInputFile");
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
