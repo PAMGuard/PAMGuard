@@ -191,6 +191,7 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 			completeMark(e);
 			nowMarking = false;
 		}
+		nowMarking = false;
 		return wasMarking;
 	}
 	

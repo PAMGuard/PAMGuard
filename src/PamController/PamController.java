@@ -44,6 +44,7 @@ import PamController.command.WatchdogComms;
 import PamController.fileprocessing.ReprocessManager;
 import PamController.fileprocessing.ReprocessManagerMonitor;
 import PamController.masterReference.MasterReferencePoint;
+import PamController.pamWizard.PamWizardManager;
 import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.XMLWriterDialog;
 import PamController.soundMedium.GlobalMediumManager;
@@ -214,6 +215,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * through.
 	 */
 	private GlobalMediumManager globalMediumManager;
+	
+	/**
+	 * Manager for PamWizard functionality
+	 */
+	private PamWizardManager pamWizardManager;
 
 	/**
 	 * A reference to the module currently being loaded. Used by the
@@ -268,6 +274,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		globalTimeManager = new GlobalTimeManager(this);
 		globalMediumManager = new GlobalMediumManager(this);
+		pamWizardManager = new PamWizardManager(this);
 
 		setPamStatus(PAM_IDLE);
 
@@ -295,7 +302,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 		// diagnosticTimer = new Timer(1000, new DiagnosticTimer());
 		// diagnosticTimer.start();
 	}
-
 
 	/**
 	 * Get the location of the install folder. Note that this will be system dependent.
@@ -3130,6 +3136,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public WatchdogComms getWatchdogComms() {
 		return watchdogComms;
+	}
+	
+	
+	/**
+	 * Get the PAMWizard manager - manages creating configurations
+	 * @return the pamWizardManager
+	 */
+	public PamWizardManager getPamWizardManager() {
+		return pamWizardManager;
 	}
 
 	/**
