@@ -14,6 +14,7 @@ import org.jflac.metadata.Metadata;
 import org.jflac.metadata.StreamInfo;
 import org.jflac.sound.spi.FlacAudioFileReader;
 import Acquisition.filedate.FileDate;
+import Acquisition.filedate.FileTimeData;
 import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileLoader;
 import Acquisition.pamAudio.PamAudioFileFilter;
@@ -56,8 +57,11 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 	@Override
 	public long[] getFileStartandEndTime(File file) {
 		long[] t = new long[2];
-		t[0] = fileDate.getTimeFromFile(file);
-		return t;
+		FileTimeData ftd = fileDate.getTimeFromFile(file);
+		if (ftd == null) {
+			return null;
+		}
+		return ftd.getStartandEnd();
 	}
 
 	@Override

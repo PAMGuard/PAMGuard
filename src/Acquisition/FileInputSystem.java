@@ -47,6 +47,7 @@ import org.pamguard.x3.sud.SudFileListener;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
+import Acquisition.filedate.FileTimeData;
 import Acquisition.filetypes.SoundFileType;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioFileManager;
@@ -189,6 +190,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected volatile long currentAnalysisTime;
 
 	private WavFileType currentFile;
+
+	private FileTimeData currentFileTime;
 
 	public FileInputSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
@@ -645,7 +648,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean prepareInputFile() {
 
 		currentFile = getCurrentFile();
+		
+		
 		if (currentFile == null || currentFile.exists() == false) {
+			currentFileTime = null;
 			String warning;
 			if (currentFile == null) {
 				warning = "No sound input file has been selected";
@@ -656,6 +662,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			WarnOnce.showWarning(acquisitionControl.getGuiFrame(),  "Sound Acquisition system", warning, WarnOnce.WARNING_MESSAGE);
 			return false;
 		}
+
+		currentFileTime = acquisitionControl.getFileDate().getTimeFromFile(currentFile);
 		
 //		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
@@ -849,7 +857,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				return wt.getStartMilliseconds();
 			}
 		}
-		return acquisitionControl.getFileDate().getTimeFromFile(file);
+		FileTimeData fileTimeData = acquisitionControl.getFileDate().getTimeFromFile(file);
+		if (fileTimeData == null) {
+			return 0;
+		}
+		else {
+			return fileTimeData.getFileStart();
+		}
 	}
 	
 //	/**
@@ -1465,4 +1479,24 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getStartTimeSource() {
+		// copy reference in case it changes in a different thread. 
+		FileTimeData td = currentFileTime;
+		if (td == null || td.getDateSource() == null) {
+			return "Unknown File Time";
+		}
+		return td.getDateSource();
+	}
+	
+	public double getTotalClockDriftSamples(long currentSamples) {
+		// copy reference in case it changes in a different thread. 
+		FileTimeData td = currentFileTime;
+		if (td == null || td.getDriftPPM() == null) {
+			return 0;
+		}
+		return currentSamples * td.getDriftPPM() / 1.e6;
+	}
+	
 }
