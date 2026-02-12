@@ -767,28 +767,28 @@
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-javafx</artifactId>
-			<version>12.4.0</version>
+			<version>12.3.1</version>
 		</dependency>
 
 		<!-- Icon symbol pack for swing icons . -->
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-swing</artifactId>
-			<version>12.4.0</version>
+			<version>12.3.1</version>
 		</dependency>
 
 		<!-- Ikonli MaterialDesign2 (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-materialdesign2-pack</artifactId>
-			<version>12.4.0</version>
+			<version>12.3.1</version>
 		</dependency>
 
 		<!-- Ikonli File Icons (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-fileicons-pack</artifactId>
-			<version>12.4.0</version>
+			<version>12.3.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/net.sf.geographiclib/GeographicLib-Java 
