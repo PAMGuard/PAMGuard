@@ -165,17 +165,26 @@ public class StandardFileDate implements FileDate, PamSettings {
 		 * has the same name. Try to find such a file and get
 		 * some time information from it. 
 		 */
-//		long dTagTime = D3XMLFile.getXMLStartTime(file);
-//		if (dTagTime != Long.MIN_VALUE) {
-//			setLastFormat("D3 time from xml file");
-//			return dTagTime;
-//		}
+
 		FileTimeData fileTimeData = null;
 		
 		fileTimeData = D3XMLFile.getXMLTimeData(file);
 		if (fileTimeData != null) {
 			return fileTimeData;
 		}
+
+		long sudTime = SUDFileTime.getSUDFileTime(file);
+		if (sudTime != Long.MIN_VALUE) {
+			setLastFormat("SUD METADATA");
+			return new FileTimeData(file, sudTime, "SUD METADATA");
+		}
+
+		long d2Time = d2TextTime.getTimeFromFile(file);
+		if (d2Time != Long.MIN_VALUE) {
+			setLastFormat("D2 time from txt file");
+			return new FileTimeData(file, d2Time, "D2 time from txt file");
+		}
+		
 		
 		// otherwise, for now, just do the old way
 		long oldWay = doTheWorkOldWay(file);
@@ -184,7 +193,12 @@ public class StandardFileDate implements FileDate, PamSettings {
 			oldWay += offset;
 			
 		}
-		return new FileTimeData(oldWay, null, "FILE NAME");
+		if (oldWay == 0) {
+			return new FileTimeData(file, oldWay, getFormat());
+		}
+		else {
+			return new FileTimeData(file, oldWay, "FILE NAME " + getFormat());
+		}
 	}
 	
 	/**
@@ -203,9 +217,12 @@ public class StandardFileDate implements FileDate, PamSettings {
 			return sudTime;
 		}
 		
+		long dTagTime = D3XMLFile.getXMLStartTime(file);
+		if (dTagTime != Long.MIN_VALUE) {
+			setLastFormat("D3 time from xml file");
+			return dTagTime;
+		}
 		
-		
-
 		long stTime = SoundTrapTime.getSoundTrapTime(file, settings.getDateTimeFormatToUse());
 		if (stTime != Long.MIN_VALUE) {
 			setLastFormat("Soundtrap file format \"" + settings.getDateTimeFormatToUse() + "\"");

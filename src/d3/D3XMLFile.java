@@ -115,9 +115,9 @@ public class D3XMLFile {
 	 */
 	public FileTimeData findD3GNSData(Document doc) {
 		Element el = doc.getDocumentElement();
-		Element cue = findElement(el, "CUE");
+		Element cue = findCueElement(el, "wav");
 		Element driftEl = findElement(el, "DRIFT");
-		String tBase = null;
+		String tBase = "D3 CUE";
 		Long time = null;
 		Double drift = null;
 		if (cue != null) {
@@ -145,12 +145,41 @@ public class D3XMLFile {
 				System.out.println("Error reading dtg DRIFT element: " + driftEl.getTextContent());
 			}
 		}
+		if (tBase == null || tBase.length() == 0) {
+			tBase = "D3 CUE";
+		}
 		if (time != null) {
 			return new FileTimeData(xmlFile, time, endTime, tBase, drift);
 		}
 		else {
 			return null;
 		}
+	}
+	
+	/**
+	 * Find one of MJ's Cue's with a specific SUFFIX attribute. 
+	 * @param cueSuffix
+	 * @return
+	 */
+	private Element findCueElement(Element root, String cueSuffix) {
+		NodeList childs = root.getChildNodes();
+		if (childs == null) {
+			return null;
+		}
+		int n = childs.getLength();
+		for (int i = 0; i < n; i++) {
+			Node aChild = childs.item(i);
+			if (aChild.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) aChild;
+				if (aChild.getNodeName().equals("CUE")) {
+					String suf = eElement.getAttribute("SUFFIX");
+					if (suf != null && suf.equalsIgnoreCase(cueSuffix)) {
+						return eElement;
+					}
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**
