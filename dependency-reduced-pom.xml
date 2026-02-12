@@ -98,7 +98,7 @@
           <plugin>
             <groupId>de.perdian.maven.plugins</groupId>
             <artifactId>macosappbundler-maven-plugin</artifactId>
-            <version>1.21.1</version>
+            <version>1.21.2</version>
             <executions>
               <execution>
                 <phase>deploy</phase>
@@ -112,6 +112,7 @@
                 <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
                 <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
                 <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+                <CFBundleName>${project.build.finalName}</CFBundleName>
                 <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
                 <CFBundleURLTypes>
                   <string>msa</string>
@@ -122,9 +123,10 @@
                   <string>-Xmx8192m</string>
                 </JVMArguments>
                 <NSAppSleepDisabled>true</NSAppSleepDisabled>
+                <NSMicrophoneUsageDescription>"PAMGuard requires access to the microphone and sound cards for real time operation"</NSMicrophoneUsageDescription>
               </plist>
               <dmg>
-                <generate>true</generate>
+                <generate>false</generate>
                 <additionalResources>
                   <additionalResource>
                     <directory>${project.basedir}/target/bundle/</directory>
@@ -141,37 +143,10 @@
                 <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
               </jdk>
               <codesign>
-                <enable>false</enable>
-                <identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
+                <enable>true</enable>
+                <identity>Apple Distribution: Jamie Macaulay (7365S9DZ34)</identity>
               </codesign>
             </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>3.5.0</version>
-            <executions>
-              <execution>
-                <id>sign-app</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>bash</executable>
-                  <arguments>
-                    <argument>-c</argument>
-                    <argument>echo ${project.basedir}/target/${project.build.finalName}.dmg
-											xattr -cr ${project.basedir}/target/PAMGuard.app
-											codesign --force --sign "3rd Party Mac Developer Application: Jamie Macaulay" ${project.basedir}/target/PAMGuard.app
-											cp -r ${project.basedir}/target/PAMGuard.app ${project.basedir}/target/bundle/PAMGuard.app
-											cd ${project.basedir}/target/bundle
-											hdiutil create -srcfolder ${project.basedir}/target/bundle -volname "PAMGuard" -fs HFS+ -o "${project.build.finalName}-signed.dmg"
-											rm -r ${project.basedir}/target/bundle/PAMGuard.app</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
@@ -275,7 +250,7 @@
           </plugin>
           <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>3.8.1</version>
+            <version>3.10.0</version>
             <executions>
               <execution>
                 <id>copy-dependencies</id>
@@ -360,14 +335,14 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.source>11</maven.compiler.source>
+    <mockito.version>1.10.19</mockito.version>
+    <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
+    <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <powermock.version>1.6.6</powermock.version>
     <javafx.version>21</javafx.version>
     <jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
-    <mockito.version>1.10.19</mockito.version>
     <jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
-    <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
   </properties>
 </project>

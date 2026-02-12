@@ -29,7 +29,7 @@ public class MLSuperDetExport extends MLDataUnitExport {
 
 		//We create a struct within a struct within a struct here...
 		SuperDetection superDetection = (SuperDetection) dataUnit;
-		
+
 		Struct dataUnits = Mat5.newStruct(); 
 		//now iterate through the data units and add data units to the struct. 
 
@@ -37,19 +37,19 @@ public class MLSuperDetExport extends MLDataUnitExport {
 		//		Itself has sub structures for each detection. That way we can have data units structures with different fields for detections
 		//		 which have different types of data units. For example one super detection may only have clicks and the other clicks and whistles etc. 
 		Struct dataUnitStruct = Mat5.newStruct(); 
-		
-		
+
+
 		//vital to clone this or we mess up all the data units in PAMGuard!
 		ArrayList<PamDataUnit> subDataUnits = (ArrayList<PamDataUnit>) superDetection.getSubDetections().clone();
-		
+
 		int n=0; 
 		MLDataUnitExport exporter; 
 		ArrayList<PamDataUnit> savedUnits;
 		Struct dataUnitstruct;
 		for (int j=0; j<mlDetectionsManager.getMlDataUnitsExport().size(); j++) {
-						
+
 			exporter = mlDetectionsManager.getMlDataUnitsExport().get(j);
-//			System.out.println("Try export " + subDataUnits.size());		
+			//			System.out.println("Try export " + subDataUnits.size());		
 
 			//do we have any data units of that type?
 			if  (hasCompatibleUnits(subDataUnits,  exporter)) {
@@ -60,25 +60,24 @@ public class MLSuperDetExport extends MLDataUnitExport {
 				savedUnits = new ArrayList<PamDataUnit>(); 
 				for (int i=0; i<subDataUnits.size(); i++) {
 					if (exporter.getUnitClass().isAssignableFrom(subDataUnits.get(i).getClass())) {
-						
+
 						//add to the struct.
 						dataUnitstruct= exporter.detectionToStruct(dataUnitStruct, subDataUnits.get(i), n);
 						savedUnits.add(subDataUnits.get(i));
 						n++;
 					}
 				}
-				
+
 				//now we have to remove all the data units that were saved. Otherwise they will be saved again by the more generic 
 				//exporters towards the bottom of the list. 
 				subDataUnits.removeAll(savedUnits);
-				
+
 				dataUnits.set(exporter.getName(), dataUnitStruct); 
-				
-//				System.out.println("Exported " + n+ " of " + superDetection.getSubDetectionsCount() + " data units " + superDetection.getLoadedSubDetectionsCount());		
-				}
 
 			}
-			
+
+		}
+//		System.out.println("Exported " + n+ " of " + superDetection.getSubDetectionsCount() + " data units " + superDetection.getLoadedSubDetectionsCount());		
 
 		mlStruct.set("subdetections", index, dataUnits);
 		mlStruct.set("nsubdet", index, Mat5.newScalar(superDetection.getSubDetectionsCount()));

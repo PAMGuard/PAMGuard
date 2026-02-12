@@ -547,6 +547,7 @@ public class OfflineTaskGroup implements PamSettings {
 		
 		taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
 				taskGroupParams.startRedoDataTime));
+		
 		OfflineDataStore dataSource = dataMap.getOfflineDataSource();
 		Iterator<OfflineDataMapPoint> mapIterator = dataMap.getListIterator();
 		OfflineDataMapPoint mapPoint;
@@ -577,11 +578,17 @@ public class OfflineTaskGroup implements PamSettings {
 						lastTime));
 
 				primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(mapPoint.getStartTime(), mapPoint.getEndTime()), null);
+				
+				System.out.println("No. viewer units: " + primaryDataBlock.getUnitsCount());
 
 				primaryDataBlock.sortData();
 
+				long[] startEndTimes = getSecondaryLoadTimes(mapPoint); 
+				
+				System.out.println(String.format("Processing map point %s with data from %s to %s", mapPoint.toString(), 
+						PamCalendar.formatDateTime(startEndTimes[0]), PamCalendar.formatDateTime(startEndTimes[1])));
 				//					if (procDataEnd - procDataStart < maxSecondaryLoad) {
-				loadSecondaryData(mapPoint.getStartTime(), mapPoint.getEndTime());
+				loadSecondaryData(startEndTimes[0], startEndTimes[1]);
 				//					}
 				for (OfflineTask aTask: offlineTasks) {
 					if (!aTask.isDoRun() || !aTask.canRun()) {
@@ -622,6 +629,49 @@ public class OfflineTaskGroup implements PamSettings {
 		primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(currentStart, currentEnd), null);
 	}
 
+	
+	/**
+	 * Get the actual start and end times of the data we have loaded for this map
+	 * point. This is particularly important where the map points are based on super
+	 * detections and the start and end times of the map point may not reflect the
+	 * start and end times the sub detection data.
+	 * 
+	 * @param mapPointc - the map point to check
+	 * @return array with start time at 0 and end time at 1.
+	 */
+	public long[] getSecondaryLoadTimes(OfflineDataMapPoint mapPoint) {
+		if (primaryDataBlock==null || primaryDataBlock.getUnitsCount() == 0) {
+			Debug.out.printf("No data loaded for map point %s\n", mapPoint.toString());
+			return new long[] {mapPoint.getStartTime(), mapPoint.getEndTime()};
+		}
+		
+		//now we need to check through the datablock and viewer data to work out the actual start and end times of the data we have loaded.
+		//This is particularly important for things like super detection data where the map points are based on the start times of primary data 
+		//but the secondary data may have different start and end times.
+		long minTime = mapPoint.getStartTime();
+		long maxTime = mapPoint.getEndTime();
+		
+		ListIterator<PamDataUnit> iterator = primaryDataBlock.getListIterator(0);
+		while (iterator.hasNext()) {
+			PamDataUnit dataUnit = iterator.next();
+			
+			
+			//only include map points that are actually within the map point. Otherwise if all super detections are loaded (without the sub detections)
+			//then we end up in a situration where we load the entire dataset into memory - not a good idea.
+			if ((dataUnit.getTimeMilliseconds()>=mapPoint.getStartTime() && dataUnit.getTimeMilliseconds()<=mapPoint.getEndTime()) ||
+					dataUnit.getEndTimeInMilliseconds()>=mapPoint.getStartTime() && dataUnit.getEndTimeInMilliseconds()<=mapPoint.getEndTime()) {
+			
+			
+			minTime = Math.min(minTime, dataUnit.getTimeMilliseconds());
+			maxTime = Math.max(maxTime, dataUnit.getEndTimeInMilliseconds());
+			
+			}
+		}
+		
+		return new long[] {minTime,maxTime};
+	}	
+	
+	
 	/**
 	 * See if it's worth loading this map point. This will currently always
 	 * return true unless there is a superDetectionFilter, in which case it will 
