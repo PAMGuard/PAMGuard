@@ -585,8 +585,8 @@ public class OfflineTaskGroup implements PamSettings {
 
 				long[] startEndTimes = getSecondaryLoadTimes(mapPoint); 
 				
-				System.out.println(String.format("Processing map point %s with data from %s to %s", mapPoint.toString(), 
-						PamCalendar.formatDateTime(startEndTimes[0]), PamCalendar.formatDateTime(startEndTimes[1])));
+//				System.out.println(String.format("Processing map point %s with data from %s to %s", mapPoint.toString(), 
+//						PamCalendar.formatDateTime(startEndTimes[0]), PamCalendar.formatDateTime(startEndTimes[1])));
 				//					if (procDataEnd - procDataStart < maxSecondaryLoad) {
 				loadSecondaryData(startEndTimes[0], startEndTimes[1]);
 				//					}
@@ -650,24 +650,25 @@ public class OfflineTaskGroup implements PamSettings {
 		//but the secondary data may have different start and end times.
 		long minTime = mapPoint.getStartTime();
 		long maxTime = mapPoint.getEndTime();
-		
-		ListIterator<PamDataUnit> iterator = primaryDataBlock.getListIterator(0);
-		while (iterator.hasNext()) {
-			PamDataUnit dataUnit = iterator.next();
-			
-			
-			//only include map points that are actually within the map point. Otherwise if all super detections are loaded (without the sub detections)
-			//then we end up in a situration where we load the entire dataset into memory - not a good idea.
-			if ((dataUnit.getTimeMilliseconds()>=mapPoint.getStartTime() && dataUnit.getTimeMilliseconds()<=mapPoint.getEndTime()) ||
-					dataUnit.getEndTimeInMilliseconds()>=mapPoint.getStartTime() && dataUnit.getEndTimeInMilliseconds()<=mapPoint.getEndTime()) {
-			
-			
-			minTime = Math.min(minTime, dataUnit.getTimeMilliseconds());
-			maxTime = Math.max(maxTime, dataUnit.getEndTimeInMilliseconds());
-			
+
+		synchronized (primaryDataBlock.getSynchLock()) {
+			ListIterator<PamDataUnit> iterator = primaryDataBlock.getListIterator(0);
+			while (iterator.hasNext()) {
+				PamDataUnit dataUnit = iterator.next();
+
+				//only include map points that are actually within the map point. Otherwise if all super detections are loaded (without the sub detections)
+				//then we end up in a situation where we load the entire dataset into memory - not a good idea.
+				if ((dataUnit.getTimeMilliseconds()>=mapPoint.getStartTime() && dataUnit.getTimeMilliseconds()<=mapPoint.getEndTime()) ||
+						dataUnit.getEndTimeInMilliseconds()>=mapPoint.getStartTime() && dataUnit.getEndTimeInMilliseconds()<=mapPoint.getEndTime()) {
+
+					minTime = Math.min(minTime, dataUnit.getTimeMilliseconds());
+					maxTime = Math.max(maxTime, dataUnit.getEndTimeInMilliseconds());
+
+				}
 			}
+
 		}
-		
+
 		return new long[] {minTime,maxTime};
 	}	
 	
