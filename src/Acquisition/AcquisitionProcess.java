@@ -239,6 +239,7 @@ public class AcquisitionProcess extends PamProcess {
 		 */
 		DaqStatusDataUnit daqStatusDataUnit = new DaqStatusDataUnit(daqStartedTime, daqStartedTime, daqStartedTime,
 				0, null, "Start", "", acquisitionControl.acquisitionParameters, runningSystem.getSystemName(), 0, 0);
+		daqStatusDataUnit.setStartTimeSource(runningSystem.getStartTimeSource());
 		lastStatusTime = daqStartedTime;
 		addServerTime(daqStatusDataUnit);
 		daqStatusDataBlock.addPamData(daqStatusDataUnit);
@@ -320,7 +321,7 @@ public class AcquisitionProcess extends PamProcess {
 		if (runningSystem == null) return;
 		long samplesRead = newDataQueue.getSamplesIn(0);
 		double duration = (double) samplesRead / getSampleRate();
-		double clockError = checkClockSpeed(samplesRead, 1);
+		double clockError = getClockErrMillis(samplesRead);
 		long adcMillis = this.absSamplesToMilliseconds(samplesRead);
 		long simpleTime= simpleSamplesToMilliseconds(samplesRead);
 		DaqStatusDataUnit ds = new DaqStatusDataUnit(PamCalendar.getTimeInMillis(), adcMillis, simpleTime,
@@ -362,14 +363,18 @@ public class AcquisitionProcess extends PamProcess {
 		if (reason == null) reason = new String("");
 		long samplesRead = newDataQueue.getSamplesIn(0);
 		double duration = (double) samplesRead / getSampleRate();
-		double clockError = checkClockSpeed(samplesRead, 2);
+		double clockError = getClockErrMillis(samplesRead);
 		long adcMillis = this.absSamplesToMilliseconds(samplesRead);
 		long simpleMillis = this.simpleSamplesToMilliseconds(samplesRead);
-		DaqStatusDataUnit ds = new DaqStatusDataUnit(PamCalendar.getTimeInMillis(), adcMillis, simpleMillis,
-				samplesRead, null, "Stop", reason,
-				acquisitionControl.acquisitionParameters, runningSystem.getSystemName(), duration, clockError);
-		addServerTime(ds);
-		daqStatusDataBlock.addPamData(ds);
+		if (samplesRead > 0) {
+			// this seems to get called twice, so only write the data unit the first time when samplesRead > 0
+			DaqStatusDataUnit ds = new DaqStatusDataUnit(PamCalendar.getTimeInMillis(), adcMillis, simpleMillis,
+					samplesRead, null, "Stop", reason,
+					acquisitionControl.acquisitionParameters, runningSystem.getSystemName(), duration, clockError);
+			ds.setStartTimeSource(runningSystem.getStartTimeSource());
+			addServerTime(ds);
+			daqStatusDataBlock.addPamData(ds);
+		}
 
 		runningSystem.stopSystem(acquisitionControl);
 
@@ -729,7 +734,9 @@ public class AcquisitionProcess extends PamProcess {
 
 			if (threadDataUnit.getChannelBitmap() == 1<<(acquisitionControl.getAcquisitionParameters().nChannels-1) &&
 					threadDataUnit.getTimeMilliseconds() - lastStatusTime > statusInterval) {
-				logRunningStatus();
+				if (runningSystem.isRealTime()) {
+					logRunningStatus();
+				}
 				lastStatusTime += statusInterval;
 			}
 		}
@@ -739,135 +746,29 @@ public class AcquisitionProcess extends PamProcess {
 	private void clearData() {
 		newDataQueue.clearList();
 	}
-
-	//	private void streamRunning(boolean finalFlush) {
-	//		if (runningSystem == null) return;
-	//		if (runningSystem.isRealTime()) {
-	//			/*
-	//			 * Do a test to see if we're getting too far behind. For now hard wire a
-	//			 * buffer with a 10s maximum
-	//			 */
-	//			if (needRestart() && finalFlush == false) {
-	//
-	//				System.out.println(PamCalendar.formatDateTime(System.currentTimeMillis()) +
-	//						" : Emergency sound system restart due to buffer overflow");
-	//				pamStop("Buffer overflow in sound system");
-	//
-	//				newDataUnits.clear();
-	//
-	//				acquisitionStopped();
-	//
-	//				restartTimer.start();
-	//
-	//				return;
-	//			}
-	//
-	//			long now = PamCalendar.getTimeInMillis();
-	//			if (now - daqCheckTime >= daqCheckInterval) {
-	//				double duration = (double) totalSamples[0] / getSampleRate();
-	//				double clockError = checkClockSpeed(totalSamples[0], 1);
-	//				DaqStatusDataUnit ds = new DaqStatusDataUnit(PamCalendar.getTimeInMillis(), "Continue", "Check",
-	//						runningSystem.getSystemName(), getSampleRate(), acquisitionControl.acquisitionParameters.nChannels,
-	//						acquisitionControl.acquisitionParameters.voltsPeak2Peak, duration, clockError);
-	//				daqStatusDataBlock.addPamData(ds);
-	//				daqCheckTime = now;
-	//			}
-	//
-	//			/*
-	//			 * The blocks should be in pairs, so there should generally
-	//			 * be two blocks there every time this gets called. Adjust timing
-	//			 * automatically to deal with just about any data rate. Start at a low
-	//			 * value though since file reading only adds blocks if there are none
-	//			 * there - so would never reduce the delay !
-	//			 *
-	//			 * Don't do this if it isn't a real time process since we want to
-	//			 * keep going as fast as possible
-	//			 */
-	////			trials++;
-	////			counts += newDataUnits.size();
-	////			if (trials == 15 || counts >= 40) {
-	////				if (trials > counts * 3) {
-	////					daqTimer.setDelay(Math.max(10,daqTimer.getDelay() * 5 / 4));
-	////					System.out.println("Increasing timer delay to " + daqTimer.getDelay() + " ms");
-	////				}
-	////				else if (counts > trials * 2) {
-	////					daqTimer.setDelay(Math.max(1,daqTimer.getDelay() * 2 / 3));
-	////					System.out.println("Reducing timer delay to " + daqTimer.getDelay() + " ms");
-	////				}
-	////				trials = counts = 0;
-	////			}
-	//		}
-	//
-	//		RawDataUnit newDataUnit, threadDataUnit;
-	//
-	//		int readCount = 0;
-	//		while (!newDataUnits.isEmpty()) {
-	//
-	//			threadDataUnit = newDataUnits.remove(0);
-	//
-	//			int channel = PamUtils.getSingleChannel(threadDataUnit.getChannelBitmap());
-	//			newDataUnit = new RawDataUnit(absSamplesToMilliseconds(threadDataUnit.getStartSample()),
-	//					threadDataUnit.getChannelBitmap(), threadDataUnit.getStartSample(),
-	//					threadDataUnit.getDuration());
-	//			newDataUnit.setRawData(threadDataUnit.getRawData(), true);
-	//			// can also here convert the measured amplitude (which was
-	//			// calculated in the call to setRawData, to dB.
-	//			newDataUnit.setCalculatedAmlitudeDB(rawAmplitude2dB(newDataUnit.getMeasuredAmplitude(),
-	//					PamUtils.getSingleChannel(threadDataUnit.getChannelBitmap()), false));
-	//			update(null, newDataUnit);
-	//			rawData = newDataUnit.getRawData();
-	//			dataBlockLength = rawData.length;
-	//			totalSamples[channel] += dataBlockLength;
-	//			for (int i = 0; i < rawData.length; i++) {
-	//				maxLevel = Math.max(maxLevel, Math.abs(rawData[i]));
-	//			}
-	//			levelSamples += rawData.length;
-	//
-	//
-	//			// about every 5 seconds, check the buffer isn't filling
-	//			if (newDataUnit.getAbsBlockIndex() % (50 * acquisitionControl.acquisitionParameters.nChannels) == 0) {
-	//				double buffer = getBufferEstimate(newDataUnit.getStartSample() + newDataUnit.getDuration());
-	//				if (buffer > 3) {
-	//					System.out.println(PamCalendar.formatDateTime(System.currentTimeMillis()) +
-	//					" : Emergency sound system restart due to Buffer overflow type 2");
-	//					pamStop("Type 2 Buffer overflow in sound system");
-	//
-	//					newDataUnits.clear();
-	//
-	//					acquisitionStopped();
-	//
-	//					restartTimer.start();
-	//
-	//					return;
-	//				}
-	//			}
-	//
-	//			// about every minute, or every 1200 blocks, check the timing
-	//			if ((newDataUnit.getAbsBlockIndex()+1) % (600 * acquisitionControl.acquisitionParameters.nChannels) == 0) {
-	//				checkClockSpeed(newDataUnit.getStartSample() + newDataUnit.getDuration(), 1);
-	//			}
-	//			// only ever stay in here for 10 reads - if it's getting behind, tough !
-	//			// need to keep the GUI going whatever.
-	//			if (++readCount >= acquisitionControl.acquisitionParameters.nChannels * 4 && finalFlush == false) {
-	//				break;
-	//			}
-	//
-	//		}
-	//		if (levelSamples >= sampleRate * acquisitionControl.acquisitionParameters.nChannels * 2) {
-	//			acquisitionControl.setStatusBarLevel(maxLevel);
-	//			acquisitionControl.fillStatusBarText();
-	//			levelSamples = 0;
-	//			maxLevel = 0;
-	//		}
-	//	}
+	
+	private double getClockErrMillis(long totalSamples) {
+		if (runningSystem instanceof FileInputSystem) {
+			double samplesOff = ((FileInputSystem) runningSystem).getTotalClockDriftSamples(totalSamples);
+			return samplesOff/getSampleRate()*1000;
+		}
+		// otherwise just do our best based on sample numbers. 
+		double clockSeconds = (PamCalendar.getTimeInMillis() - PamCalendar.getSessionStartTime()) / 1000.;
+		double sampleSeconds = (double) totalSamples / getSampleRate();
+		if (clockSeconds == 0) {
+			return 0;
+		}
+		return (sampleSeconds - clockSeconds) * 1000;
+	}
 
 	/**
-	 * Check and optionally display clock speed error
+	 * Check and optionally display clock speed error as a percentage. 
 	 * @param totalSamples total samples acquired
 	 * @param print 0 = never, 1 = if the error is > .2%, 2 always
 	 * @return % clock speed error
 	 */
 	private double checkClockSpeed(long totalSamples, int print) {
+
 		double clockSeconds = (PamCalendar.getTimeInMillis() - PamCalendar.getSessionStartTime()) / 1000.;
 		double sampleSeconds = (double) totalSamples / getSampleRate();
 		if (clockSeconds == 0) {

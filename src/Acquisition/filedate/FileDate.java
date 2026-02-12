@@ -19,9 +19,9 @@ public interface FileDate {
 	/**
 	 * Get a time in milliseconds from a file date. 
 	 * @param file file
-	 * @return time in milliseconds or 0 if can't work it out. 
+	 * @return FileTimeData on start, end, and source of the time info.  
 	 */
-	public long getTimeFromFile(File file);
+	public FileTimeData getTimeFromFile(File file);
 	
 	/**
 	 * True if the file date subclass has associated settings

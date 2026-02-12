@@ -211,36 +211,11 @@
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.12.1</version>
-            <executions>
-              <execution>
-                <id>default-compile</id>
-                <phase>compile</phase>
-                <goals>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <release>21</release>
-                  <compilerId>jdt</compilerId>
-                </configuration>
-              </execution>
-              <execution>
-                <id>default-testCompile</id>
-                <phase>test-compile</phase>
-                <goals>
-                  <goal>testCompile</goal>
-                </goals>
-                <configuration>
-                  <release>21</release>
-                  <compilerId>jdt</compilerId>
-                </configuration>
-              </execution>
-            </executions>
             <dependencies>
               <dependency>
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-compiler-jdt</artifactId>
                 <version>1.5.1</version>
-                <scope>compile</scope>
               </dependency>
             </dependencies>
             <configuration>
@@ -273,17 +248,6 @@
                     </transformer>
                     <transformer />
                   </transformers>
-                  <filters>
-                    <filter>
-                      <artifact>*:*</artifact>
-                      <excludes>
-                        <exclude>META-INF/*.SF</exclude>
-                        <exclude>META-INF/*.DSA</exclude>
-                        <exclude>META-INF/*.RSA</exclude>
-                        <exclude>test/resources/**</exclude>
-                      </excludes>
-                    </filter>
-                  </filters>
                 </configuration>
               </execution>
             </executions>
@@ -320,7 +284,7 @@
                   <goal>copy-dependencies</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>C:\Users\dg50\source\repos\PAMGuardPAMGuard\target/tempDependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
                   <overWriteReleases>false</overWriteReleases>
                   <overWriteSnapshots>false</overWriteSnapshots>
                   <overWriteIfNewer>true</overWriteIfNewer>
@@ -396,14 +360,14 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <mockito.version>1.10.19</mockito.version>
-    <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
     <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <powermock.version>1.6.6</powermock.version>
     <javafx.version>21</javafx.version>
     <jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
+    <mockito.version>1.10.19</mockito.version>
     <jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
+    <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
   </properties>
 </project>

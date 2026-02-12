@@ -699,7 +699,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			//Hidden files should not be used in analysis...
 			try {
-				System.out.println("FolderInputSystem: Opening file for audio info: " + file.getName());
+//				System.out.println("FolderInputSystem: Opening file for audio info: " + file.getName());
 				audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 				AudioFormat audioFormat = audioStream.getFormat();
 				fileSamples = audioStream.getFrameLength();
