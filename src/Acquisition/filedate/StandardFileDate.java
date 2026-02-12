@@ -133,21 +133,71 @@ public class StandardFileDate implements FileDate, PamSettings {
 	}
 
 	@Override
-	public long getTimeFromFile(File file) {
+	public FileTimeData getTimeFromFile(File file) {
 		
 //		System.out.println("Get time from file: getTimeFromFile" ); 
 		
 		// if the user wants to force the local PC time, return immediately
-		if (settings.isForcePCTime()) return 0;
+		if (settings.isForcePCTime()) {
+			return new FileTimeData(0, null, "CURRENT PC CLOCK");
+		}
 		
 		// true to figure out the time from the filename
-		long time = doTheWork(file);
-		if (time == 0) {
-			return 0;
+//		long time = doTheWork(file);
+//		if (time == 0) {
+//			return 0;
+//		}
+//		else {
+//			long offset = settings.getTimeOffset(time);
+//			return time + offset;
+//		}
+		return doTheWork(file);
+	}
+	
+	/**
+	 * Get a file time object. 
+	 * @param file
+	 * @return
+	 */
+	private FileTimeData doTheWork(File file) {
+		/*
+		 * Dtag files have an accompanying XML file which 
+		 * has the same name. Try to find such a file and get
+		 * some time information from it. 
+		 */
+
+		FileTimeData fileTimeData = null;
+		
+		fileTimeData = D3XMLFile.getXMLTimeData(file);
+		if (fileTimeData != null) {
+			return fileTimeData;
+		}
+
+		long sudTime = SUDFileTime.getSUDFileTime(file);
+		if (sudTime != Long.MIN_VALUE) {
+			setLastFormat("SUD METADATA");
+			return new FileTimeData(file, sudTime, "SUD METADATA");
+		}
+
+		long d2Time = d2TextTime.getTimeFromFile(file);
+		if (d2Time != Long.MIN_VALUE) {
+			setLastFormat("D2 time from txt file");
+			return new FileTimeData(file, d2Time, "D2 time from txt file");
+		}
+		
+		
+		// otherwise, for now, just do the old way
+		long oldWay = doTheWorkOldWay(file);
+		if (oldWay != 0) {
+			long offset = settings.getTimeOffset(oldWay);
+			oldWay += offset;
+			
+		}
+		if (oldWay == 0) {
+			return new FileTimeData(file, oldWay, getFormat());
 		}
 		else {
-			long offset = settings.getTimeOffset(time);
-			return time + offset;
+			return new FileTimeData(file, oldWay, "FILE NAME " + getFormat());
 		}
 	}
 	
@@ -156,7 +206,7 @@ public class StandardFileDate implements FileDate, PamSettings {
 	 * @param file
 	 * @return time in millis UTC. 
 	 */
-	private long doTheWork(File file) {
+	private long doTheWorkOldWay(File file) {
 //		allowCustomFormats = false;
 		if (settings.isUseBespokeFormat() && settings.getForcedDateFormat() != null) {
 			return forcedDataFormat(file, settings.getForcedDateFormat());
@@ -167,18 +217,12 @@ public class StandardFileDate implements FileDate, PamSettings {
 			return sudTime;
 		}
 		
-		/*
-		 * Dtag files have an accompanying XML file which 
-		 * has the same name. Try to find such a file and get
-		 * some time information from it. 
-		 */
 		long dTagTime = D3XMLFile.getXMLStartTime(file);
 		if (dTagTime != Long.MIN_VALUE) {
 			setLastFormat("D3 time from xml file");
 			return dTagTime;
 		}
 		
-
 		long stTime = SoundTrapTime.getSoundTrapTime(file, settings.getDateTimeFormatToUse());
 		if (stTime != Long.MIN_VALUE) {
 			setLastFormat("Soundtrap file format \"" + settings.getDateTimeFormatToUse() + "\"");

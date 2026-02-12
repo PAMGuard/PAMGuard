@@ -384,7 +384,7 @@ PAMGuardBeta_ViewerMode.exe):</p>
 
 <p class=MsoNormal style='line-height:115%'><em><b><span style='font-size:12.0pt;
 line-height:115%;font-family:"Cambria",serif;font-style:normal'><a
-href="#_Version_2.02.18_????">Version 2.02.18 ???? 2025&nbsp;</a></span></b></em></p>
+href="#_Version_2.02.18_????">Version 2.02.18 February 2026&nbsp;</a></span></b></em></p>
 
 <p class=MsoNormal style='line-height:115%'><em><b><u><span style='font-size:
 12.0pt;line-height:115%;font-family:"Cambria",serif;font-style:normal'><a
@@ -446,7 +446,7 @@ name="_Latest_Version_2.02.08"></a><a name="_Version_2.02.09_June"></a><a
 name="_Version_2.02.10_January"></a><a name="_Version_2.02.11_April"></a><a
 name="_Version_2.02.14_October"></a><a name="_2.02.15_December_2014"></a><a
 name="_Version_2.02.16_February"></a><a name="_Version_2.02.17_?????"></a><a
-name="_Version_2.02.18_????"></a>Version 2.02.18 ????</h1>
+name="_Version_2.02.18_????"></a>Version 2.02.18 February 2026</h1>
 
 <p class=MsoNormal><b>New Features</b></p>
 
@@ -475,6 +475,12 @@ href="https://www.pamguard.org/matlabandr.html">Matlab, R, and Python libraries<
 
 <p class=MsoNormal>Support for DeepAcoustics AI models</p>
 
+<p class=MsoNormal>SoundTrap wav files now have millis time and PAMGuard starts
+at the start time of each file, not the sample clock</p>
+
+<p class=MsoNormal>DMG on macOS can now access computer's microphone but mac
+security requires user to accept a prompt</p>
+
 <p class=MsoNormal><b>Bug Fixes / minor enhancements </b></p>
 
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/286">Issue
@@ -482,6 +488,13 @@ href="https://www.pamguard.org/matlabandr.html">Matlab, R, and Python libraries<
 a time zone offset for SUD files. See <a
 href="https://www.pamguard.org/olhelp/detectors/clickDetectorHelp/docs/SoundTrapClickDetector.html">online
 help</a>.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/285">Issue
+285</a>: Fixed bugs in DelphinID, which was not working. </p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/280">Issue
+280</a>: Fix long standing bug in click detector BT display where last click
+was not showing</p>
 
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/pull/283">Issue
 238</a>: Updates SUD file reader to correctly zero-pad files with missing
@@ -550,6 +563,12 @@ changes are used in bearing localisers. </p>
 <p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/247">Issue
 247</a>: Make correct interpretation of invalid speed and heading values (given
 as 102.3knots and 360.0 degrees in the data) </p>
+
+<p class=MsoNormal>Fixed some dialogs in localiser that were not showing
+properly on macOS.</p>
+
+<p class=MsoNormal>Updated to latest X3 library which fixes zero-pad bugs when
+processing SoundTrap data</p>
 
 <h1>Version 2.02.17 June 2025</h1>
 
@@ -655,8 +674,8 @@ the spectrogram display. </p>
 <h2>Bug Fixes</h2>
 
 <p class=MsoNormal>Issue 190. Array Files exported from array manager were not
-automatically getting the correct file end, making the exported files impossible
-to use. This is fixed and files will get the correct .paf end.</p>
+automatically getting the correct file end, making the exported files
+impossible to use. This is fixed and files will get the correct .paf end.</p>
 
 <p class=MsoNormal>Issue 167. File counter not resetting when restarting
 PAMGuard if it was paused during processing of folders of offline files. This
@@ -1187,8 +1206,8 @@ href="http://www.PAMGuard.org/downloads.php?cat_id=3">here</a>.</p>
 <p class=MsoNormal><b><span lang=EN-US>Detection Group Localiser</span></b><span
 lang=EN-US> </span></p>
 
-<p class=MsoNormal>This module has been renamed &quot;Detection Grouper&quot;, so
-as to avoid confusion with the Group 3D localizer. This is because the
+<p class=MsoNormal>This module has been renamed &quot;Detection Grouper&quot;,
+so as to avoid confusion with the Group 3D localizer. This is because the
 Detection Grouper is more for organizing data into groups to be localized than
 it is for doing localization.</p>
 
@@ -1317,9 +1336,9 @@ available. For details, see the online help </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>18. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>A Deep Learning module for sound classification is now
-available. This allows users to deploy a large variety of deep learning models
-natively in PAMGuard. For details, see the <a
+lang=EN-US> </span>A Deep Learning module for sound classification is now available.
+This allows users to deploy a large variety of deep learning models natively in
+PAMGuard. For details, see the <a
 href="https://github.com/macster110/PAMGuard_DeepLearningSegmenter/blob/master/deep_learning_help.md">online
 help</a>. </p>
 
@@ -1414,12 +1433,13 @@ CTRL+arrow keys to move to previous/next displayed data unit. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Implemented new Effort Monitoring System to track on/off-effort
-information </p>
+lang=EN-US> </span>Implemented new Effort Monitoring System to track
+on/off-effort information </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Added ability to receive NMEA over UDP multicast in addition to UDP broadcast </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Added ability to receive NMEA over UDP multicast in addition
+to UDP broadcast </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -3435,10 +3455,10 @@ which is useful when using PAMGuard for demonstration purposes. </p>
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>4.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>The sound File and Folder audio input systems now have an optional time
-zone setting. Note that PAMGuard analysis should still all be taking place in UTC
-and that this option is intended to allow the conversion of file times which
-were not recorded as UTC into UTC and not the other way around. Use the option
-with caution !</p>
+zone setting. Note that PAMGuard analysis should still all be taking place in
+UTC and that this option is intended to allow the conversion of file times
+which were not recorded as UTC into UTC and not the other way around. Use the
+option with caution !</p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>5.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4809,7 +4829,6 @@ file)</p>
 <p class=MsoNormal>Fixed Landmarks (requires help file) </p>
 
 <p class=MsoNormal><b>Changes</b></p>
-
 
 <p class=MsoNormal>The User Input module (for text entry of information by the user)
 has been moved from the Displays sub menu of the Add Modules menu, to
