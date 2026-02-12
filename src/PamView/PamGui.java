@@ -219,7 +219,8 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		
 		//add the ability to import files by dropping them on the import tab - note that this tab is removed as soon 
 		//as a PAMControlledUnit is added
-//		mainTab.addTab("Import", FontIcon.of(MaterialDesignF.FILE_IMPORT, DEFAULT_ICON_SIZE) , fileDropPanel = new PamGuiFileDropPanel());				
+
+    //		mainTab.addTab("Import", FontIcon.of(MaterialDesignF.FILE_IMPORT, DEFAULT_ICON_SIZE) , fileDropPanel = new PamGuiFileDropPanel());			
 		//		mainTab.setForeground(Color.BLUE);
 
 		centralPanel.add(BorderLayout.CENTER, mainTab);
