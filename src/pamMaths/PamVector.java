@@ -841,14 +841,22 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 		}
 		// first gte the maximum number of dimensions:
 		int nDim = 0;
+		int nGood = 0;
 		for (int i = 0; i < vectors.length; i++) {
+			if (vectors[i] == null) {
+				continue;
+			}
+			nGood++;
 			nDim = Math.max(nDim, vectors[i].getNumCoordinates());
 		}
 		double[] vecData = new double[nDim];
 		for (int i = 0; i < vectors.length; i++) {
 			PamVector v = vectors[i];
+			if (v == null) {
+				continue;
+			}
 			for (int d = 0; d < v.getNumCoordinates(); d++) {
-				vecData[d] += (v.vector[d] / vectors.length);
+				vecData[d] += (v.vector[d] / nGood);
 			}
 		}
 		return new PamVector(vecData);		

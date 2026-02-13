@@ -130,11 +130,14 @@ public class PSFXReadWriter {
 		ArrayList<UsedModuleInfo> umiList = psg.getUsedModuleInfo();
 		UsedModuleInfo umi;
 		ModuleNameObject moduleNameObject;
-		int nMods = umiList.size();
-		for (int i = 0; i < nMods; i++) {
-			umi = umiList.get(i);
-			moduleNameObject = new ModuleNameObject(umi.className, umi.getUnitType(), umi.unitName);
-			writeData(dos, ModuleNameObject.typeId, moduleNameObject.createBinaryWriteObject());
+		int nMods;
+		if (umiList != null) {
+			nMods = umiList.size();
+			for (int i = 0; i < nMods; i++) {
+				umi = umiList.get(i);
+				moduleNameObject = new ModuleNameObject(umi.className, umi.getUnitType(), umi.unitName);
+				writeData(dos, ModuleNameObject.typeId, moduleNameObject.createBinaryWriteObject());
+			}
 		}
 
 		// now write out the serialized settings. 
