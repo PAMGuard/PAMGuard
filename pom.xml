@@ -476,11 +476,11 @@
 		  	<version>1.2.5</version>
 		</dependency>
 		
-		<dependency>
+		<!--<dependency>
 		    <groupId>net.sourceforge.lame</groupId>
 		    <artifactId>lame</artifactId>
 		    <version>3.98.4</version>
-		</dependency>
+		</dependency>-->
 
 		
 
@@ -1086,8 +1086,8 @@
 	X3 library for decompressing sud files. Not in Maven repository  
 	you may need to copy files from your downloaded PAMGuard source code, 
 	e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
-	C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
-	-->
+	C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2-->
+	
 		<dependency>
 			<groupId>org.pamguard</groupId>
 			<artifactId>x3</artifactId>
