@@ -24,6 +24,7 @@ public class AISBinaryDataSource extends BinaryDataSource {
 		super(sisterDataBlock);
 		this.aisControl = aisControl;
 		this.aisDataBlock = sisterDataBlock;
+		this.setSaveUpdates(true);
 	}
 
 	@Override
