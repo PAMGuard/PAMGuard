@@ -838,7 +838,9 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		}
 //		boolean vis = (dataSelector != null && clipUnit != null && dataSelector.scoreData(clipUnit) > 0);
 		vis = vis && this.shouldAllowChannel(clipDisplayUnit);
-		clipDisplayUnit.setVisible(vis);
+		if (shouldShowClip(clipDisplayUnit)) {
+			clipDisplayUnit.setVisible(vis);
+		}
 	}
 	
 	
@@ -1013,6 +1015,10 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 				clipDisplayUnit.setBorderColour();
 			}
 		}
+	}
+
+	protected boolean shouldShowClip(ClipDisplayUnit dataUnit) {
+		return true;
 	}
 
 }
