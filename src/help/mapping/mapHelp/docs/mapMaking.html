@@ -6,12 +6,22 @@
 
 <body>
 	<h1>Map</h1>
+	<br>
+	<h3>DO NOT USE THE PAMGUARD MAP FOR NAVIGATION</h3>
+	
 	<h2>Making Maps for PAMGuard</h2>
 	<br>
 	<p>PAMGuard now supports two types of map, raster maps and contour
 		vector maps.</p>
 	<br>
 	<h3>Raster Maps</h3>
+	<p>Two types of Raster maps can be used with PAMGuard. The first are derived
+		from GEBCO depth data and turned into a base image for PAMGuard to show
+		coastlines and depth. The second are <a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF</a>
+		 Files, that is image files
+		that have georeferencing information in them. </p>
+	
+		<h4>GEBCO Raster Depth Data</h4>
 	<p>Raster maps are the most easily accessible now that the GEBCO
 		contour maps are no long available (see below).</p>
 	<p>
@@ -24,11 +34,20 @@
 		Shift key and use the mouse to select the area you're interested in
 		then place an order for the data in "2D netCDF" format.</p>
 	<p>The maps typically have about a 400m resolution, so will look a
-		bit grainy if you zoom in.
+		bit grainy if you zoom in.</p>
 	<p>
 		You are also advised against making a map that is too large. Maps that
 		are too large will be downsampled by PAMGuard, further reducing their
-		resolution. <br>
+		resolution. </p>
+		
+		<h4>GeoTIFF Files</h4>
+		<p><a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF</a>
+			files can be taken from many data sources. GIS software, such as
+			<a href="https://qgis.org/">QGIS</a> can export data in GeoTIFF format. This 
+			might be a google earth image, or some other data that you want to display as
+			a base map image. Several nautical chart suppliers will sell you charts in 
+			GeoTIFF format. </p>
+		
 	<h3>Contour Maps</h3>
 	<p>PAMGuard contour map files are text files that follow the same
 		format for maps used by the IFAW LOGGER&nbsp; program.&nbsp; These are

@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import Map.gridbaselayer.RasterFileTypes.RASTERTYPES;
 import PamUtils.LatLong;
 import PamView.PamGui;
 import PamView.dialog.PamDialog;
@@ -38,7 +39,7 @@ public class GridDialogPanel implements PamDialogPanel{
 	private JButton fileButton, clearButton;
 	private Window ownerWindow;
 	private JLabel latRange, lonRange, maxHeight, maxDepth;
-	
+
 
 	public GridDialogPanel(Window owner, GridbaseControl gridbaseControl) {
 		this.ownerWindow = owner;
@@ -53,7 +54,7 @@ public class GridDialogPanel implements PamDialogPanel{
 		//		mainPanel.add();
 		//		c.gridx = 0;
 		c.gridwidth = 2;
-		mainPanel.add(new JLabel("Select NETCDF File "), c);
+		mainPanel.add(new JLabel("Select NETCDF or GeoTIFF File "), c);
 		c.gridy++;
 		c.gridwidth = 2;
 		mainPanel.add(fileLabel = new JTextField(), c);
@@ -89,8 +90,8 @@ public class GridDialogPanel implements PamDialogPanel{
 		mainPanel.add(new JLabel("Max water depth: ", JLabel.RIGHT),c);
 		c.gridx++;
 		mainPanel.add(maxDepth = new JLabel(), c); 
-		
-		
+
+
 		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth = 2;
@@ -133,27 +134,71 @@ public class GridDialogPanel implements PamDialogPanel{
 	}
 
 	private void selectFile() {
-		String selFile = PamFileBrowser.fileBrowser(ownerWindow, gridbaseParameters.netCDFFile, PamFileBrowser.OPEN_FILE, ".nc");
+		String selFile = PamFileBrowser.fileBrowser(ownerWindow, gridbaseParameters.netCDFFile, PamFileBrowser.OPEN_FILE, RasterFileTypes.fileExtensions);
 		if (selFile != null) {
 			fileLabel.setText(selFile);
 			sayRange();
 		}
 
 	}
-	
+
 	private void sayRange() {
 		String fn = fileLabel.getText();
-		GebcoNETCDF gebfile = GebcoNETCDF.makeGebcoNCDFFile(fn);
-		if (gebfile == null) {
-			latRange.setText("-");
-			lonRange.setText("-");
-			maxHeight.setText("-");
-			maxDepth.setText("-");
+		RASTERTYPES rasterType = RasterFileTypes.getFileType(fn);
+		if (rasterType == null) {
+			sayGeoTiffRange("No file selected");
 			return;
 		}
+		String fileError = null;
+		switch (rasterType) {
+		case GEOTIFF:
+			fileError = sayGeoTiffRange(fn);
+			break;
+		case NETCDF:
+			fileError = sayNETCDFRange(fn);
+			break;
+		default:
+			break;
 
-		if (gebfile==null) return; 
+		}
+		if (fileError != null) {
+			clearRangeData(fileError);
+		}
+
+
+	}
+
+	private String sayGeoTiffRange(String fn) {
+		if (fn == null) {
+			return "No File";
+		}
+		File g = new File(fn);
+		if (g.exists() == false) {
+			return g.getName() + " doesn't exist";
+		}
+		GeoTiffFile gtf = GeoTiffFile.makeFile(g);
+		if (gtf == null) {
+			return "Can't use file";
+		}
 		
+		LatLong minLL = gtf.getMinLatLong();
+		LatLong maxLL = gtf.getMaxLatLong();
+
+		latRange.setText(String.format("%s - %s", LatLong.formatLatitude(minLL.getLatitude()), LatLong.formatLatitude(maxLL.getLatitude())));
+		lonRange.setText(String.format("%s - %s", LatLong.formatLongitude(minLL.getLongitude()), LatLong.formatLongitude(maxLL.getLongitude())));
+		maxDepth.setText("-");
+		maxHeight.setText("-");
+		
+		return null;
+	}
+
+	private String sayNETCDFRange(String fn) {
+		GebcoNETCDF gebfile = GebcoNETCDF.makeGebcoNCDFFile(fn);
+		if (gebfile == null) {
+			return "No file selected";
+		}
+
+
 		double[] lats = gebfile.getLatRange();
 		int nLat = gebfile.getnLat();
 		double[] lons = gebfile.getLonRange();
@@ -166,11 +211,21 @@ public class GridDialogPanel implements PamDialogPanel{
 			maxHeight.setText(String.format("%3.0fm", ele[1]));
 		}
 		catch (Exception e) {
-			latRange.setText("Error in file");
-			lonRange.setText("Error in file");
-			maxHeight.setText("-");
-			maxDepth.setText("-");
+			return "Error in file";
 		}
+		return null;
+	}
+
+	private void clearRangeData(String fileErr) {
+		if (fileErr == null) {
+			latRange.setText("-");
+		}
+		else {
+			latRange.setText(fileErr);
+		}
+		lonRange.setText("-");
+		maxHeight.setText("-");
+		maxDepth.setText("-");
 	}
 
 	protected void openURL() {
@@ -203,7 +258,7 @@ public class GridDialogPanel implements PamDialogPanel{
 			}
 		}
 		gridbaseParameters.netCDFFile = fn;
-		GebcoNETCDF ncFile = GebcoNETCDF.makeGebcoNCDFFile(fn);
+//		GebcoNETCDF ncFile = GebcoNETCDF.makeGebcoNCDFFile(fn);
 		gridbaseControl.setGridbaseParameters(gridbaseParameters);
 		return true;
 	}

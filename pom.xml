@@ -1,12 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.pamguard</groupId>
-  <artifactId>Pamguard</artifactId>
-  <version>2.02.18</version>
-  <name>Pamguard</name>
-  <description>Pamguard using Maven to control dependencies</description>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.pamguard</groupId>
+	<artifactId>Pamguard</artifactId>
+	<version>2.02.18</version>
+	<name>Pamguard</name>
+	<description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
 	<organization>
 		<name>Sea Mammal Research Unit, University of St. Andrews</name>
@@ -17,28 +17,34 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javafx.version>21</javafx.version>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.deploy.skip>true</maven.deploy.skip>
 		<!-- Tethys version control -->
 		<jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
 		<jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
 		<jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
 		<mockito.version>1.10.19</mockito.version>
 		<powermock.version>1.6.6</powermock.version>
+		<geotools.version>34.0</geotools.version>
 	</properties>
 
 
 	<build>
 		<!-- Define where the source and test directories are -->
 		<sourceDirectory>${basedir}/src</sourceDirectory>
-		<testSourceDirectory>${basedir}/src/test</testSourceDirectory> <!-- where the Unit tets are located -->
+		<testSourceDirectory>${basedir}/src/test</testSourceDirectory> <!-- where
+		the Unit tets are located -->
 		<resources>
 			<resource>
 				<directory>src</directory>
 				<excludes>
 					<exclude>META-INF/*.SF,META-INF/*.DSA,META-INF/*.RSA</exclude>
-					<exclude>**/*.java</exclude> <!--  don't include any source files -->
-					<exclude>jars/*.*</exclude> <!--  don't include files in the jars folder -->
+					<exclude>**/*.java</exclude> <!--  don't include any source
+					files -->
+					<exclude>jars/*.*</exclude> <!--  don't include files in the
+					jars folder -->
 				</excludes>
 			</resource>
 		</resources>
@@ -48,7 +54,8 @@
 	common-profile runs on all systems and then there are specific profiles which
 	are activated depending on the OS type. Note that the order of profiles is such
 	that  the ones which are defined later take precedence over the ones defined
-	earlier. Most OS specific profiles are for generating executables and code signing. 
+	earlier. Most OS specific profiles are for generating executables and code
+	signing. 
 	Note use help:active-profiles to see which profiles are active -->
 	<profiles>
 
@@ -154,7 +161,8 @@
 			</build>
 		</profile>
 
-		<!-- The MacOS profile creates a DMG package for installing PAMGuard on MacOS-->
+		<!-- The MacOS profile creates a DMG package for installing PAMGuard on
+		MacOS-->
 		<!--Note: There is a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
 		In PAMGuard it essential that the shade plugin is called before the macos plugin and so the phase of the 
 		macos bundling has been moved to deploy. To run the bundler we therefore need to put both the macossappbunlder 
@@ -162,11 +170,11 @@
 		the package phase using mvn package shade:shade macosappbundler:bundle exec:exec -->
 		<profile>
 			<id>macos-profile</id>
-	        <activation>
-	            <os>
-	                <family>mac</family>
-	            </os>
-	        </activation>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
 			<build>
 				<plugins>
 					<!--  Plugin which creates a .dmg file for MacOS. -->
@@ -191,7 +199,9 @@
 									<string>-Xmx8192m</string>
 								</JVMArguments>
 								<NSAppSleepDisabled>true</NSAppSleepDisabled>
-								<NSMicrophoneUsageDescription>"PAMGuard requires access to the microphone and sound cards for real time operation"</NSMicrophoneUsageDescription>
+								<NSMicrophoneUsageDescription>"PAMGuard requires
+									access to the microphone and sound cards for
+									real time operation"</NSMicrophoneUsageDescription>
 							</plist>
 							<dmg>
 								<generate>false</generate>
@@ -205,17 +215,19 @@
 								<appendVersion>false</appendVersion>
 							</dmg>
 							<!--Very important or deep learning does not work-->
-							 <app>
-					            <includeDependencies>true</includeDependencies>
-					        </app>
-					        <jdk>
-					        	<!--There is an issue with signing that stops the right java .plist file-->
+							<app>
+								<includeDependencies>true</includeDependencies>
+							</app>
+							<jdk>
+								<!--There is an issue with signing that stops the right java .plist file-->
 								<include>true</include>
-								<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
+								<location>
+									/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
 							</jdk>
 							<codesign>
 								<enable>true</enable>
-								<identity>Apple Distribution: Jamie Macaulay (7365S9DZ34)</identity>
+								<identity>Apple Distribution: Jamie Macaulay
+									(7365S9DZ34)</identity>
 							</codesign>
 						</configuration>
 						<executions>
@@ -255,7 +267,7 @@
 							</execution>
 						</executions>
 					</plugin>-->
-					
+
 				</plugins>
 			</build>
 		</profile>
@@ -264,15 +276,18 @@
 		<!-- The common profile always runs-->
 		<profile>
 			<id>common-profile</id>
-			
+
 			<activation>
-				<!--<activeByDefault>true</activeByDefault>--> <!--Deactivates if another profile activates--> 
-				 <file><exists>.</exists></file>
+				<!--<activeByDefault>true</activeByDefault>--> <!--Deactivates if another profile activates-->
+				<file>
+					<exists>.</exists>
+				</file>
 			</activation>
 
 			<build>
 				<plugins>
-					<!-- original maven compiler definition - uses the JRE's javac compiler, not the one Eclipse uses 
+					<!-- original maven compiler definition - uses the JRE's
+					javac compiler, not the one Eclipse uses 
 			        <artifactId>maven-compiler-plugin</artifactId>
 			        <version>3.8.0</version>
 			        <configuration>
@@ -280,7 +295,8 @@
 			        </configuration>
 			     	 -->
 
-					<!--  attempt to use the Eclipse JDT compiler, so that the errors match when building
+					<!--  attempt to use the Eclipse JDT compiler, so that the
+					errors match when building
 					https://stackoverflow.com/questions/38070326/java-generics-compiler-error-not-shown-in-eclipse
 					https://wiki.eclipse.org/JDT/FAQ#Can_I_use_JDT_outside_Eclipse_to_compile_Java_code.3F
 					https://wiki.eclipse.org/Tycho/FAQ#Can_I_use_the_Tycho_compiler_support_in_non-OSGi_projects.2C_too.3F
@@ -290,12 +306,14 @@
 						<artifactId>maven-compiler-plugin</artifactId>
 						<version>3.12.1</version>
 						<configuration>
-							<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
+							<!--  set compiler to use Java version 11 API
+							https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
 							<release>21</release>
 							<compilerId>jdt</compilerId>
 						</configuration>
 						<dependencies>
-							<!-- https://mvnrepository.com/artifact/org.eclipse.tycho/tycho-compiler-jdt -->
+							<!--
+							https://mvnrepository.com/artifact/org.eclipse.tycho/tycho-compiler-jdt -->
 							<dependency>
 								<groupId>org.eclipse.tycho</groupId>
 								<artifactId>tycho-compiler-jdt</artifactId>
@@ -312,7 +330,9 @@
 					</plugin>
 
 					<!--  Maven Shade plugin - for creating the uberjar / fatjar -->
-					<!--  see http://maven.apache.org/plugins/maven-shade-plugin/index.html for details -->
+					<!--  see
+					http://maven.apache.org/plugins/maven-shade-plugin/index.html
+					for details -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-shade-plugin</artifactId>
@@ -323,21 +343,28 @@
 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 							</transformers>
 							<filters>
-								<!-- Moved these filters up to here from where they were int <executions><execution><configurtion> 
-								based on advice at https://stackoverflow.com/questions/34738653/maven-shade-plugin-does-not-exclude-the-manifest-signature-files
+								<!-- Moved these filters up to here from where
+								they were int
+								<executions><execution><configurtion> 
+								based on advice at
+								https://stackoverflow.com/questions/34738653/maven-shade-plugin-does-not-exclude-the-manifest-signature-files
 								and the are now working -->
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>
-										<exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
+										<exclude>META-INF/*.SF</exclude> <!--  get
+										rid of manifests from library jars -
+										also done in orig ant build file -->
 										<exclude>META-INF/*.DSA</exclude>
 										<exclude>META-INF/*.RSA</exclude>
-										<exclude>test/resources/**</exclude> <!--  get rid of deep learning moduels and wav files used for unit tests -->
+										<exclude>test/resources/**</exclude> <!--
+										get rid of deep learning moduels and wav
+										files used for unit tests -->
 									</excludes>
 								</filter>
 							</filters>
 						</configuration>
-		
+
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -346,11 +373,17 @@
 								</goals>
 								<configuration>
 									<transformers>
-										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 											<manifestEntries>
 												<Main-Class>pamguard.Pamguard</Main-Class>
-												<Class-Path>.</Class-Path> <!--  this is from the orig ant build file -->
-												<SplashScreen-Image>Resources/pgBlankSplash.png</SplashScreen-Image> <!--  this is from the orig ant build file -->
+												<Class-Path>.</Class-Path> <!--
+												this is from the orig ant build
+												file -->
+												<SplashScreen-Image>
+													Resources/pgBlankSplash.png</SplashScreen-Image> <!--
+												this is from the orig ant build
+												file -->
 											</manifestEntries>
 										</transformer>
 										<transformer
@@ -362,15 +395,18 @@
 					</plugin>
 
 
-					<!--  The Maven-JDEPS plugin, to analyze necessary JDK dependencies.  See
-				  this site for details: https://maven.apache.org/plugins/maven-jdeps-plugin/index.html -->
+					<!--  The Maven-JDEPS plugin, to analyze necessary JDK
+					dependencies.  See
+				  this site for details:
+					https://maven.apache.org/plugins/maven-jdeps-plugin/index.html -->
 					<plugin>
 						<groupId>com.github.marschall</groupId>
 						<artifactId>jdeps-maven-plugin</artifactId>
 						<version>0.5.1</version>
 					</plugin>
 
-					<!-- The Maven dependency plugin, which can copy all dependencies into a temp folder for jdeps analysis -->
+					<!-- The Maven dependency plugin, which can copy all
+					dependencies into a temp folder for jdeps analysis -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
@@ -383,22 +419,30 @@
 									<goal>copy-dependencies</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
+									<outputDirectory>
+										${project.build.directory}/tempDependencies</outputDirectory>
 									<overWriteReleases>false</overWriteReleases>
 									<overWriteSnapshots>false</overWriteSnapshots>
 									<overWriteIfNewer>true</overWriteIfNewer>
 								</configuration>
 							</execution>
-							<!--  this deletes all the dependencies in the local repository and downloads them again.  
-			          Run a Maven > Update after doing this in order to properly reset the dependencies.  Also, you
-			          will need to add the 3 jar files (x3, JasioHost and jave) back into the local repository after
+							<!--  this deletes all the dependencies in the local
+							repository and downloads them again.  
+			          Run a Maven > Update after doing this in order to properly reset the
+							dependencies.  Also, you
+			          will need to add the 3 jar files (x3, JasioHost and jave) back into the local
+							repository after
 			          running this command -->
 
-							<!-- I'm not sure why, but every time I try to run the shade:shade build to create a
-					fatjar it first runs this, which deletes all of the dependencies and completely fails.
-					I think it has something to do with the lifecycle mapping, but that's beyond my Maven
+							<!-- I'm not sure why, but every time I try to run
+							the shade:shade build to create a
+					fatjar it first runs this, which deletes all of the dependencies and completely
+							fails.
+					I think it has something to do with the lifecycle mapping, but that's beyond my
+							Maven
 					abilities right now.
-					I can't even remember why I added this in the first place, so I'm going to comment
+					I can't even remember why I added this in the first place, so I'm going to
+							comment
 					it out 
 			          <execution>
 			            <id>purge-local-dependencies</id>
@@ -411,8 +455,8 @@
 			          </execution>
 			          -->
 						</executions>
-					</plugin>				
-			
+					</plugin>
+
 				</plugins>
 
 				<pluginManagement>
@@ -428,18 +472,18 @@
 										<pluginExecution>
 											<pluginExecutionFilter>
 												<groupId>
-			    									org.apache.maven.plugins
-			    								</groupId>
+													org.apache.maven.plugins
+												</groupId>
 												<artifactId>
-			    									maven-dependency-plugin
-			    								</artifactId>
+													maven-dependency-plugin
+												</artifactId>
 												<versionRange>
-			    									[3.1.1,)
-			    								</versionRange>
+													[3.1.1,)
+												</versionRange>
 												<goals>
 													<goal>
-			    										purge-local-repository
-			    									</goal>
+														purge-local-repository
+													</goal>
 												</goals>
 											</pluginExecutionFilter>
 											<action>
@@ -453,9 +497,9 @@
 					</plugins>
 				</pluginManagement>
 			</build>
-			
-	    </profile>
-		
+
+		</profile>
+
 	</profiles>
 
 	<!--  Plugin which creates a .dmg file for MacOS. 
@@ -499,10 +543,6 @@
 		            </execution>
 		        </executions>
 		    </plugin>-->
-		    
-
-			    
-		    
 
 
 	<reporting>
@@ -516,10 +556,13 @@
 	</reporting>
 
 
-	<!--  ************************* Extra Repositories ************************************* -->
+	<!--  ************************* Extra Repositories
+	************************************* -->
 	<repositories>
-		<!--  Project repo to hold the custom jar files that are not available in Maven.  Do
-		this so that we don't have to do the extra step of manually installing jar files in the local repo -->
+		<!--  Project repo to hold the custom jar files that are not available in
+		Maven.  Do
+		this so that we don't have to do the extra step of manually installing jar
+		files in the local repo -->
 		<repository>
 			<id>repo</id>
 			<releases>
@@ -563,11 +606,36 @@
 			<id>central</id>
 			<url>https://repo1.maven.org/maven2</url>
 		</repository>
+		<!-- Repos for geotools -->
+		<repository>
+			<id>osgeo</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<!-- Repos for geotools (do I need both ? >-->
+		<repository>
+			<id>osgeo-snapshot</id>
+			<name>OSGeo Snapshot Repository</name>
+			<url>https://repo.osgeo.org/repository/snapshot/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
 
 	</repositories>
 
 
-	<!--  ************************* Dependencies ************************************* -->
+	<!--  ************************* Dependencies
+	************************************* -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -586,7 +654,8 @@
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
 			<version>1.0.0</version>
-			<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
+			<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit
+			dependencies which breaks our own testing -->
 			<!--<exclusions>
 				<exclusion>
 					<groupId>org.junit.platform</groupId>
@@ -662,21 +731,106 @@
 			<version>${javafx.version}</version>
 		</dependency>
 
-		<!-- Swing theme for MacOS -->
 		<dependency>
-		  <groupId>com.formdev</groupId>
-		  <artifactId>flatlaf</artifactId>
-		  <version>3.5.1</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.14.0</version>
 		</dependency>
 
-		<!-- Decorates JavaFX components with error icons if inputs are incorrect-->
+		<!--  <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>5.2.2</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>5.2.2</version>
+    </dependency> -->
+
+		<!-- Source:
+		https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-imaging</artifactId>
+			<version>1.0.0-alpha6</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!--   GeoTools to unpack GeoTIFF files 
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geotiff</artifactId>
+			<version>29.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+			<version>29.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-referencing</artifactId>
+			<version>29.0</version>
+		</dependency>-->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-bom</artifactId>
+			<version>${geotools.version}</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit</groupId>
+			<artifactId>junit-bom</artifactId>
+			<version>5.11.0</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+		<!--<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-shapefile</artifactId>
+			<version>${geotools.version}</version>
+		</dependency> -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-swing</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-hsql</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geotiff</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<!-- <dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-image</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>-->
+
+		<!-- Swing theme for MacOS -->
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+
+		<!-- Decorates JavaFX components with error icons if inputs are
+		incorrect-->
 		<dependency>
 			<groupId>net.synedra</groupId>
 			<artifactId>validatorfx</artifactId>
 			<version>0.4.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+		<!--
+		https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
@@ -690,12 +844,12 @@
 			<version>1.7</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
@@ -754,15 +908,18 @@
 			</exclusions>
 		</dependency>
 
-		<!-- html to markdown conversion https://github.com/furstenheim/copy-down --> 
-    <dependency>
-        <groupId>io.github.furstenheim</groupId>
-        <artifactId>copy_down</artifactId>
-        <version>1.1</version>
-    </dependency>
+		<!-- html to markdown conversion
+		https://github.com/furstenheim/copy-down -->
+		<dependency>
+			<groupId>io.github.furstenheim</groupId>
+			<artifactId>copy_down</artifactId>
+			<version>1.1</version>
+		</dependency>
 
-		<!-- https://search.maven.org/artifact/org.kordamp.ikonli/ikonli-javafx/12.2.0/jar -->
-		<!-- Icon symbol pack to replace FontAwesome.  This is the core library, and the
+		<!--
+		https://search.maven.org/artifact/org.kordamp.ikonli/ikonli-javafx/12.2.0/jar -->
+		<!-- Icon symbol pack to replace FontAwesome.  This is the core library,
+		and the
 	     actual symbol packs need to be added separately (see below) -->
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
@@ -777,21 +934,24 @@
 			<version>12.3.1</version>
 		</dependency>
 
-		<!-- Ikonli MaterialDesign2 (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
+		<!-- Ikonli MaterialDesign2 (Latest) font pack
+		https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-materialdesign2-pack</artifactId>
 			<version>12.3.1</version>
 		</dependency>
 
-		<!-- Ikonli File Icons (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
+		<!-- Ikonli File Icons (Latest) font pack
+		https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
 		<dependency>
 			<groupId>org.kordamp.ikonli</groupId>
 			<artifactId>ikonli-fileicons-pack</artifactId>
 			<version>12.3.1</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/net.sf.geographiclib/GeographicLib-Java 
+		<!--
+		https://mvnrepository.com/artifact/net.sf.geographiclib/GeographicLib-Java 
 	 Used in the video range module-->
 		<dependency>
 			<groupId>net.sf.geographiclib</groupId>
@@ -807,14 +967,16 @@
 	</dependency>-->
 
 
-		<!-- https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess
+		<!--
+		https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess
 	<dependency>
 		<groupId>com.healthmarketscience.jackcess</groupId>
 		<artifactId>jackcess</artifactId>
 		<version>3.0.1</version>
 	</dependency>-->
 
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<!--
+		https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -828,7 +990,8 @@
 		<version>2.3.2</version>
 	</dependency>-->
 
-		<!-- NOT SURE IF WE NEED THE JAXB LIBRARIES HERE - NO ERRORS WHEN REMOVED
+		<!-- NOT SURE IF WE NEED THE JAXB LIBRARIES HERE - NO ERRORS WHEN
+		REMOVED
 	<dependency>
 	    <groupId>javax.xml.bind</groupId>
 	    <artifactId>jaxb-api</artifactId>
@@ -903,7 +1066,8 @@
 		</dependency>
 
 
-		<!-- https://mvnrepository.com/artifact/com.drewnoakes/metadata-extractor -->
+		<!--
+		https://mvnrepository.com/artifact/com.drewnoakes/metadata-extractor -->
 		<dependency>
 			<groupId>com.drewnoakes</groupId>
 			<artifactId>metadata-extractor</artifactId>
@@ -912,13 +1076,15 @@
 
 		<!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
 		<dependency>
-		    <groupId>com.mysql</groupId>
-		    <artifactId>mysql-connector-j</artifactId>
-		    <version>9.1.0</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>9.1.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-		<!-- this is needed so that tensorflow models run properly (used in Deep Learning plugin) -->
+		<!--
+		https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<!-- this is needed so that tensorflow models run properly (used in Deep
+		Learning plugin) -->
 		<!-- NOTE it is important this is included before edu.ucar.netcdfAll so 
 		that this version is used instead of the internal version - exclusions do 
 		not seem to work otherwise -->
@@ -928,8 +1094,10 @@
 			<version>4.29.1</version>
 		</dependency>
 
-		<!-- https://docs.unidata.ucar.edu/netcdf-java/5.2/userguide/using_netcdf_java_artifacts.html -->
-		<!--  exclusions have been added here to fix problem with Deep Learning plugin - see above -->
+		<!--
+		https://docs.unidata.ucar.edu/netcdf-java/5.2/userguide/using_netcdf_java_artifacts.html -->
+		<!--  exclusions have been added here to fix problem with Deep Learning
+		plugin - see above -->
 		<dependency>
 			<groupId>edu.ucar</groupId>
 			<artifactId>netcdfAll</artifactId>
@@ -954,7 +1122,8 @@
 			<version>5.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework/org.springframework.core -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework/org.springframework.core -->
 
 		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
@@ -972,7 +1141,8 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	this one is only needed to get rid of an annoying warning that shows up during startup -->
+	this one is only needed to get rid of an annoying warning that shows up during
+		startup -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -981,7 +1151,8 @@
 
 
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
-	this one is only needed to get rid of an annoying warning that shows up during startup -->
+	this one is only needed to get rid of an annoying warning that shows up during
+		startup -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-nop</artifactId>
@@ -989,12 +1160,16 @@
 		</dependency>
 
 
-		<!-- https://mvnrepository.com/artifact/org.docx4j/docx4j-JAXB-ReferenceImpl -->
-		<!--  note that we are excluding slf4j-api here, because if we don't then one of the
+		<!--
+		https://mvnrepository.com/artifact/org.docx4j/docx4j-JAXB-ReferenceImpl -->
+		<!--  note that we are excluding slf4j-api here, because if we don't then
+		one of the
 	transitive dependencies of docx4j (jcl-over-slf4j) will try to load an older
-	version of slf4j-api, resulting in a weird warning/error that shows up every time that
+	version of slf4j-api, resulting in a weird warning/error that shows up every
+		time that
 	PAMGuard start up -->
-		<!--  DONT BOTHER WITH EXCLUSION, DOESN'T MAKE THE ERROR GO AWAY.  Leaving code here
+		<!--  DONT BOTHER WITH EXCLUSION, DOESN'T MAKE THE ERROR GO AWAY.  Leaving
+		code here
 	just in case the older version does cause a conflict at some point -->
 		<dependency>
 			<groupId>org.docx4j</groupId>
@@ -1038,8 +1213,10 @@
 			<version>1.5.2</version>
 		</dependency>
 
-		<!-- Jave2 (https://github.com/a-schild/jave2) - fork of original jave from sauronsoft.  A LOT bigger; the win64 files alone are > 60Mb compared
-	to 14Mb originally.  Since the old one worked fine, let's stick with it for now and save the space
+		<!-- Jave2 (https://github.com/a-schild/jave2) - fork of original jave
+		from sauronsoft.  A LOT bigger; the win64 files alone are > 60Mb compared
+	to 14Mb originally.  Since the old one worked fine, let's stick with it for now
+		and save the space
 	<dependency>
     	<groupId>ws.schild</groupId>
 	   	<artifactId>jave-core</artifactId>
@@ -1062,7 +1239,8 @@
 	 -->
 
 
-		<!-- From NilusXMLGenerator POM at https://bitbucket.org/tethysacousticmetadata/nilusxmlgenerator/src/master/-->
+		<!-- From NilusXMLGenerator POM at
+		https://bitbucket.org/tethysacousticmetadata/nilusxmlgenerator/src/master/-->
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>org.eclipse.persistence.moxy</artifactId>
@@ -1186,14 +1364,15 @@
 		<!-- dependencies copied from TethysJavaClient END -->
 
 
-		<!-- Thethy library not in Maven central, so you may need to copy the javaclient and nilus folders from 
+		<!-- Thethy library not in Maven central, so you may need to copy the
+		javaclient and nilus folders from 
 	e.g. C:\Users\dg50\source\repos\**your projectfolder**\repo\tethys\org
 	to C:\Users\dg50\.m2\repository\tethys\org -->
-	<dependency>
-		<groupId>tethys.org</groupId>
-		<artifactId>nilus</artifactId>
-		<version>3.2</version>
-	</dependency>
+		<dependency>
+			<groupId>tethys.org</groupId>
+			<artifactId>nilus</artifactId>
+			<version>3.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>tethys.org</groupId>
@@ -1204,7 +1383,9 @@
 		<!-- 
 	X3 library for decompressing sud files. Not in Maven repository  
 	you may need to copy files from your downloaded PAMGuard source code, 
-	e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
+	e.g.
+		C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2
+		to 
 	C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
 	-->
 		<dependency>
@@ -1228,7 +1409,8 @@
 			<version>1.0.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
+		<!--
+		https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
 		<!-- 
  	<dependency>
  		<groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -1275,7 +1457,8 @@
 			<version>2.1.0</version>
 		</dependency>
 
-		<!-- Four dependencies from xbee library that are needed for Genus module. -->
+		<!-- Four dependencies from xbee library that are needed for Genus
+		module. -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
