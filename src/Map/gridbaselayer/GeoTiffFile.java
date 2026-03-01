@@ -46,9 +46,9 @@ public class GeoTiffFile {
 	 * @return
 	 */
 	public static GeoTiffFile makeFile(File f) {
-		GeoTiff gtf = new GeoTiff(f.getAbsolutePath());
-		String info = gtf.showInfo();
-		System.out.println("GT Info: " + info);
+//		GeoTiff gtf = new GeoTiff(f.getAbsolutePath());
+//		String info = gtf.showInfo();
+//		System.out.println("GT Info: " + info);
 		GeoTiffReader reader = null; 
 		GridCoverage2D coverage = null;
 
@@ -56,12 +56,10 @@ public class GeoTiffFile {
 			reader = new GeoTiffReader(f);
 			coverage = reader.read(null);
 		} catch (DataSourceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		}
 
@@ -77,26 +75,25 @@ public class GeoTiffFile {
 			CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326");
 			transform = CRS.findMathTransform(refSystem, targetCRS);
 		} catch (NoSuchAuthorityCodeException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		} catch (FactoryException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		}
 
 		GeometryFactory gf = new GeometryFactory();
 		Point minPoint = gf.createPoint(new Coordinate(minLon, minLat));
 		Point maxPoint = gf.createPoint(new Coordinate(maxLon, maxLat));
-		//		sourcePoint = gf.createPoint(new Coordinate(lcC[0], lcC[1]));
 
 		try {
 			minPoint = (Point) JTS.transform(minPoint, transform);
 			maxPoint = (Point) JTS.transform(maxPoint, transform);
 		} catch (MismatchedDimensionException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		} catch (TransformException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return null;
 		}
 		LatLong minLL = new LatLong(minPoint.getX(), minPoint.getY());

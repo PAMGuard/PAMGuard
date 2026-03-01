@@ -100,8 +100,14 @@
 
    <tocitem text="Map Controls " target="mapping.mapHelp.docs.mapControlPanel" image="topic"/>
 
-   <tocitem text="Making Map Files " target="mapping.mapHelp.docs.mapMaking" image="topic"/>
+   <tocitem text="Making Map and Background Files " target="mapping.mapHelp.docs.mapMaking" image="topic">
+    <tocitem text="GEBCO Raster Files " target="mapping.mapHelp.docs.makegebcoraster" image="topic"/>
 
+    <tocitem text="GEBCO Contour Files " target="mapping.mapHelp.docs.makegebcocontour" image="topic"/>
+
+    <tocitem text="GeoTIFF Image Files " target="mapping.mapHelp.docs.makegeotiff" image="topic"/>
+
+   </tocitem>
   </tocitem>
   <tocitem text="AIS ">
    <tocitem text="AIS Overview " target="mapping.AIS.docs.AISOverview" image="topic"/>

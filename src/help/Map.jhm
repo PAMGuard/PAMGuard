@@ -26,6 +26,8 @@
 
 <mapID target="overview.PamMasterHelp.docs.logfiles" url="overview/PamMasterHelp/docs/logfiles.html"/>
 
+<mapID target="mapping.mapHelp.docs.makegebcoraster" url="mapping/mapHelp/docs/makegebcoraster.html"/>
+
 <mapID target="localisation.difar.difarLocalisation.docs.difar_RunningSystem" url="localisation/difar/difarLocalisation/docs/difar_RunningSystem.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_UsingDifarGramDisplay" url="localisation/difar/difarLocalisation/docs/difar_UsingDifarGramDisplay.html"/>
@@ -135,6 +137,8 @@
 <mapID target="detectors.likelihoodDetectionModuleHelp.LikelihoodDetector_helpIndex" url="detectors/likelihoodDetectionModuleHelp/LikelihoodDetector_helpIndex.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_ConfigureProcessing_Automation" url="localisation/difar/difarLocalisation/docs/difar_ConfigureProcessing.html#Automation"/>
+
+<mapID target="mapping.mapHelp.docs.makegeotiff" url="mapping/mapHelp/docs/makegeotiff.html"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules" url="overview/PamMasterHelp/docs/modules.html"/>
 
@@ -793,6 +797,8 @@
 <mapID target="classifiers.roccaHelp.docs.rocca_SelectingWhistle" url="classifiers/roccaHelp/docs/rocca_SelectingWhistle.html"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification_SchoolClassification" url="classifiers/roccaHelp/docs/rocca_WhistleSchoolClassification.html#SchoolClassification"/>
+
+<mapID target="mapping.mapHelp.docs.makegebcocontour" url="mapping/mapHelp/docs/makegebcocontour.html"/>
 
 <mapID target="utilities.BinaryStore.docs.matlabandr" url="utilities/BinaryStore/docs/matlabandr.html"/>
 
