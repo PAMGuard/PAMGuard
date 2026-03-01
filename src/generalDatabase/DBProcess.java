@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -25,7 +27,10 @@ import javax.swing.Timer;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamFolders;
+import PamController.PamguardVersionInfo;
 import PamController.fileprocessing.StoreStatus;
+import PamModel.CommonPluginInterface;
+import PamModel.PamModel;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamView.dialog.warn.WarnOnce;
@@ -39,6 +44,9 @@ import generalDatabase.clauses.FromClause;
 import generalDatabase.clauses.PAMSelectClause;
 import generalDatabase.pamCursor.PamCursor;
 import generalDatabase.ucanAccess.UCanAccessSystem;
+import generalDatabase.version.VersionDataBlock;
+import generalDatabase.version.VersionDataUnit;
+import generalDatabase.version.VersionLogging;
 import loggerForms.FormDescription;
 import loggerForms.FormsControl;
 import warnings.PamWarning;
@@ -72,6 +80,10 @@ public class DBProcess extends PamProcess {
 
 	private DBCommitter dbCommitter;
 
+	private VersionDataBlock versionDataBlock;
+
+	private VersionLogging versionLogging;
+
 	public DBProcess(DBControl databaseControll) {
 		super(databaseControll, null);
 		this.databaseControll = databaseControll;
@@ -95,6 +107,8 @@ public class DBProcess extends PamProcess {
 		
 		dbSpecials.add(new LogXMLSettings(databaseControll));
 
+		versionDataBlock = new VersionDataBlock(this);
+		versionDataBlock.SetLogging(versionLogging = new VersionLogging(versionDataBlock));
 	}
 
 	@Override
@@ -1589,6 +1603,51 @@ public class DBProcess extends PamProcess {
 			ok &= logging.deleteData(clause);
 		}
 		return ok;
+	}
+
+	/** 
+	 * write version info for PAMGuard and all plugins to the database. 
+	 */
+	public void storeVersionInfo() {
+		String v = PamguardVersionInfo.version;
+		VersionDataUnit vdu;
+		long now = System.currentTimeMillis();
+		PamConnection con = databaseControll.getConnection();
+		if (con == null) {
+			return;
+		}
+		checkTable(versionLogging.getTableDefinition());
+		// PAMGuard
+		String runMode = PamController.getInstance().getRunModeName();
+		vdu = new VersionDataUnit(now, "PAMGuard", runMode, v);
+//		versionDataBlock.addPamData(vdu);
+		versionLogging.logData(con, vdu);
+		// can we get the users ? 
+//		Properties props = System.getProperties();
+		String user = System.getProperty("user.name");
+		String os = System.getProperty("os.name");
+		if (user != null || os != null) {
+			vdu = new VersionDataUnit(now, "User", user, os);
+//			versionDataBlock.addPamData(vdu);
+			versionLogging.logData(con, vdu);
+		}
+		//JAVA
+		v = System.getProperty("java.vm.version");
+		String name = System.getProperty("java.vm.name");
+		vdu = new VersionDataUnit(now, "Java", name, v);
+//		versionDataBlock.addPamData(vdu);
+		versionLogging.logData(con, vdu);
+		
+		// and all the plugins
+		List<CommonPluginInterface> plugins = PamModel.getPamModel().getPluginList();
+		for (CommonPluginInterface aPlug : plugins) {
+			vdu = new VersionDataUnit(now, aPlug.getDefaultName(), aPlug.getClass().getName(), aPlug.getVersion());
+//			versionDataBlock.addPamData(vdu);
+			versionLogging.logData(con, vdu);
+		}
+		
+		databaseControll.commitChanges();
+		
 	}
 
 }

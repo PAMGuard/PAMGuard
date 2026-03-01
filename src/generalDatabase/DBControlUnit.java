@@ -118,6 +118,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 				createOfflineDataMap(null);
 			}
 			getDbProcess().checkTables();
+			getDbProcess().storeVersionInfo();
 			break;
 		case PamControllerInterface.ADD_DATABLOCK:
 			if (initialisationComplete) {
