@@ -5,6 +5,7 @@ import networkTransfer.NetworkReceiverInterface;
 import networkTransfer.receive.status.BuoyStatusDataBlock;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
 import networkTransfer.receive.status.BuoyStatusLogging;
+import networkTransfer.receive.status.base.NetReceiverStatusManager;
 import networkTransfer.receive.swing.NetworkRXTabPanel;
 import networkTransfer.receive.swing.NetworkReceiveDialog;
 import networkTransfer.receive.swing.NetworkReceiveSidePanel;
@@ -32,6 +33,8 @@ import java.util.Vector;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import AIS.AISDataBlock;
+import AIS.AISDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.BinaryStore;
@@ -102,6 +105,8 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 	private ArrayList<NetworkDataUser> extraDataUsers = new ArrayList<NetworkDataUser>();
 	
 	private RXTableMouseListener<BuoyStatusDataUnit> tableMouseListener;
+	
+	private NetReceiverStatusManager netRxStatusProcess;
 
 	/**
 	 * Flags for dataType1 - these must match equivalent commands in 
@@ -133,6 +138,10 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 		networkReceiveSidePanel = new NetworkReceiveSidePanel(this);
 
 		BuoyDataSerialiser buoyDataSerialiser = new BuoyDataSerialiser(this);
+		
+		netRxStatusProcess = new NetReceiverStatusManager(this);
+		addPamProcess(this.netRxStatusProcess);
+		
 		PamSettingManager.getInstance().registerSettings(buoyDataSerialiser);
 		this.setTableMouseListener(new TableMouseListener());
 	}
@@ -388,8 +397,11 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 	 * @return 
 	 */
 	public  NetworkObject interpretPamData(NetworkObject receivedData, BuoyStatusDataUnit buoyStatusDataUnit) {
-		
-		PamDataBlock dataBlock = rxDataBlockMap.get(receivedData.getDataType2());		
+		PamDataBlock dataBlock = rxDataBlockMap.get(receivedData.getDataType2());
+		if(dataBlock==null) {
+			System.out.println("Received data of unknown type: "+receivedData.getDataType2()+". Make sure that you have a module on the base station for each of the modules you have for the CABs");
+			return null;
+		}
 		BinaryDataSource dataSource = dataBlock.getBinaryDataSource();
 		PamProcess parentProcess = dataBlock.getParentProcess();
 		// we'll want to see if we can find the latest acquisition status data unit. 
@@ -421,7 +433,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 //			System.out.printf("NetRX read %d of expected %d bytes\n", bytesRead, dataLength);
 //			if (1>0) return null;
 			ds.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		BinaryObjectData bod = new BinaryObjectData(receivedData.getDataVersion(), objectId, baseData, 0, data, dataLength);
@@ -521,6 +533,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 		 * This could still get used if GPS data were sent from PAMGuard rather than PAMBuoy. 
 		 */
 		if (dataUnit.getClass() == GpsDataUnit.class) {
+			System.out.println("new gps data");
 			useBuoyGPSData(buoyStatusDataUnit, (GpsDataUnit) dataUnit);
 			//			networkReceiveProcess.newGpsData((GpsDataUnit) dataUnit);
 		}
@@ -529,7 +542,12 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 			if(networkReceiveParams.channelNumberOption==networkReceiveParams.CHANNELS_RENUMBER) {
 				dataUnit.setUID(0);
 			}
-			dataBlock.addPamData(dataUnit);
+			if(dataBlock instanceof AISDataBlock) {
+				((AISDataBlock) dataBlock).addAISData((AISDataUnit) dataUnit);
+			}else {
+				dataBlock.addPamData(dataUnit);
+			}
+			//dataBlock.addPamData(dataUnit);
 			//			System.out.println("DAta added to data block " + dataBlock.getDataName());
 		}
 		return null;
@@ -700,7 +718,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 
 		public NetworkReceiveProcess(NetworkReceiver networkReceiver) {
 			super(networkReceiver, null);
-			buoyStatusDataBlock = new BuoyStatusDataBlock(this);
+			buoyStatusDataBlock = new BuoyStatusDataBlock(this,networkReceiver);
 			addOutputDataBlock(buoyStatusDataBlock);
 			buoyStatusDataBlock.setOverlayDraw(new NetworkGPSDrawing(networkReceiver));
 			buoyStatusDataBlock.setPamSymbolManager(new StandardSymbolManager(buoyStatusDataBlock, NetworkGPSDrawing.defaultSymbol, true));

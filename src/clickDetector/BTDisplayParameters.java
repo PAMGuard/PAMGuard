@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamguardMVC.PamDataUnit;
 import clickDetector.tdPlots.ClickSymbolOptions;
 
 public class BTDisplayParameters implements Serializable, Cloneable, ManagedParameters {
@@ -45,7 +46,7 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	public int minClickLength = 2, maxClickLength = 12;
 	public int minClickHeight = 2, maxClickHeight = 12;
 	private double timeRange = 10;
-	public int displayChannels = 0;
+	protected int displayChannels = 0;
 	public boolean view360;
 	public boolean amplitudeSelect = false;
 //	public double minAmplitude = 0;
@@ -148,6 +149,21 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 //			e.printStackTrace();
 //		}
 		return ps;
+	}
+	
+	public boolean shouldPlot(PamDataUnit dataUnit) {
+		if (displayChannels > 0 && (displayChannels & dataUnit.getChannelBitmap()) == 0) {
+			return false;
+		}
+		return true;
+	}
+	
+	public int getDisplayChannels() {
+		return this.displayChannels;
+	}
+	
+	public void setDisplayChannels(int displayChannels) {
+		this.displayChannels = displayChannels;
 	}
 
 }

@@ -1,6 +1,7 @@
 package clickDetector;
 
 import Layout.PamFramePlots;
+import PamguardMVC.PamDataUnit;
 
 /**
  * Common functionality for all display windows in the click 
@@ -29,6 +30,17 @@ public abstract class ClickDisplay extends PamFramePlots {
 
 	public ClickDisplayManager.ClickDisplayInfo getClickDisplayInfo() {
 		return clickDisplayInfo;
+	}
+	
+	protected boolean shouldDisplayClick(PamDataUnit newData) {
+		if (newData==null) return false; 
+		if (this.clickDisplayManager.findFirstBTDisplay()!=null) {
+			BTDisplayParameters displayParams = this.clickDisplayManager.findFirstBTDisplay().getBtDisplayParameters();
+			if (displayParams.shouldPlot(newData) != true) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	abstract public void noteNewSettings(); 

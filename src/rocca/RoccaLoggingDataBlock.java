@@ -63,8 +63,12 @@ public class RoccaLoggingDataBlock extends PamDataBlock<RoccaLoggingDataUnit> {
         this.roccaProcess = (RoccaProcess) parentProcess;
         this.roccaControl = roccaControl;
         //this.setNaturalLifetime(Integer.MAX_VALUE/1000);	
+<<<<<<< HEAD
         this.setNaturalLifetime(10);
         setPamSymbolManager(new RoccaSymbolManager(this, RoccaGraphics.defaultSymbol));
+=======
+        this.setNaturalLifetimeSeconds(10);
+>>>>>>> refs/heads/SMRUC_Prod
     }
 
 

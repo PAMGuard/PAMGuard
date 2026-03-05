@@ -1,11 +1,14 @@
 package AIS;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import NMEA.AcquireNmeaData;
 import PamController.masterReference.MasterReferencePoint;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import generalDatabase.DBControlUnit;
 import generalDatabase.SQLTypes;
@@ -15,13 +18,17 @@ import nmeaEmulator.NMEAEmulator;
 public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmulator {
 	
 	private AISControl aisControl;
+	
+	//private HashMap<Integer,AISDataUnit> aisVesselMap;
+	private Object vesselMapSyncLock = new Object();
 
 	public AISDataBlock(AISControl aisControl, PamProcess parentProcess) {
 		super(AISDataUnit.class, "AIS Data", parentProcess, 0);
 		this.aisControl = aisControl;
-		setNaturalLifetime(600);
-		//setNaturalLifetime(87100);
-
+		/*synchronized(vesselMapSyncLock) {
+			aisVesselMap = new HashMap<Integer,AISDataUnit>();
+		}*/
+		setNaturalLifetimeSeconds(600);
 	}
 	/**
 	 * aisDataUnit is always a new unit extracted from a 
@@ -49,6 +56,7 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 		AISDataUnit aisDataUnit = findAISDataUnit(newAISUnit.mmsiNumber);
 		boolean want = wantData(aisDataUnit, newAISUnit);
 		if (aisDataUnit != null) {
+			
 			aisDataUnit.isInRange = want;
 		}
 		if (!want) {
@@ -103,6 +111,36 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 		}
 		return existingUnit.isInRange;
 	}
+	
+	/*@Override
+	protected void removedDataUnit(AISDataUnit dataUnit) {
+		super.removedDataUnit(dataUnit);
+		long ageMillis = System.currentTimeMillis()-dataUnit.getTimeMilliseconds();
+		System.out.println("Removing vessel record for mmsi "+dataUnit.mmsiNumber);
+		if(ageMillis>this.getNaturalLifetimeMillis()) {
+			synchronized(vesselMapSyncLock) {
+				this.aisVesselMap.remove(dataUnit.mmsiNumber);
+			}
+		}
+	}
+	
+	@Override
+	public void updatePamData(AISDataUnit dataUnit, long updateTime) {
+		super.updatePamData(dataUnit, updateTime);
+		synchronized(vesselMapSyncLock) {
+			System.out.println("Updating");
+			//this.aisVesselMap.put(dataUnit.mmsiNumber, dataUnit);
+		}
+	}
+	
+	@Override
+	public void addPamData(AISDataUnit dataUnit) {
+		super.addPamData(dataUnit);
+		synchronized(vesselMapSyncLock) {
+			this.aisVesselMap.put(dataUnit.mmsiNumber, dataUnit);
+		}
+	}*/
+	
 	/**
 	 * Find and AIS unit based on it's MMSI Number.
 	 * Returns the PamDataUnit rather than the AISData since
@@ -112,6 +150,10 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 	 */
 	synchronized public AISDataUnit findAISDataUnit(int mmsiNumber) {
 		// speed up March 09 to do faster search using correct iterator. 
+		//synchronized(vesselMapSyncLock) {
+		//	return aisVesselMap.get(mmsiNumber);
+		//}
+		
 		AISDataUnit aisDataUnit;
 		ListIterator<AISDataUnit> listIterator = getListIterator(ITERATOR_END);		
 		while (listIterator.hasPrevious()) {

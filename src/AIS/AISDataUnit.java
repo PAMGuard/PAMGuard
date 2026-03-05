@@ -131,6 +131,7 @@ may not be null.
 	 * @return true if the message was decoded successfully
 	 */
 	public boolean decodeMessage() {
+		
 		// time to process the string ...
 		//		More updated useful information at http://gpsd.berlios.de/AIVDM.html
 		try {
@@ -143,7 +144,6 @@ may not be null.
 			messageId = bitData.getUnsignedInteger(0, 5);
 			mmsiNumber = bitData.getUnsignedInteger(8, 37);
 			AISPositionReport positionReport = null;
-
 			switch (messageId) {
 			case 1:
 			case 2:

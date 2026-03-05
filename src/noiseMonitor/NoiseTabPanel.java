@@ -125,7 +125,7 @@ public class NoiseTabPanel implements PamTabPanel {
 
 	private PamPanel timeLabelPanel;
 
-	private SpecPlotAxesPanel specAxisPanel;
+	public SpecPlotAxesPanel specAxisPanel;
 
 	private boolean isViewer;
 
@@ -385,9 +385,14 @@ private void setAxisLabels() {
 //						continue;
 					}
 					for (int m = 0; m < nBands; m++) {
-						max = Math.max(max, noiseData[m][i]+bandCorrection[m]);
-						min = Math.min(min, noiseData[m][i]+bandCorrection[m]);
-						haveData++;
+						try {
+							max = Math.max(max, noiseData[m][i]+bandCorrection[m]);
+							min = Math.min(min, noiseData[m][i]+bandCorrection[m]);
+							haveData++;
+						}catch(ArrayIndexOutOfBoundsException e) {
+							
+						}
+
 					}
 				}
 			}
@@ -484,7 +489,7 @@ private void setAxisLabels() {
 
 	}
 
-	private class SpecPlotAxesPanel extends PamAxisPanel {
+	public class SpecPlotAxesPanel extends PamAxisPanel {
 
 		public SpecPlotAxesPanel() {
 			super();

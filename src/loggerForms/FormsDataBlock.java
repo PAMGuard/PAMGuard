@@ -21,7 +21,7 @@ public class FormsDataBlock extends PamDataBlock<FormsDataUnit> {
 			PamProcess parentProcess, int channelMap) {
 		super(FormsDataUnit.class, dataName, parentProcess, channelMap);
 		this.formDescription = formDescription;
-		setNaturalLifetime(600);
+		setNaturalLifetimeSeconds(600);
 		setDataSelectCreator(new FormDataSelCreator(this, formDescription));
 //		setBinaryDataSource(new FormsBinaryIO(formDescription.getFormsControl(), this));
 //		setNaturalLifetimeMillis(60000);

@@ -126,7 +126,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 	@Override
 	public void setupProcess() {
 		super.setupProcess();
-		outputDataBlock.setNaturalLifetime(300);
+		outputDataBlock.setNaturalLifetimeSeconds(300);
 	}
 	
 	@Override
@@ -441,7 +441,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 
 	@Override
 	public void pamStart() {
-		outputDataBlock.setNaturalLifetime(300);
+		outputDataBlock.setNaturalLifetimeSeconds(300);
 	}
 
 	@Override

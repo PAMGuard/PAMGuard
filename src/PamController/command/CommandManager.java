@@ -46,6 +46,7 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new JVMHeap());
 		commandsList.add(new BufferCommand());
 		commandsList.add(new FindGUICommand());
+		commandsList.add(new GeneralUptimeCommand());
 //		commandsList.add(new SetSerializedSettingsCommand());
 		
 	}

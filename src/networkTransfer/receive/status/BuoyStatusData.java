@@ -32,6 +32,14 @@ public class BuoyStatusData implements Serializable, ManagedParameters {
 	private long lastCommsTime;
 	
 	private double lastCommsStrength;
+	
+	private double voltage;
+	
+	private double power;
+	
+	private double temp;
+	
+	private double humidity;
 
 	private Hashtable<String, BuoyStatusValue> genericStringPairs = new Hashtable<String, BuoyStatusValue>();
 
@@ -163,6 +171,42 @@ public class BuoyStatusData implements Serializable, ManagedParameters {
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
+	}
+
+	public double getVoltage() {
+		return voltage;
+	}
+
+	public void setVoltage(double voltage) {
+		this.voltage = voltage;
+	}
+
+	public double getPower() {
+		return power;
+	}
+
+	public void setPower(double power) {
+		this.power = power;
+	}
+
+	public double getTemp() {
+		return temp;
+	}
+
+	public void setTemp(double temp) {
+		this.temp = temp;
+	}
+
+	public double getHumidity() {
+		return humidity;
+	}
+
+	public void setHumidity(double humidity) {
+		this.humidity = humidity;
+	}
+
+	public void setGenericStringPairs(Hashtable<String, BuoyStatusValue> genericStringPairs) {
+		this.genericStringPairs = genericStringPairs;
 	}
 
 	@Override

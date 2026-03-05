@@ -234,7 +234,7 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	 */
 	private void setupClickTrainDetector() {
 		if (clickTrainProcess.getParentDataBlock()!=null) {
-			getClickTrainDataBlock().setNaturalLifetime((int) 
+			getClickTrainDataBlock().setNaturalLifetimeSeconds((int) 
 					(clickTrainProcess.getParentDataBlock().getRequiredHistory()/1000.));
 			
 			//create the data selector

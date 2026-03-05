@@ -1,16 +1,8 @@
 package Acquisition.mp3;
 
-import javax.sound.sampled.AudioFormat;
-
-import PamDetection.RawDataUnit;
-import net.sourceforge.lame.lowlevel.LameEncoder;
-import net.sourceforge.lame.mp3.Lame;
-import net.sourceforge.lame.mp3.MPEGMode;
-
-
 public class Mp3ConversionWorker {
 	
-	private CompressedRawDataBlock outputDataBlock;
+	/*private CompressedRawDataBlock outputDataBlock;
 	private LameEncoder encoder;
 	private AudioFormat inputAudioFormat;
 	
@@ -33,7 +25,7 @@ public class Mp3ConversionWorker {
 	
 	public void encodeData(RawDataUnit newRawData) {
 		newRawData.getRawData();
-	}
+	}*/
 	
 
 }

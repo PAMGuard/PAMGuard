@@ -79,7 +79,7 @@ public class DataKeepDialog extends PamDialog {
 			listPanel.add(new JLabel(" seconds", JLabel.LEFT), c);
 			int t = dataKeeper.getKeepTimeSeconds(dataBlock);
 			if (t == 0) {
-				t = Math.max(t, dataBlock.getNaturalLifetime());
+				t = Math.max(t, dataBlock.getNaturalLifetimeSeconds());
 			}
 			listEdits[i].setText(String.format("%d", t));
 			PamObserver longestObs = dataBlock.getLongestObserver();

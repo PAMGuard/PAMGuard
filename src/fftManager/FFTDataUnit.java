@@ -10,6 +10,9 @@ import PamguardMVC.superdet.SuperDetection;
 
 public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implements AcousticDataUnit {
 
+	/**
+	 * The values of this complex array are scaled to 1/n
+	 */
 	private ComplexArray fftData;
 
 	private int fftSlice;
@@ -52,6 +55,10 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 		}
 	}
 
+	/**
+	 * The data contained in the complex array are scaled to 1/n
+	 * @return
+	 */
 	public ComplexArray getFftData() {
 		return fftData;
 	}
@@ -62,6 +69,37 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 
 	public int getFftSlice() {
 		return fftSlice;
+	}
+	
+	
+	/**
+	 * Calculate and return the magnitude of the of the FFT expressed in dBFS
+	 * 
+	 * @return magnitude in dB
+	 */
+	public double[] magToDecibels(){
+		double[] mag = this.fftData.mag();
+		double[] out = new double[mag.length];
+		for(int i=0;i<out.length;i++) {
+			double dB = 20 * Math.log10(mag[i]);
+			if (!Double.isFinite(dB)) out[i] = 0;
+			else out[i] = dB;
+		}		
+		return out;
+	}
+	
+	
+	
+	public double[] psdFullScale() {
+		double[] magSq = this.fftData.magsq();
+		double[] psd = new double[magSq.length];
+		float fs = getParentDataBlock().getSampleRate();
+		double N = magSq.length;
+		double df = fs/N;
+		for(int i=0;i<magSq.length;i++) {
+			psd[i] = magSq[i]/df;
+		}
+		return psd;
 	}
 	
 	/**

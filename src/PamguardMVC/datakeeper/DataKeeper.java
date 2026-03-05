@@ -63,7 +63,7 @@ public class DataKeeper implements PamSettings {
 
 	private void setDataBlockKeepTime(PamDataBlock aDataBlock) {
 		Integer tSecs = keeperSettings.getKeepTimeSeconds(aDataBlock.getLongDataName());
-		if (tSecs != null) {
+		if (tSecs != null && tSecs>0) {
 			aDataBlock.setNaturalLifetimeMillis(tSecs*1000);
 		}
 	}

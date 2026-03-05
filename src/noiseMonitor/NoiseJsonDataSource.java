@@ -16,12 +16,17 @@ public class NoiseJsonDataSource extends JSONObjectDataSource<NoiseJsonData>{
 	private NoiseBandControl noiseBandControl;
 	
 	public NoiseJsonDataSource(NoiseDataBlock noiseBlock,NoiseBandControl noiseControl) {
-		super();
+		super(false);
 		this.noiseBandControl = noiseControl;
 		this.noiseBlock = noiseBlock;
 		bandNames=noiseBlock.getBandNames();
 		measurementNames = noiseBlock.getUsedMeasureNames();
 		objectData = new NoiseJsonData();
+	}
+	
+	protected NoiseJsonData initializeObjectData() {
+		return new NoiseJsonData();
+
 	}
 	
 	@Override

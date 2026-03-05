@@ -10,6 +10,8 @@ import java.util.Set;
 import Acquisition.DaqStatusDataUnit;
 import Array.ArrayManager;
 import Array.Streamer;
+import Array.streamerOrigin.OriginSettings;
+import Array.streamerOrigin.StaticOriginSettings;
 import GPS.GPSDataBlock;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
@@ -97,12 +99,22 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 		unknownPackets++;
 	}
 	
+	public String getSiteName() {
+		int streamerId = ArrayManager.getArrayManager().getCurrentArray().getStreamerForPhone(this.getLowestChannel());
+		Streamer streamer = ArrayManager.getArrayManager().getCurrentArray().getStreamer(streamerId);
+		OriginSettings streamerOrigin = streamer.getOriginSettings();
+		if(streamerOrigin instanceof StaticOriginSettings) {
+			return ((StaticOriginSettings) streamerOrigin).getSiteName();
+		}
+		return "Unknown";
+	}
+	
 	/**
 	 * Get a standard string name for a buoy. 
 	 * @return a standard name in the form 'buoy xxx';
 	 */
 	public String getBuoyName() {
-		return String.format("Buoy %03d", buoyStatusData.getBuoyId1());
+		return String.format("pb%03d", buoyStatusData.getBuoyId1());
 	}
 
 	/**
@@ -417,6 +429,13 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 	@Override
 	public String toString() {
 		return String.format("Status %s\n", buoyStatusData.toString());
+	}
+
+	public void setHousingMeasurements(double supplyVoltage, double power, double temperatureC, double humidityPercent) {
+		this.buoyStatusData.setPower(power);
+		this.buoyStatusData.setTemp(temperatureC);
+		this.buoyStatusData.setVoltage(supplyVoltage);
+		this.buoyStatusData.setHumidity(humidityPercent);
 	}
 
 //	/**

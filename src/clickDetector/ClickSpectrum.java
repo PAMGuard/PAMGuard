@@ -916,7 +916,9 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 	}
 
 	protected void showClick(ClickDetection newClick) {
-		if (newClick==null) return; 
+		if(this.shouldDisplayClick(newClick)!=true) {
+			return;
+		}
 		synchronized (storedSpectrumLock) {
 			storedClick = newClick;
 			logSpectrum = null;

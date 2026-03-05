@@ -61,12 +61,12 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	
 	public NetworkSender(String unitName) {
 		super("Network Sender", unitName);
-		PamSettingManager.getInstance().registerSettings(this);
 		if(this.networkSendParams.sendingFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
 			commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
 			commandProcess.setCommandProcess(true);
 			addPamProcess(commandProcess);
 		}
+		PamSettingManager.getInstance().registerSettings(this);
 		sidePanel = new NetworkSendSidePanel(this);
 		initializeClient();
 	}
@@ -204,7 +204,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		String useJson = GlobalArguments.getParam(NetSendCommandParam.SENDJSON.arg);
 		String persistenceDir = GlobalArguments.getParam(NetSendCommandParam.PERSISTANCE_DIRECTORY.arg);
 
-
 		if(user!=null) {
 			networkSendParams.userId = user;
 		}
@@ -254,20 +253,19 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		}
 		
 		if(persistenceDir!=null) {
-			networkSendParams.persistenceDir = persistenceDir;
+			networkSendParams.persistenceDirectory = persistenceDir;
 		}
 		
-		boolean isSetJson = false;
+		boolean isSetJson = networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_JSON;
 		if(useJson!=null) {
 			isSetJson = Boolean.valueOf(useJson);
-			if(isSetJson) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_JSON;
-			}else {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-			}
 		}
 		
-		
+		if(isSetJson) {
+			networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_JSON;
+		}else {
+			networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BYTEARRAY;
+		}
 		
 		return (networkSendParams != null);
 	}
@@ -406,29 +404,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 				client.setWarning("Error transmitting data. "+e.getMessage());
 			}*/
 		}
-	}
-	
-	private class ConnectionResetTimer implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			timerCall();
-		}
-	}
-
-	public void timerCall() {
-		if(client.requireReconnect) {
-			System.out.println("Attempting to reinitialize client");
-			client.removeWarning();
-			client.disconnect();
-			client.additionalClose();
-			initializeClient();
-			runClient();
-		}
-	}
-	
-	public void runClientCheckTimer() {
-		Timer t = new Timer(20000, new ConnectionResetTimer());
-		t.start();
 	}
 
 	public String getStatus() {

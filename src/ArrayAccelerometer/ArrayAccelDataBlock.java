@@ -11,7 +11,7 @@ public class ArrayAccelDataBlock extends PamDataBlock<ArrayAccelDataUnit> implem
 	public ArrayAccelDataBlock(String dataName, ArrayAccelControl accelControl, ArrayAccelProcess parentProcess) {
 		super(ArrayAccelDataUnit.class, dataName, parentProcess, 0);
 		this.accelControl = accelControl;
-		setNaturalLifetime(60);
+		setNaturalLifetimeSeconds(60);
 	}
 
 	@Override

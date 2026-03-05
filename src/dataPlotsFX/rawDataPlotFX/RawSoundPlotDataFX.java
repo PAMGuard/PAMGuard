@@ -428,7 +428,7 @@ public class RawSoundPlotDataFX {
 			start=(int) Math.round(startPixel);
 		}
 		
-//		System.out.println(String.format("secondsBack: %.3f  arrayPixBack %.1f  arrayPixStart: %d start: %d soundStore.storeSize: %d wrapPix %.2f", secondsBack, arrayPixBack, arrayPixStart,start, soundStore.storeSize, wrapPix)); 
+		//System.out.println(String.format("secondsBack: %.3f  arrayPixBack %.1f  arrayPixStart: %d start: %d soundStore.storeSize: %d wrapPix %.2f", secondsBack, arrayPixBack, arrayPixStart,start, soundStore.storeSize, wrapPix)); 
 
 	
 		int windowSize = (int) ((orientation==Orientation.HORIZONTAL) ? windowRect.getWidth(): windowRect.getHeight());

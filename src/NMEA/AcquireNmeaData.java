@@ -189,6 +189,14 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		timer.start();
 		activeNMEAsource.start();
 	}
+	
+	public void makeEmptyThread() {
+		timer.stop();
+		activeNMEAsource = null;
+		activeNMEAsource = new Thread(new EmptyThread());
+		timer.start();
+		activeNMEAsource.start();
+	}
 
 	public void makeSerialThread() {
 		//System.out.println("OK making a serial thread");
@@ -288,8 +296,13 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 		
 		stopNMEASource();
+		
+		if(runMode == PamController.RUN_NETWORKRECEIVER) {
+			//makeEmptyThread();
+			return;
+		}
 
-		if(sourceType == NmeaSources.SERIAL){
+		else if(sourceType == NmeaSources.SERIAL){
 			makeSerialThread();
 		}else if(sourceType == NmeaSources.UDP){
 			if (nmeaControl.nmeaParameters.multicast)
@@ -551,6 +564,23 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 //		}
 //
 //	}
+	
+	class EmptyThread implements Runnable {
+
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					Thread.sleep(20000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		
+	}
 
 	class TimestampFileThread implements Runnable {
 
@@ -562,27 +592,28 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 				InputStreamReader fileIn = new InputStreamReader(instream);
 				BufferedReader reader = new BufferedReader(fileIn);
 				String nextLine;
-				long lastMilli = 0;
+				long lastMessageMillis = 0;
 				while(!stopActiveNMEAsource && !readFile) {
-					
+					Thread.sleep(500);
 				}
 				while (!stopActiveNMEAsource && (nextLine=reader.readLine())!=null) {
-					System.out.println(nextLine);
+					//System.out.println(nextLine);
 				    String[] tokens = nextLine.split(",", 2);
-				    long millis = Long.valueOf(tokens[0]);
-				    if(lastMilli!=0 && lastMilli<millis) {
-				    	//Thread.sleep(millis-lastMilli);
+				    long thisMessageMillis = Long.valueOf(tokens[0]);
+				    if(lastMessageMillis!=0 && lastMessageMillis<thisMessageMillis) {
+				    	long waitTime = thisMessageMillis-lastMessageMillis;
+				    	Thread.sleep(waitTime);
 				    }
-				    processNmeaStringWithTimestamp(millis,tokens[1]);
-				   // processNmeaString(new StringBuffer(tokens[1]));
-				    lastMilli = millis;
+				    //processNmeaStringWithTimestamp(thisMessageMillis,tokens[1]);
+				    processNmeaString(new StringBuffer(tokens[1]));
+				    lastMessageMillis = thisMessageMillis;
 				}
 				while(!stopActiveNMEAsource) {
 					
 				}
 				reader.close();
-			}catch(IOException   e) {
-				
+			}catch(IOException | InterruptedException   e) {
+				e.printStackTrace();
 			}
 			
 			stopActiveNMEAsource=false;
@@ -889,8 +920,10 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	private class SignalTimerAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (System.currentTimeMillis() - lastSigTime > 10000) {
-				restartNMEA();
+			if(PamController.getInstance().getRunMode()!=PamController.RUN_NETWORKRECEIVER) {
+				if (System.currentTimeMillis() - lastSigTime > 10000) {
+					restartNMEA();
+				}
 			}
 		}
 	}
@@ -906,7 +939,15 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 	@Override
 	public ModuleStatus getStatus() {
+		
 		ModuleStatus status = processCheck.getStatus();
+		
+		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+			status.setStatus(ModuleStatus.STATUS_OK);
+			return status;
+		}
+		
+		
 		
 		if (status.getStatus() == ModuleStatus.STATUS_OK && nmeaControl.nmeaParameters.sourceType == NmeaSources.SIMULATED) {
 			status.setStatus(ModuleStatus.STATUS_WARNING);

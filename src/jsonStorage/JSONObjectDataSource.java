@@ -1,6 +1,7 @@
 package jsonStorage;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,8 @@ import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryStore;
 
 public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
+	
+	private boolean includeAllBaseData = true;
 
 	/** 
 	 * The data object to load parameters into - this is what will be used to generate
@@ -36,6 +39,11 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	 */
 	protected JSONObjectDataSource() {
 	}
+	
+	protected JSONObjectDataSource(boolean includeAllBaseData) {
+		this.includeAllBaseData = includeAllBaseData;
+		
+	}
 
 
 	/**
@@ -45,8 +53,15 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	public String getPackedObject(PamDataUnit dataUnit) {
 		setFields(dataUnit);
 		
+		if(objectData.shouldIgnoreDataUnit) {
+			return null;
+		}
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		if(!includeAllBaseData) {
+			objectMapper.setDefaultPropertyInclusion(Include.NON_EMPTY);
+		}
 		
 		String jsonString;
 		try {
@@ -58,7 +73,7 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		
 		jsonString = jsonString.substring(0, jsonString.length()-2);
 		jsonString = jsonString+","+getAdditionalJson(dataUnit)+"}";
-		
+				
 		return jsonString;
 	}
 	
@@ -66,6 +81,7 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		return "\"addition\":\"null\"";
 	}
 	
+	protected abstract DataSource initializeObjectData();
 	
 	/**
 	 * Loads the fields of the JSONObjectData object with the parameters from the dataUnit.  First
@@ -75,11 +91,18 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	 * @param dataUnit
 	 */
 	private void setFields(PamDataUnit dataUnit) {
+		
+		objectData = initializeObjectData();
+		
 		DataUnitBaseData baseData = dataUnit.getBasicData();
 		
 		// transfer over the data common to all data unit types
-		objectData.flagBitmap = baseData.getS1Contents();
 		objectData.millis = baseData.getTimeMilliseconds();
+		objectData.dateReadable = PamCalendar.formatDateTime2(objectData.millis, "yyyy MMMM dd HH:mm:ss.SSS", false);
+
+			
+		
+		objectData.flagBitmap = baseData.getS1Contents();
 		if ((objectData.flagBitmap & DataUnitBaseData.S1_TIMENANOSECONDS) != 0) {
 			objectData.timeNanos = baseData.getTimeNanoseconds();
 		}
@@ -127,12 +150,13 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		// force the subclass to set the object type
 		setObjectType(dataUnit);
 		
+		
 		// now add any fields specific to the subclass
 		addClassSpecificFields(dataUnit);
 		
 		// finally, add in the new fields used in the convertBinToJSON Matlab script
-		objectData.dateReadable = PamCalendar.formatDateTime2(objectData.millis, "yyyy MMMM dd HH:mm:ss.SSS", false);
 		objectData.filePath = "Network Sender";
+		
 		BinaryDataSource theBinarySource = dataUnit.getParentDataBlock().getBinaryDataSource();
 		if(theBinarySource!=null) {
 			objectData.moduleType = theBinarySource.getModuleType();

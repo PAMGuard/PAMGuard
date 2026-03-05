@@ -37,7 +37,11 @@ public class NoiseBandSettings implements Serializable, Cloneable, ManagedParame
 	@Override
 	protected NoiseBandSettings clone() {
 		try {
-			return (NoiseBandSettings) super.clone();
+			NoiseBandSettings noiseBandSettings = (NoiseBandSettings) super.clone();
+			noiseBandSettings.rawDataSource = this.rawDataSource;
+			noiseBandSettings.bandType = this.bandType;
+			noiseBandSettings.filterType = this.filterType;
+			return noiseBandSettings;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;

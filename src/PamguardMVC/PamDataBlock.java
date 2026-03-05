@@ -232,7 +232,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	/**
 	 * Natural lifetime of data in seconds.
 	 */
-	protected int naturalLifetime = 0; // natural lifetime in milliseconds.
+	protected int naturalLifetimeSeconds = 0; 
 
 	protected int unitsRemoved = 0;
 
@@ -2236,8 +2236,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * 
 	 * @return lifetime in seconds
 	 */
-	public int getNaturalLifetime() {
-		return getNaturalLifetimeMillis() / 1000;
+	public int getNaturalLifetimeSeconds() {
+		return naturalLifetimeSeconds;
 	}
 
 	/**
@@ -2246,7 +2246,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @param naturalLifetime
 	 */
 	public void setNaturalLifetimeMillis(int naturalLifetime) {
-		this.naturalLifetime = naturalLifetime;
+		if(naturalLifetime>0) {
+			this.setNaturalLifetimeSeconds((int) (naturalLifetime/1000.));
+		}
 	}
 
 	/**
@@ -2255,7 +2257,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @return
 	 */
 	public int getNaturalLifetimeMillis() {
-		return naturalLifetime;
+		return (int) (getNaturalLifetimeSeconds()*1000.);
 	}
 
 	/**
@@ -2264,8 +2266,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * 
 	 * @param naturalLifetime in seconds (NOT milliseconds)
 	 */
-	public void setNaturalLifetime(int naturalLifetime) {
-		this.naturalLifetime = naturalLifetime * 1000;
+	public void setNaturalLifetimeSeconds(int naturalLifetime) {
+		if(naturalLifetime>0) {
+			this.naturalLifetimeSeconds = naturalLifetime;
+		}
 	}
 
 	public boolean isLinkGpsData() {

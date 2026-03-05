@@ -522,6 +522,9 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * @return frame. 
 	 */
 	public Frame getGuiFrame() {
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			return null;
+		}
 		if (pamView != null) {
 			return pamView.getGuiFrame();
 		}

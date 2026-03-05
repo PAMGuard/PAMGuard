@@ -1,5 +1,6 @@
 package clickDetector;
 
+import AIS.AISJsonData;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryTypes;
 import clickDetector.background.ClickBackgroundDataUnit;
@@ -14,6 +15,11 @@ public class ClickBackgroundJSONDataSource extends JSONObjectDataSource<ClickBac
 	public ClickBackgroundJSONDataSource() {
 		super();
 		objectData = new ClickBackgroundJSONData();
+	}
+	
+	protected ClickBackgroundJSONData initializeObjectData() {
+		return new ClickBackgroundJSONData();
+
 	}
 
 	
