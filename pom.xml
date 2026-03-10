@@ -298,7 +298,7 @@
 							<dependency>
 								<groupId>org.eclipse.tycho</groupId>
 								<artifactId>tycho-compiler-jdt</artifactId>
-								<version>1.5.1</version>
+								<version>4.0.8</version>
 							</dependency>
 						</dependencies>
 					</plugin>
@@ -618,14 +618,6 @@
 		  	<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
 		  	<version>1.2.5</version>
 		</dependency>
-		
-		<dependency>
-		    <groupId>net.sourceforge.lame</groupId>
-		    <artifactId>lame</artifactId>
-		    <version>3.98.4</version>
-		</dependency>
-
-		
 
 		<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
 		<dependency>

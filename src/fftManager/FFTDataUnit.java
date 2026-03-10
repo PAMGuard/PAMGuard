@@ -137,7 +137,7 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 		}
 		double mGain = gain/gain;
 		for (int i = 0; i < magSqData.length; i++) {
-			magSqData[i] = daqProcess.fftAmplitude2dBV(magSqData[i]/mGain, iChannel, 
+			magSqData[i] = daqProcess.fftAmplitude2dB(magSqData[i]/mGain, iChannel, 
 					getParentDataBlock().getSampleRate(), magSqData.length*2, true, true);
 		}
 		return magSqData;

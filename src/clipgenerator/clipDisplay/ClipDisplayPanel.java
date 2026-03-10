@@ -50,6 +50,7 @@ import PamguardMVC.dataSelector.DataSelectorChangeListener;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.ClipProcess;
+import soundPlayback.ClipPlayback;
 
 /**
  * Clip display panel. Can be incorporated into a tab panel or stand alone in 
@@ -582,10 +583,6 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 			}
 		}
 		return -1;
-	}
-	
-	public ClipDisplayMarker getClipDisplayMarker() {
-		return clipDisplayMarker;
 	}
 
 	

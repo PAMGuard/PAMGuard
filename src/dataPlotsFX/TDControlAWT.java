@@ -37,7 +37,7 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 	/**
 	 * Checks for incoming data. 
 	 */
-	private PamObserverAdapter dataObserver;
+	private DataObserver dataObserver;
 
 	private String uniqueName;
 
