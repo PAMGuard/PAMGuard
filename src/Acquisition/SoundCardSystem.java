@@ -427,11 +427,11 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 	 */
 	public int getDeviceNumber(int number, String name) {
 		ArrayList<String> devList = getDevicesList();
-		if (devList == null) {
+		if (devList == null || devList.size() == 0) {
 			return 0;
 		}
 		if (name == null) {
-			return number;
+			return Math.min(number, devList.size()-1);
 		}
 		for (int i = 0; i < devList.size(); i++) {
 			String aDev = devList.get(i);
@@ -439,7 +439,7 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 				return i;
 			}
 		}
-		return 0;
+		return Math.min(number, devList.size()-1);
 	}
 	
 	/**
