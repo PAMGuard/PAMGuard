@@ -14,9 +14,14 @@ public class ClipDisplayProjector extends GeneralProjector<PamCoordinate> {
 
 	private ClipDisplayPanel clipDisplayPanel;
 	
+	private static final ParameterType[] pTypes = {ParameterType.TIME, ParameterType.FREQUENCY};
+	
+	private static final ParameterUnits[] pUnits = {ParameterUnits.SECONDS, ParameterUnits.HZ};
+	
 	public ClipDisplayProjector(ClipDisplayPanel clipDisplayPanel) {
 		super();
 		this.clipDisplayPanel = clipDisplayPanel;
+		
 	}
 
 	@Override
@@ -39,6 +44,16 @@ public class ClipDisplayProjector extends GeneralProjector<PamCoordinate> {
 	 */
 	public ClipDisplayPanel getClipDisplayPanel() {
 		return clipDisplayPanel;
+	}
+
+	@Override
+	public ParameterType[] getParameterTypes() {
+		return pTypes;
+	}
+
+	@Override
+	public ParameterUnits[] getParameterUnits() {
+		return pUnits;
 	}
 
 }

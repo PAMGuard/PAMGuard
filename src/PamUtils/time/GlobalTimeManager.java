@@ -105,7 +105,7 @@ public class GlobalTimeManager implements PamSettings {
 				long diff = Math.abs(now-lastPCTime-1000);
 				lastPCTime = now;
 				if (diff > 500) {
-					System.out.printf("PC clock Jmped %d millis at %s\n", diff, PamCalendar.formatDateTime(now));
+					System.out.printf("PC clock Jumped %d millis at %s\n", diff, PamCalendar.formatDateTime(now));
 					handleClockJump();
 					// the handler restarts the monitor system for some reason which relaunches this 
 					// thread, so end up with ever increasing numbers of this thread running which is really stupid.
@@ -132,7 +132,7 @@ public class GlobalTimeManager implements PamSettings {
 	 * no need to do time checks. 
 	 * @return true if it's a realtime system
 	 */
-	private boolean isRealTime() {
+	public boolean isRealTime() {
 		if (PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
 			return false;
 		}

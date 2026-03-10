@@ -266,16 +266,20 @@ public class WhistleClassifierProcess extends PamProcess {
 					runClassification(timeMilliseconds);
 				}
 				clearFragmentStore(timeMilliseconds);
-				System.out.println("Clear Whistle Classifier store due to low whistle rate");
+//				System.out.println("Clear Whistle Classifier store due to low whistle rate");
 			}
 		}
 	}
 
 
 	private void newWhistleData(AbstractWhistleDataUnit shapeDataUnit) {
+		FragmentClassifierParams fragClassParams = getWhistleClassifierControl().getWhistleClassificationParameters().
+				fragmentClassifierParams;
+		if (fragClassParams == null) {
+			return;
+		}
 		if (!isTraining() && shapeDataUnit.getSliceCount() <
-				getWhistleClassifierControl().getWhistleClassificationParameters().
-				fragmentClassifierParams.minimumContourLength) {
+				fragClassParams.minimumContourLength) {
 			return;
 		}
 		int nFrags = fragmentWhistle(shapeDataUnit);

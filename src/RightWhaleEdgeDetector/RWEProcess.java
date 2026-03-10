@@ -425,25 +425,31 @@ public class RWEProcess extends PamProcess {
 //		return (bearingLocaliser != null);
 //	}
 
-	private BearingLocaliser findBearingLocaliser(PamDataUnit rwDataUnit) {
-		int chanMap = rwDataUnit.getChannelBitmap();
-		int hydrophoneMap = sourceDataBlock.getChannelListManager().channelIndexesToPhones(chanMap);
-		return findBearingLocaliser(hydrophoneMap);
-	}
+
 	
-	private synchronized BearingLocaliser findBearingLocaliser(int hydrophoneMap) {
-		int nPhones = PamUtils.getNumChannels(hydrophoneMap);
+	private BearingLocaliser findBearingLocaliser(RWEDataUnit rwDataUnit) {
+		int chanMap = rwDataUnit.getChannelBitmap();
+		if (sourceDataBlock == null) {
+			return null;
+		}
+		int[] phoneList = sourceDataBlock.getChannelListManager().channelMapToPhonesList(chanMap);
+		return findBearingLocaliser(phoneList);
+	}
+
+	private synchronized BearingLocaliser findBearingLocaliser(int[] hydrophoneList) {
+		int nPhones = hydrophoneList.length;
 		if (nPhones < 2) {
 			return null;
 		}
 		if (bearingLocalisers == null) {
 			bearingLocalisers = new Hashtable<Integer, BearingLocaliser>();
 		}
-		BearingLocaliser bearingLocaliser = bearingLocalisers.get(hydrophoneMap);
+		BearingLocaliser bearingLocaliser = bearingLocalisers.get(hydrophoneList);
+		int phoneMap = PamUtils.makeChannelMap(hydrophoneList);
 		if (bearingLocaliser == null) {
-			bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(hydrophoneMap, Correlations.defaultTimingError(getSampleRate()));
+			bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(hydrophoneList, Correlations.defaultTimingError(getSampleRate()));
 			if (bearingLocaliser != null) {
-				bearingLocalisers.put(hydrophoneMap, bearingLocaliser);
+				bearingLocalisers.put(phoneMap, bearingLocaliser);
 			}
 		}
 		return bearingLocaliser;

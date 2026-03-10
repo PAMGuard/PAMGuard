@@ -24,6 +24,10 @@
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_ConfigureProcessing_Data" url="localisation/difar/difarLocalisation/docs/difar_ConfigureProcessing.html#Data"/>
 
+<mapID target="overview.PamMasterHelp.docs.logfiles" url="overview/PamMasterHelp/docs/logfiles.html"/>
+
+<mapID target="mapping.mapHelp.docs.makegebcoraster" url="mapping/mapHelp/docs/makegebcoraster.html"/>
+
 <mapID target="localisation.difar.difarLocalisation.docs.difar_RunningSystem" url="localisation/difar/difarLocalisation/docs/difar_RunningSystem.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_UsingDifarGramDisplay" url="localisation/difar/difarLocalisation/docs/difar_UsingDifarGramDisplay.html"/>
@@ -37,6 +41,8 @@
 <mapID target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_ResetContour" url="classifiers/roccaHelp/docs/rocca_Spectrogram.html#rocca_ResetContour"/>
 
 <mapID target="localisation.docs.localisation_overview" url="localisation/docs/localisation_overview.html"/>
+
+<mapID target="detectors.ishmael.docs.ishmael_overview" url="detectors/ishmael/docs/ishmael_overview.html"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.FFTEngine_Configuring" url="sound_processing/fftManagerHelp/docs/FFTEngine_Configuring.html"/>
 
@@ -53,6 +59,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_basicClassification" url="detectors/clickDetectorHelp/docs/ClickDetector_basicClassification.html"/>
 
 <mapID target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Output" url="classifiers/whistleClassifierHelp/docs/whistleClassifier_Output.html"/>
+
+<mapID target="sound_processing.mel.docs.mel_overview" url="sound_processing/mel/docs/mel_overview.html"/>
 
 <mapID target="utilities.tethys.docs.calibrations" url="utilities/tethys/docs/calibrations.html"/>
 
@@ -100,6 +108,8 @@
 
 <mapID target="overview.PamMasterHelp.docs.PamdogHelp" url="overview/PamMasterHelp/docs/PamdogHelp.html"/>
 
+<mapID target="detectors.rwedge.docs.rwedisplays" url="detectors/rwedge/docs/rwedisplays.html"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SchoolStatsFile" url="classifiers/roccaHelp/docs/rocca_Configure.html#rocca_SchoolStatsFile"/>
 
 <mapID target="localisation.docs.localisation_tdoa" url="localisation/docs/localisation_tdoa.html"/>
@@ -107,6 +117,8 @@
 <mapID target="overview.PamMasterHelp.docs.multipleDisplays" url="overview/PamMasterHelp/docs/multipleDisplays.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.BEARING" url="visual_methods/loggerFormsHelp/docs/BEARING.html"/>
+
+<mapID target="overview.PamMasterHelp.docs.internalstorage" url="overview/PamMasterHelp/docs/internalstorage.html"/>
 
 <mapID target="sensors.analogarray.docs.analogarrayconfig" url="sensors/analogarray/docs/analogarrayconfig.html"/>
 
@@ -116,6 +128,8 @@
 
 <mapID target="detectors.gpl.docs.gpldisplays" url="detectors/gpl/docs/gpldisplays.html"/>
 
+<mapID target="sound_processing.mel.docs.mel_config" url="sound_processing/mel/docs/mel_config.html"/>
+
 <mapID target="utilities.tethys.docs.tethys_batch" url="utilities/tethys/docs/tethys_batch.html"/>
 
 <mapID target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_overview" url="classifiers/rawDeepLearningHelp/docs/rawDeepLearning_overview.html"/>
@@ -123,6 +137,8 @@
 <mapID target="detectors.likelihoodDetectionModuleHelp.LikelihoodDetector_helpIndex" url="detectors/likelihoodDetectionModuleHelp/LikelihoodDetector_helpIndex.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_ConfigureProcessing_Automation" url="localisation/difar/difarLocalisation/docs/difar_ConfigureProcessing.html#Automation"/>
+
+<mapID target="mapping.mapHelp.docs.makegeotiff" url="mapping/mapHelp/docs/makegeotiff.html"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules" url="overview/PamMasterHelp/docs/modules.html"/>
 
@@ -167,6 +183,8 @@
 <mapID target="utilities.SIDEModule.docs.SIDE_ReportMatrix" url="utilities/SIDEModule/docs/SIDE_ReportMatrix.html"/>
 
 <mapID target="visual_methods.videoRangeHelp.docs.videoRange_MeasureToShoreline" url="visual_methods/videoRangeHelp/docs/videoRange_MeasureToShoreline.html"/>
+
+<mapID target="detectors.rwedge.docs.rwedgedetector" url="detectors/rwedge/docs/rwedgedetector.html"/>
 
 <mapID target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Configuring" url="displays/radarDisplayHelp/docs/UserDisplay_Radar_Configuring.html"/>
 
@@ -229,6 +247,8 @@
 <mapID target="overview.PamMasterHelp.docs.mixedMode" url="overview/PamMasterHelp/docs/mixedMode.html"/>
 
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone" url="utilities/hydrophoneArrayManagerHelp/docs/Array_NewHydrophone.html"/>
+
+<mapID target="detectors.ishmael.docs.ishmael_speccorrelation" url="detectors/ishmael/docs/ishmael_speccorrelation.html"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_SavedFiles_contour" url="classifiers/roccaHelp/docs/rocca_SavedFiles.html#contour"/>
 
@@ -312,6 +332,8 @@
 
 <mapID target="sound_processing.beamformer.docs.Beamformer_AlgoConfig_BF_ArryInfo" url="sound_processing/beamformer/docs/Beamformer_AlgoConfig.html#BF_ArryInfo"/>
 
+<mapID target="sound_processing.mel.docs.mel_display" url="sound_processing/mel/docs/mel_display.html"/>
+
 <mapID target="sensors.arrayAccelerometer.docs.arrayAccelerometer" url="sensors/arrayAccelerometer/docs/arrayAccelerometer.html"/>
 
 <mapID target="utilities.SIDEModule.docs.SIDE_Output" url="utilities/SIDEModule/docs/SIDE_Output.html"/>
@@ -335,6 +357,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_clickDetector" url="detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html"/>
 
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_betterClassification" url="detectors/clickDetectorHelp/docs/ClickDetector_betterClassification.html"/>
+
+<mapID target="detectors.rwedge.docs.rweconfig" url="detectors/rwedge/docs/rweconfig.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_medianfilter" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html#medianfilter"/>
 
@@ -371,6 +395,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types" url="detectors/clickDetectorHelp/docs/offline_Reanalyse_click_types.html"/>
 
 <mapID target="sound_processing.beamformer.docs.Beamformer_Output_BF_OutputBeamogram" url="sound_processing/beamformer/docs/Beamformer_Output.html#BF_OutputBeamogram"/>
+
+<mapID target="detectors.ishmael.docs.ishmael_energysum" url="detectors/ishmael/docs/ishmael_energysum.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html"/>
 
@@ -435,6 +461,8 @@
 <mapID target="visual_methods.videoRangeHelp.docs.VideoRange_SidePanel" url="visual_methods/videoRangeHelp/docs/VideoRange_SidePanel.html"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation" url="classifiers/roccaHelp/docs/rocca_ContourExtractionManipulation.html"/>
+
+<mapID target="utilities.tethys.docs.tethys_deleting" url="utilities/tethys/docs/tethys_deleting.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.SINGLE" url="visual_methods/loggerFormsHelp/docs/SINGLE.html"/>
 
@@ -507,6 +535,8 @@
 <mapID target="mapping.AirgunDisplay.docs.AirgunDisplay" url="mapping/AirgunDisplay/docs/AirgunDisplay.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings" url="localisation/difar/difarLocalisation/docs/difar_CrossingBearings.html"/>
+
+<mapID target="utilities.BinaryStore.docs.binarystore_update" url="utilities/BinaryStore/docs/binarystore_update.html"/>
 
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_clickTabPanelDisplays" url="detectors/clickDetectorHelp/docs/ClickDetector_clickTabPanelDisplays.html"/>
 
@@ -614,6 +644,8 @@
 
 <mapID target="utilities.tethys.docs.tethys_module" url="utilities/tethys/docs/tethys_module.html"/>
 
+<mapID target="visual_methods.loggerFormsHelp.docs.loggerFormsMoving" url="visual_methods/loggerFormsHelp/docs/loggerFormsMoving.html"/>
+
 <mapID target="sound_processing.fftManagerHelp.docs.FFTEngine_Creating" url="sound_processing/fftManagerHelp/docs/FFTEngine_Creating.html"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal_clickremoval" url="sound_processing/fftManagerHelp/docs/noise_removal.html#clickremoval"/>
@@ -660,6 +692,8 @@
 
 <mapID target="utilities.listening.docs.Listening_Overview" url="utilities/listening/docs/Listening_Overview.html"/>
 
+<mapID target="detectors.ishmael.docs.ishmael_matchedfilter" url="detectors/ishmael/docs/ishmael_matchedfilter.html"/>
+
 <mapID target="sensors.cpod.docs.cpod" url="sensors/cpod/docs/cpod.html"/>
 
 <mapID target="utilities.SIDEModule.docs.SIDE_Overview_tests" url="utilities/SIDEModule/docs/SIDE_Overview.html#tests"/>
@@ -681,6 +715,8 @@
 <mapID target="detectors.clickDetectorHelp.docs.offline_Tools" url="detectors/clickDetectorHelp/docs/offline_Tools.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_Configure" url="detectors/whistleMoanHelp/docs/whistleMoan_Configure.html"/>
+
+<mapID target="overview.PamMasterHelp.docs.pcclock" url="overview/PamMasterHelp/docs/pcclock.html"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules__Sensors" url="overview/PamMasterHelp/docs/modules.html#_Sensors"/>
 
@@ -740,6 +776,8 @@
 
 <mapID target="localisation.group3d.docs.3dalgorithms" url="localisation/group3d/docs/3dalgorithms.html"/>
 
+<mapID target="sound_processing.NoiseBands.Docs.NoiseBandsFilters" url="sound_processing/NoiseBands/Docs/NoiseBandsFilters.html"/>
+
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_thresholding" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html#thresholding"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules__Classifiers" url="overview/PamMasterHelp/docs/modules.html#_Classifiers"/>
@@ -759,6 +797,8 @@
 <mapID target="classifiers.roccaHelp.docs.rocca_SelectingWhistle" url="classifiers/roccaHelp/docs/rocca_SelectingWhistle.html"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification_SchoolClassification" url="classifiers/roccaHelp/docs/rocca_WhistleSchoolClassification.html#SchoolClassification"/>
+
+<mapID target="mapping.mapHelp.docs.makegebcocontour" url="mapping/mapHelp/docs/makegebcocontour.html"/>
 
 <mapID target="utilities.BinaryStore.docs.matlabandr" url="utilities/BinaryStore/docs/matlabandr.html"/>
 
@@ -837,6 +877,8 @@
 <mapID target="mapping.NMEA.docs.configuringNMEADataSource_NMEAStringList" url="mapping/NMEA/docs/configuringNMEADataSource.html#NMEAStringList"/>
 
 <mapID target="sensors.analogarray.docs.analogarraycalibration" url="sensors/analogarray/docs/analogarraycalibration.html"/>
+
+<mapID target="sound_processing.NoiseBands.Docs.NoiseBandsFFT" url="sound_processing/NoiseBands/Docs/NoiseBandsFFT.html"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal" url="sound_processing/fftManagerHelp/docs/noise_removal.html"/>
 

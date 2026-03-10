@@ -127,7 +127,7 @@ public class AISGraphics extends PamDetectionOverlayGraphics {
 		aisGPSPosition.setLongitude(positionReport.getLongitude());
 		aisGPSPosition.setCourseOverGround(positionReport.courseOverGround);
 		aisGPSPosition.setTrueHeading(positionReport.trueHeading);
-		aisGPSPosition.setSpeed(positionReport.speedOverGround);
+		aisGPSPosition.setSpeed(positionReport.getKnownSpeed());
 		aisGPSPosition.setTimeInMillis(positionReport.timeMilliseconds);
 
 
@@ -298,9 +298,9 @@ public class AISGraphics extends PamDetectionOverlayGraphics {
 		//str += "<br>ETA        : " + PamCalendar.formatDateTime(aisDataUnit.staticData.etaMilliseconds);
 		str += String.format("<br>%s   %s", LatLong.formatLatitude(positionReport.getLatitude()),
 				LatLong.formatLongitude(positionReport.getLongitude()));
-		str += String.format("<br>Speed      : %3.1f", positionReport.speedOverGround);
-		str += String.format("<br>Course      : %d\u00B0", (int) positionReport.courseOverGround);
-		str += String.format("<br>Head        : %d\u00B0", (int) positionReport.trueHeading);
+		str += String.format("<br>Speed       : %s", positionReport.getSpeedString());
+		str += String.format("<br>Course      : %s", (int) positionReport.courseOverGround);
+		str += String.format("<br>Head        : %s", positionReport.getCOGString());
 		if (staticData != null) {
 			str += String.format("<br>LOA %dm, Beam %dm", (int)staticData.getLength(), (int) staticData.getWidth());
 			str += String.format("<br>%s", staticData.getStationTypeString(aisDataUnit.stationType, staticData.shipType));

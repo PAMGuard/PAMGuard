@@ -18,6 +18,7 @@ public class FileMapProgress extends PamTaskUpdate {
 	public static final int STATE_COUNTINGFILES = 3;
 	public static final int STATE_DONECOUNTINGFILES = 4;
 	public static final int STATE_CHECKINGFILES = 5;
+	public static final int STATE_MAPPINGFILES = 6;
 	
 	
 	public FileMapProgress(int countingState, int totalFiles,

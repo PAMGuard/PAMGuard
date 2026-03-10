@@ -355,18 +355,6 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 		return false;
 	}
 
-	/**
-	 * Update the provider register. This removes any data block which no longer exist in the data model. 
-	 */
-	public void updateProviderRegister() {
-		ArrayList<TDDataProviderFX> dataInfos=TDDataProviderRegisterFX.getInstance().getDataInfos();
-		for (int i=0; i<dataInfos.size() ;i++){
-			if (!PamController.getInstance().getDataBlocks().contains(dataInfos.get(i).getDataBlock())){
-				//no datablock in model. must unregister!
-				TDDataProviderRegisterFX.getInstance().unRegisterDataInfo(dataInfos.get(i));
-			}
-		}
-	}
 	
 	/**
 	 * Called just before settings are saved. Will have to go 

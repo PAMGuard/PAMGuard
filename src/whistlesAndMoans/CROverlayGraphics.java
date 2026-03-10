@@ -10,11 +10,14 @@ import java.util.ListIterator;
 
 import PamController.PamController;
 import PamUtils.Coordinate3d;
+import PamUtils.PamUtils;
 import PamView.GeneralProjector;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.symbol.SymbolData;
+import PamguardMVC.DataBlock2D;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 
 public class CROverlayGraphics extends PamDetectionOverlayGraphics {
@@ -31,6 +34,8 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 //	private int iCol = 0;
 
 	private boolean isViewer;
+
+private DataBlock2D dataBlock2D;
 
 //	public void resetColour() {
 //		iCol = 0;
@@ -54,6 +59,17 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 		drawShape(g, crDataUnit, generalProjector);
 		return r;
 	}
+	
+	private double bin2Frequency(double fftBin, int seqChannel) {
+		if (dataBlock2D != null) {
+			return dataBlock2D.bin2Value(fftBin, seqChannel);
+		}
+		else {
+			float sampleRate = dataBlock.getSampleRate();
+			int fftLength = dataBlock.getFftLength();
+			return fftBin * sampleRate / fftLength;
+		}
+	}
 
 	//	int yOff = 0;
 	private Rectangle drawShape(Graphics g, ConnectedRegionDataUnit dataUnit,
@@ -70,6 +86,7 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 		int maxX = Integer.MIN_VALUE;
 		int maxY = maxX;
 
+		int channelNo = PamUtils.getLowestChannel(dataUnit.getChannelBitmap());
 		SliceData sliceData, prevSlice = null;
 		if (wmParams.shortShowPolicy == WhistleToneParameters.SHORT_HIDEALL && 
 				cr.getNumSlices() < wmParams.shortLength) {
@@ -96,6 +113,17 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 		}
 
 		((Graphics2D) g).setStroke(new BasicStroke(2));
+
+		/*
+		 * find input datablock so that we can do log scale calculations if necessary. 
+		 */
+		PamDataBlock fftblock = whistleControl.getSpectrogramNoiseProcess().getParentDataBlock();
+		if (fftblock instanceof DataBlock2D) {
+			dataBlock2D = (DataBlock2D) fftblock;
+		}
+		else {
+			dataBlock2D = null;
+		}
 
 		long startMillis = dataUnit.getTimeMilliseconds();
 		double binStepMillis = fftHop / sampleRate * 1000;
@@ -141,14 +169,15 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 				else {
 					lastPeak = prevSlice.peakInfo[lastPeakNum];
 				}
-				f1 = thisPeak[1] * sampleRate / fftLength;
+//				f1 = thisPeak[1] * sampleRate / fftLength;
+				f1 = bin2Frequency(thisPeak[1], channelNo);
 				//					f2 = lastPeak[1] * sampleRate / fftLength;
 
 				c3d = generalProjector.getCoord3d(sliceMillis, f1, 0);
 				pt2 = c3d.getXYPoint();
 
-				c3d = generalProjector.getCoord3d(prevSliceMillis,
-						lastPeak[1] * sampleRate / fftLength, 0);
+				double ff = bin2Frequency(lastPeak[1], channelNo);
+				c3d = generalProjector.getCoord3d(prevSliceMillis, ff, 0);
 				pt1 = c3d.getXYPoint();
 
 				//				if (s1 == prevSlice.getStartSample()) {
@@ -164,12 +193,12 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 					g.drawLine(prevSliceX, pt1.y, sliceX, pt2.y);
 				}
 				if (fullOutline) {
-					c3d = generalProjector.getCoord3d(sliceMillis, 
-							thisPeak[0] * sampleRate / fftLength, 0);
+					ff = bin2Frequency(thisPeak[0], channelNo);
+					c3d = generalProjector.getCoord3d(sliceMillis, ff, 0);
 					pt2 = c3d.getXYPoint();
 
-					c3d = generalProjector.getCoord3d(prevSliceMillis,
-							lastPeak[0] * sampleRate / fftLength, 0);
+					ff = bin2Frequency(lastPeak[0], channelNo);
+					c3d = generalProjector.getCoord3d(prevSliceMillis, ff, 0);
 					pt1 = c3d.getXYPoint();
 					g.drawLine(prevSliceX, pt1.y, sliceX, pt2.y);
 					minX = Math.min(minX, pt1.x);
@@ -181,12 +210,12 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 					maxX = Math.max(maxX, pt2.x);
 					maxY = Math.max(maxY, pt2.y);
 
-					c3d = generalProjector.getCoord3d(sliceMillis, 
-							thisPeak[2] * sampleRate / fftLength, 0);
+					ff = bin2Frequency(thisPeak[2], channelNo);
+					c3d = generalProjector.getCoord3d(sliceMillis, ff, 0);
 					pt2 = c3d.getXYPoint();
 
-					c3d = generalProjector.getCoord3d(prevSliceMillis,
-							lastPeak[2] * sampleRate / fftLength, 0);
+					ff = bin2Frequency(lastPeak[2], channelNo);
+					c3d = generalProjector.getCoord3d(prevSliceMillis, ff, 0);
 					pt1 = c3d.getXYPoint();
 					g.drawLine(prevSliceX, pt1.y, sliceX, pt2.y);
 

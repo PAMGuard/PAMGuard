@@ -125,7 +125,7 @@ public class UserBandDialog extends PamDialog {
 	@Override
 	public boolean getParams() {
 		if (noiseMeasurementBand == null) {
-			noiseMeasurementBand = new NoiseMeasurementBand(NoiseMeasurementBand.TYPE_USER);
+			noiseMeasurementBand = new NoiseMeasurementBand(null);
 		}
 		try {
 			noiseMeasurementBand.name = name.getText();

@@ -36,14 +36,24 @@ import java.io.RandomAccessFile;
  */
 public class WindowsFile extends RandomAccessFile implements WriteWinFile , ReadWinFile {
 
+	private String file;
+
 	public WindowsFile(String file, String mode) throws IOException {
 		super(file, mode);
+		this.file = file;
 	}
 
 	public WindowsFile(File file, String mode) throws IOException {
 		super(file, mode);
+		if (file != null) {
+			this.file = file.getAbsolutePath();
+		}
 	}
 	
+	public String getFile() {
+		return file;
+	}
+
 	/**
 	 * Go to the end of the file. 
 	 * @throws IOException 

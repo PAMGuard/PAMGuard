@@ -21,6 +21,7 @@ import PamController.StorageOptions;
 import PamController.StorageParameters.StoreChoice;
 import analogarraysensor.swing.AnalogSensorDialog;
 import analoginput.AnalogDevicesManager;
+import analoginput.AnalogSensorData;
 import analoginput.AnalogSensorUser;
 import analoginput.SensorChannelInfo;
 
@@ -168,12 +169,6 @@ public class ArraySensorControl extends PamControlledUnit implements AnalogSenso
 		return getUnitName();
 	}
 
-	/**
-	 * @return the helpPoint
-	 */
-	public String getHelpPoint() {
-		return helpPoint;
-	}
 
 	/**
 	 * @return the sensChannelNames
@@ -208,6 +203,69 @@ public class ArraySensorControl extends PamControlledUnit implements AnalogSenso
 	@Override
 	public boolean showDisplayParamsDialog(Window window) {
 		return ArrayDisplayParamsDialog.showDialog(window, this);
+	}
+	
+	public String getHelpPoint() {
+		return helpPoint;
+	}
+	
+	
+	@Override
+	public String getModuleSummary(boolean clear) {
+		AnalogArraySensorDataUnit lastDataUnit = this.analogSensorProcess.getSensorDataBlock().getLastUnit();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<AnalogSensorsSummary>");
+
+		if (lastDataUnit == null) {
+			sb.append("</AnalogSensorsSummary>");
+			return sb.toString();
+		}
+
+		// include a single timestamp (milliseconds since epoch) from the PamDataUnit
+		sb.append("<timeMillis>").append(lastDataUnit.getTimeMilliseconds()).append("</timeMillis>");
+
+		AnalogSensorData[] sensorData = lastDataUnit.getSensorData();
+		if (sensorData == null || sensorData.length == 0) {
+			sb.append("</AnalogSensorsSummary>");
+			return sb.toString();
+		}
+
+		// Determine streamer count so we can disambiguate names
+		int numStreamers = 1;
+		try {
+			PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+			if (array != null) numStreamers = array.getNumStreamers();
+		} catch (Exception e) {
+			// ignore
+		}
+
+		int nameLen = (sensChannelNames == null) ? 0 : sensChannelNames.length;
+		for (int i = 0; i < sensorData.length; i++) {
+			AnalogSensorData a = sensorData[i];
+			if (a == null) continue;
+
+			String baseName = (nameLen > 0) ? sensChannelNames[i % nameLen] : ("channel" + i);
+			String fieldName = baseName;
+			if (numStreamers > 1 && nameLen > 0) {
+				int streamer = i / nameLen;
+				fieldName = String.format("%s_%d", baseName, streamer);
+			}
+
+			// sanitize for XML element name
+			fieldName = fieldName.replaceAll("\\s+", "_");
+
+			double calVal = a.getCalibratedValue();
+			double voltage = a.getRawValue();
+
+			sb.append("<").append(fieldName).append(">");
+			sb.append("<calVal>").append(calVal).append("</calVal>");
+			sb.append("<voltage>").append(voltage).append("</voltage>");
+			sb.append("</").append(fieldName).append(">");
+		}
+
+		sb.append("</AnalogSensorsSummary>");
+		return sb.toString();
 	}
 
 }

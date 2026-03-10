@@ -22,6 +22,9 @@ package pamguard;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
 import Array.ArrayManager;
@@ -124,16 +127,27 @@ public class Pamguard {
 			//			  System.out.println(keys.nextElement() + ": " + ui.get(nxt));
 			//			}
 			//			PamColors.getInstance().setColors();
-		} catch (Exception e) { }
+		} catch (Exception e) { 
+			System.out.println("Unable to load lookAndFeel: " + e.getMessage());
+//			e.printStackTrace();
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+			}
+		}
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
-		
 
 		// set up the system to output to both a log file and the console window.  Also
 		// set up a monitor to check for the size of the folder every hour - if it gets
 		// too big, just stop logging the messages
-		String logFile = getSettingsFolder() + File.separator + "PamguardLog";
+//		LogFileUtils.checkLogFileErrors(Pamguard.getSettingsFolder());
+		
+		String logFile = getSettingsFolder() + File.separator + LogFileUtils.LogFileRootName;
 		System.setOut(new ProxyPrintStream(System.out, logFile));
 		System.setErr(new ProxyPrintStream(System.err, logFile));   
 		FolderSizeMonitor folderSizeMon = new FolderSizeMonitor();
@@ -142,7 +156,7 @@ public class Pamguard {
 
 //		TimeZone.setDefault(PamCalendar.defaultTimeZone);
 
-		System.out.println("**********************************************************");
+		System.out.println("\n**********************************************************");
 		// print out the entire command line
 		if (args != null && args.length > 0) {
 			System.out.printf("Command line options: ");

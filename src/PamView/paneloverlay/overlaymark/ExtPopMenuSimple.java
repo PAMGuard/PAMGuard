@@ -9,7 +9,6 @@ import javax.swing.SwingUtilities;
 
 import PamController.PamController;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -25,18 +24,21 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
  */
 public class ExtPopMenuSimple implements ExtPopMenu {
 	
+	private ContextMenu contextMenu;
+
 	/**
 	 * Show a master menu at the current mouse position. 
-	 * @param e
-	 * @return
+	 * @param e - the mouse event
+	 * @param extMouseAdapters - the list of mouse adapters to query for menu items
+	 * @param parentNode - the parent node to attach the menu to. If null, a swing menu will be used instead.
 	 */
 	@Override
 	public boolean showPopupMenu(MouseEvent e, ArrayList<ExtMouseAdapter> extMouseAdapters, Node parentNode) {
 			
-		ContextMenu contextMenu = null;
+		contextMenu = null;
 		for (ExtMouseAdapter ma:extMouseAdapters) {
 			List<MenuItem> adapMenuItems = ma.getPopupMenuItems(e);
-//			System.out.println("ExtMapMouseHandler: adpater " + ma.getPopupMenuItems(e).size());
+			//System.out.println("ExtPopMenuSimple: adpater " + (ma.getPopupMenuItems(e) == null ? "null" : ma.getPopupMenuItems(e).size()));
 			if (adapMenuItems != null) {
 				if (contextMenu == null) {
 					contextMenu = new ContextMenu();
@@ -52,7 +54,10 @@ public class ExtPopMenuSimple implements ExtPopMenu {
 //			contextMenu.setAnchorX(e.getSceneX());
 //			contextMenu.setAnchorY(e.getScreenY());
 			if (parentNode != null) {
+				//System.out.println("ExtPopMenuSimple: show menu with parent");
+
 				contextMenu.show(parentNode, e.getScreenX(), e.getScreenY());
+				//contextMenu.setAutoHide(true);
 			}
 			else {
 				// have to use a swing menu which can operate without a parent. 
@@ -95,6 +100,15 @@ public class ExtPopMenuSimple implements ExtPopMenu {
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean closePopupMenu(MouseEvent e) {
+		if (contextMenu!=null && contextMenu.isShowing()) {
+			contextMenu.hide();
+			return true;
+		}
+		return false;
 	}
 
 }

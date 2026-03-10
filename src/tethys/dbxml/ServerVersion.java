@@ -21,6 +21,17 @@ public class ServerVersion {
 	 * @return the versionNo
 	 */
 	public float getVersionNo() {
+		// if the version number is zero, then try to convert the name into a 
+		// number
+		if (versionNo <= 0) {
+			try {
+				float n = Float.valueOf(getVersionName());
+				return n;
+			}
+			catch (Exception e) {
+				
+			}
+		}
 		return versionNo;
 	}
 	/**

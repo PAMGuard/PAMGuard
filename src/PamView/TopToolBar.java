@@ -25,6 +25,7 @@ import PamController.RawInputControlledUnit;
 import PamUtils.PamCalendar;
 import PamView.PamColors.PamColor;
 import PamView.component.PamSettingsIconButton;
+import PamView.dialog.PamButton;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
 import warnings.SingleLineWarningDisplay;
@@ -55,20 +56,20 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 
 		pamController = PamController.getInstance();
 		if (pamController.getRunMode() == PamController.RUN_PAMVIEW) {
-			add(startButton = new JButton(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
+			add(startButton = new PamButton(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
 			startButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 			startButton.setToolTipText("Start sound playback");
-			add(stopButton = new JButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
+			add(stopButton = new PamButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
 			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 
 			stopButton.setToolTipText("Stop sound playback");
 		}
 		else {
-			add(startButton = new JButton(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.RED)));
+			add(startButton = new PamButton(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.RED)));
 			startButton.setDisabledIcon(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 			startButton.setToolTipText("Start processing");
 			startButton.addMouseListener(new StartButtonMouse());
-			add(stopButton = new JButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
+			add(stopButton = new PamButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
 			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 			stopButton.setToolTipText("Stop processing");
 		}

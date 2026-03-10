@@ -1,6 +1,8 @@
 package PamView;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.util.Vector;
 
 import javax.swing.JTable;
@@ -49,20 +51,30 @@ public class PamTable extends JTable implements ColorManaged {
 
 	private PamColor defaultColor = PamColor.BORDER;
 	
-	public PamColor getDefaultColor() {
-		return defaultColor;
-	}
-
-	public void setDefaultColor(PamColor defaultColor) {
-		this.defaultColor = defaultColor;
-	}
+//	public PamColor getDefaultColor() {
+//		return defaultColor;
+//	}
+//
+//	public void setDefaultColor(PamColor defaultColor) {
+//		this.defaultColor = defaultColor;
+//	}
 	@Override
 	public PamColor getColorId() {
 		return defaultColor;
 	}
 	@Override
 	public void setBackground(Color bg) {
+//		bg = Color.blue;
 		super.setBackground(bg);
+		int nComp = this.getComponentCount();
+		for (int i = 0; i < nComp; i++) {
+			Component comp = this.getComponent(i);
+			comp.setBackground(bg);
+		}
+//		Container p = super.getParent();
+//		if (p != null) {
+//			p.setBackground(bg);
+//		}
 		Color lines = PamColors.getInstance().getColor(PamColor.AXIS);
 		this.setForeground(lines);
 		JTableHeader th = super.getTableHeader();

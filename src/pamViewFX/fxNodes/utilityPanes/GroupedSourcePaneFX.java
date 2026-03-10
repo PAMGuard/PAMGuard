@@ -431,6 +431,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		return channelPanel;
 	}
 
+
 	
 	
 }

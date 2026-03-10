@@ -1,6 +1,7 @@
 package Acquisition.layoutFX;
 
 import PamController.SettingsPane;
+import javafx.scene.layout.Pane;
 
 /**
  * Settings pane for a DAQ specific nodes. 
@@ -23,5 +24,12 @@ public abstract class DAQSettingsPane<T> extends SettingsPane<T>{
 	 * 
 	 */
 	public abstract boolean getParams(); 
+	
+	/**
+	 * Returns a pane to be added to the status bar of the acquisition pane. 
+	 * @return
+	 */
+	public abstract DAQStatusPaneFactory getStatusBarFactory();
+		
 
 }

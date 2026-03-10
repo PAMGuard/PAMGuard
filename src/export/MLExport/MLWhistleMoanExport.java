@@ -3,6 +3,7 @@ package export.MLExport;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 
 import PamUtils.PamArrayUtils;
+import PamguardMVC.PamDataBlock;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
@@ -120,6 +121,13 @@ public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUni
 	@Override
 	public String getName() {
 		return "whistles";
+	}
+
+
+	@Override
+	protected Struct detectionHeader(PamDataBlock pamDataBlock) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

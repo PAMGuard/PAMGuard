@@ -55,6 +55,7 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamCalendar;
+import PamUtils.PamUtils;
 import PamView.PamSidePanel;
 import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
@@ -691,7 +692,8 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 		}
 		checkHydrophoneArray(buoyStatusDataUnit);
 		int phones = ArrayManager.getArrayManager().getCurrentArray().getPhonesForStreamer(buoyStatusDataUnit.getHydrophoneStreamer());
-		BearingLocaliser bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(phones, 1e-5);
+		int[] phonesList = PamUtils.getChannelArray(phones);
+		BearingLocaliser bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(phonesList, 1e-5);
 	}
 
 	/**

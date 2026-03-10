@@ -60,8 +60,8 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 	private JComboBox<Collection> collectionSelector;
 	
-	// won't work since only Deployment documents have project info. 
-//	private JCheckBox projectOnly;
+	private JCheckBox projectOnly, datasetOnly;
+	
 	/**
 	 * @param tethysControl
 	 * @param collectionName
@@ -83,6 +83,10 @@ public class TethysDocumentTable implements PamDialogPanel {
 		topPanel.add(new JLabel("Collection "),c);
 		c.gridx++;
 		topPanel.add(collectionSelector,c);
+		c.gridx++;
+		topPanel.add(projectOnly = new JCheckBox("Current Tethys Project"));
+		c.gridx++;
+		topPanel.add(datasetOnly = new JCheckBox("Current PAMGuard dataset"));
 //		topPanel.add(projectOnly);
 		mainPanel.add(BorderLayout.NORTH, northPanel);
 		collectionSelector.setSelectedItem(collection);
@@ -93,16 +97,28 @@ public class TethysDocumentTable implements PamDialogPanel {
 				collectionChanged();
 			}
 		});
-//		projectOnly.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				collectionChanged();
-//			}
-//		});
+
+		projectOnly.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				collectionChanged();
+			}
+		});
+		datasetOnly.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				collectionChanged();
+			}
+		});
 		
 		tableModel = new TableModel();
-		mainTable = new JTable(tableModel);
+		mainTable = new JTable(tableModel) {
+            public String getToolTipText(MouseEvent e) {
+            	return tableModel.getToolTipText(e);
+            }
+		};
 		scrollPane = new JScrollPane(mainTable);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		new SwingTableColumnWidths(tethysControl.getUnitName()+"TethysDocumentsTable", mainTable);
@@ -110,8 +126,10 @@ public class TethysDocumentTable implements PamDialogPanel {
 		mainTable.setRowSelectionAllowed(true);
 		mainTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		new SwingTableColumnWidths(tethysControl.getUnitName()+"docstableview", mainTable);
+		projectOnly.setToolTipText("Show only documents that are associated with this Tethys project name");
+		datasetOnly.setToolTipText("Show only documents that are associated with this PAMGuard dataset");
 	}
-	
+
 	/**
 	 * Called on any options change. 
 	 */
@@ -126,13 +144,71 @@ public class TethysDocumentTable implements PamDialogPanel {
 	}
 
 	public void updateTableData() {
-		documentInfos = tethysControl.getDbxmlQueries().getCollectionDocumentList(collection);
-		if (documentInfos != null) {
-			Collections.sort(documentInfos);
+//		documentInfos = tethysControl.getDbxmlQueries().getCollectionDocumentList(collection);
+		ArrayList<DocumentInfo> allInfos = tethysControl.getDocumentMap().getCollection(collection);
+		if (allInfos != null) {
+			Collections.sort(allInfos);
+			// and filter the data. 
+			documentInfos = filterData(allInfos);
+		}
+		else {
+			documentInfos = allInfos;
 		}
 		tableModel.fireTableDataChanged();
 	}
 	
+	private ArrayList<DocumentInfo> filterData(ArrayList<DocumentInfo> allDocs) {
+		boolean t = projectOnly.isSelected();
+		boolean p = datasetOnly.isSelected();
+		boolean f = canFilter(collection);
+		if (f == false) {
+			return allDocs;
+		}
+		if (t == false && p == false) {
+			return allDocs;
+		}
+		ArrayList<DocumentInfo> filtered = new ArrayList<>();
+		for (DocumentInfo aDoc : allDocs) {
+			if (t && aDoc.isThisTethysProject() == false) {
+				continue;
+			}
+			if (p && aDoc.isThisPAMGuardDataSet() == false) {
+				continue;
+			}
+			filtered.add(aDoc);
+		}
+		return filtered;
+	}
+	
+	private boolean canFilter(Collection collection) {
+		if (collection == null) {
+			return false;
+		}
+		switch (collection) {
+		case Calibrations:
+		case Deployments:
+		case Detections:
+		case Localizations:
+			return true;
+		case Ensembles:
+			break;
+		case ITIS:
+			break;
+		case ITIS_ranks:
+			break;
+		case OTHER:
+			break;
+		case SourceMaps:
+			break;
+		case SpeciesAbbreviations:
+			break;
+		default:
+			break;
+		
+		}
+		return false;
+	}
+
 	private class TableMouse extends MouseAdapter {
 
 		@Override
@@ -183,9 +259,24 @@ public class TethysDocumentTable implements PamDialogPanel {
 			}
 		});
 		popMenu.add(menuItem);
-		
+	
+		// can only delete when making a sub selection. 
+		boolean haveSelection = projectOnly.isSelected() || datasetOnly.isSelected();
+//		String tipText = "Deleting is only possible when you select only the current project or dataset";
+		String tipText = "You can only delete documents associated with the current Tethys Project: \""+ tethysControl.getGlobalDeplopymentData().getProject() + "\"";
 
 		int[] rows = mainTable.getSelectedRows();
+		boolean nonProject = false;
+		if (rows != null) {
+			for (int i = 0; i < rows.length; i++) {
+				DocumentInfo dInf = documentInfos.get(rows[i]);
+				if (dInf.isThisTethysProject() == false) {
+					nonProject = true;
+					break;
+				}
+			}
+		}
+		
 		if (rows != null && rows.length == 1) {
 			popMenu.addSeparator();
 //			docName = documentNames.get(rows[0]);
@@ -197,6 +288,10 @@ public class TethysDocumentTable implements PamDialogPanel {
 				}
 			});
 			popMenu.add(menuItem);
+			if (nonProject) {
+				menuItem.setEnabled(false);
+				menuItem.setToolTipText(tipText);
+			}
 		}
 		else if (rows != null && rows.length > 1) {
 			String mt = String.format("Delete multiple (%d) documents", rows.length);
@@ -208,6 +303,10 @@ public class TethysDocumentTable implements PamDialogPanel {
 				}
 			});
 			popMenu.add(menuItem);
+			if (nonProject) {
+				menuItem.setEnabled(false);
+				menuItem.setToolTipText(tipText);
+			}
 		}
 		
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
@@ -261,7 +360,8 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 	private class TableModel extends AbstractTableModel {
 		
-		private String[] columnNames = {"", "Document Name", "Document Id"};
+		private String[] columnNames = {"Ind", "Document Name", "Document Id", "Project", "Dataset"};
+		private String[] toolTip = {"", "Name of Tethys Document", "Document Id", "Part of this Tethys Project", "Part of this PAMGuard dataset"};
 
 		@Override
 		public int getRowCount() {
@@ -269,6 +369,16 @@ public class TethysDocumentTable implements PamDialogPanel {
 				return 0;
 			}
 			return documentInfos.size();
+		}
+
+		public String getToolTipText(MouseEvent e) {
+            java.awt.Point p = e.getPoint();
+            int rowIndex = mainTable.rowAtPoint(p);
+            int colIndex = mainTable.columnAtPoint(p);
+            if (colIndex < 0 || colIndex >= toolTip.length) {
+            	return null;
+            }
+            return toolTip[colIndex];
 		}
 
 		@Override
@@ -289,6 +399,10 @@ public class TethysDocumentTable implements PamDialogPanel {
 				return docInfo.getDocumentName();
 			case 2:
 				return docInfo.getDocumentId();
+			case 3:
+				return docInfo.isThisTethysProject() ? "  Y" : null;
+			case 4:
+				return docInfo.isThisPAMGuardDataSet() ? "  Y" : null;
 			}
 			return null;
 		}

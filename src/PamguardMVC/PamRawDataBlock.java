@@ -73,7 +73,15 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		if (pamDataUnits.isEmpty())
 			return 0;
 		int n = super.removeOldUnitsT(getLastUnitMillis());
+//		System.out.printf("%d units removed from %s in removeOldUnitsT\n", n, getLongDataName());
 //		checkIntegrity();
+		return n;
+	}
+
+	@Override
+	protected int removeOldUnitsS(long mastrClockSample) {
+		int n = super.removeOldUnitsS(mastrClockSample);
+//		System.out.printf("%d units removed from %s in removeOldUnitsS\n", n, getLongDataName());
 		return n;
 	}
 
@@ -156,6 +164,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	 */
 	@Override
 	public void reset() {
+		desiredSample = -1;
 		prevChannelSample = new long[PamConstants.MAX_CHANNELS];
 		summaryTotals = new double[PamConstants.MAX_CHANNELS];
 		summaryTotals2 = new double[PamConstants.MAX_CHANNELS];
@@ -183,8 +192,8 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		}
 		else if (desiredSample != pamDataUnit.getStartSample()) {
 			// don't add this data unit since its probably out of synch
-			System.out.println(String.format("Sample %d channel %d in %s out of synch - expected sample %d, previously got %d",
-					pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample, prevChannelSample[thisChannel]));
+//			System.out.println(String.format("Sample %d channel %d in %s out of synch - expected sample %d, previously got %d",
+//					pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample, prevChannelSample[thisChannel]));
 //			return; add the data anyway, may get back into synch !!!! 
 		}
 		prevChannelSample[thisChannel] = pamDataUnit.getStartSample();
@@ -225,7 +234,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				// try to load some data !
 				if (parentProcess != null) {
 					this.clearAll();
-					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 1);
+					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 20);
 				}
 			}
 		}
@@ -650,6 +659,20 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	public DCFilter getDcFilter() {
 		return dcFilter;
 	}
+
+	@Override
+	public void clearAll() {
+//		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//		System.out.printf("ClearAll() in %s called from %s\n", getLongDataName(), stack[2].toString());
+		super.clearAll();
+	}
+
+	@Override
+	public void clearAll(boolean andDownStream) {
+//		System.out.printf("ClearAll(%s) called in %s\n", Boolean.valueOf(andDownStream).toString(), getLongDataName());
+		super.clearAll(andDownStream);
+	}
+
 
 
 

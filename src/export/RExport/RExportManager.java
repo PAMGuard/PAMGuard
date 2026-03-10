@@ -17,6 +17,7 @@ import org.renjin.sexp.PairList;
 import org.renjin.sexp.PairList.Builder;
 
 import PamUtils.PamArrayUtils;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import export.PamExporterManager;
@@ -52,7 +53,9 @@ public class RExportManager implements PamDataUnitExporter {
 		rDataExport.add(new RClickExport()); 
 		rDataExport.add(new RWhistleExport()); 
 		rDataExport.add(new RCPODExport()); 
+		rDataExport.add(new RNoiseExport()); //should be last in case raw data holders have specific exporters
 		rDataExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
+
 	}
 
 
@@ -189,6 +192,7 @@ public class RExportManager implements PamDataUnitExporter {
 
 			n=0; 
 			double sampleRate = 0.;
+			PamDataBlock parentBlock = null;
 			//allocate the class now. 
 			for (int j=0; j<dataUnits.size(); j++){
 				//check whether the same. 
@@ -201,6 +205,7 @@ public class RExportManager implements PamDataUnitExporter {
 					dataListArray.add(String.valueOf(dataUnits.get(j).getUID()), dataList);	
 
 					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
+					parentBlock =  dataUnits.get(j).getParentDataBlock();
 					n++; 
 					alreadyStruct[j] = true;
 				}
@@ -216,6 +221,10 @@ public class RExportManager implements PamDataUnitExporter {
 
 				allData.add(dataName, dataListArray.build());
 				allData.add(rDataExport.get(i).getName()+"_sR",  new DoubleArrayVector(sampleRate));
+				
+				if (rDataExport.get(i).detectionHeader(parentBlock)!=null) {
+					allData.add(rDataExport.get(i).getName()+"_metadata", rDataExport.get(i).detectionHeader(parentBlock).build());
+				}
 
 				dataUnitTypes.add(rDataExport.get(i).getName()); 
 			}

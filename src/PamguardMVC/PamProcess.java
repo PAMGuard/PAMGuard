@@ -44,9 +44,9 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.status.ProcessCheck;
 import PamModel.PamModel;
-import PamModel.PamProfiler;
 import PamUtils.PamCalendar;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import PamguardMVC.datakeeper.DataKeeper;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 /**
@@ -105,7 +105,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	/**
 	 * The sample rate of the process. 
 	 */
-	protected float sampleRate;
+	private float sampleRate;
 
 	// private PamDataUnit lastUsedUnit;
 	protected String processName;
@@ -121,7 +121,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 */
 	boolean isExternalProcess = true; 
 
-	PamProfiler.CPUUsageSnapshot startCPUSnapShot, endCPUSnapShot;
+//	PamProfiler.CPUUsageSnapshot startCPUSnapShot, endCPUSnapShot;
 	
 	private long cpuUsage;
 	private long lastCPUCheckTime = System.currentTimeMillis();
@@ -386,6 +386,9 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		// notify all output data blocks that there is a new sample rate
+//		if (Math.round(sampleRate) == 9600) {
+//			System.out.printf("Sample rate in %s set to 9600\n", getProcessName());
+//		}
 		this.sampleRate = sampleRate;
 		if (notify && outputDataBlocks != null) {
 			for (int i = 0; i < outputDataBlocks.size(); i++) {
@@ -689,6 +692,19 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		return processName;
 	}
 
+	/**
+	 * Should all output data from this process be cleared at startup ? 
+	 * Default behaviour is to follow the global value in DataKeeper for real time. 
+	 * For file analysis, we need to avoid going back in time, so clear anyway !
+	 * @return
+	 */
+	public boolean isClearAtStart() {
+		if (PamCalendar.isSoundFile()) {
+			return true;
+		}
+		boolean cas = DataKeeper.getInstance().isClearAtStart();
+		return cas;
+	}
 
 	/**
 	 * Clears all data from all output data blocks of this process.
@@ -696,8 +712,21 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 * start of operations. Can be overridden in some classes
 	 * which don't want to delete existing data or they can set the 
 	 * clearAtStart flag in any data block. 
+	 * <br> will check the isClearAtStart flag to see if we really should clear data at start up
 	 */
 	public void clearOldData() {
+		boolean cas = isClearAtStart();
+		if (cas) {
+			doClearOldData();
+		}
+	}
+	
+	/**
+	 * Clears all data from all output data blocks of this process.
+	 * <br>Does not ask or check, so can bypass the behaviour of 
+	 * clearOldData(), which will check on the datakeeper option to clearatstart. 
+	 */
+	public void doClearOldData() {
 		for (int i = 0; i < outputDataBlocks.size(); i++) {
 			if (outputDataBlocks.get(i).isClearAtStart()) {
 				outputDataBlocks.get(i).clearAll();
@@ -934,7 +963,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 //		if (getParentDataBlock() == null) {
 //			return PamDataBlock.REQUEST_NO_DATA;
 //		}
-		return getOfflineData(new OfflineDataLoadInfo(this, endUser, startMillis, endMillis, loadKeepLayers-1, true));
+		return getOfflineData(new OfflineDataLoadInfo(this, endUser, startMillis, endMillis, loadKeepLayers, true));
 	}
 	
 	

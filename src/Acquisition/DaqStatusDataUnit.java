@@ -45,6 +45,11 @@ public class DaqStatusDataUnit extends PamDataUnit {
 	private long rawADCMillis;
 
 	private String systemName;
+	
+	/**
+	 * Source for start time of data. 
+	 */
+	private String startTimeSource;
 //	private static DaqStatusDataUnit previousDaqStatusUnit = null;
 
 	public DaqStatusDataUnit(long timeMilliseconds, long adcMilliseconds, long rawADCMillis,
@@ -208,6 +213,20 @@ public class DaqStatusDataUnit extends PamDataUnit {
 	 */
 	public long getRawADCMillis() {
 		return rawADCMillis;
+	}
+
+	/**
+	 * @return the startTimeSource
+	 */
+	public String getStartTimeSource() {
+		return startTimeSource;
+	}
+
+	/**
+	 * @param startTimeSource the startTimeSource to set
+	 */
+	public void setStartTimeSource(String startTimeSource) {
+		this.startTimeSource = startTimeSource;
 	}
 
 }

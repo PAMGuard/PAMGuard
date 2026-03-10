@@ -196,6 +196,9 @@ public class BasicFreqDomBeam extends BeamInformation {
 				PamVector kVec = beamVec.times(k);
 
 				// calculate the phase delay by getting the dot product of the location and wavenumber vectors
+				if (elementLocs[j] == null) {
+					continue;
+				}
 				double phaseDelay = kVec.dotProd(elementLocs[j]);
 				
 				// put the real and imaginary components into the double array after multiplying by the element weight

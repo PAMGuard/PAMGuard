@@ -1,0 +1,76 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Ishmael</title>
+</head>
+
+<body>
+
+
+	<h1>Ishmael Matched Filter</h1>
+	<h2>Overview of the method</h2>
+	<p>This method works by cross-correlating a time series input
+		signal with another signal that you specify, called the kernel.
+		Cross-correlation is the optimum method for detecting a known signal
+		in white Gaussian noise. It works best when the signal you wish to
+		detect is quite constant from one instance to the next and from one
+		animal to the next.</p>
+	<p>In animal bioacoustics it's actually quite rare that the signal
+		is well enough known (since all natural sounds vary slightly) and the
+		noise background is rarely Gaussian, so this detector is rarely
+		optimal!</p>
+
+	<h3>Adding the module</h3>
+	<p>
+		From the PAMGuard file menu select <b>Add Modules > Detectors >
+			Ishmael matched filter.</b>
+	<p>Give a name to the detector, and hit OK.</p>
+	<p>
+		This detector will require that you also configure a <a
+			href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound
+			Acquisition module</a> or a <a
+			href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator</a>
+		as it's input.
+	</p>
+
+	<h3>Configure the module</h3>
+	<p>
+		From the PAMGuard Settings menu select <b>Ishmael matched filter
+			Settings ...</b> to open the dialog
+	</p>
+	<p>
+	<center>
+		<img src="images/matchedfilterdialog.png">
+	</center>
+	</p>
+	<br>
+	<p>
+		Select the Raw data source. This must be at the same sample rate as
+		the data in the kenel file you're using with the Matched filter. If
+		necessary, use a <a
+			href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator</a>
+		module to get your data to the correct sample rate.
+	</p>
+
+	<p>
+		Select which channels you want to process and how you want them to be
+		grouped. If channels are in the same group, it's slightly easier for
+		the <a href="../../../localisation/docs/localisation_overview.html">PAMGuard
+			localisers</a> to measure time delays between data on the different
+		channels, but only if the hydrophones in each group are quite close
+		together.
+	</p>
+<p>Select the kernel file. This must be a short clip containing a single channel of data that contains a typical example of 
+the sound you're trying to detect.</p>
+
+	<br>
+	<br>
+	<p CLASS="prevLink">
+		<a href="ishmael_speccorrelation.html">Previous: Ishmael
+			Spectrogram Correlation </a>
+	</p>
+	<br>
+	<br>
+</body>
+</html>

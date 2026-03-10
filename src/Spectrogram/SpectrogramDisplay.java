@@ -447,16 +447,25 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		if (spectrogramParameters == null || sourceFFTDataBlock == null) {
 			return;
 		}
-		freqBinRange[0] = (int) Math
-				.floor(spectrogramParameters.frequencyLimits[0]
+		double[] freqLimits = spectrogramParameters.frequencyLimits;
+		double freqStart = 0;
+		int nBins = sourceFFTDataBlock.getDataWidth(0);
+		if (sourceFFTDataBlock != null) {
+			freqStart = sourceFFTDataBlock.getMinDataValue();
+			freqLimits[0] = Math.max((double) freqLimits[0], sourceFFTDataBlock.getMinDataValue());
+			freqLimits[1] = Math.min((double) freqLimits[1], sourceFFTDataBlock.getMaxDataValue());
+		}
+		freqBinRange[0] = (int) Math.floor((spectrogramParameters.frequencyLimits[0]-freqStart)
 						* sourceFFTDataBlock.getFftLength() / sampleRate);
-		freqBinRange[1] = (int) Math
-				.ceil(spectrogramParameters.frequencyLimits[1]
-						* sourceFFTDataBlock.getFftLength() / sampleRate);
+		freqBinRange[1] = (int) Math.ceil((spectrogramParameters.frequencyLimits[1]-freqStart)
+				* sourceFFTDataBlock.getFftLength() / sampleRate);
+		if (sourceFFTDataBlock != null) {
+			freqBinRange[1] = Math.min(freqBinRange[1], sourceFFTDataBlock.getDataWidth(0));
+		}
 		for (int i = 0; i < 2; i++) {
 			freqBinRange[i] = Math.min(Math.max(freqBinRange[i], 0),
 					sourceFFTDataBlock.getFftLength() / 2 - 1);
-			freqBinDisplayRange[1-i] = sourceFFTDataBlock.getFftLength()/2-freqBinRange[i];
+			freqBinDisplayRange[1-i] = nBins-freqBinRange[i];
 			//			freqBinDisplayRange[i] = freqBinRange[i];
 		}
 	}
@@ -787,7 +796,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		if (sourceFFTDataBlock == null) {
 			return 1;
 		}
-		return sourceFFTDataBlock.getFftLength()/2;
+		return sourceFFTDataBlock.getDataWidth(0);
 	}
 
 	/**
@@ -843,6 +852,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 	}
 
 	private void setAxisLimits() {
+		if (sourceFFTDataBlock == null) {
+			return;
+		}
 		if (frequencyAxis != null && spectrogramParameters != null) {
 			freqAxisScale = 1.;
 			if (spectrogramParameters.frequencyLimits[1] > 2000) {
@@ -866,7 +878,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					if (maxV < 1) {
 						freqAxisScale = 0.001;
 					}
-					frequencyAxis.setRange(minV, maxV/freqAxisScale);
+					frequencyAxis.setRange(minV/freqAxisScale, maxV/freqAxisScale);
 				}
 			}
 			else {
@@ -874,6 +886,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				frequencyAxis.setRange(spectrogramParameters.frequencyLimits[0]/freqAxisScale,
 						spectrogramParameters.frequencyLimits[1]/freqAxisScale);
 			}
+			frequencyAxis.setLogScale(sourceFFTDataBlock.isLogScale());
 		}
 	}
 
@@ -1223,25 +1236,41 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 	 * and also sets up the range spinner
 	 */
 	private void setupViewScroller() {
-		if (viewerScroller == null) {
+		// store as local variable so it doesn't get nulled in a different thread. 
+		PamScroller vs = viewerScroller;
+		if (vs == null) {
 			return;
 		}
 		long visibleMillis = (long)(spectrogramParameters.displayLength * 1000);
-		viewerScroller.setVisibleMillis(visibleMillis);
-		viewerScroller.setBlockIncrement(visibleMillis * 9 / 10);
-		viewerScroller.setUnitIncrement(visibleMillis * 1 / 10);
+		vs.setVisibleMillis(visibleMillis);
+		vs.setBlockIncrement(visibleMillis * 9 / 10);
+		vs.setUnitIncrement(visibleMillis * 1 / 10);
 
 		if (sourceFFTDataBlock != null) {
 			// now depending on the hop set the minimum step size for the viewerscroller
-			if (viewerScroller != null) {
-				PamScrollerData scrollerData = viewerScroller.getScrollerData();
-				// default step size is only 1000 millis. for LTSA data we want to make
-				// this a LOT longer. 
-				double hopSeconds = sourceFFTDataBlock.getFftHop() / sourceFFTDataBlock.getSampleRate();
-				int minStep = (int) Math.max(1, hopSeconds * 1000);
-				scrollerData.setStepSizeMillis(minStep);
+			PamScrollerData scrollerData = vs.getScrollerData();
+			// default step size is only 1000 millis. for LTSA data we want to make
+			// this a LOT longer. 
+			double hopSeconds = sourceFFTDataBlock.getFftHop() / sourceFFTDataBlock.getSampleRate();
+			int minStep = (int) Math.max(1, hopSeconds * 1000);
+			scrollerData.setStepSizeMillis(minStep);
+		}
+		
+		/**
+		 * And add observing data required by plugins to the scroller. 
+		 */
+		synchronized(displayPanels) {
+			int nD = displayPanels.size();
+			for (int i = 0; i < nD; i++) {
+				DisplayPanel dp = displayPanels.get(i);
+				PamDataBlock dataBlock = dp.getViewerDataBlock();
+				if (dataBlock == null) {
+					continue;
+				}
+				vs.addDataBlock(dataBlock);
 			}
 		}
+
 
 		requestFFTData();
 
@@ -1374,6 +1403,17 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 	}
 
+	/**
+	 * Is the axis set to log frequency scale ? Be null aware !
+	 * @return
+	 */
+	private boolean isLogFreqScale() {
+		PamAxis fa = frequencyAxis;
+		if (fa == null) {
+			return false;
+		}
+		return fa.isLogScale();
+	}
 
 	void newScrollPosition() {
 		if (spectrogramPanels == null) {
@@ -1729,9 +1769,20 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 			int botInset = axisInsets.bottom;
 			if (spectrogramOuterPanel != null) {
-				botInset += (spectrogramPlotPanel.getHeight() - spectrogramOuterPanel.getHeight());
+				int h = spectrogramOuterPanel.getHeight();
+				if (h > 0) {
+					// gets a bit confused when plots are recreated at startup since h is 0. 
+					botInset += (spectrogramPlotPanel.getHeight() - h);
+				}
+				else {
+					botInset += 2;
+				}
+//				if (spectrogramOuterPanel.getHeight() == 0) {
+//					System.out.println("no outer panel");
+//				}
+//				System.out.printf("Set spec botInset to %d as %d - %d\n", botInset, spectrogramPlotPanel.getHeight(), spectrogramOuterPanel.getHeight());
 			}
-
+//			System.out.printf("Setting spec axis positiong at %d / %d\n", axisInsets.top, botInset);
 			SetBorderMins(axisInsets.top, 0, botInset, 10);
 			//			SetBorderMins(12, 0, 19, 100);
 			// setMinimumSize(new Dimension(300, 20));
@@ -2668,6 +2719,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					directImagePos = getWidth();
 				}
 				//				System.out.println(" Panel " + String.valueOf(this.panelId) + " directImagePos = " + String.valueOf(directImagePos));
+				directDrawProjector.setLogScale(isLogFreqScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 
@@ -2687,6 +2739,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				fillSpectrogramImage(g2d, this);
 
 				double millisPerBin = sampleRate / 1000. / sourceFFTDataBlock.getFftHop();
+				directDrawProjector.setLogScale(isLogFreqScale());
 				spectrogramProjector.setScales(millisPerBin,
 						2. / sourceFFTDataBlock.getFftLength(), specImage.getWidth(),
 						specImage.getHeight());
@@ -2730,6 +2783,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 				drawMarkLabel(g);
 
+				directDrawProjector.setLogScale(isLogFreqScale());
 				directDrawProjector.setScales(getWidth(), getHeight(), 
 						displayStartTime,
 						spectrogramParameters.displayLength * 1000 / spectrogramPixelOverlap, 
@@ -2953,6 +3007,10 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			else {
 				directDrawProjector.setPamSymbolChooser(null);
 			}
+			boolean cont = usedDataBlock.getOverlayDraw().preDrawAnything(g, usedDataBlock, directDrawProjector);
+			if (cont == false) {
+				return;
+			}
 			try {
 				//				System.out.println("Unlocked" + usedDataBlock.getDataName());
 				iterator = usedDataBlock.getListIterator(PamDataBlock.ITERATOR_END);
@@ -3145,8 +3203,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				return null;
 			}
 			if (viewerMode) {
-				String moreStr = 
-						directDrawProjector.getHoverText(mouseEvent.getPoint());
+				String moreStr = directDrawProjector.getHoverText(mouseEvent.getPoint(), panelId);
 				if (moreStr != null) {
 					str += "<p>" + moreStr;
 				}

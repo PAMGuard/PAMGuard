@@ -54,7 +54,9 @@ public class DataSelectDialog extends PamDialog {
 		}
 		if (symbolChooser != null) {
 			symbolPanel = symbolChooser.getSwingOptionsPanel(symbolChooser.getProjector());
-			tabPane.addTab("Symbols", new PamNorthPanel(symbolPanel.getDialogComponent()));
+			if (symbolPanel != null) {
+				tabPane.addTab("Symbols", new PamNorthPanel(symbolPanel.getDialogComponent()));
+			}
 		}
 		setDialogComponent(tabPane);
 		if (tabPane.getComponentCount() > currentTab) {

@@ -16,7 +16,7 @@ import loggerForms.controlDescriptions.CdLookup;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controls.LoggerControl.ComponentFocusListener;
 
-public class LookupControl extends LoggerControl{
+public class LookupControl extends LoggerControl {
 
 	private LookupComponent lookup;
 	
@@ -24,7 +24,7 @@ public class LookupControl extends LoggerControl{
 			LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
 		
-		lookup=new LookupComponent(controlDescription.getTopic(),((CdLookup)controlDescription).getLookupList());
+		lookup = new LookupComponent(controlDescription.getTopic(),((CdLookup)controlDescription).getLookupList(), false, true);
 //		lookup.setToolTipText(controlDescription.getHint());
 		
 		component.add(new PamLabel(controlDescription.getTitle()));

@@ -22,8 +22,8 @@ public class WhistleBearingInfo extends AbstractLocalisation {
 	double bearingRef;
 	
 	public WhistleBearingInfo(PamDataUnit pamDataUnit, BearingLocaliser bearingLocaliser, 
-			int hydrophones, double[][] anglesAndErrors) {
-		super(pamDataUnit, LocContents.HAS_BEARING, hydrophones);
+			int hydrophoneMap, double[][] anglesAndErrors) {
+		super(pamDataUnit, LocContents.HAS_BEARING, hydrophoneMap);
 		this.anglesAndErrors = anglesAndErrors;
 //		System.out.println("Whistle bearing = " + bearing * 180/Math.PI);
 		/**
@@ -32,15 +32,15 @@ public class WhistleBearingInfo extends AbstractLocalisation {
 		 * hydrophone axis - it's the same in the click detector. 
 		 */
 		int p1, p2;
-		p1 = PamUtils.getLowestChannel(hydrophones);
-		p2 = PamUtils.getNthChannel(1, hydrophones);
+		p1 = PamUtils.getLowestChannel(hydrophoneMap);
+		p2 = PamUtils.getNthChannel(1, hydrophoneMap);
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 //		bearingRef = array.getHydrophoneLocator().getPairAngle(pamDataUnit.getTimeMilliseconds(), 
 //				p2, p1, HydrophoneLocator.ANGLE_RE_NORTH);
 //		bearingRef = Math.toRadians(bearingRef);
 		// bearing ref is now the heading of the array as a whole, not elements within the array. D.G. 6/2/2012
 		// just get for the first hydrophone in the group. 
-		int firstPhone = PamUtils.getLowestChannel(hydrophones);
+		int firstPhone = PamUtils.getLowestChannel(hydrophoneMap);
 		bearingRef = pamDataUnit.getHydrophoneHeading(false);
 		bearingRef = Math.toRadians(bearingRef);
 		setArrayAxis(bearingLocaliser.getArrayAxis());

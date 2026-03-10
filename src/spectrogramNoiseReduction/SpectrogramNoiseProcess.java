@@ -68,6 +68,9 @@ public class SpectrogramNoiseProcess extends PamProcess {
 		sourceData = (FFTDataBlock) getPamControlledUnit().getPamConfiguration().getDataBlock(FFTDataUnit.class, 
 				getNoiseSettings().dataSource);
 		setParentDataBlock(sourceData);
+		if (sourceData != null) {
+			outputData.setLogScale(sourceData.isLogScale());
+		}
 		
 		prepareProcess();
 		
@@ -279,6 +282,14 @@ public class SpectrogramNoiseProcess extends PamProcess {
 	@Override
 	public ArrayList getCompatibleDataUnits() {
 		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(FFTDataUnit.class));
+	}
+
+	/**
+	 * The original input to the noise process. May not be normal FFT data, e.g. Mel spectrogram. 
+	 * @return the sourceData
+	 */
+	public FFTDataBlock getSourceData() {
+		return sourceData;
 	}
 
 	

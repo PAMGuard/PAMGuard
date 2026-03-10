@@ -95,6 +95,12 @@ public class FileMapMakingdialog extends PamDialog {
 			progress.setValue(mapProgress.openedFiles);
 			fileName.setText(mapProgress.fileName);
 			break;
+		case FileMapProgress.STATE_MAPPINGFILES:
+			progress.setIndeterminate(false);
+			progress.setMaximum(mapProgress.totalFiles);
+			progress.setValue(mapProgress.openedFiles);
+			fileName.setText(mapProgress.fileName);
+			break;
 		}
 	}
 

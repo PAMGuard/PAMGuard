@@ -133,7 +133,7 @@ public abstract class PamBlockProcess extends PamProcess {
 	 * (UTC milliseconds from the epoch - the standard Java way)
 	 */
 	public long absSamplesToMilliseconds(long samples) {
-		if (sampleRate == 0) {
+		if (getSampleRate() == 0) {
 			return PamCalendar.getTimeInMillis();
 		}
 		if (lastSentDataUnit != null) {
@@ -142,7 +142,7 @@ public abstract class PamBlockProcess extends PamProcess {
 			return lastSentDataUnit.getTimeMilliseconds() + relSamplesToMilliseconds(samples-lastSentDataUnit.getStartSample());
 		}
 		else {
-			return (long) (samples * 1000. / sampleRate) + PamCalendar.getSessionStartTime();
+			return (long) (samples * 1000. / getSampleRate()) + PamCalendar.getSessionStartTime();
 		}
 	}
 	

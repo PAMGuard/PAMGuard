@@ -3,6 +3,7 @@ package Acquisition.offlineFuncs;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.sound.sampled.AudioFormat;
@@ -13,18 +14,26 @@ import org.jflac.metadata.Metadata;
 import org.jflac.metadata.StreamInfo;
 import org.jflac.sound.spi.FlacAudioFileReader;
 import Acquisition.filedate.FileDate;
+import Acquisition.filedate.FileTimeData;
 import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileLoader;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import PamController.OfflineFileDataStore;
 import PamController.fileprocessing.StoreStatus;
+import PamUtils.worker.filelist.WavFileType;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import clickDetector.WindowsFile;
 import dataMap.OfflineDataMap;
 import dataMap.filemaps.FileDataMapPoint;
+import dataMap.filemaps.FileMapProgress;
+import dataMap.filemaps.FileSubSection;
 import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.ViewLoadObserver;
 import wavFiles.ByteConverter;
+import wavFiles.WavHeader;
+import wavFiles.xwav.HarpCycle;
+import wavFiles.xwav.HarpHeader;
 
 /**
  * This has been split off from OfflineFileServer so that OfflineFileServer can be used with 
@@ -48,8 +57,11 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 	@Override
 	public long[] getFileStartandEndTime(File file) {
 		long[] t = new long[2];
-		t[0] = fileDate.getTimeFromFile(file);
-		return t;
+		FileTimeData ftd = fileDate.getTimeFromFile(file);
+		if (ftd == null) {
+			return null;
+		}
+		return ftd.getStartandEnd();
 	}
 
 	@Override
@@ -57,8 +69,63 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 		if (endTime == 0) {
 			endTime = startTime;
 		}
-		FileDataMapPoint mapPoint = new FileDataMapPoint(file, startTime, endTime);
-		return mapPoint;
+		// need to see if it's an xwav file from a HARP that would contain additional header data. 
+		HarpHeader harpHeader = null;
+		if (file.getName().toLowerCase().endsWith(".x.wav")) {
+			harpHeader = getHarpHeader(file);
+		}
+		if (harpHeader == null || harpHeader.harpCycles == null) {
+			FileDataMapPoint mapPoint = new FileDataMapPoint(file, startTime, endTime);
+			/*
+			 * Create a single map point as normal. 
+			 */
+			return mapPoint;
+		}
+		else {
+			//make many map points and add them.
+			ArrayList<HarpCycle> cycles = harpHeader.harpCycles;
+			OfflineDataMap<FileDataMapPoint> map = getDataMap();
+			for (int i = 0; i < cycles.size(); i++) {
+				HarpCycle harpCycle = cycles.get(i);
+				/**
+				 * It's cycled HARP data so make lots of map points and add them to the map 
+				 * here, then return null so that the functions in the main map maker (OfflineFileServer)
+				 * doesn't add anything itself. 
+				 */
+				FileSubSection subSection = new FileSubSection(harpCycle.getByteLoc(), harpCycle.getByteLoc()+harpCycle.getByteLength());
+				WavFileType harpFile = new WavFileType(file);
+				harpFile.setSamplesOffset(harpCycle.getSamplesSkipped());
+				harpFile.setMaxSamples(harpCycle.getDurationMillis() * harpCycle.getSampleRate() / 1000);
+				FileDataMapPoint mapPoint = new FileDataMapPoint(harpFile, harpCycle.gettMillis(), harpCycle.getEndMillis());
+				mapPoint.setFileSubSection(subSection);
+				map.addDataPoint(mapPoint);
+			}
+		}
+		return null;
+	}
+
+	private HarpHeader getHarpHeader(File file) {		
+		WavHeader wavHeader = new WavHeader();
+		WindowsFile windowsFile;
+		try {
+			windowsFile = new WindowsFile(file, "r");
+			if (wavHeader.readHeader(windowsFile) == false) {
+				return null;
+			}
+			windowsFile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			return null;
+		}
+		HarpHeader harpHeader = wavHeader.getHarpHeader();
+		if (harpHeader == null) {
+			return null;
+		}
+		if (harpHeader.harpCycles == null || harpHeader.harpCycles.size() == 0) {
+			return null;
+		}
+		return harpHeader;
 	}
 
 	@Override
@@ -73,15 +140,23 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 	}
 
 	@Override
-	public void sortMapEndTimes() {
+	public void sortMapEndTimes(OfflineFileServer.MapMaker mapMaker) {
 		OfflineDataMap<FileDataMapPoint> dataMap = this.getDataMap();
 		Iterator<FileDataMapPoint> it = dataMap.getListIterator();
 		FileDataMapPoint mapPoint;
 		File file;
 		int totalPoints = dataMap.getNumMapPoints();
 		int opened = 0;
+		int nDone = 0;
 		while (it.hasNext()) {
 			mapPoint = it.next();
+			nDone ++;
+			if (mapPoint.getFileSubSection() != null) {
+				// already sorted for xwav viles, so do nothing more
+				continue;
+			}
+			String msg = String.format("Checking file %d of %d: %s", nDone, totalPoints, mapPoint.getSoundFile().getName());
+			mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_MAPPINGFILES, totalPoints, nDone, msg));
 			if (mapPoint.getMatchedPoint() != null) {
 				// this shows that the map point has come back from the serialised file
 				// so the time information will already be ok. 
@@ -136,8 +211,10 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 					}
 					AudioFormat audioFormat = audioStream.getFormat();
 					audioStream.close();
+					
 					fileSamples = audioStream.getFrameLength();
 					float sampleRate = audioFormat.getSampleRate();
+										
 					fileMillis = (long) (fileSamples*1000/sampleRate);
 					mapPoint.setEndTime(mapPoint.getStartTime() + fileMillis);
 				} catch (UnsupportedAudioFileException e) {
@@ -178,6 +255,11 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			return false;
 		}
 		
+		/**
+		 * This just gets a loader based on the types of audio file. These are a bit different
+		 * for wav, flac, and SUD files. The loading itself of multiple map points is handled a 
+		 * bit later in the call to loadAudioData, which will iterate again through the file map. 
+		 */
 		PamAudioFileLoader audioFile = PamAudioFileManager.getInstance().getAudioFileLoader(mapPoint.getSoundFile()); 
 		
 		if (audioFile==null) {
@@ -185,8 +267,8 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			return false; 
 		}
 		
-		return audioFile.loadAudioData(this, dataBlock, offlineLoadDataInfo, loadObserver); 
-		
+		boolean ans = audioFile.loadAudioData(this, dataBlock, offlineLoadDataInfo, loadObserver); 
+		return ans;
 	}
 
 }

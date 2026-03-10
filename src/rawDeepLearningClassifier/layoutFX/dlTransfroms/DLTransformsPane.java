@@ -22,6 +22,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.orderedList.PamDraggableList;
 
 /**
+ * 
  * Pane which allows users to create a series of transforms for 
  * raw data before inputting into a deep learning model. 
  * 
@@ -164,7 +165,15 @@ public class DLTransformsPane extends PamBorderPane {
 			}
 
 			transformPane = DataTransformPaneFactory.getSettingsPane(dlTransforms.get(i)); 
-			//System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
+			
+//			if ((((SimpleTransform) dlTransforms.get(i)).getParams())!=null && ((SimpleTransform) dlTransforms.get(i)).getParams().length>0) {
+//				//if there are no params then just skip this transform. 
+//				System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()[0]); 
+//			}
+//			else {
+//				System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() ); 
+//
+//			}
 
 			//there must be a transform pane or else this will break. 
 			dlTransformPanes.add(transformPane); 

@@ -253,12 +253,12 @@ public class SendEmailAction extends AlarmAction implements PamSettings {
 			Transport transport = session.getTransport("smtp");
 		    transport.connect(emailSettings.getHost(), Integer.valueOf(emailSettings.getPort()), emailSettings.getUsername(), pwd);
 		    transport.close();
-		    System.out.println("Successfully connected to Gmail SMTP server");
+		    System.out.println("Successfully connected to Email SMTP server");
 		    emailReady=AlarmAction.ALARM_CAN_DO;
 		 } 
 		 catch(Exception e) {
-			 String title = "Error connecting to Gmail SMTP server";
-			 String msg = "There was an error trying to authenticate the Gmail account " + emailSettings.getUsername() +
+			 String title = "Error connecting to Email SMTP server " + emailSettings.getHost();
+			 String msg = "There was an error trying to authenticate the Email account " + emailSettings.getUsername() +
 					 " to be used for alarm " + alarmControl.getUnitName() + 
 					 ".  The alarm will not be able to send emails until " +
 					 "this is fixed.  Please check the Alarm Email Settings to ensure they are correct.";

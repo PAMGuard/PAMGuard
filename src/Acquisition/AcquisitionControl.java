@@ -57,11 +57,13 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.RawInputControlledUnit;
+import PamModel.CommonPluginInterface;
 import PamModel.SMRUEnable;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
 import PamUtils.PlatformInfo;
 import PamUtils.PlatformInfo.OSType;
+import PamUtils.worker.PamWorkMonitor;
 import PamView.MenuItemEnabler;
 import PamView.PamStatusBar;
 import PamView.dialog.PamLabel;
@@ -777,13 +779,14 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	public void loadExternalDaqSystems() {
 
 		// get a list of plugins
-		List<DaqSystemInterface> daqList = PamController.getInstance().getModelInterface().getDaqList();
+		List<CommonPluginInterface> daqList = PamController.getInstance().getModelInterface().getPluginType(DaqSystemInterface.class);
 
 		// if there are no plugins, return
 		if (daqList.isEmpty()) {
 			return;
 		}
-		for (DaqSystemInterface dsi : daqList ) {
+		for (CommonPluginInterface cpi : daqList) {
+			DaqSystemInterface dsi = (DaqSystemInterface) cpi;
 			registerDaqSystem(dsi.createDAQControl(this));
 		}
 	}
@@ -897,8 +900,14 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		}
 	}
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
-		return getDaqProcess().getStoreInfo(detail);
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
+		if (isViewer) {
+			// I think this might always be true, but get it from the offlineFileServer
+			return offlineFileServer.getStoreInfo(workMonitor, detail);
+		}
+		else {
+			return getDaqProcess().getStoreInfo(workMonitor, detail);
+		}
 	}
 
 	@Override

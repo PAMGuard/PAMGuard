@@ -11,6 +11,7 @@ import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -21,6 +22,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
+import PamUtils.FrequencyFormat;
 import soundPlayback.PlaybackControl;
 import soundPlayback.PlaybackSystem;
 import soundPlayback.SoundCardPlayback;
@@ -38,10 +40,9 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 
 	public static final String sysType = "Sound Card";
 
-	JPanel daqDialog;
-
-	JComboBox audioDevices;
-
+//	JPanel daqDialog;
+	SoundCardPanel soundCardPanel;
+	
 	SoundCardParameters soundCardParameters = new SoundCardParameters(sysType);
 
 	private AudioFormat audioFormat;
@@ -89,7 +90,7 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 		daqChannels = daqControl.acquisitionParameters.nChannels;
 		float sampleRate = daqControl.acquisitionParameters.sampleRate;
 
-		audioFormat = new AudioFormat(sampleRate, 16, daqChannels, true, true);
+		audioFormat = new AudioFormat(sampleRate, soundCardParameters.getBitDepth(), daqChannels, true, true);
 
 		dataUnitSamples = (int) (acquisitionControl.acquisitionParameters.sampleRate / 10);
 		dataUnitSamples = Math.max(dataUnitSamples, 1000);
@@ -130,13 +131,14 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 //		}
 		// if the 24 bit recording failed, then try to open for 16 bit recording.
 		if (!lineOk) {
-			audioFormat = new AudioFormat(sampleRate, 16, daqChannels, true, true);
+			audioFormat = new AudioFormat(sampleRate, soundCardParameters.getBitDepth(), daqChannels, true, true);
 			try {
 				targetDataLine.open(audioFormat);
-				sampleMax = 1<<15;
+				sampleMax = 1<<(soundCardParameters.getBitDepth()-1);
 				lineOk = true;
 			} catch (LineUnavailableException Ex) {
-				System.out.println("Sound card 16 bit recording unavailable");
+				System.out.printf("Sound card %d bit %d channel recording at %s unavailable\n", 
+						soundCardParameters.getBitDepth(), daqChannels, FrequencyFormat.formatFrequency(sampleRate, true));
 				return false;
 			}
 		}
@@ -202,25 +204,17 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 	}
 
 	@Override
-	public JPanel getDaqSpecificDialogComponent(AcquisitionDialog acquisitionDialog) {
+	public JComponent getDaqSpecificDialogComponent(AcquisitionDialog acquisitionDialog) {
 
-		if (daqDialog == null) {
-			daqDialog = createDaqDialogPanel();
-		}
-
-		return daqDialog;
+		return getSoundCardPanel().getComponent(acquisitionDialog);
 
 	}
-
-	private JPanel createDaqDialogPanel() {
-
-		JPanel p = new JPanel();
-
-		p.setBorder(new TitledBorder("Select audio line"));
-		p.setLayout(new BorderLayout());
-		p.add(BorderLayout.CENTER, audioDevices = new JComboBox());
-
-		return p;
+	
+	private SoundCardPanel getSoundCardPanel() {
+		if (soundCardPanel == null) {
+			soundCardPanel = new SoundCardPanel(this);
+		}
+		return soundCardPanel;
 	}
 
 
@@ -302,27 +296,28 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 		// whether or not to include the parameters in the XML output
 		if (soundCardParameters.systemType==null) soundCardParameters.systemType=getSystemType();
 
-
-		ArrayList<String> devices = getDevicesList();
-
-		audioDevices.removeAllItems();
-		for (String element : devices) {
-			//System.out.println("Adding to audio device:"+devices.get(i));
-			audioDevices.addItem(element);
-		}
-
-		soundCardParameters.deviceNumber = Math.max(Math.min(devices.size()-1, soundCardParameters.deviceNumber), 0);
-		if (devices.size() > 0) {
-			audioDevices.setSelectedIndex(soundCardParameters.deviceNumber);
-		}
+		getSoundCardPanel().setParams();
+//		ArrayList<String> devices = getDevicesList();
+//
+//		audioDevices.removeAllItems();
+//		for (String element : devices) {
+//			//System.out.println("Adding to audio device:"+devices.get(i));
+//			audioDevices.addItem(element);
+//		}
+//
+//		soundCardParameters.deviceNumber = Math.max(Math.min(devices.size()-1, soundCardParameters.deviceNumber), 0);
+//		if (devices.size() > 0) {
+//			audioDevices.setSelectedIndex(soundCardParameters.deviceNumber);
+//		}
 
 	}
 
 	@Override
 	public boolean dialogGetParams() {
 		//System.out.println("soundCardParameters: " + soundCardParameters + "audioDevices: " + audioDevices);
-		if (audioDevices!=null) soundCardParameters.deviceNumber = audioDevices.getSelectedIndex();
-		return true;
+//		if (audioDevices!=null) soundCardParameters.deviceNumber = audioDevices.getSelectedIndex();
+//		return true;
+		return getSoundCardPanel().getParams();
 	}
 
 	@Override
@@ -563,5 +558,10 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 	 */
 	public SoundCardParameters getSoundCardParameters() {
 		return this.soundCardParameters;
+	}
+
+	@Override
+	public int getSampleBits() {
+		return soundCardParameters.getBitDepth();
 	}
 }

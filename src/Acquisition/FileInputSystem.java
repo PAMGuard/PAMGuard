@@ -47,11 +47,13 @@ import org.pamguard.x3.sud.SudFileListener;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
+import Acquisition.filedate.FileTimeData;
 import Acquisition.filetypes.SoundFileType;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioFileManager;
 import PamController.DataInputStore;
 import PamController.InputStoreInfo;
+import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -59,12 +61,14 @@ import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
+import PamUtils.worker.PamWorkMonitor;
 import PamUtils.worker.filelist.WavFileType;
 import PamView.dialog.PamLabel;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import pamguard.GlobalArguments;
+import soundPlayback.PlaybackControl;
 import warnings.PamWarning;
 
 //import org.kc7bfi.jflac.FLACDecoder;
@@ -104,6 +108,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	protected AcquisitionControl acquisitionControl;
 
+	/**
+	 * The number of samples in each data block read from the file. This is passed to downstream processes as a single data unit. 
+	 */
 	protected int blockSamples = 4800;
 
 	protected PamProgressBar fileProgress = new PamProgressBar(PamProgressBar.defaultColor);
@@ -181,6 +188,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 * Can help to control restarts. 
 	 */
 	protected volatile long currentAnalysisTime;
+
+	private WavFileType currentFile;
+
+	private FileTimeData currentFileTime;
 
 	public FileInputSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
@@ -425,7 +436,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			fileInputParameters.recentFiles.add(0, newFile);
 			fillFileList();
 		}
-		interpretNewFile(newFile);
+		interpretNewFile(new WavFileType(newFile));
 	}
 	
 	public String getFirstFile() {
@@ -439,17 +450,20 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 * Called when a new file or folder is selected.
 	 * @param newFile
 	 */
-	public void interpretNewFile(String newFile){
+	public void interpretNewFile(WavFileType newFile){
 		if ((newFile == null) || (newFile.length() == 0)) return;
 
-		File file = new File(newFile);
+		File file = newFile.getAbsoluteFile();
 
 		setSelectedFileTypes(acquisitionControl.soundFileTypes.getUsedTypes(file));
 
 		if (file == null) return;
-
-		// try to work out the date of the file
-		fileDateMillis = getFileStartTime(file);
+		
+		fileDateMillis = newFile.getStartMilliseconds();
+		if (fileDateMillis == 0) {
+			// try to work out the date of the file
+			fileDateMillis = getFileStartTime(newFile);
+		}
 		fileDateStrip.setDate(fileDateMillis);
 		fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
 		//		if (fileDateMillis <= 0) {
@@ -466,23 +480,26 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 //				System.out.println("FileInputSystem - interpretNewFile");
 				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
-				//      // Get additional information from the header if it's a wav file.
-				//				if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
-				//					WavHeader wavHeader = ((WavFileInputStream) audioStream).getWavHeader();
-				//					int nChunks = wavHeader.getNumHeadChunks();
-				//					for (int i = 0; i < nChunks; i++) {
-				//						WavHeadChunk aChunk = wavHeader.getHeadChunk(i);
-				//						System.out.println(String.format("Chunk %d %s: %s", i, aChunk.getChunkName(), aChunk.toString()));
-				//					}
-				//				}
+				      // Get additional information from the header if it's a wav file.
+//								if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
+//									WavHeader wavHeader = ((WavFileInputStream) audioStream).getWavHeader();
+//									int nChunks = wavHeader.getNumHeadChunks();
+//									for (int i = 0; i < nChunks; i++) {
+//										WavHeadChunk aChunk = wavHeader.getHeadChunk(i);
+//										System.out.println(String.format("Chunk %d %s: %s", i, aChunk.getChunkName(), aChunk.toString()));
+//									}
+//								}
 
 				if (audioStream instanceof SudAudioInputStream) {
-					acquisitionControl.getSUDNotificationManager().interpretNewFile(newFile, (SudAudioInputStream) audioStream);
+					acquisitionControl.getSUDNotificationManager().interpretNewFile(newFile.getAbsolutePath(), (SudAudioInputStream) audioStream);
 				}
 
 				AudioFormat audioFormat = audioStream.getFormat();
 				//				fileLength = file.length();
 				fileSamples = audioStream.getFrameLength();
+				if (currentFile != null && currentFile.getMaxSamples() > 0) {
+					fileSamples = currentFile.getMaxSamples();
+				}
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());
 				acquisitionDialog.setChannels(audioFormat.getChannels());
 				fileInputParameters.bitDepth = audioFormat.getSampleSizeInBits();
@@ -591,8 +608,12 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean prepareSystem(AcquisitionControl daqControl) {
 
 		this.acquisitionControl = daqControl;
+		
 
 		fileSamples = 0;
+		//Need to set this to zero so that file times reset to the true file time if contiguous is not set. 
+		currentAnalysisTime=0;
+		
 		PamCalendar.setSoundFileTimeInMillis(0);
 		// check a sound file is selected and open it.
 		//		if (fileInputParameters.recentFiles == null) return false;
@@ -604,11 +625,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		return true;
 	}
 
-	public File getCurrentFile() {
+	public WavFileType getCurrentFile() {
 //		System.out.println("fileInputParameters: " + fileInputParameters);
 		if ((fileInputParameters.recentFiles == null) || (fileInputParameters.recentFiles.size() < 1)) return null;
 		String fileName = fileInputParameters.recentFiles.get(0);
-		return new File(fileName);
+		return new WavFileType(new File(fileName));
 	}
 
 
@@ -626,11 +647,24 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 */
 	public boolean prepareInputFile() {
 
-		File currentFile = getCurrentFile();
-		if (currentFile == null) {
-			System.out.println("The current file was null");
+		currentFile = getCurrentFile();
+		
+		
+		if (currentFile == null || currentFile.exists() == false) {
+			currentFileTime = null;
+			String warning;
+			if (currentFile == null) {
+				warning = "No sound input file has been selected";
+			}
+			else {
+				warning = "The sound file " + currentFile.getAbsolutePath() + " does not exist";
+			}
+			WarnOnce.showWarning(acquisitionControl.getGuiFrame(),  "Sound Acquisition system", warning, WarnOnce.WARNING_MESSAGE);
 			return false;
 		}
+
+		currentFileTime = acquisitionControl.getFileDate().getTimeFromFile(currentFile);
+		
 //		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
 		try {
@@ -639,7 +673,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				audioStream.close();
 			}
 
-//			System.out.println("FileInputSystem - prepareInputFile");
+//			System.out.println("FileInputSystem: - prepareInputFile");
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
@@ -668,6 +702,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				return false;
 			}
 			long toSkip = (long) (millisToSkip * audioFormat.getFrameRate() / 1000) * audioFormat.getFrameSize();
+			// this next line deals with harp data offsets.
+			toSkip += currentFile.getSamplesOffset() * audioFormat.getFrameSize();
 			if (toSkip > 0) {
 				audioStream.skip(toSkip);
 			}
@@ -675,6 +711,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			//			fileLength = currentFile.length();
 			fileSamples = audioStream.getFrameLength();
+			if (currentFile.getMaxSamples() > 0) {
+				fileSamples = currentFile.getMaxSamples();
+			}
 			readFileSamples = 0;
 
 			acquisitionControl.getAcquisitionProcess().setSampleRate(audioFormat.getSampleRate(), true);
@@ -733,6 +772,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		PamCalendar.setSoundFile(true);
 		PamCalendar.setSoundFileTimeInMillis(0);
 		long fileTime = getFileStartTime(getCurrentFile());
+		
+		//System.out.println("FolderInputSystem.runFileAnalysis: currentAnalysisTime "  + currentAnalysisTime);
+
+		
 		if (currentAnalysisTime > 0) {
 			PamCalendar.setSessionStartTime(currentAnalysisTime);
 		}
@@ -762,7 +805,28 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		acquisitionControl.getDaqProcess().setSampleRate(sampleRate = audioFormat.getSampleRate(), true);
 		//		System.out.println("Audio sample rate set to " + sampleRate);
 
-		blockSamples = Math.max((int) sampleRate / 10, 1000); // make sure the
+		/**
+		 * We have a few situations here. We want processed data to be smooth but we don't want tiny blocks that might reduce processing 
+		 */
+		
+		//first is there a playback control
+		PamControlledUnit playBackControl = PamController.getInstance().findControlledUnit(PlaybackControl.PLAYBACK_TYPE_STRING);
+		
+		blockSamples = Math.max((int) sampleRate / 10, 500);
+		if (playBackControl != null) {
+			//if no control
+			PlaybackControl pbc = (PlaybackControl) playBackControl;
+			double pbcSpeed = pbc.getPlaybackParameters().getPlaybackSpeed();
+			boolean pbcChannels = pbc.getPlaybackParameters().channelBitmap>0;
+		
+			
+			if (pbcChannels && pbcSpeed < 8.0) {
+				//if there are channels selected and pbcSpeed is low then lower the block size for smooth playback
+				blockSamples = (int) (sampleRate/10); 
+			}
+
+		}
+		
 		// block has at
 		// least 1000 samples
 		acquisitionControl.getDaqProcess().setNumChannels(nChannels);
@@ -787,8 +851,37 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public long getFileStartTime(File file) {
 		// if there is no file, return 0
 		if (file==null) return 0;
-		return acquisitionControl.getFileDate().getTimeFromFile(file);
+		if (file instanceof WavFileType) {
+			WavFileType wt = (WavFileType) file;
+			if (wt.getStartMilliseconds() > 0) {
+				return wt.getStartMilliseconds();
+			}
+		}
+		FileTimeData fileTimeData = acquisitionControl.getFileDate().getTimeFromFile(file);
+		if (fileTimeData == null) {
+			return 0;
+		}
+		else {
+			return fileTimeData.getFileStart();
+		}
 	}
+	
+//	/**
+//	 * Get the file duration, either from the file type or the audio format. 
+//	 * @param file
+//	 * @param af
+//	 * @return
+//	 */
+//	public long getFileDuration(File file, AudioFormat af) {
+//		if (file instanceof WavFileType) {
+//			WavFileType wt = (WavFileType) file;
+//			if (wt.getDurationInSeconds() > 0) {
+//				return (long) (wt.getDurationInSeconds() * 1000.);
+//			}
+//		}
+////		return (long) af.getFrameLength() * 1000L / (long) af.getFormat().getFrameSize();	
+//		return af.get
+//	}
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
@@ -935,11 +1028,12 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			long ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
 			currentAnalysisTime = ms + (long) (newSamples * 1000L / sampleRate);
 			RawDataUnit newDataUnit = null;
+//			DaqSourceInfo sourceInfo = new DaqSourceInfo(getSystemName(), totalSamples);
 			for (int ichan = 0; ichan < nChannels; ichan++) {
 
 				newDataUnit = new RawDataUnit(ms, 1 << (ichan+channelOffset), totalSamples, newSamples);
 				newDataUnit.setRawData(doubleData[ichan]);
-
+//				newDataUnit.setDaqSourceInfo(sourceInfo);
 				newDataUnits.addNewData(newDataUnit);
 
 				// GetOutputDataBlock().addPamData(pamDataUnit);
@@ -1008,6 +1102,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			 * File should have been opened in the constructor so just read it
 			 * in in chunks and pass to datablock
 			 */
+			DaqSourceInfo sourceInfo;
 			int blockSize = blockSamples * audioFormat.getFrameSize();
 			int bytesRead = 0;
 			byte[] byteArray = new byte[blockSize];
@@ -1020,16 +1115,24 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			int startbyte;
 			RawDataUnit newDataUnit = null;
 			long ms;
+			long maxSamples = (long) Integer.MAX_VALUE * 2L;
+			if (currentFile.getMaxSamples() > 0) {
+				maxSamples = currentFile.getMaxSamples();
+			}
+			long maxBytes = maxSamples * audioFormat.getFrameSize();
+			long totalBytesRead = 0;
 
 
 			while (dontStop && audioStream != null) {
+				int toRead = (int) Math.min(blockSize, maxBytes-totalBytesRead);
 				try {
-					bytesRead = audioStream.read(byteArray, 0, blockSize);
+					bytesRead = audioStream.read(byteArray, 0, toRead);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					break; // file read error
 				}
-				while (bytesRead < blockSize) {
+				totalBytesRead += bytesRead;
+				while (bytesRead < toRead) {
 					// for single file operation, don't do anything, but need to have a hook
 					// in here to read multiple files, in which case we may just get the extra
 					// samples from the next file.
@@ -1062,11 +1165,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
 //					currentAnalysisTime = ms;
 					currentAnalysisTime = ms + (long) (newSamples * 1000L / sampleRate); // get ms of last sample for this. 
+//					sourceInfo = new DaqSourceInfo(getSystemName(), (double) totalSamples / sampleRate);
 
 					for (int ichan = 0; ichan < nChannels; ichan++) {
 
 						newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
 						newDataUnit.setRawData(doubleData[ichan]);
+//						newDataUnit.setDaqSourceInfo(sourceInfo);
 
 						if (1000*(readFileSamples/sampleRate)<fileInputParameters.skipStartFileTime) {
 							// zero the data. Skipping it causes all the timing to screw up
@@ -1112,6 +1217,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				}
 				else {
 					break; // end of file
+				}
+				if (totalBytesRead == maxBytes) {
+					break; // called at end of HARP chunk. 
 				}
 			}
 			if (audioStream != null) {
@@ -1341,15 +1449,15 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		}
 	}
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 //		System.out.println("FileInputSystem: Get store info start:");
-		File currentFile = getCurrentFile();
+		WavFileType currentFile = getCurrentFile();
 		if (currentFile == null || currentFile.exists() == false) {
 			return null;
 		}
 		WavFileType wavType = new WavFileType(currentFile);
 		wavType.getAudioInfo();
-		long firstFileStart = getFileStartTime(currentFile.getAbsoluteFile());
+		long firstFileStart = getFileStartTime(currentFile);
 		float duration = wavType.getDurationInSeconds();
 		long fileEnd = (long) (firstFileStart + duration*1000.);
 		long[] allFileStarts = {firstFileStart};
@@ -1371,4 +1479,24 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getStartTimeSource() {
+		// copy reference in case it changes in a different thread. 
+		FileTimeData td = currentFileTime;
+		if (td == null || td.getDateSource() == null) {
+			return "Unknown File Time";
+		}
+		return td.getDateSource();
+	}
+	
+	public double getTotalClockDriftSamples(long currentSamples) {
+		// copy reference in case it changes in a different thread. 
+		FileTimeData td = currentFileTime;
+		if (td == null || td.getDriftPPM() == null) {
+			return 0;
+		}
+		return currentSamples * td.getDriftPPM() / 1.e6;
+	}
+	
 }

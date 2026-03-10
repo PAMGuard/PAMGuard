@@ -16,6 +16,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamUtils.PamCalendar;
+import PamView.component.PamFormattedTextField;
 import loggerForms.LoggerForm;
 import loggerForms.controlDescriptions.ControlDescription;
 
@@ -44,9 +45,9 @@ public class TimestampControl extends LoggerControl {
 
 		component.add(new LoggerFormLabel(loggerForm, controlDescription.getTitle()));
 		component.add(new LoggerFormLabel(loggerForm, "Date"));
-		component.add(textFieldDate = new JFormattedTextField(getDateAbstractformatter()));
+		component.add(textFieldDate = new PamFormattedTextField(getDateAbstractformatter()));
 		component.add(new LoggerFormLabel(loggerForm, "Time"));
-		component.add(textFieldTime = new JFormattedTextField(getTimeAbstractformatter()));
+		component.add(textFieldTime = new PamFormattedTextField(getTimeAbstractformatter()));
 		addF1KeyListener(textFieldDate);
 		addF1KeyListener(textFieldTime);
 		Font font = getControlDescription().getFormDescription().getFONT();

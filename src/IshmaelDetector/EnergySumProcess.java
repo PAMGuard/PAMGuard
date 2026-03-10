@@ -57,7 +57,7 @@ public class EnergySumProcess extends IshDetFnProcess {
 	@Override
 	public float getDetSampleRate() {
 		FFTDataBlock fftDataSource = (FFTDataBlock)getInputDataBlock();
-		return sampleRate / fftDataSource.getFftHop();
+		return getSampleRate() / fftDataSource.getFftHop();
 	}
 	
 	@Override
@@ -83,6 +83,7 @@ public class EnergySumProcess extends IshDetFnProcess {
 			savedGramHeight = lastFFTUnit.getFftData().length();	
 			int len = savedGramHeight;
 			//Should be max(1,...) here, but FFT bin 0 has 0's in it.
+			float sampleRate = getSampleRate();
 			loBin = Math.max(1,     (int) Math.floor(len * p.f0 / (sampleRate/2)));
 			hiBin = Math.min(len-1, (int) Math.ceil (len * p.f1 / (sampleRate/2)));
 			

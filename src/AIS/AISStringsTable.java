@@ -187,10 +187,10 @@ public class AISStringsTable {
 				if (positionReport != null) return LatLong.formatLongitude(positionReport.getLongitude());
 				break;
 			case 8:
-				if (positionReport != null) return String.format("%.1f", positionReport.courseOverGround);
+				if (positionReport != null) return positionReport.getCOGString();
 				break;
 			case 9:
-				if (positionReport != null) return String.format("%.1f", positionReport.speedOverGround);
+				if (positionReport != null) return positionReport.getSpeedString();
 				break;
 			}
 			return null;

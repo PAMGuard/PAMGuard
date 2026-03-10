@@ -19,6 +19,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.Region;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -112,6 +114,11 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	
 	PamValidator validator;
 
+	/**
+	 * The grid pane for the binary prediction settings. 
+	 */
+	private PamGridPane predictionGridPane;
+
 
 
 	public StandardModelPane(DLClassiferModel soundSpotClassifier) {
@@ -165,8 +172,10 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			defaultSegmentLenChanged(); 
 			//only set the hop if the user physically changes the toggle switch. This is not included in defaultSegmentLenChanged
 			//becuase defaultSegmentLenChanged can be called from elsewhere
-			int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
-			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
+			
+			//int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
+			//cannot set the default hop length here because it means when PG restarts the hop length is reset. 
+			//dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 		});
 		usedefaultSeg.setPadding(new Insets(0,0,0,0));
 		//there is an issue with the toggle switch which means that it has dead space to the left if
@@ -199,26 +208,27 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		/**
 		 * There are tow classifiers the detector and the classifier
 		 */
-		PamGridPane gridPane = new PamGridPane(); 
-		gridPane.setHgap(5);
-		gridPane.setVgap(5);
+		predictionGridPane = new PamGridPane(); 
+		predictionGridPane.setHgap(5);
+		predictionGridPane.setVgap(5);
+		predictionGridPane.getColumnConstraints().addAll( new ColumnConstraints( 65 ), new ColumnConstraints( 70 ),  new ColumnConstraints(135) );
 
-		gridPane.add(new Label("Min. prediction"), 0, 0);
-		gridPane.add(detectionSpinner = new PamSpinner<Double>(0.0, 1.0, 0.9, 0.1), 1, 0);
-		detectionSpinner.setPrefWidth(70);
+		predictionGridPane.add(new Label("Min. prediction"), 0, 0);
+		predictionGridPane.add(detectionSpinner = new PamSpinner<Double>(0.0, 1.0, 0.9, 0.1), 1, 0);
+		detectionSpinner.setPrefWidth(60);
 		detectionSpinner.setEditable(true);
 		detectionSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		detectionSpinner.setTooltip(new Tooltip("Set the minimum prediciton value for selected classes. If a prediction exceeds this value "
 				+ "a detection will be saved."));
 
 
-		gridPane.add(new Label(""), 2, 0);
+//		predictionGridPane.add(new Label(""), 2, 0);
 		speciesIDBox = new CheckComboBox<String>(); 
-		gridPane.add(speciesIDBox, 3, 0);
+		predictionGridPane.add(speciesIDBox, 2, 0);
 		//speciesIDBox.setMaxWidth(100);
 //		speciesIDBox.setPrefWidth(100);
 		speciesIDBox.prefHeightProperty().bind(detectionSpinner.heightProperty());
-		speciesIDBox.setMaxWidth(150); //otherwise expands too much if multiple classes selected
+		speciesIDBox.setMaxWidth(130); //otherwise expands too much if multiple classes selected
 		speciesIDBox.setTooltip(new Tooltip("Select output classes to use for binary classification. "
 				+ "If the prediction value of a selected class exceeds the minimum prediction threshold then a detection is saved. "));
 		validator = new PamValidator();
@@ -249,13 +259,20 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		vBoxHolder = new PamVBox(); 
 		vBoxHolder.setSpacing(5);
-		vBoxHolder.getChildren().addAll(classifierIcon, advSettings, classiferInfoLabel2, gridPane); 
+		vBoxHolder.getChildren().addAll(classifierIcon, advSettings, classiferInfoLabel2, predictionGridPane); 
 		
 		mainPane.setCenter(vBoxHolder);
 
 		return mainPane; 
 	}
 
+	/**
+	 * Get the grid pane for the prediction settings.
+	 * @return the prediciton settings
+	 */
+	public PamGridPane getPredictionGridPane() {
+		return predictionGridPane;
+	}
 
 	/**
 	 * The default segment len changed. 

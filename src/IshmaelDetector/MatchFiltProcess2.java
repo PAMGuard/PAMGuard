@@ -107,7 +107,7 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 		if (kernel == null) {
 			return false;
 		}
-		int bufLen = Math.max((int)Math.round(sampleRate * 0.1), kernel.length * 2);
+		int bufLen = Math.max((int)Math.round(getSampleRate() * 0.1), kernel.length * 2);
 		fftLength = FastFFT.nextBinaryExp(bufLen);
 		logFFTLength = FastFFT.log2(fftLength);
 		// pack it slightly differently so that the data are at the end. 
@@ -257,13 +257,13 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 
 	@Override
 	public float getDetSampleRate() {
-		return sampleRate;
+		return getSampleRate();
 	}
 
 
 	@Override
 	public float getHiFreq() {
-		return sampleRate / 2;
+		return getSampleRate() / 2;
 	}
 
 	@Override

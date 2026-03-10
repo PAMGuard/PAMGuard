@@ -40,7 +40,7 @@ public class ClipboardCopier implements ClipboardOwner, Transferable, Printable 
 
 	private Image image;
 
-	private String printJobName = "PAMGUARD";
+	private String printJobName = "PAMGuard";
 
 	/**
 	 * 

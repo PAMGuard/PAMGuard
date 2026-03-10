@@ -26,6 +26,12 @@ public class PamguardMetaData implements Serializable {
 	
 	public boolean useAudioForDeploymentTimes = false;
 	
+	/**
+	 * Keep a last modified timestamp so that the batch processor can 
+	 * work out if the remote is more recent than the local. 
+	 */
+	private long lastModified;
+	
 //	/**
 //	 * Deployment time (used if different 
 //	 */
@@ -85,6 +91,7 @@ public class PamguardMetaData implements Serializable {
 			deploymentWrapper = new NilusSettingsWrapper<>();
 		}
 		deploymentWrapper.setNilusObject(deployment);
+		setLastModified(System.currentTimeMillis());
 	}
 
 	/**
@@ -103,6 +110,22 @@ public class PamguardMetaData implements Serializable {
 			deploymentWrapper = new NilusSettingsWrapper<>();
 		}
 		deploymentWrapper.reSerialise();
+	}
+
+	/**
+	 * When was this last modified ? 
+	 * @return the lastModified
+	 */
+	public long getLastModified() {
+		return lastModified;
+	}
+
+	/**
+	 * Set when this was last modified. Useful in the batch processor. 
+	 * @param lastModified the lastModified to set
+	 */
+	public void setLastModified(long lastModified) {
+		this.lastModified = lastModified;
 	}
 	
 

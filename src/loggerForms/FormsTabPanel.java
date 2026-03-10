@@ -1,6 +1,7 @@
 package loggerForms;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
@@ -38,6 +39,7 @@ public class FormsTabPanel implements PamTabPanel {
 		super();
 		this.formsControl = formsControl;
 		mainPanel = new FormsPanel();
+		
 		
 		// Application-wide hotkey manager
 //		keyManager=KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -134,6 +136,11 @@ public class FormsTabPanel implements PamTabPanel {
 			
 			
 			add(BorderLayout.CENTER, mainTabbedPane = new LoggerTabbedPane(formsControl));
+		}
+
+		@Override
+		public void setBackground(Color bg) {
+			super.setBackground(bg);
 		}
 		
 	}

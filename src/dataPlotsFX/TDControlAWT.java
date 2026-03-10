@@ -90,6 +90,7 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 		 * button and other controls until this thread has completed.
 		 */
 		PAMStartupEnabler.addDisableCount();
+		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {

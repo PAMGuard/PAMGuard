@@ -1,5 +1,7 @@
 package noiseBandMonitor;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +22,7 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
+import PamguardMVC.PamDataBlock;
 import noiseMonitor.NoiseTabPanel;
 
 public class NoiseBandControl extends PamControlledUnit implements PamSettings {
@@ -94,6 +97,18 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	}
 
 	public void settingsMenu(Frame parentFrame) {
+		/**
+		 * Stop the annoying popup in the noise dialog, which compains about no input the first time
+		 * this runs. 
+		 */
+		if (noiseBandSettings.rawDataSource == null) {
+			// find anything we can !
+			ArrayList<PamDataBlock> rawBlocks = getPamConfiguration().getRawDataBlocks();
+			if (rawBlocks.size() > 0) {
+				noiseBandSettings.rawDataSource = rawBlocks.get(0).getLongDataName();
+				noiseBandSettings.channelMap = rawBlocks.get(0).getChannelMap();
+			}
+		}
 		NoiseBandSettings newSettings = NoiseBandDialog.showDialog(parentFrame, this);
 		if (newSettings != null) {
 			noiseBandSettings = newSettings.clone();
@@ -101,49 +116,95 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 			sortBandEdges();
 		}
 	}
+	
 
-	public ArrayList<FilterMethod> makeDecimatorFilters(NoiseBandSettings noiseSettings, double sampleRate) {
-		ArrayList<FilterMethod> decFilters = new ArrayList<FilterMethod>();
-//		float sampleRate = (float) getSampleRate();
-		for (int i = 0; i < noiseSettings.endDecimation; i++) {
+	public ArrayList<DecimatorMethod> makeDecimatorFilters(NoiseBandSettings noiseSettings, double sampleRate) {
+		ArrayList<DecimatorMethod> decFilters = new ArrayList<DecimatorMethod>();
+		/*
+		 * Now that we have Decade bands as well as octave, third octave, and smaller, we 
+		 * need to think more about the step size for the decimators: 2 for most, but 10 if 
+		 * it's Decade bands. 
+		 */
+		int deciStep = noiseSettings.bandType.getDecimateFactor();
+		/*
+		 * We only need an additional Decimator if the nyquist frequency of the data is
+		 * much over deciStep* the maximum frequency of the band we're working with. 
+		 * The lowest frequency we'll want to decimate to is the upper frequency of the lowest
+		 * band * bandGap
+		 */
+		bandData = new BandData(noiseSettings.bandType, noiseSettings.getMinFrequency(), noiseSettings.getMaxFrequency(), noiseSettings.getReferenceFrequency());
+		double[] hiEdges = bandData.getBandHiEdges();
+		if (hiEdges == null || hiEdges.length == 0) {
+			return decFilters;
+		}
+		double minNiquist = hiEdges[0]*getBandGap();
+		double currFS = sampleRate;
+		while (currFS/2/deciStep > minNiquist) {
+			// make another decimator
 			FilterParams filterParams = new FilterParams();
 			filterParams.chebyGamma = noiseSettings.firGamma;
 			filterParams.filterBand = FilterBand.LOWPASS;
 			filterParams.filterType = noiseSettings.filterType;
 			filterParams.lowPassFreq = (float) sampleRate/4;
+			double filterFreq = currFS/2/deciStep;
+			FilterMethod filterMethod = null;
 			switch(noiseSettings.filterType) {
 			case BUTTERWORTH:
 				filterParams.filterOrder = noiseSettings.iirOrder+2;
-				filterParams.lowPassFreq /= Math.sqrt(2.);
-				ButterworthMethod bm;
-				decFilters.add(bm = new ButterworthMethod(sampleRate, filterParams));
+				filterParams.lowPassFreq = (float) filterFreq;
+				filterMethod = new ButterworthMethod(currFS, filterParams);
 				break;
 			case FIRWINDOW:
 				filterParams.filterOrder = noiseSettings.firOrder;
-				decFilters.add(new FIRFilterMethod(sampleRate, filterParams));
+				filterMethod = new FIRFilterMethod(currFS, filterParams);
 				break;
 			}
-			sampleRate/=2;
+			currFS/=deciStep;
+			decFilters.add(new DecimatorMethod(filterMethod, currFS));
 		}
+		
+////		float sampleRate = (float) getSampleRate();
+//		for (int i = 0; i < noiseSettings.endDecimation; i++) {
+//			FilterParams filterParams = new FilterParams();
+//			filterParams.chebyGamma = noiseSettings.firGamma;
+//			filterParams.filterBand = FilterBand.LOWPASS;
+//			filterParams.filterType = noiseSettings.filterType;
+//			filterParams.lowPassFreq = (float) sampleRate/4;
+//			switch(noiseSettings.filterType) {
+//			case BUTTERWORTH:
+//				filterParams.filterOrder = noiseSettings.iirOrder+2;
+//				filterParams.lowPassFreq /= Math.sqrt(2.);
+//				ButterworthMethod bm;
+//				decFilters.add(bm = new ButterworthMethod(sampleRate, filterParams));
+//				break;
+//			case FIRWINDOW:
+//				filterParams.filterOrder = noiseSettings.firOrder;
+//				decFilters.add(new FIRFilterMethod(sampleRate, filterParams));
+//				break;
+//			}
+//			sampleRate/=2;
+//		}
 		return decFilters;
 	}
 
 	
 	public ArrayList<FilterMethod> makeBandFilters(NoiseBandSettings noiseSettings, 
-			ArrayList<FilterMethod> decimationFilters, 
+			ArrayList<DecimatorMethod> decimationFilters, 
 			double topSampleRate) {
 		// work out the lowest frequency we're likely to go to. 
 		ArrayList<FilterMethod> bandFilters = new ArrayList<FilterMethod>();
-		double minFreq = topSampleRate / Math.pow(2., noiseSettings.endDecimation+1) / 2;
+//		double minFreq = topSampleRate / Math.pow(2., noiseSettings.endDecimation+1) / 2;
 //		double maxFreq = 
-		double maxFreq = BandData.calcFreq(noiseSettings.highBandNumber) * BandData.getBandHalfWidth(noiseSettings.bandType);
-		bandData = new BandData(noiseSettings.bandType, minFreq, maxFreq);
+		/*
+		 * Need to improve on this - work out what the max centre frequency can really be based on band. 
+		 */
+//		double maxFreq = noiseSettings.getMaxFrequency() * BandData.getBandHalfWidth(noiseSettings.bandType);
 		// can now work through them backwards - the first three must be in the 
 		// top octave, etc.
 		double[] loEdges = bandData.getBandLoEdges();
 		double[] hiEdges = bandData.getBandHiEdges();
 		double[] centreFreqs = bandData.getBandCentres();
-		FilterMethod decimator;
+		DecimatorMethod decimator;
 		bandFilters.clear();
 		if (hiEdges == null) {
 			return null;
@@ -162,7 +223,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 			}
 			else {
 				decimator = decimationFilters.get(decimatorIndex[iBand]);
-				sampleRate = (float) decimator.getSampleRate()/2;
+				sampleRate = (float) decimator.getOutputSampleRate();
 			}
 			FilterParams filterParams = new FilterParams();
 			filterParams.chebyGamma = noiseSettings.firGamma;
@@ -195,21 +256,38 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 		return decimatorIndex;
 	}
 	
-	int findDecimatorIndex(ArrayList<FilterMethod> decimationFilters, double hiFreq) {
+	/**
+	 * How much gap we we need between the filter frequency of a decimator
+	 * and the maximim frequency of an analysis band ? Needs some since there
+	 * is considerable roll off near the corner freq of the decimator. 
+	 * @return
+	 */
+	double getBandGap() {
+		return Math.sqrt(2);
+	}
+	
+	/**
+	 * Get the index of the decimator for each filter.
+	 * return -1 if it won't actually need a decimator.  
+	 * @param decimationFilters
+	 * @param hiFreq
+	 * @return
+	 */
+	int findDecimatorIndex(ArrayList<DecimatorMethod> decimationFilters, double hiFreq) {
 		if (decimationFilters == null) {
 			return -1;
 		}
-		double bandGap = 1;
 		int nDecimators = decimationFilters.size();
 		FilterMethod aFilter;
+		double bandGap = getBandGap();
 		for (int i = nDecimators-1; i >= 0; i--) {
-			aFilter = decimationFilters.get(i);
-			if (aFilter.getFilterParams().filterType == FilterType.BUTTERWORTH) {
-				bandGap = Math.pow(2, 1./2.);
-			}
-			else {
-				bandGap = 1.;
-			}
+			aFilter = decimationFilters.get(i).getFilterMethod();
+//			if (aFilter.getFilterParams().filterType == FilterType.BUTTERWORTH) {
+//				bandGap = Math.pow(2, 1./2.);
+//			}
+//			else {
+//				bandGap = 1.;
+//			}
 			if (aFilter.getFilterParams().lowPassFreq > hiFreq*bandGap) {
 				return i;
 			}
@@ -238,6 +316,9 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 
 	protected void sortBandEdges() {
 		if (bandData == null) {
+			return;
+		}
+		if (bandData.getBandLoEdges() == null) {
 			return;
 		}
 		getNoiseBandProcess().getNoiseDataBlock().setBandLoEdges(bandData.getBandLoEdges());

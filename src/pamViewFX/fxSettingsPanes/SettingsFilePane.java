@@ -60,6 +60,7 @@ public class SettingsFilePane extends SettingsPane<SettingsFileData> {
 		PamGuiManagerFX.titleFont2style(label);
 //		label.setFont(PamGuiManagerFX.titleFontSize2);
 		vBox.getChildren().add(label);
+		vBox.setPadding(PamGuiManagerFX.defaultPadding);
 
 		//folder select and browse pane.
 		PamHBox folderSelectPane=new PamHBox(); 
@@ -105,6 +106,7 @@ public class SettingsFilePane extends SettingsPane<SettingsFileData> {
 		
 		progressBar = new ProgressBar();
 		progressBar.setVisible(false);
+		
 		
 		mainPane.setBottom(progressBar);
 

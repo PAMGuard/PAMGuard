@@ -3,12 +3,13 @@ package export.MLExport;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 
 import PamUtils.PamUtils;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
-import pamMaths.PamVector;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
+
 
 /**
  * Export data for any data unit which implements raw data holder. 
@@ -66,6 +67,11 @@ public class MLRawExport extends MLDataUnitExport<PamDataUnit<?,?>>{
 	@Override
 	public String getName() {
 		return "raw_data_units";
+	}
+
+	@Override
+	protected Struct detectionHeader(PamDataBlock pamDataBlock) {
+		return null;
 	}
 
 

@@ -48,6 +48,7 @@ import PamUtils.PamCalendar;
 import PamUtils.XMLUtils;
 import PamView.PamTabPanel;
 import PamView.panel.PamPanel;
+import PamView.panel.PamSplitPane;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.DBControlUnit;
@@ -1068,7 +1069,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 			}
 			formsDataDisplayTable = new FormsDataDisplayTable(formsControl, this);
 
-			splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, formComponent, formsDataDisplayTable.getMainPanel());
+			splitPane = new PamSplitPane(JSplitPane.VERTICAL_SPLIT, formComponent, formsDataDisplayTable.getMainPanel(), formsControl.getUnitName());
 			if (formSettingsControl.getFormSettings().splitPanelPosition != null) {
 				splitPane.setDividerLocation(formSettingsControl.getFormSettings().splitPanelPosition);
 			}

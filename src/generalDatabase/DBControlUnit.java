@@ -118,6 +118,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 				createOfflineDataMap(null);
 			}
 			getDbProcess().checkTables();
+			getDbProcess().storeVersionInfo();
 			break;
 		case PamControllerInterface.ADD_DATABLOCK:
 			if (initialisationComplete) {
@@ -477,7 +478,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 		PamConnection con = getConnection();
 		ModuleStatus moduleStatus;
 		if (con == null) {
-			moduleStatus = new ModuleStatus(ModuleStatus.STATUS_ERROR, "No database connection");
+			moduleStatus = new ModuleStatus(ModuleStatus.STATUS_ERROR, "DBControlledUnit:getModuleStatus() No database connection");
 			moduleStatus.setRemedialAction(new QuickRemedialAction(this, "Fix database connection", new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {

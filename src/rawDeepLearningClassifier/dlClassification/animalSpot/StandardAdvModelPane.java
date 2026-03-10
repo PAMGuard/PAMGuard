@@ -137,6 +137,7 @@ public class StandardAdvModelPane extends SettingsPane<StandardModelParams> {
 			transfromPane.setDisable(params.useDefaultTransfroms);
 			toggleSwitch.setSelected(params.useDefaultTransfroms);
 			
+			transfromPane.setExampleSoundIndex(params.exampleSoundIndex);  //set example sound if available
 			transfromPane.setTransforms(params.dlTransfroms); 
 			//set the image 
 			mainPane.setBottom(dlImage);

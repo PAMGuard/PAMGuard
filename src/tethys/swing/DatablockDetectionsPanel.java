@@ -278,28 +278,28 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			});
 			popMenu.add(menuItem);
 			
-			popMenu.addSeparator();
-			menuItem = new JMenuItem("Delete document " + pDets.getDocumentId());
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteDocument(pDets);
-				}
-			});
-			popMenu.add(menuItem);
+//			popMenu.addSeparator();
+//			menuItem = new JMenuItem("Delete document " + pDets.getDocumentId());
+//			menuItem.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					deleteDocument(pDets);
+//				}
+//			});
+//			popMenu.add(menuItem);
 		}
-		else if (rows.length > 0){
-			menuItem = new JMenuItem("Delete multiple Detections documents");
-			menuItem.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteDocuments(rows);
-				}
-
-			});
-			popMenu.add(menuItem);
-		}
+//		else if (rows.length > 0){
+//			menuItem = new JMenuItem("Delete multiple Detections documents");
+//			menuItem.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					deleteDocuments(rows);
+//				}
+//
+//			});
+//			popMenu.add(menuItem);
+//		}
 
 
 		popMenu.show(e.getComponent(), e.getX(), e.getY());

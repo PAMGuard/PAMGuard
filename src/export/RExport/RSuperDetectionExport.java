@@ -52,7 +52,7 @@ public class RSuperDetectionExport extends RDataUnitExport<SuperDetection>{
 						datasUnitsStruct= exporter.detectionToStruct(subDataUnits.get(i), n);
 	
 						
-						System.out.println("Save sub det: " + subDataUnits.get(i).getUID());
+						//System.out.println("Save sub det: " + subDataUnits.get(i).getUID());
 						
 						//must be named differently
 						dataUnits.add((exporter.getName() + "_" + subDataUnits.get(i).getUID()) , datasUnitsStruct); 

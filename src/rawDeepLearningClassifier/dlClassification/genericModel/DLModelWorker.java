@@ -11,7 +11,6 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
 
-import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
@@ -32,7 +31,7 @@ public abstract class DLModelWorker<T> {
 	/**
 	 * The maximum allowed queue size;
 	 */
-	public final static int MAX_QUEUE_SIZE = 10 ; 
+	public final static int MAX_QUEUE_SIZE = 10; 
 
 	/**
 	 * The model transforms for the data. 
@@ -131,6 +130,7 @@ public abstract class DLModelWorker<T> {
 			//run the model. 
 			float[] output = null; 
 			long time1 = System.currentTimeMillis();
+			
 			output = runModel(transformedDataStack); 
 //			System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
 			long time2 = System.currentTimeMillis();
@@ -189,6 +189,11 @@ public abstract class DLModelWorker<T> {
 		}
 	}
 
+	/**
+	 * Run the model on a stack of transformed data.
+	 * @param transformedDataStack - the input data for the model where the outer array is the number of input images or wavforms.
+	 * @return the prediction as a flattened array of probabilities for each class.
+	 */
 	public abstract float[] runModel(float[][][] transformedDataStack);
 	
 	/**
@@ -197,10 +202,21 @@ public abstract class DLModelWorker<T> {
 	 */
 	public abstract boolean isModelNull();
 
-
+	/**
+	 * Make a model result from the probabilities and the time it took to run the model.
+	 * @param prob - the probabilities for each class.
+	 * @param time - the time taken to run the model.
+	 * @return a model result object. 
+	 */
 	public abstract T makeModelResult(float[] prob, double time);
 
-	public abstract DLStatus prepModel(StandardModelParams soundSpotParams, DLControl dlControl);
+	/**
+	 * Prepare the model for running. 
+	 * @param standardModelParams - the parameters for the sound spot model.
+	 * @param dlControl - the control object for the deep learning process.
+	 * @return a status of the preparation of the model. 
+	 */
+	public abstract DLStatus prepModel(StandardModelParams standardModelParams, DLControl dlControl);
 
 
 	/**
@@ -228,16 +244,21 @@ public abstract class DLModelWorker<T> {
 	//		return soundSpotResult; 
 	//	}
 
-
+	/**
+	 * Get the model transforms for the data. These are the transforms that are applied to the data before it is input into the model.
+	 * @return the model transforms.
+	 */
 	public ArrayList<DLTransform> getModelTransforms() {
 		return modelTransforms;
 	}
 
+	/**
+	 * Set the model transforms for the data. These are the transforms that are applied to the data before it is input into the model.
+	 * @param modelTransforms - the model transforms.
+	 */
 	public void setModelTransforms(ArrayList<DLTransform> modelTransforms) {
 		this.modelTransforms = modelTransforms;
 	}
-
-
 
 	/**
 	 * Convert the parameters saved in the sound spot model to DLtransform parameters. 

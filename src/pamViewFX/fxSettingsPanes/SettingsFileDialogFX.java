@@ -49,9 +49,9 @@ public class SettingsFileDialogFX  {
 //			singleInstance.settingsFilePane.getProgressBar().setProgress(-1);;
 
 			singleInstance.settingsFilePane.paneInitialized();
-			//fix to make sure the dialog appearsa in pre PG GUI FX insitialisation i.e. when selecting viewer database 
-			//on PG start up/. 
-			((Stage) singleInstance.settingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);
+//			//fix to make sure the dialog appearsa in pre PG GUI FX insitialisation i.e. when selecting viewer database 
+//			//on PG start up/. 
+//			((Stage) singleInstance.settingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);
 		});
 		
 		

@@ -44,6 +44,8 @@ public class DLGroupDetectionInfoFX extends GenericDataPlotInfo {
 	@Override
 	public Polygon drawDataUnit(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
+		
+		//System.out.println("DLGroupDetectionInfoFX: drawDataUnit called");
 
 		if (getCurrentScaleInfo().getDataType() == ParameterType.FREQUENCY) { // frequency data !
 //			System.out.println("Draw frequency: " + pamDataUnit.getFrequency()[0] + "  " +  pamDataUnit.getFrequency()[1]); 

@@ -225,9 +225,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	/**
 	 * Used in offline analysis when data are being reloaded. this list gets used to
-	 * distribute data being loaded from upstream processes.
+	 * distribute data being loaded from upstream processes. No it doesn't. 
+	 * All handled in the OfflineDataLoading
 	 */
-	private Vector<PamObserver> requestingObservers;
+//	private Vector<PamObserver> requestingObservers;
 
 	/**
 	 * Natural lifetime of data in seconds.
@@ -327,7 +328,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * Class of any super detections referenced by the data units held in this data
 	 * block
 	 */
-	private Class<?> superDetectionClass;
+//	private Class<?> superDetectionClass;
 
 	//	/**
 	//	 * Class of any sub detections referenced by the data units held in this data
@@ -444,8 +445,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		try {
 			Class[] superDetArgs = { Class.class };
 			method = unitClass.getMethod("getSuperDetection", superDetArgs);
-			superDetectionClass = GenericTypeResolver.resolveReturnType(method, unitClass);
-		} catch (NoSuchMethodException | SecurityException e) {
+//			superDetectionClass = GenericTypeResolver.resolveReturnType(method, unitClass);
+		} catch (Exception e) {
 			//			ok = false;
 		}
 		//		try {
@@ -1389,6 +1390,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public void updatePamData(Tunit pamDataUnit, long updateTimeMillis) {
 		pamDataUnit.updateDataUnit(updateTimeMillis);
 		setChanged();
+		
 		if (!isOffline && !pamDataUnit.isEmbryonic()) {
 			/*
 			 * Save it if it't not been saved already or we're saving updates. 
@@ -1457,7 +1459,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		synchronized (synchronizationLock) {
 			//			if (isdebug()) {
 			//				Debug.out.println("Removing data unit " + aDataUnit);
-			//			}
+			//			
+			aDataUnit.setDeleted(true);
 			boolean rem = pamDataUnits.remove(aDataUnit);
 			if (!rem) {
 				return false;
@@ -4229,12 +4232,12 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		this.currentViewDataEnd = currentViewDataEnd;
 	}
 
-	/**
-	 * @return the superDetectionClass
-	 */
-	public Class<?> getSuperDetectionClass() {
-		return superDetectionClass;
-	}
+//	/**
+//	 * @return the superDetectionClass
+//	 */
+//	public Class<?> getSuperDetectionClass() {
+//		return superDetectionClass;
+//	}
 
 	//	/**
 	//	 * @return the subDetectionClass
@@ -4491,6 +4494,13 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		else {
 			return config;
 		}
+	}
+
+	/**
+	 * @return the offlineDataLoading
+	 */
+	public OfflineDataLoading<Tunit> getOfflineDataLoading() {
+		return offlineDataLoading;
 	}
 
 }

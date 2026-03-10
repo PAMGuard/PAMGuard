@@ -312,6 +312,9 @@ public class D3Control extends OfflineFileControl {
 		 * due to cycled sampling, it may need to ditch the first point (set to zero)
 		 * since it won't correctly match. 
 		 */
+		if (jerk == null || jerk.length == 0) {
+			return;
+		}
 		if (previousJerkUnit == null || d3DataUnit.getTimeMilliseconds()-previousJerkUnit.getTimeMilliseconds() > 2000) {
 			jerk[0] = 0;
 		}

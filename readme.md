@@ -19,6 +19,8 @@ PAMGuard fulfils two main requirements within marine bioacoustics
 PAMGuard is available on Windows and MacOS and can be downloaded from the [PAMGuard website](https://pamguard.org). Note that we are considering a Linux installer but it is not available at this time. 
 
 ## Quick start tutorial
+The easiest way to get started with PAMGuard is to work through our tutorials available at [www.pamguard.org/tutorials](https://www.pamguard.org/tutorials.html)
+
 PAMGuard is a modular program with two modes; real-time and viewer. Typically a user will start with real-time model, either in the field collecting data or post processing sound files from a recorder. Once data are processed, users move on to viewer mode where data can be explored and further processed. 
 
 Upon opening PAMGuard for the first time you are greeted with a blank screen. You must add a series of modules to create the desired acoustic workflow - this is referred to as PAMGuard *data model*. For example if processing sound files then first add the Sound Acquisition module **_File->Add Modules->Sound Processing->Sound Acquisition_**. Then add the desired detection algorithms e.g.  **_File->Add Modules->Detector->Click Detectors_**. Some modules (such as the click detector) have their own bespoke displays, others are added to more generalised displays. For example, the whistle and moan detector module shows detections on a spectrogram display, time base display, map etc. First add a new tab using  **_File->Add Modules->Displays->User Display_**. Click on the user display tab and then from the top menu select **_User display-> New Spectrogram_**. Right click on the added spectrogram and select whistle and moan contours to show whistle detections overlaid on the raw spectrogram. 

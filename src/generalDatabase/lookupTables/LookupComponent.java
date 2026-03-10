@@ -26,7 +26,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import PamView.component.PamComboBox;
 import PamView.dialog.PamDialog;
+import PamView.dialog.PamLabel;
+import PamView.dialog.PamTextField;
 import PamView.dialog.SettingsButton;
 import PamView.panel.PamPanel;
 
@@ -81,6 +84,8 @@ public class LookupComponent {
 	
 	private boolean allowEdits = true;
 
+	private boolean colourManage;
+
 	/**
 	 * Make a lookup list with an option to auto-update automatically whenever there is a change to this list
 	 * within PAMGuard, e.g. if the same topic is used in multiple controls. 
@@ -89,9 +94,35 @@ public class LookupComponent {
 	 * @param autoUpdate  flag to auto update in the event of changes. 
 	 */
 	public LookupComponent(String lookupTopic, LookupList lookupList, boolean autoUpdate) {
+		this(lookupTopic, lookupList, autoUpdate, false);
+	}
+	/**
+	 * Make a lookup list with an option to auto-update automatically whenever there is a change to this list
+	 * within PAMGuard, e.g. if the same topic is used in multiple controls. 
+	 * @param lookupTopic lookup topic
+	 * @param lookupList lookup list
+	 * @param autoUpdate  flag to auto update in the event of changes. 
+	 * @param colourManage MAnage colour, using some kind of night mode scheme. 
+	 */
+	public LookupComponent(String lookupTopic, LookupList lookupList, boolean autoUpdate, boolean colourManage) {
 		this.lookupList = lookupList;
 		
 		this.lookupTopic = lookupTopic;
+		
+		this.colourManage = colourManage;
+		
+		if (colourManage) {
+			comboBox = new PamComboBox();
+//			westLabel = new PamLabel();
+//			northLabel = new PamLabel();
+			codeField = new PamTextField(5);
+		}
+		else {
+			comboBox = new JComboBox();
+//			westLabel = new JLabel();
+//			northLabel = new JLabel();
+			codeField = new JTextField(5);
+		}
 		
 		mainPanel = new PamPanel();
 		mainPanel.setLayout(new BorderLayout());
@@ -104,24 +135,21 @@ public class LookupComponent {
 
 
 		westPanel = new JPanel(new BorderLayout());
-		westPanel.add(BorderLayout.CENTER, codeField = new JTextField(5));
+		westPanel.add(BorderLayout.CENTER, codeField);
 		c.gridx++;
 
 		PamDialog.addComponent(eventPanel, westPanel, c);
 		c.gridx++;
 		
-		PamDialog.addComponent(eventPanel, comboBox = new JComboBox(), c);
+		PamDialog.addComponent(eventPanel, comboBox, c);
 		c.gridx++;
 		
-		SettingsButton editButton = new SettingsButton(); 
+		SettingsButton editButton = new SettingsButton(true); 
 		editButton.addActionListener(new EditList());
 		PamDialog.addComponent(eventPanel, editButton, c);
 		
-		
-
 		mainPanel.add(BorderLayout.CENTER, eventPanel);
 
-		
 		comboBox.addActionListener(new ListActionListener());
 		codeField.addFocusListener(new CodeFieldListener());
 		comboBox.addMouseListener(new CodeMouseListener());
@@ -331,7 +359,7 @@ public class LookupComponent {
 	
 	public void setWestTitle(String westTitle) {
 		if (westLabel == null) {
-			westLabel = new JLabel(westTitle, SwingConstants.RIGHT);
+			westLabel = makeLabel(westTitle, SwingConstants.RIGHT);
 			westPanel.add(BorderLayout.WEST, westLabel);
 		}
 		else {
@@ -340,11 +368,20 @@ public class LookupComponent {
 	}
 	public void setNorthTitle(String northTitle) {
 		if (northLabel == null) {
-			northLabel = new JLabel(northTitle, SwingConstants.LEFT);
+			northLabel = makeLabel(northTitle, SwingConstants.LEFT);
 			mainPanel.add(BorderLayout.NORTH, northLabel);
 		}
 		else {
 			westLabel.setText(northTitle);
+		}
+	}
+	
+	private JLabel makeLabel(String title, int align) {
+		if (colourManage) {
+			return new PamLabel(title, align);
+		}
+		else {
+			return new JLabel(title, align);
 		}
 	}
 

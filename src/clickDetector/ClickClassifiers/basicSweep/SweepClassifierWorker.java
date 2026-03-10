@@ -79,7 +79,7 @@ public class SweepClassifierWorker {
 		int passn=0; 
 		for (int i = 0; i < n; i++) {
 			scs = sweepClassifier.sweepClassifierParameters.getSet(i);
-			if (scs.enable) {
+			if (scs.getEnable()) {
 				passed = classify(click, scs); 
 				if (passed && sweepClassifier.sweepClassifierParameters.checkAllClassifiers) {
 					if (clickInfo==null) clickInfo = new ClickIdInformation(scs.getSpeciesCode(), scs.getDiscard());

@@ -21,6 +21,7 @@
 package PamView;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
@@ -72,7 +73,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import Acquisition.DaqSystemInterface;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import org.kordamp.ikonli.swing.FontIcon;
+
 import Array.ArrayManager;
 //import Logging.LogDataObserver;
 import PamController.PamControlledUnit;
@@ -87,7 +90,6 @@ import PamModel.AboutPluginDisplay;
 import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
-import PamModel.PamPluginInterface;
 import PamModel.SMRUDevFunctions;
 import PamUtils.PamCalendar;
 import PamUtils.Splash;
@@ -100,6 +102,8 @@ import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamguardMVC.datakeeper.DataKeeper;
 import annotation.tasks.AnnotationManager;
 import metadata.MetaDataContol;
+import pamguard.LogFileUtils;
+import pamguard.Pamguard;
 import performanceTests.PerformanceDialog;
 import tipOfTheDay.TipOfTheDayManager;
 /**
@@ -110,6 +114,9 @@ import tipOfTheDay.TipOfTheDayManager;
  * 
  */
 public class PamGui extends PamView implements WindowListener, PamSettings {
+	
+	private static final int DEFAULT_ICON_SIZE = 22;
+
 
 	boolean gpsSimActive = true;
 	private JPanel mainPanel;
@@ -133,6 +140,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 */
 	private JLayeredPane layeredPane;
 	private PamController pamController;
+	
+	/**
+	 * Drop files into this panel. 
+	 */
+	private PamFileDropPanel fileDropPanel;
 
 	public PamGui(PamController pamControllerInterface, 
 			PamModel pamModelInterface, int frameNumber)
@@ -203,9 +215,12 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		sidePanel = new HidingSidePanel(this);
 
-		mainTab = new PamTabbedPane(pamControllerInterface, this);
+		mainTab = new PamTabbedPane(pamControllerInterface, this);		
 		
-				
+		//add the ability to import files by dropping them on the import tab - note that this tab is removed as soon 
+		//as a PAMControlledUnit is added
+
+    //		mainTab.addTab("Import", FontIcon.of(MaterialDesignF.FILE_IMPORT, DEFAULT_ICON_SIZE) , fileDropPanel = new PamGuiFileDropPanel());			
 		//		mainTab.setForeground(Color.BLUE);
 
 		centralPanel.add(BorderLayout.CENTER, mainTab);
@@ -392,6 +407,14 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	@Override
 	public void addControlledUnit(PamControlledUnit unit) {
+		
+		if (unit.getPamModuleInfo().getMinNumber()<=0) {
+			//any user added module removes the import tab - i.e. the 
+			//import tab is only there for essentially blank configurations. 
+			System.out.println("Removing import tab: " + unit.getUnitName());
+			removeImportTab();
+		}
+				
 		if (unit.getFrameNumber() != this.getFrameNumber()) {
 			return;
 		}
@@ -416,10 +439,24 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 		//		showSidePanel();
 		if (initializationComplete) {
-			ShowTabSpecificSettings();
+			showTabSpecificSettings();
 		}
 	}
 
+	/**
+	 * Remove the import tab.  
+	 */
+	private void removeImportTab() {
+		for (int i = 0; i < mainTab.getTabCount(); i++) {
+			Component c = mainTab.getComponentAt(i);
+			if (c == fileDropPanel) {
+				mainTab.removeTabAt(i);
+				break;
+			}
+		}
+	}
+	
+	
 	@Override
 	public void setTitle(String title) {
 		frame.setTitle(title);
@@ -434,7 +471,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		if (unit.getTabPanel() != null) mainTab.remove(unit.getTabPanel().getPanel());
 		if (unit.getSidePanel() != null) sidePanel.remove(unit.getSidePanel().getPanel());
 		//		showSidePanel();
-		ShowTabSpecificSettings();
+		showTabSpecificSettings();
 	}
 
 	@Override
@@ -457,7 +494,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 					guiParameters.setCurrentSelectedTab(mainTab.getTitleAt(guiParameters.selectedTab));
 				}
 			}
-			ShowTabSpecificSettings();
+			showTabSpecificSettings();
 
 		}	
 	}
@@ -485,7 +522,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 * existing modules. 
 	 *
 	 */
-	public void ShowTabSpecificSettings()
+	public void showTabSpecificSettings()
 	{   
 		if (!initializationComplete) return;
 		//System.out.println("Index: "+mainTab.getSelectedIndex());
@@ -537,6 +574,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 * changes. 
 	 */
 	private JMenuItem hydrophoneArrayMenu;
+	private JCheckBoxMenuItem checkLogFiles;
 
 	public JMenuBar makeGuiMenu() {
 
@@ -655,26 +693,21 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menuItem.setToolTipText("Show a graphical representation of modules and their interconnections");
 		fileMenu.add(menuItem);
 
-		if (!isViewer) {
-			fileMenu.add(DataKeeper.getInstance().getSwingMenuItem(frame));
-		}
-
 		menuItem = new JMenuItem("Multi-Threading ...");
 		menuItem.addActionListener(new MenuMultiThreading());
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
-
-		//		if (SMRUEnable.isEnable()) {
-		//			menuItem = new JMenuItem("Create Watchdod ...");
-		//			menuItem.addActionListener(new CreateWatchDog());
-		//			fileMenu.add(menuItem);
-		//		}
+		
+		if (!isViewer) {
+			fileMenu.add(DataKeeper.getInstance().getSwingMenuItem(frame));
+		}
 
 		fileMenu.addSeparator();
 
 		boolean needSeperator = false;
 
-		menuItem = new JMenuItem("Storage Options ...");
+		menuItem = new JMenuItem("External Data Storage ...");
+		menuItem.setToolTipText("Control data storage in the datbase and binary files");
 		menuItem.addActionListener(new StorageOptions(getGuiFrame()));
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
@@ -850,9 +883,9 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		 * Michael Oswald
 		 * 2016/09/30
 		 */
-		List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
-		List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
-		if (!pluginList.isEmpty() || !daqList.isEmpty()) {
+		List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
+//		List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
+		if (!pluginList.isEmpty()) {
 			JMenu subPluginsMenu= new JMenu("About Plugins");
 			//subPluginsMenu.addMouseListener(new menuArrayListener(menu));
 
@@ -864,14 +897,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 					subPluginsMenu.add(menuItem);
 				}
 			}
-			if (!daqList.isEmpty()) {
-				for (int i=0; i<daqList.size(); i++) {
-					menuItem = new JMenuItem(daqList.get(i).getDefaultName());
-					menuItem.addActionListener(new menuPlugin());
-					menuItem.setActionCommand(daqList.get(i).getDefaultName());
-					subPluginsMenu.add(menuItem);
-				}
-			}
+			
 			menu.add(subPluginsMenu);
 		}
 
@@ -919,6 +945,13 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		toggleLogFile.addActionListener(new ToggleLogFile());
 		logFileMenu.add(toggleLogFile);
 		menu.add(logFileMenu);
+		
+		checkLogFiles = new JCheckBoxMenuItem("Check Log Files at Startup");
+		checkLogFiles.setToolTipText("Checks old log files at startup and prompts user to report any errors");
+		checkLogFiles.setSelected(PamSettingManager.getInstance().isCheckLogFileErrors());
+		logFileMenu.add(checkLogFiles);
+		checkLogFiles.addActionListener(new CheckLogFiles());
+		
 
 		menu.addSeparator();
 		menuItem = new JMenuItem("Set Display Scaling Factor");
@@ -1182,6 +1215,19 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 	}
 
+	class CheckLogFiles implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			boolean check = checkLogFiles.isSelected();
+			PamSettingManager.getInstance().setCheckLogFileErrors(check);
+			if (check) {
+				// check it now 
+				LogFileUtils.checkLogFileErrors(Pamguard.getSettingsFolder());
+			}
+		}
+		
+	}
 
 	class ScalingFactorManager implements ActionListener {
 		@Override
@@ -1457,19 +1503,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			// figure out which plugin was selected.  The plugin default name was saved as the action command
 			// when the menu item was created, so loop through the plugin list and the daq list looking for the
 			// match.  When found, cast to the generic CommonPluginInterface and call the dialog
-			List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
-			List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
+			List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
 			if (!pluginList.isEmpty()) {
 				for (int i=0; i<pluginList.size(); i++) {
 					if (pluginList.get(i).getDefaultName().equals(ev.getActionCommand())) {
 						AboutPluginDisplay.showDialog(frame, ((CommonPluginInterface) pluginList.get(i)));
-					}
-				}
-			}
-			if (!daqList.isEmpty()) {
-				for (int i=0; i<daqList.size(); i++) {
-					if (daqList.get(i).getDefaultName().equals(ev.getActionCommand())) {
-						AboutPluginDisplay.showDialog(frame, ((CommonPluginInterface) daqList.get(i)));
 					}
 				}
 			}
@@ -1546,11 +1584,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initializationComplete = true;
 			setSelectedTab();
-			ShowTabSpecificSettings();
+			showTabSpecificSettings();
 			break;
 		case PamControllerInterface.REORDER_CONTROLLEDUNITS:
 			changeUnitOrder();
-			ShowTabSpecificSettings();
+			showTabSpecificSettings();
 			break;
 		case PamControllerInterface.DESTROY_EVERYTHING:
 			this.mainPanel.removeAll();
@@ -1558,12 +1596,12 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			frame.setVisible(false);
 			break;	
 		case PamControllerInterface.CHANGED_DISPLAY_SETTINGS:
-			ShowTabSpecificSettings();
+			showTabSpecificSettings();
 			break;
 		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
 			if (initializationComplete) {
-				ShowTabSpecificSettings();
+				showTabSpecificSettings();
 			}
 			break;
 		}
@@ -2015,7 +2053,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		if (guiFrame == null) {
 			return;
 		}
-		ShowTabSpecificSettings();
+		showTabSpecificSettings();
 		if (normalLocation != null) {
 		}
 		if (normalSize != null && normalSize.getHeight() > 100 && normalSize.getWidth() > 100 && normalLocation != null) {
@@ -2062,6 +2100,50 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 */
 	public PamTabbedPane getTabbedPane() {
 		return this.mainTab;
+	}
+	/**
+	 * A file drop panel for pamGui
+	 * @author Jam
+
+	private static final long serialVersionUID = 1L;ie Macaulay
+	 *
+	 */
+	class PamGuiFileDropPanel extends PamFileDropPanel {
+		
+
+		@Override
+	    public void processFileList(List<File> files) {
+	       System.out.println("Successful Drop: " + files);
+	       pamController.getPamWizardManager().newImportedFiles(files);
+	    }
+		
+		@Override
+		public Component getDefaultCenterComponent() {
+			// 1. Create the Large Icon
+	        FontIcon icon = FontIcon.of(MaterialDesignF.FILE_MULTIPLE, DEFAULT_ICON_SIZE);
+	        //icon.setIconColor(new Color(52, 152, 219)); // A nice blue
+	        icon.setIconColor(Color.LIGHT_GRAY); // A nice blue
+	        JLabel iconLabel = new JLabel("Drag and drop sound files");
+	        iconLabel.setIcon(icon);
+//	        iconLabel.setBounds(0, 0, 300, 300);
+//
+//	        // 2. Create the Text Label
+//	        JLabel textLabel = new JLabel("Drag and drop sound files", SwingConstants.CENTER);
+////	        textLabel.setFont(new Font("Arial", Font.BOLD, 40));
+////	        textLabel.setForeground(Color.WHITE);
+//	        textLabel.setBounds(0, 0, 300, 300); // Must match icon size for centering
+//
+//	        // 3. Layer them
+//	        JLayeredPane layeredPane = new JLayeredPane();
+//	        layeredPane.setPreferredSize(new Dimension(300, 300));
+//	        
+//	        // Lower index = further back; Higher index = further front
+//	        layeredPane.add(iconLabel, Integer.valueOf(1)); 
+//	        layeredPane.add(textLabel, Integer.valueOf(2));
+			
+	       
+			return iconLabel;
+		}
 	}
 	
 	/**

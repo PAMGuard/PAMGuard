@@ -15,8 +15,6 @@ import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosUI;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -30,12 +28,12 @@ import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 
 	private static final String MODEL_NAME = "Zip Model";
-	
+
 	/**
 	 * The file extensions
 	 */
 	private String[] fileExtensions = new String[] {"*.zip"};
-		
+
 	/**
 	 * Parameters for a Ketos classifier. 
 	 */
@@ -44,31 +42,31 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	/**
 	 * The UI components of the Ketos classifier
 	 */
-	private ArchiveModelUI archiveModelUI; 
+	protected ArchiveModelUI archiveModelUI; 
 
 	/**
 	 * The Ketos worker. this handles the heavy lifting such as loading and running
 	 * models. 
 	 */
-	private ArchiveModelWorker archiveModelWorker; 
+	protected ArchiveModelWorker archiveModelWorker; 
 
 	public ArchiveModelClassifier(DLControl dlControl) {
 		super(dlControl);
 		this.standardDLParams = makeParams(); 
 
 		this.archiveModelUI= new ArchiveModelUI(this); 
-		
+
 		//load the previous settings
 		PamSettingManager.getInstance().registerSettings(this);
 
 	}
 
 
-	public void setDLParams(StandardModelParams ketosParams) {
-		this.standardDLParams=ketosParams;
-		
+	public void setDLParams(StandardModelParams modelParams) {
+		this.standardDLParams=modelParams;
+
 	}
-	
+
 	@Override
 	public String getName() {
 		return MODEL_NAME;
@@ -78,7 +76,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	public DLCLassiferModelUI getModelUI() {
 		return this.archiveModelUI;
 	}
-	
+
 
 	@Override
 	public DLModelWorker<StandardPrediction> getDLWorker() {
@@ -90,7 +88,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	public StandardModelParams getDLParams() {
 		return standardDLParams;
 	}
-	
+
 	/**
 	 * Get the parameters for the Ketos classifier. 
 	 * @param standardDLParams - the Ketos parameters. 
@@ -134,11 +132,11 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		if (standardDLParams==null) {
 			standardDLParams = makeParams();
 		}
-		
+
 		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(standardDLParams.dlTransfroms);
-		
+
 		standardDLParams.dlTransfromParams=dlTransformParams; 
-//		System.out.println("KetosParams have been saved. : " + standardDLParams.dlTransfromParams); 
+		//		System.out.println("KetosParams have been saved. : " + standardDLParams.dlTransfromParams); 
 		return standardDLParams;
 	}
 
@@ -154,7 +152,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		StandardModelParams newParameters = (StandardModelParams) pamControlledUnitSettings.getSettings();
 		if (newParameters != null) {
 			standardDLParams = newParameters.clone();
-			System.out.println("KetosParams have been restored. : " + standardDLParams.dlTransfromParams);
+			System.out.println("Archive model params have been restored. : " + standardDLParams.dlTransfromParams);
 			if (standardDLParams.dlTransfromParams != null) {
 				standardDLParams.dlTransfroms = DLTransformsFactory
 						.makeDLTransforms((ArrayList<DLTransfromParams>) standardDLParams.dlTransfromParams);
@@ -165,7 +163,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		}
 		return true;
 	}
-	
+
 	/**
 	 *Create the parameters class for the model. This can be overridden for bespoke parameters. 
 	 *classes. 
@@ -188,8 +186,6 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	public String[] getFileExtensions() {
 		return fileExtensions;
 	}
-
-
-
-
 }
+
+

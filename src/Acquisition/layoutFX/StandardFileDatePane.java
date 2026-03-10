@@ -5,6 +5,7 @@ import java.util.TimeZone;
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import Acquisition.filedate.FileTimeData;
 import Acquisition.filedate.StandardFileDate;
 import Acquisition.filedate.StandardFileDateSettings;
 import PamUtils.PamCalendar;
@@ -294,7 +295,11 @@ public class StandardFileDatePane extends FileDatePane<StandardFileDateSettings>
 			dateExampleLabel.setText("No loaded files to test date format");
 		}
 		else {
-			long timeMillis = standardFileDate.getTimeFromFile(this.currentFiles.get(0)); 
+			long timeMillis = 0;
+			FileTimeData fileTimeData = standardFileDate.getTimeFromFile(this.currentFiles.get(0));
+			if (fileTimeData != null) {
+				timeMillis = fileTimeData.getFileStart();
+			}
 			if (timeMillis==0) {
 				dateExampleLabel.setText("Could not parse date format:");
 				dateExampleLabel.setTextFill(Color.RED);

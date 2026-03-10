@@ -3,6 +3,8 @@ package Acquisition.sud;
 import java.io.File;
  
 import org.pamguard.x3.sud.SudAudioInputStream;
+
+import PamUtils.PamCalendar;
  
 public class SUDFileTime {
  
@@ -29,7 +31,7 @@ public class SUDFileTime {
 		 * Open the sud file and read it until the first chunk arrive, get the time 
 		 * from there and close it again. I don't really see another way. 
 		 */
-//		long t1 = System.currentTimeMillis();
+		//long t1 = System.currentTimeMillis();
 		sudTime = Long.MIN_VALUE;
 //		SudParams sudParams = new SudParams();
 //		sudParams.saveMeta = false;
@@ -76,8 +78,8 @@ public class SUDFileTime {
 //			}
 //			
 //			sudAudioInputStream.close();
-//			long t2 = System.currentTimeMillis();
-//			System.out.printf("SUD file time %s extracted in %d milliseconds\n", PamCalendar.formatDBDateTime(sudTime), t2-t1);
+			//long t2 = System.currentTimeMillis();
+			//System.out.printf("SUD file time %s extracted in %d milliseconds\n", PamCalendar.formatDBDateTime(sudTime, true), t2-t1);
 		} catch (Exception e) {
 			System.err.println("Error getting time from SUD file: " + file + "  " + e.getMessage());
 			e.printStackTrace();

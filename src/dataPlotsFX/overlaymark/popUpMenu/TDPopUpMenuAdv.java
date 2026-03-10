@@ -119,4 +119,15 @@ public class TDPopUpMenuAdv implements ExtPopMenu {
 		
 	}
 
+	@Override
+	public boolean closePopupMenu(MouseEvent e) {
+		if (popOver==null || !popOver.isShowing()) {
+			return false; 
+		}
+		else {
+			popOver.hide();
+			return true;
+		}
+	}
+
 }

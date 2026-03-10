@@ -7,35 +7,64 @@
 </head>
 
 <body>
-<h1>Logger Form Annotation</h1>
-<h2>Overview</h2>
+	<h1>Logger Form Annotation</h1>
+	<h2>Overview</h2>
 
-<p>Logger Form annotations can be used to design complex data entry forms with multiple input controls in which the user can 
-enter additional data. For further details see the <a href="../../../visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html">Help for Logger Forms</a>.</p>
-<p>Logger forms can be very simple, for instance containing a single drop down list of species for the user to select, or may have many dozens of 
-different data entry fields.</p>
-<p>It is not necessary to add a Logger Forms module to PAMGuard in order to use Logger Forms as annotations.</p>
-<h2>Usage</h2>
-<h3>Configuring</h3>
-<p>Any module using Logger Forms annotations will offer a way of configuring those forms 
-(see <a href="../../../localisation/detectiongroup/docs/dglocaliser.html">Detection Group Localiser</a> for an example). 
-When you enter the configuration for the forms you will first be
-presented with a dialog allowing to select and existing form or to create a new one.</p>
-<center><img alt="" src="./images/loggerannotation1.png"></center>
-<br>
-<p>One you have selected / created the form of your choice, you can edit the form by pressing the "Edit Form" button. This will display a dialog from the Logger Forms
-system which enables you to interactively add and remove controls from the form.</p>
-<center><img alt="" src="./images/loggerannotation2.png"></center>
-<br>
-<p>Alternately you can directly edit the Logger UDF_ table in the database.</p> 
-<p>See  <a href="../../../visual_methods/loggerFormsHelp/docs/designingForms.html">Designing Logger Forms</a> for further information</p>
+	<p>
+		Logger Form annotations can be used to design complex data entry forms
+		with multiple input controls in which the user can enter additional
+		data. For further details see the <a
+			href="../../../visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html">Help
+			for Logger Forms</a>.
+	</p>
+	<p>Logger forms can be very simple, for instance containing a
+		single drop down list of species for the user to select, or may have
+		many dozens of different data entry fields.</p>
+	<p>It is not necessary to add a Logger Forms module to PAMGuard in
+		order to use Logger Forms as annotations.</p>
+	<h2>Usage</h2>
+	<h3>Configuring</h3>
+	<p>
+		Any module using Logger Forms annotations will offer a way of
+		configuring those forms (see <a
+			href="../../../localisation/detectiongroup/docs/dglocaliser.html">Detection
+			Group Localiser</a> for an example). When you enter the configuration for
+		the forms you will first be presented with a dialog allowing to select
+		and existing form or to create a new one.
+	</p>
+	<center>
+		<img alt="" src="./images/loggerannotation1.png">
+	</center>
+	<br>
+	<p>One you have selected / created the form of your choice, you can
+		edit the form by pressing the "Edit Form" button. This will display a
+		dialog from the Logger Forms system which enables you to interactively
+		add and remove controls from the form.</p>
+	<center>
+		<img alt="" src="./images/loggerannotation2.png">
+	</center>
+	<br>
+	<p>Alternately you can directly edit the Logger UDF_ table in the
+		database.</p>
+	<p>
+		See <a
+			href="../../../visual_methods/loggerFormsHelp/docs/designingForms.html">Designing
+			Logger Forms</a> for further information
+	</p>
 
-<h3>Data entry</h3>
-<p>When required the form will appear on the screen. The user should enter data as required by the form and press Ok, or press Cancel if
-they do not wish to add any new data.</p>
+	<h3>Data entry</h3>
+	<p>When required the form will appear on the screen. The user
+		should enter data as required by the form and press Ok, or press
+		Cancel if they do not wish to add any new data.</p>
 
-<h2>Stored Data</h2>
-<p>Multiple columns will added to output database tables. One for each data entry field in the selected form.</p>
+	<h2>Stored Data</h2>
+	<p>Logger form annotations will be appended as additional columns to the output database table
+	for the data you're annotating, or will be written into the binary data. </p>
+	<p>Multiple columns will be added to output database tables. One for
+		each data entry field in the selected form.</p>
+		<p>Note that an output table for the logger form will normally still be created, i.e. if 
+		you made a logger annotation UDF_ table UDF_MyAnnot, then the table MyAnnot will appear
+		in the database, but no data will be written to that table. </p> 
 
 
 

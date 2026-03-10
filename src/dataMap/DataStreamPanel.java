@@ -778,7 +778,10 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 				OfflineDataMapPoint mapPoint = aMap.findMapPoint(tm);
 				if (mapPoint != null) {
 					tipText += String.format("<p>%s: %s", aMap.getDataMapName(), mapPoint.toString());
-					tipText += String.format("<p>UID %s to %s", mapPoint.getLowestUID(), mapPoint.getHighestUID());
+					Long lUID = mapPoint.getLowestUID();
+					if (lUID != null) {
+						tipText += String.format("<p>UID %s to %s", lUID, mapPoint.getHighestUID());
+					}
 				}
 			}
 

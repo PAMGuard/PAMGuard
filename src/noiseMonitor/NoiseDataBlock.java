@@ -44,6 +44,8 @@ public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements Alarm
 	public static final String[] displayNames = {"Mean", "Median", "Lower 95%", "Upper 95%", "Minimum", "Maximim", "Peak"};
 	
 	private int statisticTypes;
+	
+	
 	private TethysNoiseDataProvider tethysNoiseDataProvider;
 	private FixedSpeciesManager fixedSpeciesManager;
 	
@@ -203,7 +205,24 @@ public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements Alarm
 		double[] f = new double[2];
 		f[0] = bandLoEdges[iBand];
 		f[1] = bandHiEdges[iBand];
+		double fc = Math.sqrt(f[0]*f[1]);
 		return FrequencyFormat.formatFrequencyRange(f, true);
+	}
+	
+	/**
+	 * Geet the centre frequency of a banc. 
+	 * @param iBand
+	 * @return
+	 */
+	public Double getBandCentreFrequency(int iBand) {
+		if (bandLoEdges == null || bandHiEdges == null || bandLoEdges.length <= iBand) {
+			return null;
+		}
+		double[] f = new double[2];
+		f[0] = bandLoEdges[iBand];
+		f[1] = bandHiEdges[iBand];
+		double fc = Math.sqrt(f[0]*f[1]);
+		return fc;
 	}
 
 	public String[] getBandNames() {

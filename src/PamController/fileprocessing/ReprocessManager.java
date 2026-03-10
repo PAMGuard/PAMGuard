@@ -9,16 +9,17 @@ import javax.swing.SwingWorker;
 import PamController.DataInputStore;
 import PamController.DataOutputStore;
 import PamController.InputStoreInfo;
-import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamController.RawInputControlledUnit;
-import PamUtils.PamCalendar;
 import PamUtils.worker.PamWorkDialog;
 import PamUtils.worker.PamWorkMonitor;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamView.dialog.warn.WarnOnce;
+import generalDatabase.DBControlUnit;
+import pamViewFX.pamTask.PamTaskUpdate;
+import pamViewFX.pamTask.SimplePamTaskUpdate;
 import pamguard.GlobalArguments;
 
 /**
@@ -42,14 +43,18 @@ public class ReprocessManager {
 	public void startCheckingThread(Frame mainFrame, ReprocessManagerMonitor mon) {
 		CheckWorker checkWorker = new CheckWorker(mainFrame, mon);
 		checkWorker.execute();	
-		if(PamGUIManager.getGUIType()!=PamGUIManager.NOGUI) {
+		
+		//TODO - JavaFX GUI crashes here
+		//		Headless does too
+		if (PamGUIManager.getGUIType() == PamGUIManager.FX || PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			//do nothing - progress messages will be sent to PamController via the monitor interface.
+		}
+		else {
 			synchronized (synch) {
 				workDialog = new PamWorkDialog(mainFrame, 1, "Checking input files and existing output data");
-			}	
-			
-			workDialog.setVisible(true);
+				workDialog.setVisible(true);
+			}
 		}
-		
 	}
 	
 	private void closeWorkDialog() {
@@ -107,6 +112,7 @@ public class ReprocessManager {
 					if (workDialog != null) {
 						workDialog.update(message);
 					}
+					
 				}
 			}
 		}
@@ -119,7 +125,15 @@ public class ReprocessManager {
 
 		@Override
 		public void update(PamWorkProgressMessage message) {
-			this.publish(message);
+			if (PamGUIManager.getGUIType() == PamGUIManager.FX) {
+				// in FX mode we just send the message to PamController which will deal with it.
+				PamController.getInstance().notifyTaskProgress(
+						new SimplePamTaskUpdate(message));
+			}
+			else {
+				//publish normally for SwingWorker
+				this.publish(message);
+			}
 		}
 		
 	}
@@ -174,6 +188,12 @@ public class ReprocessManager {
 		
 		boolean deleteOK = deleteOldData(choiceSummary, choice);
 		
+		// Commit the database - this is important to make sure that any deletions are saved before we start reprocessing.
+		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+		if (dbControl != null) {
+			dbControl.commitChanges();
+		}
+		
 		return true;
 		
 	}
@@ -195,7 +215,9 @@ public class ReprocessManager {
 		for (PamControlledUnit aPCU : inputStores) {
 			DataInputStore inputStore = (DataInputStore) aPCU;
 			OK &= inputStore.setAnalysisStartTime(procStartTime);
-			System.out.println("Input store info: " + inputInfo);
+			if (inputInfo != null) {
+				System.out.println("Input store info: " + inputInfo);
+			}
 		}
 		return OK;
 	}
@@ -220,6 +242,7 @@ public class ReprocessManager {
 			DataOutputStore offlineStore = (DataOutputStore) aPCU;
 			ok &= offlineStore.deleteDataFrom(deleteFrom);
 		}
+		
 		return ok;
 	}
 
@@ -271,22 +294,8 @@ public class ReprocessManager {
 		if (inputStores == null || inputStores.size() == 0) {
 			return new StoreChoiceSummary(null, ReprocessStoreChoice.STARTNORMAL);
 		}
-		InputStoreInfo inputInfo = null;
-		
-		for (PamControlledUnit aPCU : inputStores) {
-			DataInputStore inputStore = (DataInputStore) aPCU;
-			if (workMonitor != null) {
-				workMonitor.update(new PamWorkProgressMessage(-1, "Checking input data " + aPCU.getUnitName()));
-			}
-			inputInfo = inputStore.getStoreInfo(true);
-//			System.out.println("Input store info: " + inputInfo);
-		}
-		StoreChoiceSummary choiceSummary = new StoreChoiceSummary(inputInfo);
-		
-		if (inputInfo == null || inputInfo.getFileStartTimes() == null) {
-			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
-			return choiceSummary;
-		}
+		StoreChoiceSummary choiceSummary = new StoreChoiceSummary(null);
+
 				
 		choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 		
@@ -315,7 +324,25 @@ public class ReprocessManager {
 		if (partStores == false)  {
 //			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 			return null; // no part full stores, so can start without questions
+		}		
+		
+		// now deal with the input data. 
+		InputStoreInfo inputInfo = null;
+		for (PamControlledUnit aPCU : inputStores) {
+			DataInputStore inputStore = (DataInputStore) aPCU;
+			if (workMonitor != null) {
+				workMonitor.update(new PamWorkProgressMessage(-1, "Checking input data " + aPCU.getUnitName()));
+			}
+			inputInfo = inputStore.getStoreInfo(workMonitor, true);
+//			System.out.println("Input store info: " + inputInfo);
 		}
+		choiceSummary.setInputStoreInfo(inputInfo);
+		
+		if (inputInfo == null || inputInfo.getFileStartTimes() == null) {
+			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
+			return choiceSummary;
+		}
+		
 		if (choiceSummary.getInputStartTime() >= choiceSummary.getOutputEndTime()) {
 			/*
 			 *  looks like it's new data that starts after the end of the current store,
@@ -375,11 +402,17 @@ public class ReprocessManager {
 			System.out.println("In Nogui mode you should set a choice as to how to handle existing storage overwrites. Using default of overwriting everything");
 			return ReprocessStoreChoice.OVERWRITEALL;			
 		}
-		
-		// otherwise we'll need to show a dialog to let the user decide what to do 
-		ReprocessStoreChoice choice = ReprocessChoiceDialog.showDialog(PamController.getMainFrame(), choices);
-		
-		return choice;
+		else if (PamGUIManager.getGUIType() == PamGUIManager.FX) {
+			// otherwise we'll need to show a dialog to let the user decide what to do 
+			ReprocessStoreChoice choice = ReprocessChoiceDialogFX.showDialog(PamController.getMainStage(), choices);
+			return choice;
+		}
+		else {
+			// otherwise we'll need to show a dialog to let the user decide what to do 
+			ReprocessStoreChoice choice = ReprocessChoiceDialog.showDialog(PamController.getMainFrame(), choices);
+			
+			return choice;
+		}
 	}
 
 	/**

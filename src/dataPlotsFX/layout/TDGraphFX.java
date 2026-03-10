@@ -102,6 +102,17 @@ public class TDGraphFX extends PamBorderPane {
 	 * ArrayList containing all the plot panels.
 	 */
 	private ArrayList<TDPlotPane> tdPlotPanels;
+	
+	/**
+	 * The canvas flag to use. 
+	 *
+	 * Because we have lots of INCLIMING repaint requests there is a time in repaint to ensure it's only called 
+	 * once per xx milliseconds. However, these repaint requests also come with a flag request. If, for example we have a 
+	 * request to change the base canvas followed by fr4ont canvas and then base again, if we were to only use the last
+	 * received flag, then not all canvas's would be repainted properly on the next repaint request. This flag is used to 
+	 * ensure all flags are added as bits that needed painted. 
+	 */
+	public int lastCanvasFlag = 0;
 
 	// /**
 	// * ArrayList containing all the plot panels.
@@ -1065,6 +1076,7 @@ public class TDGraphFX extends PamBorderPane {
 		 * Repaint all canvas
 		 */
 		public static final int ALL_CANVAS = HIGHLIGHT_CANVAS | FRONT_CANVAS | BASE_CANVAS;
+		
 
 		/**
 		 * Indicates what plot panel this is.
@@ -1188,7 +1200,7 @@ public class TDGraphFX extends PamBorderPane {
 		 * 
 		 */
 		public synchronized void repaint(long tm, int flag) {
-			
+					
 			// clear the current canvas's
 			if (hasCanvas(flag, BASE_CANVAS)) {
 				baseCanvas.getGraphicsContext2D().clearRect(0, 0, baseCanvas.getWidth(), baseCanvas.getHeight());
@@ -1216,6 +1228,8 @@ public class TDGraphFX extends PamBorderPane {
 			synchronized (dataList) {
 				for (TDDataInfoFX dataInfo : dataList) {
 					
+					//System.out.println("Data list: " + dataInfo.getDataName() + " flag: " + flag);
+
 					base = false;
 					
 					if (!dataInfo.isShowing()) {
@@ -1248,6 +1262,7 @@ public class TDGraphFX extends PamBorderPane {
 						gc = drawCanvas.getGraphicsContext2D();
 					}
 					;
+
 
 					// OK so only repaint if we have the right CANVAS
 					if (base && hasCanvas(flag, BASE_CANVAS)) {
@@ -1605,14 +1620,18 @@ public class TDGraphFX extends PamBorderPane {
 				
 		// Start of block moved over from the panel repaint(tm) function.
 		long currentTime = System.currentTimeMillis();
+		//perform bit operation which will add required bits to canvas flag. 
+		lastCanvasFlag =  flag | lastCanvasFlag;
+		
 		if (currentTime - lastTime < tm) {
+
 			// start a timer. If a repaint hasn't be called because diff is too short this
 			// will ensure that
 			// the last repaint which is less than diff is called. This means a final
 			// repaint is always called
 			if (timeline != null)
 				timeline.stop();
-			timeline = new Timeline(new KeyFrame(Duration.millis(tm), ae -> repaint(0, flag)));
+			timeline = new Timeline(new KeyFrame(Duration.millis(tm), ae -> repaint(0, lastCanvasFlag)));
 			timeline.play();
 			return;
 		}
@@ -1633,9 +1652,10 @@ public class TDGraphFX extends PamBorderPane {
 				 * up with empty hover data and overlay marking won't work either.
 				 */
 				// if (this.getCurrentScaleInfo().getVisibleChannels()[n])
-				plotPanel.repaint(0, flag); // always do, to make sure hover and mark information is up to date.
+				plotPanel.repaint(0,lastCanvasFlag); // always do, to make sure hover and mark information is up to date.
 				n++;
 			}
+			lastCanvasFlag=0; //reset the canvas flag
 		}
 		// System.out.println("Hoverdata N = " +
 		// graphProjector.getHoverDataList().size());
@@ -2209,8 +2229,10 @@ public class TDGraphFX extends PamBorderPane {
 	public void notifyModelChanged(int changeType) {
 		switch (changeType) {
 		case PamController.CHANGED_PROCESS_SETTINGS:
+//			 System.out.println("CHANGED_PROCESS_SETTINGS");
 			// needed to pick up when sequence number maps have changed in output data
 			// blocks.
+			checkDataBlocksExists(); 
 			sortAxisandPanes();
 			break;
 		case PamController.OFFLINE_PROCESS_COMPLETE:
@@ -2223,6 +2245,20 @@ public class TDGraphFX extends PamBorderPane {
 			tdDataInfo.notifyChange(changeType);
 		}
 
+	}
+
+	/**
+	 * Check whether the data blocks for the data info still exist. If not, remove them. 
+	 */
+	private void checkDataBlocksExists() {
+		PamDataBlock datablock;
+		for (int i=0; i<getDataList().size(); i++) {
+			datablock = PamController.getInstance().getDataBlockByLongName(getDataList().get(i).getDataBlock().getLongDataName()); 
+			if (datablock==null) {
+			//this datablock no longer exists
+				this.removeDataItem(i);
+			}
+		}
 	}
 
 	/**

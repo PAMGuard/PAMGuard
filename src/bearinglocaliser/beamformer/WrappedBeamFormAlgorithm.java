@@ -84,13 +84,17 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 		else {
 			locContents = LocContents.HAS_BEARING;
 		}
-
-		ArrayManager arrayManager = ArrayManager.getArrayManager();
-		PamArray currentArray = arrayManager.getCurrentArray();
-		groupHydrophones = beamAlgorithmParams.getChannelMap();
-		groupHydrophones = getFftSourceData().getChannelListManager().channelIndexesToPhones(groupHydrophones);
-		arrayShape = arrayManager.getArrayShape(currentArray, groupHydrophones);
-		arrayAxes = arrayManager.getArrayVectors(currentArray, groupHydrophones);
+		try {
+			ArrayManager arrayManager = ArrayManager.getArrayManager();
+			PamArray currentArray = arrayManager.getCurrentArray();
+			groupHydrophones = beamAlgorithmParams.getChannelMap();
+			groupHydrophones = getFftSourceData().getChannelListManager().channelIndexesToPhones(groupHydrophones);
+			arrayShape = arrayManager.getArrayShape(currentArray, groupHydrophones);
+			arrayAxes = arrayManager.getArrayVectors(currentArray, groupHydrophones);
+		}
+		catch (Exception e) {
+			System.out.println("Problem configuring beam former: " + e.getMessage());
+		}
 	}
 
 

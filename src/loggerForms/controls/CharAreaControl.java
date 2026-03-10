@@ -12,6 +12,8 @@ import javax.swing.text.BadLocationException;
 
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
+import PamView.component.PamFormattedTextField;
+import PamView.dialog.PamTextArea;
 import loggerForms.LoggerForm;
 import loggerForms.controlDescriptions.ControlDescription;
 
@@ -26,9 +28,9 @@ public class CharAreaControl extends LoggerControl {
 			LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
 		//create this just to steal graphics properties so is consistent.
-		JFormattedTextField textField = new JFormattedTextField();
+		JFormattedTextField textField = new PamFormattedTextField();
 		
-		textArea=new JTextArea();
+		textArea=new PamTextArea();
 		textArea.setLineWrap(true);
 		Font font = getControlDescription().getFormDescription().getFONT();
 		if (font != null) {

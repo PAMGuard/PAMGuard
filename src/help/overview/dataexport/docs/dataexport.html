@@ -52,10 +52,13 @@
 </ul>
 <p>Note that the format of each struct is the same as the format if extracting data using the <a href="https://github.com/PAMGuard/PAMGuardMatlab">PAMGuard-MATLAB</a> library.</p>
 <p>To open an exported .mat file simply drag it into <strong>MATLAB</strong> or use the function;</p>
-<pre><code class="language-Matlab"> load(/my/path/to/file.mat)
+<pre><code class="language-Matlab"> 
+load(/my/path/to/file.mat)
 </code></pre>
+<br>
 <p>To open a .mat file in <strong>Python</strong> use</p>
-<pre><code class="language-Python">import scipy.io
+<pre><code class="language-Python">
+import scipy.io
 mat = scipy.io.loadmat('/my/path/to/file.mat')
 clkstruct = mat['det_20170704_204536_580'] #The name of the struct array within the file
  
@@ -63,10 +66,13 @@ clkstruct = mat['det_20170704_204536_580'] #The name of the struct array within 
 nwaves = len(clkstruct[0]) #Number of clicks
 thirdwaveform = clkstruct[0, 2]['wave'] #Waveform from third click in samples between -1 and 1. 
 </code></pre>
+
 <h3>R</h3>
-<p>Data can be exported to an RData frame. The data are exported as R structs with the same fields as in MATLAB (and PAMBinaries package). To open a an RData frame open RStudio and import the file or use;</p>
-<pre><code class="language-R">load(&quot;/my/path/to/file.RData&quot;)
-</code></pre>
+<p>Data can be exported to an RData frame. The data are exported as R structs with the same fields as in MATLAB (and PAMBinaries package). 
+To open a an RData frame open RStudio and import the file or use;</p>
+<pre><code class="language-R">
+load("/my/path/to/file.RData")
+</code>
 <h3>Wav files</h3>
 <p>Any detection which contains raw sound data, for example a click, clip or deep learning detection, can be exported as a wav file. When wav files are selected three options are presented for saving files.</p>
 <p align="center">
@@ -75,13 +81,13 @@ thirdwaveform = clkstruct[0, 2]['wave'] #Waveform from third click in samples be
 <center><em> When wav files are selected additional options are presented on how to save the file </em></center>
 <ul>
 <li>
-<p><em>Zero pad</em> :  Here detections are saved as wav files with the time in between detections zero padded. The resulting files will be as large as the initial wav files processed to create the data. This can be useful if for example opening the files in another acoustic analysis program.</p>
+<em>Zero pad</em> :  Here detections are saved as wav files with the time in between detections zero padded. The resulting files will be as large as the initial wav files processed to create the data. This can be useful if for example opening the files in another acoustic analysis program.
 </li>
 <li>
-<p><em>Concatenate</em> : The detections are saved to a wav file without any zero padding. This saves storage space but temporal information is lost within the wav file. The sample positions of each detection are saved in a text file along with the wav file so that temporal info is available if needed. This is same format as SoundTrap click detection data.</p>
+<em>Concatenate</em> : The detections are saved to a wav file without any zero padding. This saves storage space but temporal information is lost within the wav file. The sample positions of each detection are saved in a text file along with the wav file so that temporal info is available if needed. This is same format as SoundTrap click detection data.
 </li>
 <li>
-<p><em>Individual</em> : Each detection is saved in it's own time stamped individual sound file.</p>
+<em>Individual</em> : Each detection is saved in it's own time stamped individual sound file.
 </li>
 </ul>
 <h2>After export</h2>

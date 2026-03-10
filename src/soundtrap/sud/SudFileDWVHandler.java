@@ -13,6 +13,9 @@ import org.pamguard.x3.sud.SudDataInputStream;
 import org.pamguard.x3.sud.SudFileMap;
 
 import Acquisition.AcquisitionControl;
+import Acquisition.filedate.FileDate;
+import Acquisition.filedate.StandardFileDate;
+import Acquisition.filedate.StandardFileDateSettings;
 import Acquisition.sud.SUDNotificationHandler;
 import Acquisition.sud.SUDNotificationManager;
 import PamController.PamController;
@@ -22,6 +25,7 @@ import clickDetector.ClickDetector;
 import clickDetector.ClickDetector.ChannelGroupDetector;
 import soundtrap.STAcquisitionControl;
 import soundtrap.STClickControl;
+import ucar.nc2.ft.point.bufr.StandardFields.StandardFieldsFromStructure;
 import wavFiles.ByteConverter;
 
 /**
@@ -53,6 +57,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 	private ByteConverter byteConverter;
 	private ClickDetector clickDetector;
 	private ChannelGroupDetector channelGroupDetector;
+	private long dateOffset;
 
 	public SudFileDWVHandler(STClickControl stClickControl) {
 		this.stClickControl = stClickControl;
@@ -89,10 +94,31 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		stClickControl.getSTAcquisition().acquisitionParameters.sampleRate = (float) sampleRate;
 		stClickControl.getSTAcquisition().acquisitionParameters.voltsPeak2Peak = STAcquisitionControl.SOUNDTRAPVP2P;
 		stClickControl.getSTAcquisition().getAcquisitionProcess().setSampleRate((float) sampleRate, true);
+		checkTimeZoneOffset();
 //		System.out.printf("Open input stream fs = %3.1f\n", sampleRate);
 
 	}
 
+	private void checkTimeZoneOffset() {
+
+		AcquisitionControl daq = (AcquisitionControl) PamController.getInstance()
+				.findControlledUnit(AcquisitionControl.unitType);
+		if (daq == null) {
+			dateOffset = 0;
+			return;
+		}
+		/**
+		 * Also need to get the time offset from the acquisition if there has been a timezone set so that it
+		 * can be added to every click. 
+		 */
+		FileDate fileDate = daq.getFileDate();
+		dateOffset = 0L;
+		if (fileDate instanceof StandardFileDate) {
+			StandardFileDateSettings settings = ((StandardFileDate) fileDate).getSettings();
+			dateOffset = settings.getTimeOffset(PamCalendar.getTimeInMillis());
+		}
+	}
+	
 	@Override
 	public void sudStreamClosed() {
 //		System.out.printf("SUD input stream closed, %d DWV, %d bcl Detectins and %d BCL Noise, %d chunks processed\n",
@@ -219,7 +245,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 
 	private void makeClick(BCLDetectionChunk bclChunk, Chunk dwvChunk) {
 		long elapsedSamples = (long) ((bclChunk.getJavaMicros() - fileStartMicros) * (sampleRate / 1e6));
-		long millis = bclChunk.getJavaMillis();
+		long millis = bclChunk.getJavaMillis() + dateOffset;
 		byte[] rawData = dwvChunk.getBuffer();
 		int nBytes = rawData.length;
 		int nSamples = nBytes / Short.BYTES;
@@ -240,7 +266,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 	}
 
 	private void dwvEffort(long javaMillis, boolean isStart) {
-		System.out.printf("DWV Effort %s at %s\n", isStart ? "Start" : "End", PamCalendar.formatDBDateTime(javaMillis));
+//		System.out.printf("DWV Effort %s at %s\n", isStart ? "Start" : "End", PamCalendar.formatDBDateTime(javaMillis));
 	}
 
 	private void processClickChunk(int chunkID, Chunk sudChunk) {
@@ -271,6 +297,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 			return false;
 		}
 		sudManager.addNotificationHandler(this);
+		checkTimeZoneOffset();
 		return true;
 	}
 

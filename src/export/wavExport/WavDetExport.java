@@ -255,7 +255,7 @@ public class WavDetExport {
 	/**
 	 * Save wav data from a data unit instead of from the raw file store. 
 	 * @param foundDataUnits - the list of found data units. 
-	 * @param currentFile - path to current file to save to. 
+	 * @param currentFileIndex - path to current file to save to. 
 	 * @param zeroPad - if true will zeroPad detections. 
 	 * @return the number of data units that were saved. 
 	 */

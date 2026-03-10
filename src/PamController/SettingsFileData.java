@@ -22,6 +22,8 @@ public class SettingsFileData implements Serializable, Cloneable {
 	protected boolean showTipAtStartup = true;
 	
 	private double scalingFactor = 1.0;
+	
+	private Boolean checkLogFileErrors = true;
 			
 	public SettingsFileData() {
 //		recentFiles.add(new File(defaultFile));
@@ -65,6 +67,17 @@ public class SettingsFileData implements Serializable, Cloneable {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public boolean getCheckLogFileErrors() {
+		if (checkLogFileErrors == null) {
+			checkLogFileErrors = true;
+		}
+		return checkLogFileErrors;
+	}
+
+	public void setCheckLogFileErrors(boolean checkLogFileErrors) {
+		this.checkLogFileErrors = checkLogFileErrors;
 	}
 	
 }

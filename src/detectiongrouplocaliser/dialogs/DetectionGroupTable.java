@@ -156,6 +156,20 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 		// sortColumnWidths();
 	}
+	
+	private boolean isShowCurrent() {
+		if (showCurrent == null) {
+			return false;
+		}
+		return showCurrent.isSelected();
+	}
+	
+	private boolean isShowAll() {
+		if (showAll == null) {
+			return true;
+		}
+		return showAll.isSelected();
+	}
 
 	protected void dataSelectionButton(ActionEvent e) {
 		DataSelector dataSelector = getDataSelector();
@@ -241,7 +255,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	public void dataChanged() {
 		long t1 = 0;
 		long t2 = Long.MAX_VALUE;
-		if (showCurrent.isSelected()) {
+		if (isShowCurrent()) {
 			t1 = detectionGroupDataBlock.getCurrentViewDataStart();
 			t2 = detectionGroupDataBlock.getCurrentViewDataEnd();
 		}
@@ -366,7 +380,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		if (!isViewer) {
 			return DisplayOptionsHandler.SHOW_ALL;
 		} else if (showCurrent != null) {
-			if (showCurrent.isSelected()) {
+			if (isShowCurrent()) {
 				return displayOptionsHandler.SHOW_CURRENT;
 			}
 		}

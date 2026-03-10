@@ -140,10 +140,10 @@ public class SpectralEtiProcess extends PamProcess {
 		etiBands.clear();
 		// sampleRate is set when we addObserver, must do this after that call
 		for( SignalBand s : signalBands ) {
-			etiBands.add( new SpectralBand( s.startFrequencyHz, s.endFrequencyHz, sampleRate ));
+			etiBands.add( new SpectralBand( s.startFrequencyHz, s.endFrequencyHz, getSampleRate() ));
 		}
 		for( GuardBand g : guardBands ) {
-			etiBands.add( new SpectralBand( g.startFrequencyHz, g.endFrequencyHz, sampleRate ));
+			etiBands.add( new SpectralBand( g.startFrequencyHz, g.endFrequencyHz, getSampleRate() ));
 		}
 	}
 	
@@ -160,6 +160,6 @@ public class SpectralEtiProcess extends PamProcess {
 	
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
-		this.sampleRate = sampleRate;
+		this.setSampleRate(sampleRate, false);
 	}
 }

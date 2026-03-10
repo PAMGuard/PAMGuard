@@ -1,0 +1,10 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon May 26 15:48:32 BST 2025
+@default-unidata-all-https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1748270912445
+file\:///Users/jdjm/git/PAMGuard/repo/.error=
+file\:///Users/jdjm/git/PAMGuard/repo/.lastUpdated=1748270912036
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=Could not transfer artifact org.pamguard\:x3\:jar\:2.3.0 from/to unidata-all (https\://artifacts.unidata.ucar.edu/repository/unidata-all/)\: status code\: 403, reason phrase\: Forbidden (403)
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1748270912529
+https\://repo1.maven.org/maven2/.error=
+https\://repo1.maven.org/maven2/.lastUpdated=1748270912575

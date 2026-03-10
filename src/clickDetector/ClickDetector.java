@@ -1419,7 +1419,7 @@ public class ClickDetector extends PamProcess {
 
 		private BearingLocaliser bearingLocaliser;
 
-		private int groupHydrophones;
+		private int groupHydrophones[];
 
 		private PamRawDataBlock finalDataSource;
 
@@ -1451,9 +1451,10 @@ public class ClickDetector extends PamProcess {
 		private boolean findBearingLocaliser() {
 			if (rawDataSource != null && rawDataSource.getChannelListManager() != null) {
 				int locChannels = SMRUEnable.getGoodChannels(groupChannels);
-				groupHydrophones = rawDataSource.getChannelListManager().channelIndexesToPhones(locChannels);
+//				groupHydrophones = rawDataSource.getChannelListManager().channelIndexesToPhones(locChannels);
+				int[] phoneList = rawDataSource.getChannelListManager().channelMapToPhonesList(locChannels);
 				double timingError = Correlations.defaultTimingError(getSampleRate());
-				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(groupHydrophones, timingError);
+				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(phoneList, timingError);
 				return true;
 			} else {
 				return false;
@@ -1924,15 +1925,17 @@ public class ClickDetector extends PamProcess {
 		}
 
 		public void notifyArrayChanged() {
-			groupHydrophones = rawDataSource.getChannelListManager().channelIndexesToPhones(groupChannels);
+			int goodChans = SMRUEnable.getGoodChannels(groupChannels);
+			groupHydrophones = rawDataSource.getChannelListManager().channelMapToPhonesList(goodChans);
 			double timingError = Correlations.defaultTimingError(getSampleRate());
+
 			bearingLocaliser = BearingLocaliserSelector
-					.createBearingLocaliser(SMRUEnable.getGoodChannels(groupHydrophones), timingError);
+					.createBearingLocaliser(groupHydrophones, timingError);
 			if (bearingLocaliser == null) {
 				return;
 			}
-			int[] phones = PamUtils.getChannelArray(SMRUEnable.getGoodChannels(groupHydrophones));
-			bearingLocaliser.prepare(phones, 0, Correlations.defaultTimingError(getSampleRate()));
+//			int[] phones = PamUtils.getChannelArray(SMRUEnable.getGoodChannels(groupHydrophones));
+			bearingLocaliser.prepare(groupHydrophones, 0, Correlations.defaultTimingError(getSampleRate()));
 
 		}
 
@@ -1953,7 +1956,7 @@ public class ClickDetector extends PamProcess {
 		/**
 		 * @return the groupHydrophones
 		 */
-		public int getGroupHydrophones() {
+		public int[] getGroupHydrophones() {
 			return groupHydrophones;
 		}
 

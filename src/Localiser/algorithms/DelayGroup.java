@@ -46,16 +46,22 @@ public class DelayGroup {
 	 * @param maxDelays m- the maximum delay search range in samples. Can be used to restrict searches. Can be null
 	 * @return time delay class with time delays and errors in seconds. 
 	 */
-	public TimeDelayData[] getDelays(double[][] waveformInput, float sampleRate, DelayMeasurementParams delayParams, double[] maxDelays) {
-		int nChan = waveformInput.length;
+	public TimeDelayData[] getDelays(double[][] waveformIn, float sampleRate, DelayMeasurementParams delayParams, double[] maxDelays) {
+		int nChan = waveformIn.length;
 		if (nChan < 2) {
 			return null;
 		}
-		
+		double[][] waveformCopy = waveformIn;
+		/**
+		 * If we're using the full waveform we don't need to do anything, however it
+		 * the waveform is resized it will totally mess up the waveform before it's writte
+		 * to binary files, so need to do a deep copy of the waveforms. 
+		 */
 		//restrict the size of the waveform (usually to reduce echoes). 
 		if (delayParams.useRestrictedBins) {
-			for (int i=0; i<waveformInput.length; i++) {
-				waveformInput[i]=Arrays.copyOf(waveformInput[i], delayParams.restrictedBins); 
+			waveformCopy = new double[nChan][];
+			for (int i=0; i<nChan; i++) {
+				waveformCopy[i]=Arrays.copyOf(waveformIn[i], delayParams.restrictedBins); 
 			}
 		}
 		
@@ -64,7 +70,7 @@ public class DelayGroup {
 			if (upSampler == null) {
 				upSampler = new UpSampler(delayParams.getUpSample());
 			}
-			waveformInput = upSampler.upSample(waveformInput, delayParams.getUpSample());
+			waveformCopy = upSampler.upSample(waveformCopy, delayParams.getUpSample());
 			if (maxDelays != null) {
 				maxDelays = maxDelays.clone();
 				for (int i = 0; i < maxDelays.length; i++) {
@@ -78,7 +84,7 @@ public class DelayGroup {
 		}
 		
 		//filter the waveform.
-		FFTDataArray[] specData = getComplexCorrelatorData(waveformInput, sampleRate*delayParams.getUpSample(), null, delayParams);
+		FFTDataArray[] specData = getComplexCorrelatorData(waveformCopy, sampleRate*delayParams.getUpSample(), null, delayParams);
 		int nOutputs = (nChan-1)*nChan/2;
 		TimeDelayData[] delays = new TimeDelayData[nOutputs];
 		int iOut = 0;
@@ -87,7 +93,7 @@ public class DelayGroup {
 		//added maxDelays.length!=nOutputs because imported clicks (e.g. from Rainbow clicks) can have 
 		//a maxDelays length of 0. 
 		if (maxDelays==null || maxDelays.length!=nOutputs) {
-			maxDelays = new double[waveformInput.length];
+			maxDelays = new double[waveformCopy.length];
 			for (int i = 0; i < nOutputs; i++) {
 				maxDelays[i]=specData[0].getFftLength(); 
 			}

@@ -1,5 +1,6 @@
 package annotation;
 
+import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.Window;
 
@@ -7,6 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import PamView.dialog.DataUnitSummaryPanel;
 import PamView.dialog.PamDialog;
@@ -31,12 +33,14 @@ public class AnnotationDialog extends PamDialog {
 		this.dataUnit = dataUnit;
 		dialogPanel = dataAnnotationType.getDialogPanel();
 		summaryPanel = new DataUnitSummaryPanel();
+		summaryPanel.getComponent().setBorder(new TitledBorder(dataUnit.getParentDataBlock().getDataName()));
 		JPanel borderPanel = new JPanel();
-		borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.Y_AXIS));
+//		borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.Y_AXIS));
+		borderPanel.setLayout(new BorderLayout());
 		int IS = 4;
 		borderPanel.setBorder(new EmptyBorder(IS, IS, IS, IS));
-		borderPanel.add(summaryPanel.getComponent());
-		borderPanel.add(dialogPanel.getDialogComponent());
+		borderPanel.add(summaryPanel.getComponent(), BorderLayout.NORTH);
+		borderPanel.add(dialogPanel.getDialogComponent(), BorderLayout.CENTER);
 		setDialogComponent(borderPanel);
 	}
 	

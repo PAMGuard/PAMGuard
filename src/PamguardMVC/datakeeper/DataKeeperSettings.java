@@ -14,6 +14,11 @@ public class DataKeeperSettings implements Serializable, Cloneable, ManagedParam
 	public static final long serialVersionUID = 1L;
 	
 	private Hashtable<String, Integer> keepTimeData = new Hashtable<>();
+	
+	/**
+	 * Clear all data when PAMGuard starts.
+	 */
+	private Boolean clearAtStart = Boolean.TRUE;
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
@@ -76,6 +81,23 @@ public class DataKeeperSettings implements Serializable, Cloneable, ManagedParam
 			e.printStackTrace();
 		}
 		return ps;
+	}
+
+	/**
+	 * @return the clearAtStart
+	 */
+	public boolean isClearAtStart() {
+		if (clearAtStart == null) {
+			clearAtStart = true; // default behaviour for older configs
+		}
+		return clearAtStart;
+	}
+
+	/**
+	 * @param clearAtStart the clearAtStart to set
+	 */
+	public void setClearAtStart(boolean clearAtStart) {
+		this.clearAtStart = clearAtStart;
 	}
 
 }

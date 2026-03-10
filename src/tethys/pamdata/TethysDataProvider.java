@@ -2,16 +2,23 @@ package tethys.pamdata;
 
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Element;
+
 import Localiser.LocalisationAlgorithm;
 import PamDetection.LocalisationInfo;
 import PamguardMVC.PamDataUnit;
 import nilus.AlgorithmType;
 import nilus.AlgorithmType.Parameters;
+import nilus.Detection.Parameters.UserDefined;
 import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
 import nilus.DetectionEffortKind;
 import nilus.GranularityEnumType;
+import nilus.Helper;
 import tethys.Collection;
 import tethys.localization.TethysLocalisationInfo;
 import tethys.niluswraps.PDeployment;
@@ -27,31 +34,48 @@ import tethys.swing.export.ExportWizardCard;
  * @author dg50
  *
  */
-public interface TethysDataProvider {
+public abstract class TethysDataProvider {
 
-//	/**
-//	 * This gets the Tethys schema for this type of data in whatever
-//	 * form we decide it's best stored in, an XML string, or what ? 
-//	 * @return
-//	 */
-//	public TethysSchema getSchema();
-//	
+	private Helper helper;
 
 	/**
-	 * This will convert a data unit for this provider into whatever format we need the 
-	 * data to be in for Tethys. Some base function but also bespoke stuff depending on the
-	 * data type. Will probably need writing for every module individually?
-	 * @param pamDataUnit
-	 * @return
+	 * 
 	 */
-//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit);
+	public TethysDataProvider() {
+		super();
+		
+		try {
+			helper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public  Element addUserDefined(Detection.Parameters parameters, String parameterName, String parameterValue) {
+		UserDefined userDefined = parameters.getUserDefined();
+		if (userDefined == null) {
+			userDefined = new UserDefined();
+			parameters.setUserDefined(userDefined);
+		}
+		Element el = null;
+		try {
+			el = getHelper().AddAnyElement(userDefined.getAny(), parameterName, parameterValue);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return el;
+	}
 
 	/**
 	 * Get a standard Method string for each detector. This can be a bit 
 	 * verbose and might even have a reference to a paper ? Is this the best place for this ? 
 	 * @return
 	 */
-	public String getDetectionsMethod();
+	public abstract String getDetectionsMethod();
 
 	/**
 	 * Get DescriptionType object to include in a Tethys Detections document. 
@@ -59,7 +83,7 @@ public interface TethysDataProvider {
 	 * @param tethysExportParams
 	 * @return Tethys DescriptionType object, which contains infromation about detections
 	 */
-	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams);
+	public abstract DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams);
 
 
 	/**
@@ -67,13 +91,13 @@ public interface TethysDataProvider {
 	 * @param collection Detections or Localisations may have different parameter sets. 
 	 * @return Algorithm information
 	 */
-	public AlgorithmType getAlgorithm(Collection collection);
+	public abstract AlgorithmType getAlgorithm(Collection collection);
 	
 	/**
 	 * Get a list of allowed granularity types for this output 
 	 * @return list of granularities. 
 	 */
-	public GranularityEnumType[] getAllowedGranularities();
+	public abstract GranularityEnumType[] getAllowedGranularities();
 	
 //	public String getGranularityName GranularityEnumType);
 	
@@ -85,7 +109,7 @@ public interface TethysDataProvider {
 	 * human readable. 
 	 * @return A name, similar to datablock.getLongDataName(), but no spaces. 
 	 */
-	public String getDetectionsName();
+	public abstract String getDetectionsName();
 	
 	/**
 	 * True if the datablock is detections. This will (nearly) always 
@@ -94,7 +118,7 @@ public interface TethysDataProvider {
 	 * localisation information. 
 	 * @return
 	 */
-	public boolean hasDetections();
+	public abstract boolean hasDetections();
 	
 	/**
 	 * See if it's possible for this block to export localisations. This may 
@@ -102,7 +126,7 @@ public interface TethysDataProvider {
 	 * @param granularityType
 	 * @return
 	 */
-	public boolean canExportLocalisations(GranularityEnumType granularityType);
+	public abstract boolean canExportLocalisations(GranularityEnumType granularityType);
 
 	/**
 	 * Create a Tethys Detection object from a PamDataUnit.<br>
@@ -112,7 +136,7 @@ public interface TethysDataProvider {
 	 * @param streamExportParams
 	 * @return Detection Tethys Detection object. 
 	 */
-	public Detection createDetection(PamDataUnit dataUnit, TethysExportParams tethysExportParams,
+	public abstract Detection createDetection(PamDataUnit dataUnit, TethysExportParams tethysExportParams,
 			StreamExportParams streamExportParams);
 
 
@@ -120,7 +144,7 @@ public interface TethysDataProvider {
 	 * Get the algorithm parameters. 
 	 * @return
 	 */
-	public Parameters getAlgorithmParameters();
+	public abstract Parameters getAlgorithmParameters();
 
 
 	/**
@@ -131,7 +155,7 @@ public interface TethysDataProvider {
 	 * @param effortKinds tethys object list to add to. 
 	 * @param exportParams 
 	 */
-	public void getEffortKinds(PDeployment pDeployment, List<DetectionEffortKind> effortKinds, StreamExportParams exportParams);
+	public abstract void getEffortKinds(PDeployment pDeployment, List<DetectionEffortKind> effortKinds, StreamExportParams exportParams);
 
 	/**
 	 * See if a particular card should be used in the export wizard. This may
@@ -139,20 +163,27 @@ public interface TethysDataProvider {
 	 * @param wizPanel
 	 * @return
 	 */
-	public boolean wantExportDialogCard(ExportWizardCard wizPanel);
+	public abstract boolean wantExportDialogCard(ExportWizardCard wizPanel);
 	
 	/**
 	 * Get the localisation algorithm (if there is one). This is generally 
 	 * found automatically from the datablock, but it may be necessary to override. 
 	 * @return Localisation Algorithm, or null. 
 	 */
-	public LocalisationAlgorithm getLocalisationAlgorithm();
+	public abstract LocalisationAlgorithm getLocalisationAlgorithm();
 
 	/**
 	 * Get localisation info for the datablock. Can be null, but probably never is. More likely to have a zero of available types;
 	 * @return
 	 */
-	public TethysLocalisationInfo getLocalisationInfo();
+	public abstract TethysLocalisationInfo getLocalisationInfo();
+
+	/**
+	 * @return the helper
+	 */
+	public Helper getHelper() {
+		return helper;
+	}
 	
 			
 	

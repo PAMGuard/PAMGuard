@@ -78,7 +78,7 @@ public class AnalogChannelPanel implements PamDialogPanel {
 				channelNumber[i].addItem("-");
 			}
 			for (int j = 0; j < maxChannel; j++) {
-				channelNumber[i].addItem(String.format("%d", j));
+				channelNumber[i].addItem(getChannelName(j));
 			}
 			channelRange[i] = new JComboBox<>();
 			for (int j = 0; j < rangeList.size(); j++) {
@@ -137,6 +137,15 @@ public class AnalogChannelPanel implements PamDialogPanel {
 		//		leftPanel = new WestAlignedPanel(tabPane);
 		leftPanel = new JPanel(new BorderLayout());
 		leftPanel.add(BorderLayout.CENTER, tabPane);
+	}
+	
+	/**
+	 * Get the name of a channel for display in the ComboBox
+	 * @param j channel index
+	 * @return channel name
+	 */
+	public String getChannelName(int j) {
+		return String.format("%d", j); 
 	}
 
 	protected void channelNumberChange(int i) {

@@ -151,6 +151,13 @@ public abstract class IshDetControl extends PamControlledUnit implements PamSett
 
 	abstract public void showParamsDialog1(Frame parentFrame);
 	
+	/**
+	 * Get a help point for this detector, e.g. 
+	 *	"detectors.ishmael.docs.ishmael_energysum";
+	 * @return
+	 */
+	abstract String getHelpPoint();
+	
 //	class menuSmoothingDetection implements ActionListener {
 //		public void actionPerformed(ActionEvent ev) {
 //			KernelSmoothingParameters newParams = KernelSmoothingDialog.show(smoothingParameters, smoothingProcess.getOutputDataBlock(0));

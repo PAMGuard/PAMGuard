@@ -133,6 +133,9 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 */
 	@Override
 	public boolean canDraw(GeneralProjector generalProjector) {
+		if (generalProjector == null) {
+			return false;
+		}
 		return canDraw(generalProjector.getParameterTypes(), generalProjector.getParameterUnits());
 	}
 

@@ -1,0 +1,65 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Map Menu Items</title>
+</head>
+
+<body>
+	<h1>Map</h1>
+	<br>
+	<h3>DO NOT USE THE PAMGUARD MAP FOR NAVIGATION</h3>
+
+	<h2>Making Background Images files PAMGuard</h2>
+
+	<p>
+		PAMGuard can now use any geo referenced image file in <a
+			href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF</a> format as a
+		background image.
+	</p>
+	<p>GeoTIFF files can be obtained from a wide number of sources.
+		They can often be generated from GIS software, such as QGIS, or
+		nautical charts in GeoTIFF format can often be purchased or extracted
+		from chart plotting software.</p>
+		
+		<h3>Using QGIS to extract a Google Earth Satellite Image</h3>
+		
+		<p><a href="https://qgis.org/">QGIS</a> is a powerful open source and free GIS 
+		software packages. These operations can probably also be performed with many 
+		other GIS softwares, but the PAMGuard team like open source products!</p>
+		
+		<p>This is not intended to be a reference manual for QGIS, but does summaries
+		what you'll need to install, and how to use it. There are plenty of resources 
+		and videos on line that will tell you how to do this in more detail.</p>
+		
+		<ol>
+		<li>Install QGIS</li>
+		<li>From the QGIS plugins menu install QuickMapServices</li>
+		<li>Goto to the menu Web/QuickMapServices/Settings</li>
+		<li>Select the last tab: More services and click on the 
+		button at the bottom "Get contributed pack".<br>		
+		<img src="./images/qgiscontributed.png", width=50%></li>
+		<li>Goto the menu Web/QuickMapServices and select the service you want to use
+		(e.g. Google satellite)</li>
+		<li>Zoom to the area you're interested in.</li>
+		<li>From the processing toolbox, find the Raster Tools section and double
+		click on "Convert map to raster"</li>
+		<li>In the dialog that appears, select the area of interest, then try different
+		Map Units Per Pixel values (press Run) until you get a resolution you're happy with.</li>
+		<li>You've probably made a lot of layers now, so delete the ones you don't want.</li>
+		<li>Right click on the layer you're happy with and select Export/Save As...</li>
+		<li>Save the file somewhere.</li>
+		<li>Select that file in the PAMGuard map options Raster File settings.</li>
+		
+		</ol>
+		
+		<p>There are plenty of tutorials out there that will give a lot more detail on these operations.</p>
+		<p>Be aware that a very high resolution map may slow down the map display and impact 
+		PAMGuard operation. Generally, this is something that is best used only in viewer 
+		mode when you want to make a pretty plot for a presentation. </p>
+
+	
+<br>
+			<p><a href="makegebcocontour.html">Previous: GEBCO Contour Files</a></p>
+			<br>
+</body>
+</html>

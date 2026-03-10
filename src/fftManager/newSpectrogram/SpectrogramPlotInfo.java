@@ -6,7 +6,7 @@ import java.awt.Window;
 import java.io.Serializable;
 
 import Layout.PamAxis;
-import PamUtils.PamCalendar;
+import PamController.PamControlledUnit;
 import PamUtils.PamUtils;
 import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
@@ -19,7 +19,6 @@ import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.dataOffline.OfflineDataLoading;
 import Spectrogram.SpectrogramHidingPanel;
@@ -35,11 +34,10 @@ import dataPlots.layout.TDGraph;
 import dataPlotsFX.data.TDScaleInfo;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import fftManager.PamFFTControl;
 
 public class SpectrogramPlotInfo extends TDDataInfo implements SpectrogramParametersUser, HidingDialogChangeListener {
 
-	private PamFFTControl fftControl;
+	private PamControlledUnit fftControl;
 	
 	private DataLineInfo fftDataLine;
 	
@@ -63,7 +61,7 @@ public class SpectrogramPlotInfo extends TDDataInfo implements SpectrogramParame
 
 	protected int[] freqBinRange = new int[2];
 	
-	public SpectrogramPlotInfo(TDDataProvider tdDataProvider, PamFFTControl fftControl, TDGraph tdGraph,
+	public SpectrogramPlotInfo(TDDataProvider tdDataProvider, PamControlledUnit fftControl, TDGraph tdGraph,
 			PamDataBlock pamDataBlock) {
 		super(tdDataProvider, tdGraph, pamDataBlock);
 		this.fftControl = fftControl;

@@ -1480,7 +1480,8 @@ public class SweepClassifierDialog extends PamDialog implements ImportExportUser
 	
 		@Override
 		protected boolean getParams() {
-			if (enableBearings.isSelected()) {
+			sweepClassifierSet.enableBearingLims = enableBearings.isSelected();
+			if (sweepClassifierSet.enableBearingLims) {
 
 				sweepClassifierSet.enableBearingLims	 = enableBearings.isSelected();
 				sweepClassifierSet.excludeBearingLims	 = bearingsExcludeBox.getSelectedIndex()==1 ? true : false; 

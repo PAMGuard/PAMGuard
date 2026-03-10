@@ -525,7 +525,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 				
 				widthExpandAnimation.setOnFinished((event)->{
 					this.layoutXProperty().bind(getConnectionNodeBody().layoutXProperty());//.subtract(layoutXShift));
-					System.out.println("width property: "+hidePane.getWidth() );
+					//System.out.println("width property: "+hidePane.getWidth() );
 				});
 			}
 			

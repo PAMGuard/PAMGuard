@@ -710,15 +710,20 @@ public class TDDisplayFX extends PamBorderPane {
 		//		System.out.println("timeScrollerFX.getMaximumMillis() "+timeScrollerFX.getMaximumMillis()+" timeScrollerFX.getMinimumMillis() "+
 		//						timeScrollerFX.getMinimumMillis()+" "+timeScrollerFX.getObservers().size()+ " "+timeScrollerFX.getNumUsedDataBlocks()+" vis amount "+timeScrollerFX.getVisibleAmount()
 		//						+" rangeMillis(): "+timeScrollerFX.getRangeMillis());
-		//		System.out.println(String.format("ScrollerFX set start %s, End %s, pos %s pc time %s", PamCalendar.formatTime(scrollStart),
-		//		PamCalendar.formatTime(scrollEnd),PamCalendar.formatTime(scrollPos), PamCalendar.formatTime(System.currentTimeMillis())));
+//				System.out.println(String.format("ScrollerFX set start %s, End %s, pos %s pc time %s", PamCalendar.formatTime(scrollStart),
+//				PamCalendar.formatTime(scrollEnd),PamCalendar.formatTime(scrollPos, true), PamCalendar.formatTime(System.currentTimeMillis(), true)));
 		getTimeScroller().setRangeMillis(scrollStart, scrollEnd, true);
 		getTimeScroller().setVisibleMillis(tdParametersFX.visibleTimeRange);
 		getTimeScroller().setValueMillis(scrollPos);
 
 		setTimeStamp();
 
+//		long time0 = System.currentTimeMillis();
 		repaintAll(STANDARD_REFRESH_MILLIS);
+//		long time1 = System.currentTimeMillis();
+		
+//		System.out.println("Time repaint all: " + (time1-time0));
+
 
 	}
 
@@ -747,13 +752,13 @@ public class TDDisplayFX extends PamBorderPane {
 		}
 	}
 
-	/**
-	 * Cycles through all the time data graphs and updates the plot display. 
-	 * @param flag - a canvas repaint flag e.g. TDPlotPane.FRONT_CANAVAS.  
-	 */
-	public void repaintAll(int flag){
-		repaintAll(0, flag);
-	}
+//	/**
+//	 * Cycles through all the time data graphs and updates the plot display. 
+//	 * @param flag - a canvas repaint flag e.g. TDPlotPane.FRONT_CANAVAS.  
+//	 */
+//	public void repaintAll(int flag){
+//		repaintAll(0, flag);
+//	}
 
 	/**
 	 * Cycles through all the time data graphs and updates the plot display. 
@@ -779,7 +784,7 @@ public class TDDisplayFX extends PamBorderPane {
 		timeScrollerFX.scrollerChangingProperty().addListener((obsVal, oldVal, newVal)->{
 			//only repaint if the scroller has stopped moving. 
 			if (!newVal && (newVal!=oldVal)){
-				this.repaintAll(10);
+				this.repaintAll(10L);
 				oldVal=newVal; 
 			}
 		});
@@ -906,6 +911,7 @@ public class TDDisplayFX extends PamBorderPane {
 				}
 				setTimeStamp();
 				repaintAll(STANDARD_REFRESH_MILLIS);
+
 			});
 		}
 
@@ -1206,6 +1212,8 @@ public class TDDisplayFX extends PamBorderPane {
 			//			this.repaintAll();
 			break; 
 		case PamController.CHANGED_PROCESS_SETTINGS:
+			//might need to update the register to remove any data info
+			this.getTDControl().updateProviderRegister();
 			break;
 		}
 

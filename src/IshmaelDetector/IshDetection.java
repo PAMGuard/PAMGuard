@@ -11,7 +11,7 @@ import PamguardMVC.superdet.SuperDetection;
  * <p>
  * Note that the Ishmael detection does not contain raw wav data - this is
  * intentional as the clip generator can be used to generate clips if required. 
- * As the Ishmael detector is a high false positive rate intial detection stage
+ * As the Ishmael detector is a high false positive rate initial detection stage
  * then it may very well be beneficial not to store clips but simply pass the raw 
  * data to downstream processes. 
  *  

@@ -257,6 +257,9 @@ public class BasicFreqDomBeamFormer implements BeamFormerAlgorithm {
 		 */
 		PamVector arrayCenter = PamVector.mean(elementLocs);
 		for (int i = 0; i < channelList.length; i++) {
+			if (elementLocs[i] == null) {
+				continue;
+			}
 			elementLocs[i] = elementLocs[i].sub(arrayCenter);
 		}
 		/*

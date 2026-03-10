@@ -138,6 +138,7 @@ public class BinaryOutputStream {
 			makeLock(outputFile);
 		}
 		
+		
 		return open;
 	}
 

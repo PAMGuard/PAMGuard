@@ -39,6 +39,13 @@ public class WrappedBeamFormerProcess extends BeamFormerBaseProcess {
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public boolean isClearAtStart() {
+		// definitely always want to clear these data at start, whatever about anything else. 
+		return true;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see beamformer.BeamFormerBaseProcess#findFFTDataBlock()

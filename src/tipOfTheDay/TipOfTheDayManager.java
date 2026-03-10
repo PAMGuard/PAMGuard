@@ -28,17 +28,11 @@ public class TipOfTheDayManager {
 	private TipOfTheDayManager() {
 		addTipRandom(new PamTip("NMEA Acquisition", "If your computer does not have a serial port, " +
 				"use a serial to USB converter", "NMEA Acquisition", null));
-//		addTipRandom(new PamTip("PAMGuard Viewer", "A new scroll system was implemented in version 1.10.00 " +
-//				"(Novemeber 2010). See the PAMGuard help for details"));
-//		addTipRandom(new PamTip("Binary Storage", "A new binary data storage system is now in place. This can " +
-//				"be used with or without the database"));
 		addTipRandom(new PamTip("Sound Acquisition", "For high sample rates (above 192 kHz) " +
 				"use National instruments data acquisition boards"));
 		addTipRandom(new PamTip("Sound Acquisition", "Multiple National Instruments cards can use a " +
 				"synchronised clock signal enabling you to use multiple cards for high channel numbers and " +
 				"sample rates"));
-		addTipRandom(new PamTip("Distance Sampling", "Did you know that some of the statistics " +
-				"quoted in the Distance software are made up"));
 		addTipRandom(new PamTip("Coordinate System", "We live in three dimensions: Space, time and doubt. " +
 				"Of the three doubt is the most certain."));
 		addTipRandom(new PamTip("Map Comments", "Map Comments are a good way of keeping track of " +
@@ -62,7 +56,8 @@ public class TipOfTheDayManager {
 		addTipRandom(new PamTip("Airgun display", "Used in conjunction with an AIS module, the positions of airguns can " +
 				"be displayed even if they are on a different vessel"));
 		addTipRandom(new PamTip("Static hydrophone arrays", "PAMGuard can work with static as well as towed array data"));
-		addTipRandom(new PamTip("Online help", "All PAMGuard modules in the Core release are documented in the online help (Nearly)"));
+		addTipRandom(new PamTip("Try reading the Help files !", "All PAMGuard modules in the Core release are documented in the online help (Nearly)"));
+		addTipRandom(new PamTip("Web Help", "The PAMGuard Help system is also available on the web at https://www.pamguard.org/olhelp/"));
 		addTipRandom(new PamTip("Home page", "The PAMGuard home page is at www.pamguard.org"));
 //		addTipRandom(new PamTip("Click Detector", "The click detector can output files which are compatible with the IFAW " +
 //				"RainbowClick software, but only if channels are arranged into groups of exactly two channels per group"));

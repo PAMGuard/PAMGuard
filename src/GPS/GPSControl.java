@@ -16,6 +16,8 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.positionreference.PositionReference;
+import PamUtils.PlatformInfo;
+import PamUtils.PlatformInfo.OSType;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import warnings.PamWarning;
@@ -36,13 +38,16 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 	
 	private ProcessNmeaData gpsProcess;
 	
+	public ProcessNmeaData getGpsProcess() {
+		return gpsProcess;
+	}
 	protected ProcessHeadingData headingProcess;
 	
 	//viewer functionality;
 	private ImportGPSData importGPSData;
-	ImportGPSParams gpsImportParams= new ImportGPSParams(); 
 	
-	
+	ImportGPSParams gpsImportParams = new ImportGPSParams(); 
+		
 	public static final String gpsUnitType = "GPS Acquisition";
 	
 	private PamWarning gpsTimeWarning;
@@ -126,7 +131,6 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 		menuItem.addActionListener(new UpdateClock(parentFrame));
 		subMenu.add(menuItem);
 		
-
 		return subMenu;
 	}
 
@@ -185,14 +189,22 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
-		"The Global time settings do not require administrator privilidges<p><p>" +
-					"Press OK to proceed anyway to old GPS clock setting method</html>";
-			int ans = WarnOnce.showWarning(parentFrame, "System clock updating", message, WarnOnce.OK_CANCEL_OPTION);
-			if (ans == WarnOnce.OK_OPTION) {
-				GPSParameters newP = UpdateClockDialog.showDialog(parentFrame, gpsControl, gpsParameters, false);
-				gpsParameters = newP.clone();
-			}
+//			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+			/**
+			 * This is no longer relevant since we've found a way to get round Windows security and allow
+			 * clock updates again. A different warning will be issued if the clock update fails, directing
+			 * people to the help pages. 
+			 */
+//				String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
+//						"The Global time settings do not require administrator privilidges<p><p>" +
+//						"Press OK to proceed anyway to old GPS clock setting method</html>";
+//				int ans = WarnOnce.showWarning(parentFrame, "System clock updating", message, WarnOnce.OK_CANCEL_OPTION);
+//				if (ans == WarnOnce.CANCEL_OPTION) {
+//					return;
+//				}
+//			}
+			GPSParameters newP = UpdateClockDialog.showDialog(parentFrame, gpsControl, gpsParameters, false);
+			gpsParameters = newP.clone();
 		}
 	}
 	@Override

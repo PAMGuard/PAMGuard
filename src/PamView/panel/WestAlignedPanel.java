@@ -12,7 +12,7 @@ import PamView.ColorManaged;
 import PamView.PamColors.PamColor;
 
 /**
- * Panel to west align components witin other components. 
+ * Panel to west align components within other components. 
  * Will automatically use or not use PAMcolours to apply 
  * to the blank space in the panel.  
  * @author dg50

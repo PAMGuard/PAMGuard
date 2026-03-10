@@ -1,20 +1,28 @@
 package tethys.deployment;
 
+import java.util.ArrayList;
+
 import PamUtils.PamCalendar;
 import tethys.niluswraps.PDeployment;
 
-public class RecordingPeriod {
+public class RecordingPeriod implements Cloneable {
 
 	private long recordStart;
 	
 	private long recordStop;
 	
 	private boolean selected; // selected in the table or elsewhere for export. 
+	
+	// record gaps in this. 
+	private ArrayList<RecordingPeriod> recordingGaps;
+	
 	/**
 	 * Reference to a matched nilus Deployment document retrieved 
 	 * from the database. 
 	 */
 	private PDeployment matchedTethysDeployment;
+	
+	private DutyCycleInfo dutyCycleInfo;
 
 	public RecordingPeriod(long recordStart, long recordStop) {
 		super();
@@ -77,6 +85,48 @@ public class RecordingPeriod {
 	public String toString() {
 		return String.format("%s to %s, %s", PamCalendar.formatDBDateTime(recordStart), 
 				PamCalendar.formatDBDateTime(recordStop), PamCalendar.formatDuration(getDuration()));
+	}
+
+	@Override
+	public RecordingPeriod clone() {
+		try {
+			return (RecordingPeriod) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Add a gap in the recording period. 
+	 * @param gap
+	 */
+	public void addRecordingGap(RecordingPeriod gap) {
+		if (recordingGaps == null) {
+			recordingGaps = new ArrayList<>();
+		}
+		recordingGaps.add(gap);
+	}
+
+	/**
+	 * @return the recordingGaps
+	 */
+	public ArrayList<RecordingPeriod> getRecordingGaps() {
+		return recordingGaps;
+	}
+
+	/**
+	 * @return the dutyCycleInfo
+	 */
+	public DutyCycleInfo getDutyCycleInfo() {
+		return dutyCycleInfo;
+	}
+
+	/**
+	 * @param dutyCycleInfo the dutyCycleInfo to set
+	 */
+	public void setDutyCycleInfo(DutyCycleInfo dutyCycleInfo) {
+		this.dutyCycleInfo = dutyCycleInfo;
 	}
 	
 }

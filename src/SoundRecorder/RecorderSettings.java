@@ -35,7 +35,7 @@ public class RecorderSettings implements Serializable, Cloneable, ManagedParamet
 	/**
 	 * Allowable bit depths. 
 	 */
-	static public final int[] BITDEPTHS = {8, 16, 24};
+	static public final int[] BITDEPTHS = {8, 16, 24, 32};
 	/**
 	 * Name of the raw data source
 	 */

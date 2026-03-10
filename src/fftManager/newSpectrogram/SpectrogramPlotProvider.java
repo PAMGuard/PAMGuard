@@ -1,18 +1,17 @@
 package fftManager.newSpectrogram;
 
+import PamController.PamControlledUnit;
 import PamguardMVC.PamDataBlock;
 import dataPlots.data.TDDataInfo;
 import dataPlots.data.TDDataProvider;
 import dataPlots.layout.TDGraph;
-import fftManager.FFT;
-import fftManager.PamFFTControl;
 
 public class SpectrogramPlotProvider extends TDDataProvider {
 
 
-	private PamFFTControl fftControl;
+	private PamControlledUnit fftControl;
 
-	public SpectrogramPlotProvider(PamFFTControl fftControl, PamDataBlock parentDataBlock) {
+	public SpectrogramPlotProvider(PamControlledUnit fftControl, PamDataBlock parentDataBlock) {
 		super(parentDataBlock);
 		this.fftControl = fftControl;
 	}

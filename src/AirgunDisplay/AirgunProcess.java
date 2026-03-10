@@ -98,7 +98,7 @@ public class AirgunProcess extends PamProcess {
 		gpsData.setLongitude(positionReport.getLongitude());
 		gpsData.setTrueHeading(positionReport.trueHeading);
 		gpsData.setCourseOverGround(positionReport.trueHeading);
-		gpsData.setSpeed(positionReport.speedOverGround);
+		gpsData.setSpeed(positionReport.getKnownSpeed());
 		gpsData.setTimeInMillis(aisDataUnit.getTimeMilliseconds());
 		createAirgunData(gpsData);
 	}

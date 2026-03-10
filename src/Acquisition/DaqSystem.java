@@ -122,6 +122,14 @@ public abstract class DaqSystem {
 	abstract public int getMaxChannels();
 
 	/**
+	 * Get the source of the start time for the acquisition. 
+	 * @return
+	 */
+	public String getStartTimeSource() {
+		return "PC System Clock";
+	}
+	
+	/**
 	 *
 	 * @return peak to peak voltage for the device or PARAMETER_UNKNOWN
 	 */

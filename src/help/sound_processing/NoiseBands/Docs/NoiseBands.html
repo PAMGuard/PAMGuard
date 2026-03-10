@@ -10,71 +10,65 @@
 	<h1>Noise Band Measurement</h1>
 	<h2>Overview</h2>
 	<br>
-
-	<p>This module allows you to measure noise is a multiple octave or third octave 
-	frequency bands. These measurements are compatible with the ANSI Standard 
-	<a href = "http://scitation.aip.org/content/asa/standard/ansi/ASASTD.ANSI.ASA.S1.11">
-	ANSI S1.11-2004 American National Standard Specification for
-Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
-	</p>
-	<p>The method works by measuring noise in three third octave (or one octave) band in the highest octave 
-	of the available data using a bank o fband pass filters. The data are then decimated
-	 by a factor 2 and a further three third octave (or one octave)
-	band measurements made in the highest octave of the decimated data. This process can be repeated for as many decimators /
-	octaves of data that you wish, reaching lower and lower frequencies. Because the amount of raw data to be processed
-	is halved in each decimator, each bank of filters requires increasingly less processing power. </p>
-
-	<h3>Creating the module</h3>
 	<p>
-		From the <em><strong>File>Add modules>Sound Processing</strong></em>
-		menu, or from the pop-up menu on the data model display select "<em><strong>
-				Noise Band Measurement</strong></em>". Enter a name for the new module and press Ok.
+		PAMGuard contains two modules which can measure noise levels in
+		multiple frequency bands. These are called the <a
+			href=NoiseBandsFFT.html>Noise Monitor</a> and the <a
+			href=NoiseBandsFilters.html>Noise Band Monitor</a>, both available
+		from the <em>File / Add Modules / Sound Processing</em> menu.
 	</p>
-	
-	<h3>Configuring the module</h3>
-	<p>
-		To configure the module, open the settings dialog from the <em><strong>Detection>"your
-				module name" </strong></em> menu:
-	</p>
-	<br>
-	<img alt="Filters Settings" src="Images/NoiseBandDialog.png" />
-	<br>
-	<h4>Raw Data Source</h4>
-	<p>
-		Select a source of raw data. This will generally be a <a
-			href="../../AcquisitionHelp/docs/AcquisitionOverview.html">
-			Sound Acquisition Module</a> or the output of a <a
-			href="../../decimatorHelp/docs/decimator_decimator.html">
-			Decimator</a> if a lower frequency noise measurement is required. Check
-		the channels you want to measure noise on.
-	</p>
+	<p>Both modules should give the same results to within a fraction
+		of a Decibel, so which you use is largely up to you. however, there
+		are some subtle differences.</p>
+	<p>The Noise Monitor module works using FFT data as input. The
+		resolution of the noise measurements in both time and frequency is
+		therefore governed by how you've set up the FFF. For example, if
+		you've data with a sample rate of 48kHz and are using a FFT length of
+		1024 samples, then the frequency resolution of the FFT will be
+		48000/1024 = 46.9Hz. Since the measurements are made by adding up
+		multiple bins of data from the FFT's, you can't get a sensible
+		measurement below a frequency bin size of about 200Hz. Further, the
+		FFT time intervals may not align nicely with exact seconds, so the
+		intervals between measurements may be a bit longer than you've asked
+		for.</p>
+	<p>The Noise Band Monitor works differently, using a bank of
+		filters to process the incoming raw data and these filters can go as
+		low in frequency as you like, and take measurements from the data at
+		the exat times you've asked for. On the other hand, the filter banks
+		are slow to process, so this module will take more resources on your
+		computer than the FFT based method.</p>
+	<p>The advantages and disadvantages of the two methods are laid out
+		below</p>
+	<table>
+		<tr>
+			<th>Method</th>
+			<th>Advantages</th>
+			<th>Disadvantages</th>
+		</tr>
+		<tr>
+			<td><a href=NoiseBandsFFT.html>Noise Monitor</a> (FFT method)</td>
+			<td><p>Faster (especially if you're doing the FFT anyway);</p><p>
+			User can create  non-standard bands</p>
+			</td>
+			<td><p>Poor resolution at low frequency;</p> <p>Time intervals
+				between measurement may not be precise</p>
+			</td>
+		</tr>
+		<tr>
+			<td><a href=NoiseBandsFilters.html>Noise Band Monitor</a> (Filter bank method)</td>
+			<td><p>Better resolution at low frequency;</p> <p>Accurate time
+				intervals;</p> 
+			</td>
+			<td>Slower</td>
+		</tr>
+	</table>
 
-<br>
-	<h4>Output Interval</h4>
-	<p>Enter the interval between measurements in seconds.</p>
-	
-<br>
-	<h4>Measurement Bands</h4>
-	<p>Select Octave or Third Octave bands and the band number of the highest band you wish to measure. Select the 
-	number of decimators, which will in turn control the lowest frequency that the module measures noise at. 
-	</p>
-	
-<br>
-	<h4>Filters</h4>
-	<p>Select Butterworth or IIR Filters. Generally, Butterworth filters will operate much faster than FIR filters on a 
-	desktop computer. Generally 5th order Butterworth or 7th oder (128 tap) FIR filters are more than adequate. 
-	The exact cut off frequencies and filter responses are shown for information only. 
-	</p>
-	
-<br>
-	<h4>Bode Plots</h4>
-	<p>The filter responses and the responses of the decimators are shown in the Bode plot on the right
-	hand side of the dialog. It is also possible to overlay the various ANSI standards. The scale of the 
-	amplitude axis can be altered by double clicking on it. 
-	</p>
+
 
 	<br>
-<p CLASS="nextLink"><a href="NoiseBandDisplays.html">Next: Displays and Output </a></p>
+	<p CLASS="nextLink">
+		<a href="NoiseBandsFFT.html">Next: FFT Method </a>
+	</p>
 	<br>
 </body>
 </html>

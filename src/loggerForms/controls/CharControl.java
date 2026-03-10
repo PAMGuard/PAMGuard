@@ -10,27 +10,12 @@ import loggerForms.LoggerForm;
 import loggerForms.controlDescriptions.ControlDescription;
 
 public class CharControl extends SimpleControl {
-//	ControlDescription controlDescription;
-//	LoggerForm loggerForm;
 	
 	public CharControl(ControlDescription controlDescription,
 			LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
-		
-//		if (controlDescription.getLength()>50){
-//			int lines = (int) Math.ceil(controlDescription.getLength()/50.0);
-//			Dimension dim = textField.getPreferredSize();
-//			dim.height=lines*dim.height;
-//			textField.setPreferredSize(new Dimension(dim));
-//			textField.set
-//			
-//			//textField.setAutoscrolls(true);
-//		}
-		
+				
 	}
-	
-	
-	
 	
 	@Override
 	public Object getData() {

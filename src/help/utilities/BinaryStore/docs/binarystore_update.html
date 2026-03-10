@@ -1,0 +1,40 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Binary Storage</title>
+</head>
+
+<body>
+
+	<h1>Binary Storage</h1>
+	<h2>Updating the Binary Store</h2>
+	<p>
+		Occasionally, we have to make format changes to the binary storage system.
+		This is usually due to new features in some of the modules, but occasionally we also make
+		changes to the main file structure. </p>
+		<p>We've done everything we can to keep PAMGuard backwards compatible with older versions, and are not
+		aware of any backwards compatibility issues. </p>
+		<p>However, the <a href="matlabandr.html">Matlab, R, and Python libraries</a>, that can read binary files
+		are only maintained for the latest PAMGuard file versions. </p>  
+		<p>If you're using these libraries with old PAMGuard data, or a data that mixes old and new
+		data file formats, you're going to run into difficulties. </p>
+		<p>You can update all data for a PAMGuard project in <a href="../../../overview/PamMasterHelp/docs/viewerMode.html">Viewer mode</a> so that's it's in the latest format
+		and will be compatible with the external libraries. </p>
+		<p>Use the <b>File > Binary Store > Update Old Binary Files ...</b> menu to open the update dialog. </p>
+		<p><center><img src="images/binaryupdate.png"></center></p>
+		<br>
+		<p>This will show options to either overwrite existing data, or write data to a new folder, and a list
+		of data outputs that use binary storage. </p>
+		<p>Select the options you want, and press Start. For most datasets, this will only take a few minutes. The first time
+		you open the new dataset with <a href="../../../overview/PamMasterHelp/docs/viewerMode.html">PAMGuard Viewer</a>, 
+		PAMGuard may need to recreate the <a href="../../../utilities/datamap/docs/datamap.html">Data Map</a>, which will again take a few minutes.</p>
+
+		<br>
+	<p CLASS="prevLink">
+		<a href="matlabandr.html">Previous: Matlab, R, and Python interfaces</a>
+	</p>
+	<br>
+	<br>
+
+</body>
+</html>

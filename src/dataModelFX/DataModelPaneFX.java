@@ -184,7 +184,7 @@ public class DataModelPaneFX extends PamBorderPane {
 
 		PamSplitPane splitPane = new PamSplitPane();
 		splitPane.setOrientation(Orientation.HORIZONTAL);
-		splitPane.setDividerPositions(0.25);
+		splitPane.setDividerPositions(0.1);
 
 		moduleSelectPane.setMinWidth(Region.USE_PREF_SIZE);
 		moduleSelectPane.setPrefWidth(370);

@@ -80,7 +80,7 @@ public class STAcquisitionProcess extends AcquisitionProcess {
 	 */
 	public void setSampleRate(float sampleRate, boolean notify) {
 		// notify all output data blocks that there is a new sample rate
-		this.sampleRate = sampleRate;
+		super.setSampleRate(sampleRate, false);
 		if (notify && outputDataBlocks != null) {
 			for (int i = 0; i < outputDataBlocks.size(); i++) {
 				outputDataBlocks.get(i).setSampleRate(sampleRate, notify);

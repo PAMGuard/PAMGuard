@@ -14,7 +14,7 @@
 </p>
 <p>
   In multi-thread mode, each process within each PAMGuard module operates in a different 
-  processing thread, which basically allows several processes to take place at once in a multiprocessor computer. 
+  processing thread, which  allows several processes to take place at once in a multiprocessor computer. 
 </p>
 <p>
   In single thread mode, actions take place one at a time as data propagates through PAMGuard. 
@@ -29,8 +29,16 @@
 </p>
 <p>
   Multi-threading may introduce instability in some modules, where certain processes have to happen
-  in a certain sequence, so although multi-threading is usually  preferable, single thread 
+  in a certain sequence. It can also mean that the last second or so of a file, when re-processing offline,
+  may still be in a buffer when processing stops, so never get analysed. 
+  So although multi-threading is usually  preferable, single thread 
   operation is maintained as an option.</p>
+  
+  <p>As an example, when using PAMGuard to decimate wav files using three modules: Sound acquisition to read the files, 
+  a Decimator to drop the frequency, and a Sound Recorder to make lower frequency wav files, it's better to turn multi-threading off, 
+  which will ensure no samples are lost, and in any case there would be no advantages in having multiple threads since you're only 
+  doing one thing. </p> 
+  
 <h3>Turning multi-threading on and off</h3>
 <p>Multi-threading can be turned on and off from the <em><strong>Detection>Multi-threading</strong></em> menu command. </p>
 <br>

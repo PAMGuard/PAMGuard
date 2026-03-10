@@ -100,7 +100,7 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 	}
 
 	@Override
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnits) {
+	public ArrayList runModel(ArrayList<? extends PamDataUnit> rawDataUnits) {
 
 //		for (PamDataUnit groupedRawData: rawDataUnits){
 //			if (queue.size()>MAX_QUEUE_SIZE) {

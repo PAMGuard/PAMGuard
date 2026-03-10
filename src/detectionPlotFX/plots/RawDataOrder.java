@@ -220,6 +220,7 @@ public abstract class RawDataOrder {
 		 * @param dataUnit
 		 */
 		private void newRawData(RawDataUnit dataUnit) {
+			if (rawData==null) return;
 //					System.out.println("New raw data " +  count);
 			//			try{
 			if (PamUtils.hasChannel(dataUnit.getChannelBitmap(), channel)){

@@ -18,9 +18,9 @@ import PamModel.parametermanager.PrivatePamParameterData;
 public class SgramCorrParams extends IshDetParams implements Serializable, Cloneable, ManagedParameters {
 
 	static public final long serialVersionUID = 0;
-	double segment[][] = { };		//really [nSeg][4]; each row has t0,f0,t1,f1
-	double spread = 100;
-	boolean useLog;
+	public double segment[][] = { };		//really [nSeg][4]; each row has t0,f0,t1,f1
+	public double spread = 100;
+	public boolean useLog;
 	//int nSegments = 0;
 	
 	@Override

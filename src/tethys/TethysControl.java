@@ -45,6 +45,7 @@ import tethys.TethysState.StateType;
 import tethys.calibration.CalibrationHandler;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.DBXMLQueries;
+import tethys.dbxml.DocumentMap;
 import tethys.dbxml.ServerStatus;
 import tethys.dbxml.ServerVersion;
 import tethys.dbxml.TethysException;
@@ -99,6 +100,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	
 	private ITISFunctions itisFunctions;
 	private TethysTaskManager tethysTaskManager;
+	private DocumentMap documentMap;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
@@ -110,6 +112,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		detectionsHandler = new DetectionsHandler(this);
 		calibrationHandler = new CalibrationHandler(this);
 		localizationHandler = new LocalizationHandler(this);
+		documentMap = new DocumentMap(this);
+		
 		
 		if (PamController.getInstance().isInitializationComplete()) {
 			// added module, so need to do more work
@@ -635,6 +639,9 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		case DELETEDATA:
 			countProjectDetections();
 			break;
+		case NEWPAMGUARDSELECTION:
+			documentMap.clearMap();
+			break;
 		}
 	}
 
@@ -868,6 +875,13 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			return false;
 		}
 		return lastServerStatus.ok;
+	}
+
+	/**
+	 * @return the documentMap
+	 */
+	public DocumentMap getDocumentMap() {
+		return documentMap;
 	}
 
 }

@@ -19,6 +19,7 @@ public class RClickEventExport extends RSuperDetectionExport{
 		
 
 		rData.add("event_id",  clickEvent.getEventId());
+		rData.add("event_num",  clickEvent.getEventNumber());
 		rData.add("event_type", clickEvent.getEventType());
 		String comment = "";
 		if (clickEvent.getComment()!=null) comment = clickEvent.getComment();

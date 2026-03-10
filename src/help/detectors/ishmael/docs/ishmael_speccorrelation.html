@@ -1,0 +1,80 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Ishmael</title>
+</head>
+
+<body>
+
+	<h1>Ishmael Spectrogram Correlation</h1>
+	<h2>Overview of the method</h2>
+	<p>
+		This method works by cross-correlating a spectrogram of Ishmael’s
+		input signal with a synthetic time-frequency kernel. It works well
+		when there is some amount of variability in the call type to be
+		detected; certain parameters in construction of the kernel can be
+		arranged to allow more or less variability in the calls to be
+		detected. The construction of kernels, and their performance, is
+		beyond the scope of this guide, but more information is available
+		elsewhere (<a href="https://doi.org/10.1121/1.429434">Mellinger
+			and Clark, 2000</a>).
+	</p>
+
+	<h3>Adding the module</h3>
+	<p>
+		From the PAMGuard file menu select <b>Add Modules > Detectors >
+			Ishmael spectrogram correlation.</b>
+	<p>Give a name to the detector, and hit OK.</p>
+	<p>
+		This detector will require that you also configure a <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
+			(Spectrogram) Engine</a> as it's input.
+	</p>
+
+	<h3>Configure the module</h3>
+	<p>
+		From the PAMGuard Settings menu select <b>Ishmael spectrogram
+			correlation Settings ...</b> to open the dialog
+	</p>
+	<p>
+	<center>
+		<img src="images/speccorrdialog.png">
+	</center>
+	</p>
+	<br>
+	<p>Select the FFT data source. You should think carefully about 
+	the best FFT Length and FFT Hop to use based on the sample rate 
+	of your data and the type of sound you are trying to detect. 
+	<a href="../../..//sound_processing/fftManagerHelp/docs/FFTEngine_Configuring.html">See here</a>
+	for more information on this important, but often overlooked, topic.  </p>
+	
+	<p>Select which channels you want to process and how you want them to be grouped. 
+	If channels are in the same group, it's slightly easier for the 
+	<a href="../../../localisation/docs/localisation_overview.html">PAMGuard localisers</a>
+	to measure time delays between data on the different channels, but only if the 
+	hydrophones in each group are quite close together. </p> 
+	
+	<h4>Create the kernel</h4>
+	<p>Create the outline of the sounds you're trying to detect. Before entering data, you'll need to 
+	look at some sounds and make measurements of their time frequency contours. Divide the 'typical' contour
+	up into sections that can be approximated by straight lines, and enter them here. The start time of 
+	each segment should be equal to the end time of any preceding segment. </p>
+
+
+
+
+
+
+	<br>
+	<br>
+	<p CLASS="prevLink">
+		<a href="ishmael_energysum.html">Previous: Ishmael Energy Sum </a>
+	<p CLASS="nextLink">
+		<a href="ishmael_matchedfilter.html">Next: Ishmael Matched Filter
+		</a>
+	</p>
+	<br>
+	<br>
+</body>
+</html>

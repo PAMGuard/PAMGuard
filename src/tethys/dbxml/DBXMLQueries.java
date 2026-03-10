@@ -322,45 +322,21 @@ public class DBXMLQueries {
 		return documentInfos;
 		
 		
-		
-		//		if (collection.endsWith("s")) {
-		//			collection = collection.substring(0, collection.length()-1);
-		//		}
-//		String baseQuery = "{\"return\":[\"COLLECTIONNAME/Id\"],\"select\":[],\"enclose\":1}";
-//		baseQuery = baseQuery.replace("COLLECTIONNAME", collection);
-//		String tagName = "Id";
-//
-//		if (collection.equals("SpeciesAbbreviations")) {
-//			baseQuery = "{\"return\":[\"Abbreviations/Name\"],\"select\":[],\"enclose\":1}";
-//			tagName = "Name";
-//		}
-//
-//		DBQueryResult result;
-//		try {
-//			result = executeQuery(baseQuery);
-//		} catch (TethysQueryException e) {
-//			System.out.println("Error with query: " + baseQuery);
-//			tethysControl.showException(e);
-//			return null;
-//		}
-//
-//		if (result == null || result.queryResult == null) {
-//			return null;
-//		}
-//		Document doc = convertStringToXMLDocument(result.queryResult);
-//		if (doc == null) {
-//			return null;
-//		}
-//		NodeList returns = doc.getElementsByTagName(tagName);
-//		ArrayList<String> docIds = new ArrayList<>();
-//		int n = returns.getLength();
-//		for (int i = 0; i < n; i++) {
-//			Node aNode = returns.item(i);
-//			String docId = aNode.getTextContent();
-//			docIds.add(docId);
-//		}
-//
-//		return docIds;
+	}
+	
+	public void labelDocumentList(Collection collection, ArrayList<DocumentInfo> documentList) {
+		/**
+		 * working out which documents are part of this dataset can be tricky !
+		 * For Deployment Documents. relatively easy since just need to see if they have the Project name the
+		 * same as for this PAMGuard data, then can see if they match into our list of matched deployments. this is pretty much available. 
+		 * For Detections, we'd need to first get the list of Deployment documents, then check that the Detections doc refers back to one 
+		 * of these at the TProject or PProject level. 
+		 * Might just be easier to get everything at once, cascading through the levels and matching as we go, to make
+		 * lists of Deployments, Detections, Localizations, and Calibrations, adding the links as necessary.
+		 * Then go into current deployments and label the ones associated with this project. Not too many of them, so quite easy. 
+		 * Then  
+		 * 
+		 */
 	}
 
 	/**
@@ -558,6 +534,57 @@ public class DBXMLQueries {
 		}
 		return deployments;
 	}
+	
+	public ArrayList<String> getDeploymnetCalibrations(String deploymentId) {
+		String qString = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},"
+				+ "\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},"
+				+ "\"return\":[\"Deployment/Sensors/Audio/SensorId\"],\"select\":[{\"op\":\"=\","
+				+ "\"operands\":[\"Deployment/Id\",\"THEDEPLOYMENTID\"],\"optype\":\"binary\"}],\"enclose\":1,\r\n"
+				+ "\"namespaces\":0}";
+		qString = qString.replace("THEDEPLOYMENTID", deploymentId);DBQueryResult queryResult = null;
+		try {
+			queryResult = executeQuery(qString);
+		} catch (TethysQueryException e1) {
+			tethysControl.showException(e1);
+			return null;
+		}
+		if (queryResult ==null) {
+			return null;
+		}
+		Document doc;
+		try {
+			doc = queryResult.getDocument();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if (doc == null) {
+			return null;
+		}
+		ArrayList<String> calibrationNames = new ArrayList();
+		int count = 0;
+		NodeList returns = doc.getElementsByTagName("Deployment");
+		//		if (returns.getLength() == 0) {
+		//			returns = doc.getElementsByTagName("Result");
+		//		}
+		for (int i = 0; i < returns.getLength(); i++) {
+			Node aNode = returns.item(i);
+			String docName = null;
+			if (aNode instanceof Element) {
+				Element el = (Element) aNode;
+				NodeList ids = el.getElementsByTagName("SensorId");
+				if (ids.getLength() > 0) {
+					Node idNode = ids.item(0);
+					docName = idNode.getTextContent();
+				}
+			}
+			if (docName == null) {
+				docName = PamUtils.trimString(aNode.getTextContent());
+			}
+			calibrationNames.add(docName);
+		}
+		return calibrationNames;
+	}
 
 	/**
 	 * Get a list of Detections documents which associate with a datablock and a deploymentId.
@@ -690,7 +717,7 @@ public class DBXMLQueries {
 	 * Get the names of all the detection or localisation documents for a given deployment id. 
 	 * @param collection Localizations or Detetections
 	 * @param deploymentId Deployment document id. 
-	 * @return
+	 * @return list of document id's. 
 	 */
 	public ArrayList<String> getDeploymentDocuments(Collection collection, String deploymentId) {
 		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"collectionname/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"collectionname/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
@@ -718,11 +745,12 @@ public class DBXMLQueries {
 
 		NodeList returns = doc.getElementsByTagName("Record");
 		if (returns.getLength() == 0) {
-			returns = doc.getElementsByTagName("Record");
+			returns = doc.getElementsByTagName(collection.documentName());
 		}
 		for (int i = 0; i < returns.getLength(); i++) {
 			Node aNode = returns.item(i);
-			detectionDocs.add(aNode.getTextContent());
+//			aNode.get
+			detectionDocs.add(PamUtils.trimString(aNode.getTextContent()));
 		}
 		return detectionDocs;
 	}

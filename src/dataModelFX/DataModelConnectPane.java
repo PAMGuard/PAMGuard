@@ -9,6 +9,7 @@ import dataModelFX.DataModelModulePane.ModuleRectangle;
 import dataModelFX.connectionNodes.ModuleConnectionNode;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -44,28 +45,54 @@ public class DataModelConnectPane extends ConnectionPane {
 	 */
 	private DataModelPaneFX dataModelPaneFX; 
 
+    private static final DataFormat NODE_DATA_FORMAT = new DataFormat("application/x-java-custom-node");
 
 	public DataModelConnectPane (DataModelPaneFX dataModelPaneFX){
 		super();
 		this.dataModelPaneFX=dataModelPaneFX; 
+		
+		//4k display size 3840 x 2160
+		//This important because the pane is only the size of the module postions
+		//unless the size is explicitly set. 
+		this.setPrefSize(3840, 2160);
+		
+		  // Optional: Visual feedback when mouse enters/exits target
+        this.setOnDragEntered(event -> {
+        	
+			final Dragboard dragboard = event.getDragboard();
+            if (event.getGestureSource() != this &&
+            		dataModelPaneFX.getModuleDragKey().equals(dragboard.getString())) {
+                this.setStyle("-fx-background-color: #e0ffe0;");
+            }
+            event.consume();
+        });
+        
+        this.setOnDragExited(event -> {
+            // Reset background
+           this.setStyle("");
+           event.consume();
+       });
+
 
 		//set what happens when mouse is dragged over pane
 		this.setOnDragOver(new EventHandler<DragEvent>(){
+			
+			
 			@Override
 			public void handle(DragEvent event)
 			{
 				
-//				System.out.println("START drag over node drag dropped" + dataModelPaneFX.getDraggingStructure());
+				//System.out.println("START drag over node drag dropped" + dataModelPaneFX.getDraggingStructure());
 
 				final Dragboard dragboard = event.getDragboard();
 				if (dragboard.hasString()
 						&& dataModelPaneFX.getModuleDragKey().equals(dragboard.getString())
 						&& dataModelPaneFX.getDraggingModule().get() != null || dataModelPaneFX.getDraggingStructure()!=null)
 				{
-//					System.out.println("ACCEPT drag over node drag dropped" + dataModelPaneFX.getDraggingStructure());
-
+					//System.out.println("ACCEPT drag over node drag dropped" + dataModelPaneFX.getDraggingStructure());
+	
 					event.acceptTransferModes(TransferMode.ANY);
-					//event.consume(); //causesd issues with dropping nodes not being detected
+					event.consume(); //causesd issues with dropping nodes not being detected
 				}
 			}
 		});
@@ -76,7 +103,7 @@ public class DataModelConnectPane extends ConnectionPane {
 			public void handle(DragEvent event)
 			{
 				
-				System.out.println("Add Some Node drag dropped: " + dataModelPaneFX.getDraggingStructure());
+				//System.out.println("Add Some Node drag dropped: " + dataModelPaneFX.getDraggingStructure());
 
 				final Dragboard dragboard = event.getDragboard();
 				if (dragboard.hasString()

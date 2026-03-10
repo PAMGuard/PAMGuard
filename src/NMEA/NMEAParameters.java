@@ -97,7 +97,7 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 		public final int timestampFileValue = 4;
 	}
 	
-	public NmeaSources sourceType = NmeaSources.SIMULATED;
+	public NmeaSources sourceType = NmeaSources.SERIAL;
 
 	public String getName() {
 		return name;

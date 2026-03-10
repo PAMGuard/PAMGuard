@@ -1,5 +1,6 @@
 package dataPlotsFX.spectrogramPlotFX;
 
+import PamController.PamControlledUnit;
 import PamguardMVC.PamDataBlock;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
@@ -14,9 +15,9 @@ import javafx.scene.paint.Color;
 public class FFTPlotProvider extends TDDataProviderFX {
 
 
-	private PamFFTControl fftControl;
+	private PamControlledUnit fftControl;
 
-	public FFTPlotProvider(PamFFTControl fftControl, @SuppressWarnings("rawtypes") PamDataBlock parentDataBlock) {
+	public FFTPlotProvider(PamControlledUnit fftControl, @SuppressWarnings("rawtypes") PamDataBlock parentDataBlock) {
 		super(parentDataBlock);
 		this.fftControl = fftControl;
 	}

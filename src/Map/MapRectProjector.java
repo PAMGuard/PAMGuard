@@ -408,20 +408,21 @@ public class MapRectProjector extends MapProjector {
 		}
 		LatLong currentPos = getDataPosition(new Coordinate3d(mousePoint.x, mousePoint.y));
 		GPSDataBlock gpsDataBlock = gpsControl.getGpsDataBlock();
-		double dist = Double.MAX_VALUE;
-		GpsDataUnit closest = null;
-		ListIterator<GpsDataUnit> it = gpsDataBlock.getListIterator(0);
-		while (it.hasNext()) {
-			GpsDataUnit gpsUnit = it.next();
-			double r = gpsUnit.getGpsData().distanceToMetres(currentPos);
-			if (r < dist) {
-				dist = r;
-				closest = gpsUnit;
-			}
-		}
+		// 2025-09-03 change to using synchronized search in gps data block. 
+		GpsDataUnit closest = gpsDataBlock.findClosestGPS(currentPos);
+//		ListIterator<GpsDataUnit> it = gpsDataBlock.getListIterator(0);
+//		while (it.hasNext()) {
+//			GpsDataUnit gpsUnit = it.next();
+//			double r = gpsUnit.getGpsData().distanceToMetres(currentPos);
+//			if (r < dist) {
+//				dist = r;
+//				closest = gpsUnit;
+//			}
+//		}
 		if (closest == null) {
 			return null;
 		}
+		double dist = closest.getGpsData().distanceToMetres(currentPos);
 		double rPix = dist*this.pixelsPerMetre;
 		if (rPix > 20) {
 			return null;

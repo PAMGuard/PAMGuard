@@ -87,7 +87,7 @@ public class LoggerForm{
 	private NMEAMonitor nmeaMonitor;
 
 	/**
-	 * holds refernce to itsself so close button can find it's self in the tabPane
+	 * holds reference to itself so close button can find it's self in the tabPane
 	 */
 	protected LoggerForm loggerForm = this;
 	protected JComponent thingToClose;

@@ -17,6 +17,29 @@ public interface PredictionResult {
 	 */
 	public long getTimeMillis(); 
 	
+	
+	/**
+	 * Get the start sample - this is the sample number of the first sample in the result.
+	 * 	 * Note: required for object detection results where the start sample may not be same as the input data
+	 * @return the start sample
+	 */
+	public long getStartSample(); 
+	
+	
+	/**
+	 * Get duration in sample - this is the number of samples in the result.
+	 * Note: required for object detection results where the duration is not the same as the input data
+	 * @return the duration of the result in samples.
+	 */
+	public int getSampleDuration(); 
+	
+	
+	/**
+	 * Get frequency limits of the prediction result
+	 * @return the frequency limits of the prediction result
+	 */
+	public double[] getFreqLimits(); 
+	
 
 	/**
 	 * Get the predictions for this result. The array contains the probabilities for all classes. 

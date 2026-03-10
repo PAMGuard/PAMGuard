@@ -19,6 +19,7 @@ import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.AutoTethysProvider;
+import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
 
 public abstract class GranularityHandler {
@@ -35,6 +36,8 @@ public abstract class GranularityHandler {
 	
 	private Helper helper;
 
+	private TethysDataProvider tethysDataProvider;
+
 	/**
 	 * @param tethysControl
 	 * @param dataBlock
@@ -47,6 +50,7 @@ public abstract class GranularityHandler {
 		this.dataBlock = dataBlock;
 		this.tethysExportParams = tethysExportParams;
 		this.streamExportParams = streamExportParams;
+		this.tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		speciesManager = dataBlock.getDatablockSpeciesManager();
 		try {
 			helper = new Helper();
@@ -218,7 +222,7 @@ public abstract class GranularityHandler {
 				detection.setParameters(params);
 			}
 			if (chanMap < 0) chanMap += 65536L;
-			AutoTethysProvider.addUserDefined(params, "ChannelBitmap", String.format("0x%X", chanMap));
+			tethysDataProvider.addUserDefined(params, "ChannelBitmap", String.format("0x%X", chanMap));
 		}
 		
 		return chanMap;

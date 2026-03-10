@@ -6,11 +6,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import PamController.SettingsPane;
-import PamView.dialog.warn.WarnOnce;
-import PamView.dialog.warn.WarnOnceDialog;
-import javafx.application.Platform;
 import javafx.scene.Node;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;

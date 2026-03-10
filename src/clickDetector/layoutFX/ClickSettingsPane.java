@@ -785,6 +785,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 			sourcePane.setSourceIndex(0);
 		}
 
+		
 		sourcePane.setParams(clickParameters.getGroupedSourceParameters());
 
 		//		sourcePane.setGrouping(clickParameters.groupingType);

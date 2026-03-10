@@ -4,7 +4,6 @@ import java.awt.Window;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,10 +12,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.sound.sampled.AudioFormat.Encoding;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -27,18 +22,12 @@ import javax.swing.SwingWorker;
 //import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 //import org.kc7bfi.jflac.util.ByteData;
 
-import org.jflac.FLACDecoder;
-import org.jflac.PCMProcessor;
-import org.jflac.metadata.Metadata;
-import org.jflac.metadata.StreamInfo;
-import org.jflac.sound.spi.FlacAudioFileReader;
-import org.jflac.util.ByteData;
-
 import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import pamScrollSystem.ViewLoadObserver;
 import PamController.AWTScheduler;
+import PamController.DataStoreInfoHolder;
+import PamController.InputStoreInfo;
 import PamController.OfflineDataStore;
 import PamController.OfflineFileDataStore;
 import PamController.PamControlledUnitSettings;
@@ -47,10 +36,8 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamDetection.RawDataUnit;
+import PamUtils.worker.PamWorkMonitor;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 
 /**
  * Functionality for handling data from files offline.
@@ -58,7 +45,7 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
  * @author Doug Gillespie
  *
  */
-public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> implements OfflineDataStore, PamSettings {
+public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> implements OfflineDataStore, PamSettings, DataStoreInfoHolder {
 
 	private OfflineFileDataStore offlineRawDataStore;
 
@@ -118,7 +105,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	}
 		
 
-	private class MapMaker extends SwingWorker<Integer, FileMapProgress> {
+	protected class MapMaker extends SwingWorker<Integer, FileMapProgress> {
 
 		private OfflineFileServer fileServer;
 
@@ -170,7 +157,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 				}
 
 				
-				sortMapEndTimes();
+				sortMapEndTimes(mapMaker);
 				mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_CHECKINGFILES, dataMap.getDataCount(), dataMap.getDataCount(), ""));
 				
 				long t3 = System.currentTimeMillis();
@@ -346,8 +333,9 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	/**
 	 * Get the end times of map points. In most cases the data will have come back from 
 	 * the serialised file, so will already have this information so it can be skipped. 
+	 * @param mapMaker 
 	 */
-	public abstract void sortMapEndTimes();
+	public abstract void sortMapEndTimes(OfflineFileServer.MapMaker mapMaker);
 	
 	@Override
 	public String getDataSourceName() {
@@ -457,5 +445,27 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	public OfflineFileDataStore getOfflineRawDataStore() {
 		return offlineRawDataStore;
 	}
+
+
+	@Override
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
+		if (dataMap == null || dataMap.getNumMapPoints() == 0) {
+			return null;
+		}
+		long firstStart = dataMap.getFirstDataTime();
+		long lastEnd = dataMap.getLastMapPoint().getEndTime();
+		long lastStart = dataMap.getLastMapPoint().getStartTime();
+		InputStoreInfo info = new InputStoreInfo(this, dataMap.getNumMapPoints(), firstStart, lastStart, lastEnd);
+		if (detail) {
+			// get all times of all files 
+			long[][] startsEnds = dataMap.getAllStartsAndEnds();
+			if (startsEnds != null) {
+				info.setFileStartTimes(startsEnds[0]);
+				info.setFileEndTimes(startsEnds[1]);
+			}
+		}
+		return info;
+	}
+
 
 }

@@ -6,6 +6,7 @@ import Acquisition.SoundCardSystem;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
@@ -28,6 +29,8 @@ public class SoundCardDAQPane extends DAQSettingsPane {
 	 * The sound card system. 
 	 */
 	private SoundCardSystem soundCardSystem; 
+	
+	private DAQStatusPaneFactory statusBarPaneFactory = new SimpleStatusPaneFactory("This is  sound card DAQ");
 
 	public SoundCardDAQPane(SoundCardSystem soundCardSystem) {
 
@@ -119,6 +122,11 @@ public class SoundCardDAQPane extends DAQSettingsPane {
 	public void paneInitialized() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public DAQStatusPaneFactory getStatusBarFactory() {
+		return statusBarPaneFactory;
 	}
 
 }

@@ -38,6 +38,7 @@ import tethys.deployment.RecordingList;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
 
+@Deprecated
 public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentTableObserver {
 	
 	private JPanel mainPanel;
@@ -58,7 +59,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 
 	private ArrayList<RecordingPeriod> selectedDeployments;
 
-	public DeploymentExportPanel(TethysControl tethysControl, PAMGuardDeploymentsTable pamDeploymentsTable) {
+	private DeploymentExportPanel(TethysControl tethysControl, PAMGuardDeploymentsTable pamDeploymentsTable) {
 		super(tethysControl);
 		this.pamDeploymentsTable = pamDeploymentsTable;
 		mainPanel = new PamAlignmentPanel(BorderLayout.NORTH);
@@ -244,7 +245,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		};
 		// need to turn that list back into a RecordingList object. 
 		RecordingList tempList = new RecordingList("eport list", selectedDeployments);
-		getTethysControl().getDeploymentHandler().exportDeployments(tempList);
+//		getTethysControl().getDeploymentHandler().exportDeployments(tempList);
 	}
 	
 

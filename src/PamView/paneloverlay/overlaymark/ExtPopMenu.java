@@ -20,4 +20,10 @@ public interface ExtPopMenu {
 	 */
 	public boolean showPopupMenu(MouseEvent e, ArrayList<ExtMouseAdapter> extMouseAdapters, Node parentNode);
 	
+	/**
+	 * Close the pop up menu programmatically
+	 * @param e - the mouse location. 
+	 */
+	public boolean closePopupMenu(MouseEvent e);
+	
 }

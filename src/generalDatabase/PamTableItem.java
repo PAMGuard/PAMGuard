@@ -483,6 +483,18 @@ public class PamTableItem implements Cloneable {
 		if (value == null) {
 			return Double.NaN;
 		}
+		if (value.getClass() == Integer.class) {
+			int iv = (Integer) value;
+			return iv;
+		}
+		if (value.getClass() == Long.class) {
+			long iv = (Long) value;
+			return iv;
+		}
+		if (value.getClass() == Float.class) {
+			float iv = (Float) value;
+			return iv;
+		}
 		return (Double) value;
 	}
 	

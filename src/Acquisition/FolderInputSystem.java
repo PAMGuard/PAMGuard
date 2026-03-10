@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
@@ -44,6 +45,8 @@ import PamController.PamSettings;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
+import PamUtils.worker.PamWorkMonitor;
+import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorker;
 import PamUtils.worker.filelist.FileListData;
 import PamUtils.worker.filelist.WavFileType;
@@ -51,6 +54,7 @@ import PamUtils.worker.filelist.WavListUser;
 import PamUtils.worker.filelist.WavListWorker;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
+import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import PamguardMVC.debug.Debug;
@@ -76,7 +80,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	protected ArrayList<WavFileType> allFiles = new ArrayList<>();
 
-	protected int currentFile;
+	protected int currentFileIndex;
 
 	private PamFileFilter audioFileFilter = getFolderFileFilter();
 
@@ -114,23 +118,40 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		 * Here, need to handle restarts if we've stopped and are restarting. 
 		 * There are two things to do. 1 identify correct file for processing based
 		 * on currentAnalysisTime, then if necessary, skip part of that first file. 
+		 * 
+		 * The behaviour of this is a bit (OK, very) weird since it's basically looking for 
+		 * a file that ends later than the current end time and it always backs up one before
+		 * starting. I can't remember why this is. However, if there is a corrupt file that
+		 * has a null audioformat, it's going to go back one if we're not careful and start
+		 * to repeat the same file again and again. 
 		 */
-		if (currentFile > 0) {
-			currentFile--; // shouldn't ever need to go back more than one.  
+		if (currentFileIndex > 0) {
+			//			currentFileIndex--; // shouldn't ever need to go back more than one.  
 		}
 		millisToSkip = 0;
 		long fileStart = 0, fileEnd = 0;
 		if (currentAnalysisTime > 0) {
-			for (int i = currentFile; i < allFiles.size(); i++) {
+			for (int i = currentFileIndex; i < allFiles.size(); i++) {
 				WavFileType aF = allFiles.get(i);
-				AudioFormat audioformat = aF.getAudioFormat(aF);
+				AudioFormat audioformat = aF.getAudioFormat(aF, null);
 				if (audioformat == null) {
-					break; // can't do much now!
+					System.out.printf("Error in audio file %s: no AudioFormat available\n", aF.toString());
+					/* continue rather than break so we don't get stuck in a loop. But be careful, because if
+					 * this is the last file, then currentFile will never be set, so will be at one less than
+					 * we started with, so will start repeating the last two good files !
+					 */
+					currentFileIndex = i; // as a minimum !!!
+					if (i == allFiles.size()-1) {
+						// we're at the end. Last file is corrupt. Need to stop. 
+						return false;
+					}
+					continue; 
 				}
 				fileStart = getFileStartTime(aF);
 				fileEnd = fileStart + (long) (aF.getDurationInSeconds()*1000.);
+				//				fileEnd = fileStart + getFileDuration(aF, aF);
 				if (fileEnd > currentAnalysisTime + 2000) { // don't go 2s at end of file
-					currentFile = i; // set the correct file. 
+					currentFileIndex = i; // set the correct file. 
 					millisToSkip = currentAnalysisTime - fileStart; // how much of the file to skip.
 					if (millisToSkip < 0) {
 						// this is a normal gap in files. So start at the start of the file. 
@@ -146,9 +167,24 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public boolean prepareInputFile() {
-		boolean ans = super.prepareInputFile();
-		if (!ans && ++currentFile < allFiles.size()) {
-			System.out.println("Failed to open sound file. Try again with file " + allFiles.get(currentFile).getName());
+		boolean ans = false;
+		if (allFiles == null || allFiles.size() == 0) {
+			WarnOnce.showWarning(acquisitionControl.getGuiFrame(), "Sound Files Warning",
+					"No sound input files have been found in location " + folderInputParameters.getMostRecentFile(), WarnOnce.WARNING_MESSAGE);
+			return false;
+		}
+		// allow for the file to be corrupt. 
+		while (currentFileIndex < allFiles.size()) {
+			ans = super.prepareInputFile();
+			if (ans == true) {
+				break;
+			}
+			else {
+				currentFileIndex++;
+			}
+		}
+		if (!ans && ++currentFileIndex < allFiles.size()) {
+			System.out.println("Failed to open sound file. Try again with file " + allFiles.get(currentFileIndex).getName());
 			/*
 			 *  jumping striaght to the next file messes it up if it thinks the files
 			 *  are continuous, so we HAVE to stop and restart.
@@ -242,6 +278,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		constraints.anchor = GridBagConstraints.WEST;
 		addComponent(p, subFolders = new JCheckBox("Include sub folders"), constraints);
 		subFolders.addActionListener((a)->{
+			folderInputParameters.subFolders = subFolders.isSelected();
 			if (folderInputParameters.getSelectedFiles()!=null) {
 				makeSelFileList(folderInputParameters.getSelectedFiles());
 			}
@@ -382,7 +419,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 * @return flag to indicate...nothing?
 	 */
 	public int makeSelFileList() {
-		
+
 		/**
 		 * This is only for real time operation. In Viewer mode, the list is entirely
 		 * handled in the OfflinefileServer object. 
@@ -429,20 +466,37 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			//need to make sure this is dynamically set - following means that the dialog will work 
 			//with whatever has been set by the user but if cancel is pressed settings will still revert.
 			boolean useSubFolders = false;
-			if (subFolders!=null) {
-				useSubFolders = subFolders.isSelected();
-			}
-			else {
-				useSubFolders = folderInputParameters.subFolders;
-			}
+			//			if (subFolders!=null) {
+			//				useSubFolders = subFolders.isSelected();
+			//			}
+			//			else {
+			useSubFolders = folderInputParameters.subFolders;
+			//			}
 			//Swing way
 			wavListWorker.startFileListProcess(PamController.getMainFrame(), rootList,
 					useSubFolders, true);
 		}
 		else {
 			//FX system
+			wavListWorker.setLoadAudioInfo(true); //need to load sample rate for each file because FX GUI wants this to show in table.
+
+
 			PamWorker<FileListData<WavFileType>> worker = wavListWorker.makeFileListProcess(rootList, folderInputParameters.subFolders, true);
+
+			wavListWorker.setWavLoadListener((message, progress)->{
+				if (message!=null) {
+					Platform.runLater(()->{
+						//show an update when loading a single file!
+						worker.getPamWorkProgress().getMessageProperty().set(message);
+					});
+				}
+			});
+
+			//pass the worker to the folder input pane so it can show progress.
 			folderInputPane.setFileWorker(worker);
+
+			System.out.println("FolderInputSystem: Starting makeFileListProcess: " + worker);
+
 			if (worker!=null) worker.start();
 		}
 
@@ -595,14 +649,14 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	}
 
 	@Override
-	public void interpretNewFile(String newFile) {
+	public void interpretNewFile(WavFileType newFile) {
 		if (newFile == null) {
 			return;
 		}
 		/*
 		 *  don't actually need to do anything ? Could make a new list, but do it from what's in the
 		 *  folder parameters, not the file parameters. do nothing here, or it gets too complicated.
-		 *  Call the search function from the file select part of the dialot.
+		 *  Call the search function from the file select part of the dialog.
 		 */
 
 		// test the new Wav list worker ...
@@ -617,8 +671,10 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 */
 	public  void newFileList(FileListData<WavFileType> fileListData) {
 
-		//		System.out.printf("Wav list recieved with %d files after %d millis\n",
-		//				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+//		System.out.printf("FolderInputSystem: Wav list recieved with %d files after %d millis\n",
+//				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+		
+		fileListData.sort();
 		allFiles = fileListData.getListCopy();
 
 		List<WavFileType> asList = allFiles;
@@ -626,8 +682,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 		//set the date of the first file.
 		setFileDateText();
+		
+		//set the number of files
+		setFileNumberText();
 
-		//set any bespoke options for the files to be laoded.
+
+		//set any bespoke options for the files to be loaded.
 		setFileOptionPanel();
 
 		// also open up the first file and get the sample rate and number of channels from it
@@ -641,6 +701,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			//Hidden files should not be used in analysis...
 			try {
+//				System.out.println("FolderInputSystem: Opening file for audio info: " + file.getName());
 				audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 				AudioFormat audioFormat = audioStream.getFormat();
 				fileSamples = audioStream.getFrameLength();
@@ -668,6 +729,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			});
 		}
 	}
+
+
 
 	/**
 	 * Fudge function so that the RonaInputsystem can always fudge the number
@@ -716,21 +779,29 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long fileTime = getFileStartTime(getCurrentFile());
 			//			fileDateText.setText(PamCalendar.formatDateTime(fileTime));
 			getDialogPanel(); // make sure it's created
-			fileDateStrip.setDate(fileTime);
-			fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
+			if (fileDateStrip != null) {
+				fileDateStrip.setDate(fileTime);
+				fileDateStrip.setFormat(acquisitionControl.getFileDate().getFormat());
+			}
 		}
 	}
+	
+	/**
+	 * Set the number of files that have been loaded
+	 * @param fileListData
+	 */
+	private void setFileNumberText() {
+		if (fileDateStrip != null) {
+			fileDateStrip.setNfiles(allFiles);		
+		}
+	}
+
 
 	@Override
 	public String getSystemType() {
 		return sysType;
 	}
 
-	@Override
-	public String getUnitName() {
-		//		return "File Folder Analysis";
-		return acquisitionControl.getUnitName();
-	}
 
 	@Override
 	public String getUnitType() {
@@ -738,11 +809,11 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	}
 
 	@Override
-	public File getCurrentFile() {
+	public WavFileType getCurrentFile() {
 		//System.out.println("All files: " +  allFiles);
 		//		System.out.printf("Folder: getCurrentfile. on %d of %d\n", currentFile, allFiles.size());
-		if (allFiles != null && allFiles.size() > currentFile) {
-			return allFiles.get(currentFile);
+		if (allFiles != null && allFiles.size() > currentFileIndex) {
+			return allFiles.get(currentFileIndex);
 		}
 		return null;
 	}
@@ -754,22 +825,27 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		boolean ans = false;
 		if (!folderInputParameters.mergeFiles) return false;
 
-		long currFileStart = 0;
-		long currFileLength = 0;
-		long currFileEnd = 0;
-		if (currentFile >= 0) {
-			try {
-				WavFileType currentWav = allFiles.get(currentFile);
-				currFileStart = getFileStartTime(currentWav.getAbsoluteFile());
-				if (audioStream != null) {
-					fileSamples = audioStream.getFrameLength();
-					currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
-					currFileEnd = currFileStart + currFileLength;
-				}
-			}
-			catch (Exception e) {
+		File latestFile = super.getCurrentFile();
 
-			}
+		//		long currFileStart = 0;
+		//		long currFileLength = 0;
+		long currFileEnd = 0;
+		if (currentFileIndex >= 0) {
+			//			try {
+			//				WavFileType currentWav = allFiles.get(currentFileIndex);
+			//				currFileStart = getFileStartTime(currentWav);
+			//				if (audioStream != null) {
+			////					fileSamples = audioStream.getFrameLength();
+			////					currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
+			////					currFileLength = getFileDuration(getCurrentFile(), audioStream);
+			//					currFileLength = (long) (currentWav.getDurationInSeconds() * 1000.);
+			//					currFileEnd = currFileStart + currFileLength;
+			//				}
+			//			}
+			//			catch (Exception e) {
+			//
+			//			}
+			currFileEnd = this.currentAnalysisTime;
 		}
 		if (currFileEnd == 0) {
 			//			System.out.println("OpenNextfile " + currentFile + " " + allFiles.get(currentFile).getName());
@@ -779,14 +855,15 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long lastBit = (long) ((blockSamples * 1000L) / getSampleRate());
 			currFileEnd += lastBit;
 		}
-		if (++currentFile < allFiles.size()) {
+
+		if (++currentFileIndex < allFiles.size()) {
 
 			calculateETA();
 
 			long newStartTime = getFileStartTime(getCurrentFile());
 			long diff = newStartTime - currFileEnd;
 			if (diff > 2000 || diff < -5000 || newStartTime == 0) {
-				currentFile--;
+				currentFileIndex--;
 				return false;
 				/*
 				 * Return since it's not possible to merge this file into the
@@ -805,6 +882,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			 */
 			ans = super.prepareInputFile();
 			if (!ans) {
+				//				currentFileIndex--;
 				return false;
 			}
 			currentFileStart = System.currentTimeMillis();
@@ -824,11 +902,11 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public void daqHasEnded() {
-		currentFile++; // not ideal if paused in a file since it makes starter back up. 
-		if (folderInputParameters.repeatLoop && currentFile >= allFiles.size()) {
+		currentFileIndex++; // not ideal if paused in a file since it makes starter back up. 
+		if (folderInputParameters.repeatLoop && currentFileIndex >= allFiles.size()) {
 			resetToStart();
 		}
-		if (currentFile < allFiles.size()) {
+		if (currentFileIndex < allFiles.size()) {
 			// only restart if the file ended - not if it stopped
 			if (getStreamStatus() == STREAM_ENDED && !PamController.getInstance().isManualStop()) {
 				//				System.out.println(String.format("Start new file timer (file %d/%d)",currentFile+1,allFiles.size()));
@@ -838,21 +916,21 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		calculateETA();
 		setFolderProgress();
 
-		if (currentFile > 0 && currentFile >= allFiles.size()) {
+		if (currentFileIndex > 0 && currentFileIndex >= allFiles.size()) {
 			fileListComplete();
 		}
 		//		System.out.println("FolderinputSytem: daqHasEnded");
 	}
 
 	private void setFolderProgress() {
-		folderProgress.setValue(currentFile);
-		folderProgress.setString(String.format("%d/%d", currentFile, folderProgress.getMaximum()));
+		folderProgress.setValue(currentFileIndex);
+		folderProgress.setString(String.format("%d/%d", currentFileIndex, folderProgress.getMaximum()));
 	}
 
 	protected void calculateETA() {
 		long now = System.currentTimeMillis();
 		eta = now-currentFileStart;
-		eta *= (allFiles.size()-currentFile);
+		eta *= (allFiles.size()-currentFileIndex);
 		eta += now;
 	}
 
@@ -879,7 +957,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public long getEta() {
-		if (currentFile == allFiles.size()-1) {
+		if (currentFileIndex == allFiles.size()-1) {
 			return super.getEta();
 		}
 		return eta;
@@ -968,7 +1046,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
-		//		System.out.println("Start system");
+		//System.out.println("FolderInputSystem.startSystem: Start system");
 		setFolderProgress();
 		return super.startSystem(daqControl);
 	}
@@ -1002,32 +1080,19 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		this.audioFileFilter = audioFileFilter;
 	}
 
-	/****JavaFX bits***/
-
 	@Override
-	public DAQSettingsPane getDAQSpecificPane(AcquisitionPaneFX acquisitionPaneFX) {
-		if (folderInputPane==null) this.folderInputPane = new FolderInputPane(this, acquisitionPaneFX);
-		return folderInputPane;
-	}
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
 
-	/**
-	 * Called by AcquisitionDialog.SetParams so that the dialog node can update it's
-	 * fields.
-	 */
-	public void dialogFXSetParams() {
-		folderInputPane.setParams(folderInputParameters);
-	}
-
-	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
-		System.out.println("FolderInputSystem: Get store info start:");
+		//		System.out.println("FolderInputSystem: Get store info start:");
 		if (allFiles == null || allFiles.size() == 0) {
+			// returns null in viewer mode because I stopped it recataloging files 
+			// using the online file list. Need to get the offline file mal. 
 			return null;
 		}
 		WavFileType firstFile = allFiles.get(0);
-		long firstFileStart = getFileStartTime(firstFile.getAbsoluteFile());
+		long firstFileStart = getFileStartTime(firstFile);
 		WavFileType lastFile = allFiles.get(allFiles.size()-1);
-		long lastFileStart = getFileStartTime(lastFile.getAbsoluteFile());
+		long lastFileStart = getFileStartTime(lastFile);
 		lastFile.getAudioInfo();
 		long lastFileEnd = (long) (lastFileStart + lastFile.getDurationInSeconds()*1000.);
 		InputStoreInfo storeInfo = new InputStoreInfo(acquisitionControl, allFiles.size(), firstFileStart, lastFileStart, lastFileEnd);
@@ -1036,7 +1101,13 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long[] allFileEnds = new long[allFiles.size()];
 			for (int i = 0; i < allFiles.size(); i++) {
 				WavFileType aFile = allFiles.get(i);
-				allFileStarts[i] = getFileStartTime(aFile.getAbsoluteFile());
+				try {
+					//System.out.println("Get file time for " + aFile.getName());
+					allFileStarts[i] = getFileStartTime(aFile);
+				}
+				catch (Exception e) {
+					System.err.println("Error getting audio info for " + aFile.getName() + " " + e.getLocalizedMessage());
+				}
 				aFile.getAudioInfo();
 				allFileEnds[i] = (allFileStarts[i] + (long) (aFile.getDurationInSeconds()*1000.));
 				if (allFileStarts[i] < firstFileStart) {
@@ -1049,14 +1120,21 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 					lastFile = allFiles.get(i);
 					lastFileEnd = allFileStarts[i] + (long) (lastFile.getDurationInSeconds()*1000.);
 				}
+				if (workMonitor != null) {
+					int prog = (i+1)*100/allFiles.size();
+					String msg = String.format("File %d of %d: %s", i+1, allFiles.size(), aFile.getName());
+					PamWorkProgressMessage progMsg = new PamWorkProgressMessage(prog, msg);
+					workMonitor.update(progMsg);
+				}
 			}
 			storeInfo.setFirstFileStart(firstFileStart); // just incase changed.
 			storeInfo.setLastFileEnd(lastFileEnd); // just incase changed
 			storeInfo.setFileStartTimes(allFileStarts);
 			storeInfo.setFileEndTimes(allFileEnds);
 		}
-		System.out.println("FolderInputSystem: Get store info complete:");
+		//		System.out.println("FolderInputSystem: Get store info complete:");
 		return storeInfo;
+
 	}
 
 	@Override
@@ -1075,21 +1153,22 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			System.out.println("Daq setanal start time: no files to check against");
 			return false;
 		}
-		System.out.printf("setAnalysisStarttTime: checking %d files for start time of %s\n", allFiles.size(), PamCalendar.formatDBDateTime(startTime));
+
+//		System.out.printf("setAnalysisStarttTime: checking %d files for start time of %s\n", allFiles.size(), PamCalendar.formatDBDateTime(startTime));
 		/*
 		 * If the starttime is maxint then there is nothing to do, but we do need to set the file index
 		 * correctly to not over confuse the batch processing system.
 		 */
-		long lastFileTime = getFileStartTime(allFiles.get(allFiles.size()-1).getAbsoluteFile());
+		long lastFileTime = getFileStartTime(allFiles.get(allFiles.size()-1));
 		if (startTime > lastFileTime) {
-			currentFile = allFiles.size();
+			currentFileIndex = allFiles.size();
 			System.out.println("Folder Acquisition processing is complete and no files require processing");
 			return true;
 		}
 		for (int i = 0; i < allFiles.size(); i++) {
-			long fileStart = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+			long fileStart = getFileStartTime(allFiles.get(i));
 			if (fileStart >= startTime) {
-				currentFile = i;
+				currentFileIndex = i;
 				PamCalendar.setSoundFile(true);
 				if (startTime > 0) {
 					PamCalendar.setSessionStartTime(startTime);
@@ -1115,9 +1194,11 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		int generalStatus = PamController.getInstance().getPamStatus();
 		File currFile = getCurrentFile();
 		// status string is nFiles, currentFile, generalStatus from PamController and current file as string. 
-		String bs = String.format("%d,%d,%d,%s", nFiles,currentFile,generalStatus,currFile);
+		String bs = String.format("%d,%d,%d,%s", nFiles,currentFileIndex,generalStatus,currFile);
 		return bs;
 	}
+	
+	
 	/**
 	 * Extra options for the start menu
 	 * @param component
@@ -1165,7 +1246,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 * Reset to start of file list and also the current time to zero. 
 	 */
 	public void resetToStart() {
-		currentFile = 0;
+		currentFileIndex = 0;
 		currentAnalysisTime = 0;
 	}
 
@@ -1177,4 +1258,22 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	public String getStartButtonToolTip() {
 		return "Press to start processing, or right click for more options";
 	}
+	
+	
+	/****JavaFX bits***/
+
+	@Override
+	public DAQSettingsPane getDAQSpecificPane(AcquisitionPaneFX acquisitionPaneFX) {
+		if (folderInputPane==null) this.folderInputPane = new FolderInputPane(this, acquisitionPaneFX);
+		return folderInputPane;
+	}
+
+	/**
+	 * Called by AcquisitionDialog.SetParams so that the dialog node can update it's
+	 * fields.
+	 */
+	public void dialogFXSetParams() {
+		folderInputPane.setParams(folderInputParameters);
+	}
+
 }

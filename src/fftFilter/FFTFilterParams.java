@@ -3,6 +3,7 @@ package fftFilter;
 import java.io.Serializable;
 
 import Filters.FilterBand;
+import Filters.FilterParams;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
@@ -15,6 +16,21 @@ public class FFTFilterParams implements Serializable, Cloneable, ManagedParamete
 	public FilterBand filterBand = FilterBand.HIGHPASS;
 
 	public double lowPassFreq, highPassFreq;
+	
+	/**
+	 * Constructor from other type of filter params. 
+	 * @param fp
+	 */
+	public FFTFilterParams(FilterParams fp) {
+		this.filterBand = fp.filterBand;
+		this.lowPassFreq = fp.lowPassFreq;
+		this.highPassFreq = fp.highPassFreq;
+	}
+
+	public FFTFilterParams() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public FFTFilterParams clone() {
