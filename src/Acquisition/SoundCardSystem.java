@@ -10,10 +10,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.TargetDataLine;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 import Acquisition.layoutFX.AcquisitionPaneFX;
 import Acquisition.layoutFX.DAQSettingsPane;
@@ -23,6 +20,7 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.FrequencyFormat;
+import pamguard.GlobalArguments;
 import soundPlayback.PlaybackControl;
 import soundPlayback.PlaybackSystem;
 import soundPlayback.SoundCardPlayback;
@@ -39,6 +37,12 @@ import wavFiles.ByteConverter;
 public class SoundCardSystem extends DaqSystem implements PamSettings {
 
 	public static final String sysType = "Sound Card";
+	
+	/**
+	 * global argument options to set device name or number 
+	 */
+	public static final String SETDEVNAME = "scname";
+	public static final String SETDEVNUMBER = "scnumber";
 
 //	JPanel daqDialog;
 	SoundCardPanel soundCardPanel;
@@ -77,6 +81,33 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 		this.acquisitionControl = daqControl;
 		PamSettingManager.getInstance().registerSettings(this);
 		soundCardPlayback = new SoundCardPlayback(this);
+		checkGlobalArguments();
+	}
+
+	/**
+	 * Check to see if a device name or number has been fed in as a global argument
+	 */
+	private void checkGlobalArguments() {
+		String gName = GlobalArguments.getParam(SETDEVNAME);
+		if (gName != null) {
+			if (checkDeviceName(gName)) {
+				soundCardParameters.deviceName = gName;
+				soundCardParameters.deviceNumber = getDeviceNumber(soundCardParameters.deviceNumber, gName);
+			}
+		}
+		
+		String gNumS = GlobalArguments.getParam(SETDEVNUMBER);
+		if (gNumS != null) {
+			try {
+				int gNum = Integer.valueOf(gNumS);
+				soundCardParameters.deviceNumber = gNum;
+				soundCardParameters.deviceName = getDeviceName(gNum);
+			}
+			catch (NumberFormatException e) {
+				
+			}
+		}
+		
 	}
 
 	@Override
@@ -422,6 +453,24 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 			return null;
 		}
 		return devList.get(devNumber);
+	}
+	
+	/**
+	 * Check a device name exists (Case sensitive);
+	 * @param devName
+	 * @return true if it exists. 
+	 */
+	public boolean checkDeviceName(String devName) {
+		ArrayList<String> devList = getDevicesList();
+		if (devList == null || devName == null) {
+			return false;
+		}
+		for (String aName : devList) {
+			if (aName.equals(devName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

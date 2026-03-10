@@ -43,6 +43,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
+import Acquisition.SoundCardSystem;
 import PamController.PamController;
 import PamController.PamFolders;
 import PamController.PamGUIManager;
@@ -346,6 +347,14 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase(NetworkSender.PORT)) {
 					// auto exit at end of processing. 
 					GlobalArguments.setParam(NetworkSender.PORT, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(SoundCardSystem.SETDEVNAME)) {
+					// sound card name
+					GlobalArguments.setParam(SoundCardSystem.SETDEVNAME, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(SoundCardSystem.SETDEVNUMBER)) {
+//					soundcard number
+					GlobalArguments.setParam(SoundCardSystem.SETDEVNUMBER, args[iArg++]);
 				}
 				else if (anArg.equalsIgnoreCase(ReprocessStoreChoice.paramName)) {
 					String arg = args[iArg++];
