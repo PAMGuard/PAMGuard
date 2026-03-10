@@ -261,7 +261,8 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 	 * Get the data observer- monitors incoming real time data an updates graphs. 
 	 * @return data observer
 	 */
-	public PamObserverAdapter getDataObserver() {
+	@Override
+	public DataObserver getDataObserver() {
 		return dataObserver;
 	}
 

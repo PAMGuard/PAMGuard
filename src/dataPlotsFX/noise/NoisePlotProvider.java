@@ -7,6 +7,7 @@ import dataPlotsFX.layout.TDGraphFX;
 import noiseBandMonitor.NoiseBandControl;
 import noiseMonitor.NoiseDataBlock;
 
+//ST: didn't get anywhere inmplementing this.
 public class NoisePlotProvider extends TDDataProviderFX{
 	
 	NoiseBandControl noiseBandControl;

@@ -210,7 +210,8 @@ public class BinaryOutputStream {
 			dataOutputStream = new DataOutputStream(new BufferedOutputStream(fileOutputStream = new 
 					FileOutputStream(outputFile)));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 		
@@ -238,7 +239,8 @@ public class BinaryOutputStream {
 			try {
 				noiseOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(noiseFile)));
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				noiseOutputStream = null;
 				return false;
 			}
@@ -301,7 +303,8 @@ public class BinaryOutputStream {
 			try {
 				dataOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				ok = false;
 			}
 			dataOutputStream = null;
@@ -310,7 +313,8 @@ public class BinaryOutputStream {
 			try {
 				noiseOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				ok = false;
 			}
 		}
@@ -410,7 +414,8 @@ public class BinaryOutputStream {
 				outputStream.write(headerData);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 
@@ -474,7 +479,8 @@ public class BinaryOutputStream {
 				outputStream.write(footerData);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 		lastObjectType = BinaryTypes.MODULE_FOOTER;
@@ -677,7 +683,8 @@ public class BinaryOutputStream {
 		try {
 			opStream.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 		}
 
 		return true;

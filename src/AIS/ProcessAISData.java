@@ -153,7 +153,6 @@ public class ProcessAISData extends PamProcess {
 			 * the first thing to do though is to get the MMSI number 
 			 * from the string's header.
 			 */
-
 			boolean ok = aivdm.decodeMessage();
 
 			if(((NMEAControl) aisControl.nmeaDataBlock.getParentProcess().getPamControlledUnit()).getNmeaParameters().sourceType!=NMEAParameters.NmeaSources.TIMESTAMP_FILE) {
@@ -161,7 +160,6 @@ public class ProcessAISData extends PamProcess {
 			}
 			// only add the data to the list if it's a useful type 
 			// (i.e. not base station data)
-
 			if (ok) {
 				switch(aivdm.messageId){
 				case 1:

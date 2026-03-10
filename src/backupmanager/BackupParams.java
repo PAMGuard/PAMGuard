@@ -13,7 +13,7 @@ public class BackupParams implements Serializable, Cloneable {
 	private ScheduleState scheduleState = ScheduleState.RUNNING;
 	
 	private String scheduleType = SmallHoursSchedule.class.getName();
-	
+
 	/**
 	 * @return the scheduleState
 	 */

@@ -46,7 +46,7 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	public int minClickLength = 2, maxClickLength = 12;
 	public int minClickHeight = 2, maxClickHeight = 12;
 	private double timeRange = 10;
-	protected int displayChannels = 0;
+	public int displayChannels = 0;
 	public boolean view360;
 	public boolean amplitudeSelect = false;
 //	public double minAmplitude = 0;

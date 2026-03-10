@@ -211,6 +211,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
+//			clipDisplayParent.ge
 			newSampleRate(sampleRate);
 		}
 
@@ -361,48 +362,10 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 	private PamDataUnit findTriggerDataUnit(ClipDataUnit clipDataUnit) {
 		return clipDataUnit.findTriggerDataUnit();
-//		if (clipDataUnit.getTriggerDataUnit())
-//		String trigName = clipDataUnit.triggerName;
-//		long trigMillis = clipDataUnit.triggerMilliseconds;
-//		long startMillis = clipDataUnit.getTimeMilliseconds();
-//		PamDataBlock<PamDataUnit> dataBlock = findTriggerDataBlock(trigName);
-//		if (dataBlock == null) {
-//			return null;
-//		}
-////		PamDataUnit trigUnit = dataBlock.findDataUnit(trigMillis, 0);
-////		if (trigUnit == null) {
-//			PamDataUnit trigUnit = findTriggerDataUnit2(dataBlock, clipDataUnit, 200);
-////		}
-//		return trigUnit;
+
 	}
 
-//	/**
-//	 * Bespoke search for finding the trig data unit, since the times don't always 
-//	 * seem to be matching up correctly. This seems to be more a problem for old data from old file
-//	 * format which didn't store the trigger time than it is for newer data. 
-//	 * @param dataBlock datablock to search
-//	 * @param clipDataUnit clip to match to
-//	 * @param timeJitter allowable time jitter (+ or -)
-//	 * @return found data unit with overlapping channel map and time close to the clip trigger time. 
-//	 */
-//	private PamDataUnit findTriggerDataUnit2(PamDataBlock<PamDataUnit> dataBlock, ClipDataUnit clipDataUnit, int timeJitter) {
-//		long trigMillis = clipDataUnit.triggerMilliseconds;
-//		long t1 = trigMillis - timeJitter;
-//		long t2 = trigMillis + timeJitter;
-//		int channels = clipDataUnit.getChannelBitmap();
-//		synchronized (dataBlock.getSynchLock()) {
-//			ListIterator<PamDataUnit> iter = dataBlock.getListIterator(PamDataBlock.ITERATOR_END);
-//			while (iter.hasPrevious()) {
-//				PamDataUnit trigUnit = iter.previous();
-//				long trigTime = trigUnit.getTimeMilliseconds();
-//				if (trigTime >= t1 && trigTime <= t2 && (trigUnit.getChannelBitmap() & channels) != 0) {
-//					return trigUnit;
-//				}
-//			}
-//			
-//		}
-//		return null;
-//	}
+
 
 	private String lastFoundName;
 	private PamDataBlock<PamDataUnit> lastFoundBlock;
@@ -490,7 +453,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		updatePanelLater();
 	}
 
-	private void newSampleRate(float sampleRate) {
+	protected void newSampleRate(float sampleRate) {
 		this.setSampleRate(sampleRate);
 	}
 
@@ -560,7 +523,7 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 	 * Play the clip (called from mouse double click)
 	 * @param clipDataUnit
 	 */
-	private void playClip(ClipDataUnit clipDataUnit) {
+	public void playClip(ClipDataUnit clipDataUnit) {
 		if (clipDataUnit == null) {
 			return;
 		}
@@ -570,6 +533,15 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 		if (process instanceof ClipProcess) {
 			ClipProcess clipProc = (ClipProcess) process;
 			clipProc.playClip(clipDataUnit);
+		}
+		else {
+			ClipPlayback clipPlayback = ClipPlayback.getInstance();
+			if (clipPlayback.isPlaying()) {
+				clipPlayback.stopPlayback();
+			}
+			else {
+				clipPlayback.playClip(clipDataUnit.getRawData(), clipDataUnit.getParentDataBlock().getSampleRate(), true);
+			}
 		}
 	}
 
@@ -1015,6 +987,20 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 				clipDisplayUnit.setBorderColour();
 			}
 		}
+	}
+
+	/**
+	 * @return the displayControlPanel
+	 */
+	public DisplayControlPanel getDisplayControlPanel() {
+		return displayControlPanel;
+	}
+
+	/**
+	 * @return the clipDisplayMarker
+	 */
+	public ClipDisplayMarker getClipDisplayMarker() {
+		return clipDisplayMarker;
 	}
 
 	protected boolean shouldShowClip(ClipDisplayUnit dataUnit) {

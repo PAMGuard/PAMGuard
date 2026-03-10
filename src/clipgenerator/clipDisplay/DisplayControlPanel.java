@@ -44,6 +44,7 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorder;
 import PamView.panel.PamPanel;
+import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamProcess;
 import clipgenerator.ClipControl;
 
@@ -71,6 +72,7 @@ public class DisplayControlPanel {
 	private ClipDisplayParent clipDisplayParent;
 	private JCheckBox newClipsLast;
 	private JCheckBox showFullSummary;
+	private ScrollPaneAddon scrollButtons;
 	public DisplayControlPanel(ClipDisplayParent clipDisplayParent,
 			ClipDisplayPanel clipDisplayPanel) {
 		super();
@@ -213,9 +215,7 @@ public class DisplayControlPanel {
 			
 		}
 		controlPanel.add(historyPanel);
-		controlPanel.add(sortPanel);		
-		
-		
+		controlPanel.add(sortPanel);
 	}
 	
 	
@@ -325,8 +325,8 @@ public class DisplayControlPanel {
 			long start = pamScroller.getMinimumMillis();
 			long end = pamScroller.getMaximumMillis();
 			if (viewerStart != null) {
-				viewerStart.setText(PamCalendar.formatDateTime(start));
-				viewerEnd.setText(PamCalendar.formatDateTime(end));
+				viewerStart.setText(PamCalendar.formatDBDateTime(start));
+				viewerEnd.setText(PamCalendar.formatDBDateTime(end));
 			}
 			clipDisplayPanel.newViewerTimes(start, end);
 		}
@@ -337,7 +337,6 @@ public class DisplayControlPanel {
 			
 		}
 
-		
 	}
 	
 	/**
@@ -509,6 +508,13 @@ public class DisplayControlPanel {
 			currValue.setText(String.format("Max Niquist X%3.2f", super.getValue()));
 		}
 		
+	}
+
+	/**
+	 * @return the scrollButtons
+	 */
+	public ScrollPaneAddon getScrollButtons() {
+		return scrollButtons;
 	}
 
 

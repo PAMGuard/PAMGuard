@@ -65,7 +65,7 @@ public class ClipControl extends PamControlledUnit implements PamSettings, ClipD
 		super("Clip Generator", unitName);
 
 		addPamProcess(clipProcess = new ClipProcess(this));
-				
+		
 		PamSettingManager.getInstance().registerSettings(this);
 		
 //		clipTabPanel = new ClipTabPanel(this);

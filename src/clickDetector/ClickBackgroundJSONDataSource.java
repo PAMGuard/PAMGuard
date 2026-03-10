@@ -1,6 +1,5 @@
 package clickDetector;
 
-import AIS.AISJsonData;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryTypes;
 import clickDetector.background.ClickBackgroundDataUnit;

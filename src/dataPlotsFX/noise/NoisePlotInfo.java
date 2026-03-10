@@ -12,6 +12,7 @@ import dataPlotsFX.scrollingPlot2D.Scrolling2DPlotInfo;
 import noiseBandMonitor.NoiseBandControl;
 import noiseMonitor.NoiseDataBlock;
 
+//ST: didn't get anywhere inmplementing this.
 public class NoisePlotInfo extends TDDataInfoFX{
 
 	public NoisePlotInfo(TDDataProviderFX tdDataProvider, TDGraphFX tdGraph, NoiseBandControl noiseBandControl, NoiseDataBlock dataBlock) {

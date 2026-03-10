@@ -133,7 +133,7 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 			break;
 		}
 		
-			
+		
 	}
 	private void unpackAidtoNavigationData(NMEABitArray bitData) {
 		shipName = bitData.getString(43, 162);
