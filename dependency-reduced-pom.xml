@@ -371,16 +371,16 @@
   </dependencyManagement>
   <properties>
     <maven.compiler.release>11</maven.compiler.release>
-    <maven.compiler.source>11</maven.compiler.source>
-    <mockito.version>1.10.19</mockito.version>
     <geotools.version>34.0</geotools.version>
-    <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
-    <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <powermock.version>1.6.6</powermock.version>
     <javafx.version>21</javafx.version>
+    <jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <mockito.version>1.10.19</mockito.version>
+    <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
+    <maven.compiler.target>11</maven.compiler.target>
     <jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
     <maven.deploy.skip>true</maven.deploy.skip>
-    <jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
   </properties>
 </project>

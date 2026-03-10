@@ -16,7 +16,15 @@ public class SoundCardParameters implements Serializable, Cloneable, ManagedPara
 
 	public static final long serialVersionUID = 1;
 
-	public int deviceNumber;
+	/**
+	 * Ordinal number of sound card, old. Used if name cannot be found
+	 */
+	public int deviceNumber; 
+	
+	/**
+	 * Device name. 
+	 */
+	public String deviceName;
 
 	public String systemType;
 	

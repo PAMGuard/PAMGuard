@@ -58,8 +58,9 @@ public class SoundCardPanel implements DialogComponent {
 		for (int i = 0; i < currNames.size(); i++) {
 			deviceNames.addItem(currNames.get(i).toString());
 		}
-		if (soundCardSystem.soundCardParameters.deviceNumber < currNames.size()) {
-			deviceNames.setSelectedIndex(soundCardSystem.soundCardParameters.deviceNumber);
+		int num = soundCardSystem.getDeviceNumber();
+		if (num < currNames.size()) {
+			deviceNames.setSelectedIndex(num);
 		}
 		for (int i = 0; i < SoundCardParameters.BITDEPTHS.length; i++) {
 			bitButtons[i].setSelected(soundCardSystem.soundCardParameters.getBitDepth() == SoundCardParameters.BITDEPTHS[i]);
@@ -70,6 +71,8 @@ public class SoundCardPanel implements DialogComponent {
 	@Override
 	public boolean getParams() {
 		soundCardSystem.soundCardParameters.deviceNumber = deviceNames.getSelectedIndex();
+		soundCardSystem.soundCardParameters.deviceName = soundCardSystem.getDeviceName(soundCardSystem.soundCardParameters.deviceNumber);
+		
 		for (int i = 0; i < SoundCardParameters.BITDEPTHS.length; i++) {
 			if (bitButtons[i].isSelected()) {
 				soundCardSystem.soundCardParameters.setBitDepth(SoundCardParameters.BITDEPTHS[i]);
