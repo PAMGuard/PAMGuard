@@ -41,8 +41,8 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 	/**
 	 * global argument options to set device name or number 
 	 */
-	public static final String SETDEVNAME = "scname";
-	public static final String SETDEVNUMBER = "scnumber";
+	public static final String SETDEVNAME = "-scname";
+	public static final String SETDEVNUMBER = "-scnumber";
 
 //	JPanel daqDialog;
 	SoundCardPanel soundCardPanel;
