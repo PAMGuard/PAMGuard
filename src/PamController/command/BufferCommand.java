@@ -3,6 +3,7 @@ package PamController.command;
 import Acquisition.AcquisitionControl;
 import PamController.PamController;
 
+//ST: add monitor for daq buffer. 
 public class BufferCommand extends ExtCommand{
 
 	public BufferCommand() {

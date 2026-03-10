@@ -154,6 +154,7 @@ public class WhistleBinaryDataSource extends BinaryDataSource {
 			 * as file version went from 3 to 4. May have been some middle stuff where file version and module 
 			 * There is some FV 3 with MV 1, in which case data were probably duplicated. 
 			 */
+			//ST: modified to read decimus files in modern pamguard sometime between 2020 and 2026. likely okay to align 3/26
 			if (fileVersion > 3 && !SMRUEnable.isEnableDecimus()) { // basic data now in standard format. 
 				if (binaryObjectData.getDataUnitBaseData().getStartSample()==null) {
 					//some very rare circumstances
@@ -182,6 +183,7 @@ public class WhistleBinaryDataSource extends BinaryDataSource {
 			if (moduleVersion >= 1) {
 				amplitude = (double) dis.readShort() / 100.;
 			}
+			//ST: modified to read decimus files in modern pamguard. likely okay to align 3/26
 			if (fileVersion >= 4 && !SMRUEnable.isEnableDecimus()) {
 				// As of FILE version 4, the time delays are now stored in the DataUnitBaseData object.
 				// If there are no time delays yet, this method would return null.  In previous versions
@@ -268,6 +270,7 @@ public class WhistleBinaryDataSource extends BinaryDataSource {
 //		cr.addOfflineSlice(sliceData);
 //		cr.condenseInfo();
 		crdu = new ConnectedRegionDataUnit(binaryObjectData.getDataUnitBaseData(), cr, wmDetector);
+		//ST: modified to read decimus files in modern pamguard. likely okay to align 3/26
 		if(SMRUEnable.isEnableDecimus()) {
 			crdu.setTimeMilliseconds(binaryObjectData.getTimeMilliseconds());
 			crdu.setTimeDelaysSeconds(delays);

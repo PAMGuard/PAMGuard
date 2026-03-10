@@ -20,12 +20,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 
-import PamController.PamController;
-import PamController.PamGUIManager;
-import PamUtils.PlatformInfo;
-import PamUtils.PlatformInfo.OSType;
 import ai.djl.util.ZipUtils;
-import pamguard.GlobalArguments;
 import rawDeepLearningClassifier.defaultModels.RightWhaleModel1;
 
 /**
@@ -299,12 +294,7 @@ public class DLDownloadManager {
 	 * @return file object for new folder
 	 */
 	static public String getModelFolder() {
-		String settingsFolder;
-		if(GlobalArguments.getParam(DLControl.MODELPATH)!=null) {
-			settingsFolder = GlobalArguments.getParam(DLControl.MODELPATH);
-		}else {
-			settingsFolder = System.getProperty("user.home");
-		}
+		String settingsFolder = System.getProperty("user.home");
 		settingsFolder += File.separator + "Pamguard_deep_learning";
 		// now check that folder exists
 		File folder =  makeFolder( settingsFolder); 

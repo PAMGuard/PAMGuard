@@ -615,7 +615,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				
 			}
 		}
-		if (clear || true) {
+		if (clear) {
 			clearSummaryData();
 		}
 		

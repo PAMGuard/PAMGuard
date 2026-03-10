@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamTable;
 import PamView.panel.PamPanel;
@@ -59,24 +58,8 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	private ArrayList<T> dataUnitCopy;
 	
 	private Object copySynch = new Object();
-	
-	protected PamControlledUnit controlledUnit;
 
 	public DataBlockTableView(PamDataBlock<T> pamDataBlock, String displayName) {
-		initializeObject(pamDataBlock,displayName);
-	}
-
-	public DataBlockTableView(PamDataBlock<T> pamDataBlock, String displayName, PamControlledUnit controlledUnit) {
-		this.controlledUnit = controlledUnit;
-		setControlledUnit();
-		initializeObject(pamDataBlock,displayName);
-	}
-	
-	protected void setControlledUnit() {
-		
-	}
-	
-	private void initializeObject(PamDataBlock<T> pamDataBlock, String displayName) {
 		this.pamDataBlock = pamDataBlock;
 		this.displayName = displayName;
 		tablePanel = new PamPanel(new BorderLayout());

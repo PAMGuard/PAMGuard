@@ -2,6 +2,7 @@ package PamController.command;
 
 import PamUtils.PamCalendar;
 
+//ST: Added for configs/setups running without acoustic aquisition (ie ais only)
 public class GeneralUptimeCommand extends ExtCommand{
 	
 	private final static String name = "generaluptime";

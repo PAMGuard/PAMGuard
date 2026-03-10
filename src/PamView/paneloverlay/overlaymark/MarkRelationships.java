@@ -26,15 +26,7 @@ public class MarkRelationships implements PamSettings {
 	
 	private MarkRelationships() {
 		PamSettingManager.getInstance().registerSettings(this);
-		/*If called in constructor, 
-		then it will be called before all Controllers
-		have had the chance to register themselves as observers or markers
-		So true relationship establishment isn't able to get made.
-		In PamController.setupPamguard (at line 597 at the time of this comment)
-		rather than calling this constructor, call subscribeAllMarkers() to explicitly 
-		require the relationships prior to pam start.
-		*/
-		//subscribeAllMarkers();
+		subscribeAllMarkers();
 	}
 	
 	/**

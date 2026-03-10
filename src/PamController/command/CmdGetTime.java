@@ -2,6 +2,7 @@ package PamController.command;
 
 import PamUtils.PamCalendar;
 
+//ST: Add a network time to get system time
 public class CmdGetTime extends ExtCommand {
 
 	public CmdGetTime() {

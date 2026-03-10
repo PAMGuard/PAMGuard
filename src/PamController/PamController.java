@@ -220,6 +220,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * through.
 	 */
 	private GlobalMediumManager globalMediumManager;
+	
+	/**
+	 * Manager for PamWizard functionality
+	 */
+	private PamWizardManager pamWizardManager;
 
 	/**
 	 * A reference to the module currently being loaded. Used by the
@@ -274,6 +279,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		globalTimeManager = new GlobalTimeManager(this);
 		globalMediumManager = new GlobalMediumManager(this);
+		pamWizardManager = new PamWizardManager(this);
 
 		setPamStatus(PAM_IDLE);
 
@@ -378,6 +384,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * modules will have received INITIALISATION_COMPLETE and should be good to run
 	 */
 	private void creationComplete() {
+		
+		MarkRelationships.getInstance().subscribeAllMarkers();
+		
 		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {
 			if (getRunMode() == RUN_NORMAL) {
 				startLater(); // may as well give AWT time to loop it's queue once more
@@ -385,6 +394,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 			else if (getRunMode() == RUN_PAMVIEW) {
 				startOfflineTasks();
 			}
+		}
+		else {
 		}
 	}
 
@@ -621,7 +632,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			 * to do anything more than call the constructor and everything else will
 			 * happen...
 			 */
-			MarkRelationships.getInstance().subscribeAllMarkers();
+			MarkRelationships.getInstance();
 		}
 		if (getRunMode() == RUN_PAMVIEW) {
 			/**
@@ -794,7 +805,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public void shutDownPamguard() {
 		// force close the javaFX thread (because it won't close by itself - see
 		// Platform.setImplicitExit(false) in constructor
-		Platform.exit();
+		try {
+			Platform.exit();
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 
 		// terminate the JVM
 		System.exit(getPamStatus());
@@ -1353,8 +1369,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//				System.out.println("Invalid reprocess choice command: " + reprocessString);
 		//			}
 		//		}
-
-		if (saveSettings && getRunMode() == RUN_NORMAL) { // only true on a button press or network start.
+		
+		/*
+		 *  only want to run the reprocess manager if it's file analysis, not for real time, since in real
+		 *  time, things can only move forwards.  
+		 */
+		boolean isRT = globalTimeManager.isRealTime();
+		if (saveSettings && getRunMode() == RUN_NORMAL && isRT == false) { // only true on a button press or network start and it's not real time
 			checkReprocessManager(saveSettings, startTime);
 		}
 		else {
@@ -2931,16 +2952,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-<<<<<<< Updated upstream
 	 * Respond to storage options dialog. Selects whether data 
 	 * are stored in binary, database or both
 	 * @param parentFrame 
-=======
-	 * Respond to storage options dialog. Selects whethere data are stored in
-	 * binary, database or both
-	 * 
-	 * @param parentFrame
->>>>>>> Stashed changes
 	 */
 	public void storageOptions(JFrame parentFrame) {
 		StorageOptions.getInstance().showDialog(parentFrame);
@@ -3182,6 +3196,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public WatchdogComms getWatchdogComms() {
 		return watchdogComms;
+	}
+	
+	
+	/**
+	 * Get the PAMWizard manager - manages creating configurations
+	 * @return the pamWizardManager
+	 */
+	public PamWizardManager getPamWizardManager() {
+		return pamWizardManager;
 	}
 
 	/**
