@@ -33,6 +33,9 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	
 	String name;
 
+	/**
+	 * Port for UDP comms
+	 */
 	public int port;
 	
 	public boolean multicast;

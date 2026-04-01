@@ -34,6 +34,7 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import nmeaEmulator.NMEAFrontEnd;
+import pamguard.GlobalArguments;
 
 
 /**
@@ -55,13 +56,18 @@ import nmeaEmulator.NMEAFrontEnd;
  */
 public class NMEAControl extends PamControlledUnit implements PamSettings {
 
-	AcquireNmeaData acquireNmeaData;
+	protected AcquireNmeaData acquireNmeaData;
 //	ProcessAISData processAISData;
-	NMEAParameters nmeaParameters = new NMEAParameters();
+	protected NMEAParameters nmeaParameters = new NMEAParameters();
 //	JMenuItem nmeaMenu;
-	NMEAControl nmeaControl;
+	private NMEAControl nmeaControl;
 	
 	public static final String nmeaUnitType = "NMEA Data";
+	
+	/**
+	 * Command line to set com port from command start line. 
+	 */
+	public static final String NMEACOMCOMMAND = "-NMEAPORT";
 
 	public NMEAControl(String unitName) {
 		
@@ -73,14 +79,20 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 
 		addPamProcess(acquireNmeaData);
 		setModuleStatusManager(acquireNmeaData);
-
-//		addPamProcess(new ProcessNmeaData(this, acquireNmeaData.getOutputDataBlock(0), new NMEAParameters()));
-
-//		addPamProcess(processAISData = new ProcessAISData(this, acquireNmeaData.getOutputDataBlock(0)));
 		
 		PamSettingManager.getInstance().registerSettings(this);
 		
-//		nmeaMenu = createNMEAMenu();
+		checkGlobalArguments();
+		
+	}
+
+	private void checkGlobalArguments() {
+		String globArg = GlobalArguments.getParam(NMEACOMCOMMAND);
+		if (globArg != null) {
+			System.out.printf("Setting %s COM port to %s\n", getUnitName(), globArg);
+			nmeaParameters.serialPortName = globArg;
+		}
+		
 	}
 
 	public JMenuItem createNMEAMenu(Frame parentFrame) {
@@ -231,6 +243,13 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	 */
 	public NMEADataBlock getNMEADataBLock() {
 		return acquireNmeaData.getOutputDatablock();
+	}
+
+	/**
+	 * @return the acquireNmeaData
+	 */
+	public AcquireNmeaData getAcquireNmeaData() {
+		return acquireNmeaData;
 	}
 	
 }

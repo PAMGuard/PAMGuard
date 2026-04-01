@@ -44,6 +44,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
 import Acquisition.SoundCardSystem;
+import NMEA.NMEAControl;
 import PamController.PamController;
 import PamController.PamFolders;
 import PamController.PamGUIManager;
@@ -362,6 +363,10 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase(SoundCardSystem.SETDEVNUMBER)) {
 //					soundcard number
 					GlobalArguments.setParam(SoundCardSystem.SETDEVNUMBER, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(NMEAControl.NMEACOMCOMMAND)) {
+					// NMEA COM Port
+					GlobalArguments.setParam(NMEAControl.NMEACOMCOMMAND, args[iArg++]);
 				}
 				else if (anArg.equalsIgnoreCase(ReprocessStoreChoice.paramName)) {
 					String arg = args[iArg++];
