@@ -205,8 +205,7 @@ public class SpecCorrPane extends SettingsPane<IshDetParams> {
 
 	@Override
 	public IshDetParams getParams(IshDetParams params) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.params;
 	}
 
 	@Override
@@ -217,7 +216,6 @@ public class SpecCorrPane extends SettingsPane<IshDetParams> {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Ishmael Spec. Correlation Pane";
 	}
 

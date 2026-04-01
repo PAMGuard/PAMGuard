@@ -165,7 +165,7 @@ public class NetworkReceiveThread implements Runnable {
 		}
 		networkDataUser.socketClosed(this);
 		
-//		System.out.println("Receive thread terminated");
+		System.out.println("Receive thread terminated");
 //					clientSocket.close();
 	}
 

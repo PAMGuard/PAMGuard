@@ -5,7 +5,6 @@ import networkTransfer.receive.swing.NetworkRXTabPanel;
 import networkTransfer.receive.swing.NetworkReceiveDialog;
 import networkTransfer.receive.swing.NetworkReceiveSidePanel;
 import networkTransfer.receive.swing.RXTableMouseListener;
-import nidaqdev.networkdaq.NetworkAudioInterpreter;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -493,6 +492,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	}
 	
 	private NetworkAudioInterpreter networkAudioInterpreter;
+
 	@Override
 	public synchronized NetworkObject interpretData(NetworkObject receivedObject) {
 		
@@ -542,7 +542,8 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 			break;
 		case NET_AUDIO_DATA:
 			if (networkAudioInterpreter == null) {
-				networkAudioInterpreter = new NetworkAudioInterpreter(this);
+//				networkAudioInterpreter = new CRioAudioInterpreter(this);
+				return null;
 			}
 			networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
 		}
@@ -1076,4 +1077,11 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		
 	}
 
+	public NetworkAudioInterpreter getNetworkAudioInterpreter() {
+		return networkAudioInterpreter;
+	}
+
+	public void setNetworkAudioInterpreter(NetworkAudioInterpreter networkAudioInterpreter) {
+		this.networkAudioInterpreter = networkAudioInterpreter;
+	}
 }
