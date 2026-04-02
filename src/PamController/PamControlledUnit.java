@@ -757,7 +757,7 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	}
 
 	/**
-	 * Get a module summary text string for shorthand output to anyting wanting a 
+	 * Get a module summary text string for shorthand output to anything wanting a 
 	 * short summary of data state / numbers of detections. 
 	 * @param clear clear data after generating string, so that counts of detections, etc. start again from 0. 
 	 * @return module summary string - goings on since the last call to this function

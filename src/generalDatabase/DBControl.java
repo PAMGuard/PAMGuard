@@ -896,5 +896,18 @@ PamSettingsSource {
 		return lastErrorCount;
 	}
 
+	@Override
+	public String getModuleSummary(boolean clear) {
+		/**
+		 * Get a module summary for the database, so can check remotely
+		 * Returned fields will be name, autocommit (0 or 1), number of writes, number of fails. 
+		 */
+		if (dbProcess == null) {
+			return null;
+		}
+		
+		return dbProcess.getModuleSummary(clear);
+	}
+
 
 }
