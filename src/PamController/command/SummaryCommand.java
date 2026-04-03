@@ -44,6 +44,10 @@ public class SummaryCommand extends ExtCommand {
 		}
 		long nowTime = PamCalendar.getTimeInMillis();
 		totalString = PamCalendar.formatDBDateTime(lastCallTime) + "-" + PamCalendar.formatDBDateTime(nowTime);
+		String mainSummary = pamController.getMainSummary(clear);
+		String mainName = "PAMGUARD";
+		totalString += String.format("\n<%s>%s<\\%s>", mainName, 
+				 mainSummary, mainName);
 		int usedModules = 0;
 		for (int i = 0; i < nMod; i++) {
 			aModule = pamController.getControlledUnit(i);

@@ -1664,8 +1664,8 @@ public class DBProcess extends PamProcess {
 	 * 
 	 * Get a module summary for the database, so can check remotely
 	 * Returned fields will be name, autocommit (0 or 1), number of writes, number of fails. 
-	 * @param clear
-	 * @return
+	 * @param clear reset data counts to zero when called. 
+	 * @return summary string
 	 */
 	public String getModuleSummary(boolean clear) {
 		DBSystem dbSystem = databaseControll.databaseSystem;
@@ -1678,7 +1678,6 @@ public class DBProcess extends PamProcess {
 		if (clear) {
 			summaryWriteOK = summaryWriteErr = 0;
 		}
-		
 		return summary;
 	}
 
