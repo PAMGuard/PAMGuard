@@ -33,6 +33,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,11 +64,12 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 		19200, 38400, 57600, 115200, 230400, 460800, 921600};
 	private JComboBox<String> portComboBox = new JComboBox<String>();
 	private JComboBox<Integer> bitsPerSecondComboBox = new JComboBox<Integer>();	
+	private JCheckBox autoComPort = new JCheckBox("Auto serial port");
 
 	public static NMEAParameters showDialog(Frame parentFrame, NMEAParameters nmeaParameters) {
-		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
+//		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new NMEAParametersDialog(parentFrame, nmeaParameters);
-		}
+//		}
 		singleInstance.nmeaParameters = nmeaParameters.clone();
 		
 		singleInstance.SetParams(nmeaParameters);
@@ -95,6 +97,8 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 			System.out.println("setting = choice == Sim");
 			simNmeaGpsRadio.setSelected(true);
 		}
+		
+		autoComPort.setSelected(nmeaParameters.autoSerialPort);
 		
 		bitsPerSecondComboBox.setSelectedItem(nmeaParameters.serialPortBitsPerSecond);
 //		ArrayList<CommPortIdentifier> commPortIds = SerialPortCom.getPortArrayList();
@@ -147,11 +151,29 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 		udpPortSelection.add(new PamLabel("Group IP address"));
 		udpPortSelection.add(groupTextField = new PamTextField(12));
 		
-		serialPortSelection.setLayout(new GridLayout(2,2));
-		serialPortSelection.add(new JLabel("Port"));
-		serialPortSelection.add(portComboBox);
-		serialPortSelection.add(new JLabel("BAUD"));
-		serialPortSelection.add(bitsPerSecondComboBox);
+		serialPortSelection.setLayout(new GridBagLayout());
+		GridBagConstraints c = new PamGridBagContraints();
+		c.gridx = 0;
+		c.gridwidth = 2;
+		serialPortSelection.add(autoComPort, c);
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy++;
+		serialPortSelection.add(new JLabel("Port", JLabel.RIGHT), c);
+		c.gridx++;
+		serialPortSelection.add(portComboBox, c);
+		c.gridx = 0;
+		c.gridy++;
+		serialPortSelection.add(new JLabel("BAUD", JLabel.RIGHT), c);
+		c.gridx++;
+		serialPortSelection.add(bitsPerSecondComboBox, c);
+		autoComPort.setToolTipText("Automatically search available serial ports for NMEA data");
+		autoComPort.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				enableControls();
+			}
+		});
 
 		gpsRadioGroup = new ButtonGroup(); // for logical association of rad buttons 
 		//JRadioButton serialNmeaGpsRadio;
@@ -169,7 +191,7 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 //		simSelection.add(simNmeaGpsRadio);
 		
 		simSelection.setLayout(new GridBagLayout());
-		GridBagConstraints c = new PamGridBagContraints();
+		c = new PamGridBagContraints();
 		addComponent(simSelection, serialNmeaGpsRadio, c);
 		c.gridy++;
 		addComponent(simSelection, udpNmeaGpsRadio, c);
@@ -234,6 +256,7 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 				nmeaParameters.sourceType = NmeaSources.SIMULATED;
 			}
 			nmeaParameters.simThread = nmeaParameters.sourceType == NmeaSources.SIMULATED;
+			nmeaParameters.autoSerialPort = autoComPort.isSelected();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -265,8 +288,10 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 	}
 	
 	public void enableControls() {
+//		portComboBox.setEnabled(autoComPort.isSelected() == false);
+		
 		portTextField.setEnabled(udpNmeaGpsRadio.isSelected());
-		portComboBox.setEnabled(serialNmeaGpsRadio.isSelected());
+		portComboBox.setEnabled(serialNmeaGpsRadio.isSelected() && autoComPort.isSelected() == false);
 		bitsPerSecondComboBox.setEnabled(serialNmeaGpsRadio.isSelected());
 		
 		udpPortSelection.setVisible(udpNmeaGpsRadio.isSelected());
