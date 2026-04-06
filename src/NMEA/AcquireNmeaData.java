@@ -262,7 +262,25 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 		@Override
 		public void newLine(String aLine) {
-			processNmeaString(new StringBuffer(aLine));
+			/*
+			 * Do a couple more checks, now that we're allowing auto port detection
+			 * to be sure that it's NMEA data coming through, and not some other junk. 
+			 */
+			// check the first character is a $
+			if (aLine == null || aLine.length() == 0) {
+				return;
+			}
+			if (aLine.startsWith("$") == false) {
+				sayErrorString("Invalid NMEA string (no $): " + aLine);
+				return;
+			}
+			StringBuffer sb = new StringBuffer(aLine);
+			boolean ok = checkStringCheckSum(sb);
+			if (ok == false) {
+				sayErrorString("Invalid NMEA string checksum: " + aLine);
+				return;
+			}
+			processNmeaString(sb);
 		}
 
 		@Override
