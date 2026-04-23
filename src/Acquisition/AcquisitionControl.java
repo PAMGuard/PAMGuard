@@ -939,5 +939,11 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		}
 		return daqSys.getStartButtonToolTip();
 	}
+	/**
+	 * @return the lastSelSystem
+	 */
+	public DaqSystem getLastSelSystem() {
+		return lastSelSystem;
+	}
 
 }

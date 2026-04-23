@@ -41,6 +41,7 @@ import PamController.DataInputStore;
 import PamController.InputStoreInfo;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamGUIManager;
 import PamController.PamSettings;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
@@ -203,7 +204,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			setFolderInputParameters(new FolderInputParameters(getSystemType()));
 		//		PamSettingManager.getInstance().registerSettings(this); //calling super already registers this in the FileInputSystem constructor
 		//		checkComandLine();
-		makeSelFileList();
+		// don't do anything if this isn't the selected system
+
+		/*
+		 * Don't call makeSelFileList() here. It will get called when this system is selected. 
+		 * makeSelFileList();
+		 */
 		newFileTimer = new Timer(1000, new RestartTimer());
 		newFileTimer.setRepeats(false);
 		//		timer = new Timer(1000, new TimerAction());
@@ -773,6 +779,10 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 * Show the date of the first file in the dialog.
 	 */
 	public void setFileDateText() {
+		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			// protect against is trying to display anything in nogui mode. 
+			return;
+		}
 		if (allFiles.size() > 0) {
 			long fileTime = getFileStartTime(getCurrentFile());
 			//			fileDateText.setText(PamCalendar.formatDateTime(fileTime));
