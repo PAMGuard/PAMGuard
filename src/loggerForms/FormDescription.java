@@ -1312,7 +1312,9 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 	 * removes the Subtabform that the loggerForm calling it is on
 	 */
 	void removeSubtabform(LoggerForm loggerForm){
-
+if (subTabPane == null) {
+	return;
+}
 		//removes the Subtabform that is currently selected(it will be the one this command is called from)
 
 		//		subTabs.removeTabAt(subTabs.getSelectedIndex());

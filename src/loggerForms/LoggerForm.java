@@ -869,7 +869,7 @@ public class LoggerForm{
 	/**
 	 * Extract and save teh data inot a new PAmDAtaUnit. 
 	 */
-	private void save() {
+	public void save() {
 		//create form data object 
 		Object[] formData = extractFormData();
 		
@@ -972,6 +972,18 @@ public class LoggerForm{
 	}
 	public void optionsChange() {
 		enableControls();
+	}
+	/**
+	 * @return the clearButton
+	 */
+	public JButton getClearButton() {
+		return clearButton;
+	}
+	/**
+	 * @return the cancelButton
+	 */
+	public JButton getCancelButton() {
+		return cancelButton;
 	}
 	
 //	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {
