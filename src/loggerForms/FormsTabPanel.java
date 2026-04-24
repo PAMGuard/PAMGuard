@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -83,16 +85,48 @@ public class FormsTabPanel implements PamTabPanel {
 	
 	public void createForms() {
 		int nForms = formsControl.getNumFormDescriptions();
-		FormDescription fD;
 		JComponent formComponent;
 		
+		// make a list of form descriptions, then sort it sensibly. 
+		ArrayList<FormDescription> formDescriptions = new ArrayList();
 		for (int i = 0; i < nForms; i++) {
-			fD = formsControl.getFormDescription(i);
+			FormDescription fD = formsControl.getFormDescription(i);
+			formDescriptions.add(fD);
+		}
+		
+		formDescriptions.sort(new FormSorter());
+		
+		for (FormDescription fD : formDescriptions) {
 			formComponent = fD.getTabComponent();
 			if (formComponent != null) {
 				mainTabbedPane.addTab(fD.getFormTabName(), null, formComponent, fD.getTabToolTip());
 			}
 		}
+	}
+	
+	private class FormSorter implements Comparator<FormDescription> {
+
+		@Override
+		public int compare(FormDescription f1, FormDescription f2) {
+			Integer o1 = f1.getFormOrderProperty();
+			Integer o2 = f2.getFormOrderProperty();
+			String n1 = f1.getFormName();
+			String n2 = f2.getFormName();
+			if (o1 != null && o2 != null) {
+				if (o2 != o1) {
+					return o1-o2;
+				}
+			}
+			else if (o1 != null) {
+				return 1;
+			}
+			else if (o2 != null) {
+				return -1;
+			}
+			// arrive here if both order properties are null.			
+			return n1.compareToIgnoreCase(n2);
+		}
+		
 	}
 	
 	/**

@@ -101,7 +101,7 @@ public abstract class PamDialogFX<T> extends Dialog<T> {
 	}
 	
 	/**
-	 * Set a default PAMguard icon on the dialog. 
+	 * Set a default PAMGuard icon on the dialog. 
 	 */
 	private void setDefaultIcon() {
 		try {

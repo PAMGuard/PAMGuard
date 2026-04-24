@@ -12,7 +12,6 @@ import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -50,7 +49,7 @@ import loggerForms.controls.LoggerControl;
 import loggerForms.controls.NMEAControl;
 
 /**
- * A LoggerForm is the central component of all form types, inclucing normal forms
+ * A LoggerForm is the central component of all form types, including normal forms
  * popup forms and subtab forms. Therefore the form itself is capable of providing a single
  * JComponent (a JPanel). some other part of the software will either place this into the main tab
  * panel, a sub tab panel or it's own dialog frame (for a pop-up). 
@@ -489,9 +488,12 @@ public class LoggerForm{
 		innerCenterPanel = new LoggerFormPanel(this);
 		ArrayList<ControlDescription> controlDescriptions = formDescription.getControlDescriptions();
 
-		innerCenterPanel.setLayout(new BoxLayout(innerCenterPanel, BoxLayout.Y_AXIS));
+		int vGap = 1;
+//		BoxLayout boxLayout;
+//		innerCenterPanel.setLayout(boxLayout = new BoxLayout(innerCenterPanel, BoxLayout.Y_AXIS));
 
-		innerCenterPanel.setLayout(new VerticalLayout(0,VerticalLayout.LEFT,VerticalLayout.TOP));
+		VerticalLayout vLayout;
+		innerCenterPanel.setLayout(vLayout = new VerticalLayout(0,VerticalLayout.LEFT,VerticalLayout.TOP));
 
 		//		VerticalFlowLayout vert;
 		//		innerCenterPanel.setLayout(vert=new VerticalFlowLayout(VerticalFlowLayout.TOP,0,0));
@@ -499,7 +501,10 @@ public class LoggerForm{
 		//		vert.set
 		//		new FlowLayout().set
 
-		LoggerFormPanel currentRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.LEFT));
+		FlowLayout rowLayout;
+		LoggerFormPanel currentRow = new LoggerFormPanel(this, rowLayout = new FlowLayout(FlowLayout.LEFT));
+
+		rowLayout.setVgap(vGap);
 
 		/*
 		 * start loop. whenever you get a newline, add to centrePanel and create a new currentRow
@@ -516,13 +521,26 @@ public class LoggerForm{
 					boolean tst = true; // why isthis here ? Must have been for a debug point
 				}
 				inputControls.add(currentControl);
-				currentRow.add(currentControl.getComponent());
+				JPanel comp;
+				currentRow.add(comp = currentControl.getComponent());
+//				comp.setBackground(Color.cyan);
 			}else if(c.getEType()==ControlTypes.NEWLINE){
 				//				currentRow.add(new JLabel("|"));
 				innerCenterPanel.add(currentRow);
-				currentRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.LEFT));
+				currentRow = new LoggerFormPanel(this, rowLayout = new FlowLayout(FlowLayout.LEFT));
+				rowLayout.setVgap(vGap);
 			}else{
-				JPanel component = c.makeComponent(this);
+//				JPanel component = c.makeComponent(this);
+				JPanel component = null;
+				LoggerControl currentControl = c.makeControl(this);
+				if (currentControl != null) {
+//					inputControls.add(currentControl);
+					 component = currentControl.getComponent();
+				}
+				if (component == null) {
+					component = c.makeComponent(loggerForm);
+				}
+				
 				if (component != null) {
 					currentRow.add(component);
 				}

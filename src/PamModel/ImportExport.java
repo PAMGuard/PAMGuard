@@ -23,7 +23,7 @@ import PamUtils.PamFileFilter;
 import PamView.dialog.warn.WarnOnce;
 
 /**
- * General PAMguard class for managing import and export of specific Java object types. 
+ * General PAMGuard class for managing import and export of specific Java object types. 
  * @author Doug
  *
  * @param <IOClass>

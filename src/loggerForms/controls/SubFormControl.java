@@ -88,7 +88,9 @@ public class SubFormControl extends LoggerControl {
 		 * Probably better to make the form once so that it can be re-used, not clearing all
 		 * controls, etc. 
 		 */
-		LoggerForm subForm = subFormDescription.createForm();
+		if (subFormDescription != null) {
+			LoggerForm subForm = subFormDescription.createForm();
+		}
 		// throw the sub form into a new window - similar to editing from the table views.  
 		
 	}

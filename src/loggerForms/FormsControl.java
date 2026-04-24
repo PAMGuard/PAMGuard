@@ -587,7 +587,7 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 		if (subFormCount == 0) {
 			return true;
 		}
-		String message = "One or more forms have open sub tab forms. Do you still want to close PAMguard";
+		String message = "One or more forms have open sub tab forms. Do you still want to close PAMGuard";
 		int ans = JOptionPane.showConfirmDialog(getGuiFrame(), message, getUnitName(), JOptionPane.YES_NO_OPTION);
 		return (ans == JOptionPane.YES_OPTION);
 	}
