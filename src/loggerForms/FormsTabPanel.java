@@ -18,6 +18,8 @@ import javax.swing.KeyStroke;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import com.fasterxml.jackson.core.format.DataFormatDetector;
+
 import PamView.PamTabPanel;
 import PamView.panel.PamPanel;
 
@@ -294,5 +296,24 @@ public class FormsTabPanel implements PamTabPanel {
 		}
 
 
+	}
+
+	/**
+	 * Goto the form for the given tab. 
+	 * @param formDescription
+	 */
+	public void gotoForm(FormDescription formDescription) {
+		JComponent tabComponent = formDescription.getTabComponent();
+		if (tabComponent == null) {
+			return; // there is no tab for this form (probably hidden or popup)
+		}
+		int nTbs = mainTabbedPane.getTabCount();
+		for (int i = 0; i < nTbs; i++) {
+			String tabTit = mainTabbedPane.getTitleAt(i);
+			if (tabTit.equalsIgnoreCase(formDescription.getFormTabName())) {
+				mainTabbedPane.setSelectedIndex(i);
+				break;
+			}
+		}
 	}
 }

@@ -82,6 +82,8 @@ public class ControlEditor {
 			return new TimePropertySet(formDescription, controlTitle);
 		case VSPACE:
 			return new SpacePropertySet(formDescription, controlTitle);
+		case BUTTON:
+			return new ButtonPropertySet(formDescription, controlTitle);
 		default:
 			return null;
 		}

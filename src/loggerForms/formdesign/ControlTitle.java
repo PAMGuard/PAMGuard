@@ -17,6 +17,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import loggerForms.FormDescription;
 import loggerForms.ItemInformation;
 import loggerForms.UDColName;
 import loggerForms.controlDescriptions.ControlDescription;
@@ -59,8 +60,16 @@ public class ControlTitle {
 		baseColour = titleComponent.getBackground();
 		titleComponent.setBorder(new EmptyBorder(2,2,2,2));
 		titleComponent.setLayout(new BorderLayout());
+		FormDescription fd = itemInformation.getFormDescription();
+		ControlTypes[] availableTypes;
+		if (fd.isUDB()) {
+			availableTypes = ControlTypes.getUDBControls();
+		}
+		else {
+			availableTypes = ControlTypes.getUDFControls();
+		}
 		controlType  = new JComboBox<>();
-		for (ControlTypes ct:ControlTypes.values()) {
+		for (ControlTypes ct:availableTypes) {
 			controlType.addItem(ct);
 		}
 		controlType.setSelectedItem(itemInformation.getControlType());

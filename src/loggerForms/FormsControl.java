@@ -286,6 +286,9 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 					if (tableName.toUpperCase().startsWith("UDF_")) {
 						udfTableNameList.add(tableName);
 					}
+					if (tableName.toUpperCase().startsWith("UDB_")) {
+						udfTableNameList.add(tableName);
+					}
 				}
 
 			} catch (SQLException e) {
@@ -373,8 +376,16 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 	public JMenuItem createDetectionMenu(Frame parentFrame) {
 		JMenuItem detMenu = new JMenu(getUnitName());
 		JMenuItem menuItem = new JMenuItem("Create New Form ...");
+		menuItem.setToolTipText("Create a new data entry (UDF) type form");
 		detMenu.add(menuItem);
 		menuItem.addActionListener(new NewLoggerForm(parentFrame));
+
+		menuItem = new JMenuItem("Create Button Form ...");
+		menuItem.setToolTipText("Create a new button (UDB) type form");
+		detMenu.add(menuItem);
+		menuItem.addActionListener(new NewButtonForm(parentFrame));
+		
+		
 //		if (SMRUEnable.isEnable()) {
 		JMenu editMenu = new JMenu("Edit form");
 		for (int i = 0; i < getNumFormDescriptions(); i++) {
@@ -417,6 +428,21 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 			newLoggerform(parentFrame);
 		}
 	}
+	
+	class NewButtonForm implements ActionListener {
+
+		private Frame parentFrame;
+
+		public NewButtonForm(Frame parentFrame) {
+			this.parentFrame = parentFrame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			newButtonform(parentFrame);
+		}
+	}
+	
 	
 	private void notifyOptionsChange() {
 		if (formDescriptions == null) {
@@ -477,13 +503,45 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 			newName = "UDF_" + newName;
 		}
 		String message = String.format("The table definition %s will now be created in the database.", newName);
-		message += "\nNote that youwill have to exit PAMGUARD and enter form control data by hand into this table.";
-		message += "\nFuture releases will (hopefully) contain a more friendly programmable interface";
+		message += "\nUse for form design tools from the \"Edit Form\" meny to add controls and other options";
+//		message += "\nNote that youwill have to exit PAMGUARD and enter form control data by hand into this table.";
+//		message += "\nFuture releases will (hopefully) contain a more friendly programmable interface";
 		int ans = JOptionPane.showConfirmDialog(parentFrame, message, "Create Form", JOptionPane.OK_CANCEL_OPTION);
 		if (ans == JOptionPane.CANCEL_OPTION) {
 			return null;
 		}
 		UDFTableDefinition tableDef = new UDFTableDefinition(newName);
+		message = String.format("The table %s could not be created in the databse %s", newName,
+				DBControlUnit.findDatabaseControl().getDatabaseName());
+		if (!DBControlUnit.findDatabaseControl().getDbProcess().checkTable(tableDef)) {
+			JOptionPane.showMessageDialog(parentFrame, "Error Creating form", message, JOptionPane.ERROR_MESSAGE);
+		}
+		return newName;
+	}
+	/**
+	 * Create a new logger form
+	 * 
+	 * @param parentFrame parent frame
+	 * @return selected name for new form, or null if nothing created.
+	 */
+	public String newButtonform(Frame parentFrame) {
+		String newName = JOptionPane.showInputDialog(parentFrame, "Enter the name for the new button form",
+				"New Button Form", JOptionPane.OK_CANCEL_OPTION);
+		if (newName == null) {
+			return null;
+		}
+		// will make a form table definition with a standard structure and name UDF_ ...
+		// check the current name starts with UDF and add if necessary.
+		if (!newName.toUpperCase().startsWith("UDF_")) {
+			newName = "UDB_" + newName;
+		}
+		String message = String.format("The table definition %s will now be created in the database.", newName);
+		message += "\nUse for form design tools from the \"Edit Form\" meny to add controls and other options";
+		int ans = JOptionPane.showConfirmDialog(parentFrame, message, "Create Form", JOptionPane.OK_CANCEL_OPTION);
+		if (ans == JOptionPane.CANCEL_OPTION) {
+			return null;
+		}
+		UDBTableDefinition tableDef = new UDBTableDefinition(newName);
 		message = String.format("The table %s could not be created in the databse %s", newName,
 				DBControlUnit.findDatabaseControl().getDatabaseName());
 		if (!DBControlUnit.findDatabaseControl().getDbProcess().checkTable(tableDef)) {

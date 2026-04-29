@@ -19,6 +19,9 @@ import loggerForms.LoggerForm;
 import loggerForms.controls.LoggerControl;
 
 /**
+ * ControlDescriptions describe specific controls and help handle their data, i.e. they only exist once a form has been
+ * designed and created. 
+ * <p>A list of possible control types is in the enum ControlType. 
  * @author GrahamWeatherup
  *
  */
@@ -183,23 +186,13 @@ public abstract class ControlDescription extends ItemDescription  {
 				return new CdxVSpace(formDescription, itemInformation);
 			case SUBFORM: 
 				return new CdSubForm(formDescription, itemInformation);
+			case BUTTON:
+				return new CdButton(formDescription, itemInformation);
 		}
 		return null;
 	}
 	
-//	abstract Class getDataClasses();
-	
-//	
-//	public boolean isInput(){
-////		System.out.println(getType());
-//		if (/**/eType==ControlTypes.HSPACE||
-//				eType==ControlTypes.STATIC||
-//				eType==ControlTypes.VSPACE||
-//				eType==ControlTypes.NEWLINE){
-//			return false;
-//		}
-//		return true;
-//	}
+
 	
 	public abstract LoggerControl makeControl(LoggerForm loggerForm);
 	

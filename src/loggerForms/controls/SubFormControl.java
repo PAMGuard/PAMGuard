@@ -106,13 +106,14 @@ public class SubFormControl extends LoggerControl {
 		if (otherItem == null) {
 			return null;
 		}
-		ArrayList<LoggerControl> inputs = otherForm.getInputControls();
-		for (LoggerControl lc : inputs) {
-			if (lc.getControlDescription().getTitle().equalsIgnoreCase(otherItem)) {
-				return lc;
-			}
-		}
-		return null;
+		return otherForm.findInputControl(otherItem);
+//		ArrayList<LoggerControl> inputs = otherForm.getInputControls();
+//		for (LoggerControl lc : inputs) {
+//			if (lc.getControlDescription().getTitle().equalsIgnoreCase(otherItem)) {
+//				return lc;
+//			}
+//		}
+//		return null;
 	}
 	
 	/**

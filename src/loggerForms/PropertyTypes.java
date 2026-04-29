@@ -1,5 +1,8 @@
 package loggerForms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public enum PropertyTypes {
 	STARTTIME, ENDTIME, ORDER, AUTOALERT,SUBTABS,POPUP,HIDDEN,AUTORECORD,BEARING,
 	RANGE,HEADING,FONT,DBTABLENAME,
@@ -75,5 +78,53 @@ public enum PropertyTypes {
 		
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @return true if the property can be used on a UDF form
+	 */
+	public boolean isUDF() {
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @return true if the property can be used on a UDB (button) form. 
+	 */
+	public boolean isUDB() {
+		return false;
+	}
+	
+	/**
+	 * Get a list of property types that can be used with UDF (normal) forms. 
+	 * @return
+	 */
+	public static PropertyTypes[] getUDFProperties() {
+		PropertyTypes[] v = values();
+		PropertyTypes[] types = new PropertyTypes[v.length];
+		int j = 0;
+		for (int i = 0; i < v.length; i++) {
+			if (v[i].isUDF()) {
+				types[j++] = v[i];
+			}
+		}
+		return Arrays.copyOf(types, j);
+	}
+	
+	/**
+	 * Get a list of property types that can be used with UDB (button) forms. 
+	 * @return
+	 */
+	public static PropertyTypes[] getUDBProperties() {
+		PropertyTypes[] v = values();
+		PropertyTypes[] types = new PropertyTypes[v.length];
+		int j = 0;
+		for (int i = 0; i < v.length; i++) {
+			if (v[i].isUDB()) {
+				types[j++] = v[i];
+			}
+		}
+		return Arrays.copyOf(types, j);
 	}
 }

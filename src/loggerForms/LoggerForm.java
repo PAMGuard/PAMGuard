@@ -68,6 +68,7 @@ public class LoggerForm{
 	 */
 	private ArrayList<LoggerControl> inputControls;
 
+	private ArrayList<LoggerControl> allControls;
 
 	/**
 	 * @return the inputControls
@@ -158,6 +159,7 @@ public class LoggerForm{
 
 		formPanel.add(BorderLayout.CENTER, centrePanel);
 		inputControls = new ArrayList<LoggerControl>();
+		allControls = new ArrayList<LoggerControl>();
 
 
 		fillCentrePanel();
@@ -521,6 +523,7 @@ public class LoggerForm{
 					boolean tst = true; // why isthis here ? Must have been for a debug point
 				}
 				inputControls.add(currentControl);
+				allControls.add(currentControl);
 				JPanel comp;
 				currentRow.add(comp = currentControl.getComponent());
 //				comp.setBackground(Color.cyan);
@@ -533,6 +536,7 @@ public class LoggerForm{
 //				JPanel component = c.makeComponent(this);
 				JPanel component = null;
 				LoggerControl currentControl = c.makeControl(this);
+				allControls.add(currentControl);
 				if (currentControl != null) {
 //					inputControls.add(currentControl);
 					 component = currentControl.getComponent();
@@ -609,6 +613,40 @@ public class LoggerForm{
 		}
 
 		enableControls();
+	}
+	
+	/**
+	 * find a control from it's name. 
+	 * @param controlTitle
+	 * @return
+	 */
+	public LoggerControl findInputControl(String controlTitle) {
+		ArrayList<LoggerControl> inputs = getInputControls();
+		for (LoggerControl lc : inputs) {
+			if (lc == null) {
+				continue;
+			}
+			if (lc.getControlDescription().getTitle().equalsIgnoreCase(controlTitle)) {
+				return lc;
+			}
+		}
+		return null;
+	}
+	/**
+	 * find a control from it's name. 
+	 * @param controlTitle
+	 * @return
+	 */
+	public LoggerControl findControl(String controlTitle) {
+		for (LoggerControl lc : allControls) {
+			if (lc == null) {
+				continue;
+			}
+			if (lc.getControlDescription().getTitle().equalsIgnoreCase(controlTitle)) {
+				return lc;
+			}
+		}
+		return null;
 	}
 
 	/**
