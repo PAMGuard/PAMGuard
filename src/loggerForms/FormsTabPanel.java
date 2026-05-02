@@ -14,11 +14,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
+//
+//import org.jnativehook.keyboard.NativeKeyEvent;
+//import org.jnativehook.keyboard.NativeKeyListener;
 
 import com.fasterxml.jackson.core.format.DataFormatDetector;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import PamView.PamTabPanel;
 import PamView.panel.PamPanel;

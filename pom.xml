@@ -1388,12 +1388,12 @@
 			<version>5.2.3.RELEASE</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
-		<!-- For global hotkeys, especially in Logger -->
+		<!-- Source: https://mvnrepository.com/artifact/com.github.kwhat/jnativehook -->
 		<dependency>
-			<groupId>com.1stleg</groupId>
-			<artifactId>jnativehook</artifactId>
-			<version>2.1.0</version>
+   		 	<groupId>com.github.kwhat</groupId>
+    		<artifactId>jnativehook</artifactId>
+    		<version>2.2.2</version>
+    		<scope>compile</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.swinglabs.swingx/swingx-all -->

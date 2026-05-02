@@ -1,8 +1,9 @@
-package loggerForms.formdesign;
+package loggerForms.formdesign.controlpropsets;
 
 import loggerForms.FormDescription;
 import loggerForms.UDColName;
-import loggerForms.formdesign.controlpropsets.BasePropertySet;
+import loggerForms.formdesign.ControlTitle;
+import loggerForms.formdesign.HotkeyTopicPanel;
 import loggerForms.formdesign.itempanels.ButtonTopicPanel;
 import loggerForms.formdesign.itempanels.CtrlColPanel;
 import loggerForms.formdesign.itempanels.SubformTopicPanel;
@@ -21,6 +22,8 @@ public class ButtonPropertySet extends BasePropertySet {
 		switch (propertyName) {
 		case Topic:
 			return new ButtonTopicPanel(formDescription, selTitle, propertyName);
+		case Hotkey:
+			return new HotkeyTopicPanel(formDescription, selTitle, propertyName);
 		case PostTitle:
 			return null;
 //			return new TextCtrlColPanel(controlTitle, UDColName.DbTitle, UDColName.DbTitle.getStringLength());

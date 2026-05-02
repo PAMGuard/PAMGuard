@@ -3,6 +3,9 @@ package loggerForms;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Properties that can be applied to a entire form.
+ */
 public enum PropertyTypes {
 	STARTTIME, ENDTIME, ORDER, AUTOALERT,SUBTABS,POPUP,HIDDEN,AUTORECORD,BEARING,
 	RANGE,HEADING,FONT,DBTABLENAME,
@@ -93,6 +96,21 @@ public enum PropertyTypes {
 	 * @return true if the property can be used on a UDB (button) form. 
 	 */
 	public boolean isUDB() {
+		switch (this) {
+		case DBTABLENAME:
+		case FONT:
+		case FORMCOLOR:
+		case FORMCOLOUR:
+		case ORDER:
+			return true;
+//		case PLOT:
+//			break;
+//		case SYMBOLTYPE:
+//			break;
+		default:
+			break;
+		
+		}
 		return false;
 	}
 	

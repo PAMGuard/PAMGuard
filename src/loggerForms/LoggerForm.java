@@ -569,7 +569,9 @@ public class LoggerForm{
 
 		lastRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.RIGHT));
 
-		lastRow.add(saveButton);
+		if (haveSaveButton()) {
+			lastRow.add(saveButton);
+		}
 
 
 		boolean isSubTabs = (formDescription.findProperty(PropertyTypes.SUBTABS) != null);
@@ -582,17 +584,14 @@ public class LoggerForm{
 			isNormal=false;
 		}
 
-		boolean noClear = (formDescription.findProperty(PropertyTypes.NOCLEAR)!= null);
-		boolean noCancel= (formDescription.findProperty(PropertyTypes.NOCANCEL)!= null);
-
 		if (isSubTabs || isPopup){
-			if (!noCancel){
+			if (haveCancelButton()){
 				lastRow.add(cancelButton);
 				cancelButton.addActionListener(new CancelButtonListener());
 			}
 			saveButton.addActionListener(new SaveAndCloseButtonListener());
 		}else{
-			if (!noClear){
+			if (haveClearButton()){
 				lastRow.add(clearButton);
 				clearButton.addActionListener(new ClearButtonListener());
 			}
@@ -613,6 +612,26 @@ public class LoggerForm{
 		}
 
 		enableControls();
+	}
+	
+	private boolean haveSaveButton() {
+		return formDescription.isUDF();
+	}
+	
+	private boolean haveClearButton() {
+		if (formDescription.isUDB()) {
+			return false;
+		}
+		boolean noClear = (formDescription.findProperty(PropertyTypes.NOCLEAR)!= null);
+		return noClear == false;
+	}
+	
+	private boolean haveCancelButton() {
+		if (formDescription.isUDB()) {
+			return false;
+		}
+		boolean noCancel= (formDescription.findProperty(PropertyTypes.NOCANCEL)!= null);
+		return noCancel = false;
 	}
 	
 	/**

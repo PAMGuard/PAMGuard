@@ -35,6 +35,8 @@ public class UDBTableDefinition extends EmptyTableDefinition {
 	private PamTableItem controlOnSubform;	//String 50		//Spaces to deal with
 //	private PamTableItem getControlData;	//String 50		//Spaces to deal with
 //	private PamTableItem defaultValue;		//String 50		//Needs suffixed with 'Value'
+	private PamTableItem hotKey;
+	
 	public UDBTableDefinition(String tableName) {
 		super(tableName);
 		addTableItem(order				= new PamTableItem("Order"				, Types.INTEGER)); // problems in MySQL
@@ -64,6 +66,7 @@ public class UDBTableDefinition extends EmptyTableDefinition {
 //		addTableItem(readOnly			= new PamTableItem("ReadOnly"			, Types.BOOLEAN));
 //		addTableItem(sendControlName	= new PamTableItem("Send_Control_Name"	, Types.CHAR,50));	//Space here
 		addTableItem(controlOnSubform	= new PamTableItem("Control_on_Subform"	, Types.CHAR,50));	//Space here
+		addTableItem(hotKey = new PamTableItem(UDColName.Hotkey.toString(), Types.CHAR, 10));
 //		addTableItem(getControlData		= new PamTableItem("Get_Control_Data"	, Types.CHAR,50));	//Space here
 //		addTableItem(defaultValue		= new PamTableItem("Default"			, Types.CHAR,50));
 	}

@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import PamView.dialog.PamDialog;
+import PamView.panel.PamAlignmentPanel;
 import loggerForms.FormDescription;
 import loggerForms.ItemDescription;
 import loggerForms.ItemInformation;
@@ -51,6 +52,7 @@ public class FormEditDialog extends PamDialog {
 		editControlPanel = new EditControlPanel(this, formDescription);
 		editPropertyPanel = new EditPropertyPanel(this, formDescription);
 		tabPane.add(" Control Layout ", editControlPanel.getDialogComponent());
+//		tabPane.add(" Form Properties ", new PamAlignmentPanel(editPropertyPanel.getDialogComponent(), BorderLayout.NORTH));
 		tabPane.add(" Form Properties ", editPropertyPanel.getDialogComponent());
 		
 		getButtonPanel().add(previewButton = new JButton("Preview form"));
