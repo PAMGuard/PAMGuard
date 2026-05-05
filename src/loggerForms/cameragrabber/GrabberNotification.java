@@ -2,22 +2,24 @@ package loggerForms.cameragrabber;
 
 import java.awt.image.BufferedImage;
 
+import loggerForms.cameragrabber.data.CameraDataUnit;
+
 public class GrabberNotification {
 
 	public enum Type {NEWCONFIG, TESTIMAGE, GRABBEDIMAGE}
-	
-	private BufferedImage image;
-	
+		
 	private Type type;
+
+	private CameraDataUnit cameraDataUnit;
 
 	/**
 	 * @param type
 	 * @param image
 	 */
-	public GrabberNotification(Type type, BufferedImage image) {
+	public GrabberNotification(Type type, CameraDataUnit cameraDataUnit) {
 		super();
 		this.type = type;
-		this.image = image;
+		this.cameraDataUnit = cameraDataUnit;
 	}
 
 	/**
@@ -28,8 +30,11 @@ public class GrabberNotification {
 		this.type = type;
 	}
 
-	public BufferedImage getImage() {
-		return image;
+	/**
+	 * @return the cameraDataUnit
+	 */
+	public CameraDataUnit getCameraDataUnit() {
+		return cameraDataUnit;
 	}
 
 	public Type getType() {

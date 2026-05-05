@@ -11,6 +11,7 @@ import javax.swing.JMenuItem;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
+import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
@@ -81,6 +82,16 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings {
 			}
 		});
 		return menuItem;
+	}
+
+	@Override
+	public void notifyModelChanged(int changeType) {
+		super.notifyModelChanged(changeType);
+		switch (changeType) {
+		case PamController.INITIALIZATION_COMPLETE:
+			notifyObservers(new GrabberNotification(Type.NEWCONFIG));
+			setupGrabber();
+		}
 	}
 
 	protected void showGrabberParams(Frame parentFrame) {
