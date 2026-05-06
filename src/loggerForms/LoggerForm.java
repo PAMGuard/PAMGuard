@@ -1014,6 +1014,11 @@ public class LoggerForm{
 		if (nmeaMonitor != null) {
 			nmeaMonitor.disconnect();
 		}
+		for (LoggerControl c : allControls) {
+			if (c != null) {
+				c.destroyControl();
+			}
+		}
 	}
 	/**
 	 * @return the lastRow

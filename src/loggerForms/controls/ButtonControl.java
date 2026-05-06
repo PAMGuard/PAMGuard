@@ -1,35 +1,50 @@
 package loggerForms.controls;
 
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.KeyStroke;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
-import com.github.kwhat.jnativehook.dispatcher.SwingDispatchService;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyAdapter;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+//import com.github.kwhat.jnativehook.GlobalScreen;
+//import com.github.kwhat.jnativehook.NativeHookException;
+//import com.github.kwhat.jnativehook.dispatcher.SwingDispatchService;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyAdapter;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import NMEA.NMEADataUnit;
+import PamController.PamController;
 import PamView.PamGui;
+import PamView.PamTabPanel;
 import loggerForms.FormDescription;
 import loggerForms.LoggerForm;
 import loggerForms.UDColName;
 import loggerForms.controlDescriptions.ControlDescription;
-import loggerForms.hotkey.HotKeyException;
 import loggerForms.hotkey.HotKeyManager;
 
 public class ButtonControl extends LoggerControl {
 	
 	private JButton button;
+	private ActionMap actionMap;
+	private InputMap inputMap;
+	private int hotKeyId;
+	private AWTListener thisListener;
 
 	public ButtonControl(ControlDescription controlDescription, LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
@@ -53,38 +68,137 @@ public class ButtonControl extends LoggerControl {
 		}
 	}
 	
+	@Override
+	public void destroyControl() {
+		super.destroyControl();
+		if (thisListener != null) {
+			Toolkit.getDefaultToolkit().removeAWTEventListener(thisListener);
+		}
+	}
+
 	private void setupHotKey(String hotKey) {
 		if (hotKey == null) {
 			return;
 		}
-		int keyId = HotKeyManager.getHotKeyId(hotKey);
-		if (keyId < 0) {
+		hotKeyId = HotKeyManager.getHotKeyId(hotKey);
+		if (hotKeyId < 0) {
 			return;
 		}
-		// work out the hotkey id. It was probably input as F5 or something. 
-		
-		HotKeyManager hkMan = null;
-		try {
-			hkMan = HotKeyManager.getInstance();
-		} catch (HotKeyException e) {
-			e.printStackTrace();
+		Frame mainFrame = PamController.getMainFrame();
+		if (mainFrame == null) {
 			return;
 		}
 		
-		hkMan.registerHotKey(keyId, new HotListener());
+		Toolkit.getDefaultToolkit().addAWTEventListener(thisListener = new AWTListener(), AWTEvent.KEY_EVENT_MASK);
+		
+		
+		
+//		mainFrame.addKeyListener(new HKeyListener());
+
+//		JComponent component = button.getRootPane();
+//		if (component == null) {
+//			component = (JComponent) mainFrame.getComponent(0);
+//		}
+//		String actionName = String.format("Hotkey_%s", hotKey);
+//		this.inputMap = new InputMap();
+//		inputMap.put(KeyStroke.getKeyStroke(hotKey), actionName);
+////		component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(hotKey), actionName);
+//		this.actionMap = new ActionMap();
+//		actionMap.put(actionName, new HotKeyAction(hotKey));
+////		// work out the hotkey id. It was probably input as F5 or something. 
+//		
+//		HotKeyManager hkMan = null;
+//		try {
+//			hkMan = HotKeyManager.getInstance();
+//		} catch (HotKeyException e) {
+//			e.printStackTrace();
+//			return;
+//		}
+//		
+//		hkMan.registerHotKey(keyId, new HotListener());
 		
 	}
 	
-	private class HotListener implements NativeKeyListener {
+	private class AWTListener implements AWTEventListener {
 
 		@Override
-		public void nativeKeyPressed(NativeKeyEvent nEvent) {
-//			System.out.printf("Key press %d (0x%X)\n", nEvent.getKeyCode(), nEvent.getKeyCode());
-			hotKeyPressed();
+		public void eventDispatched(AWTEvent event) {
+			if (event instanceof KeyEvent) {
+				KeyEvent keyEvent = (KeyEvent) event;
+				if (keyEvent.getKeyCode() == hotKeyId) {
+//					int modsEx = keyEvent.getModifiersEx();
+					int eventType = keyEvent.getID();
+					//					keyEvent.
+					if (eventType == KeyEvent.KEY_PRESSED) {
+						System.out.printf("Hotkey AWT Event %d mods %d %s\n", keyEvent.getKeyCode(),eventType, keyEvent.toString());
+						hotKeyPressed();
+					}
+				}
+			}
 		}
-
 		
 	}
+
+	
+	private class HotKeyAction implements Action {
+		private String hotKey;
+		public HotKeyAction(String hotKey) {
+			super();
+			this.hotKey = hotKey;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println(String.format("Hotkey %s pressed", hotKey));
+			hotKeyPressed();
+		}
+		@Override
+		public Object getValue(String key) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public void putValue(String key, Object value) {
+			
+		}
+		@Override
+		public void setEnabled(boolean b) {
+			
+		}
+		@Override
+		public boolean isEnabled() {
+			return true;
+		}
+		@Override
+		public void addPropertyChangeListener(PropertyChangeListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void removePropertyChangeListener(PropertyChangeListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	private class HKeyListener extends KeyAdapter {
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			System.out.println("Key pressed: " + e.getKeyChar());
+		}
+		
+	}
+	
+//	private class HotListener implements NativeKeyListener {
+//
+//		@Override
+//		public void nativeKeyPressed(NativeKeyEvent nEvent) {
+////			System.out.printf("Key press %d (0x%X)\n", nEvent.getKeyCode(), nEvent.getKeyCode());
+//			hotKeyPressed();
+//		}
+//
+//		
+//	}
 
 	public String getTip() {
 		String hint = controlDescription.getItemInformation().getStringProperty(UDColName.Hint.toString());

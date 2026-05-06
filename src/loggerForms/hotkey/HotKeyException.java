@@ -1,8 +1,5 @@
 package loggerForms.hotkey;
 
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-
 public class HotKeyException extends Exception {
 
 	private static final long serialVersionUID = 1L;

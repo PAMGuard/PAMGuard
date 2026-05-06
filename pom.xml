@@ -1407,13 +1407,15 @@
 			<version>5.2.3.RELEASE</version>
 		</dependency>
 
-		<!-- Source: https://mvnrepository.com/artifact/com.github.kwhat/jnativehook -->
+		<!-- Source: https://mvnrepository.com/artifact/com.github.kwhat/jnativehook 
+		no way is nativehook going to get past any virus checker since it allows logging of 
+		every key stroke across the entire system, so will have to live iwithout. 
 		<dependency>
    		 	<groupId>com.github.kwhat</groupId>
     		<artifactId>jnativehook</artifactId>
     		<version>2.2.2</version>
     		<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 
 		<!-- https://mvnrepository.com/artifact/org.swinglabs.swingx/swingx-all -->
 		<!-- For new Network Receive Module -->
