@@ -16,10 +16,8 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
 //import com.github.kwhat.jnativehook.GlobalScreen;
 //import com.github.kwhat.jnativehook.NativeHookException;
@@ -31,7 +29,6 @@ import javax.swing.KeyStroke;
 import NMEA.NMEADataUnit;
 import PamController.PamController;
 import PamView.PamGui;
-import PamView.PamTabPanel;
 import loggerForms.FormDescription;
 import loggerForms.LoggerForm;
 import loggerForms.UDColName;
@@ -84,11 +81,11 @@ public class ButtonControl extends LoggerControl {
 		if (hotKeyId < 0) {
 			return;
 		}
-		Frame mainFrame = PamController.getMainFrame();
-		if (mainFrame == null) {
-			return;
-		}
-		
+
+
+		/**
+		 * Might want to move this to a single manager with a HashMap so that it's easier to avoid repeats. 
+		 */
 		Toolkit.getDefaultToolkit().addAWTEventListener(thisListener = new AWTListener(), AWTEvent.KEY_EVENT_MASK);
 		
 		
@@ -125,14 +122,9 @@ public class ButtonControl extends LoggerControl {
 		public void eventDispatched(AWTEvent event) {
 			if (event instanceof KeyEvent) {
 				KeyEvent keyEvent = (KeyEvent) event;
-				if (keyEvent.getKeyCode() == hotKeyId) {
-//					int modsEx = keyEvent.getModifiersEx();
-					int eventType = keyEvent.getID();
-					//					keyEvent.
-					if (eventType == KeyEvent.KEY_PRESSED) {
-						System.out.printf("Hotkey AWT Event %d mods %d %s\n", keyEvent.getKeyCode(),eventType, keyEvent.toString());
-						hotKeyPressed();
-					}
+				if (keyEvent.getKeyCode() == hotKeyId && keyEvent.getID() == KeyEvent.KEY_PRESSED) {
+					//						System.out.printf("Hotkey AWT Event %d mods %d %s\n", keyEvent.getKeyCode(),eventType, keyEvent.toString());
+					hotKeyPressed();
 				}
 			}
 		}

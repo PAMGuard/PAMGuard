@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +47,9 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamCalendar;
 import PamUtils.XMLUtils;
+import PamView.PamGui;
 import PamView.PamTabPanel;
+import PamView.PamView;
 import PamView.panel.PamPanel;
 import PamView.panel.PamSplitPane;
 import PamguardMVC.PamDataBlock;
@@ -1194,6 +1197,13 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		}
 		// try to go to this tab. 
 		formsControl.getFormsTabPanel().gotoForm(this);
+		
+		// and also tell the main GUI to go to the forms tab. 
+		PamView view = formsControl.getPamView();
+		if (view != null) {
+			view.showControlledUnit(formsControl);
+		}		
+		
 		return activeForm;
 	}
 
