@@ -35,6 +35,7 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings {
 	
 	private GrabberProcess grabberProcess;
 	
+	
 	public CameraGrabber(PamConfiguration pamConfiguration, String unitName) {
 		super(pamConfiguration, unitType, unitName);
 		
@@ -46,6 +47,13 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings {
 		grabberAction = new GrabberAction(this);
 		LoggerActions.getInstance().registerAction(grabberAction);
 		
+	}
+
+	/**
+	 * @return the grabberProcess
+	 */
+	public GrabberProcess getGrabberProcess() {
+		return grabberProcess;
 	}
 
 	@Override

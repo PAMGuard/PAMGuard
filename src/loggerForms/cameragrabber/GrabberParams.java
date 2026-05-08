@@ -19,9 +19,22 @@ public class GrabberParams implements Serializable, Cloneable {
 	
 	public boolean autoGrab;
 	
+	/**
+	 * how often to grab when in a sequence. 
+	 */
 	public int autoGrabSeconds = 5;
 	
 	public boolean autoGrabRandomise = false;
+	
+	/**
+	 * Seconds for sequence BEFORE a sequence call. 
+	 */
+	public int bufferSeconds = 5;
+	
+	/**
+	 * Seconds for sequence AFTER a grab sequence call
+	 */
+	public int sequenceSeconds = 5;
 
 	@Override
 	protected GrabberParams clone() {

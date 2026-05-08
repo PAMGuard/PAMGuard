@@ -72,7 +72,7 @@ public class GrabberPanel implements GrabberObserver {
 		mainPanel.removeAll();
 		GrabberParams gp = cameraGrabber.getGrabberParams();
 		int nCam = gp.nCameras;
-		mainPanel.setLayout(new GridLayout(2, nCam));
+		mainPanel.setLayout(new GridLayout(nCam, 2));
 		previewImages = new ImagePanel[nCam];
 		caughtImages = new ImagePanel[nCam];
 		for (int i = 0; i < nCam; i++) {

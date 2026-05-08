@@ -39,6 +39,8 @@ public class GrabberDialog extends PamDialog {
 	private JCheckBox autoGrab, autoGrabRandom;
 	private JTextField autoInterval;
 	
+	private JTextField bufferSeconds, sequenceSeconds; // pre and post times for getting sequences of images. 
+	
 	private CameraPanel[] cameraPanels;
 
 	private GrabberDialog(Window parentFrame) {
@@ -53,7 +55,7 @@ public class GrabberDialog extends PamDialog {
 		
 		JPanel nPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		c.gridwidth = 4;
+		c.gridwidth = 6;
 		nPanel.add(selectFolder.getFolderPanel(), c);
 		c.gridwidth = 1;
 		c.gridy++;
@@ -75,10 +77,26 @@ public class GrabberDialog extends PamDialog {
 		c.gridx++;
 		nPanel.add(new JLabel(" seconds ", JLabel.LEFT), c);
 		c.gridx++;
+		c.gridwidth = 2;
 		nPanel.add(autoGrabRandom = new JCheckBox("Randomise"),c);
+		// sequence stuff
+		c.gridx = 0;
+		c.gridwidth = 1;
+		c.gridy++;
+		nPanel.add(new JLabel("Sequences: pre ",JLabel.RIGHT), c);
+		c.gridx++;
+		nPanel.add(bufferSeconds = new JTextField(2), c);
+		c.gridx++;
+		nPanel.add(new JLabel(" and post ",JLabel.CENTER), c);
+		c.gridx++;
+		nPanel.add(sequenceSeconds = new JTextField(2), c);
+		c.gridx++;
+		nPanel.add(new JLabel(" sampling (seconds) ",JLabel.LEFT), c);
+		
+		
+		
+
 		nPanel.setBorder(new TitledBorder("General"));
-		
-		
 		
 		mainPanel.add(BorderLayout.NORTH, nPanel);
 		mainPanel.add(camPanel);
@@ -117,6 +135,8 @@ public class GrabberDialog extends PamDialog {
 		autoGrab.setSelected(grabberParams.autoGrab);
 		autoInterval.setText(String.format("%d", grabberParams.autoGrabSeconds));
 		autoGrabRandom.setSelected(grabberParams.autoGrabRandomise);
+		bufferSeconds.setText(String.format("%d", grabberParams.bufferSeconds));
+		sequenceSeconds.setText(String.format("%d", grabberParams.sequenceSeconds));
 		
 		createComponents();
 		if (cameraPanels == null) {
@@ -159,6 +179,14 @@ public class GrabberDialog extends PamDialog {
 			return showWarning("Invalid grab interval. Must be integer");
 		}
 		grabberParams.autoGrabRandomise = autoGrabRandom.isSelected();
+		grabberParams.autoGrab = autoGrab.isSelected();
+		try {
+			grabberParams.bufferSeconds = Integer.valueOf(bufferSeconds.getText());
+			grabberParams.sequenceSeconds = Integer.valueOf(sequenceSeconds.getText());
+		}
+		catch (NumberFormatException e) {
+			return showWarning("Sequence pre and post sampling times must be integer");
+		}
 		
 		if (grabberParams.outputFolder == null) {
 			return showWarning("You must select a storage folder for camera images");

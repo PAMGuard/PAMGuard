@@ -9,6 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -35,18 +38,21 @@ public class GrabberProcess extends PamProcess {
 	private Timer timer;
 	
 	private Camera[] cameras;
+	
+	private Random random = new Random();
 
 	public GrabberProcess(CameraGrabber cameraGrabber) {
 		super(cameraGrabber, null);
 		this.cameraGrabber = cameraGrabber;
 		
+		if (cameraGrabber.isViewer() == false) {
 		timer = new Timer(1000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				timerAction();
 			}
 		});
-		
+		}
 		
 	}
 
@@ -61,15 +67,20 @@ public class GrabberProcess extends PamProcess {
 	 * @param cameraBitmap
 	 */
 	public void grabFrames(int cameraBitmap) {
+		synchronized (this) {
 		int n = PamUtils.getNumChannels(cameraBitmap);
 		for (int i = 0; i < n; i++) {
 			int ind = PamUtils.getNthChannel(i, cameraBitmap);
 			grabFrame(ind);
 		}
+		}
 	}
 	
-	public void grabFrame(int cameraIndex) {
+	public synchronized void grabFrame(int cameraIndex) {
 		long now = PamCalendar.getTimeInMillis();
+		if (cameraIndex >= cameras.length) {
+			return;
+		}
 		Camera camera = cameras[cameraIndex];
 		if (camera == null) {
 			return;
@@ -84,12 +95,22 @@ public class GrabberProcess extends PamProcess {
 			stampImage(image, now);
 		}
 		
+		/**
+		 * Send out the image to the preview pane on the display (and to anything else
+		 * that wants this notification
+		 */
 		CameraDataUnit cdu = new CameraDataUnit(now, cameraIndex, true, image, null);
 		cameraGrabber.notifyObservers(new GrabberNotification(Type.TESTIMAGE, cdu));
+		
 		
 		if (shouldStore(now, cameraIndex)) {
 			storeImage(cdu);
 		}
+		else if (gp.bufferSeconds > 0){
+			// only put it in the buffer if it's not to be stored. 
+			camera.imageBuffer.add(cdu);
+		}
+		camera.clearEarlyBuffer(now - gp.bufferSeconds*1000);
 	}
 
 	/**
@@ -125,7 +146,7 @@ public class GrabberProcess extends PamProcess {
 		}
 		CameraDataUnit scdu = new CameraDataUnit(now, cdu.getCameraIndex(), false, image, fileName);
 		cameraGrabber.notifyObservers(new GrabberNotification(Type.GRABBEDIMAGE, scdu));
-		camera.lastStoreTime = now;
+		camera.setNextStoreTime(now);
 		
 	}
 
@@ -135,15 +156,27 @@ public class GrabberProcess extends PamProcess {
 		if (camera == null) {
 			return false;
 		}
-		if (gp.autoGrab && now-camera.lastStoreTime > gp.autoGrabSeconds*1000) {
+		if (camera.inSequence == true) {
+			if (now > camera.sequenceEnd) {
+				camera.inSequence = false;
+			}
+			else {
+				return true;
+			}
+		}
+		if (gp.autoGrab && now >= camera.nextStoreTime) {
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean prepareProcessOK() {
+	public synchronized boolean prepareProcessOK() {
 		boolean ok = super.prepareProcessOK();
+		
+		if (cameraGrabber.isViewer()) {
+			return true;
+		}
 		
 		GrabberParams gp = cameraGrabber.getGrabberParams();
 		
@@ -175,7 +208,7 @@ public class GrabberProcess extends PamProcess {
 		return ok;
 	}
 	
-	private void stopCameras() {
+	private synchronized void stopCameras() {
 		if (cameras == null) {
 			return;
 		}
@@ -193,8 +226,14 @@ public class GrabberProcess extends PamProcess {
 		private int cameraIndex;
 		
 		private Webcam webCam;
+				
+		private LinkedList<CameraDataUnit> imageBuffer = new LinkedList<>();
 		
-		private long lastStoreTime = 0;
+		private long nextStoreTime;
+		
+		private boolean inSequence;
+		
+		private long sequenceEnd;
 
 		/**
 		 * @param cameraIndex
@@ -220,6 +259,54 @@ public class GrabberProcess extends PamProcess {
 			}
 		}
 		
+		public void setNextStoreTime(long now) {
+			GrabberParams gp = cameraGrabber.getGrabberParams();
+			if (gp.autoGrabRandomise) {
+				// pick a random number between 1 and 2xgp.autograbseconds
+				int maxT = 2 * gp.autoGrabSeconds - 1;
+				int t = 1;
+				if (maxT > 1) {
+					t = random.nextInt(maxT) + 1;
+				}
+				nextStoreTime = now + t * 1000;
+			}
+			else {
+				nextStoreTime = now + gp.autoGrabSeconds * 1000;
+			}
+		}
+
+		/**
+		 * Remove all images from the buffer that occurred before the min time. 
+		 * @param minTime
+		 */
+		public void clearEarlyBuffer(long minTime) {
+			synchronized(imageBuffer) {
+				while (imageBuffer.size() > 0) {
+					CameraDataUnit cdu = imageBuffer.getFirst();
+					if (cdu.getTimeMilliseconds() >= minTime) {
+						break;
+					}
+					imageBuffer.removeFirst();
+				}
+			}
+		}
+		
+		/**
+		 * Store all images in the buffer and empty it at the same time 
+		 * @return
+		 */
+		public int storeBufferedImages() {
+			int n = 0;
+			synchronized(imageBuffer) {
+				while (imageBuffer.size() > 0) {
+					CameraDataUnit cdu = imageBuffer.removeFirst();
+					storeImage(cdu);
+					n++;
+				}
+			}
+			return n;
+		}
+
 		public void stop() {
 			webCam.close();
 		}
@@ -252,6 +339,44 @@ public class GrabberProcess extends PamProcess {
 	public void pamStop() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void grabOne(int cameraIndex) {
+		Camera camera = null;
+		try {
+			camera = cameras[cameraIndex];
+		}
+		catch (Exception e) {
+			System.out.println("Error grabbing camera frame: " + e.getMessage());
+			return;
+		}
+		if (camera == null) {
+			return;
+		}
+		camera.inSequence = true;
+		camera.sequenceEnd = Long.MAX_VALUE;
+		
+		grabFrame(cameraIndex);
+		
+		camera.inSequence = false;
+	}
+
+	public void grabSequence(int cameraIndex) {
+		Camera camera = null;
+		try {
+			camera = cameras[cameraIndex];
+		}
+		catch (Exception e) {
+			System.out.println("Error grabbing camera frame: " + e.getMessage());
+			return;
+		}
+		if (camera == null) {
+			return;
+		}
+		camera.inSequence = true;
+		camera.sequenceEnd = PamCalendar.getTimeInMillis() + cameraGrabber.getGrabberParams().sequenceSeconds * 1000;
+		camera.storeBufferedImages(); // get eveything in the buffer. 
+		
 	}
 
 }

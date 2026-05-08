@@ -1,9 +1,13 @@
 package loggerForms.cameragrabber.swing;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -30,6 +34,8 @@ public class ImagePanel {
 	private boolean preview;
 	
 	private CameraDataUnit currentImageData;
+	
+	private JButton grabOne, grabSequence;
 
 	/**
 	 * @param cameraGrabber
@@ -46,16 +52,47 @@ public class ImagePanel {
 		imagePanel = new PaintPanel();
 		titlePanel = new PamPanel(new BorderLayout());
 		mainPanel.add(BorderLayout.CENTER, imagePanel);
-		mainPanel.add(BorderLayout.SOUTH, titlePanel);
+		mainPanel.add(BorderLayout.NORTH, titlePanel);
 		title = new JLabel(" ");
 		titlePanel.add(BorderLayout.CENTER, title);
 		
+		if (preview) {
+			PamPanel buttonPanel = new PamPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+			grabOne = new JButton("Grab Frame");
+			grabSequence = new JButton("Grab Sequence");
+			buttonPanel.add(grabOne);
+			buttonPanel.add(grabSequence);
+			titlePanel.add(BorderLayout.EAST, buttonPanel);
+			grabOne.setToolTipText("Grab and store a single image");
+			grabSequence.setToolTipText("Grab and store a sequence of images");
+			grabOne.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					grabOne();
+				}
+			});
+
+			grabSequence.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					grabSequence();
+				}
+			});
+		}
 		GrabberParams gp = cameraGrabber.getGrabberParams();
 		CameraParams cp = gp.getCameraParams(cameraIndex);
 		makeTitleBorder(cp);
 		
 	}
+
+	protected void grabOne() {
+		cameraGrabber.getGrabberProcess().grabOne(this.cameraIndex);
+	}
 	
+	protected void grabSequence() {
+		cameraGrabber.getGrabberProcess().grabSequence(this.cameraIndex);
+	}
+
 	private void makeTitleBorder(CameraParams cp) {
 		String tit = String.format("%s - %s (%s)", cp.cameraName, cp.imageInitials, preview ? "Preview" : "Capture");
 		mainPanel.setBorder(new TitledBorder(tit));
