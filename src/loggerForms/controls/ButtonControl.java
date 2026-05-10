@@ -265,6 +265,10 @@ public class ButtonControl extends LoggerControl {
 					nErr++;
 				}
 			}
+			else {
+				// get out as soon as it's not a ACTION, so we only do the actions immediately after the button 
+				break;
+			}
 		}
 	}
 
