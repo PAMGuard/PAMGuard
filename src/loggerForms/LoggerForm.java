@@ -631,7 +631,7 @@ public class LoggerForm{
 			return false;
 		}
 		boolean noCancel= (formDescription.findProperty(PropertyTypes.NOCANCEL)!= null);
-		return noCancel = false;
+		return noCancel == false;
 	}
 	
 	/**

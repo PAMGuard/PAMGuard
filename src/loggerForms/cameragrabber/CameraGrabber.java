@@ -15,18 +15,18 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
+import loggerForms.actions.ActionOwner;
+import loggerForms.actions.LoggerAction;
 import loggerForms.actions.LoggerActions;
 import loggerForms.cameragrabber.GrabberNotification.Type;
 import loggerForms.cameragrabber.logger.GrabberAction;
 import loggerForms.cameragrabber.swing.GrabberDialog;
 import loggerForms.cameragrabber.swing.GrabberTabPanel;
 
-public class CameraGrabber extends PamControlledUnit implements PamSettings {
+public class CameraGrabber extends PamControlledUnit implements PamSettings, ActionOwner {
 
 	public static String unitType = "Camera Grabber";
-	
-	private GrabberAction grabberAction;
-	
+		
 	private GrabberParams grabberParams = new GrabberParams();
 	
 	private ArrayList<GrabberObserver> observers = new ArrayList<>();
@@ -43,9 +43,6 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings {
 		
 		grabberProcess = new GrabberProcess(this);
 		addPamProcess(grabberProcess);
-		
-		grabberAction = new GrabberAction(this);
-		LoggerActions.getInstance().registerAction(grabberAction);
 		
 	}
 
@@ -116,7 +113,19 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings {
 	}
 
 	private void setupGrabber() {
+		// prepare the cameras
 		grabberProcess.prepareProcessOK();
+		// and register all possible actions. 
+		int nCam = grabberParams.nCameras;
+		LoggerActions loggerActions = LoggerActions.getInstance();
+		loggerActions.removeAllOwnersActions(this);
+		LoggerAction action;
+		for (int i = 0; i < nCam; i++) {
+			action = GrabberAction.createAction(this, i, GrabberAction.GRABTYPE.FRAME);
+			loggerActions.registerAction(action);
+			action = GrabberAction.createAction(this, i, GrabberAction.GRABTYPE.SEQUENCE);
+			loggerActions.registerAction(action);
+		}
 	}
 
 	public void addObserver(GrabberObserver grabberObserver) {

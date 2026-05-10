@@ -1,6 +1,10 @@
 package loggerForms.actions;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import loggerForms.LoggerForm;
 import loggerForms.controls.LoggerControl;
@@ -14,21 +18,21 @@ import loggerForms.controls.LoggerControl;
 public class LoggerActions {
 
 	private static LoggerActions singleInstance;
-	
+
 	private HashMap<String, LoggerAction> actionsMap;
 
 	private LoggerActions() {
 		super();
 		actionsMap = new HashMap<>();
 	}
-	
+
 	public static LoggerActions getInstance() {
 		if (singleInstance == null) {
 			singleInstance = new LoggerActions();
 		}
 		return singleInstance;
 	}
-	
+
 	/**
 	 * Find and run the action. 
 	 * @param actionName Name of action to run
@@ -53,6 +57,14 @@ public class LoggerActions {
 	}
 	
 	/**
+	 * Get the set of possible actions. 
+	 * @return possible actions set
+	 */
+	public Set<String> getActionKeys() {
+		return actionsMap.keySet();
+	}
+
+	/**
 	 * Register an action
 	 * @param loggerAction
 	 */
@@ -64,7 +76,7 @@ public class LoggerActions {
 		}
 		actionsMap.put(loggerAction.getName(), loggerAction);
 	}
-	
+
 	/**
 	 * Remove an action
 	 * @param loggerAction
@@ -72,5 +84,24 @@ public class LoggerActions {
 	 */
 	public boolean removeAction(LoggerAction loggerAction) {
 		return actionsMap.remove(loggerAction.getName()) != null;
+	}
+
+	/**
+	 * Remove all actions belonging to a given owner. 
+	 * @param owner
+	 * @return number of actions removes. 
+	 */
+	public int removeAllOwnersActions(ActionOwner owner) {
+		Collection<Entry<String, LoggerAction>> ents = actionsMap.entrySet();
+		int nr = 0;
+		Iterator<Entry<String, LoggerAction>> it = ents.iterator();
+		while (it.hasNext()) {
+			Entry<String, LoggerAction> act = it.next();
+			if (act.getValue().getActionOwner() == owner) {
+				it.remove();
+				nr ++;
+			}
+		}
+		return nr;
 	}
 }

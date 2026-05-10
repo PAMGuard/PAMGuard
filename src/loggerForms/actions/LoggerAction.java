@@ -8,11 +8,13 @@ import loggerForms.controls.LoggerControl;
  */
 abstract public class LoggerAction {
 
+	private ActionOwner actionOwner;
 	private String name;
 	private String description;
 
-	public LoggerAction(String name, String description) {
+	public LoggerAction(ActionOwner actionOwner, String name, String description) {
 		super();
+		this.actionOwner = actionOwner;
 		this.name = name;
 		this.description = description;
 	}
@@ -57,6 +59,10 @@ abstract public class LoggerAction {
 		else {
 			return String.format("Logger action %s", name);
 		}
+	}
+
+	public ActionOwner getActionOwner() {
+		return actionOwner;
 	}
 	
 	

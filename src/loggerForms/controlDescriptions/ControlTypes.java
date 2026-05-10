@@ -27,7 +27,8 @@ public enum ControlTypes {
 	BUTTON,
 	//		ANALOGUE,
 	//		DIGITAL,
-	VSPACE;
+	VSPACE,
+	ACTION;
 
 	public String getDescription() {
 		switch (this) {
@@ -71,6 +72,8 @@ public enum ControlTypes {
 			return "Creates a button to open a new form";
 		case VSPACE:
 			return "Creates a vertical space between controls";
+		case ACTION:
+			return "Performs some action, selected from a list, in some other part of PAMGuard";
 		default:
 			break;
 
@@ -103,6 +106,7 @@ public enum ControlTypes {
 	public boolean isUDF() {
 		switch (this) {
 		case BUTTON:
+		case ACTION:
 			return false;
 		default:
 			return true;
@@ -118,6 +122,7 @@ public enum ControlTypes {
 		case BUTTON:
 		case STATIC:
 		case NEWLINE:
+		case ACTION:
 			return true;
 		default:
 			return false;

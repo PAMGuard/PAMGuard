@@ -41,7 +41,7 @@ public class EditPropertyPanel implements PamDialogPanel {
 		JLabel label;
 		PropertyTypes[] allowedTypes = null;
 		if (formDescription.isUDF()) {
-			allowedTypes = PropertyTypes.getUDBProperties();
+			allowedTypes = PropertyTypes.getUDFProperties();
 		}
 		else {
 			allowedTypes = PropertyTypes.getUDBProperties();

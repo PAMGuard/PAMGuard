@@ -188,6 +188,8 @@ public abstract class ControlDescription extends ItemDescription  {
 				return new CdSubForm(formDescription, itemInformation);
 			case BUTTON:
 				return new CdButton(formDescription, itemInformation);
+			case ACTION:
+				return new CdAction(formDescription, itemInformation);
 		}
 		return null;
 	}

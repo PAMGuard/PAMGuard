@@ -32,7 +32,11 @@ import PamView.PamGui;
 import loggerForms.FormDescription;
 import loggerForms.LoggerForm;
 import loggerForms.UDColName;
+import loggerForms.actions.ActionException;
+import loggerForms.actions.LoggerActions;
 import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.controlDescriptions.ControlTypes;
+import loggerForms.formdesign.FormList;
 import loggerForms.hotkey.HotKeyManager;
 
 public class ButtonControl extends LoggerControl {
@@ -234,8 +238,55 @@ public class ButtonControl extends LoggerControl {
 		if (form != null && toSetCtrl != null) {
 			toSetCtrl.setData(toSetData);
 		}
+		
+		runLoggerActions();
 	}
 	
+	/**
+	 * Run logger actions. Any valid actions is an ACTION control that comes after this button in the form description, but 
+	 * before the next button. 
+	 */
+	private void runLoggerActions() {
+		FormDescription fd = loggerForm.getFormDescription();
+		FormList<ControlDescription> cdList = fd.getControlDescriptions();
+		int thisInd = cdList.indexOf(controlDescription);
+		if (thisInd < 0) {
+			return;
+		}
+		int nOk = 0, nErr = 0;
+		for (int i = thisInd + 1; i < cdList.size(); i++) {
+			ControlDescription cd = cdList.get(i);
+			if (cd.getEType() == ControlTypes.ACTION) {
+				boolean ok = runLoggerAction(cd);
+				if (ok) {
+					nOk++;
+				}
+				else {
+					nErr++;
+				}
+			}
+		}
+	}
+
+	private boolean runLoggerAction(ControlDescription cd) {
+		if (cd == null) {
+			return false;
+		}
+		String topic = cd.getTopic();
+		if (topic == null) {
+			System.out.println("Unnamed Logger action in button form " + getLoggerForm().getFormDescription().getFormName());
+			return false;
+		}
+		boolean ran = false;
+		try {
+			ran = LoggerActions.getInstance().runAction(topic, loggerForm, this);
+		} catch (ActionException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return ran;
+	}
+
 	/**
 	 * Bring PAMGuard to the front of the display, and make sure it's not minimized. 
 	 */
