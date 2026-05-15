@@ -18,6 +18,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 //import com.github.kwhat.jnativehook.GlobalScreen;
 //import com.github.kwhat.jnativehook.NativeHookException;
@@ -38,14 +39,19 @@ import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
 import loggerForms.formdesign.FormList;
 import loggerForms.hotkey.HotKeyManager;
+import loggerForms.network.LoggerNetworkManager;
+import loggerForms.network.LoggerNetworkMessage;
+import loggerForms.network.LoggerNetworkReceiver;
 
-public class ButtonControl extends LoggerControl {
+public class ButtonControl extends LoggerControl implements LoggerNetworkReceiver {
 	
 	private JButton button;
 	private ActionMap actionMap;
 	private InputMap inputMap;
 	private int hotKeyId;
 	private AWTListener thisListener;
+	
+	private boolean useUDPInput = true; // just for testing, should probably become an option per control ? 
 
 	public ButtonControl(ControlDescription controlDescription, LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
@@ -67,6 +73,9 @@ public class ButtonControl extends LoggerControl {
 		if (hotKey != null) {
 			setupHotKey(hotKey);
 		}
+		if (useUDPInput) {
+			setupUDPInput();
+		}
 	}
 	
 	@Override
@@ -75,6 +84,14 @@ public class ButtonControl extends LoggerControl {
 		if (thisListener != null) {
 			Toolkit.getDefaultToolkit().removeAWTEventListener(thisListener);
 		}
+		if (useUDPInput) {
+			LoggerNetworkManager.getInstance().unsubscribeTopic(null, this);
+		}
+	}
+
+	private void setupUDPInput() {
+		LoggerNetworkManager netManager = LoggerNetworkManager.getInstance();
+		netManager.subsribeTopic("pamguard/button/" + controlDescription.getTitle(), this);
 	}
 
 	private void setupHotKey(String hotKey) {
@@ -349,6 +366,18 @@ public class ButtonControl extends LoggerControl {
 	public int fillNMEAControlData(NMEADataUnit dataUnit) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public boolean newMessage(LoggerNetworkMessage message) {
+		System.out.println("Logger network message received: " + message.toString());
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				hotKeyPressed();
+			}
+		});
+		return true;
 	}
 
 }

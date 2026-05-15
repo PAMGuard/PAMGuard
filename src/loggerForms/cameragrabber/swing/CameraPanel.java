@@ -130,6 +130,7 @@ public class CameraPanel implements PamDialogPanel {
 		initials.setText(cameraParams.imageInitials);
 		fillCameraList();
 		cameraList.setSelectedItem(cameraParams.cameraName);
+		selectCamera();
 	}
 
 	public boolean getParams(CameraParams cameraParams) {
