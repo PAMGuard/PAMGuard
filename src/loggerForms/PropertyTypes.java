@@ -12,7 +12,7 @@ public enum PropertyTypes {
 	FORMCOLOUR,FORMCOLOR,
 	HOTKEY,NOCLEAR,NOCANCEL,NOTOFFLINE,NOTONLINE,
 	PLOT,READONTIMER,READONGPS,READONNMEA,
-	SYMBOLTYPE;
+	SYMBOLTYPE, UDPINPUT;
 	//,BLOBSIZE;
 	
 	/**
@@ -76,6 +76,8 @@ public enum PropertyTypes {
 			return "The form opens in a separate window (not currently implemented)";
 		case ORDER:
 			return "The order forms will be displayed in on the display";
+		case UDPINPUT:
+			return "Receive UDP data with given topic name";
 		default:
 			break;
 		
@@ -102,6 +104,7 @@ public enum PropertyTypes {
 		case FORMCOLOR:
 		case FORMCOLOUR:
 		case ORDER:
+		case UDPINPUT:
 			return true;
 //		case PLOT:
 //			break;

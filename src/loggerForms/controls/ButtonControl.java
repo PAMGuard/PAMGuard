@@ -32,6 +32,8 @@ import PamController.PamController;
 import PamView.PamGui;
 import loggerForms.FormDescription;
 import loggerForms.LoggerForm;
+import loggerForms.PropertyDescription;
+import loggerForms.PropertyTypes;
 import loggerForms.UDColName;
 import loggerForms.actions.ActionException;
 import loggerForms.actions.LoggerActions;
@@ -51,7 +53,7 @@ public class ButtonControl extends LoggerControl implements LoggerNetworkReceive
 	private int hotKeyId;
 	private AWTListener thisListener;
 	
-	private boolean useUDPInput = true; // just for testing, should probably become an option per control ? 
+	private String udpTopic = null; // just for testing, should probably become an option per control ? 
 
 	public ButtonControl(ControlDescription controlDescription, LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
@@ -73,9 +75,27 @@ public class ButtonControl extends LoggerControl implements LoggerNetworkReceive
 		if (hotKey != null) {
 			setupHotKey(hotKey);
 		}
-		if (useUDPInput) {
+		
+		udpTopic = findUDPTopic();
+		if (udpTopic != null) {
 			setupUDPInput();
 		}
+	}
+	
+	private String findUDPTopic() {
+		PropertyDescription uinp = loggerForm.getFormDescription().findProperty(PropertyTypes.UDPINPUT);
+		if (uinp == null) {
+			return null;
+		}
+		String baseTopic = uinp.getTopic();
+		if (baseTopic == null) {
+			baseTopic = "";
+		}
+		else {
+			baseTopic = baseTopic.trim() + "/";
+		}
+		baseTopic += controlDescription.getTitle();
+		return baseTopic;
 	}
 	
 	@Override
@@ -84,14 +104,14 @@ public class ButtonControl extends LoggerControl implements LoggerNetworkReceive
 		if (thisListener != null) {
 			Toolkit.getDefaultToolkit().removeAWTEventListener(thisListener);
 		}
-		if (useUDPInput) {
+		if (udpTopic != null) {
 			LoggerNetworkManager.getInstance().unsubscribeTopic(null, this);
 		}
 	}
 
 	private void setupUDPInput() {
 		LoggerNetworkManager netManager = LoggerNetworkManager.getInstance();
-		netManager.subsribeTopic("pamguard/button/" + controlDescription.getTitle(), this);
+		netManager.subsribeTopic(udpTopic, this);
 	}
 
 	private void setupHotKey(String hotKey) {

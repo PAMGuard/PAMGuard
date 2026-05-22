@@ -21,7 +21,7 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 	
 	private MulticastSocket multicastSocket;
 	
-	private CRC32C crc32 = new CRC32C();
+	private CRC32 crc32 = new CRC32();
 	
 	public LoggerMulticastManager() {
 		setupListener();
@@ -157,7 +157,12 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 			} catch (IOException e) {
 				break;
 			}
+            try {
             usePacket(packet);
+            }
+            catch (Exception e) {
+            	e.printStackTrace();
+            }
             
         }
         try {
@@ -204,6 +209,9 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 	}
 	
 	private boolean topicMatch(String topic, String topic2) {
+		if (topic == null) {
+			return false;
+		}
 		return topic.equals(topic2);
 	}
 
@@ -227,7 +235,8 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 				String item = new String(bitName);
 				int dataLen = dis.readInt();
 				byte[] itemData = new byte[dataLen];
-				dis.read(itemData);
+				int read = dis.read(itemData);
+				System.out.println(new String(itemData));
 				int checksum = dis.readInt();
 				long checksumL = Integer.toUnsignedLong(checksum);
 				crc32.reset();
