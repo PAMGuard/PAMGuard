@@ -3179,7 +3179,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		ArrayList<PamControlledUnit> bs = findControlledUnits(BinaryStore.class);
 		for (PamControlledUnit aBS : bs) {
 			BinaryStore binStore = (BinaryStore) aBS;
-			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis);
+			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis, "Master Clock");
 		}
 	}
 

@@ -1121,6 +1121,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			}
 			long maxBytes = maxSamples * audioFormat.getFrameSize();
 			long totalBytesRead = 0;
+			long blockEndTime = 0; // needed to set Calendar at end of a file. 
 
 
 			while (dontStop && audioStream != null) {
@@ -1181,7 +1182,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 						// GetOutputDataBlock().addPamData(pamDataUnit);
 					}
-					long blockMillis = (int) ((newDataUnit.getStartSample() * 1000) / sampleRate);
+					long blockMillis = (long) ((newDataUnit.getStartSample() * 1000) / sampleRate);
+					blockEndTime = (long) (((newDataUnit.getStartSample()+newSamples) * 1000) / sampleRate);
 					//					newDataUnit.timeMilliseconds = blockMillis;
 					PamCalendar.setSoundFileTimeInMillis(blockMillis);
 					long now = System.currentTimeMillis();
@@ -1216,12 +1218,17 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 				}
 				else {
-					break; // end of file
+					break; // end of file or folder
 				}
 				if (totalBytesRead == maxBytes) {
 					break; // called at end of HARP chunk. 
 				}
 			}
+			/*
+			 *  blast the end time of the file into the Calendar since this will get used to wrap up the binary
+			 *  files, so needs to be correct for the end of the file, not the start of the last block. 
+			 */
+			PamCalendar.setSoundFileTimeInMillis(blockEndTime);
 			if (audioStream != null) {
 				if (audioStream instanceof SudAudioInputStream) {
 					acquisitionControl.getSUDNotificationManager().sudStreamClosed();
