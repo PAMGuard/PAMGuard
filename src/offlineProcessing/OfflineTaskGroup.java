@@ -577,7 +577,8 @@ public class OfflineTaskGroup implements PamSettings {
 				taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.LOADING, nMapPoints, iPoint++, mapPoint.getName(),
 						lastTime));
 
-				primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(mapPoint.getStartTime(), mapPoint.getEndTime()), null);
+//				primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(mapPoint.getStartTime(), mapPoint.getEndTime()), null);
+				primaryDataBlock.loadMapPointData(mapPoint, null);
 				
 				System.out.println("No. viewer units: " + primaryDataBlock.getUnitsCount());
 
