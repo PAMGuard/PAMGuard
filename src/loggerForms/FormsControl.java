@@ -31,6 +31,7 @@ import PamguardMVC.PamDataBlock;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import loggerForms.monitor.FormsMonitorMaster;
+import loggerForms.network.LoggerNetworkManager;
 
 /**
  * 
@@ -374,16 +375,24 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 	 */
 	@Override
 	public JMenuItem createDetectionMenu(Frame parentFrame) {
+		
+		
+		
 		JMenuItem detMenu = new JMenu(getUnitName());
-		JMenuItem menuItem = new JMenuItem("Create New Form ...");
+		
+		JMenu createItem = new JMenu("Create new ..."); 
+		
+		JMenuItem menuItem = new JMenuItem("Data form ...");
 		menuItem.setToolTipText("Create a new data entry (UDF) type form");
-		detMenu.add(menuItem);
+		createItem.add(menuItem);
 		menuItem.addActionListener(new NewLoggerForm(parentFrame));
 
-		menuItem = new JMenuItem("Create Button Form ...");
+		menuItem = new JMenuItem("Button form ...");
 		menuItem.setToolTipText("Create a new button (UDB) type form");
-		detMenu.add(menuItem);
+		createItem.add(menuItem);
 		menuItem.addActionListener(new NewButtonForm(parentFrame));
+		
+		detMenu.add(createItem);
 		
 		
 //		if (SMRUEnable.isEnable()) {
@@ -396,6 +405,10 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 		}
 		detMenu.add(editMenu);
 //		}
+		
+		JMenuItem netItem = LoggerNetworkManager.getInstance().getConfigMenu();
+		detMenu.add(netItem);
+		
 		detMenu.add(menuItem = new JMenuItem("Regenerate all forms"));
 		menuItem.addActionListener(new ReGenerateForms(parentFrame));
 		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {

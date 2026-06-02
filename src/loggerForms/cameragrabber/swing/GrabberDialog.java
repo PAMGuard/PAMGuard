@@ -19,6 +19,7 @@ import PamUtils.SelectFolder;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamAlignmentPanel;
+import loggerForms.cameragrabber.CameraGrabber;
 import loggerForms.cameragrabber.CameraParams;
 import loggerForms.cameragrabber.GrabberParams;
 
@@ -43,8 +44,19 @@ public class GrabberDialog extends PamDialog {
 	
 	private CameraPanel[] cameraPanels;
 
-	private GrabberDialog(Window parentFrame) {
+	private CameraGrabber cameraGrabber;
+
+	/**
+	 * @return the cameraGrabber
+	 */
+	public CameraGrabber getCameraGrabber() {
+		return cameraGrabber;
+	}
+
+
+	private GrabberDialog(CameraGrabber cameraGrabber, Window parentFrame) {
 		super(parentFrame, "Camera grabber options", false);
+		this.cameraGrabber = cameraGrabber;
 		mainPanel = new JPanel(new BorderLayout());
 		camPanel = new JPanel();
 		camPanel.setLayout(new BoxLayout(camPanel, BoxLayout.Y_AXIS));
@@ -112,9 +124,9 @@ public class GrabberDialog extends PamDialog {
 	}
 	
 
-	public static GrabberParams showDialog(Window parentFrame, GrabberParams gabberParams) {
+	public static GrabberParams showDialog(Window parentFrame, CameraGrabber cameraGrabber, GrabberParams gabberParams) {
 //		if (singleInstance == null) {
-			singleInstance = new GrabberDialog(parentFrame);
+			singleInstance = new GrabberDialog(cameraGrabber, parentFrame);
 //		}
 		singleInstance.setParams(gabberParams);
 		singleInstance.setVisible(true);
@@ -159,7 +171,7 @@ public class GrabberDialog extends PamDialog {
 		camPanel.removeAll();
 		cameraPanels = new CameraPanel[nCam];
 		for (int i = 0; i < nCam; i++) {
-			cameraPanels[i] = new CameraPanel(i);
+			cameraPanels[i] = new CameraPanel(this, cameraGrabber, i);
 			camPanel.add(new PamAlignmentPanel(cameraPanels[i].getDialogComponent(), BorderLayout.WEST, true));
 		}
 		pack();
@@ -205,13 +217,11 @@ public class GrabberDialog extends PamDialog {
 		}
 
 		for (int i = 0; i < Math.min(nCam, cameraPanels.length); i++) {
-			CameraParams cameraParams = grabberParams.getCameraParams(i);
-			if (cameraPanels[i].getParams(cameraParams) == true) {
-				grabberParams.setCameraParams(i, cameraParams);
-			}
-			else {
+			CameraParams cameraParams = cameraPanels[i].getParams();
+			if (cameraParams == null) {
 				return false;
 			}
+			grabberParams.setCameraParams(i, cameraParams);
 		}
 		
 		return true;

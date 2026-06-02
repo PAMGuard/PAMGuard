@@ -1,5 +1,7 @@
 package loggerForms.network;
 
+import javax.swing.JMenuItem;
+
 /**
  * A new network manager to receive data from external devices, primarily a mobile phone
  * app that will provide button presses and camera images. This will use either UDP multicast
@@ -56,6 +58,8 @@ abstract public class LoggerNetworkManager {
 	 * @return
 	 */
 	abstract public boolean closeListener();
+	
+	abstract public JMenuItem getConfigMenu();
 	
 	
 }

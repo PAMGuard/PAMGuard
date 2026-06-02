@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +27,11 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamProcess;
 import loggerForms.cameragrabber.GrabberNotification.Type;
 import loggerForms.cameragrabber.data.CameraDataUnit;
+import loggerForms.cameragrabber.source.CameraSource;
+import loggerForms.cameragrabber.source.CameraSourceType;
+import loggerForms.network.LoggerNetworkManager;
+import loggerForms.network.LoggerNetworkMessage;
+import loggerForms.network.LoggerNetworkReceiver;
 
 /**
  * Do all the grabbing in a PamProcess - we may want to log stuff and it seems consistent
@@ -35,48 +41,65 @@ public class GrabberProcess extends PamProcess {
 
 	private CameraGrabber cameraGrabber;
 	
-	private Timer timer;
+//	private Timer timer;
 	
 	private Camera[] cameras;
 	
 	private Random random = new Random();
+		
 
 	public GrabberProcess(CameraGrabber cameraGrabber) {
 		super(cameraGrabber, null);
 		this.cameraGrabber = cameraGrabber;
+				
 		
-		if (cameraGrabber.isViewer() == false) {
-		timer = new Timer(1000, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				timerAction();
-			}
-		});
-		}
-		
+//		if (cameraGrabber.isViewer() == false) {
+//		timer = new Timer(1000, new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				timerAction();
+//			}
+//		});
+//		}
+//				unpackCameraMessage(message);
+//				return true;
+//			}
+//		});
+//		
 	}
 
-	protected void timerAction() {
-		GrabberParams gp = cameraGrabber.getGrabberParams();
-		int allMap = PamUtils.makeChannelMap(gp.nCameras);
-		grabFrames(allMap);
-	}
+
+//	protected void timerAction() {
+//		GrabberParams gp = cameraGrabber.getGrabberParams();
+//		int allMap = PamUtils.makeChannelMap(gp.nCameras);
+//		grabFrames(allMap);
+//	}
+	
+//	/**
+//	 * Grab frames from one or more cameras according to the bitmap
+//	 * @param cameraBitmap
+//	 */
+//	public void grabFrames(int cameraBitmap) {
+//		synchronized (this) {
+//		int n = PamUtils.getNumChannels(cameraBitmap);
+//		for (int i = 0; i < n; i++) {
+//			int ind = PamUtils.getNthChannel(i, cameraBitmap);
+//			grabFrame(ind);
+//		}
+//		}
+//	}
 	
 	/**
-	 * Grab frames from one or more cameras according to the bitmap
-	 * @param cameraBitmap
+	 * Call from a camera source to put a new image into the system. 
+	 * @param cameraIndex
+	 * @param cameraSource
+	 * @param image
 	 */
-	public void grabFrames(int cameraBitmap) {
-		synchronized (this) {
-		int n = PamUtils.getNumChannels(cameraBitmap);
-		for (int i = 0; i < n; i++) {
-			int ind = PamUtils.getNthChannel(i, cameraBitmap);
-			grabFrame(ind);
-		}
-		}
+	public synchronized void takeFrame(int cameraIndex, CameraSource cameraSource, BufferedImage image) {
+		grabFrame(cameraIndex, image);
 	}
 	
-	public synchronized void grabFrame(int cameraIndex) {
+	public synchronized void grabFrame(int cameraIndex, BufferedImage image) {
 		long now = PamCalendar.getTimeInMillis();
 		if (cameraIndex >= cameras.length) {
 			return;
@@ -85,7 +108,6 @@ public class GrabberProcess extends PamProcess {
 		if (camera == null) {
 			return;
 		}
-		BufferedImage image = camera.takePhoto();
 		if (image == null) {
 			return;
 		}
@@ -196,8 +218,8 @@ public class GrabberProcess extends PamProcess {
 		 * Always take data at one per second for preview and storage
 		 * in image buffer, then decide separately which ones to store. 
 		 */
-		timer.setDelay(1000);
-		timer.start();
+//		timer.setDelay(1000);
+//		timer.start();
 //		if (gp.autoGrab) {
 //			timer.start();
 //		}
@@ -225,7 +247,7 @@ public class GrabberProcess extends PamProcess {
 		
 		private int cameraIndex;
 		
-		private Webcam webCam;
+//		private Webcam webCam;
 				
 		private LinkedList<CameraDataUnit> imageBuffer = new LinkedList<>();
 		
@@ -234,6 +256,8 @@ public class GrabberProcess extends PamProcess {
 		private boolean inSequence;
 		
 		private long sequenceEnd;
+		
+		private CameraSource cameraSource;
 
 		/**
 		 * @param cameraIndex
@@ -243,20 +267,28 @@ public class GrabberProcess extends PamProcess {
 			super();
 			this.cameraIndex = cameraIndex;
 			this.cameraParams = cameraParams;
-			webCam = Webcam.getWebcamByName(cameraParams.cameraName);
-			if (webCam == null) {
-				throw new Exception("Camera " + cameraParams.cameraName + " cannot be opened");
+			CameraSourceType ct = cameraGrabber.findSourceType(cameraParams.sourceType);
+			if (ct == null) {
+				System.out.println("Unknown camera source type: " + cameraParams.sourceType);
 			}
-			try {
-				Dimension d = cameraParams.dimension;
-				if (d != null) {
-					webCam.setViewSize(d);
-				}
-				webCam.open();
+			cameraSource = ct.createCameraSource(GrabberProcess.this, cameraIndex);
+			if (cameraGrabber.isViewer() == false) {
+				cameraSource.prepare(cameraParams);
 			}
-			catch (Exception e) {
-				throw e;
-			}
+//			webCam = Webcam.getWebcamByName(cameraParams.cameraName);
+//			if (webCam == null) {
+//				throw new Exception("Camera " + cameraParams.cameraName + " cannot be opened");
+//			}
+//			try {
+//				Dimension d = cameraParams.dimension;
+//				if (d != null) {
+//					webCam.setViewSize(d);
+//				}
+//				webCam.open();
+//			}
+//			catch (Exception e) {
+//				throw e;
+//			}
 		}
 		
 		public void setNextStoreTime(long now) {
@@ -308,23 +340,25 @@ public class GrabberProcess extends PamProcess {
 		}
 
 		public void stop() {
-			webCam.close();
+			if (cameraSource != null) {
+				cameraSource.shutdown();
+			}
 		}
 
-		public BufferedImage takePhoto() {
-			if (webCam == null) {
-				return null;
-			}
-			return webCam.getImage();
-		}
+//		public BufferedImage takePhoto() {
+//			if (webCam == null) {
+//				return null;
+//			}
+//			return webCam.getImage();
+//		}
 		
-		public boolean isOk() {
-			if (webCam == null) {
-				return false;
-			}
-			
-			return true;
-		}
+//		public boolean isOk() {
+//			if (webCam == null) {
+//				return false;
+//			}
+//			
+//			return true;
+//		}
 		
 		
 	}
@@ -356,7 +390,7 @@ public class GrabberProcess extends PamProcess {
 		camera.inSequence = true;
 		camera.sequenceEnd = Long.MAX_VALUE;
 		
-		grabFrame(cameraIndex);
+//		grabFrame(cameraIndex);
 		
 		camera.inSequence = false;
 	}

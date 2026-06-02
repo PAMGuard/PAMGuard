@@ -1,27 +1,41 @@
 package loggerForms.network;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CRC32C;
 
+import javax.swing.JMenuItem;
+
+import PamController.PamControlledUnitSettings;
+import PamController.PamSettings;
 import javafx.util.Duration;
 
-public class LoggerMulticastManager extends LoggerNetworkManager {
+public class LoggerMulticastManager extends LoggerNetworkManager implements PamSettings {
 	
-	private static final int BUFFLEN = 1024*1024;
+	private static final int BUFFLEN = 65536; // maz size for UDP. Not enough for camera images.
 	private ArrayList<MulticastUser> users = new ArrayList<>();
 	private Thread listenerThread;
+	
+	private static String NAME = "LoggerMulticastManager";
 	
 	private MulticastSocket multicastSocket;
 	
 	private CRC32 crc32 = new CRC32();
+	
+	private MulticastNetworkSettings multicastSettings = new MulticastNetworkSettings();
 	
 	public LoggerMulticastManager() {
 		setupListener();
@@ -149,7 +163,11 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("Enter logger multicast receive loop");
+        System.out.println("*********************************************************************");
+        System.out.println("*                                                                   *");
+		System.out.println("*               Enter logger multicast receive loop                 *");
+        System.out.println("*                                                                   *");
+        System.out.println("*********************************************************************");
         while (true) {
             DatagramPacket packet = new DatagramPacket(buff, buff.length);
             try {
@@ -169,11 +187,14 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 			multicastSocket.leaveGroup(group);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
         multicastSocket.close();
-		System.out.println("Leave logger multicast receive loop");
-		
+        System.out.println("*********************************************************************");
+        System.out.println("*                                                                   *");
+		System.out.println("*               Leave logger multicast receive loop                 *");
+        System.out.println("*                                                                   *");
+        System.out.println("*********************************************************************");
 	}
 
 	/**
@@ -236,14 +257,19 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 				int dataLen = dis.readInt();
 				byte[] itemData = new byte[dataLen];
 				int read = dis.read(itemData);
-				System.out.println(new String(itemData));
-				int checksum = dis.readInt();
-				long checksumL = Integer.toUnsignedLong(checksum);
-				crc32.reset();
-				crc32.update(itemData);
-				long chk = crc32.getValue();
-				if (checksumL != chk) {
-					checksumwarning = true;
+				//				System.out.println(new String(itemData));
+				if (bis.available() >= 4) {
+					int checksum = dis.readInt();
+					long checksumL = Integer.toUnsignedLong(checksum);
+					crc32.reset();
+					crc32.update(itemData);
+					long chk = crc32.getValue();
+					if (checksumL != chk) {
+						checksumwarning = true;
+					}
+				}
+				else {
+					System.out.println("no checksum available in data " + topic);
 				}
 				switch (item) {
 				case "TOPC":
@@ -264,5 +290,84 @@ public class LoggerMulticastManager extends LoggerNetworkManager {
 		}
 		
 		return new LoggerNetworkMessage(topic, payload, checksumwarning ? "Checksum warning" : null);		
+	}
+
+	/**
+	 * Configure network options. 
+	 */
+	private void configureNetork() {
+		
+		// what adapters are available ? 
+		Enumeration<NetworkInterface> interfaces = null;
+		try {
+			interfaces = NetworkInterface.getNetworkInterfaces();
+			while (interfaces.hasMoreElements()) {
+				NetworkInterface ni = interfaces.nextElement();
+				if (ni.isUp() == false || ni.isLoopback() || ni.isVirtual()) {
+					continue;
+				}
+				byte[] hwAddr = ni.getHardwareAddress();
+				if (hwAddr == null) {
+					continue;
+				}
+				int mtu = ni.getMTU();
+				System.out.println("Netowrk interface: " + ni.getDisplayName() + "; " + ni.getName() + "; hardware: " + ni.getHardwareAddress());
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		NetworkInterface ni2 = null;
+		try {
+			ni2 = NetworkInterface.getByName("ethernet_0");
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// only if it's already running ?
+		if (listenerThread != null || users.size() > 0) {
+			setupListener();
+		}
+	}
+
+	@Override
+	public JMenuItem getConfigMenu() {
+		JMenuItem mi = new JMenuItem("Configure Logger Network ...");
+		mi.setToolTipText("Configure options for exchanging data betwen logger forms and other programs");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				configureNetork();
+			}
+
+		});
+		
+		return mi;
+	}
+
+	@Override
+	public String getUnitName() {
+		return NAME;
+	}
+
+	@Override
+	public String getUnitType() {
+		return NAME;
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		return multicastSettings;
+	}
+
+	@Override
+	public long getSettingsVersion() {
+		return MulticastNetworkSettings.serialVersionUID;
+	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		this.multicastSettings = (MulticastNetworkSettings) pamControlledUnitSettings.getSettings();
+		return true;
 	}
 }

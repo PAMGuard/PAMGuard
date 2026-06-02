@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -20,134 +21,131 @@ import com.github.sarxos.webcam.Webcam;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
+import loggerForms.cameragrabber.CameraGrabber;
 import loggerForms.cameragrabber.CameraParams;
+import loggerForms.cameragrabber.source.CameraSourcePanel;
+import loggerForms.cameragrabber.source.CameraSourceType;
+import loggerForms.cameragrabber.source.WebcamDialogPanel;
 
-public class CameraPanel implements PamDialogPanel {
+/**
+ * Dialog panel for camera setup. this in turn will have to have a 
+ * dynamically changing panel depending on what type of source is selected. 
+ */
+public class CameraPanel {
 
 	private int camIndex;
-
+	
 	private JPanel mainPanel;
+	
+	private JTextField initials;
+	
+	private CameraSourcePanel cameraSourcePanel;
 
-	private JComboBox<String> cameraList;
+	private JPanel centralPanel;
+	
+	private JComboBox<CameraSourceType> sourceTypes;
 
-	private JComboBox<String> camDimensions;
+	private GrabberDialog grabberDialog;
 
 	private CameraParams cameraParams;
 
-	private Dimension[] currentDimensions;
-	
-	private JTextField initials;
-
-	public CameraPanel(int camIndex) {
+	public CameraPanel(GrabberDialog grabberDialog, CameraGrabber cameraGrabber, int camIndex) {
 		super();
+		this.grabberDialog = grabberDialog;
 		this.camIndex = camIndex;
-		mainPanel = new JPanel(new GridBagLayout());
+		mainPanel = new JPanel(new BorderLayout());
+		JPanel topPanel = new JPanel(new GridBagLayout());
+		centralPanel = new JPanel();
+		mainPanel.add(BorderLayout.NORTH, topPanel);
+		mainPanel.add(BorderLayout.CENTER, centralPanel);
 		mainPanel.setBorder(new TitledBorder("Camera " + camIndex));
-		cameraList = new JComboBox<String>();
-		camDimensions = new JComboBox<String>();
 		GridBagConstraints c = new PamGridBagContraints();
-		mainPanel.add(new JLabel("Camera ", JLabel.RIGHT),c);
+		
+		sourceTypes = new JComboBox<>();
+		topPanel.add(new JLabel("Camera Type: ", JLabel.RIGHT),c);
 		c.gridx++;
-		mainPanel.add(cameraList, c);
-		c.gridy++;
+		c.gridwidth = 2;
+		topPanel.add(sourceTypes);
 		c.gridx = 0;
-		mainPanel.add(new JLabel("Dimension ", JLabel.RIGHT),c);
-		c.gridx++;
-		mainPanel.add(camDimensions, c);
 		c.gridy++;
-		c.gridx = 0;
-		mainPanel.add(new JLabel("Image initials ", JLabel.RIGHT),c);
+		c.gridwidth = 1;
+		topPanel.add(new JLabel("Image initials ", JLabel.RIGHT),c);
 		c.gridx++;
-		mainPanel.add(initials = new JTextField(7), c);
+		topPanel.add(initials = new JTextField(7), c);
 
-		cameraList.addActionListener(new ActionListener() {
+		ArrayList<CameraSourceType> camTypes = cameraGrabber.getCameraSouceTypes();
+		for (CameraSourceType ct : camTypes) {
+			sourceTypes.addItem(ct);
+		}
+		
+		sourceTypes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				selectCamera();
+				newSourceType();
 			}
 		});
 	}
 
-	protected void selectCamera() {
-		try {
-			String name = (String) cameraList.getSelectedItem();
-			if (name == null) {
-				return;
-			}
-			Webcam wc = Webcam.getWebcamByName(name);
-			if (wc != null) {
-				currentDimensions = wc.getViewSizes();
-				camDimensions.removeAllItems();
-				for (int i = 0; i < currentDimensions.length; i++) {
-					String tx = formatDimension(currentDimensions[i]);
-					camDimensions.addItem(tx);
-				}
-			}
-			Dimension d = cameraParams.dimension;
-			if (d != null) {
-				camDimensions.setSelectedItem(formatDimension(d));
-			}
+
+	protected void newSourceType() {
+		CameraSourceType ct = (CameraSourceType) sourceTypes.getSelectedItem();
+		centralPanel.removeAll();
+		if (ct == null) {
+			cameraSourcePanel = null;
+			return;
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		cameraSourcePanel = ct.getDialogPanel(null);
+		if (cameraSourcePanel != null) {
+			centralPanel.add(cameraSourcePanel.getDialogComponent());
+			cameraSourcePanel.setParams(cameraParams);
 		}
+		grabberDialog.pack();
 	}
 
-	@Override
+
 	public JComponent getDialogComponent() {
 		return mainPanel;
-	}
-
-	@Override
-	public void setParams() {
-		fillCameraList();
-
-	}
-
-	@Override
-	public boolean getParams() {
-		return false;
-	}
-
-	private void fillCameraList() {
-		cameraList.removeAllItems();
-		List<Webcam> cams = Webcam.getWebcams();
-		for (Webcam cam : cams) {
-			cameraList.addItem(cam.getName());
-		}
-	}
-	
-	private String formatDimension(Dimension d) {
-		if (d == null) {
-			return null;
-		}
-		String tx = String.format("%d x %d", d.width, d.height);
-		return tx;
 	}
 
 	public void setParams(CameraParams cameraParams) {
 		this.cameraParams = cameraParams;
 		initials.setText(cameraParams.imageInitials);
-		fillCameraList();
-		cameraList.setSelectedItem(cameraParams.cameraName);
-		selectCamera();
+		if (cameraParams != null) {
+			CameraSourceType ct = grabberDialog.getCameraGrabber().findSourceType(cameraParams.sourceType);
+			if (ct != null) {
+				sourceTypes.setSelectedItem(ct);
+			}
+		}
+		newSourceType();
 	}
 
-	public boolean getParams(CameraParams cameraParams) {
+	public CameraParams getParams() {
 		cameraParams.imageInitials = initials.getText();
 		if (cameraParams.imageInitials == null) {
-			return PamDialog.showWarning(null, "Camera " + camIndex, "you must set initals for camera image files");
+			 PamDialog.showWarning(null, "Camera " + camIndex, "you must set initals for camera image files");
+			 return null;
 		}
-		String name = (String) cameraList.getSelectedItem();
-		if (name == null) {
-			return PamDialog.showWarning(null, "Camera " + camIndex, "No camera selected");
+
+		CameraSourceType ct = (CameraSourceType) sourceTypes.getSelectedItem();
+		CameraParams newParams = null;
+		if (cameraSourcePanel != null) {
+			newParams = cameraSourcePanel.getParams(); 
 		}
-		cameraParams.cameraName = name;
-		cameraParams.cameraIndex = cameraList.getSelectedIndex();
-		int dInd = camDimensions.getSelectedIndex();
-		if (currentDimensions != null && dInd >= 0 && dInd < currentDimensions.length) {
-			cameraParams.dimension = currentDimensions[dInd];
+		if (newParams == null) {
+			return null;
 		}
-		return true;
+		newParams.sourceType = ct.getName();
+		
+//		String name = (String) cameraList.getSelectedItem();
+//		if (name == null) {
+//			return PamDialog.showWarning(null, "Camera " + camIndex, "No camera selected");
+//		}
+//		cameraParams.cameraName = name;
+//		cameraParams.cameraIndex = cameraList.getSelectedIndex();
+//		int dInd = camDimensions.getSelectedIndex();
+//		if (currentDimensions != null && dInd >= 0 && dInd < currentDimensions.length) {
+//			cameraParams.dimension = currentDimensions[dInd];
+//		}
+		return newParams;
 	}
 }

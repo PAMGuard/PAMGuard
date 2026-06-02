@@ -20,6 +20,10 @@ import loggerForms.actions.LoggerAction;
 import loggerForms.actions.LoggerActions;
 import loggerForms.cameragrabber.GrabberNotification.Type;
 import loggerForms.cameragrabber.logger.GrabberAction;
+import loggerForms.cameragrabber.source.CameraSourceType;
+import loggerForms.cameragrabber.source.NetcamType;
+import loggerForms.cameragrabber.source.WebcamSource;
+import loggerForms.cameragrabber.source.WebcamType;
 import loggerForms.cameragrabber.swing.GrabberDialog;
 import loggerForms.cameragrabber.swing.GrabberTabPanel;
 
@@ -34,13 +38,26 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings, Act
 	private GrabberTabPanel grabberTabPanel;
 	
 	private GrabberProcess grabberProcess;
+
+	private ArrayList<CameraSourceType> cameraSouceTypes;
 	
 	
+	/**
+	 * @return the cameraSouceTypes
+	 */
+	public ArrayList<CameraSourceType> getCameraSouceTypes() {
+		return cameraSouceTypes;
+	}
+
 	public CameraGrabber(PamConfiguration pamConfiguration, String unitName) {
 		super(pamConfiguration, unitType, unitName);
+
+		cameraSouceTypes = new ArrayList<>();
+		cameraSouceTypes.add(new WebcamType(this));
+		cameraSouceTypes.add(new NetcamType(this));
 		
 		PamSettingManager.getInstance().registerSettings(this);
-		
+
 		grabberProcess = new GrabberProcess(this);
 		addPamProcess(grabberProcess);
 		
@@ -100,7 +117,7 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings, Act
 	}
 
 	protected void showGrabberParams(Frame parentFrame) {
-		GrabberParams newParams = GrabberDialog.showDialog(parentFrame, grabberParams);
+		GrabberParams newParams = GrabberDialog.showDialog(parentFrame, this, grabberParams);
 		if (newParams != null) {
 			grabberParams = newParams;
 			notifyObservers(new GrabberNotification(Type.NEWCONFIG));
@@ -136,5 +153,19 @@ public class CameraGrabber extends PamControlledUnit implements PamSettings, Act
 		for (GrabberObserver obs : observers) {
 			obs.notify(grabberNotification);
 		}
+	}
+	
+	/**
+	 * Find a camera source type for it's name. 
+	 * @param typeName
+	 * @return
+	 */
+	public CameraSourceType findSourceType(String typeName) {
+		for (CameraSourceType ct : cameraSouceTypes) {
+			if (ct.getName().equals(typeName)) {
+				return ct;
+			}
+		}
+		return null;
 	}
 }
