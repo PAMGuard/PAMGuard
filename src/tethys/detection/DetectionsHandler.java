@@ -484,7 +484,9 @@ public class DetectionsHandler extends CollectionHandler {
 //				dataBlock.loadViewerData(mapPoint, null);
 				SuperDetDataBlock.reattachAllSubDetections();
 				
-				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+//				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+				// export all loaded data. Solves problem of minor mismatches at start and end of binary files. 
+				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(Long.MIN_VALUE/2, Long.MAX_VALUE/2, true, dataSelector);
 				Collections.sort(dataCopy);
 				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
 				for (PamDataUnit dataUnit : dataCopy) {
