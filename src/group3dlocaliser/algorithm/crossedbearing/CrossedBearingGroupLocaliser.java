@@ -54,7 +54,7 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 	@Override
 	public String getName() {
-		return "Crossed Bearings";
+		return CrossedBearingProvider.algoName; // needs to match for settings to work.
 	}
 
 	@Override
@@ -76,6 +76,7 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 //			System.out.println(tmAnnotation.toString());
 //		}
 		if (tmAnnotation == null) {
+			tmAnnotation = tmAnnotationType.autoAnnotate(groupDataUnit);
 			return null;
 		}
 		
@@ -258,7 +259,7 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 		@Override
 		public String getName() {
-			return "Crossed Bearing Settings";
+			return CrossedBearingProvider.algoName;
 		}
 
 		@Override

@@ -1731,17 +1731,13 @@ public class ClickDetector extends PamProcess {
 					}
 					maxSE = Math.max(maxSE, dB);
 					if (clickControl.clickParameters.publishTriggerFunction) {
-						// triggerWaveData[iChan][iSamp] = (shortVal / longVal);
-						// triggerWaveData[iChan][iSamp] = (20*Math.log10(longVal*3276.));
 						triggerWaveData[iChan][iSamp] = (dB);
 					}
 				}
 
 				// end of loop over channels to see which have triggered
 				if (clickStatus == ClickStatus.CLICK_OFF && overThreshold != 0) { // start
-					// a
-					// new
-					// click
+					// a new click
 					clickStatus = ClickStatus.CLICK_ON;
 					clickStartSample = Math.max(0, blockStartSample + iSamp - clickControl.clickParameters.preSample); // subtract
 					clickEndSample = blockStartSample + iSamp;
