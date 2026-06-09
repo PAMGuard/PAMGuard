@@ -198,6 +198,9 @@ public class NoiseDialog extends PamDialog {
 			return false;
 		}
 		noiseSettings.useAll = useAllButton.isSelected();
+		if (noiseSettings.getNumMeasurementBands() == 0) {
+			return showWarning("You must create at least one measurement frequency band");
+		}
 		return true;
 	}
 
