@@ -10,9 +10,12 @@ import Localiser.algorithms.Correlations;
 import Localiser.algorithms.PeakPosition;
 import Localiser.algorithms.PeakPosition2D;
 import Localiser.algorithms.PeakSearch;
+import PamController.soundMedium.GlobalMedium;
+import PamController.soundMedium.GlobalMediumManager;
 import PamDetection.LocContents;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamUtils;
+import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.TFContourData;
 import PamguardMVC.TFContourProvider;
@@ -32,6 +35,7 @@ import bearinglocaliser.display.BearingDataDisplay;
 import fftManager.FFTDataUnit;
 import fftManager.fftorganiser.FFTDataList;
 import pamMaths.PamVector;
+import pamMaths.STD;
 
 public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 
@@ -58,6 +62,12 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 	private Beam2DPlot bearing2DPlot;
 
 	private PamVector[] arrayAxes;
+
+	private double[] arrayDimension;
+
+	private double speedOfSound;
+
+	private STD std = new STD();
 	
 	public WrappedBeamFormAlgorithm(WrappedBeamFormAlgorithmProvider wrappedBeamFormAlgorithmProvider, WrappedBeamFormerProcess wrappedBeamFormerProcess, 
 			BeamGroupProcess beamGroupProcess, BearingProcess bearingProcess, BearingAlgorithmParams algorithmParams,
@@ -91,6 +101,8 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 			groupHydrophones = getFftSourceData().getChannelListManager().channelIndexesToPhones(groupHydrophones);
 			arrayShape = arrayManager.getArrayShape(currentArray, groupHydrophones);
 			arrayAxes = arrayManager.getArrayVectors(currentArray, groupHydrophones);
+			arrayDimension = arrayManager.getArrayDimension(currentArray, groupHydrophones);
+			speedOfSound = currentArray.getSpeedOfSound();
 		}
 		catch (Exception e) {
 			System.out.println("Problem configuring beam former: " + e.getMessage());
@@ -169,19 +181,44 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 		}
 
 		double[] angles;
+		BeamAngleData beamAngleData;
 		switch (nDimensions) {
 		case 1:
-			angles = interpret1DBeamOGram(wrappedBeamFormerProcess.getCollatedBeamOGram());
+			beamAngleData = interpret1DBeamOGram(wrappedBeamFormerProcess.getCollatedBeamOGram());
 			break;
 		case 2:
-			angles = interpret2DBeamOGram(wrappedBeamFormerProcess.getCollatedBeamOGram());
+			beamAngleData = interpret2DBeamOGram(wrappedBeamFormerProcess.getCollatedBeamOGram());
 			break;
 		default:
-			angles = null;
+			beamAngleData = null;
 		}
-		if (angles == null) {
+		if (beamAngleData == null) {
 			return null;
 		}
+		angles = beamAngleData.getAngles();
+		/*
+		 * Based on the SNR, mean frequency, and snr, estimate the CRLB for bearing errors. 
+		 */
+		double[] angleErrors = new double[angles.length];
+		double[] snr = beamAngleData.getSnr();
+		double f0 = 150; // need to get a better estimate of this - perhaps extract the mean frequency ?  
+
+		double[] snrErrors = new double[snr.length];
+		if (snr != null && snr.length > 0) {
+			// need the array dimension ... take biggest x,y value
+			double dim = Math.max(arrayDimension[0], arrayDimension[1]);
+			for (int i = 0; i < snr.length; i++) {
+				// error on time
+				snrErrors[i] = Math.sqrt(1./(2*2*snr[i]))/(2*Math.PI*f0);
+				// change to minimum error on bearing
+				snrErrors[i] = snrErrors[i] / (dim /speedOfSound);
+			}
+		}
+		for (int i = 0; i < angleErrors.length; i++) {
+			angleErrors[i] = snrErrors[Math.min(snrErrors.length-1, i)];
+		}
+		
+		
 		/*
 		 * The graphics output...
 		 */
@@ -197,7 +234,7 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 
 		double[] arrayAngles = PamVector.getMinimalHeadingPitchRoll(arrayAxes);
 		BearingLocalisation bl = new BearingLocalisation(pamDataUnit, shortAlgoName, 
-				locContents, groupHydrophones, angles, null, arrayAngles);
+				locContents, groupHydrophones, angles, angleErrors, arrayAngles);
 		bl.setSubArrayType(arrayShape);
 //		PamVector[] arrayAxis = beamGroupProcess.getArrayMainAxes();
 //		bl.setArrayAxis(arrayAxis);
@@ -205,7 +242,7 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 		return bl;
 	}
 
-	private double[] interpret2DBeamOGram(List<BeamOGramDataUnit> collatedBeamOGram) {
+	private BeamAngleData interpret2DBeamOGram(List<BeamOGramDataUnit> collatedBeamOGram) {
 		double[][] angleData = BeamOGramDataUnit.averageAngleAngleData(collatedBeamOGram);
 		peakSearch.setWrapDim0(true);
 		peakSearch.setWrapStep0(2);
@@ -217,16 +254,21 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 		double[] ang = {Math.toRadians(ang0), Math.toRadians(ang1)};
 		
 
-		return ang;
+		return new BeamAngleData(ang, null, null);
 	}
 
-	private double[] interpret1DBeamOGram(List<BeamOGramDataUnit> collatedBeamOGram) {
+	private BeamAngleData interpret1DBeamOGram(List<BeamOGramDataUnit> collatedBeamOGram) {
 		double[] angle1Data = BeamOGramDataUnit.getAverageAngle1Data(collatedBeamOGram);
 		// now collapse that 
 		peakSearch.setWrapDim0(false);
 		PeakPosition peakPosition = peakSearch.interpolatedPeakSearch(angle1Data);
 		int[] angRange = beamAlgorithmParams.getBeamOGramAngles();
 		double[] ang = {Math.toRadians(peakPosition.getBin() * angRange[2] + angRange[0])};
+		double median = std.getMedian(angle1Data);
+		double snr = peakPosition.getHeight()/median;
+		snr *= snr;
+		double[] snrA = {snr};
+//		System.out.println("SNR = " + snr);
 		
 //		/*
 //		 * The graphics output...
@@ -242,7 +284,7 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 //			bearing2DPlot.setData(faData, aR, fR);
 //		}
 		
-		return ang;
+		return new BeamAngleData(ang, null, snrA);
 	}
 
 

@@ -762,6 +762,40 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 		}
 		return arrayVectors;
 	}
+	
+	/**
+	 * Get the outer limits of the array in x,y,z
+	 * @param array
+	 * @param phones
+	 * @return 3 element array
+	 */
+	public double[] getArrayDimension(PamArray array, int phones) { 
+		double[] dim = new double[3];
+		int nPhones = PamUtils.getNumChannels(phones);
+		if (nPhones <= 1) {
+			return dim;
+		}
+		double[] dMin, dMax;
+		int iPhone = PamUtils.getNthChannel(0, phones);
+		PamVector hydVec = array.getAbsHydrophoneVector(iPhone,0);
+		dMin = Arrays.copyOf(hydVec.getVector(), 3);
+		dMax = Arrays.copyOf(hydVec.getVector(), 3);
+		
+		for (int i = 0; i < nPhones; i++) {
+			iPhone = PamUtils.getNthChannel(i, phones);
+			hydVec = array.getAbsHydrophoneVector(iPhone,0);
+			double[] hA = hydVec.getVector();
+			for (int j = 0; j < 3; j++) {
+				dMin[j] = Math.min(dMin[j], hA[j]);
+				dMax[j] = Math.max(dMax[j], hA[j]);
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			dim[i] = dMax[i]-dMin[i];
+		}
+		
+		return dim;
+	}
 
 	public static String getArrayTypeString(int arrayType) {
 		switch (arrayType) {
