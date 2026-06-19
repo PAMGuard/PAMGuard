@@ -1,5 +1,7 @@
 package signal.snr;
 
+import PamUtils.FrequencyFormat;
+
 public class SNRData {
 
 	private double snr; // signal to noise
@@ -77,6 +79,16 @@ public class SNRData {
 	 */
 	public double[] getFrequencySearch() {
 		return frequencySearch;
+	}
+
+	public double getCRLB() {
+		return 1./Math.sqrt(2*getDurationS()*getBandwidthHz()*getSnr()) / (2*Math.PI*getF0());
+	}
+
+	@Override
+	public String toString() {
+		return String.format("SNR=%3.1fdB, dT=%3.2fms. dF=%s, f0=%s, CRLB=%3.4f", 10.*Math.log10(snr), durationS*1000, 
+				FrequencyFormat.formatFrequency(bandwidthHz, true),FrequencyFormat.formatFrequency(f0, true), getCRLB());
 	}
 
 

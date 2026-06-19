@@ -6,12 +6,16 @@ import java.io.Serializable;
 import Array.ArrayManager;
 import Localiser.LocaliserPane;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
+import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.AnnotationSettingsDialog;
+import annotation.handler.AnnotationOptions;
 import annotation.localise.targetmotion.TMAnnotation;
 import annotation.localise.targetmotion.TMAnnotationOptions;
 import annotation.localise.targetmotion.TMAnnotationType;
@@ -30,7 +34,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 
-public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
+public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D implements PamSettings {
 
 	private double sampleRate;
 	
@@ -42,13 +46,15 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 	private Group3DLocaliserControl group3dLocaliserControl;
 
+	private TMAnnotationOptions tmAnnotationOptions = new TMAnnotationOptions("CrossedBearingGroupLocaliser");
+
 	public CrossedBearingGroupLocaliser(Group3DLocaliserControl group3dLocaliserControl) {
 		this.group3dLocaliserControl = group3dLocaliserControl; 
 		tmAnnotationType = new TMAnnotationType();
-		TMAnnotationOptions tmAnnotationOptions = new TMAnnotationOptions("CrossedBearingGroupLocaliser");
-		tmAnnotationOptions.getLocalisationParams().setIsSelected(0, false);
-		tmAnnotationOptions.getLocalisationParams().setIsSelected(1, false);
-		tmAnnotationOptions.getLocalisationParams().setIsSelected(2, true);
+//		tmAnnotationOptions.getLocalisationParams().setIsSelected(0, false);
+//		tmAnnotationOptions.getLocalisationParams().setIsSelected(1, false);
+//		tmAnnotationOptions.getLocalisationParams().setIsSelected(2, true);
+		PamSettingManager.getInstance().registerSettings(this);
 		tmAnnotationType.setAnnotationOptions(tmAnnotationOptions);
 	}
 
@@ -284,6 +290,39 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 		}
 		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
 		return locCont.hasLocContent(LocContents.HAS_BEARING);
+	}
+
+	@Override
+	public String getUnitName() {
+		return this.group3dLocaliserControl.getUnitName();
+	}
+
+	@Override
+	public String getUnitType() {
+		// TODO Auto-generated method stub
+		return this.getClass().getName();
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		return tmAnnotationType.getAnnotationOptions();
+	}
+
+	@Override
+	public long getSettingsVersion() {
+				return tmAnnotationType.getAnnotationOptions().serialVersionUID;
+	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		try {
+			tmAnnotationOptions = (TMAnnotationOptions) pamControlledUnitSettings.getSettings();
+			setTmAnnotationOptions(tmAnnotationOptions);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 

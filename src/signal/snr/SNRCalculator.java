@@ -3,6 +3,7 @@ package signal.snr;
 import java.util.Arrays;
 
 import PamUtils.complex.ComplexArray;
+import Spectrogram.WindowFunction;
 import fftManager.FastFFT;
 import pamMaths.STD;
 import signal.Hilbert;
@@ -33,6 +34,8 @@ public class SNRCalculator {
 	private int smooth = 1;
 	
 	private Hilbert hilbert = new Hilbert();
+	
+	private double[] window;
 	
 	public SNRCalculator() {
 	}
@@ -177,11 +180,24 @@ public class SNRCalculator {
 		double fPeakWidth = (fPeak.binEnd-fPeak.binStart+ 1) * fScale;
 		double tPeakWidth = (tPeak.binEnd-tPeak.binStart + 1) * tScale;
 		
+//		double snr = tPeak.peakEnergy / tPeak.median;
 //		double snr = tPeak.peakEnergy / (tPeak.median*tSeries.length);
 		double snr = tPeak.peakEnergy / (tPeak.binEnd-tPeak.binStart + 1) / tPeak.median;
-		double f0 = fPeak.peakBin * fScale;		
+		double f0 = (fPeak.peakBin+0.5) * fScale;		
 		
-		return new SNRData(snr, f0, tPeakWidth, fPeakWidth, frequencyRange);
+		SNRData snrData = new SNRData(snr, f0, tPeakWidth, fPeakWidth, frequencyRange);
+//		if (Double.isInfinite(snrData.getCRLB())) {
+//			System.out.println("Infinite CRLB " + snrData);
+//		}
+		
+		return snrData;
+	}
+	
+	double[] getWindow() {
+		if (window == null || window.length != fftLength) {
+			window = WindowFunction.hann(fftLength);
+		}
+		return window;
 	}
 	
 	/**
@@ -201,6 +217,10 @@ public class SNRCalculator {
 			s2 = Math.min(wave.length, s2);
 			double[] fDat = Arrays.copyOfRange(wave, s1, s2);
 			// should probably window this too ?
+			double[] win = getWindow();
+			for (int j = 0; j < fDat.length; j++) {
+				fDat[i] *= win[i];
+			}
 			ComplexArray compData = fastFFT.rfft(fDat, fftLength);
 			specGram[i] = compData.magsq();
 			s1 += fftHop;
@@ -238,7 +258,7 @@ public class SNRCalculator {
 		int[] fB = {0, nF};
 		if (frequencyRange != null) {
 			for (int i = 0; i < frequencyRange.length; i++) {
-				fB[i] = Math.max(0,  Math.min(nF, (int) Math.round(frequencyRange[0]*fftLength/sampleRate)));
+				fB[i] = Math.max(0,  Math.min(nF, (int) Math.round(frequencyRange[i]*fftLength/sampleRate)));
 			}
 		}
 		return fB;
@@ -347,7 +367,7 @@ public class SNRCalculator {
 				b1++;
 				break;
 			}
-			energy = data[b1];
+			energy += data[b1];
 		}
 		return new PeakData(maxBin, b1,b2,energy,median);
 	}
@@ -370,6 +390,14 @@ public class SNRCalculator {
 			this.binEnd = binEnd;
 			this.peakEnergy = peakEnergy;
 			this.median = median;
+		}
+		
+		/**
+		 * Get the width - inclusive since binEnd is included in the peak. 
+		 * @return
+		 */
+		public int getWidth() {
+			return binEnd-binStart+1;
 		}
 	}
 	

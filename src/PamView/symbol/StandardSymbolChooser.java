@@ -238,6 +238,7 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 		//			standardSymbolManager.removeSymbolOption(StandardSymbolManager.HAS_LINE_LENGTH);
 		//		}
 		standardSymbolManager.addAnnotationModifiers(this);
+		standardSymbolManager.checkLocalisationOptions(this);
 		StandardSymbolOptionsPanel ssop = new StandardSymbolOptionsPanel(standardSymbolManager, this);
 
 		return ssop;
