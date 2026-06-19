@@ -34,6 +34,12 @@ public class EllipticalError implements LocaliserError {
 		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
 	}
 	
+	public EllipticalError(ErrorEllipse errorEllipse) {
+		this.errorEllipse = errorEllipse;
+		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
+	}
+	
+	
 	/**
 	 * Create an empty elliptical error. The error ellipse needs to be set explicitly. 
 	 */

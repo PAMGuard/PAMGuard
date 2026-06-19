@@ -14,7 +14,7 @@ import PamModel.parametermanager.PamParameterSet.ParameterSetType;
  */
 public class AnnotationOptions implements Serializable, ManagedParameters {
 
-	private static final long serialVersionUID = 1L;
+	public static final long serialVersionUID = 1L;
 
 	private String annotationName;
 

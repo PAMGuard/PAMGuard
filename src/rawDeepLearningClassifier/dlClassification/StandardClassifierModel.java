@@ -104,7 +104,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			//REAL TIME - when using a sound card. 
 			//add to a buffer if in real time. 
 			if (workerThread.getQueue().size()>getMaxQueueSize()) {
-				System.out.println(getName() + " deep learning model queue size exceeded: " + workerThread.getQueue().size());
+//				System.out.println(getName() + " deep learning model queue size exceeded: " + workerThread.getQueue().size());
 
 				if (PamCalendar.isSoundFile() && !forceQueue) {
 					//we are analysing a sound file so just wait until the queue has space. Note that we

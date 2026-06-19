@@ -26,10 +26,10 @@ import rawDeepLearningClassifier.logging.DLAnnotation;
  */
 public class DLDetection extends ClipDataUnit implements PamDetection, RawDataHolder {
 	
-	/**
-	 * The abstract localisation 
-	 */
-	private DLLocalisation localisation; 
+//	/**
+//	 * The abstract localisation 
+//	 */
+//	private DLLocalisation localisation; 
 	
 	/**
 	 * The raw data unit. 
@@ -110,12 +110,13 @@ public class DLDetection extends ClipDataUnit implements PamDetection, RawDataHo
 		 */
 		if (dataAnnotation instanceof BearingAnnotation) {
 			
-			BearingAnnotation bearingAnnotation = (BearingAnnotation) dataAnnotation; 
-			
-			localisation = new DLLocalisation(this, LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY, 
-					PamUtils.getSingleChannel(this.getChannelBitmap())); 
+			BearingAnnotation bearingAnnotation = (BearingAnnotation) dataAnnotation;
+			setLocalisation(bearingAnnotation.getBearingLocalisation());
+//			
+//			localisation = new DLLocalisation(this, LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY, 
+//					PamUtils.getSingleChannel(this.getChannelBitmap())); 
 
-			localisation.setBearing(bearingAnnotation); 
+//			localisation.setBearing(bearingAnnotation); 
 		}
 	}
 	
