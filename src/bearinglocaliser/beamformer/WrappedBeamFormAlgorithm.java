@@ -134,7 +134,7 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 
 		/**
 		 * Set the frequency range for analysis. this is pretty crude, but will work for any 
-		 * data unit that has a single freqeuncy range. Sweeping sounds such as whistles will 
+		 * data unit that has a single frequency range. Sweeping sounds such as whistles will 
 		 * probably override this on a bin by bin basis. 
 		 */
 		double[] setFRange = beamAlgorithmParams.getBeamOGramFreqRange();

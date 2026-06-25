@@ -227,9 +227,9 @@ public class LikilihoodError extends EllipticalError {
 	}
 	
 	/**
-	 * The log likilihood. 
-	 * @param location - the point on the chi2 surface to fin dlog likilhood for.  
-	 * @return the log likilihood. 
+	 * The log likelihood. 
+	 * @param location - the point on the chi2 surface to find log likelihood for.  
+	 * @return the log likelihood. 
 	 */
 	public double logLikelihood(double[] location){
 		return -chi2.value(location) / 2;
@@ -239,7 +239,7 @@ public class LikilihoodError extends EllipticalError {
 	/**
 	 * Get chi2 error for any direction
 	 * @param chi2 - the chi2 surface
-	 * @param point - the minima of the surface i.e. the soluton
+	 * @param point - the minima of the surface i.e. the solution
 	 * @param errorVector - the direction in which to calculate the error. 
 	 * @return the error magnitude in the direction. This is the average value of the error in the 
 	 * direction specified and in the opposite direction. Curvature is expressed as 1 standard deviation

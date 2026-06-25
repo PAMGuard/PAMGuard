@@ -81,6 +81,10 @@ public class SNRData {
 		return frequencySearch;
 	}
 
+	/**
+	 * Get the Cramer-Rao lower bound based on the fundamental frequency, SNR and time-bandwidth product.  
+	 * @return
+	 */
 	public double getCRLB() {
 		return 1./Math.sqrt(2*getDurationS()*getBandwidthHz()*getSnr()) / (2*Math.PI*getF0());
 	}

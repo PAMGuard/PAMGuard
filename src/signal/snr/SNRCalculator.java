@@ -174,7 +174,7 @@ public class SNRCalculator {
 		powerSpec = smoothData(powerSpec);
 		tSeries = smoothData(tSeries);
 		
-		PeakData fPeak = findPeak(powerSpec);
+		PeakData fPeak = findPeak(powerSpec, getFreqBins());
 		PeakData tPeak = findPeak(tSeries);
 		
 		double fPeakWidth = (fPeak.binEnd-fPeak.binStart+ 1) * fScale;
@@ -183,7 +183,7 @@ public class SNRCalculator {
 //		double snr = tPeak.peakEnergy / tPeak.median;
 //		double snr = tPeak.peakEnergy / (tPeak.median*tSeries.length);
 		double snr = tPeak.peakEnergy / (tPeak.binEnd-tPeak.binStart + 1) / tPeak.median;
-		double f0 = (fPeak.peakBin+0.5) * fScale;		
+		double f0 = (fPeak.peakBin+0.5) * fScale;		// use bin centres to avoid a divide by 0 in CRLB calculations.
 		
 		SNRData snrData = new SNRData(snr, f0, tPeakWidth, fPeakWidth, frequencyRange);
 //		if (Double.isInfinite(snrData.getCRLB())) {
@@ -319,21 +319,34 @@ public class SNRCalculator {
 		}
 		return out;
 	}
-
 	/**
 	 * Find a peak in any data array according to 
 	 * threshold. If the difference between the median and the
 	 * peak is less than the threshold, then use the half way point 
 	 * between the median and peak. 
-	 * @param data
-	 * @return
+	 * @param data array of data
+	 * @return peak information
 	 */
 	private PeakData findPeak(double[] data) {
+		int[] binRange = {0, data.length};
+		return findPeak(data, binRange);
+	}
+	
+	/**
+	 * Find a peak in any data array according to 
+	 * threshold. If the difference between the median and the
+	 * peak is less than the threshold, then use the half way point 
+	 * between the median and peak. 
+	 * @param data array of data
+	 * @param binRange search range within data from binRange[0] to binRange[1]-1
+	 * @return peak information
+	 */
+	private PeakData findPeak(double[] data, int[] binRange) {
 		double median = std.getMedian(data);
 		// get the maximum and it's position in the data. 
-		double max = data[0];
+		double max = data[binRange[0]];
 		int maxBin = 0;
-		for (int i = 1; i < data.length; i++) {
+		for (int i = binRange[0]+1; i < binRange[1]; i++) {
 			if (data[i]>max) {
 				max = data[i];
 				maxBin = i;
@@ -355,14 +368,14 @@ public class SNRCalculator {
 		 */
 		double energy = max;
 		int b1, b2;
-		for (b2 = maxBin+1; b2 < data.length; b2++) {
+		for (b2 = maxBin+1; b2 < binRange[1]; b2++) {
 			if (data[b2] < sigLev) {
 				b2--;
 				break;
 			}
 			energy += data[b2];
 		}
-		for (b1 = maxBin-1; b1 >= 0; b1--) {
+		for (b1 = maxBin-1; b1 >= binRange[0]; b1--) {
 			if (data[b1] < sigLev) {
 				b1++;
 				break;
@@ -372,6 +385,9 @@ public class SNRCalculator {
 		return new PeakData(maxBin, b1,b2,energy,median);
 	}
 	
+	/**
+	 * holder for data about a peak. Only used internally in SNRCalculator
+	 */
 	private class PeakData {
 		
 		int peakBin;
