@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -240,7 +241,12 @@ public class DataMapSerialiser {
 					continue;
 				}
 				oos.writeObject(streams.get(i).getDataName());
+				try {
 				oos.writeObject(dm.getMapPoints());
+				}
+				catch (NotSerializableException se) {
+					se.printStackTrace();
+				}
 			}
 			oos.close();
 		} catch (IOException e) {

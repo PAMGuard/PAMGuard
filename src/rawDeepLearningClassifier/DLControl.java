@@ -435,7 +435,10 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// things like symbol choosers that
 		// may need to know a data block contains a certian type of annotation.
 
-		this.getParentDataBlock().addDataAnnotationType(dlClassifyProcess.getDLAnnotionType());
+		PamDataBlock pDatablock = this.getParentDataBlock();
+		if (pDatablock != null) {
+			this.getParentDataBlock().addDataAnnotationType(dlClassifyProcess.getDLAnnotionType());
+		}
 
 		if (dlSidePanel != null) {
 			dlSidePanel.setupPanel();

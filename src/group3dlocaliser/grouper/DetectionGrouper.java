@@ -165,7 +165,7 @@ public class DetectionGrouper {
 //		int lastGroup = motherGroup.getLastChannelGroup();
 		long buffer = (long) this.maxInterGroupSample;
 //		if (shouldCloseMotherGroup(lastGroup, sampleNumber, buffer)) {
-		if (sampleNumber > motherGroup.getVeryLastSample() + buffer + sampleRate) {
+		if (sampleNumber > motherGroup.getVeryLastSample() + buffer + sampleRate * 5) {
 			closeMotherGroup();
 //		if (maybeCloseMotherGroup(motherGroup.getLastChannelGroup(), sampleNumber - (long) (sampleRate / 2))) {
 //			System.out.println("Mother group closed on timer");
@@ -244,6 +244,9 @@ public class DetectionGrouper {
 	 * Close the existing group and make a new one. 
 	 */
 	public synchronized void closeMotherGroup() {
+		Thread t = Thread.currentThread();
+		StackTraceElement[] st = t.getStackTrace();
+//		System.out.println("\nCloseMotherGroup called from " + st[2].getMethodName());
 		processFirstGroup(motherGroup);
 		if (maxInterGroupSamples==null) return;
 		motherGroup = new FirstGrouping(maxInterGroupSamples.length, 0, null);
@@ -273,7 +276,6 @@ public class DetectionGrouper {
 		List<PamDataUnit> dataUnits = motherGroup.getDataUnits();
 //		for (int i = 0; i < dataUnits.size(); i++) {
 //			if (dataUnits.get(i).getUID() == 291039474) {
-//				System.out.println("Processing group with click 291039474");
 //				System.out.printf("Process first group with %d datas channels %s\n", dataUnits.size(), PamUtils.getChannelList(motherGroup.getTotalChannelMap()));
 //			}
 //		}
@@ -427,7 +429,8 @@ public class DetectionGrouper {
 			}
 		}
 		if (nAccepted > 0) {
-//			System.out.printf("Accepted %d of %d data combinations\n", detectionGroupedSet.getNumGroups(), totalCombinations);
+//			System.out.printf("Accepted %d of %d data combinations\n", detectionGroupedSet.getNumGroups(), 
+//					totalCombinations);
 			detectionGroupMonitor.newGroupedDataSet(detectionGroupedSet);
 		}
 

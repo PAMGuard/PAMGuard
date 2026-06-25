@@ -75,7 +75,7 @@ public class TOADBearingAlgorithm extends BaseFFTBearingAlgorithm {
 		if (fftSource != null) {
 			groupHydrophones = getFftSourceData().getChannelListManager().channelIndexesToPhones(groupHydrophones);
 		}
-		int[] hydrophones = fftSource.getChannelListManager().channelMapToPhonesList(groupIndex);
+		int[] hydrophones = fftSource.getChannelListManager().channelMapToPhonesList(groupChannels);
 		arrayShape = arrayManager.getArrayShape(currentArray, groupHydrophones);
 		nChannels = PamUtils.getNumChannels(groupChannels);
 		nPairs = (nChannels * (nChannels-1)) / 2;
@@ -218,6 +218,9 @@ public class TOADBearingAlgorithm extends BaseFFTBearingAlgorithm {
 //			System.out.printf(", %3.3f", peakPos[0]);
 		}
 //		System.out.printf("\n");
+		if (bearingLocaliser == null) {
+			return null;
+		}
 		double[][] locBearings = bearingLocaliser.localise(delays, pamDataUnit.getTimeMilliseconds());
 
 //		if (pamDataUnit.getDurationInMilliseconds() > 300) {

@@ -14,10 +14,8 @@ import fftManager.FastFFT;
 public class Hilbert {
 
 	private FastFFT fastFFT = new FastFFT();
-//	private Complex[] storedFFTArray = null;
-//	private Complex[] fullFFTArray = null;
+
 	private double[] storedData1221 = null;
-	
 	
 
 	/**

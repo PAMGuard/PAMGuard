@@ -30,7 +30,7 @@ public class BinaryOfflineDataMapPoint extends OfflineDataMapPoint implements Se
 
 	private Datagram datagram;
 
-	private BinaryStore binaryStore;
+	private transient BinaryStore binaryStore;
 	
 	/*
 	 * 

@@ -11,6 +11,7 @@ import bearinglocaliser.annotation.BearingAnnotation;
  * @author Jamie Macaulay
  *
  */
+@Deprecated // no idea why this was put here. 
 public class DLLocalisation extends AbstractLocalisation {
 
 	private double[] angles;
