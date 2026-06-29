@@ -748,9 +748,9 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		return unitTaskManager.get(i);
 	}
 
-	public String getModuleSummary(boolean clear) {
-		return getModuleSummary(clear,"csv");
-	}
+//	public String getModuleSummary(boolean clear) {
+//		return getModuleSummary(clear,"csv");
+//	}
 	
 
 	/**
