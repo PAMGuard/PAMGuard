@@ -412,6 +412,7 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<version>3.10.0</version>
 						<executions>
+						<!-- Throws an error on Windows. Do we need this ? 
 							<execution>
 								<id>copy-dependencies</id>
 								<phase>package</phase>
@@ -425,7 +426,7 @@
 									<overWriteSnapshots>false</overWriteSnapshots>
 									<overWriteIfNewer>true</overWriteIfNewer>
 								</configuration>
-							</execution>
+							</execution>-->
 							<!--  this deletes all the dependencies in the local
 							repository and downloads them again.  
 			          Run a Maven > Update after doing this in order to properly reset the
