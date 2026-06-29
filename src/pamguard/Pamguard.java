@@ -108,6 +108,8 @@ public class Pamguard {
 	 */
 	public static void main(String[] args) {
 		
+		CommandLine.create(args);
+		
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 		try {			
 			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
