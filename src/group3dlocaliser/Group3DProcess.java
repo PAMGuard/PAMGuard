@@ -11,7 +11,6 @@ import PamController.PamControllerInterface;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
-import PamUtils.PamCalendar;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.PamDataBlock;
@@ -21,6 +20,7 @@ import PamguardMVC.PamProcess;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
+import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
 import group3dlocaliser.grouper.DetectionGroupMonitor;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import group3dlocaliser.grouper.DetectionGrouper;
@@ -165,7 +165,12 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 		if (detectionGrouper == null)
 			return;
 //		long t1 = System.currentTimeMillis();
-//		System.out.printf("New %s at %s in Group3Dprocess\n", o.toString(), PamCalendar.formatTime(pamDataUnit.getTimeMilliseconds(), true));
+//		System.out.printf("New %s in Group3Dprocess", o.toString());
+		
+		if(localiserAlgorithm3D instanceof CrossedBearingGroupLocaliser && pamDataUnit.getLocalisation()==null) {
+			return;
+		}
+		
 		detectionGrouper.newData(pamDataUnit);
 //		long t2 = System.currentTimeMillis();
 //
@@ -219,8 +224,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			// localiserAlgorithm3D.process(detectionGroupedSet.getGroup(i));
 			abstractLocalisation = localiserAlgorithm3D.runModel(group3dDataUnits[i], null, false);
 			if (abstractLocalisation == null) {
-//				System.out.printf("Group 3D process null localisation from %d units to %s\n", group3dDataUnits[i].getSubDetectionsCount(), 
-//						localiserAlgorithm3D.getName());
+				System.out.println("Group 3D process null localisation from " + localiserAlgorithm3D.getName());
 				continue;
 			}
 			// log all outputs ..

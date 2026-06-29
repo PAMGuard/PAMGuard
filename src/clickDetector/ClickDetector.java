@@ -75,7 +75,7 @@ import clickDetector.tdPlots.ClickEventSymbolManager;
 import fftFilter.FFTFilter;
 import fftFilter.FFTFilterParams;
 import fftManager.FastFFT;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 import signal.Hilbert;
 import targetMotionOld.TargetMotionLocaliser;
 import targetMotionOld.TargetMotionSQLLogging;

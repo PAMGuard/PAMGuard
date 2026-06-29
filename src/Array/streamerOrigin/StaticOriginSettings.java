@@ -16,6 +16,8 @@ public class StaticOriginSettings extends OriginSettings implements ManagedParam
 	
 	private GpsData staticGpsData;
 	
+	private String siteName;
+	
 	public StaticOriginSettings() {
 		super(StaticOriginMethod.class);
 	}
@@ -41,6 +43,14 @@ public class StaticOriginSettings extends OriginSettings implements ManagedParam
 		if (streamer != null) {
 			staticGpsData.setTrueHeading(streamer.getHeading());
 		}
+	}
+
+	public String getSiteName() {
+		return siteName;
+	}
+
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
 	}
 
 	/**

@@ -18,9 +18,11 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
-import networkTransfer.receive.BuoyStatusDataBlock;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.MqttNetReceiver;
+import networkTransfer.receive.NetworkReceiveParams;
 import networkTransfer.receive.NetworkReceiver;
+import networkTransfer.receive.status.BuoyStatusDataBlock;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 public class NetworkReceiveSidePanel implements PamSidePanel {
 
@@ -42,7 +44,7 @@ public class NetworkReceiveSidePanel implements PamSidePanel {
 		mainPanel.setLayout(new GridBagLayout());		
 		GridBagConstraints c = new PamGridBagContraints();		
 		c.gridwidth = 1;
-		PamDialog.addComponent(mainPanel, new PamLabel("Port ", JLabel.RIGHT), c);
+		PamDialog.addComponent(mainPanel, new PamLabel("Connected ", JLabel.RIGHT), c);
 		c.gridwidth = 2;
 		c.gridx++;
 		PamDialog.addComponent(mainPanel, ipPort = new JTextField(5), c);
@@ -130,7 +132,19 @@ public class NetworkReceiveSidePanel implements PamSidePanel {
 			
 		}
 		connections.setText(String.format("%d", nConnected));
-		ipPort.setText(String.format("%d", networkReceiver.getNetworkReceiveParams().receivePort));
+		if(networkReceiver.getNetworkReceiveParams().connectionType==NetworkReceiveParams.CONNECTIONTYPE_MQTT) {
+			if(networkReceiver.connectionThread instanceof MqttNetReceiver) {
+				if(((MqttNetReceiver)networkReceiver.connectionThread).isConnected()) {
+					ipPort.setText("true");
+				}else {
+					ipPort.setText("false");
+				}
+			}else {
+				ipPort.setText("false");
+			}
+		}else {
+			ipPort.setText(String.format("%d", networkReceiver.getNetworkReceiveParams().receivePort));
+		}
 		stations.setText(String.format("%d",n));
 		recentPackets.setText(String.format("%d", networkReceiver.getRecentPackets()));
 		recentBytes.setText(String.format("%d", networkReceiver.getRecentDataBytes()/1024));

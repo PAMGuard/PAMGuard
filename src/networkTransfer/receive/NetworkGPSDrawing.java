@@ -25,6 +25,7 @@ import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 /**
  * Class for drawing buoy positions on the map. 
@@ -37,7 +38,7 @@ public class NetworkGPSDrawing extends PanelOverlayDraw {
 
 	private ManagedSymbolInfo managedSymbolInfo;
 	
-	public static final SymbolData defaultSymbol = new SymbolData(PamSymbolType.SYMBOL_DIAMOND, 12, 12, true, Color.darkGray, Color.GREEN);
+	public static final SymbolData defaultSymbol = new SymbolData(PamSymbolType.SYMBOL_CAB, 25, 25, true, Color.YELLOW, Color.black);
 	
 	/**
 	 * @param networkReceiver
@@ -93,9 +94,94 @@ public class NetworkGPSDrawing extends PanelOverlayDraw {
 				headString += String.format(";    tilt %3.1f\u00B0/%3.1f\u00B0<p>", compassData[1], compassData[2]);
 			}
 		}
-		return String.format("<html>Buoy %d(%d)<p>Software Channel: %d<p>%s,%s<p>%sLast data: %s</html>",
-				rxStats.getBuoyId1(), rxStats.getBuoyId2(), rxStats.getLowestChannel(), LatLong.formatLatitude(gpsData.getLatitude()),
+		int[] buoyChannels = PamUtils.getChannelArray(rxStats.getChannelBitmap());
+		String swChannelList = "";
+		for(int channel:buoyChannels) {
+			swChannelList+=channel+", ";
+		}
+		swChannelList = swChannelList.substring(0, swChannelList.length()-2);
+		
+		String headerData = String.format("<html><strong>%s - pb%d</strong><p>Software Channels: %s<p>%s,%s<p>%sLast data received: %s",
+				rxStats.getSiteName(),rxStats.getBuoyId1(), swChannelList, LatLong.formatLatitude(gpsData.getLatitude()),
 				LatLong.formatLongitude(gpsData.getLongitude()), headString, PamCalendar.formatDateTime(rxStats.getLastDataTime()));
+		
+		String buoyStatus = getExtendedStatus(rxStats);//"";//"<div id=\"myCanvas\"></div>";//getSVG();//String.format("<hr width=\"5\" size=\"10\" noshade><hr width=\"5\" size=\"5\" noshade>");
+		
+		
+		String fullHoverText = headerData+buoyStatus+"</html>";
+		return fullHoverText;
+	}
+	
+	private String getDrawingScript() {
+		String tooltip =
+			    "<table cellpadding='1' cellspacing='2' height='16'>" +
+			    "<tr height='16'>" +
+			    "  <td bgcolor='#4CAF50' width='6' height='1px'></td>" +
+			    "  <td bgcolor='#4CAF50' width='6' height='2px'></td>" +
+			    "  <td bgcolor='#4CAF50' width='6' height='3px'></td>" +
+			    "  <td bgcolor='#4CAF50' width='6' height='0px'></td>" +
+			    "</tr>" +
+			    "</table>";
+
+		return tooltip;
+	}
+	
+	private String getNetworkStatusHTML(BuoyStatusDataUnit buoyStatus) {
+		String lastCommPing = PamCalendar.formatDateTime(buoyStatus.getLastCommsPing());
+		if(buoyStatus.getLastCommsPing()==0) {
+			lastCommPing = "Unknown";
+		}
+		String buoyIpAddr = buoyStatus.getIPAddr();
+		if(buoyIpAddr==null) {
+			buoyIpAddr = "Unknown";
+		}
+		String signalStrengthdB = buoyStatus.getCommunicationsStrength()+" dBm";
+		String networkStatusHTML = String.format("<p>Last Signal from CAB: %s</p><p>Current CAB IP Address: %s</p><p>Signal Strength: %s</p>",lastCommPing,buoyIpAddr,signalStrengthdB);
+		return networkStatusHTML;
+	}
+	
+	private String getHousingStatusHTML(BuoyStatusDataUnit buoyStatus) {
+		
+		
+		double temp = buoyStatus.getBuoyStatusData().getTemp();
+		double voltage = buoyStatus.getBuoyStatusData().getVoltage();
+		double hum = buoyStatus.getBuoyStatusData().getHumidity();
+		double power = buoyStatus.getBuoyStatusData().getPower();
+
+		
+		String housingStatusHTML = String.format("<p>Buoy Housing power draw: %s W</p><p>Buoy Housing battery voltage: %s V</p><p>Buoy Housing temperature: %s °C</p><p>Buoy Housing humidity: %s %%</p>",power,voltage,temp,hum);
+		return housingStatusHTML;
+	}
+	
+	private String getExtendedStatus(BuoyStatusDataUnit buoyStatus) {
+		
+		
+		String networkStatusHTML = getNetworkStatusHTML(buoyStatus);
+		
+		String housingStatusHTML = getHousingStatusHTML(buoyStatus);
+		
+		String cabStatusHTML = "<br><br><strong>Buoy Housing</strong>"+housingStatusHTML+"<strong>Communications</strong>"+networkStatusHTML;
+		
+		return cabStatusHTML;
+		
+		
+		/*return String.format("<table width=\"100%%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+		+ "  <tr>\r\n"
+		+ "    <!-- Left Bar -->\r\n"
+		+ "    <td width=\"50%%\" bgcolor=\"#f1f1f1\" valign=\"top\">\r\n"
+		+ "      <h3>Buoy Housing</h3>\r\n"
+		+ "      %s\r\n"
+		+ "      <br><br><br><br><br><br><br>\r\n"
+		+ "    </td>\r\n"
+		+ "    \r\n"
+		+ "    <!-- Right Bar -->\r\n"
+		+ "    <td width=\"50%%\" bgcolor=\"#cccccc\" valign=\"top\">\r\n"
+		+ "      <h3>Communications</h3>\r\n"
+		+ "      %s\r\n"
+		+ "      <br><br><br><br><br><br><br>\r\n"
+		+ "    </td>\r\n"
+		+ "  </tr>\r\n"
+		+ "</table>",housingStatusHTML,networkStatusHTML);*/
 	}
 
 

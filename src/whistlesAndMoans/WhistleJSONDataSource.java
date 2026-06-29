@@ -15,10 +15,15 @@ public class WhistleJSONDataSource extends JSONObjectDataSource<WhistleJSONData>
 	 * a WhistleJSONData class
 	 */
 	public WhistleJSONDataSource() {
-		super();
+		super(false);
 		objectData = new WhistleJSONData();
 	}
 
+	protected WhistleJSONData initializeObjectData() {
+		return new WhistleJSONData();
+
+	}
+	
 	
 	@Override
 	protected void setObjectType(PamDataUnit pamDataUnit) {
@@ -34,7 +39,15 @@ public class WhistleJSONDataSource extends JSONObjectDataSource<WhistleJSONData>
 		// transfer over the data to this class
 		objectData.nSlices = cr.getNumSlices();
 		objectData.amplitude = (int) (crdu.getAmplitudeDB()*100);
-
+		
+		if(crdu.getLocalisation()!=null) {
+			objectData.bearingReN = crdu.getLocalisation().getAngles()[0];
+			if(crdu.getLocalisation().getAngleErrors()!=null) {
+				objectData.bearingErr = crdu.getLocalisation().getAngleErrors()[0];
+			}
+		}
+		
+		
 
 		// Note that SliceData is the class inside the whistleAndMoans package, while
 		// sliceData is the inner class within this class.  Matlab uses sliceData for

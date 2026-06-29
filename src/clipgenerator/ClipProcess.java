@@ -33,7 +33,7 @@ import clipgenerator.clipDisplay.ClipSymbolManager;
 import clipgenerator.localisation.ClipDelays;
 import clipgenerator.localisation.ClipLocalisation;
 import dataPlotsFX.layout.TDGraphFX;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 import soundPlayback.ClipPlayback;
 import warnings.PamWarning;
 import wavFiles.Wav16AudioFormat;

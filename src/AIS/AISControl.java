@@ -8,7 +8,10 @@ import java.io.Serializable;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.json.JSONObject;
+
 import NMEA.NMEADataBlock;
+import NMEA.NMEADataUnit;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
@@ -116,6 +119,40 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		aisProcess.noteNewSettings();
+	}
+	
+	@Override
+	public String getModuleSummary(boolean clear, String format) {
+		if(format.equals("json")) {
+			AISDataUnit lastUnit = aisProcess.getOutputDataBlock().getLastUnit();
+			if(lastUnit==null) {
+				return "";
+			}
+			JSONObject json = new JSONObject();
+			json.put("Note", "this is a summary, only reporting the last ais unit at the time requested.");
+			json.put("LastDataTime", lastUnit.getTimeMilliseconds());
+			json.put("MMSI", lastUnit.mmsiNumber);
+			if(lastUnit.getPositionReport()!=null) {
+				json.put("hasPosReport", true);
+				json.put("SOG", lastUnit.getPositionReport().speedOverGround);
+				json.put("COG", lastUnit.getPositionReport().courseOverGround);
+				json.put("lat", lastUnit.getPositionReport().getLatitude());
+				json.put("lon", lastUnit.getPositionReport().getLongitude());
+			}else {
+				json.put("hasPosReport", false);
+			}
+			if(lastUnit.getStaticData()!=null) {
+				json.put("hasStaticReport", true);
+				json.put("name", lastUnit.getStaticData().shipName);
+				json.put("IMO", lastUnit.getStaticData().imoNumber);
+				json.put("shipType", lastUnit.getStaticData().shipType);
+			}else {
+				json.put("hasStaticReport", false);
+			}
+			
+			return json.toString();
+		}
+		return "";
 	}
 
 	@Override

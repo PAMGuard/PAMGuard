@@ -665,6 +665,12 @@
 		  	<version>1.2.5</version>
 		</dependency>
 
+		<dependency>
+		  	<groupId>org.eclipse.paho</groupId>
+		  	<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+		  	<version>1.2.5</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
 		<dependency>
 			<groupId>gov.nist.math</groupId>
@@ -1462,6 +1468,40 @@
 			<artifactId>powermock-api-mockito</artifactId>
 			<version>${powermock.version}</version>
 		</dependency>
+		
+		<dependency>
+	    		<groupId>com.itextpdf</groupId>
+	    		<artifactId>itextpdf</artifactId>
+	    		<version>5.5.13.3</version>
+		</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.itextpdf/io -->
+	<dependency>
+	    <groupId>com.itextpdf</groupId>
+	    <artifactId>io</artifactId>
+	    <version>8.0.4</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.itextpdf/kernel -->
+	<dependency>
+	    <groupId>com.itextpdf</groupId>
+	    <artifactId>kernel</artifactId>
+	    <version>8.0.4</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.itextpdf/layout -->
+	<dependency>
+	    <groupId>com.itextpdf</groupId>
+	    <artifactId>layout</artifactId>
+	    <version>8.0.4</version>
+	</dependency>
+
+	<dependency>
+	    <groupId>org.apache.pdfbox</groupId>
+	    <artifactId>pdfbox</artifactId>
+	    <version>3.0.0</version>
+	</dependency>
+
 
 
 		<!-- Test dependencies -->

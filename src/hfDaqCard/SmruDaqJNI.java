@@ -35,7 +35,7 @@ public class SmruDaqJNI {
 	
 	private static final int MINJNIVERSION = 5;
 
-	private SmruDaqSystem smruDaqSystem;
+	//private SmruDaqSystem smruDaqSystem;
 
 	private boolean haveLibrary;
 
@@ -257,9 +257,10 @@ public class SmruDaqJNI {
 	
 	public static final int ERROR_SUCCESS = 0;
 
-	public SmruDaqJNI(SmruDaqSystem smruDaqSystem) {
+	//public SmruDaqJNI(SmruDaqSystem smruDaqSystem) {
+	public SmruDaqJNI() {
 		super();
-		this.smruDaqSystem = smruDaqSystem;
+		//this.smruDaqSystem = smruDaqSystem;
 		loadLibrary();
 		if (haveLibrary()) {
 			setVerbose(SmruDaqSystem.VERBOSELEVEL);
@@ -299,11 +300,13 @@ public class SmruDaqJNI {
 		if (nDevices > SmruDaqParameters.MAX_DEVICES) {
 			nDevices = SmruDaqParameters.MAX_DEVICES;
 		}
-		smruDaqSystem.terminalPrint("Number of SAIL DAQ cards found = " + nDevices, 1);
+		//smruDaqSystem.terminalPrint("Number of SAIL DAQ cards found = " + nDevices, 1);
+		terminalPrint("Number of SAIL DAQ cards found = " + nDevices, 1);
 		for (int i = 0; i < nDevices; i++) {
 			int ok = jniPrepareDevice(i, false);
 			if (ok != SMRU_RET_OK) {
-				smruDaqSystem.terminalPrint(String.format("Opening SAIL DAQ card %d returned code %d", i, ok), 1);
+				//smruDaqSystem.terminalPrint(String.format("Opening SAIL DAQ card %d returned code %d", i, ok), 1);
+				terminalPrint(String.format("Opening SAIL DAQ card %d returned code %d", i, ok), 1);
 				continue;
 			}
 //			jniResetCard(i); // might help !
@@ -319,7 +322,9 @@ public class SmruDaqJNI {
 				long newSN = readDeviceSerialNumber(i);
 				tSN[t] = ((float) (System.nanoTime()-n)) / 1.0e6f;
 				if (newSN == 0 || newSN !=serialNumbers[i] || tSN[t]>200) {
-					smruDaqSystem.terminalPrint(String.format("Opening SAIL DAQ card %d with sn 0x%X call %d in %3.4fms", 
+					//smruDaqSystem.terminalPrint(String.format("Opening SAIL DAQ card %d with sn 0x%X call %d in %3.4fms", 
+					//		i, newSN, t, tSN[t]), 1);
+					terminalPrint(String.format("Opening SAIL DAQ card %d with sn 0x%X call %d in %3.4fms", 
 							i, newSN, t, tSN[t]), 1);
 					serialNumbers[i] = newSN;
 				}
@@ -372,7 +377,8 @@ public class SmruDaqJNI {
 		jniCloseCard(iBoard);
 //		jniResetCard(iBoard);
 		int ok = prepareDevice(iBoard, fullReset);
-		smruDaqSystem.terminalPrint("In resetBoard with fullRest = " + fullReset, 1);
+		//smruDaqSystem.terminalPrint("In resetBoard with fullRest = " + fullReset, 1);
+		terminalPrint("In resetBoard with fullRest = " + fullReset, 1);
 		serialNumbers[iBoard] = readDeviceSerialNumber(iBoard);
 		if (serialNumbers[iBoard] != 0) {
 			// resort the boards according to serial number. 
@@ -385,7 +391,8 @@ public class SmruDaqJNI {
 
 	@Override
 	protected void finalize() throws Throwable {
-		smruDaqSystem.terminalPrint("Finalise Daq JNI - close card", 3);
+		//smruDaqSystem.terminalPrint("Finalise Daq JNI - close card", 3);
+		terminalPrint("Finalise Daq JNI - close card", 3);
 		nDevices = getNumDevices();
 		for (int i = 0; i < nDevices; i++) {
 			closeCard(i);
@@ -434,7 +441,7 @@ public class SmruDaqJNI {
 	 * @param device (hardware index)
 	 * @return serial number of 0 if call fails. 
 	 */
-	protected long readDeviceSerialNumber(int device) {
+	public long readDeviceSerialNumber(int device) {
 		if (!haveLibrary()) {
 			return 0;
 		}
@@ -535,11 +542,12 @@ public class SmruDaqJNI {
  	 * @param reset
 	 * @return 0 on succes
 	 */
-	protected int prepareDevice(int board, boolean reset) {
+	public int prepareDevice(int board, boolean reset) {
 		if (!haveLibrary()) {
 			return Integer.MIN_VALUE;
 		}
-		smruDaqSystem.terminalPrint("In prepare device with reset = " + reset, 1);
+		//smruDaqSystem.terminalPrint("In prepare device with reset = " + reset, 1);
+		terminalPrint("In prepare device with reset = " + reset, 1);
 		int ans = jniPrepareDevice(board, reset);
 		boardOpen[board] = (ans == 0);
 		return ans;
@@ -818,8 +826,9 @@ public class SmruDaqJNI {
 		 */
 		int hardId = getBoardOrder(board);
 		boolean wasOpen = isboardOpen(hardId);
-		if (!wasOpen) {
-			smruDaqSystem.terminalPrint("Opening card to flash board " + board, 2);
+		if (wasOpen == false) {
+			//smruDaqSystem.terminalPrint("Opening card to flash board " + board, 2);
+			terminalPrint("Opening card to flash board " + board, 2);
 			boolean isOpen = prepareDevice(hardId, false) == 0;
 			if (!isOpen) {
 				return false;
@@ -836,8 +845,9 @@ public class SmruDaqJNI {
 		}
 		setLED(board, 0, 0);
 		setLED(board, 0, 0);
-		if (!wasOpen) {
-			smruDaqSystem.terminalPrint("Closing card after flash board " + board, 2);
+		if (wasOpen == false) {
+			//smruDaqSystem.terminalPrint("Closing card after flash board " + board, 2);
+			terminalPrint("Closing card after flash board " + board, 2);
 			closeCard(board);
 		}
 		return true;
@@ -852,6 +862,8 @@ public class SmruDaqJNI {
 		return SILIB;
 	}
 	
+	
+	static final int VERBOSELEVEL = 0;
 	/**
 	 * Get the version of the dll library. 
 	 * @return
@@ -860,5 +872,9 @@ public class SmruDaqJNI {
 		return libVersion;
 	}
 
-
+	protected void terminalPrint(String str, int verboseLevel) {
+		if (verboseLevel <= VERBOSELEVEL) {
+			System.out.println(str);
+		}
+	}
 }

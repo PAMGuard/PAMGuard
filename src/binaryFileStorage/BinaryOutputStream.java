@@ -8,6 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileLock;
 
+import PamController.PamController;
+import PamController.PamGUIManager;
+import dataGram.Datagram;
+import warnings.RepeatWarning;
 import PamUtils.PamCalendar;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
@@ -26,7 +30,7 @@ import warnings.RepeatWarning;
  */
 public class BinaryOutputStream {
 
-	private RepeatWarning repeatWarning;
+	private static RepeatWarning repeatWarning;
 
 	private PamDataBlock parentDataBlock;
 
@@ -58,6 +62,8 @@ public class BinaryOutputStream {
 	
 	private int lastObjectType = Integer.MIN_VALUE;
 	
+	private File outputFile;
+
 	public BinaryOutputStream(BinaryStore binaryStore,
 			PamDataBlock parentDataBlock) {
 		super();
@@ -111,7 +117,7 @@ public class BinaryOutputStream {
 		uidHandler.roundUpUID(DataBlockUIDHandler.ROUNDINGFACTOR);		
 		fileStartUID = parentDataBlock.getUidHandler().getCurrentUID();
 		
-		File outputFile = new File(mainFileName);
+		outputFile = new File(mainFileName);
 
 		boolean open = openPGDFFile(outputFile);
 		
@@ -128,9 +134,33 @@ public class BinaryOutputStream {
 			noiseOutputStream = null;
 		}
 		
+		if(open && PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			makeLock(outputFile);
+		}
 		
 		
 		return open;
+	}
+
+	/**
+	 * Generate lock file to flag transfer that this file is actively being written to for APS.
+	 * Linux does not handle file locks well, so explicitly building them in. 
+	 * @param outputFile
+	 */
+	private void makeLock(File outputFile) {
+		try {
+			File mainLockFile = new File(outputFile.toString()+".lck");
+			mainLockFile.createNewFile();
+			File pgdxLockFile = new File(binaryStore.swapFileType(outputFile, BinaryStore.indexFileType)+".lck");
+			pgdxLockFile.createNewFile();
+			if(wantNoiseOutputFile()) {
+				File noiseFile = binaryStore.swapFileType(outputFile, BinaryStore.noiseFileType);
+				File noiseLockFile = new File(noiseFile.toString()+".lck");
+				noiseLockFile.createNewFile();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -261,6 +291,9 @@ public class BinaryOutputStream {
 	}
 
 	public synchronized boolean closeFile() {
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			deleteLock(outputFile);
+		}
 		boolean ok = true;
 //		System.out.println("Close output file " + mainFileName);
 		if (dataOutputStream != null) {
@@ -287,6 +320,23 @@ public class BinaryOutputStream {
 		}
 //		Debug.out.printf("Closed binary storage file %s\n", mainFileName);
 		return ok;
+	}
+	
+	/**
+	 * Delete lock file to flag transfer that this file is no longer being written to for APS.
+	 * Linux does not handle file locks well, so explicitly building them in. 
+	 * @param outputFile
+	 */
+	private void deleteLock(File outputFile) {
+		File mainLockFile = new File(outputFile.toString()+".lck");
+		mainLockFile.delete();
+		File pgdxLockFile = new File(binaryStore.swapFileType(outputFile, BinaryStore.indexFileType)+".lck");
+		pgdxLockFile.delete();
+		if(wantNoiseOutputFile()) {
+			File noiseFile = binaryStore.swapFileType(outputFile, BinaryStore.noiseFileType);
+			File noiseLockFile = new File(noiseFile.toString()+".lck");
+			noiseLockFile.delete();
+		}
 	}
 
 	private long getSamplesFromMilliseconds(long timeMillis) {
@@ -577,8 +627,15 @@ public class BinaryOutputStream {
 			return false;
 		}
 
-
-
+		
+		try {
+			outputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		storedObjects++;
+		
 		return true;
 	}
 
@@ -586,10 +643,10 @@ public class BinaryOutputStream {
 	 * Report stream error counts. 
 	 * @param e
 	 */
-	private synchronized void reportStreamError(IOException e) {
+	private static synchronized void reportStreamError(IOException e) {
 		// TODO Auto-generated method stub
 		if (repeatWarning == null) {
-			repeatWarning = new RepeatWarning("Binary Output Stream " + parentDataBlock.getDataName());
+			repeatWarning = new RepeatWarning("Binary Output Stream");
 		}
 		repeatWarning.showWarning(e, 2);
 	}
@@ -607,7 +664,7 @@ public class BinaryOutputStream {
 			opStream = new DataOutputStream(new BufferedOutputStream(new 
 					FileOutputStream(indexFile)));
 		} catch (FileNotFoundException e) {
-			reportStreamError(e);
+			System.err.println("Error creating index file: " + e.getMessage());
 			return false;
 		}
 

@@ -61,6 +61,10 @@ public abstract class BackupAction implements BackupFunction {
 		return GenericBackupDialog.showDialog(owner, getName(), getBackupStream(), this, getBackupFilter());
 	}
 	
+	public boolean requiresFTPConnection() {
+		return false;
+	}
+	
 	/**
 	 * flag to say whether or not to run this action if any previous 
 	 * action threw an error. Actions such as a file copy would probably 

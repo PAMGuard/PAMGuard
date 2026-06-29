@@ -410,7 +410,8 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		if (algorithmSourcePane != null) {
 			algorithmSourcePane.setParams();
 		}
-//		algorithms.getSelectionModel().select(input.getAlgorithmName());
+		algorithms.getSelectionModel().select(input.getAlgorithmName());
+		selectAlgorithm();
 		currentParams = input;
 		newDataBlockSelection(sourcePanel.getSource());
 	

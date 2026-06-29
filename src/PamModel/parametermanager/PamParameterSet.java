@@ -49,6 +49,17 @@ public class PamParameterSet {
 		parameterDatas = new Hashtable<>();
 		hiddenFields = new ArrayList<>();
 	}
+	
+	/**
+	 * Allow backwards compatibility for plugins written 
+	 * @param parentObject
+	 * @return
+	 */
+	/*public static PamParameterSet autoGenerate(Object parentObject) {
+		PamParameterSet paramSet = autoGenerate(parentObject, STANDARD_MODIFIER_EXCLUSIONS);
+		paramSet.setParameterSetType(ParameterSetType.DETECTOR);
+		return paramSet;
+	}*/
 
 	/**
 	 * Automatically generate a parameter set for a class. Will include all public fields and 

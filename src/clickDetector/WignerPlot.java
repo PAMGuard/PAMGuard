@@ -95,6 +95,10 @@ public class WignerPlot extends ClickDisplay implements PamSettings {
 
 	@Override
 	public void clickedOnClick(ClickDetection click) {
+		
+		if(this.shouldDisplayClick(click)!=true) {
+			return;
+		}
 
 		lastClick = click;
 

@@ -71,6 +71,7 @@ public class DisplayControlPanel {
 	private JLabel viewerStart, viewerEnd;
 	private ClipDisplayParent clipDisplayParent;
 	private JCheckBox newClipsLast;
+	private JCheckBox showFullSummary;
 	private ScrollPaneAddon scrollButtons;
 	public DisplayControlPanel(ClipDisplayParent clipDisplayParent,
 			ClipDisplayPanel clipDisplayPanel) {
@@ -142,13 +143,33 @@ public class DisplayControlPanel {
 		controlPanel.add(scalePanel);
 		
 		PamPanel sortPanel = new PamPanel(); 
+		GridBagConstraints sortPanelContraints = new PamGridBagContraints();
+		sortPanel.setLayout(new GridBagLayout());
+		sortPanelContraints.gridwidth = 1;
+		sortPanelContraints.gridx = 0;
+		sortPanelContraints.gridy = 0;
+
 		//Presently clips are sorted in the order in which they were created.
 		//TODO: Add interface to allow for sorting by manual selection time or clip start time.
 		sortPanel.setBorder(new TitledBorder("Sorting"));
-		sortPanel.add(BorderLayout.CENTER, newClipsLast = new PamCheckBox("New Clips Last"));
+		sortPanel.add(newClipsLast = new PamCheckBox("New Clips Last"),sortPanelContraints);
 		newClipsLast.setToolTipText("When checked, newly created clips will be placed at the bottom of the queue. Otherwise they will be placed at the top.");
 		newClipsLast.addActionListener(new DetectChanges(false));
 		sortPanel.setVisible(false);
+		
+		sortPanelContraints.gridy++;
+
+		sortPanel.add(showFullSummary = new PamCheckBox("Show Full Clip Summary"),sortPanelContraints);
+		showFullSummary.setSelected(true);
+		showFullSummary.setToolTipText("When checked, a mouse hover over a clip will show all clip summary data, when unchecked only a short summary will be displayed");
+		showFullSummary.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clipDisplayPanel.clipDisplayParameters.showFullSummary=showFullSummary.isSelected();
+			}
+			
+		});
+		
 		
 		PamPanel historyPanel = new PamPanel();
 		historyPanel.setBorder(new TitledBorder("History"));
@@ -167,21 +188,21 @@ public class DisplayControlPanel {
 			GridBagConstraints c = new PamGridBagContraints();
 			historyPanel.setLayout(new GridBagLayout());
 			
-			scrollButtons = new ScrollPaneAddon(clipDisplayPanel.getScrollPane(), clipDisplayParent.getDisplayName(),
+			ScrollPaneAddon sco = new ScrollPaneAddon(clipDisplayPanel.getScrollPane(), clipDisplayParent.getDisplayName(),
 					AbstractPamScrollerAWT.HORIZONTAL, 1000, 3600*1000, true);
-			scrollButtons.addDataBlock(clipDisplayParent.getClipDataBlock());
+			sco.addDataBlock(clipDisplayParent.getClipDataBlock());
 			c.gridwidth = 1;
 			c.gridx = 1;
 			c.fill = GridBagConstraints.NONE;
-			PamDialog.addComponent(historyPanel, scrollButtons.getButtonPanel(), c);
+			PamDialog.addComponent(historyPanel, sco.getButtonPanel(), c);
 			c.gridx = 0;
 			c.gridy++;
-			PamDialog.addComponent(historyPanel, new PamLabel("Start: ", JLabel.RIGHT), c);
+			PamDialog.addComponent(historyPanel, new PamLabel("Start: ", JLabel.LEFT), c);
 			c.gridx++;
 			PamDialog.addComponent(historyPanel, viewerStart = new PamLabel("1970-01-01 12:00:00"), c);
 			c.gridx = 0;
 			c.gridy++;
-			PamDialog.addComponent(historyPanel, new PamLabel("End: ", JLabel.RIGHT), c);
+			PamDialog.addComponent(historyPanel, new PamLabel("End: ", JLabel.LEFT), c);
 			c.gridx++;
 			PamDialog.addComponent(historyPanel, viewerEnd = new PamLabel("1970-01-01 12:00:00"), c);
 			
@@ -190,7 +211,7 @@ public class DisplayControlPanel {
 //			historyPanel.add(viewerStart = new PamLabel("1970-01-01 12:00:00"));
 //			historyPanel.add(new PamLabel("End"));
 //			historyPanel.add(viewerEnd = new PamLabel("1970-01-01 12:00:00"));
-			scrollButtons.addObserver(new ScrollObserver());
+			sco.addObserver(new ScrollObserver());
 			
 		}
 		controlPanel.add(historyPanel);

@@ -3760,11 +3760,11 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 
 	public int getDisplayChannels() {
-		return btDisplayParameters.displayChannels;
+		return btDisplayParameters.getDisplayChannels();
 	}
 
 	public void setDisplayChannels(int displayChannels) {
-		btDisplayParameters.displayChannels = displayChannels;
+		btDisplayParameters.setDisplayChannels(displayChannels);
 		repaintBoth();
 	}
 

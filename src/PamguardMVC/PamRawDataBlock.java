@@ -29,6 +29,8 @@ package PamguardMVC;
 
 import java.util.ListIterator;
 
+import org.json.JSONObject;
+
 import Acquisition.AcquisitionProcess;
 import Acquisition.DCFilter;
 import Acquisition.RawDataBinaryDataSource;
@@ -582,7 +584,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		
 	}
 	
-	public String getSummaryString(boolean clear) {
+	public String getSummaryString(boolean clear, String format) {
 		/*
 		 * 
 	sumString[0] = 0;
@@ -600,6 +602,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		 */
 		String str = "";
 		int nChan = PamUtils.getNumChannels(getChannelMap());
+		JSONObject summaryJSON = new JSONObject();
 		synchronized(summaryTotals) {
 			for (int i = 0; i < nChan; i++) {
 				double rms = Math.sqrt(summaryTotals2[i]/summaryCount[i])+1e-6;
@@ -607,11 +610,17 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				double mean = summaryTotals[i]/summaryCount[i];
 				str += String.format("ch%d,%3.1f,%3.1f,%3.1f,", i, mean, 20.*Math.log10(max),
 						20.*Math.log10(rms));
+				if(format.equals("json"))
+					summaryJSON.put("channel"+i,new JSONObject(String.format("{\"rms\":%3.1f,\"zeroPeak\":%3.1f,\"mean\":%3.1f}", 20.*Math.log10(rms),20.*Math.log10(max),20.*Math.log10(mean))));
+				
 			}
 		}
 		if (clear) {
 			clearSummaryData();
 		}
+		
+		if(format.equals("json")) return summaryJSON.toString();
+		
 		return str;
 	}
 	

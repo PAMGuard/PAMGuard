@@ -1,7 +1,10 @@
 package AIS;
 
+import NMEA.AcquireNmeaData;
+import NMEA.NMEAControl;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
+import NMEA.NMEAParameters;
 import PamController.PamController;
 import PamDetection.LocContents;
 import PamUtils.PamCalendar;
@@ -45,6 +48,7 @@ public class ProcessAISData extends PamProcess {
 		
 		aisDataBlock.SetLogging(new AISLogger(aisDataBlock, this));
 		aisDataBlock.setBinaryDataSource(new AISBinaryDataSource(aisController, aisDataBlock));
+		aisDataBlock.setJSONDataSource(new AISJsonDataSource());
 	}
 	
 	public AISDataBlock getOutputDataBlock() {
@@ -114,7 +118,11 @@ public class ProcessAISData extends PamProcess {
 			newVDM.charData = new String(subString);
 			subString = NMEADataBlock.getSubString(dataString, 6);
 			if (subString == null) return;
-			newVDM.fillBits = Integer.valueOf(subString);
+			try {
+				newVDM.fillBits = Integer.valueOf(subString);
+			}catch(NumberFormatException e) {
+				System.out.println("Caught exception on fill bits: "+e.getMessage()+" full data String: "+dataString+" subString: "+subString);
+			}
 			
 		}
 		catch (Exception Ex) {
@@ -146,7 +154,10 @@ public class ProcessAISData extends PamProcess {
 			 * from the string's header.
 			 */
 			boolean ok = aivdm.decodeMessage();
-			aivdm.setTimeMilliseconds(PamCalendar.getTimeInMillis());
+
+			if(((NMEAControl) aisControl.nmeaDataBlock.getParentProcess().getPamControlledUnit()).getNmeaParameters().sourceType!=NMEAParameters.NmeaSources.TIMESTAMP_FILE) {
+				aivdm.setTimeMilliseconds(PamCalendar.getTimeInMillis());
+			}
 			// only add the data to the list if it's a useful type 
 			// (i.e. not base station data)
 			if (ok) {

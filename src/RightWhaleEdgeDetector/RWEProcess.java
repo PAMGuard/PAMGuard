@@ -25,7 +25,7 @@ import annotation.calcs.snr.SNRAnnotationType;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 import spectrogramNoiseReduction.kernelSmoothing.KernelSmoothing;
 import whistlesAndMoans.WhistleBearingInfo;
 
@@ -508,6 +508,9 @@ public class RWEProcess extends PamProcess {
 
 	public String getModuleSummary(boolean clear) {
 		String str = String.format("%d", RWStandardClassifier.MAXSOUNDTYPE+1);
+		if(rweChannelProcesses==null) {
+			return "No RWE Channel Processes Registered";
+		}
 		for (int c = 0; c < rweChannelProcesses.length; c++) {
 			if (rweChannelProcesses[c] == null) {
 				continue;

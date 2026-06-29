@@ -1,11 +1,14 @@
 package AIS;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import NMEA.AcquireNmeaData;
 import PamController.masterReference.MasterReferencePoint;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import generalDatabase.DBControlUnit;
 import generalDatabase.SQLTypes;
@@ -15,10 +18,16 @@ import nmeaEmulator.NMEAEmulator;
 public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmulator {
 	
 	private AISControl aisControl;
+	
+	//private HashMap<Integer,AISDataUnit> aisVesselMap;
+	private Object vesselMapSyncLock = new Object();
 
 	public AISDataBlock(AISControl aisControl, PamProcess parentProcess) {
 		super(AISDataUnit.class, "AIS Data", parentProcess, 0);
 		this.aisControl = aisControl;
+		/*synchronized(vesselMapSyncLock) {
+			aisVesselMap = new HashMap<Integer,AISDataUnit>();
+		}*/
 		setNaturalLifetime(600);
 	}
 	/**
@@ -61,10 +70,11 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 //				t = newAISUnit.getTimeMilliseconds();
 //			}
 			aisDataUnit.setTimeMilliseconds(t);
+			//This was transmitting updates twice, calling addData via notifyObservers. 
 			aisDataUnit.updateDataUnit(t);
-			if (shouldNotify()) {
+			/*if (shouldNotify()) {
 				notifyObservers(aisDataUnit);
-			}
+			}*/
 			updatePamData(aisDataUnit, t); // need this to get it to save. 
 		}
 		else {

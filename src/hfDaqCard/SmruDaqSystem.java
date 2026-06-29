@@ -55,7 +55,7 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 		super();
 		this.daqControl = daqControl;
 
-		smruDaqJNI = new SmruDaqJNI(this);
+		smruDaqJNI = new SmruDaqJNI();
 
 		nDaqCards = smruDaqJNI.getnDevices();
 		for (int i = 0; i < nDaqCards; i++) {

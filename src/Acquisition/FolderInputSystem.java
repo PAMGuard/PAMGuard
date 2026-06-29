@@ -96,6 +96,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	private FolderInputParameters folderInputParameters;
 
 	public static final String GlobalWavFolderArg = "-wavfilefolder";
+	
+	public static final String GlobalWavPrefixArg = "-recording.Prefix";
 
 
 	/**
@@ -220,7 +222,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 */
 	private String[] checkComandLineFolder() {
 		String globalFolder = GlobalArguments.getParam(GlobalWavFolderArg);
-		Debug.out.println("Checking -wavfilefolder option: is " + globalFolder);
+		System.out.println("Checking -wavfilefolder option: is " + globalFolder);
 		if (globalFolder == null) {
 			return null;
 		}

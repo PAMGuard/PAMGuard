@@ -134,6 +134,9 @@ public class Chi2Bearings implements MinimisationFunction {
 		headingVectors= new PamVector[rotationVector.length];
 		detectionAngles = new double[usedWorldVectors.length];
 		for (int i=0; i<headingVectors.length; i++){
+			if(rotationVector[i]==null) {
+				continue;
+			}
 			headingVectors[i]=PamVector.fromHeadAndSlant(Math.toDegrees(rotationVector[i].toHeading()),0); 
 			headingVectors[i].normalise(); //normalise to reduce magnitude calculations in dot product. 
 			detectionAngles[i] = Math.acos(usedWorldVectors[i].dotProd(headingVectors[i]));

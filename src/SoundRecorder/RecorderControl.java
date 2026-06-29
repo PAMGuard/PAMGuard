@@ -88,7 +88,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 
 	public static final String recorderUnitType = "Sound Recorder";
 
-	public static final String GlobalWavPrefixArg = "-recording.Prefix";
+	public static final String GlobalWavPrefixArg2 = "-recording.Prefix";
 
 	public RecorderControl(String name) {
 
@@ -157,7 +157,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			}
 		}
 		
-		String globPrefix = GlobalArguments.getParam(RecorderControl.GlobalWavPrefixArg);
+		String globPrefix = GlobalArguments.getParam(RecorderControl.GlobalWavPrefixArg2);
 		if (globPrefix != null) {
 			if (globPrefix.length()<6000) { // why was this restricted to 6 ? 
 				recorderSettings.fileInitials = globPrefix; // remember it. 
@@ -420,8 +420,12 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			return;
 		}
 		recorderProcess.setParentDataBlock(rawDataBlock);
-		recorderSettings.setChannelBitmap(recorderSettings.getChannelBitmap(rawDataBlock.getChannelMap()));
-
+		
+		if(recorderSettings.getChannelBitmap(rawDataBlock.getChannelMap())!=0) {
+			recorderSettings.setChannelBitmap(recorderSettings.getChannelBitmap(rawDataBlock.getChannelMap()));
+		}
+		
+		
 		for (int i = 0; i < recorderViews.size(); i++) {
 			recorderViews.get(i).newParams();
 		}
@@ -476,7 +480,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
-		
+				
 		return true;
 	}
 
@@ -688,7 +692,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	}
 
 	@Override
-	public String getModuleSummary(boolean clear) {
+	public String getModuleSummary(boolean clear, String format) {
 		File path = new File(recorderSettings.outputFolder);
 		long space = -1;
 		double freeSpace = -1;
@@ -701,6 +705,19 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		}
 		int currButton = pressedButton;
 		int currState = recorderStatus;
+		if(format.equals("json")) {
+			String state = "";
+			if(currState==IDLE) state="IDLE";
+			if(currState==RECORDING) state="RECORDING";
+			String currentFilePath = "System not recording";
+			if(currState==RECORDING) currentFilePath = recorderStorage.getFileName();
+			if(currentFilePath!=null) currentFilePath = currentFilePath.replace("\\", "\\\\");
+			
+			String jsonString = String.format("{\"state\":\"%s\",\"freeSpaceKB\":%3.1f,\"currentFile\":\"%s\"}",
+							state,freeSpace,currentFilePath);
+			return jsonString;
+		}
+		
 		return String.format("%d,%d,%3.1f", currButton, currState, freeSpace);
 	}
 

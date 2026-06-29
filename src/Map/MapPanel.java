@@ -94,6 +94,7 @@ import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.debug.Debug;
 import effort.EffortDataUnit;
 import effort.EffortProvider;
+import networkTransfer.receive.status.BuoyStatusDataBlock;
 import pamMaths.PamVector;
 
 /**
@@ -1155,7 +1156,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		ListIterator<PamDataUnit> duIterator;
 		long now = simpleMapRef.getMapTime();
 		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
-			now = System.currentTimeMillis();
+			//Because of data selection and clock drift possibility on both the base and the remote, give a 20 second lookahead
+			now = System.currentTimeMillis()+20*1000L;
 			// simpleMapRef.setm
 		}
 		Integer sliderVal = simpleMapRef.getHiddenSliderTime();
@@ -1215,6 +1217,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 				}
 				ds = dataBlock.getDataSelector(simpleMapRef.getUnitName(), false, DATASELECTNAME);
 //				ds = null;
+				@SuppressWarnings("unchecked")
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(earliestToPlot, now, true, ds);
 				duIterator = dataCopy.listIterator();
 				while (duIterator.hasNext()) {
@@ -1594,7 +1597,9 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	// }
 	// }
 
-	JPopupMenu plotDetectorMenu() {
+	protected JPopupMenu plotDetectorMenu() {
+		
+		simpleMapRef.mapDetectionsManager.createBlockList();
 
 		// refreshPlotableDetectorLists();
 		plotDetectorMenu = new JPopupMenu();
@@ -1775,7 +1780,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Frame frame = (JFrame) PamController.getMainFrame();
-			if (mapController.getPamView() != null) {
+			//mapController.getGui
+			if (mapController.getPamView()!=null) {
 				frame = mapController.getGuiFrame();
 			}
 
@@ -1915,6 +1921,12 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 
 	public void setSimpleMapRef(SimpleMap simpleMapRef) {
 		this.simpleMapRef = simpleMapRef;
+		if(simpleMapRef==null || simpleMapRef.mapDetectionsManager==null) {
+			return;
+		}
+		if(PamController.getInstance().isInitializationComplete()) {
+			simpleMapRef.mapDetectionsManager.createBlockList();
+		}
 	}
 
 	@Override

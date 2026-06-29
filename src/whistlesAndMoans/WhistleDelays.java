@@ -1,5 +1,6 @@
 package whistlesAndMoans;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -116,9 +117,13 @@ public class WhistleDelays {
 		}
 		
 		FFTDataUnit fftDataUnit;
+		ArrayList<FFTDataUnit> tempData = null;
 //		System.out.println("Bearings for region length " + region.getDuration() + " start " + region.getFirstSlice());
 		synchronized (sourceData) {
-			ListIterator<FFTDataUnit> fftIterator = sourceData.getListIterator(PamDataBlock.ITERATOR_END);
+			tempData = sourceData.getDataCopy();
+		}
+			//ListIterator<FFTDataUnit> fftIterator = sourceData.getListIterator(PamDataBlock.ITERATOR_END);
+		ListIterator<FFTDataUnit> fftIterator = tempData.listIterator(tempData.size()-1);
 			while (sliceIterator.hasPrevious()) {
 				sliceData = sliceIterator.previous();
 				wantedChannels = 0;
@@ -155,8 +160,8 @@ public class WhistleDelays {
 						break; // break out of backward search through FFT data blocks.  
 					}
 				}
-			}			
-		} // end of source data synchronisation
+			}	
+		
 		for (int iD = 0; iD < nDelays; iD++) {
 			delays[iD] = delayMeasures[iD].getDelay(maxDelays[iD]);
 		}

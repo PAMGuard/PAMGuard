@@ -72,6 +72,12 @@ import networkTransfer.send.NetworkSender;
 import offlineProcessing.OfflineTaskManager;
 import rocca.RoccaDev;
 
+import Array.ArrayManager;
+import NMEA.NMEAControl;
+import rawDeepLearningClassifier.DLControl;
+import networkTransfer.send.NetSendCommandParam;
+import PamUtils.PlatformInfo.OSType;
+
 /**
  * Pamguard main class. 
  * 
@@ -312,6 +318,12 @@ public class Pamguard {
 					GlobalArguments.setParam(BinaryStore.GlobalFolderArg, binFolder);
 					System.out.println("Setting output folder for binary files to " + binFolder);
 				}
+				else if (anArg.equalsIgnoreCase(NMEAControl.GlobalPortFlag)) {
+					// output folder for binary files. 
+					String serialPort = args[iArg++];
+					GlobalArguments.setParam(NMEAControl.GlobalPortFlag, serialPort);
+					System.out.println("Setting nmea serial port to " + serialPort);
+				}
 				else if (anArg.equalsIgnoreCase(DBControl.GlobalDatabaseNameArg)) {
 					// database file name
 					String dbName = args[iArg++];
@@ -324,10 +336,14 @@ public class Pamguard {
 					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, wavFolder);
 					System.out.println("Setting input wav file folder to " + wavFolder);
 				}
-				else if (anArg.equalsIgnoreCase(RecorderControl.GlobalWavPrefixArg)) {
+				else if (anArg.equalsIgnoreCase(FolderInputSystem.GlobalWavPrefixArg)) {
 					// source folder for wav files (or other supported sound files)
 					String wavPrefix = args[iArg++];
-					GlobalArguments.setParam(RecorderControl.GlobalWavPrefixArg, wavPrefix);
+					GlobalArguments.setParam(FolderInputSystem.GlobalWavPrefixArg, wavPrefix);
+				}else if (anArg.equalsIgnoreCase(RecorderControl.GlobalWavPrefixArg2)) {
+					// source folder for wav files (or other supported sound files)
+					String wavPrefix = args[iArg++];
+					GlobalArguments.setParam(RecorderControl.GlobalWavPrefixArg2, wavPrefix);
 					System.out.println("Setting recording prefix to " + wavPrefix);
 				}
 				else if (anArg.equalsIgnoreCase(PamController.AUTOSTART)) {
@@ -340,21 +356,14 @@ public class Pamguard {
 					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
 					System.out.println("Setting autoexit ON");
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.ADDRESS)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.ADDRESS, args[iArg++]);
+				else if (NetSendCommandParam.isArgRegistered(anArg)) {
+					GlobalArguments.setParam(anArg, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.ID1)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.ID1, args[iArg++]);
+				else if(anArg.equalsIgnoreCase(ArrayManager.FIRST_IDX_SENS)){
+					GlobalArguments.setParam(ArrayManager.FIRST_IDX_SENS, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.ID2)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.ID2, args[iArg++]);
-				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.PORT)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.PORT, args[iArg++]);
+				else if(anArg.equals(DLControl.MODELPATH)) {
+					GlobalArguments.setParam(DLControl.MODELPATH, args[iArg++]);
 				}
 				else if (anArg.equalsIgnoreCase(SoundCardSystem.SETDEVNAME)) {
 					// sound card name

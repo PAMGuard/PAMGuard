@@ -3794,8 +3794,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			int ib = i % 4;
 			bytes[ib] ^= chars[i];
 		}
-		int intVal = ((bytes[0] & 0xFF) << 24) + ((bytes[1] & 0xFF) << 16) + ((bytes[2] & 0xFF) << 8)
-				+ (bytes[3] & 0xFF);
+		if(bytes[0]==0 && bytes[1]==0) {
+			bytes[0] = Math.min(254, chars.length);
+			bytes[1] = chars[0];
+		}
+		int intVal = ((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
 		return intVal;
 	}
 

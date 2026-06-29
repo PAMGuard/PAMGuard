@@ -511,6 +511,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			for (int i = 0; i < markObservers.size(); i++) {
 				OverlayMarkObserver markObserver = markObservers.get(i);
 				for (SpectrogramPanel aPanel : spectrogramPanels) {
+				    if (aPanel == null)
+				        continue;
 					if (markLinks.getRelationship(aPanel.getMarker(), markObserver)) {
 						aPanel.getMarker().addObserver(markObserver);
 						nMarkObservers++;
@@ -2336,6 +2338,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			 */ 
 			double[] cellValues = dataUnit.getSpectrogramData();
 			double[] dBlevel = dataUnit.getMagnitudeData();
+			//System.out.println(cellValues[10]+" "+dBlevel[10]);
+
 
 			// int xStart = imagePos;
 			int xDraw = imagePos;
