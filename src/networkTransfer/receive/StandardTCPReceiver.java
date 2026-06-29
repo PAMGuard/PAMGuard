@@ -15,7 +15,6 @@ import networkTransfer.NetworkObject;
 import networkTransfer.NetworkReceiverInterface;
 import networkTransfer.receive.status.BuoyStatusDataBlock;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
-import nidaqdev.networkdaq.NetworkAudioInterpreter;
 
 /**
  * The connection thread does not receive data, it just listens 
@@ -268,7 +267,8 @@ class StandardTCPReceiver extends Thread implements NetworkDataUser,NetworkRecei
 			break;
 		case NetworkReceiver.NET_AUDIO_DATA:
 			if (networkAudioInterpreter == null) {
-				networkAudioInterpreter = new NetworkAudioInterpreter(netReceiver);
+				return null;
+//				networkAudioInterpreter = new NetworkAudioInterpreter(netReceiver);
 			}
 			networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
 		}

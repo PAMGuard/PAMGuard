@@ -78,6 +78,11 @@ public class StandardSymbolOptions extends PamSymbolOptions implements Serializa
 	 * A map of the symbol options associated with each symbol modifier. 
 	 */
 	private HashMap<String, SymbolModifierParams> modifierParams;
+
+	/**
+	 * Draw the bearing line as a wedge to indicate it's error. 
+	 */
+	public boolean drawBearingError;
 	
 	public StandardSymbolOptions(SymbolData defaultSymbol) {
 		this.symbolData = defaultSymbol; 

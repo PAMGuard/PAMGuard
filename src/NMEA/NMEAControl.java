@@ -39,6 +39,8 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.status.BaseProcessCheck;
+import nmeaEmulator.NMEAFrontEnd;
+import pamguard.GlobalArguments;
 
 
 /**
@@ -60,15 +62,20 @@ import PamController.status.BaseProcessCheck;
  */
 public class NMEAControl extends PamControlledUnit implements PamSettings {
 
-	AcquireNmeaData acquireNmeaData;
+	protected AcquireNmeaData acquireNmeaData;
 //	ProcessAISData processAISData;
-	NMEAParameters nmeaParameters = new NMEAParameters();
+	protected NMEAParameters nmeaParameters = new NMEAParameters();
 //	JMenuItem nmeaMenu;
-	NMEAControl nmeaControl;
+	private NMEAControl nmeaControl;
 	
 	public static final String GlobalPortFlag = "-serialPort";
 	
 	public static final String nmeaUnitType = "NMEA Data";
+	
+	/**
+	 * Command line to set com port from command start line. 
+	 */
+	public static final String NMEACOMCOMMAND = "-NMEAPORT";
 
 	public NMEAControl(String unitName) {
 		
@@ -80,14 +87,32 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 
 		addPamProcess(acquireNmeaData);
 		setModuleStatusManager(acquireNmeaData);
-
-//		addPamProcess(new ProcessNmeaData(this, acquireNmeaData.getOutputDataBlock(0), new NMEAParameters()));
-
-//		addPamProcess(processAISData = new ProcessAISData(this, acquireNmeaData.getOutputDataBlock(0)));
 		
 		PamSettingManager.getInstance().registerSettings(this);
 		
-//		nmeaMenu = createNMEAMenu();
+		checkGlobalArguments();
+		
+	}
+
+	private void checkGlobalArguments() {
+		//Doug's way
+		String globArg = GlobalArguments.getParam(NMEACOMCOMMAND);
+		if (globArg != null) {
+			System.out.printf("Setting %s serial port to %s\n", getUnitName(), globArg);
+			if (globArg.equalsIgnoreCase("auto")) {
+				nmeaParameters.autoSerialPort = true;
+			}
+			else {
+				nmeaParameters.serialPortName = globArg;
+			}
+		}
+		
+		//Sam's way -- (Doug's is better)
+		String portArg = GlobalArguments.getParam(NMEAControl.GlobalPortFlag);
+		if (portArg != null) {
+			this.nmeaParameters.serialPortName=portArg;
+		}
+		
 	}
 
 	public JMenuItem createNMEAMenu(Frame parentFrame) {
@@ -209,11 +234,6 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 			this.nmeaParameters = ((NMEAParameters) pamControlledUnitSettings.getSettings()).clone();
 		}
 		
-		String portArg = GlobalArguments.getParam(NMEAControl.GlobalPortFlag);
-		if (portArg != null) {
-			this.nmeaParameters.serialPortName=portArg;
-		}
-		
 		return true;
 	}
 	
@@ -258,6 +278,13 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	 */
 	public NMEADataBlock getNMEADataBLock() {
 		return acquireNmeaData.getOutputDatablock();
+	}
+
+	/**
+	 * @return the acquireNmeaData
+	 */
+	public AcquireNmeaData getAcquireNmeaData() {
+		return acquireNmeaData;
 	}
 	
 }

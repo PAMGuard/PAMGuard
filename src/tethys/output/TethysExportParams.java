@@ -24,6 +24,7 @@ public class TethysExportParams implements Serializable, Cloneable {
 	
 	public int detectorParameterOutput = DETECTORE_PARAMS_CHAIN;
 	
+	
 	/*
 	 * Need to add lots of other parameters here, such as the connection details
 	 * for the tethys database. 
@@ -48,8 +49,6 @@ public class TethysExportParams implements Serializable, Cloneable {
 	public boolean listDocsInPamguard;
 
 	private String effortSourceName;
-
-	
 
 	/**
 	 * @return the datasetName

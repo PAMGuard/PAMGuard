@@ -16,6 +16,7 @@ import PamUtils.PamCalendar;
  */
 public class SummaryCommand extends ExtCommand {
 	
+	private long lastCallTime = 0;
 
 	public SummaryCommand() {
 		super("summary", true);
@@ -39,6 +40,38 @@ public class SummaryCommand extends ExtCommand {
 		return ModuleSummarizer.getModulesSummary(true,format);
 	}
 	
+
+	public String getModulesSummary(boolean clear, String format) {
+		PamController pamController = PamController.getInstance();
+		int nMod = pamController.getNumControlledUnits();
+		PamControlledUnit aModule;
+		String totalString;
+		String aString;
+		if (lastCallTime == 0) {
+			lastCallTime = PamCalendar.getSessionStartTime();
+		}
+		long nowTime = PamCalendar.getTimeInMillis();
+		totalString = PamCalendar.formatDBDateTime(lastCallTime) + "-" + PamCalendar.formatDBDateTime(nowTime);
+		String mainSummary = pamController.getMainSummary(clear);
+		String mainName = "PAMGUARD";
+		totalString += String.format("\n<%s>%s<\\%s>", mainName, 
+				 mainSummary, mainName);
+		int usedModules = 0;
+		for (int i = 0; i < nMod; i++) {
+			aModule = pamController.getControlledUnit(i);
+			aString = aModule.getModuleSummary(clear,format);
+			if (aString == null) {
+				continue;
+			}
+			usedModules ++;
+			totalString += String.format("\n<%s>%s:%s<\\%s>", aModule.getShortUnitType(), 
+					aModule.getUnitName(), aString, aModule.getShortUnitType());
+		}
+		if (clear) {
+			lastCallTime = nowTime;
+		}
+		return totalString;
+	}
 
 	@Override
 	public String getHint() {

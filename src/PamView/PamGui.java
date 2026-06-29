@@ -411,7 +411,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		if (unit.getPamModuleInfo().getMinNumber()<=0) {
 			//any user added module removes the import tab - i.e. the 
 			//import tab is only there for essentially blank configurations. 
-			System.out.println("Removing import tab: " + unit.getUnitName());
+//			System.out.println("Removing import tab: " + unit.getUnitName());
 			removeImportTab();
 		}
 				

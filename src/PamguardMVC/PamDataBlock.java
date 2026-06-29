@@ -76,11 +76,13 @@ import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
 import binaryFileStorage.BinaryStore;
 import binaryFileStorage.SecondaryBinaryStore;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
 import effort.EffortProvider;
 import effort.binary.DataMapEffortProvider;
 import generalDatabase.SQLLogging;
@@ -1064,7 +1066,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public boolean loadViewerData(long dataStart, long dataEnd, ViewLoadObserver loadObserver) {
 		return loadViewerData(new OfflineDataLoadInfo(dataStart, dataEnd), loadObserver);
 	}
-
+	
 	/**
 	 * Do we need to reload offline data ? Default behaviour is to reurn true if the
 	 * time periods of the data load have changed, false otherwise.
@@ -1091,6 +1093,90 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public boolean clearOnViewerLoad() {
 		return true;
+	}
+
+	/**
+	 * Load all data for a map point. Slightly varied behaviour for binary map points
+	 * to ensure entire file is loaded in case footer and header times don't perfectly match data.  
+	 * @param mapPoint
+	 * @param loadObserver
+	 * @return
+	 */
+	public boolean loadMapPointData(OfflineDataMapPoint mapPoint, ViewLoadObserver loadObserver) {
+		if (mapPoint instanceof BinaryOfflineDataMapPoint) {
+			return loadBinaryDataMapPont((BinaryOfflineDataMapPoint) mapPoint, loadObserver);
+		}
+		else {
+			return loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), loadObserver);
+		}
+	}
+
+	/**
+	 * special behaviour for loading binary map point data in offline tasks (and Tethys) to 
+	 * ensure entire file is loaded. 
+	 * @param mapPoint
+	 * @param loadObserver
+	 */
+	private boolean loadBinaryDataMapPont(BinaryOfflineDataMapPoint mapPoint, ViewLoadObserver loadObserver) {
+		if (!PamController.getInstance().isInitializationComplete()) {
+			System.err.printf("Not loading %s since initialisation not yet complete\n", getDataName());
+			return false;
+		}
+//		long tenDays = 3600L*24L*1000L*10L;
+//		if (offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis() > tenDays) {
+//			System.out.printf("Big many day data load %s to %s in %s", PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()),
+//					PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()) ,getLongDataName());
+//		}
+
+		if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+			return false;
+		}
+		saveViewerData();
+
+//		if (!needViewerDataLoad(offlineDataLoadInfo)) {
+//			return true;
+//		}
+
+		clearChannelIterators();
+
+		if (clearOnViewerLoad()) {
+			clearAll();
+		}
+
+		currentViewDataStart = mapPoint.getStartTime();
+		currentViewDataEnd = mapPoint.getEndTime();
+
+		// run the garbage collector immediately.
+		Runtime.getRuntime().gc();
+
+		BinaryStore binaryStore = mapPoint.getBinaryStore();
+		
+		boolean loadOk = binaryStore.loadOneFile(this, mapPoint, loadObserver);
+
+//		if (dataMap.getClass() == BinaryOfflineDataMap.class) {
+//			//			System.out.println(getLongDataName() + " uses binary store");
+//			loadSecondaryBinaryData(offlineDataLoadInfo, loadObserver);
+//		}
+
+		ListIterator<Tunit> iter = getListIterator(0);
+		long newFistTime = Long.MAX_VALUE;
+		long newLastTime = 0;
+		while (iter.hasNext()) {
+			Tunit dat = iter.next();
+			long uid = dat.getUID();
+			firstViewerUID = Math.min(firstViewerUID, uid);
+			lastViewerUID = Math.max(lastViewerUID, uid);
+			currentViewDataStart = Math.min(currentViewDataStart, dat.getTimeMilliseconds());
+			currentViewDataEnd = Math.max(currentViewDataEnd, dat.getTimeMilliseconds());
+		}
+		
+		EffortProvider effProv = getEffortProvider();
+		if (effProv != null) {
+			effProv.viewerLoadData();
+		}
+
+		return loadOk;
+		
 	}
 
 	/**

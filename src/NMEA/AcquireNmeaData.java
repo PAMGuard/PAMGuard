@@ -86,7 +86,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	private NMEADataBlock outputDatablock;
 
 	/**
-	 * ArrayList to temorarily hold data read in by the captr thread before it
+	 * ArrayList to temporarily hold data read in by the capture thread before it
 	 * is read out by the main thread
 	 */
 	private List<StringBuffer> newStrings;
@@ -95,6 +95,8 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 * Timer for reading data out of newStrings
 	 */
 	private Timer timer;
+	
+	private Timer autoPortTimer;
 
 	/**
 	 * Thread references for NMEA capture.
@@ -107,6 +109,9 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	private PamWarning serialPortWarning;
 
 	private BaseProcessCheck processCheck;
+	private String autoComPortName;
+	private long lastValidStringTime = System.currentTimeMillis();
+	private int errorCount;
 
 	AcquireNmeaData(NMEAControl nmeaControl,
 			NMEAParameters nmeaParameters) {
@@ -126,6 +131,13 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 				nmeaControl.getUnitName(), this, 1)));
 
 		timer = new Timer(100, this);
+		
+		autoPortTimer = new Timer(5000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				checkAutoComPort();				
+			}
+		});
 		
 		setProcessCheck(processCheck = new NMEAProcessCheck(this, .2));
 		processCheck.setOutputAveraging(5);
@@ -199,40 +211,97 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	}
 
 	public void makeSerialThread() {
-		//System.out.println("OK making a serial thread");
 		timer.stop();
+//		autoPortTimer.stop();
+		autoPortTimer.start();
 		activeNMEAsource = null;
-//
-//		if(serialPortInterface!=null){
-//
-//			if(serialPortInterface.serialPortCom!=null){
-//				//System.out.println("Before serialPortInterface.serialPortCom.close()");
-//				//Use our local close function instead cjb
-//				//serialPortInterface.serialPortCom.close();
-//				closeSerialThread();
-//				//System.out.println("After closeSerialThread");
-//			}
-//			serialPortInterface = null;
-//		}
-//		serialPortInterface = new SerialPortInterface();
+
 		closeSerialThread();
 		NMEAParameters params = nmeaControl.getNmeaParameters();
 		try {
-			pjSerialComm = PJSerialComm.openSerialPort(params.serialPortName, params.serialPortBitsPerSecond);
+			pjSerialComm = PJSerialComm.openSerialPort(getComPortName(), params.serialPortBitsPerSecond);
 		} catch (PJSerialException e) {
-			System.out.println("PJSerialException in AcquireNMEAData" + e.getMessage());
-//			WarnOnce.sho
+			sayErrorString("PJSerialException in AcquireNMEAData" + e.getMessage());
+//			checkAutoComPort(); /// just do off timer. Slower, but less manic
 			return;
 		}
 		pjSerialComm.addLineListener(new SerialListener());
 		timer.start();
 	}
 	
+	private void checkAutoComPort() {
+		if (nmeaControl.getNmeaParameters().autoSerialPort == false) {
+			return;
+		}
+		// current com port is failing, so try a different one and see if things improve. 
+		long pause = System.currentTimeMillis() - lastValidStringTime;
+		if (pause > 5000) {
+			String newPort = findAnotherPort();
+			if (newPort != null) {
+				autoComPortName = newPort;
+				restartNMEA();
+			}
+		}
+	}
+	
+	private String findAnotherPort() {
+		String[] commPortIds = PJSerialComm.getSerialPortNames();
+		if (commPortIds == null || commPortIds.length == 0) {
+			return null;
+		}
+		// first find the index of the current port. 
+		if (autoComPortName == null) {
+			return commPortIds[0];
+		}
+		int ind = 0;
+		for (int i = 0; i < commPortIds.length; i++) {
+			if (commPortIds[i].equals(autoComPortName)) {
+				ind = i;
+				break;
+			}
+		}
+		// go to the next one. looping back to the first if at end of list. 
+		ind++;
+		if (ind >= commPortIds.length) {
+			ind = 0; 
+		}
+		return commPortIds[ind];
+	}
+
+	private String getComPortName() {
+		if (nmeaControl.getNmeaParameters().autoSerialPort == false) {
+			return nmeaControl.getNmeaParameters().serialPortName;
+		}
+		if (autoComPortName == null) {
+			// first time around, it will get current selected port, then it will scan. 
+			autoComPortName = nmeaControl.getNmeaParameters().serialPortName;
+		}
+		return autoComPortName;
+	}
+
 	private class SerialListener implements PJSerialLineListener {
 
 		@Override
 		public void newLine(String aLine) {
-			processNmeaString(new StringBuffer(aLine));
+			/*
+			 * Do a couple more checks, now that we're allowing auto port detection
+			 * to be sure that it's NMEA data coming through, and not some other junk. 
+			 */
+			// check the first character is a $
+			if (aLine == null || aLine.length() == 0) {
+				return;
+			}
+			if (aLine.startsWith("$") == false) {
+				sayErrorString("Invalid NMEA string (no $): " + aLine);
+				return;
+			}
+			StringBuffer sb = new StringBuffer(aLine);
+			boolean ok = checkStringCheckSum(sb);
+			if (ok == false) {
+				sayErrorString("Invalid NMEA string checksum: " + aLine);
+				return;
+			}
+			processNmeaString(sb);
 		}
 
 		@Override
@@ -253,7 +322,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 * invokeLater(...)
 	 */
 	private void restartNMEA() {
-		System.out.println("Problem with NMEA signal - Restarting NMEA source...");
+		sayErrorString("Problem with NMEA signal - Restarting NMEA source on port " + getComPortName());
 		SwingUtilities.invokeLater(new RestartNMEASource());
 	}
 	
@@ -765,6 +834,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		 */
 		while (!newStrings.isEmpty()) {
 			processNmeaString(newStrings.remove(0));
+			lastValidStringTime  = System.currentTimeMillis();
 		}
 	}
 
@@ -775,6 +845,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 */
 	private void processNmeaString(StringBuffer stringBuffer) {
 //		checkStringCheckSum(stringBuffer);
+		lastValidStringTime  = System.currentTimeMillis();
 		lastSigTime = System.currentTimeMillis();
 		NMEADataUnit newUnit = new NMEADataUnit(PamCalendar.getTimeInMillis(), stringBuffer);
 		outputDatablock.addPamData(newUnit);
@@ -908,6 +979,25 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 		if(nmeaControl.nmeaParameters.sourceType==NMEAParameters.NmeaSources.TIMESTAMP_FILE) {
 			stopNMEASource();
+		}
+	}
+	
+	/**
+	 * Say error string, but stop printing them after the first 20. 
+	 * @param err
+	 */
+	private void sayErrorString(String err) {
+		errorCount++;
+		if (errorCount == 20) {
+			System.out.println("NMEA Error count exceeds 20, stop reporting NMEA Errors from " + nmeaControl.getUnitName());
+			return;
+		}
+		if (errorCount % 200 == 0) {
+			System.out.println("NMEA Error count " + errorCount + ": " + err);
+			return;
+		}
+		if (errorCount < 20) {
+			System.out.println(err);
 		}
 	}
 	

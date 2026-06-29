@@ -186,8 +186,12 @@ public class Chi2Bearings implements MinimisationFunction {
 			 * Calculate a vector pointing from the origin of this detection to the 
 			 * current location in the optimisation. 
 			 */
-			if (getDim()==2) 	pointVec = new PamVector(location[0] - vecData[0], location[1] - vecData[1], 0);
-			else pointVec = new PamVector(location[0] - vecData[0], location[1] - vecData[1], location[2]-vecData[2]);
+			if (getDim()==2) {
+				pointVec = new PamVector(location[0] - vecData[0], location[1] - vecData[1], 0);
+			}
+			else {
+				pointVec = new PamVector(location[0] - vecData[0], location[1] - vecData[1], location[2]-vecData[2]);
+			}
 			
 			if (pointVec.normalise() == 0) {
 				/*

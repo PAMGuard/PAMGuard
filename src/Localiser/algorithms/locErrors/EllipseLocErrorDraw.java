@@ -155,7 +155,10 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		double horzErrPix = Math.sqrt(Math.pow(horzEndPoint.y-errorOriginXY.y,2) + Math.pow(horzEndPoint.x-errorOriginXY.x,2));
 		
 		//draw the ellipse and rotate. 
-		Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix/2, errorOriginXY.getY()-perpErrPix/2, horzErrPix, perpErrPix);
+		// the errors are radii, so earlier verison of this was drawing an ellipse half the correct size. 
+//		Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix/2, errorOriginXY.getY()-perpErrPix/2, horzErrPix, perpErrPix);
+		// this one is the correct size. 
+		Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix, errorOriginXY.getY()-perpErrPix, horzErrPix*2, perpErrPix*2);
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.05f));
 		g2d.setPaint(ellipseColor.brighter());
 

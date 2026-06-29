@@ -9,13 +9,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
-import Array.ArrayManager;
-import Array.HydrophoneLocator;
-import Array.HydrophoneLocators;
-import Array.LocatorSettings;
-import Array.StraightHydrophoneLocatorSystem;
-import Array.Streamer;
-import Array.StreamerDataBlock;
 import GPS.GpsData;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
@@ -26,7 +19,6 @@ import networkTransfer.mqttClient.PamMqttClient;
 import networkTransfer.receive.status.BuoyStatusDataBlock;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
 import networkTransfer.send.ClientConnectFailedException;
-import nidaqdev.networkdaq.NetworkAudioInterpreter;
 
 public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInterface,NetworkDataUser{
 
@@ -228,6 +220,7 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 		
 	}
 
+	//In 
 	@Override
 	public NetworkObject interpretData(NetworkObject receivedObject) {
 		BuoyStatusDataUnit buoyStatusDataUnit = netReceiver.findBuoyStatusDataUnit(receivedObject.getBuoyId1(), receivedObject.getBuoyId2(), true);
@@ -243,9 +236,11 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 			break;
 		case NetworkReceiver.NET_AUDIO_DATA:
 			if (networkAudioInterpreter == null) {
-				networkAudioInterpreter = new NetworkAudioInterpreter(netReceiver);
+				return null;
+//				networkAudioInterpreter = new NetworkAudioInterpreter(netReceiver);
+			}else {
+				networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
 			}
-			networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
 		}
 		for (NetworkDataUser extraUser : netReceiver.getExtraDataUsers()) {
 			retObject = extraUser.interpretData(receivedObject);

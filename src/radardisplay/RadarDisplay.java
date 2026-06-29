@@ -57,7 +57,7 @@ import userDisplay.UserFramePlots;
 
 public class RadarDisplay extends UserFramePlots implements PamObserver, PamSettings {
 
-	private RadarParameters radarParameters;
+	private RadarParameters radarParameters = new RadarParameters();
 	
 	private RadarPlot radarPlot;
 	

@@ -45,6 +45,22 @@ From the Detection Menu, select NMEA <em><strong>Data Collection>NMEA Parameters
   <img alt="NmeaParametersDialog (17K)" src="images/NmeaParametersDialog.png"/><br>
 </p>
 
+<h4>Serial NMEA data</h4>
+<p>This is the most common way of acquiring NMEA data. Most GPS systems output NMEA data on a serial port. 
+Even if your GPS is connected using USB, within your PC, it's still considered a serial port. </p>
+<p>The dialog shows a list of available serial ports. Select the one that you want to use, or select the 
+"Auto serial port" option, in which case, the system will scan ports until it finds one that's sending valid 
+NMEA data. </p>
+<p>Generally, setting the correct serial port yourself is the best option and is essential if you
+have more than one NMEA device connected to your system.</p>
+<p>Most GPS systems use a baud rate of 4800 bits per second. The most common exception 
+is with more complex NMEA systems for instance on a vessel that provides an NMEA stream
+from multiple multiplexed devices, in which case it's likely to using a higher baud rate.  If you're having difficulty 
+with your GPS, check the manual for your GPS, or try other baud rates. 
+
+<h4>External NMEA server</h4>
+<p>Legacy for use with the old IFAW NMEA server that worked with Logger 2000. Still usful if you're using 
+Logger and need to acquire NMEA data into both Logger and PAMGuard. </p>
 
 <h4>Simulated NMEA and AIS Data</h4>
 <p>PAMGuard can also simulate NMEA GPS and AIS data. This is useful during training and setting up exercises. 

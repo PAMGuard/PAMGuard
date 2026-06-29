@@ -10,7 +10,6 @@ import networkTransfer.receive.swing.NetworkRXTabPanel;
 import networkTransfer.receive.swing.NetworkReceiveDialog;
 import networkTransfer.receive.swing.NetworkReceiveSidePanel;
 import networkTransfer.receive.swing.RXTableMouseListener;
-import nidaqdev.networkdaq.NetworkAudioInterpreter;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -381,8 +380,115 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 	
 	
 	
-
 	
+	//Code here has been commented out to resolve errors with Sam modifications not compatible with Doug's revamped network NI card code. 
+	//In Merge between SMRUC and Main Fork June 2026, following is not complete, tested, or functional:
+	/*
+	 * ======BEGIN BLOCK=====
+	 */
+	private NetworkAudioInterpreter networkAudioInterpreter;
+
+	//@Override
+	public synchronized NetworkObject interpretData(NetworkObject receivedObject) {
+		
+		/**
+		 * Although there are many NetworkReceiveThread's there is only one
+		 * of thee, so at this point data from all senders end up in the same
+		 * thread. 
+		 */
+
+		//addPacketStats(receivedObject.getTransferedLength());
+		
+		BuoyStatusDataUnit buoyStatusDataUnit = findBuoyStatusDataUnit(receivedObject.getBuoyId1(), receivedObject.getBuoyId2(), true);
+		buoyStatusDataUnit.setSocket(receivedObject.getSocket());
+		// work out how long different socket asking questions take. 
+//		long t1 = System.currentTimeMillis();
+//		InetAddress inAddr = socket.getInetAddress();
+//		long t2 = System.currentTimeMillis();
+//		byte[] addr = inAddr.getAddress();
+//		String addrS = new String(addr);
+//		long t3 = System.currentTimeMillis();
+//		String hostName = inAddr.getHostName(); // takes 4.5s
+//		long t4 = System.currentTimeMillis();
+//		String canonicalName = inAddr.getCanonicalHostName(); // takes 4.5s
+//		long t5 = System.currentTimeMillis();
+//		String hostAddr = inAddr.getHostAddress(); // takes 0ms. 
+//		long t6 = System.currentTimeMillis();
+//		System.out.printf("Host time: inAddr %d, getAddress %d, hostName %s %d, CanonicalHostName %s %d, hostAddress %s %dms\n",
+//				t2-t1, t3-t2, hostName, t4-t3, canonicalName, t5-t4, hostAddr, t6-t5);
+		/*
+		 * Use getHostAddress() since it's faster. 
+		 */
+		
+		
+		//		if (dataId1 != NET_PAM_DATA) {
+//					String str = new String(duBuffer);
+//					str = str.substring(0, dataLen);
+//					System.out.println(String.format("Buoy data arrived id %d / %d, %s", dataId1, dataId2, str));
+		//		}
+
+		NetworkObject retObject = null;
+		switch(receivedObject.getDataType1()) {
+		case NET_PAM_DATA:
+			retObject = interpretPamData(receivedObject, buoyStatusDataUnit);
+			break;
+		case NET_PAM_COMMAND:
+			retObject = interpretPamCommand(receivedObject, buoyStatusDataUnit);
+			break;
+		case NET_AUDIO_DATA:
+			if (networkAudioInterpreter == null) {
+//				networkAudioInterpreter = new CRioAudioInterpreter(this);
+				return null;
+			}
+			//networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
+		}
+		for (NetworkDataUser extraUser : extraDataUsers) {
+			retObject = extraUser.interpretData(receivedObject);
+		}
+		buoyStatusDataBlock.updatePamData(buoyStatusDataUnit, PamCalendar.getTimeInMillis());
+		return retObject;
+	}
+
+	/**
+	 * Before opening a new thread for this client, check to see 
+	 * if that client already has a receive thread open and then
+	 * if it has close it 
+	 * @param clientSocket
+	 * @param wantedThread The thread we just made, so want to keep. 
+	 */
+	/*public synchronized void checkExistingThreads(Socket clientSocket, NetworkReceiveThread wantedThread) {
+		String newHost = clientSocket.getInetAddress().getHostAddress();
+		ArrayList<NetworkReceiveThread> stopList = new ArrayList<NetworkReceiveThread>();
+		synchronized(receiveThreads) {
+			System.out.printf("Checking %d existing recieve threads\n", receiveThreads.size());
+			ListIterator<NetworkReceiveThread> threadIt = receiveThreads.listIterator();
+			while (threadIt.hasNext()) {
+				NetworkReceiveThread rxThread = threadIt.next();
+				if (rxThread == wantedThread) {
+					continue;
+				}
+				Socket rxClient = rxThread.getClientSocket();
+				String rxHost = rxClient.getInetAddress().getHostAddress();
+				if (newHost.equals(rxHost)) {
+					System.out.println("*********  Server thread already open for " + rxHost + " force thread stop. ***********");
+					stopList.add(rxThread);
+					rxThread.stopThread();
+//					threadIt.remove();
+					
+				}
+			}
+			if (stopList.size() > 0) {
+				for (NetworkReceiveThread rxThread:stopList) {
+					rxThread.stopThread();
+				}
+			}
+		}
+	}*/
+
+
+	/*
+	 * ===== END BLOCK =====
+	 */
 
 	
 	/**
@@ -907,4 +1013,11 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 	}
 
 
+	public NetworkAudioInterpreter getNetworkAudioInterpreter() {
+		return networkAudioInterpreter;
+	}
+
+	public void setNetworkAudioInterpreter(NetworkAudioInterpreter networkAudioInterpreter) {
+		this.networkAudioInterpreter = networkAudioInterpreter;
+	}
 }

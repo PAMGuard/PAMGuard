@@ -60,9 +60,17 @@ public class DBProcess extends PamProcess {
 
 	private javax.swing.Timer timer;
 
+	/**
+	 * These two are used by the sidepanel and get zeroed every 
+	 * second or so, each time the side panel updates. 
+	 */
 	private int dbWriteOKs;
-
 	private int dbWriteErrors;
+	
+	/**
+	 * These two get used by the getModuleSummary function. 
+	 */
+	private int summaryWriteOK, summaryWriteErr;
 
 	private ArrayList<DbSpecial> dbSpecials = new ArrayList<DbSpecial>();
 
@@ -1348,8 +1356,10 @@ public class DBProcess extends PamProcess {
 		boolean ok = logger.logData(databaseControll.getConnection(), unit);
 		if (ok) {
 			dbWriteOKs++;
+			summaryWriteOK++;
 		} else {
 			dbWriteErrors++;
+			summaryWriteErr++;
 			writeWarning.setWarningMessage("Write error for " + block.getDataName());
 			writeWarning.setEndOfLife(unit.getTimeMilliseconds() + 5000);
 			WarningSystem.getWarningSystem().addWarning(writeWarning);
@@ -1648,6 +1658,28 @@ public class DBProcess extends PamProcess {
 		
 		databaseControll.commitChanges();
 		
+	}
+
+	/**
+	 * 
+	 * Get a module summary for the database, so can check remotely
+	 * Returned fields will be name, autocommit (0 or 1), number of writes, number of fails. 
+	 * @param clear reset data counts to zero when called. 
+	 * @return summary string
+	 */
+	public String getModuleSummary(boolean clear) {
+		DBSystem dbSystem = databaseControll.databaseSystem;
+		String name = "No database systen";
+		if (dbSystem != null) {
+			name = dbSystem.getShortDatabaseName(); 
+		}
+		int autoCommit = databaseControll.dbParameters.getUseAutoCommit() ? 1 : 0;
+		String summary = String.format("\n<DBNAME>%s<\\DBNAME>,\n<AUTOCOMMIT>%d<\\AUTOCOMMIT>,\n<WRITES>%d<\\WRITES>,\n<FAILS>%d<\\FAILS>", 
+				name, autoCommit, summaryWriteOK, summaryWriteErr);
+		if (clear) {
+			summaryWriteOK = summaryWriteErr = 0;
+		}
+		return summary;
 	}
 
 }

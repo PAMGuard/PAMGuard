@@ -307,6 +307,9 @@ PamSettingsSource, DataOutputStore {
 	private void closeStores() {
 		long dataTime = PamCalendar.getTimeInMillis();
 		long analTime = System.currentTimeMillis();
+//		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//		System.out.printf("Close stores at %s from %s\n" , PamCalendar.formatDBDateTime(dataTime, true), stack[2].getMethodName());
+
 		BinaryOutputStream outputStream;
 		for (int i = 0; i < storageStreams.size(); i++) {
 			outputStream = storageStreams.get(i);
@@ -1615,6 +1618,17 @@ PamSettingsSource, DataOutputStore {
 		return getUnitName();
 	}
 
+	/**
+	 * Similar to the loadData function but will load exactly one file. 
+	 * @param dataBlock
+	 * @param mapPoint
+	 * @param loadObserver
+	 * @return
+	 */
+	public boolean loadOneFile(PamDataBlock dataBlock, BinaryOfflineDataMapPoint mapPoint, ViewLoadObserver loadObserver) {
+		BinaryDataSink dataSink = new DataLoadSink();
+		return loadData(dataBlock, mapPoint, 0, mapPoint.getEndTime() + 10000000, dataSink);
+	}
 	@Override
 	public boolean loadData(PamDataBlock dataBlock, OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
 		//TODO In principle, this should load a little data just before the main data start - hard to do with binary stores 

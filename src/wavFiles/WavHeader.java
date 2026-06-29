@@ -125,10 +125,10 @@ public class WavHeader {
 						 * function which inserts an invalid format tag. I'm getting it as 65534, but
 						 * perhaps it's -2 as a signed ?
 						 */
-						if (formatWarnings++ < 2) {
-							System.out.printf("Unexpected WAV format %d in file header. Setting to default value\n",
-									fmtTag);
-						}
+//						if (formatWarnings++ < 2) {
+//							System.out.printf("Unexpected WAV format %d in file header. Setting to default value\n",
+//									fmtTag);
+//						}
 						fmtTag = 1;
 					}
 					nChannels = (short) windowsWavFile.readWinShort();

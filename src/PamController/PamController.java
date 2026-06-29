@@ -3239,8 +3239,26 @@ public class PamController implements PamControllerInterface, PamSettings {
 		ArrayList<PamControlledUnit> bs = findControlledUnits(BinaryStore.class);
 		for (PamControlledUnit aBS : bs) {
 			BinaryStore binStore = (BinaryStore) aBS;
-			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis);
+			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis, "Master Clock");
 		}
+	}
+
+	/**
+	 * Addition to getmodulesummary command, to add some more general system 
+	 * information to the summary string availale through the command interface
+	 * (udp, terminal, etc) .
+	 * @param clear
+	 * @return
+	 */
+	public String getMainSummary(boolean clear) {
+		String sum = "";
+		// system time
+		String t = PamCalendar.formatDBDateTime(System.currentTimeMillis(), true);
+		sum += String.format("\n<SYSTIME>%s<\\SYSTIME>", t);
+		sum += String.format("\n<STATUS>%d<\\STATUS>", getPamStatus());
+		sum += String.format("\n<STATE>%d<\\STATE>", getRealStatus());
+		sum += "\n";
+		return sum;
 	}
 
 

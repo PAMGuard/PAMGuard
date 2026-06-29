@@ -147,8 +147,10 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 			return false;
 		}
 		for (int j=0; j<results.length; j++){
-			if (groupLocalisation.getGroupLocaResult(j).getPerpendicularDistance()<clickLocParams.maxRange &&
-					groupLocalisation.getHeight(j)>clickLocParams.minHeight && groupLocalisation.getHeight(j)<clickLocParams.maxHeight){
+			double perpDist = groupLocalisation.getGroupLocaResult(j).getPerpendicularDistance();
+			double height = groupLocalisation.getHeight(j);
+			if (perpDist <= clickLocParams.maxRange &&
+					height >= clickLocParams.minHeight && height <= clickLocParams.maxHeight){
 				//even if one ambiguity is OK then the whole localisation passes the filter. 
 				return true; 
 			}
@@ -200,6 +202,7 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 				//add to a list of results - note: do not add the new localisation to the data unit...yet.
 				LocaliserModel algo = locAlgorithmList.get(i);
 				AbstractLocalisation newLoc = algo.runModel(pamDataUnit, detectionGroupOptions, false);
+//				System.out.println("Receive new localisation: " + newLoc);
 				groupLoc= ((GroupLocalisation) newLoc);
 				if (groupLoc!=null) locResults.add(groupLoc); 
 			}
@@ -238,12 +241,13 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 		
 		if (minIndex==-1){
 			//something has gone wrong
-//			System.err.println(getName() +": No loc results");
+//			System.err.println(getName() +": No loc results because no minIndex");
 			locWarning.setWarningMessage(getName() +": No localisation results");
 			WarningSystem.getWarningSystem().addWarning(locWarning);
 			return null; 
 		}
 		
+//		System.out.printf("Have %d localisation results \n", locResults.size());
 		if (addLoc) pamDataUnit.setLocalisation(locResults.get(minIndex));
 		
 		return locResults.get(minIndex);

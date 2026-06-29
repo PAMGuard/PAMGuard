@@ -88,6 +88,8 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 
 	public static final String recorderUnitType = "Sound Recorder";
 
+	public static final String GlobalWavPrefixArg2 = "-recording.Prefix";
+
 	public RecorderControl(String name) {
 
 		super(recorderUnitType, name);
@@ -108,6 +110,10 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		recorderStorage = new PamAudioFileStorage(this);
 
 		PamSettingManager.getInstance().registerSettings(this);
+		
+		checkGlobalArguments();
+
+		newParams();
 
 		recorderTimer.start();
 
@@ -128,6 +134,39 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		enableRecording();
 		
 		backupInformation = new BackupInformation(new RecorderBackupStream(this));
+	}
+
+	/**
+	 * Check global arguments that can control the output folder and the file initials. 
+	 * Called immediately after normal settings have been restored to overwrite them. 
+	 * Called as a separate function to restoreSettings since restoreSettings won't get 
+	 * called if no settings already exist. 
+	 */
+	private void checkGlobalArguments() {
+		/*
+		 * Then check to see if there is a command line override of the currently stored folder name. 
+		 */
+		String globFolder = GlobalArguments.getParam(FolderInputSystem.GlobalWavFolderArg);
+		if (globFolder != null) {
+			boolean ok = checkGlobFolder(globFolder);
+			if (ok) {
+				recorderSettings.setOutputFolder(globFolder); // remember it. 
+			}
+			else {
+				System.err.println("Unable to set recording storage folder " + globFolder);
+			}
+		}
+		
+		String globPrefix = GlobalArguments.getParam(RecorderControl.GlobalWavPrefixArg);
+		if (globPrefix != null) {
+			if (globPrefix.length()<6000) { // why was this restricted to 6 ? 
+				recorderSettings.fileInitials = globPrefix; // remember it. 
+			}
+			else {
+				System.err.println("Unable to set recording storage folder " + globFolder);
+			}
+		}
+		
 	}
 
 	private boolean modelComplete = false;
@@ -441,19 +480,6 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
-		/*
-		 * Then check to see if there is a command line override of the currently stored folder name. 
-		 */
-		String globFolder = GlobalArguments.getParam(FolderInputSystem.GlobalWavFolderArg);
-		if (globFolder != null) {
-			boolean ok = checkGlobFolder(globFolder);
-			if (ok) {
-				recorderSettings.setOutputFolder(globFolder); // remember it. 
-			}
-			else {
-				System.err.println("Unable to set recording storage folder " + globFolder);
-			}
-		}
 		
 		String globPrefix = GlobalArguments.getParam(FolderInputSystem.GlobalWavPrefixArg);
 		if (globPrefix != null) {

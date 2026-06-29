@@ -34,6 +34,9 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	
 	String name;
 
+	/**
+	 * Port for UDP comms
+	 */
 	public int port;
 	
 	public boolean multicast;
@@ -69,6 +72,11 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	
 	//value now gets set in the constructor CJB 2009-06-09
 	public String serialPortName;
+	
+	/**
+	 * Scan all available serial ports and find the first that's returning NMEA like data. 
+	 */
+	public boolean autoSerialPort;
 	
 	public int serialPortBitsPerSecond = 4800;
 	

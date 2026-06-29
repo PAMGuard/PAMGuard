@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.api.data.DataSourceException;
 import org.geotools.api.geometry.Bounds;
 import org.geotools.api.geometry.MismatchedDimensionException;
 import org.geotools.api.referencing.FactoryException;
@@ -14,7 +13,6 @@ import org.geotools.api.referencing.NoSuchAuthorityCodeException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.MathTransform;
 import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -23,7 +21,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
 import PamUtils.LatLong;
-import ucar.nc2.geotiff.GeoTiff;
 
 public class GeoTiffFile {
 
@@ -36,6 +33,7 @@ public class GeoTiffFile {
 		this.tifFile = gtFile;
 		this.minLatLong = minLatLong;
 		this.maxLatLong = maxLatLong;
+//		ImageN imN = null;
 	}
 
 	/**
@@ -46,25 +44,27 @@ public class GeoTiffFile {
 	 * @return
 	 */
 	public static GeoTiffFile makeFile(File f) {
-//		GeoTiff gtf = new GeoTiff(f.getAbsolutePath());
-//		String info = gtf.showInfo();
-//		System.out.println("GT Info: " + info);
+
 		GeoTiffReader reader = null; 
-		GridCoverage2D coverage = null;
+		Bounds envelope = null;
 
 		try {
 			reader = new GeoTiffReader(f);
-			coverage = reader.read(null);
-		} catch (DataSourceException e) {
-			System.out.println(e.getMessage());
-			return null;
+			 envelope = reader.getOriginalEnvelope();
+			 /**
+			  * Several days of my life were lost to this function that I'll never ever get back. 
+			  * Calling reader.read would invoke ImageN which is an eclipse library, so it would work 
+			  * fine running from Eclipse, but proved impossible to get the correct Maven repositories 
+			  * to include ImageN in the build. By using the above function to just get the envelope
+			  * we're able to read the coordinates of the goetiff. The actual image itself can be
+			  * read later with the much more robust and standard ImageIO.read function.
+			  */
+//			coverage = reader.read(null);
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 			return null;
 		}
 
-		// Get the geographic bounding box
-		Bounds envelope = coverage.getEnvelope();
 		double minLon = envelope.getMinimum(0);
 		double maxLon = envelope.getMaximum(0);
 		double minLat = envelope.getMinimum(1);
@@ -102,6 +102,11 @@ public class GeoTiffFile {
 		return new GeoTiffFile(f, minLL, maxLL);
 	}
 	
+	/**
+	 * Get the image from the file. Will only read once, then store 
+	 * in memory as a buffered image. 
+	 * @return MapRasterImage that has coordinate bounds and the image data in the same object. 
+	 */
 	public MapRasterImage getImage() {
 		if (rasterImage == null) {
 			makeRasterImage();
@@ -110,6 +115,9 @@ public class GeoTiffFile {
 		return rasterImage;
 	}
 
+	/**
+	 * Make the image. Called once. 
+	 */
 	private void makeRasterImage() {
 		BufferedImage buffImage = null;
 		try {

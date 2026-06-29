@@ -450,7 +450,7 @@ name="_Version_2.02.10_January"></a><a name="_Version_2.02.11_April"></a><a
 name="_Version_2.02.14_October"></a><a name="_2.02.15_December_2014"></a><a
 name="_Version_2.02.16_February"></a><a name="_Version_2.02.17_?????"></a><a
 name="_Version_2.02.18_????"></a><a name="_Version_2.02.19_Later"></a>Version
-2.02.19 Later in 2-26</h1>
+2.02.19 Later in 2026</h1>
 
 <p class=MsoNormal><b>New Features</b></p>
 
@@ -462,7 +462,27 @@ GIS packages. See Help for details. </p>
 of all loaded plugin modules is written to the database table
 Version_Information every time PAMGuard starts. </p>
 
+<p class=MsoNormal>Automatic NMEA serial port selection. New option, which will
+try available serial ports in turn until one is found that’s returning NMEA
+data. </p>
+
 <p class=MsoNormal><b>Bug Fixes</b></p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/296">Issue
+292</a>: Stop printing unnecessary wav file format warnings when they do no
+harm. </p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/300">Issue
+300</a>: Null pointer returned by the Ishmael Spectrogram Correlation detector.
+Fixed.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/306">Issue
+306</a>: Tethys export. Options to limit number of items per Detections
+document to about 100k.</p>
+
+<p class=MsoNormal><a href="https://github.com/PAMGuard/PAMGuard/issues/307">Issue
+307</a>: Tethys not exporting correct count of data points in Detections
+documents. </p>
 
 <h1>Version 2.02.18 February 2026</h1>
 
@@ -620,8 +640,8 @@ files from SCRIPPS HARP recorders. &nbsp;</p>
 <p class=MsoNormal><b>Bug fixes</b></p>
 
 <p class=MsoNormal>Issue 207. Marked clicks in click detector not rematching
-when data reloaded. This was occurring when multiple clicks had the same millisecond
-time and has now been rectified. </p>
+when data reloaded. This was occurring when multiple clicks had the same
+millisecond time and has now been rectified. </p>
 
 <p class=MsoNormal>Tethys deployments table. Deployments table in Tethys was
 showing multiple lines for duty cycled data. Duty cycled data will now display
@@ -880,9 +900,9 @@ exact times, rather than a couple of seconds after the hour. </p>
 <h2><span lang=EN-US>New Features</span></h2>
 
 <p class=MsoNormal><b><span lang=EN-US>Importing modules</span></b><span
-lang=EN-US> from other configurations: New options from file menu allowing
-import of specific modules, or module settings from other configurations. E.g.
-if you had three similar configurations and had set one of them up with a new
+lang=EN-US> from other configurations: New options from file menu allowing import
+of specific modules, or module settings from other configurations. E.g. if you
+had three similar configurations and had set one of them up with a new
 detector, or got the click classifier settings set up just right in one of
 those configurations, you can import the additional modules or the click
 detector settings easily into the other configurations. </span></p>
@@ -984,10 +1004,10 @@ handlers to handle corrupt map files. </span></p>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>Restart Options: When you restart
-processing of offline files, if output data already exist (binary data of
-within database tables) you will be asked if you want to overwrite the data,
-cancel, or try to continue from where to left off. </span></p>
+<p class=MsoNormal><span lang=EN-US>Restart Options: When you restart processing
+of offline files, if output data already exist (binary data of within database
+tables) you will be asked if you want to overwrite the data, cancel, or try to
+continue from where to left off. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Updated SoundTrap sud file interface so
 that PAMGuard now extracts and stores the Click Detector settings from the sud
@@ -1050,8 +1070,8 @@ being cleared from memory, so memory will eventually run out. This could happen
 after browsing a lot of data, but was most likely when reprocessing files
 offline, for example running click classifiers. This is now fixed. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Also fixed a memory leak in the ROCCA
-whistle classification module.</span></p>
+<p class=MsoNormal><span lang=EN-US>Also fixed a memory leak in the ROCCA whistle
+classification module.</span></p>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
@@ -1079,9 +1099,9 @@ system to have nested classifiers which can be enabled or disabled. </span></p>
 accommodate the new classification system.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Addition of data selectors to the minimum
-number of clicks accepted by the classifier. This allows the click-by-click
-classifier and the click train detector to be used to together to improve
-classification accuracy. </span></p>
+number of clicks accepted by the classifier. This allows the click-by-click classifier
+and the click train detector to be used to together to improve classification
+accuracy. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug fixes</span></b></p>
 
@@ -1105,8 +1125,8 @@ description of the algorithm, screen grabs and examples.</span></p>
 <p class=MsoNormal><span lang=EN-US>Help documentation for Matched Click
 Classifier</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Database logging of offline tasks (such as click
-re-classification, bearing calculation, etc.)</span></p>
+<p class=MsoNormal><span lang=EN-US>Database logging of offline tasks (such as
+click re-classification, bearing calculation, etc.)</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Data selector for Whistle Classifier module</span></p>
 
@@ -2107,8 +2127,8 @@ better visibility at night.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added print screen button to capture/save all PAMGuard screens
-to file and log the information to the database.</p>
+lang=EN-US> </span>Added print screen button to capture/save all PAMGuard
+screens to file and log the information to the database.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -3055,9 +3075,9 @@ the future. </span></p>
 
 <p class=MsoNormal><i>Logger Form Design</i></p>
 
-<p class=MsoNormal>A GUI driven system for designing Logger forms has been released.
-Currently, this feature has no online help, but is reasonably intuitive
-compared to the old method of typing directly into the database. </p>
+<p class=MsoNormal>A GUI driven system for designing Logger forms has been
+released. Currently, this feature has no online help, but is reasonably
+intuitive compared to the old method of typing directly into the database. </p>
 
 <p class=MsoNormal><i><span lang=EN-US>Improved Number handling</span></i></p>
 
@@ -3776,9 +3796,9 @@ module. </p>
 
 <p class=MsoNormal><i>Sound Recorder Module</i></p>
 
-<p class=MsoNormal>Now supports writing 8 and 24 bit as well as 16 bit files.
-Also writes data to dated sub folders, starting a new folder each day (UTC).
-Also provides additional information on disk space on the main display panel.
+<p class=MsoNormal>Now supports writing 8 and 24 bit as well as 16 bit files. Also
+writes data to dated sub folders, starting a new folder each day (UTC). Also
+provides additional information on disk space on the main display panel.
 Millisecond time is also now included in the output file names. </p>
 
 <p class=MsoNormal><i>Datagram Options</i></p>
@@ -3815,8 +3835,9 @@ shaped Finite Impulse Response filters (see online help for details). </p>
 
 <p class=MsoNormal><i>Radar Display</i></p>
 
-<p class=MsoNormal>Can now show bearings relative to true North OR the vessel heading.
-Also has the option of only showing certain types of click and whistle.</p>
+<p class=MsoNormal>Can now show bearings relative to true North OR the vessel
+heading. Also has the option of only showing certain types of click and
+whistle.</p>
 
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
@@ -3880,9 +3901,9 @@ Also has the option of only showing certain types of click and whistle.</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Clip Generator: Saves and displays
-short waveform clips around detections. Can work with any detector (or indeed
-any other data stream within PAMGuard). &nbsp;</p>
+<p class=MsoNormal style='margin-left:36.0pt'>Clip Generator: Saves and
+displays short waveform clips around detections. Can work with any detector (or
+indeed any other data stream within PAMGuard). &nbsp;</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Local time display: displays the
 computers local time on the main display panel. </p>
@@ -4486,13 +4507,13 @@ channels are assigned to a hydrophone. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Play back of high frequency wav files through National Instruments (NI)
-cards: When analysing wav files, sound can be output at high frequency
-(depending on the specification of the NI card). The primary motivation for
-this has been to develop a test bed for high frequency sound acquisition
-whereby we can play 500kHz recordings of harbour porpoise out of an NI card on
-one machine, into NI cards on a different machine which are testing high
-frequency versions of the click detector.</p>
+</span>Play back of high frequency wav files through National Instruments (NI) cards:
+When analysing wav files, sound can be output at high frequency (depending on
+the specification of the NI card). The primary motivation for this has been to
+develop a test bed for high frequency sound acquisition whereby we can play
+500kHz recordings of harbour porpoise out of an NI card on one machine, into NI
+cards on a different machine which are testing high frequency versions of the
+click detector.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4800,9 +4821,9 @@ now been fixed. </p>
 
 <p class=MsoNormal><b>Sound Recorder</b></p>
 
-<p class=MsoNormal>Level meters are shown for the correct channels (after
-channel numbering has been changed). Occasional crash due to synchronisation
-problems when &nbsp;multi-threading now fixed.</p>
+<p class=MsoNormal>Level meters are shown for the correct channels (after channel
+numbering has been changed). Occasional crash due to synchronisation problems
+when &nbsp;multi-threading now fixed.</p>
 
 <p class=MsoNormal><b>Whistle Detector</b></p>
 
@@ -5239,7 +5260,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <h2>0.5b&nbsp;&nbsp;&nbsp; 31 August 2007 </h2>
 
-<p class=MsoNormal>Requires Java 6 Update 2 (http://java.com/en/download/manual.jsp)</p>
+<p class=MsoNormal>Requires Java 6 Update 2
+(http://java.com/en/download/manual.jsp)</p>
 
 <p class=MsoNormal>Major new features include:</p>
 
