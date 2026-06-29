@@ -1177,11 +1177,6 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 		return dataBlockPrefix;
 	}
 
-	@Override
-	public String getModuleSummary(String format) {
-		// TODO Auto-generated method stub
-		return super.getModuleSummary(format);
-	}
 
 	@Override
 	public Object getShortUnitType() {
@@ -1343,7 +1338,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 	@Override
 	public String getModuleSummary(boolean clear, String format) {
 		
-		if(format.equals("json")) return null;
+		if(!format.equals("csv")) return null;
 		
 		ClickIdentifier clickId = getClickIdentifier();
 		if (clickId == null) {

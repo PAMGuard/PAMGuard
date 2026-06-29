@@ -157,7 +157,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			}
 		}
 		
-		String globPrefix = GlobalArguments.getParam(RecorderControl.GlobalWavPrefixArg);
+		String globPrefix = GlobalArguments.getParam(RecorderControl.GlobalWavPrefixArg2);
 		if (globPrefix != null) {
 			if (globPrefix.length()<6000) { // why was this restricted to 6 ? 
 				recorderSettings.fileInitials = globPrefix; // remember it. 
@@ -480,20 +480,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
-		
-		String globPrefix = GlobalArguments.getParam(FolderInputSystem.GlobalWavPrefixArg);
-		if (globPrefix != null) {
-			if (globPrefix.length()<6) {
-				recorderSettings.fileInitials = globPrefix; // remember it. 
-			}
-			else {
-				System.err.println("Unable to set recording storage folder " + globFolder);
-			}
-		}
-
-
-		newParams();
-		
+				
 		return true;
 	}
 

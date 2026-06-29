@@ -97,11 +97,11 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 
 		long minKeepSamples = 0;
 		float sr = getSampleRate();
-		if (this.getNaturalLifetimeSeconds() == 0) {
+		if (this.getNaturalLifetime() == 0) {
 			minKeepSamples = (long) (sr > 100000 ? sr / 2 : sr);
 		}
 		else {
-			minKeepSamples = (long) (this.naturalLifetimeSeconds/1000. * sr);
+			minKeepSamples = (long) (this.naturalLifetime/1000. * sr);
 		}
 
 		//			long firstWantedTime = (long) (this.naturalLifetime/1000. * getSampleRate());

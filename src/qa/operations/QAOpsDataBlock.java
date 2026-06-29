@@ -10,7 +10,7 @@ public class QAOpsDataBlock extends PamDataBlock<QAOpsDataUnit> {
 	public QAOpsDataBlock(PamProcess parentProcess) {
 		super(QAOpsDataUnit.class, "QA Ops Data", parentProcess, 0);
 		SetLogging(new QAOpsLogging(this));
-		setNaturalLifetimeSeconds(3600*24);
+		setNaturalLifetime(3600*24);
 	}
 
 

@@ -24,7 +24,7 @@ public class ListeningProcess extends PamProcess {
 				"Listening Effort", this, 0);
 		effortDataBlock.setOverlayDraw(new ListeningEffortGraphics(listeningControl));
 		effortDataBlock.setPamSymbolManager(new StandardSymbolManager(effortDataBlock, ListeningEffortGraphics.defSymbol, true));
-		effortDataBlock.setNaturalLifetimeSeconds(3600 * 3);
+		effortDataBlock.setNaturalLifetime(3600 * 3);
 		effortDataBlock.SetLogging(new ListeningEffortLogging(listeningControl, effortDataBlock));
 		effortDataBlock.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
 		addOutputDataBlock(effortDataBlock);
@@ -32,7 +32,7 @@ public class ListeningProcess extends PamProcess {
 		heardDataBlock = new PamDataBlock<ThingHeard>(ThingHeard.class, 
 				"Things Heard", this, 0);
 		heardDataBlock.setOverlayDraw(thingHeardGraphics = new ThingHeardGraphics(listeningControl));
-		heardDataBlock.setNaturalLifetimeSeconds(3600 * 3);
+		heardDataBlock.setNaturalLifetime(3600 * 3);
 		heardDataBlock.SetLogging(new ThingHeardLogging(listeningControl, heardDataBlock));
 		heardDataBlock.setPamSymbolManager(new StandardSymbolManager(heardDataBlock, ThingHeardGraphics.defaultSymbol, "Type"));
 		addOutputDataBlock(heardDataBlock);

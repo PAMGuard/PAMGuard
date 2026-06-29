@@ -1060,8 +1060,8 @@ public class DifarProcess extends PamProcess {
 	}
 
 	public void setDataKeepTimes() {
-		queuedDifarData.setNaturalLifetimeSeconds(difarControl.difarParameters.queuedDataKeepTime * 60);
-		processedDifarData.setNaturalLifetimeSeconds(difarControl.difarParameters.processedDataKeepTime * 60);
+		queuedDifarData.setNaturalLifetime(difarControl.difarParameters.queuedDataKeepTime * 60);
+		processedDifarData.setNaturalLifetime(difarControl.difarParameters.processedDataKeepTime * 60);
 	}
 
 	@Override

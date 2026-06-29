@@ -180,7 +180,7 @@ public class OneBandControl extends PamControlledUnit implements PamSettings {
 	}
 
 	@Override
-	public String getModuleSummary(String format) {
+	public String getModuleSummary(boolean clear, String format) {
 		// TODO Auto-generated method stub
 		OneBandDataUnit lastUnit = (OneBandDataUnit) oneBandProcess.getOutputDataBlock(0).getLastUnit();
 		if(format.equals("json")) {
@@ -189,7 +189,7 @@ public class OneBandControl extends PamControlledUnit implements PamSettings {
 			return jsonString;
 		}
 		
-		return super.getModuleSummary(format);
+		return super.getModuleSummary(clear, format);
 	}
 
 	@Override

@@ -98,7 +98,7 @@ public class DataKeepDialog extends PamDialog {
 			listPanel.add(new JLabel(" seconds", JLabel.LEFT), c);
 			int t = dataKeeper.getKeepTimeSeconds(dataBlock);
 			if (t == 0) {
-				t = Math.max(t, dataBlock.getNaturalLifetimeSeconds());
+				t = Math.max(t, dataBlock.getNaturalLifetime());
 			}
 			listEdits[i].setText(String.format("%d", t));
 			listEdits[i].setToolTipText(mainTip);

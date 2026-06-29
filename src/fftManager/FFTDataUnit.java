@@ -143,7 +143,7 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 		return magSqData;
 	}
 	
-	public double[] getMagitudeStage(String stage) {
+	/*public double[] getMagitudeStage(String stage) {
 		if (fftData == null) {
 			return null;
 		}
@@ -176,7 +176,7 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 					getParentDataBlock().getSampleRate(), magSqData.length*2, true, true, stage);
 		}
 		return magSqData;
-	}
+	}*/
 
 	/**
 	 * Return the values in decibels (spectrum level I think).  

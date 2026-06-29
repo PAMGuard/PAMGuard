@@ -61,7 +61,7 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		
 		setOverlayDraw(new OfflineEventGraphics(this));
 		this.setPamSymbolManager(new StandardSymbolManager(this, OfflineEventGraphics.defSymbol, true));
-		setNaturalLifetimeSeconds(120);
+		setNaturalLifetime(120);
 		
 	}
 	
@@ -217,7 +217,7 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		if (pamDataUnits.isEmpty())
 			return 0;
 		GroupDetection clickTrain;
-		long firstWantedTime = currentTimeMS - this.getNaturalLifetimeSeconds() * 1000;
+		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		
 		int i = 0;

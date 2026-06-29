@@ -108,7 +108,7 @@ public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 		//			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
 		//		}
 
-		gpsDataBlock.setNaturalLifetimeSeconds(1);
+		gpsDataBlock.setNaturalLifetime(1);
 		if (PamModel.getPamModel() != null) {
 			PamModel.getPamModel().setGpsDataBlock(gpsDataBlock);
 		}

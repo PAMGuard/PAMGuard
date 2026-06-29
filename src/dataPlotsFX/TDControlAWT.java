@@ -229,7 +229,7 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 		}
 	}
 	
-	private class NetRxDataObserver extends PamObserverAdapter {
+	private class NetRxDataObserver extends DataObserver {
 
 		
 			@Override

@@ -1880,7 +1880,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
     	fftData.setNaturalLifetimeMillis(0);
     	rawData.setNaturalLifetimeMillis(0);
     	if (roccaContourDataBlock != null) {
-        	roccaContourDataBlock.setNaturalLifetimeSeconds(0);
+        	roccaContourDataBlock.setNaturalLifetime(0);
     	}
     	
         /* clear the FFTDataBlock for garbage collection */

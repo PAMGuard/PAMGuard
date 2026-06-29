@@ -28,7 +28,7 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 		/*synchronized(vesselMapSyncLock) {
 			aisVesselMap = new HashMap<Integer,AISDataUnit>();
 		}*/
-		setNaturalLifetimeSeconds(600);
+		setNaturalLifetime(600);
 	}
 	/**
 	 * aisDataUnit is always a new unit extracted from a 

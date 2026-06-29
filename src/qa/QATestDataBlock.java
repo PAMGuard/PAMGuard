@@ -14,7 +14,7 @@ public class QATestDataBlock extends SuperDetDataBlock<QATestDataUnit, QASequenc
 		super(QATestDataUnit.class, dataName, qaDataProcess, 0, !isGenerator, SuperDetDataBlock.ViewerLoadPolicy.LOAD_OVERLAPTIME);
 		this.qaDataProcess = qaDataProcess;
 		setClearAtStart(false);
-		setNaturalLifetimeSeconds(3600*24*365);
+		setNaturalLifetime(3600*24*365);
 	}
 	
 	@Override

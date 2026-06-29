@@ -26,7 +26,7 @@ public class QADataBlock<Tunit extends QADataUnit> extends SuperDetDataBlock<Tun
 		this.isGenerator = isGenerator;
 		this.isAnalyser = !isGenerator;
 		this.qaDataProcess = qaDataProcess;
-		setNaturalLifetimeSeconds(300);
+		setNaturalLifetime(300);
 	}
 
 	@Override
@@ -50,8 +50,8 @@ public class QADataBlock<Tunit extends QADataUnit> extends SuperDetDataBlock<Tun
 	}
 
 	@Override
-	public int getNaturalLifetimeSeconds() {
-		return Math.max(super.getNaturalLifetimeSeconds(), this.minLifetimeSecs);
+	public int getNaturalLifetime() {
+		return Math.max(super.getNaturalLifetime(), this.minLifetimeSecs);
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class WhistleEventDetector extends PamProcess {
 		
 		addOutputDataBlock(eventDataBlock = new PamDataBlock<EventDataUnit>(EventDataUnit.class, "Whistle Events", 
 				this, whistleControl.whistleParameters.channelBitmap)); 
-		eventDataBlock.setNaturalLifetimeSeconds(60);
+		eventDataBlock.setNaturalLifetime(60);
 		eventDataBlock.setOverlayDraw(new WhistleEventGraphics(this));
 		eventDataBlock.setPamSymbolManager(new StandardSymbolManager(eventDataBlock, WhistleEventGraphics.defaultSymbol, true));
 		eventDataBlock.SetLogging(whistleEventLogger = new WhistleEventLogger(this, eventDataBlock));

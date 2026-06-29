@@ -28,7 +28,7 @@ public class ClickGroupDataBlock<t extends GroupDetection> extends AcousticDataB
 		if (pamDataUnits.isEmpty())
 			return 0;
 		GroupDetection clickTrain;
-		long firstWantedTime = currentTimeMS - this.getNaturalLifetimeSeconds() * 1000;
+		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		
 		int i = 0;

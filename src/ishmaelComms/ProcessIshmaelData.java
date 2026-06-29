@@ -60,7 +60,7 @@ public class ProcessIshmaelData extends PamProcess implements ActionListener {
 		ishmaelDataBlock.setOverlayDraw(new IshmaelGraphics(ishmaelController));
 		ishmaelDataBlock.setPamSymbolManager(new StandardSymbolManager(ishmaelDataBlock, IshmaelGraphics.defaultSymbol, true));
 
-		ishmaelDataBlock.setNaturalLifetimeSeconds(600);
+		ishmaelDataBlock.setNaturalLifetime(600);
 		
 		timer = new Timer(100, this);
 		

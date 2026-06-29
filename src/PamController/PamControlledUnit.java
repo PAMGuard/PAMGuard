@@ -748,16 +748,10 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		return unitTaskManager.get(i);
 	}
 
-	/**
-	 * Get a module summary text string for shorthand output to anyting wanting a 
-	 * short summary of data state / numbers of detections. <br> You should not 
-	 * override this version of the function, but instead override getModuleSummary(boolean clear)
-	 * which allows for optional clearing of summary data. 
-	 * @return module summary string - goings on since the last call to this function
-	 */
-	public String getModuleSummary(String format) {
-		return getModuleSummary(true, format);
+	public String getModuleSummary(boolean clear) {
+		return getModuleSummary(clear,"csv");
 	}
+	
 
 	/**
 	 * Get a module summary text string for shorthand output to anything wanting a 

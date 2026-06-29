@@ -40,7 +40,7 @@ public class TrackedGroupProcess extends PamProcess{
 		this.parentDataBlock = parentDataBlock;
 		trackedGroupData = new TrackedGroupDataBlock("DIFAR Tracked Groups", difarControl, this, 0);
 		trackedGroupData.SetLogging(new TrackedGroupSqlLogging(difarControl, trackedGroupData));
-		trackedGroupData.setNaturalLifetimeSeconds(3600*8);
+		trackedGroupData.setNaturalLifetime(3600*8);
 		TrackedGroupOverlayGraphics detectionOverlayGraphics= new TrackedGroupOverlayGraphics(difarControl, trackedGroupData);
 		trackedGroupData.setOverlayDraw(detectionOverlayGraphics);
 		trackedGroupData.setPamSymbolManager(new StandardSymbolManager(trackedGroupData, TrackedGroupOverlayGraphics.defaultSymbol, true));
