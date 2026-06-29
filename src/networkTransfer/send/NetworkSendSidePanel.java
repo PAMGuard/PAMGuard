@@ -96,9 +96,18 @@ public class NetworkSendSidePanel implements PamSidePanel {
 	}
 
 	public void timerCall() {
-		ipAddress.setText(String.format("%s (%d)", networkSender.networkSendParams.ipAddress, networkSender.networkSendParams.portNumber));
-		status.setText(networkSender.getStatus());
-		queueLength.setText(String.format("%d", networkSender.getQueueLength()));
-		queueSize.setText(String.format("%d", networkSender.getQueueSize()));
+		String ipString = String.format("%s (%d)", networkSender.networkSendParams.ipAddress, networkSender.networkSendParams.portNumber);
+		if(!ipString.equals(ipAddress.getText())) {
+			ipAddress.setText(ipString);
+		}
+		if(networkSender.getStatus()==null || !networkSender.getStatus().equals(status.getText())) {
+			status.setText(networkSender.getStatus());
+		}
+		if(!String.format("%d", networkSender.getQueueLength()).equals(queueLength.getText())) {
+			queueLength.setText(String.format("%d", networkSender.getQueueLength()));
+		}
+		if(!String.format("%d", networkSender.getQueueSize()).equals(queueSize.getText())) {
+			queueSize.setText(String.format("%d", networkSender.getQueueSize()));
+		}
 	}
 }

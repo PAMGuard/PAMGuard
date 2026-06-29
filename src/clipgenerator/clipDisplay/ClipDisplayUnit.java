@@ -430,7 +430,14 @@ public class ClipDisplayUnit extends PamPanel {
 		@Override
 		public String getToolTipText(MouseEvent event) {
 			// TODO Auto-generated method stub
-		return clipDataUnit.getSummaryString();
+			if(clipDisplayPanel.clipDisplayParameters.showFullSummary) {
+				return clipDataUnit.getSummaryString();
+			} else {
+				String shortSummary = "<html><p>Clip UID: "+String.valueOf(clipDataUnit.getUID())+"</p>";
+				shortSummary=shortSummary+"<p>Clip UTC: "+PamCalendar.formatTime(clipDataUnit.getLastUpdateTime(), 3, false)+"</p>";
+				return shortSummary;
+			}
+			
 //			return "Boo";
 		}
 		

@@ -145,7 +145,7 @@ public class RWEControl extends PamControlledUnit implements PamSettings {
 
 
 	@Override
-	public String getModuleSummary(boolean clear) {
+	public String getModuleSummary(boolean clear, String format) {
 		return rweProcess.getModuleSummary(clear);
 	}
 

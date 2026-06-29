@@ -293,7 +293,7 @@ public class SimProcess extends DaqSystem implements PamSettings {
 		int nSamples = (int) daqControl.acquisitionParameters.sampleRate / 10;
 		double nse;
 		double[] channelData;
-		long currentTimeMillis = startTimeMillis + totalSamples / 1000;
+		long currentTimeMillis = (long) (startTimeMillis + totalSamples * 1000L / (long)getSampleRate());
 		SimObject simObject;
 		for (int i = 0; i < nChan; i++) {
 			channelData = new double[nSamples];

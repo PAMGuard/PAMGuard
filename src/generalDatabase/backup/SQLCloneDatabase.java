@@ -1,6 +1,7 @@
 package generalDatabase.backup;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,6 +34,7 @@ import generalDatabase.sqlite.SqliteSystem;
 public class SQLCloneDatabase extends CopyDatabaseFile {
 
 	private CopyManager copyManager;
+	protected String lastNewDatabasePath;
 
 	public SQLCloneDatabase(ActionMaker actionMaker, BackupStream backupStream) {
 		super(actionMaker, backupStream);
@@ -41,13 +43,21 @@ public class SQLCloneDatabase extends CopyDatabaseFile {
 
 	@Override
 	public boolean doAction(BackupManager backupManager, BackupStream backupStream, StreamItem streamItem) throws BackupException {
-		DBControlUnit dbControlUnit = DBControlUnit.findDatabaseControl();
+		String destPath = getLocalDestination();
+		String newFile = getNewDatabaseName(destPath);
+		boolean success = cloneDatabase(backupManager, backupStream, newFile);
+		if(success) {
+			this.lastNewDatabasePath = newFile;
+		}
+		return success;
+	}
+	
+	protected String getLocalDestination() throws BackupException {
 		FileLocation dest = getCopySettings().destLocation;
 		if (dest == null) {
 			throw new BackupException("No destination folder set");
 		}
-		String newFile = getNewDatabaseName(dest.path);
-		return cloneDatabase(backupManager, backupStream, newFile);
+		return dest.path;
 	}
 
 	// bit of a cheat to make a new temp name every call since it's not
@@ -61,15 +71,16 @@ public class SQLCloneDatabase extends CopyDatabaseFile {
 	 * @param parentWindow
 	 * @param newDatabaseName
 	 * @return
+	 * @throws BackupException 
 	 */
-	public boolean cloneDatabase(BackupManager backupManager, BackupStream stream, String newDatabaseName) {
+	public boolean cloneDatabase(BackupManager backupManager, BackupStream stream, String newDatabaseName) throws BackupException {
 
 		DBControlUnit pamguardDatabase = DBControlUnit.findDatabaseControl();
 
 		if (pamguardDatabase.getDatabaseSystem() instanceof SqliteSystem == false) {
 			String msg = String.format("Datase backup for database types %s is not implemented", pamguardDatabase.getDatabaseSystem().getSystemName());
 			WarnOnce.showWarning("Database backup", msg, WarnOnce.WARNING_MESSAGE, null);
-			return false;
+			throw new BackupException("Can only clone SQLite database files. The database requested to clone is of type "+pamguardDatabase.getDatabaseSystem().getClass().toString());
 		}
 
 		if (copyManager == null) {
@@ -108,8 +119,7 @@ public class SQLCloneDatabase extends CopyDatabaseFile {
 			return attachAndCopy(backupManager, stream, pamguardDatabase, extControl, newDatabaseName, tableInfo);
 		}
 		else {
-			return false;
-			//			return queryCopy(backupManager, stream, pamguardDatabase, extControl, tableInfo);
+			throw new BackupException("Can only clone SQLite database files. The database requested to clone is of type "+pamguardDatabase.getDatabaseSystem().getClass().toString());
 		}
 	}
 
@@ -176,9 +186,10 @@ public class SQLCloneDatabase extends CopyDatabaseFile {
 	 * @param extControl
 	 * @param tableInfo
 	 * @return
+	 * @throws BackupException 
 	 */
 	private boolean attachAndCopy(BackupManager backupManager, BackupStream stream,  DBControlUnit pamguardDatabase, 
-			DBControl extControl, String newDatabaseName, List<TableInformation> tableInfo) {
+			DBControl extControl, String newDatabaseName, List<TableInformation> tableInfo) throws BackupException {
 		// then close the other database so it can be attached to this connection
 		Connection dbCon = pamguardDatabase.getConnection().getConnection();
 		try {
@@ -203,7 +214,7 @@ public class SQLCloneDatabase extends CopyDatabaseFile {
 			boolean ans = attStmt.execute(att);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			throw new BackupException(e);
 		}
 		for (TableInformation tableInf : tableInfo) {
 			String msg = String.format("Copying table %s", tableInf.getTableName());

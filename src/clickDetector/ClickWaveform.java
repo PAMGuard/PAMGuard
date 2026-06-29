@@ -140,6 +140,9 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 	}
 
 	public void showClick(ClickDetection click) {
+		if(this.shouldDisplayClick(click)!=true) {
+			return;
+		}
 		synchronized (storedWaveformLock) {
 			storedClick = click;
 			setYScale();

@@ -1,6 +1,7 @@
 package networkTransfer.receive;
 
 import networkTransfer.NetworkObject;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 /**
  * interface for any network audio interpreter. The interpreter will have 

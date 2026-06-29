@@ -1,5 +1,8 @@
 package networkTransfer.receive;
 
+import networkTransfer.receive.status.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusValue;
+
 /**
  * Information for additional paired values that will get displayed in the main 
  * RXTable view. 

@@ -6,8 +6,10 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
 import PamUtils.LatLong;
+import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamVector;
 
 /**
  * Standard logging class for any PamDetection, but you'll want to extend it for any 
@@ -30,7 +32,7 @@ public class PamDetectionLogging extends SQLLogging {
 	PamTableDefinition tableDefinition;
 
 	// basic items available in any PamDetection.
-	PamTableItem channelMap, startSample, startSeconds, duration, lowFreq, highFreq, amplitude, detectionType;
+	PamTableItem channelMap, startSample, startSeconds, duration, lowFreq, highFreq, amplitude, detectionType,worldVector,realWorldVector;
 	// some extra items if Localisation data are available.
 	PamTableItem bearingAmbiguity;
 	PamTableItem[] bearing, range, depth, bearingError, rangeError, depthError;
@@ -74,7 +76,7 @@ public class PamDetectionLogging extends SQLLogging {
 			nSides = 2;
 		}
 		
-		bearing = new PamTableItem[nSides];
+		bearing = new PamTableItem[nSides];		
 		range = new PamTableItem[nSides];
 		depth = new PamTableItem[nSides];
 		bearingError = new PamTableItem[nSides];
@@ -92,6 +94,8 @@ public class PamDetectionLogging extends SQLLogging {
 			suffix = String.format("%d", i);
 			if (localisationFlags.hasLocContent(LocContents.HAS_BEARING))  {
 				tableDefinition.addTableItem(bearing[i] = new PamTableItem("bearing"+suffix, Types.DOUBLE));
+				tableDefinition.addTableItem(worldVector = new PamTableItem("worldVector", Types.DOUBLE));
+				tableDefinition.addTableItem(realWorldVector = new PamTableItem("realWorldVector", Types.DOUBLE));
 			}
 			range[i] = new PamTableItem("range"+suffix, Types.DOUBLE);
 			if (localisationFlags.hasLocContent(LocContents.HAS_RANGE)){
@@ -121,6 +125,21 @@ public class PamDetectionLogging extends SQLLogging {
 		}
 
 		setTableDefinition(tableDefinition);
+	}
+	
+	public void setWorldVectors(SQLTypes sqlTypes, PamDataUnit pamDetection) {
+			PamVector[]	worldVecs =	pamDetection.getLocalisation().getWorldVectors();
+			if (worldVecs != null && worldVecs.length > 0) {
+				double angle = Math.PI/2-Math.atan2(worldVecs[0].getElement(1), worldVecs[0].getElement(0));
+				angle = PamUtils.constrainedAngleR(angle);
+				worldVector.setValue(angle);				
+			}
+			worldVecs = pamDetection.getLocalisation().getRealWorldVectors();
+			if (worldVecs != null && worldVecs.length > 0) {
+				double angle = Math.PI/2-Math.atan2(worldVecs[0].getElement(1), worldVecs[0].getElement(0));
+				angle = PamUtils.constrainedAngleR(angle);
+				realWorldVector.setValue(angle);
+			}
 	}
 
 	@Override
@@ -174,6 +193,11 @@ public class PamDetectionLogging extends SQLLogging {
 		if (bearingAmbiguity != null && abstractLocalisation != null) {
 			bearingAmbiguity.setValue(abstractLocalisation.bearingAmbiguity());
 		}
+		
+		if(pamDetection.getLocalisation()!=null) {
+			setWorldVectors(sqlTypes,pamDetection);
+		}
+		
 		double[] angles = abstractLocalisation.getPlanarAngles();
 		int nBearings = 0;
 		if (angles != null) {

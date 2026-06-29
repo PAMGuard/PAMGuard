@@ -211,7 +211,10 @@ public class ArraySensorControl extends PamControlledUnit implements AnalogSenso
 	
 	
 	@Override
-	public String getModuleSummary(boolean clear) {
+	public String getModuleSummary(boolean clear, String format) {
+		if(format==null || !format.equalsIgnoreCase("XML")) {
+			return null;
+		}
 		AnalogArraySensorDataUnit lastDataUnit = this.analogSensorProcess.getSensorDataBlock().getLastUnit();
 
 		StringBuilder sb = new StringBuilder();

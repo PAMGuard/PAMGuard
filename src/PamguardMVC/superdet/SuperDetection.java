@@ -40,6 +40,8 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 	 * since clicks might now be associated with multiple event types.   
 	 */
 	private ArrayList<SubdetectionInfo<T>> subdetectionsRemoved = new ArrayList<SubdetectionInfo<T>>();
+	
+	private ArrayList<SubdetectionInfo<T>> lastAddedSubDetections = new ArrayList<SubdetectionInfo<T>>();
 
 	private T lastData;
 	
@@ -109,6 +111,7 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 			
 			SubdetectionInfo<T> info = new SubdetectionInfo<T>(subDetection, getDatabaseIndex(), getUID());
 			subDetections.add(info);
+			lastAddedSubDetections.add(info);
 			PamSort.oneIterationBackSort(subDetections); // make sure all are in order. 
 			
 			sortSuperDetTimes();
@@ -532,7 +535,13 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 	public ArrayList<SubdetectionInfo<T>> getSubdetectionsRemoved() {
 		return subdetectionsRemoved;
 	}
-	
+
+	public ArrayList<SubdetectionInfo<T>> getAndResetLastAddedSubDetections() {
+		ArrayList<SubdetectionInfo<T>> tempCopy = (ArrayList<SubdetectionInfo<T>>) lastAddedSubDetections.clone();
+		lastAddedSubDetections = new ArrayList<SubdetectionInfo<T>>();
+		return tempCopy;
+	}
+
 	/**
 	 *  clears the list of subdetections that have been removed 
 	 */

@@ -119,5 +119,11 @@ public class NullClassifier implements ClickIdentifier {
 		return null;
 	}
 
+	@Override
+	public String getClassificationSummary(boolean clear) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

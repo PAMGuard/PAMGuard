@@ -47,7 +47,7 @@ import PamModel.PamModel;
 import PamUtils.PamCalendar;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.datakeeper.DataKeeper;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 /**
  * @author Doug Gillespie
@@ -894,7 +894,14 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	@Override
 	public ProcessAnnotation getAnnotation(PamDataBlock pamDataBlock, int annotation) {
 		// return a single default annotation
+		if(pamControlledUnit==null) {
+			return new ProcessAnnotation(this, this, pamDataBlock.getDataName(), getProcessName());
+		}
 		return new ProcessAnnotation(this, this, pamControlledUnit.getUnitType(), getProcessName());
+	}
+	
+	public ProcessAnnotation getAnnotationWithoutControl(PamDataBlock pamDataBlock, int annotation) {
+		return new ProcessAnnotation(this, this, pamDataBlock.getDataName(), getProcessName());
 	}
 	
 	@Override

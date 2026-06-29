@@ -1,19 +1,27 @@
-package networkTransfer.receive;
+package networkTransfer.receive.status;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ListIterator;
 import java.util.Set;
 
 import GPS.GpsDataUnit;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import networkTransfer.receive.MqttNetReceiver;
+import networkTransfer.receive.MqttReceiveThread;
+import networkTransfer.receive.NetworkReceiver;
 
 public class BuoyStatusDataBlock extends PamDataBlock<BuoyStatusDataUnit> {
+	
+	NetworkReceiver netReceiver;
 
-	public BuoyStatusDataBlock(PamProcess parentProcess) {
+	public BuoyStatusDataBlock(PamProcess parentProcess, NetworkReceiver networkReceiver) {
 		super(BuoyStatusDataUnit.class, "Buoy Status Data", parentProcess, 0);
 		super.setClearAtStart(false);
+		this.netReceiver = networkReceiver;
 	}
 
 
@@ -50,6 +58,67 @@ public class BuoyStatusDataBlock extends PamDataBlock<BuoyStatusDataUnit> {
 ////			du.setGpsData(pamDataUnit.getGpsData());
 ////		}
 //	}
+	
+	
+	public ArrayList<BuoyStatusDataUnit> getUniqueBuoyStatuses() {
+		ArrayList<Integer> buoyIdsRegistered = new ArrayList<Integer>();
+		ArrayList<BuoyStatusDataUnit> statuses = new ArrayList<BuoyStatusDataUnit>();
+		for(BuoyStatusDataUnit unit:this.getDataCopy()) {
+			if(!buoyIdsRegistered.contains(unit.getBuoyId1())){
+				statuses.add(unit);
+				buoyIdsRegistered.add(unit.getBuoyId1());
+			}
+		}
+		return statuses;
+	}
+	
+	public int getNBuoysRegistered() {
+		return getUniqueBuoyStatuses().size();
+	}
+	
+	public boolean isBuoySocketOpen(BuoyStatusDataUnit b) {
+		if(this.netReceiver.connectionThread instanceof MqttNetReceiver) {
+			MqttNetReceiver mqttThread =  (MqttNetReceiver) this.netReceiver.connectionThread;
+			if(mqttThread == null) {
+				return false;
+			}
+			MqttReceiveThread buoyReceiver = mqttThread.getBuoyReceiveThread(b.getBuoyId1());
+			if(buoyReceiver==null) {
+				return false;
+			}else {
+				return buoyReceiver.isAlive();
+			}
+		}else {
+			return b.getSocket()!=null;
+		}
+		
+	}
+	
+	public int getNBuoysConnectedAndRunning() {
+		int count = 0;
+		for(BuoyStatusDataUnit unit:getUniqueBuoyStatuses()) {
+			long timeSinceLastData = System.currentTimeMillis()-unit.getBuoyStatusData().getLastDataTime();
+			long tenMinutes = 1000L*60L*10L;
+			if(timeSinceLastData>tenMinutes) {
+				//System.out.println(unit.getBuoyName()+": Last buoy data time was "+unit.getLastDataTime()+" at "+PamCalendar.getTime()+". Milliseconds since last data: "+timeSinceLastData);
+				continue;
+			}
+			if(unit.getBuoyStatusData()==null) {
+				//System.out.println(unit.getBuoyName()+": buoy status data is null");
+				continue;
+			}
+			if(!isBuoySocketOpen(unit)) {
+				//System.out.println(unit.getBuoyName()+": buoy socket is not open");
+				continue;
+			}
+			if(unit.getCommandStatus()!=NetworkReceiver.NET_PAM_COMMAND_START) {
+				System.out.println(unit.getBuoyName()+": buoy pamguard is not running");
+				continue;
+			}
+			count++;
+		}
+		return count;
+	}
 	
 	public synchronized BuoyStatusDataUnit findDataUnit(int channelMap) {
 		ListIterator<BuoyStatusDataUnit> li = getListIterator(0);

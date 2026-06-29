@@ -26,6 +26,14 @@ public class RawDataUnit extends PamDataUnit<PamDataUnit,SuperDetection> impleme
 	public RawDataUnit(long timeMilliseconds, int channelBitmap, long startSample, long duration) {
 		super(timeMilliseconds, channelBitmap, startSample, duration);
 	}
+	
+	public void setSampleDuration(Long sampleDuration) {
+		super.setSampleDuration(sampleDuration);
+	}
+	
+	public void setDurationInMilliseconds(double durationMs) {
+		super.setDurationInMilliseconds(durationMs);
+	}
 
 	/**
 	 * @return Returns the rawData.

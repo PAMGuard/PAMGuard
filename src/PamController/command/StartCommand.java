@@ -5,23 +5,19 @@ import PamController.PamController;
 public class StartCommand extends ExtCommand {
 	
 	private String returnString;
-	
-	public static String commandId = "start";
 
 	public StartCommand() {
 //		super("start", true);
-		super(commandId, true); // need true in batch for reprocess choice stuff to work. 
+		super("start", false);
 		returnString = this.getName();	// this is what ExtCommand defaults to
 	}
 
 	@Override
 	public String execute(String command) {
-		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-			PamController.getInstance().startOfflineTasks();
+		if(PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING) {
+			return "Pamguard already running";
 		}
-		else {
-			boolean ok = PamController.getInstance().pamStart();
-		}
+		boolean ok = PamController.getInstance().pamStart();
 		return getReturnString();
 	}
 

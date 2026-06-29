@@ -30,11 +30,11 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserverAdapter;
-import networkTransfer.receive.BuoyStatusDataBlock;
-import networkTransfer.receive.BuoyStatusDataUnit;
-import networkTransfer.receive.BuoyStatusValue;
 import networkTransfer.receive.NetworkReceiver;
 import networkTransfer.receive.PairedValueInfo;
+import networkTransfer.receive.status.BuoyStatusDataBlock;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusValue;
 
 @Deprecated // Use RXTablePanel 2.  
 public class RXTablePanel {

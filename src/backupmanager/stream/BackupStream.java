@@ -18,8 +18,10 @@ import backupmanager.BackupProgress.STATE;
 import backupmanager.action.ActionMaker;
 import backupmanager.action.BackupAction;
 import backupmanager.action.BackupException;
+import backupmanager.action.FTPFile;
 import backupmanager.filter.BackupFilter;
 import backupmanager.filter.PassAllBackupFilter;
+import backupmanager.network.TransferLoginException;
 import backupmanager.settings.ActionSettings;
 import backupmanager.settings.BackupSettings;
 
@@ -93,6 +95,14 @@ public abstract class BackupStream implements PamSettings, BackupFunction {
 	private boolean runAction(BackupManager backupManager, List<StreamItem> sourceItems, BackupAction action) {
 		// need to find database entries that have a null or value for this action
 
+		if(action.requiresFTPConnection()) {
+			try {
+				backupManager.getFtpClient().connect();
+			} catch (TransferLoginException e) {
+				System.out.println("Could not connect to ftp server. Error: "+e.getMessage());
+			}
+		}
+		
 		List<StreamItem> toDoList = getToDoList(sourceItems, action);
 		
 		BackupFilter backupFilter = action.getBackupFilter();
@@ -118,7 +128,11 @@ public abstract class BackupStream implements PamSettings, BackupFunction {
 				try {
 					ok = doAction(backupManager, action, item);
 				} catch (BackupException e) {
-					System.out.println("Error in BackupStream.runAction:" + e.getMessage());
+					System.out.print("Error in BackupStream.runAction. Exception type: " +e.getClass().getName()+" error: "+ e.getMessage());
+					if(e.getCause()!=null && e.getCause().getMessage()!=null) {
+						System.out.print(" cause type: "+e.getCause().getClass()+". Cause message: "+e.getCause().getMessage());
+					}
+					System.out.println(" Failure item: "+item.getName());
 					backupManager.updateProgress(new BackupProgress(this, action, STATE.PROBLEM, toDoList.size(), 
 							iDone, "Error " + e.getMessage()));
 					ok = false; //otherwise, OK stays true! This will leave a true null entry in the database, so file will be selected next time around
@@ -131,6 +145,10 @@ public abstract class BackupStream implements PamSettings, BackupFunction {
 			}
 		}
 		backupManager.updateProgress(new BackupProgress(this, action, STATE.STREAMDONE));
+		
+		if(action.requiresFTPConnection()) {
+			backupManager.getFtpClient().disconnect();
+		}
 		
 		return ok;
 	}

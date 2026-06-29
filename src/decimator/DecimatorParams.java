@@ -90,6 +90,8 @@ public class DecimatorParams implements Serializable, Cloneable, ManagedParamete
 		try {
 			DecimatorParams dp = (DecimatorParams) super.clone();
 			dp.filterParams = filterParams.clone();
+			dp.rawDataSource = this.rawDataSource;
+			dp.interpolation = this.interpolation;
 			if (dp.channelMap == 0) {
 				dp.channelMap = 0xFFFF;
 			}

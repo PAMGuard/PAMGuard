@@ -1,4 +1,4 @@
-package networkTransfer.receive;
+package networkTransfer.receive.status;
 
 import java.sql.Connection;
 import java.sql.Types;
@@ -10,6 +10,7 @@ import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
+import networkTransfer.receive.NetworkReceiver;
 
 public class BuoyStatusLogging extends SQLLogging {
 

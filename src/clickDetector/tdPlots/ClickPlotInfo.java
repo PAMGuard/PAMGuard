@@ -121,9 +121,7 @@ public class ClickPlotInfo extends TDDataInfo {
 			return false;
 		}
 		
-		if (btDisplayParams.displayChannels > 0 && (btDisplayParams.displayChannels & click.getChannelBitmap()) == 0) return false;
-		
-		return true;
+		return this.btDisplayParams.shouldPlot(click);
 	}
 
 	@Override
@@ -208,12 +206,12 @@ public class ClickPlotInfo extends TDDataInfo {
 	}
 	
 	public int getDisplayChannels() {
-		return btDisplayParams.displayChannels;
+		return btDisplayParams.getDisplayChannels();
 	
 	}
 	
 	public void setDisplayChannels(int displayChannels) {
-		btDisplayParams.displayChannels = displayChannels;
+		btDisplayParams.setDisplayChannels(displayChannels);
 		updateSettings();
 	}
 

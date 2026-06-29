@@ -11,6 +11,7 @@ import java.util.ListIterator;
 import PamUtils.PamCalendar;
 import PamguardMVC.debug.Debug;
 import networkTransfer.NetworkObject;
+import networkTransfer.NetworkReceiverInterface;
 import networkTransfer.send.NetworkObjectPacker;
 
 public class NetworkReceiveThread implements Runnable {
@@ -19,12 +20,7 @@ public class NetworkReceiveThread implements Runnable {
 	private InputStream inStream;
 //	private byte[] duBuffer = new byte[0];
 //	private int duBufferPos;
-	private int duSize;
-	private short buoyId1;
-	private short buoyId2;
-	private short dataId1;
-	private int dataId2;
-	private int dataLen;
+	
 //	private int unitBytesRead;
 	private volatile boolean keepRunning = true;
 	private NetworkDataUser networkDataUser;
@@ -60,13 +56,9 @@ public class NetworkReceiveThread implements Runnable {
 	}
 
 	public void receiveData() {
-		byte[] receiveBuffer = new byte[1024*20];
-		int bytesRead;
-		int bytesLeft;
 		DataInputStream dis;
 		OutputStream doStream;
 		int headInt;
-		short dataVersion;
 		NetworkObjectPacker netObjectPacker = null;
 		try {
 			long t  = System.currentTimeMillis();
@@ -108,29 +100,9 @@ public class NetworkReceiveThread implements Runnable {
 				if (badHeads > 0) {
 					System.out.printf("Correct network header alignment restored after %d bytes\n", badHeads);
 				}
-				// now must be aligned on the start of real data. 
-				duSize = dis.readInt();        //4
-				dataVersion = dis.readShort(); //6
-				buoyId1 = dis.readShort();     //8
-				buoyId2 = dis.readShort();     //10
-				dataId1 = dis.readShort();     //12
-				dataId2 = dis.readInt();       //16
-				dataLen = dis.readInt();       //20
-				bytesLeft = duSize - 24;       // 24 is the size of the above + the HEADID code. 
-				if (receiveBuffer.length < bytesLeft) {
-					receiveBuffer = new byte[bytesLeft];
-				}		
-				bytesRead = 0;
-				// use readFully - will block until all data have arrived. Important with large packets. 
-				dis.readFully(receiveBuffer, 0, bytesLeft);
-				bytesRead = bytesLeft;
-				//					while (bytesRead < bytesLeft) {
-				//						bytesRead += dis.read(receiveBuffer, bytesRead, bytesLeft-bytesRead);
-				//					}
-				//					if (bytesRead< 0) {
-				//						break;
-				//					}
-				NetworkObject receivedObject = new NetworkObject(clientSocket, dataVersion, buoyId1, buoyId2, dataId1, dataId2, receiveBuffer, dataLen);
+				
+				NetworkObject receivedObject = NetworkReceiverInterface.readNetworkObject(dis, clientSocket);
+				
 //				Debug.out.println("Received " + receivedObject.toString());
 				
 				long interpretStart = System.currentTimeMillis();

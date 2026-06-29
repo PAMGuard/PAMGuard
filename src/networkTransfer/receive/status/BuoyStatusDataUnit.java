@@ -1,4 +1,4 @@
-package networkTransfer.receive;
+package networkTransfer.receive.status;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -10,6 +10,8 @@ import java.util.Set;
 import Acquisition.DaqStatusDataUnit;
 import Array.ArrayManager;
 import Array.Streamer;
+import Array.streamerOrigin.OriginSettings;
+import Array.streamerOrigin.StaticOriginSettings;
 import GPS.GPSDataBlock;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
@@ -18,6 +20,8 @@ import PamUtils.PamUtils;
 import PamguardMVC.LastDataUnitStore;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import javafx.util.Pair;
+import networkTransfer.receive.NetworkReceiver;
 
 /**
  * Class for collecting data to do with individual buoys receiving data
@@ -42,6 +46,7 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 	private Streamer hydrophoneStreamer;
 	private GPSDataBlock gpsDataBlock;
 	private double[] compassData;
+	private Pair<Long, Double> lastCommsPing;
 
 //	private boolean genericStringPairsChanged = true;
 	
@@ -66,10 +71,16 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 		gpsDataBlock = new GPSDataBlock(networkReceiver.getNetworkReceiveProcess());
 	}
 	
-	public void newDataObject(PamDataBlock dataBlock, PamDataUnit dataUnit, int blockSeq, int receivedBytes) {
+	public void newDataObject(PamDataBlock dataBlock, PamDataUnit dataUnit, int receivedBytes) {
 		buoyStatusData.setLastDataTime(dataUnit.getTimeMilliseconds());
 		totalPackets++;
 		lastDataUnitStore.addDataUnit(dataBlock, dataUnit, receivedBytes);
+	}
+	
+	public void receivedCommsPing(long time, double commStrength) {
+		this.lastCommsPing = new Pair<Long, Double>(time,commStrength);
+		this.buoyStatusData.setLastCommsStrength(commStrength);
+		this.buoyStatusData.setLastCommsTime(time);
 	}
 	
 	/**
@@ -88,12 +99,22 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 		unknownPackets++;
 	}
 	
+	public String getSiteName() {
+		int streamerId = ArrayManager.getArrayManager().getCurrentArray().getStreamerForPhone(this.getLowestChannel());
+		Streamer streamer = ArrayManager.getArrayManager().getCurrentArray().getStreamer(streamerId);
+		OriginSettings streamerOrigin = streamer.getOriginSettings();
+		if(streamerOrigin instanceof StaticOriginSettings) {
+			return ((StaticOriginSettings) streamerOrigin).getSiteName();
+		}
+		return "Unknown";
+	}
+	
 	/**
 	 * Get a standard string name for a buoy. 
 	 * @return a standard name in the form 'buoy xxx';
 	 */
 	public String getBuoyName() {
-		return String.format("Buoy %03d", buoyStatusData.getBuoyId1());
+		return String.format("pb%03d", buoyStatusData.getBuoyId1());
 	}
 
 	/**
@@ -169,7 +190,9 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 		return socket;
 	}
 	
-	
+	public void setIpAddr(InetAddress buoyWanIp) {
+		this.buoyStatusData.setIpAddr(buoyWanIp.toString());
+	}
 
 	public String getIPAddr() {
 		if (socket == null) {
@@ -183,6 +206,22 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 		return inetAddr.getHostAddress();
 	}
 	
+	public long getLastCommsPing() {
+		return buoyStatusData.getLastCommsTime();
+	}
+
+	public void setLastCommsPing(long lastCommsPing) {
+		this.buoyStatusData.setLastCommsTime(lastCommsPing);
+	}
+
+	public double getCommunicationsStrength() {
+		return this.buoyStatusData.getLastCommsStrength();
+	}
+
+	public void setCommunicationsStrength(double communicationsStrength) {
+		this.buoyStatusData.setLastCommsStrength(communicationsStrength);
+	}
+
 	public String getPort() {
 		if (socket == null) {
 			return null;
@@ -390,6 +429,13 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 	@Override
 	public String toString() {
 		return String.format("Status %s\n", buoyStatusData.toString());
+	}
+
+	public void setHousingMeasurements(double supplyVoltage, double power, double temperatureC, double humidityPercent) {
+		this.buoyStatusData.setPower(power);
+		this.buoyStatusData.setTemp(temperatureC);
+		this.buoyStatusData.setVoltage(supplyVoltage);
+		this.buoyStatusData.setHumidity(humidityPercent);
 	}
 
 //	/**

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import Filters.FilterBand;
 import Filters.FilterParams;
 import Filters.FilterType;
+import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
@@ -24,6 +25,8 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 public class DecimatorProcessW extends PamProcess {
 
 	private DecimatorControl decimatorControl;
+	
+	private DecimatorParams decimatorParams;
 
 	private DecimatorWorker decimatorWorker;
 
@@ -36,9 +39,19 @@ public class DecimatorProcessW extends PamProcess {
 	public DecimatorProcessW(DecimatorControl decimatorControl) {
 		super(decimatorControl, null);
 		this.decimatorControl = decimatorControl;
+		this.decimatorParams = decimatorControl.decimatorParams;
 		
 		addOutputDataBlock(outputDataBlock = new PamRawDataBlock(decimatorControl.getUnitName() + " Data", this,
 				0, decimatorControl.decimatorParams.newSampleRate));
+	}
+	
+	public DecimatorProcessW(PamControlledUnit controller, DecimatorParams decimatorParams) {
+		super(controller, null);
+		this.decimatorParams = decimatorParams;
+		
+		addOutputDataBlock(outputDataBlock = new PamRawDataBlock(controller.getUnitName()+" Decimator Data", this,
+				0, decimatorParams.newSampleRate));
+
 	}
 
 	@Override
@@ -59,8 +72,8 @@ public class DecimatorProcessW extends PamProcess {
 		sourceSampleRate = sampleRate;
 		//		super.setSampleRate(decimatorControl.decimatorParams.newSampleRate, false);	
 		//		this.sourceSampleRate = sampleRate;
-		if (decimatorControl != null) {
-			super.setSampleRate(decimatorControl.decimatorParams.newSampleRate, notify);
+		if (decimatorParams != null) {
+			super.setSampleRate(decimatorParams.newSampleRate, notify);
 		}
 	}
 
@@ -72,13 +85,17 @@ public class DecimatorProcessW extends PamProcess {
 
 	@Override
 	public void prepareProcess() {
+		System.out.println("Calling prepare process on decimator");
 		super.setupProcess();
 		newSettings();
 	}
 	
 	protected synchronized void newSettings() {
+		if(this.decimatorControl!=null) {
+			this.decimatorParams = decimatorControl.decimatorParams;
+		}
 		PamRawDataBlock rawDataBlock = PamController.getInstance().
-				getRawDataBlock(decimatorControl.decimatorParams.rawDataSource);
+				getRawDataBlock(this.decimatorParams.rawDataSource);
 		if (rawDataBlock != getParentDataBlock()) {
 			setParentDataBlock(rawDataBlock);
 		}
@@ -87,9 +104,9 @@ public class DecimatorProcessW extends PamProcess {
 			if (sourceSampleRate == 0) {
 				return;
 			}
-			decimatorControl.decimatorParams.channelMap &= getParentDataBlock().getChannelMap();
-			outputDataBlock.setChannelMap(decimatorControl.decimatorParams.channelMap);
-			decimateFactor = sourceSampleRate / decimatorControl.decimatorParams.newSampleRate;
+			this.decimatorParams.channelMap &= getParentDataBlock().getChannelMap();
+			outputDataBlock.setChannelMap(this.decimatorParams.channelMap);
+			decimateFactor = sourceSampleRate / this.decimatorParams.newSampleRate;
 			this.setSampleRate(sourceSampleRate, true);
 			setupDecimator();
 		}
@@ -102,9 +119,12 @@ public class DecimatorProcessW extends PamProcess {
 	}
 
 	private synchronized void setupDecimator() {
-		decimatorControl.decimatorParams.filterParams = checkFilterParams(decimatorControl.decimatorParams.filterParams);
-		decimateFactor = sourceSampleRate / decimatorControl.decimatorParams.newSampleRate;
-		decimatorWorker = new DecimatorWorker(decimatorControl.decimatorParams, outputDataBlock.getChannelMap(), sourceSampleRate, decimatorControl.decimatorParams.newSampleRate);
+		decimatorParams.filterParams = checkFilterParams(decimatorParams.filterParams);
+		decimateFactor = sourceSampleRate / decimatorParams.newSampleRate;
+		decimatorWorker = new DecimatorWorker(decimatorParams, outputDataBlock.getChannelMap(), sourceSampleRate, decimatorParams.newSampleRate);
+		if(this.decimatorControl!=null) {
+			this.decimatorControl.decimatorParams = this.decimatorParams;
+		}
 	}
 
 	/**
@@ -116,7 +136,7 @@ public class DecimatorProcessW extends PamProcess {
 		if (sourceSampleRate == 0) {
 			return filterParams; // don't do anything. 
 		}
-		DecimatorParams params = decimatorControl.decimatorParams;
+		DecimatorParams params = decimatorParams;
 		if (filterParams == null) {
 			filterParams = new FilterParams();
 			filterParams.filterType = FilterType.BUTTERWORTH;

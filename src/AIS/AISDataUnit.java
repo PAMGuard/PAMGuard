@@ -54,12 +54,13 @@ public class AISDataUnit extends PamDataUnit implements Serializable, Cloneable 
 	 */
 	protected boolean isInRange = true;
 	protected boolean newUnit = true;
+	public boolean lastUnitStaticOnly = false;
 	/**
 	 * AIVDM, etc.
 	 */
 	protected String dataType;
 
-	protected StationType stationType;
+	public StationType stationType;
 	/**
 	 * Pulled out from the start of the AIVDM string. 
 	 */
@@ -233,7 +234,9 @@ may not be null.
 	 */
 	public void update(AISDataUnit newAISUnit) {
 		newUnit = false;
+		lastUnitStaticOnly = true;
 		if (newAISUnit.positionReports.size() != 0) {
+			lastUnitStaticOnly = false;
 			this.positionReports.add(newAISUnit.getPositionReport());
 			aisLocalisation.getLocContents().setLocContent(LocContents.HAS_BEARING | LocContents.HAS_DEPTH |
 					LocContents.HAS_LATLONG | LocContents.HAS_RANGE);

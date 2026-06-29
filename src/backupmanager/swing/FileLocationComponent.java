@@ -22,6 +22,7 @@ import PamUtils.FolderChangeListener;
 import PamUtils.PamFileChooser;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamTextDisplay;
+import PamView.dialog.PamTextField;
 import PamView.dialog.warn.WarnOnce;
 import backupmanager.FileLocation;
 
@@ -33,7 +34,7 @@ import backupmanager.FileLocation;
  */
 public class FileLocationComponent {
 
-	public enum LocationType {SOURCE, DESTINATION};
+	public enum LocationType {SOURCE, DESTINATION, REMOTE_DESTINATION};
 	
 	public static final int DEFAULT_PATH_LEN = 70;
 	
@@ -47,7 +48,7 @@ public class FileLocationComponent {
 //
 //	private boolean allowFolders;
 	
-	private PamTextDisplay pathName;
+	private JTextField pathName;
 	
 	private JTextField maskField;
 
@@ -72,18 +73,26 @@ public class FileLocationComponent {
 			mainPanel.setBorder(new TitledBorder(borderTitle));
 		}
 		c.gridwidth = 3;
-		pathName = new PamTextDisplay(charWidth);
+		if(type==LocationType.REMOTE_DESTINATION) {
+			pathName = new PamTextField(charWidth);
+		}else {
+			pathName = new PamTextDisplay(charWidth);
+		}
 		mainPanel.add(pathName, c);
-		JButton browse = new JButton("Browse...");
-		browse.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				browseButton();
-			}
-		});
-		c.gridx += c.gridwidth;
-		c.gridwidth = 1;
-		mainPanel.add(browse, c);
+		
+		JButton browse = null;
+		if(type == LocationType.DESTINATION || type==LocationType.SOURCE) {
+			browse = new JButton("Browse...");
+			browse.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					browseButton();
+				}
+			});
+			c.gridx += c.gridwidth;
+			c.gridwidth = 1;
+			mainPanel.add(browse, c);
+		}
 		if (type == LocationType.SOURCE && showMask) {
 			c.gridx = 0;
 			c.gridy++;
@@ -106,7 +115,9 @@ public class FileLocationComponent {
 		}
 		
 		pathName.setEnabled(this.allowPath);
-		browse.setEnabled(this.allowPath);
+		if(browse!=null) {
+			browse.setEnabled(this.allowPath);
+		}
 	}
 	
 	private static String defaultTitle(LocationType type) {
@@ -115,6 +126,8 @@ public class FileLocationComponent {
 			return "Destination folder";
 		case SOURCE:
 			return "Source folder";
+		case REMOTE_DESTINATION:
+			return "Remote Destination";
 		default:
 			break;
 		}

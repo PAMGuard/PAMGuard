@@ -446,6 +446,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 			addTypeItem(typeMenu, PamSymbolType.SYMBOL_CROSS2);
 			addTypeItem(typeMenu, PamSymbolType.SYMBOL_PENTAGRAM);
 			addTypeItem(typeMenu, PamSymbolType.SYMBOL_HEXAGRAM);
+			addTypeItem(typeMenu, PamSymbolType.SYMBOL_CAB);
 //		}
 		// MouseInfo.getPointerInfo().
 		typeMenu.show(e, 0, 0);

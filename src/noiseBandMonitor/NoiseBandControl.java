@@ -338,6 +338,10 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 		tabPanel.newSettings();
 	}
 
+	public BandData getBandData() {
+		return bandData;
+	}
+
 	@Override
 	public void notifyModelChanged(int changeType) {
 		switch (changeType) {

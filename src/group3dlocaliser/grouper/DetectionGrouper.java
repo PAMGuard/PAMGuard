@@ -7,7 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.Timer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Array.ArrayManager;
 import Array.PamArray;
@@ -86,11 +87,22 @@ public class DetectionGrouper {
 	private DataSelector dataSelector;
 
 	private boolean isViewer;
+	
+	private boolean isNetRx;
+		
+	private Timer netRxTimer;
+
+	private NetRxTimerTask netRxTimerTask;
 
 	public DetectionGrouper(DetectionGroupMonitor detectionGroupMonitor) {
 		this.detectionGroupMonitor = detectionGroupMonitor;
 		developingGroups = new LinkedList<>();
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+		isNetRx = PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER;
+		if(isNetRx) {
+			netRxTimer = new Timer();
+			netRxTimerTask = new NetRxTimerTask();
+		}
 	}
 
 	public synchronized void newData(PamDataUnit pamDataUnit) {
@@ -102,7 +114,7 @@ public class DetectionGrouper {
 //		if (pamDataUnit.getUID() == 291039474) {
 //			System.out.println("Found it");
 //		}
-		if (sampleNo == null) {
+		if (sampleNo == null || isNetRx) {
 			/*
 			 *  make up a sample number based on the millis or the mother group thing can't work. 
 			 *  The mother group thing needs to be in samples no tmillis since millis are
@@ -147,6 +159,14 @@ public class DetectionGrouper {
 		maybeCloseMotherGroup(iChanGroup, sampleNo);
 		
 		motherGroup.addDataUnit(iChanGroup, pamDataUnit);
+	      
+        if(PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+            netRxTimerTask.cancel();
+            netRxTimer.purge();
+            long buffer = (long) maxInterGroupSample;
+            long sleepMillis = (long) (1000*(buffer + sampleRate)/sampleRate);
+            netRxTimer.schedule(netRxTimerTask = new NetRxTimerTask(),sleepMillis);
+        }
 		//			DetectionGroup oldGroup = findExistingGroup(iChanGroup, pamDataUnit);
 		//		if (oldGroup == null) {
 		//			oldGroup = new DetectionGroup(pamDataUnit);
@@ -164,6 +184,13 @@ public class DetectionGrouper {
 //		motherGroup.
 //		int lastGroup = motherGroup.getLastChannelGroup();
 		long buffer = (long) this.maxInterGroupSample;
+	      
+        if(PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+            netRxTimerTask.cancel();
+            netRxTimer.purge();
+			sampleNumber = (long) ((timeMilliseconds-PamCalendar.getSessionStartTime()) * sampleRate / 1000.);
+        }
+        
 //		if (shouldCloseMotherGroup(lastGroup, sampleNumber, buffer)) {
 		if (sampleNumber > motherGroup.getVeryLastSample() + buffer + sampleRate * 5) {
 			closeMotherGroup();
@@ -171,7 +198,24 @@ public class DetectionGrouper {
 //			System.out.println("Mother group closed on timer");
 		}
 	}
-	
+	   
+    protected class NetRxTimerTask extends TimerTask {
+        
+        public boolean runThread = true;
+        
+        @Override
+        public void run() {
+                
+                if (motherGroup == null) {
+                    return;
+                }
+                if (motherGroup.getTotalChannelMap() == 0) {
+                    return;
+                }
+                closeMotherGroup(); 
+        }
+    }
+
 	private synchronized boolean  maybeCloseMotherGroup(int iChanGroup, long currentSample) {
 		long bufferSamples = (long) (0.00*sampleRate);
 		if (shouldCloseMotherGroup(iChanGroup, currentSample, bufferSamples)) {

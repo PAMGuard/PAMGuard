@@ -1767,4 +1767,8 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 //	public void setDaqSourceInfo(DaqSourceInfo daqSourceInfo) {
 //		this.daqSourceInfo = daqSourceInfo;
 //	}
+	
+	public PamDataUnit cloneIfAllowed() throws CloneNotSupportedException{
+		return (PamDataUnit) this.clone();
+	}
 }

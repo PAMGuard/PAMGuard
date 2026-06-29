@@ -1,6 +1,11 @@
 package networkTransfer.receive;
 
 import networkTransfer.NetworkObject;
+import networkTransfer.NetworkReceiverInterface;
+import networkTransfer.receive.status.BuoyStatusDataBlock;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusLogging;
+import networkTransfer.receive.status.base.NetReceiverStatusManager;
 import networkTransfer.receive.swing.NetworkRXTabPanel;
 import networkTransfer.receive.swing.NetworkReceiveDialog;
 import networkTransfer.receive.swing.NetworkReceiveSidePanel;
@@ -9,6 +14,7 @@ import networkTransfer.receive.swing.RXTableMouseListener;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -18,12 +24,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
+import AIS.AISDataBlock;
+import AIS.AISDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.BinaryStore;
@@ -47,6 +57,7 @@ import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.PamSidePanel;
 import PamView.PamTabPanel;
+import PamView.dialog.warn.WarnOnce;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.DataUnitBaseData;
@@ -61,11 +72,11 @@ import PamguardMVC.debug.Debug;
  * @author Doug Gillespie
  *
  */
-public class NetworkReceiver extends PamControlledUnit implements PamSettings, NetworkDataUser {
+public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 
 	private ArrayList<PamDataBlock> rxDataBlocks;
-
-	private List<NetworkReceiveThread> receiveThreads;
+	
+	private HashMap<Integer,PamDataBlock> rxDataBlockMap;
 
 	//	private Vector<BuoyRXStats> buoyRXStats = new Vector<BuoyRXStats>();
 
@@ -85,17 +96,17 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 
 	private BuoyStatusDataBlock buoyStatusDataBlock;
 
-	private ConnectionThread connectionThread;
+	public NetworkReceiverInterface connectionThread;
 
 	private NetworkReceiveSidePanel networkReceiveSidePanel;
 
-	private int recentPackets, recentDataBytes;
-	
 	private ArrayList<PairedValueInfo> extraTableInfo = new ArrayList<PairedValueInfo>();
 	
 	private ArrayList<NetworkDataUser> extraDataUsers = new ArrayList<NetworkDataUser>();
 	
 	private RXTableMouseListener<BuoyStatusDataUnit> tableMouseListener;
+	
+	private NetReceiverStatusManager netRxStatusProcess;
 
 	/**
 	 * Flags for dataType1 - these must match equivalent commands in 
@@ -116,20 +127,23 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	 */
 	public NetworkReceiver(String unitName) {
 		super(unitTypeString, unitName);
-
+		
 		PamSettingManager.getInstance().registerSettings(this);
 
 		networkReceiveProcess = new NetworkReceiveProcess(this);
 		addPamProcess(networkReceiveProcess);
-
-		receiveThreads = Collections.synchronizedList(new Vector<NetworkReceiveThread>());
 
 		networkRXTabPanel = new NetworkRXTabPanel(this);
 
 		networkReceiveSidePanel = new NetworkReceiveSidePanel(this);
 
 		BuoyDataSerialiser buoyDataSerialiser = new BuoyDataSerialiser(this);
+		
+		netRxStatusProcess = new NetReceiverStatusManager(this);
+		addPamProcess(this.netRxStatusProcess);
+		
 		PamSettingManager.getInstance().registerSettings(buoyDataSerialiser);
+		this.setTableMouseListener(new TableMouseListener());
 	}
 
 	@Override
@@ -153,7 +167,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			findDataSources();
 			networkRXTabPanel.notifyModelChanged(changeType);
-			startConnectionThread();
+			//startConnectionThread();
 		}
 	}
 
@@ -201,11 +215,12 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	 * Called when parameters change
 	 */
 	private void newParams() {
-		if (connectionThread == null) {
+		/*if (connectionThread == null) {
 			startConnectionThread();
 			return;
 		}
-		if (connectionThread.currentParams.receivePort == networkReceiveParams.receivePort) {
+		if (connectionThread instanceof StandardTCPReceiver &&
+				((StandardTCPReceiver) connectionThread).currentParams.receivePort == networkReceiveParams.receivePort) {
 			return; // no need to restart if port number is the same. 
 		}
 
@@ -213,7 +228,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		/*
 		 * Then start a new connection thread. 
 		 */
-		startConnectionThread();
+		//startConnectionThread();
 	}
 
 	private void stopAllConnectionThreads() {
@@ -224,30 +239,28 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		if (connectionThread != null) {
 			connectionThread.stopConnectionThread();
 		}
-		/*
-		 * And all the client threads too !
-		 */
-		System.out.println("Stop all client threads !!!!");
-		synchronized(receiveThreads) {
-			if (receiveThreads != null) {
-				ListIterator<NetworkReceiveThread> rxIt = receiveThreads.listIterator();
-				NetworkReceiveThread rxThread;
-				while (rxIt.hasNext()) {
-					rxThread = rxIt.next();
-					rxIt.remove();
-					rxThread.stopThread();
-				}		
-			}
-		}
+		
 	}
 
 	private void startConnectionThread() {
-//		if (PamController.getInstance().getRunMode() != PamController.RUN_NETWORKRECEIVER) {
-//			return;
-//		}
-		connectionThread = new ConnectionThread(networkReceiveParams);
-		Thread t = new Thread(connectionThread);
-		t.start();		
+		if(this.networkReceiveParams.connectionType==NetworkReceiveParams.CONNECTIONTYPE_STANDARD_TCP) {
+			connectionThread = new StandardTCPReceiver(networkReceiveParams,this);
+		}else {
+			if(connectionThread==null) {
+				connectionThread = new MqttNetReceiver(networkReceiveParams,this);
+			}
+		}
+		connectionThread.runReceiver();
+	}
+	
+	private void generateDataBlockMap() {
+		rxDataBlockMap = new HashMap<Integer,PamDataBlock>();
+		if(rxDataBlocks==null) {
+			return;
+		}
+		for(PamDataBlock nextBlock:this.rxDataBlocks) {
+			rxDataBlockMap.put(nextBlock.getQuickId2(), nextBlock);
+		}
 	}
 
 	/**
@@ -266,6 +279,8 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 			quickBlockIds[j] = rxDataBlocks.get(i).getQuickId();
 //			System.out.printf("Network stream %s has ids 0x%X and 0x%x\n", rxDataBlocks.get(i).getDataName(), quickBlockIds[i], quickBlockIds[j]);
 		}
+		
+		generateDataBlockMap();
 		//		initRXStats();
 	}
 
@@ -343,21 +358,9 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		 * May now need to tell the overall pam controller that things are starting or
 		 * stopping !
 		 */
-		PamController.getInstance().netReceiveStatus(changeTime, nPrepared, nStarted, nStopped);
-	}
-
-	private synchronized void addPacketStats(int packetSize) {
-		recentPackets++;
-		recentDataBytes += packetSize;
-	}
-
-	/**
-	 * @return the number of data packets received since the last call to this function
-	 */
-	public synchronized int getRecentPackets() {
-		int n = recentPackets;
-		recentPackets = 0;
-		return n;
+		if(networkReceiveParams.connectionType==NetworkReceiveParams.CONNECTIONTYPE_STANDARD_TCP) {
+			PamController.getInstance().netReceiveStatus(changeTime, nPrepared, nStarted, nStopped);
+		}
 	}
 
 	/**
@@ -365,135 +368,27 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	 * @return The total number of bytes received since the last call to this function
 	 */
 	public synchronized int getRecentDataBytes() {
-		int n = recentDataBytes;
-		recentDataBytes = 0;
-		return n;
+		return 0;
 	}
 
-	/**
-	 * The connection thread does not receive data, it just listens 
-	 * for socket requests when clients attempt to open a connection. 
-	 * When it get's a connection, it then opens a new ReceiveThread
-	 * which will receive the actual data. 
-	 * @author Doug Gillespie
-	 *
-	 */
-	class ConnectionThread implements Runnable {
-
-		protected NetworkReceiveParams currentParams;
-
-		private volatile boolean keepRunning = true;
-
-		ServerSocket serverSocket;
-
-		/**
-		 * @param currentParams
-		 */
-		public ConnectionThread(NetworkReceiveParams currentParams) {
-			super();
-			this.currentParams = currentParams.clone();
-		}
-
-		/**
-		 * Stop the connection thread by closing the
-		 * server socket and telling it to break out of the loop. 
-		 */
-		public void stopConnectionThread() {
-			keepRunning = false;
-			if (serverSocket != null) {
-				try {
-					serverSocket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		@Override
-		public void run() {
-			runConnectionThread();
-
-		}
-
-		/**
-		 * Connection thread - sits in loop waiting for connections. 
-		 * There is one of these but many NetworkReceiveThread's (one for each client)
-		 */
-		public void runConnectionThread() {
-			int bufferSize = 1024;
-			byte[] dgBuffer = new byte[21];
-
-			Socket clientSocket;
-			NetworkReceiveThread rxThread;
-			try {
-				serverSocket = new ServerSocket(networkReceiveParams.receivePort);
-				System.out.println("Waiting for client contact on port " + networkReceiveParams.receivePort);
-				while (keepRunning) {
-					/*
-					 * This next function blocks until either something connects, or 
-					 * the serverSocket is closed. 
-					 */
-					clientSocket = serverSocket.accept();
-
-//					System.out.printf("Opening client socket for %s on port %d at %s\n",
-//							clientSocket.getInetAddress().getHostAddress(),
-//							clientSocket.getPort(), PamCalendar.formatTime(System.currentTimeMillis(), true));
-					
-
-//					System.out.printf("Opening client socket for %s on port %d at %s\n",
-//							clientSocket.getInetAddress().getHostAddress(),
-//							clientSocket.getPort(), PamCalendar.formatTime(System.currentTimeMillis(), true));
-
-					rxThread = new NetworkReceiveThread(clientSocket, NetworkReceiver.this);
-//					System.out.printf("Thread created at %s\n", PamCalendar.formatTime(System.currentTimeMillis(), true));
-					Thread t = new Thread(rxThread);
-					t.setPriority(Thread.MAX_PRIORITY);
-//					System.out.printf("Call start thread at %s\n", PamCalendar.formatTime(System.currentTimeMillis(), true));
-					t.start();
-//					System.out.printf("Called start thread at %s\n", PamCalendar.formatTime(System.currentTimeMillis(), true));
-//					synchronized(receiveThreads) {
-//						receiveThreads.add(rxThread);
-//					}
-
-//					checkExistingThreads(clientSocket, rxThread);
-				}
-			} catch (IOException e) {
-				System.out.println("IOException in NeetworkReceiver" + e.getMessage());
-			}
-
-		}
-
+	public synchronized int getRecentPackets() {
+		return 0;
 	}
+	
 
 	int findErrors = 0;
 	
-	public void socketClosed(NetworkReceiveThread networkReceiveThread) {
-		/*
-		 * Once the thread has ended, tell the stats objects that
-		 * they are no longer connected to anything. 
-		 */
-		ListIterator<BuoyStatusDataUnit> it = buoyStatusDataBlock.getListIterator(0);
-		BuoyStatusDataUnit b = null;
-		while (it.hasNext()) {
-			b = it.next();
-			if (b.getSocket() == networkReceiveThread.getClientSocket()) {
-				b.setSocket(null);
-			}
-		}
-		if (b == null) {
-			System.out.println(String.format("Rx socket closed for unknown sender on %s", toString()));
-		}
-		else {
-//			System.out.println(String.format("Rx socket closed for sender %d(%d) on %s", b.getBuoyId1(), b.getBuoyId2(), toString()));
-		}
-		synchronized(receiveThreads) {
-			receiveThreads.remove(networkReceiveThread);
-		}
-	}
 	
+	
+	
+	//Code here has been commented out to resolve errors with Sam modifications not compatible with Doug's revamped network NI card code. 
+	//In Merge between SMRUC and Main Fork June 2026, following is not complete, tested, or functional:
+	/*
+	 * ======BEGIN BLOCK=====
+	 */
 	private NetworkAudioInterpreter networkAudioInterpreter;
 
-	@Override
+	//@Override
 	public synchronized NetworkObject interpretData(NetworkObject receivedObject) {
 		
 		/**
@@ -502,7 +397,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		 * thread. 
 		 */
 
-		addPacketStats(receivedObject.getTransferedLength());
+		//addPacketStats(receivedObject.getTransferedLength());
 		
 		BuoyStatusDataUnit buoyStatusDataUnit = findBuoyStatusDataUnit(receivedObject.getBuoyId1(), receivedObject.getBuoyId2(), true);
 		buoyStatusDataUnit.setSocket(receivedObject.getSocket());
@@ -545,7 +440,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 //				networkAudioInterpreter = new CRioAudioInterpreter(this);
 				return null;
 			}
-			networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
+			//networkAudioInterpreter.interpretData(receivedObject, buoyStatusDataUnit);
 		}
 		for (NetworkDataUser extraUser : extraDataUsers) {
 			retObject = extraUser.interpretData(receivedObject);
@@ -561,7 +456,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	 * @param clientSocket
 	 * @param wantedThread The thread we just made, so want to keep. 
 	 */
-	public synchronized void checkExistingThreads(Socket clientSocket, NetworkReceiveThread wantedThread) {
+	/*public synchronized void checkExistingThreads(Socket clientSocket, NetworkReceiveThread wantedThread) {
 		String newHost = clientSocket.getInetAddress().getHostAddress();
 		ArrayList<NetworkReceiveThread> stopList = new ArrayList<NetworkReceiveThread>();
 		synchronized(receiveThreads) {
@@ -588,10 +483,12 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 				}
 			}
 		}
-	}
+	}*/
 
 
-	
+	/*
+	 * ===== END BLOCK =====
+	 */
 
 	
 	/**
@@ -607,28 +504,11 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	 * @return 
 	 */
 	public  NetworkObject interpretPamData(NetworkObject receivedData, BuoyStatusDataUnit buoyStatusDataUnit) {
-		/*
-		 * Still need to do some unpacking,  
-		 */
-		int dataBlockSeqNumber = findStreamDataBlock(receivedData.getDataType2());
-		if (dataBlockSeqNumber < 0) {
-			if (++findErrors < 10) {
-				System.out.println(String.format("Unable to find datablock for %d bytes of network data received from buoy %d(%d) with data Id %d(0x%X %d)",
-						receivedData.getDataLength(), buoyStatusDataUnit.getBuoyId1(), buoyStatusDataUnit.getBuoyId2(), 
-						receivedData.getDataType1(), receivedData.getDataType2(), receivedData.getDataType2()));
-			}
-			try {
-				String str = new String(receivedData.getData());
-				System.out.printf("Unknown data Type %d(%d)", receivedData.getDataType1(), receivedData.getDataType2(), str);
-			}
-			catch (Exception e) {
-				Debug.out.println(e.getLocalizedMessage());
-			}
-			buoyStatusDataUnit.unknownPacket();
+		PamDataBlock dataBlock = rxDataBlockMap.get(receivedData.getDataType2());
+		if(dataBlock==null) {
+			System.out.println("Received data of unknown type: "+receivedData.getDataType2()+". Make sure that you have a module on the base station for each of the modules you have for the CABs");
 			return null;
 		}
-		
-		PamDataBlock dataBlock =  rxDataBlocks.get(dataBlockSeqNumber);
 		BinaryDataSource dataSource = dataBlock.getBinaryDataSource();
 		PamProcess parentProcess = dataBlock.getParentProcess();
 		// we'll want to see if we can find the latest acquisition status data unit. 
@@ -660,7 +540,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 //			System.out.printf("NetRX read %d of expected %d bytes\n", bytesRead, dataLength);
 //			if (1>0) return null;
 			ds.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		BinaryObjectData bod = new BinaryObjectData(receivedData.getDataVersion(), objectId, baseData, 0, data, dataLength);
@@ -688,7 +568,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		
 		DaqStatusDataUnit previousDaqStatus = (DaqStatusDataUnit) buoyStatusDataUnit.findLastDataUnit(DaqStatusDataUnit.class);
 		
-		buoyStatusDataUnit.newDataObject(dataBlock, dataUnit, dataBlockSeqNumber, receivedData.getTransferedLength());
+		buoyStatusDataUnit.newDataObject(dataBlock, dataUnit, receivedData.getTransferedLength());
 		if (buoyStatusDataUnit.getCommandStatus() != NET_PAM_COMMAND_START) {
 			buoyStatusDataUnit.setCommandStatus(NET_PAM_COMMAND_START);
 			commandStateChanged(dataUnit.getTimeMilliseconds(), buoyStatusDataUnit);
@@ -760,18 +640,27 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		 * This could still get used if GPS data were sent from PAMGuard rather than PAMBuoy. 
 		 */
 		if (dataUnit.getClass() == GpsDataUnit.class) {
+			System.out.println("new gps data");
 			useBuoyGPSData(buoyStatusDataUnit, (GpsDataUnit) dataUnit);
 			//			networkReceiveProcess.newGpsData((GpsDataUnit) dataUnit);
 		}
 		else {
 			parentProcess.processNewBuoyData(buoyStatusDataUnit, dataUnit);
-			dataBlock.addPamData(dataUnit);
+			if(networkReceiveParams.channelNumberOption==networkReceiveParams.CHANNELS_RENUMBER) {
+				dataUnit.setUID(0);
+			}
+			if(dataBlock instanceof AISDataBlock) {
+				((AISDataBlock) dataBlock).addAISData((AISDataUnit) dataUnit);
+			}else {
+				dataBlock.addPamData(dataUnit);
+			}
+			//dataBlock.addPamData(dataUnit);
 			//			System.out.println("DAta added to data block " + dataBlock.getDataName());
 		}
 		return null;
 	}
 
-	private NetworkObject interpretPamCommand(NetworkObject receivedData, BuoyStatusDataUnit buoyStatusDataUnit) {
+	public NetworkObject interpretPamCommand(NetworkObject receivedData, BuoyStatusDataUnit buoyStatusDataUnit) {
 //			System.out.println("Network command received: " + getPamCommandString(dataId2));
 		buoyStatusDataUnit.setCommandStatus(receivedData.getDataType2());
 		long time = PamCalendar.getTimeInMillis();
@@ -937,7 +826,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 
 		public NetworkReceiveProcess(NetworkReceiver networkReceiver) {
 			super(networkReceiver, null);
-			buoyStatusDataBlock = new BuoyStatusDataBlock(this);
+			buoyStatusDataBlock = new BuoyStatusDataBlock(this,networkReceiver);
 			addOutputDataBlock(buoyStatusDataBlock);
 			buoyStatusDataBlock.setOverlayDraw(new NetworkGPSDrawing(networkReceiver));
 			buoyStatusDataBlock.setPamSymbolManager(new StandardSymbolManager(buoyStatusDataBlock, NetworkGPSDrawing.defaultSymbol, true));
@@ -946,12 +835,12 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 
 		@Override
 		public void pamStart() {
-
+			startConnectionThread();
 		}
 
 		@Override
 		public void pamStop() {
-
+			stopAllConnectionThreads();
 		}
 
 	}
@@ -974,8 +863,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	}
 
 	@Override
-	public boolean restoreSettings(
-			PamControlledUnitSettings pamControlledUnitSettings) {
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		networkReceiveParams = ((NetworkReceiveParams) pamControlledUnitSettings.getSettings()).clone();
 		return true;
 	}
@@ -1027,6 +915,10 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	public void addExtraDataUser(NetworkDataUser extraDataUser) {
 		extraDataUsers.add(extraDataUser);
 	}
+	
+	public ArrayList<NetworkDataUser> getExtraDataUsers() {
+		return extraDataUsers;
+	}
 
 	public boolean useBuoyGPSData(BuoyStatusDataUnit buoyStatusDataUnit, GpsDataUnit gpsDataUnit) {
 		GpsData gpsData = gpsDataUnit.getGpsData();
@@ -1056,6 +948,55 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		}
 		return true;
 	}
+	
+	private class TableMouseListener implements RXTableMouseListener<BuoyStatusDataUnit> {
+
+		@Override
+		public void popupMenuAction(MouseEvent e, BuoyStatusDataUnit dataUnit, String colName) {
+			//			System.out.println("Popup menu on column " + colName + " " + dataUnit);
+			showDecimusPopup(e, dataUnit, colName);
+		}
+
+	}
+	
+	public void showDecimusPopup(MouseEvent e, BuoyStatusDataUnit dataUnit, String colName) {
+		String station = null;
+		JPopupMenu popMenu = new JPopupMenu();
+		JMenuItem menuItem = new JMenuItem("Clear list ...");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeDataUnits(e, null);
+			}
+		});
+		popMenu.add(menuItem);
+
+		popMenu.show(e.getComponent(), e.getX(), e.getY());
+	}
+	
+	protected void removeDataUnits(ActionEvent e, BuoyStatusDataUnit dataUnit) {
+		String warnMsg;
+		if (this.getBuoyStatusDataBlock() == null) {
+			return;
+		}
+		if (dataUnit == null) {
+			warnMsg = "Delete all Decimus devices from list";
+		}
+		else {
+			warnMsg = String.format("Delete Decimus %d(%d) from list", dataUnit.getBuoyId1(), dataUnit.getBuoyId2());
+		}
+		int ans = WarnOnce.showWarning(getGuiFrame(), "Remove Deimus units", warnMsg, WarnOnce.OK_CANCEL_OPTION);
+		if (ans != WarnOnce.OK_OPTION) {
+			return;
+		}
+		if (dataUnit == null) {
+			this.getBuoyStatusDataBlock().clearAll();
+		}
+		else {
+			this.getBuoyStatusDataBlock().remove(dataUnit);
+		}
+		this.getBuoyStatusDataBlock().notifyObservers();
+	}
 
 	/**
 	 * @return the tableMouseListener
@@ -1071,11 +1012,6 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		this.tableMouseListener = tableMouseListener;
 	}
 
-	@Override
-	public void newReceivedDataUnit(BuoyStatusDataUnit buoyStatusDataUnit, PamDataUnit dataUnit) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	public NetworkAudioInterpreter getNetworkAudioInterpreter() {
 		return networkAudioInterpreter;

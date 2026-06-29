@@ -4,6 +4,7 @@ import java.net.Socket;
 
 import PamguardMVC.PamDataUnit;
 import networkTransfer.NetworkObject;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 /**
  * Interface for classes using the NetworkReceiveThread. 
