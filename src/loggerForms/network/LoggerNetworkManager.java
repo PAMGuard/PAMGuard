@@ -17,7 +17,7 @@ abstract public class LoggerNetworkManager {
 	
 	public static LoggerNetworkManager getInstance() {
 		if (singleInstance == null) {
-			singleInstance = new LoggerMulticastManager();
+			singleInstance = new LoggerMQTTManager();
 		}
 		return singleInstance;
 	}

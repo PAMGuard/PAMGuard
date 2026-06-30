@@ -407,7 +407,9 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 //		}
 		
 		JMenuItem netItem = LoggerNetworkManager.getInstance().getConfigMenu();
-		detMenu.add(netItem);
+		if (netItem != null) {
+			detMenu.add(netItem);
+		}
 		
 		detMenu.add(menuItem = new JMenuItem("Regenerate all forms"));
 		menuItem.addActionListener(new ReGenerateForms(parentFrame));

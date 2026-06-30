@@ -8,6 +8,8 @@ import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class NetworkParams implements Cloneable, Serializable, ManagedParameters{
 	
+	private static final long serialVersionUID = 1L;
+
 	public String password;
 	
 	public String userId;
