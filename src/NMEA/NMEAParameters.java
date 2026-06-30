@@ -77,6 +77,17 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	 * Scan all available serial ports and find the first that's returning NMEA like data. 
 	 */
 	public boolean autoSerialPort;
+	/**
+	 * Option to be more specific and tell the autoSerialPort search to only 
+	 * accept certain types of data - any, gps, or ais. This may not really work 
+	 * though, for AIS, so will just implement for GPS, AIS would be a problem since
+	 * if no vessels are present, no data will be received, so it would constantly
+	 * reset. 
+	 */
+//	public int serialDataType = 0;
+//	public static final int SERIAL_ANY_DATA = 0;
+//	public static final int SERIAL_GPS_DATA = 1;
+//	public static final int SERIAL_AIS_DATA = 2;
 	
 	public int serialPortBitsPerSecond = 4800;
 	

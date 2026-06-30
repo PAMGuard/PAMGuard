@@ -343,6 +343,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	
 	protected void stopNMEASource() {
 		if(activeNMEAsource != null) {
+			autoPortTimer.stop();
 //			Debug.out.println("active source = " + activeNMEAsource.getName());
 //			Debug.out.println("Stopping Current GPS thread.");
 			stopActiveNMEAsource=true;

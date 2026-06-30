@@ -17,6 +17,16 @@ import PamUtils.PamCalendar;
 public class SummaryCommand extends ExtCommand {
 	
 	private long lastCallTime = 0;
+	
+	/**
+	 * Some of the summary commands now return data in three different formats. 
+	 * There are historical reasons for this, which we'll not go into, but 
+	 * we'll just say that it's a form of divergent evolution and we need
+	 * to support all three. 
+	 */
+	public static final String CSV = "csv";
+	public static final String JSON = "json";
+	public static final String XML = "xml";
 
 	public SummaryCommand() {
 		super("summary", true);
@@ -35,7 +45,7 @@ public class SummaryCommand extends ExtCommand {
 //			
 //		}
 		String [] splitCommand = command.split(" ");
-		String format = "csv";
+		String format = CSV;
 		if(splitCommand.length>1) format = splitCommand[1];
 		return ModuleSummarizer.getModulesSummary(true,format);
 	}

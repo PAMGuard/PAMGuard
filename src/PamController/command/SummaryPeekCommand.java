@@ -12,7 +12,7 @@ public class SummaryPeekCommand extends SummaryCommand {
 	@Override
 	public String execute(String command) {
 		String [] splitCommand = command.split(" ");
-		String format = "csv";
+		String format = SummaryCommand.CSV;
 		if(splitCommand.length>1) format = splitCommand[1];
 		return ModuleSummarizer.getModulesSummary(false,format);
 	}

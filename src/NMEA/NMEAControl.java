@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import Acquisition.FolderInputSystem;
 import nmeaEmulator.NMEAFrontEnd;
+import pamguard.CommandLine;
 import pamguard.GlobalArguments;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
@@ -95,8 +96,14 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	}
 
 	private void checkGlobalArguments() {
-		//Doug's way
-		String globArg = GlobalArguments.getParam(NMEACOMCOMMAND);
+		// try the new command line way of getting these things ...
+		String globArg = CommandLine.getCommandLine().getCommandParameter(NMEACOMCOMMAND); // dougs way
+		if (globArg == null) {
+			globArg = CommandLine.getCommandLine().getCommandParameter(NMEAControl.GlobalPortFlag); // Sam's way
+		}
+		if (globArg == null) {
+			globArg = GlobalArguments.getParam(NMEACOMCOMMAND); // old way !
+		}
 		if (globArg != null) {
 			System.out.printf("Setting %s serial port to %s\n", getUnitName(), globArg);
 			if (globArg.equalsIgnoreCase("auto")) {
@@ -106,12 +113,12 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 				nmeaParameters.serialPortName = globArg;
 			}
 		}
-		
-		//Sam's way -- (Doug's is better)
-		String portArg = GlobalArguments.getParam(NMEAControl.GlobalPortFlag);
-		if (portArg != null) {
-			this.nmeaParameters.serialPortName=portArg;
-		}
+//		
+//		//Sam's way -- (Doug's is better)
+//		String portArg = GlobalArguments.getParam(NMEAControl.GlobalPortFlag);
+//		if (portArg != null) {
+//			this.nmeaParameters.serialPortName=portArg;
+//		}
 		
 	}
 

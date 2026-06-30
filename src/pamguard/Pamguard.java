@@ -108,6 +108,8 @@ public class Pamguard {
 	 */
 	public static void main(String[] args) {
 		
+		CommandLine.create(args);
+		
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 		try {			
 			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
@@ -373,10 +375,11 @@ public class Pamguard {
 //					soundcard number
 					GlobalArguments.setParam(SoundCardSystem.SETDEVNUMBER, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase(NMEAControl.NMEACOMCOMMAND)) {
-					// NMEA COM Port
-					GlobalArguments.setParam(NMEAControl.NMEACOMCOMMAND, args[iArg++]);
-				}
+				// replace this with the commandline class. Need really to do all of them at some point. 
+//				else if (anArg.equalsIgnoreCase(NMEAControl.NMEACOMCOMMAND)) {
+//					// NMEA COM Port
+//					GlobalArguments.setParam(NMEAControl.NMEACOMCOMMAND, args[iArg++]);
+//				}
 				else if (anArg.equalsIgnoreCase(ReprocessStoreChoice.paramName)) {
 					String arg = args[iArg++];
 					ReprocessStoreChoice choice = ReprocessStoreChoice.valueOf(arg);
@@ -390,7 +393,6 @@ public class Pamguard {
 					System.out.println("--PamGuard Help");
 					System.out.println("\n--For standard GUI deployment run without any options.\n");
 					System.out.println("\n--For command line deployment the following options are valid.\n");
-
 					System.out.println("  -r                           : run as a non GUI application");
 					System.out.println("  -psf <filename>              : use psf settings from filename");
 					System.out.println("  -port  <value>               : UDP connection port.");
