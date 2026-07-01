@@ -512,7 +512,6 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * to use for a dialog, better to use PamController.getGuiFrame() which handles null automatically. 
 	 * @return
 	 */
-	@Deprecated
 	public PamView getPamView() {
 		return pamView;
 	}
@@ -748,9 +747,9 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		return unitTaskManager.get(i);
 	}
 
-	public String getModuleSummary(boolean clear) {
-		return getModuleSummary(clear,"csv");
-	}
+//	public String getModuleSummary(boolean clear) {
+//		return getModuleSummary(clear,"csv");
+//	}
 	
 
 	/**

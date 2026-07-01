@@ -12,7 +12,6 @@ import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -50,7 +49,7 @@ import loggerForms.controls.LoggerControl;
 import loggerForms.controls.NMEAControl;
 
 /**
- * A LoggerForm is the central component of all form types, inclucing normal forms
+ * A LoggerForm is the central component of all form types, including normal forms
  * popup forms and subtab forms. Therefore the form itself is capable of providing a single
  * JComponent (a JPanel). some other part of the software will either place this into the main tab
  * panel, a sub tab panel or it's own dialog frame (for a pop-up). 
@@ -69,6 +68,7 @@ public class LoggerForm{
 	 */
 	private ArrayList<LoggerControl> inputControls;
 
+	private ArrayList<LoggerControl> allControls;
 
 	/**
 	 * @return the inputControls
@@ -159,6 +159,7 @@ public class LoggerForm{
 
 		formPanel.add(BorderLayout.CENTER, centrePanel);
 		inputControls = new ArrayList<LoggerControl>();
+		allControls = new ArrayList<LoggerControl>();
 
 
 		fillCentrePanel();
@@ -489,9 +490,12 @@ public class LoggerForm{
 		innerCenterPanel = new LoggerFormPanel(this);
 		ArrayList<ControlDescription> controlDescriptions = formDescription.getControlDescriptions();
 
-		innerCenterPanel.setLayout(new BoxLayout(innerCenterPanel, BoxLayout.Y_AXIS));
+		int vGap = 1;
+//		BoxLayout boxLayout;
+//		innerCenterPanel.setLayout(boxLayout = new BoxLayout(innerCenterPanel, BoxLayout.Y_AXIS));
 
-		innerCenterPanel.setLayout(new VerticalLayout(0,VerticalLayout.LEFT,VerticalLayout.TOP));
+		VerticalLayout vLayout;
+		innerCenterPanel.setLayout(vLayout = new VerticalLayout(0,VerticalLayout.LEFT,VerticalLayout.TOP));
 
 		//		VerticalFlowLayout vert;
 		//		innerCenterPanel.setLayout(vert=new VerticalFlowLayout(VerticalFlowLayout.TOP,0,0));
@@ -499,7 +503,10 @@ public class LoggerForm{
 		//		vert.set
 		//		new FlowLayout().set
 
-		LoggerFormPanel currentRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.LEFT));
+		FlowLayout rowLayout;
+		LoggerFormPanel currentRow = new LoggerFormPanel(this, rowLayout = new FlowLayout(FlowLayout.LEFT));
+
+		rowLayout.setVgap(vGap);
 
 		/*
 		 * start loop. whenever you get a newline, add to centrePanel and create a new currentRow
@@ -516,13 +523,28 @@ public class LoggerForm{
 					boolean tst = true; // why isthis here ? Must have been for a debug point
 				}
 				inputControls.add(currentControl);
-				currentRow.add(currentControl.getComponent());
+				allControls.add(currentControl);
+				JPanel comp;
+				currentRow.add(comp = currentControl.getComponent());
+//				comp.setBackground(Color.cyan);
 			}else if(c.getEType()==ControlTypes.NEWLINE){
 				//				currentRow.add(new JLabel("|"));
 				innerCenterPanel.add(currentRow);
-				currentRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.LEFT));
+				currentRow = new LoggerFormPanel(this, rowLayout = new FlowLayout(FlowLayout.LEFT));
+				rowLayout.setVgap(vGap);
 			}else{
-				JPanel component = c.makeComponent(this);
+//				JPanel component = c.makeComponent(this);
+				JPanel component = null;
+				LoggerControl currentControl = c.makeControl(this);
+				allControls.add(currentControl);
+				if (currentControl != null) {
+//					inputControls.add(currentControl);
+					 component = currentControl.getComponent();
+				}
+				if (component == null) {
+					component = c.makeComponent(loggerForm);
+				}
+				
 				if (component != null) {
 					currentRow.add(component);
 				}
@@ -547,7 +569,9 @@ public class LoggerForm{
 
 		lastRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.RIGHT));
 
-		lastRow.add(saveButton);
+		if (haveSaveButton()) {
+			lastRow.add(saveButton);
+		}
 
 
 		boolean isSubTabs = (formDescription.findProperty(PropertyTypes.SUBTABS) != null);
@@ -560,17 +584,14 @@ public class LoggerForm{
 			isNormal=false;
 		}
 
-		boolean noClear = (formDescription.findProperty(PropertyTypes.NOCLEAR)!= null);
-		boolean noCancel= (formDescription.findProperty(PropertyTypes.NOCANCEL)!= null);
-
 		if (isSubTabs || isPopup){
-			if (!noCancel){
+			if (haveCancelButton()){
 				lastRow.add(cancelButton);
 				cancelButton.addActionListener(new CancelButtonListener());
 			}
 			saveButton.addActionListener(new SaveAndCloseButtonListener());
 		}else{
-			if (!noClear){
+			if (haveClearButton()){
 				lastRow.add(clearButton);
 				clearButton.addActionListener(new ClearButtonListener());
 			}
@@ -591,6 +612,60 @@ public class LoggerForm{
 		}
 
 		enableControls();
+	}
+	
+	private boolean haveSaveButton() {
+		return formDescription.isUDF();
+	}
+	
+	private boolean haveClearButton() {
+		if (formDescription.isUDB()) {
+			return false;
+		}
+		boolean noClear = (formDescription.findProperty(PropertyTypes.NOCLEAR)!= null);
+		return noClear == false;
+	}
+	
+	private boolean haveCancelButton() {
+		if (formDescription.isUDB()) {
+			return false;
+		}
+		boolean noCancel= (formDescription.findProperty(PropertyTypes.NOCANCEL)!= null);
+		return noCancel == false;
+	}
+	
+	/**
+	 * find a control from it's name. 
+	 * @param controlTitle
+	 * @return
+	 */
+	public LoggerControl findInputControl(String controlTitle) {
+		ArrayList<LoggerControl> inputs = getInputControls();
+		for (LoggerControl lc : inputs) {
+			if (lc == null) {
+				continue;
+			}
+			if (lc.getControlDescription().getTitle().equalsIgnoreCase(controlTitle)) {
+				return lc;
+			}
+		}
+		return null;
+	}
+	/**
+	 * find a control from it's name. 
+	 * @param controlTitle
+	 * @return
+	 */
+	public LoggerControl findControl(String controlTitle) {
+		for (LoggerControl lc : allControls) {
+			if (lc == null) {
+				continue;
+			}
+			if (lc.getControlDescription().getTitle().equalsIgnoreCase(controlTitle)) {
+				return lc;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -851,7 +926,7 @@ public class LoggerForm{
 	/**
 	 * Extract and save teh data inot a new PAmDAtaUnit. 
 	 */
-	private void save() {
+	public void save() {
 		//create form data object 
 		Object[] formData = extractFormData();
 		
@@ -939,6 +1014,11 @@ public class LoggerForm{
 		if (nmeaMonitor != null) {
 			nmeaMonitor.disconnect();
 		}
+		for (LoggerControl c : allControls) {
+			if (c != null) {
+				c.destroyControl();
+			}
+		}
 	}
 	/**
 	 * @return the lastRow
@@ -954,6 +1034,18 @@ public class LoggerForm{
 	}
 	public void optionsChange() {
 		enableControls();
+	}
+	/**
+	 * @return the clearButton
+	 */
+	public JButton getClearButton() {
+		return clearButton;
+	}
+	/**
+	 * @return the cancelButton
+	 */
+	public JButton getCancelButton() {
+		return cancelButton;
 	}
 	
 //	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {

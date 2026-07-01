@@ -21,6 +21,7 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.command.CommandManager;
+import PamController.command.SummaryCommand;
 import PamUtils.FileFunctions;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
@@ -693,6 +694,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 
 	@Override
 	public String getModuleSummary(boolean clear, String format) {
+		String summaryStr;
 		File path = new File(recorderSettings.outputFolder);
 		long space = -1;
 		double freeSpace = -1;
@@ -705,7 +707,11 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		}
 		int currButton = pressedButton;
 		int currState = recorderStatus;
-		if(format.equals("json")) {
+		switch (format) {
+		case SummaryCommand.CSV:
+			summaryStr = String.format("%d,%d,%3.1f", currButton, currState, freeSpace);;
+			break;
+		case SummaryCommand.JSON:
 			String state = "";
 			if(currState==IDLE) state="IDLE";
 			if(currState==RECORDING) state="RECORDING";
@@ -713,12 +719,71 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			if(currState==RECORDING) currentFilePath = recorderStorage.getFileName();
 			if(currentFilePath!=null) currentFilePath = currentFilePath.replace("\\", "\\\\");
 			
-			String jsonString = String.format("{\"state\":\"%s\",\"freeSpaceKB\":%3.1f,\"currentFile\":\"%s\"}",
+			summaryStr = String.format("{\"state\":\"%s\",\"freeSpaceKB\":%3.1f,\"currentFile\":\"%s\"}",
 							state,freeSpace,currentFilePath);
-			return jsonString;
+			break;
+		case SummaryCommand.XML:
+			summaryStr = null;
+//			summaryStr = getModuleXMLSummary();
+			break;
+		default:
+			summaryStr = null;
 		}
+//		if(format.equals("json")) {
+//			String state = "";
+//			if(currState==IDLE) state="IDLE";
+//			if(currState==RECORDING) state="RECORDING";
+//			String currentFilePath = "System not recording";
+//			if(currState==RECORDING) currentFilePath = recorderStorage.getFileName();
+//			if(currentFilePath!=null) currentFilePath = currentFilePath.replace("\\", "\\\\");
+//			
+//			String jsonString = String.format("{\"state\":\"%s\",\"freeSpaceKB\":%3.1f,\"currentFile\":\"%s\"}",
+//							state,freeSpace,currentFilePath);
+//			return jsonString;
+//		}
 		
-		return String.format("%d,%d,%3.1f", currButton, currState, freeSpace);
+		return summaryStr;
 	}
+	
+	/*
+	private String getModuleXMLSummary() {
+		File path = new File(recorderSettings.outputFolder);
+		double freeSpaceMB = -1;
+		try {
+			freeSpaceMB = (double) path.getFreeSpace() / 1048576.;
+		}
+		catch (SecurityException e) {
+			freeSpaceMB = -9999;
+		}
+
+		String buttonName;
+		switch (pressedButton) {
+		case RecorderView.BUTTON_OFF:            buttonName = "off";            break;
+		case RecorderView.BUTTON_AUTO:           buttonName = "auto";           break;
+		case RecorderView.BUTTON_START:          buttonName = "start";          break;
+		case RecorderView.BUTTON_START_BUFFERED: buttonName = "startBuffered";  break;
+		default:                                 buttonName = "unknown";        break;
+		}
+
+		String stateName = (recorderStatus == RECORDING) ? "recording" : "idle";
+
+		double[] lastAmplitudes = recorderProcess.getLastAmplitudedB();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<RecorderSummary>");
+		sb.append(String.format("<button>%s</button>", buttonName));
+		sb.append(String.format("<state>%s</state>", stateName));
+		sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
+		sb.append("<channelAmplitudesdB>");
+		if (lastAmplitudes != null) {
+			for (int i = 0; i < lastAmplitudes.length; i++) {
+				sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
+			}
+		}
+		sb.append("</channelAmplitudesdB>");
+		sb.append("</RecorderSummary>");
+		return sb.toString();
+	}
+	*/
 
 }

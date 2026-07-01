@@ -28,6 +28,7 @@ import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamFolders;
 import PamController.PamguardVersionInfo;
+import PamController.command.SummaryCommand;
 import PamController.fileprocessing.StoreStatus;
 import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
@@ -1667,6 +1668,32 @@ public class DBProcess extends PamProcess {
 	 * @param clear reset data counts to zero when called. 
 	 * @return summary string
 	 */
+	public String getModuleSummary(boolean clear, String format) {
+		String summaryStr = null;
+		
+		DBSystem dbSystem = databaseControll.databaseSystem;
+		String name = "No database systen";
+		if (dbSystem != null) {
+			name = dbSystem.getShortDatabaseName(); 
+		}
+		int autoCommit = databaseControll.dbParameters.getUseAutoCommit() ? 1 : 0;
+		
+		switch (format) {
+		case SummaryCommand.XML:
+			summaryStr = String.format("\n<DBNAME>%s<\\DBNAME>,\n<AUTOCOMMIT>%d<\\AUTOCOMMIT>,\n<WRITES>%d<\\WRITES>,\n<FAILS>%d<\\FAILS>", 
+					name, autoCommit, summaryWriteOK, summaryWriteErr);
+			break;
+		default:
+			summaryStr = null;
+		}
+		
+		
+		if (clear) {
+			summaryWriteOK = summaryWriteErr = 0;
+		}
+		return summaryStr;
+	}
+	/*
 	public String getModuleSummary(boolean clear) {
 		DBSystem dbSystem = databaseControll.databaseSystem;
 		String name = "No database systen";
@@ -1680,6 +1707,6 @@ public class DBProcess extends PamProcess {
 			summaryWriteOK = summaryWriteErr = 0;
 		}
 		return summary;
-	}
+	}*/
 
 }

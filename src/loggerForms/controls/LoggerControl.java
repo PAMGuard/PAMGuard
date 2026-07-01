@@ -597,4 +597,9 @@ public abstract class LoggerControl {
 		return foundNMEADataBlock;
 	}
 
+	public void destroyControl() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

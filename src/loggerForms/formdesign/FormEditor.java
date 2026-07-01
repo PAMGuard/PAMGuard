@@ -27,6 +27,7 @@ import loggerForms.formdesign.propertypanels.PropertyPanel;
 import loggerForms.formdesign.propertypanels.RangePanel;
 import loggerForms.formdesign.propertypanels.SymbolPanel;
 import loggerForms.formdesign.propertypanels.TextPanel;
+import loggerForms.formdesign.propertypanels.UDPInputPanel;
 import loggerForms.formdesign.propertypanels.XReferencePanel;
 
 /**
@@ -208,6 +209,8 @@ public class FormEditor {
 			return new BooleanPanel(this, propertyType, "Multiple forms can appear simultaneously on separate subtabs");
 		case SYMBOLTYPE:
 			return new SymbolPanel(this, propertyType);
+		case UDPINPUT:
+			return new UDPInputPanel(this, propertyType);
 		default:
 			break;
 		

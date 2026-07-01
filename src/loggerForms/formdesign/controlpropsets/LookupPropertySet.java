@@ -6,6 +6,9 @@ import loggerForms.formdesign.ControlTitle;
 import loggerForms.formdesign.itempanels.CtrlColPanel;
 import loggerForms.formdesign.itempanels.LUTTopicPanel;
 
+/**
+ * Form properties that can be set for a particular control type. 
+ */
 public class LookupPropertySet extends BasePropertySet {
 
 	public LookupPropertySet(FormDescription formDescription,

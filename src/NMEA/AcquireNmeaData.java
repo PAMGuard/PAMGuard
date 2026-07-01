@@ -291,8 +291,8 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 			if (aLine == null || aLine.length() == 0) {
 				return;
 			}
-			if (aLine.startsWith("$") == false) {
-				sayErrorString("Invalid NMEA string (no $): " + aLine);
+			if (aLine.startsWith("$") == false && aLine.startsWith("!") == false) {
+				sayErrorString("Invalid NMEA string (no $ or !): " + aLine);
 				return;
 			}
 			StringBuffer sb = new StringBuffer(aLine);
@@ -343,6 +343,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	
 	protected void stopNMEASource() {
 		if(activeNMEAsource != null) {
+			autoPortTimer.stop();
 //			Debug.out.println("active source = " + activeNMEAsource.getName());
 //			Debug.out.println("Stopping Current GPS thread.");
 			stopActiveNMEAsource=true;
