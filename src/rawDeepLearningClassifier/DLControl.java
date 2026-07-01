@@ -260,6 +260,8 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		PamRawDataBlock rawDataBlock = PamController.getInstance()
 				.getRawDataBlock(rawDLParmas.groupedSourceParams.getDataSource());
 		
+		// load the previous settings
+		PamSettingManager.getInstance().registerSettings(this);
 		
 //		/**
 //		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
@@ -370,8 +372,7 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// register the DD display
 		DDPlotRegister.getInstance()
 				.registerDataInfo(new RawDLDDPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
-		// load the previous settings
-		PamSettingManager.getInstance().registerSettings(this);
+		
 
 		// because this was added after some settings classes have already been
 		// serialized
