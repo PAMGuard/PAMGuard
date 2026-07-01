@@ -2,6 +2,8 @@ package loggerForms.controlDescriptions;
 
 import java.sql.Types;
 
+import javax.swing.JPanel;
+
 import org.w3c.dom.Element;
 
 import loggerForms.FormDescription;
@@ -34,5 +36,11 @@ public class CdSubForm extends ControlDescription {
 	@Override
 	public Object extractXMLElementData(Element el, String value) {
 		return value;
+	}
+
+	@Override
+	public JPanel makeComponent(LoggerForm loggerForm) {
+		// TODO Auto-generated method stub
+		return super.makeComponent(loggerForm);
 	}
 }

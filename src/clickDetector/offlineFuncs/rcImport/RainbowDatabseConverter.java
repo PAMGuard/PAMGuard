@@ -169,7 +169,7 @@ public class RainbowDatabseConverter {
 
 	/**
 	 * Read events from the rainbow click database and write them 
-	 * to the PAMguard database. Note that event indexes may 
+	 * to the PAMGuard database. Note that event indexes may 
 	 * change during this process, so will need to keep a 
 	 * lookup table of event numbers which can be used to 
 	 * correct event cross reference numbers when the clicks are read in
@@ -308,7 +308,7 @@ public class RainbowDatabseConverter {
 		 */
 		String pamFile = rainbowFileMap.getPamFileName(oldFile, rainbowSection-1);
 		if (pamFile == null) {
-			System.out.println(String.format("Unable to find PAMguard file for click %d in section %d of file %s",
+			System.out.println(String.format("Unable to find PAMGuard file for click %d in section %d of file %s",
 					clickNo, rainbowSection, oldFile));
 			badEvents[eventId] ++;
 		}

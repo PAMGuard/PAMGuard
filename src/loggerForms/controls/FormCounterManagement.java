@@ -159,8 +159,7 @@ public class FormCounterManagement {
 					return null;
 				}
 				
-				
-
+			
 			} catch (SQLException e) {
 				System.out.println("No table "+out.getTableName()+" was found in the database");
 				e.printStackTrace();

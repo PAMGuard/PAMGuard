@@ -341,7 +341,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		mqttClient.subscribe(topic, 2, listener);
 	}
 	
-	private String getBaseTransmitTopic() {
+	public String getBaseTransmitTopic() {
 		String trueBase = this.networkParams.baseTopic+"/"+this.stationId+"/";
 		if(isAlsoNetRx) {
 			return trueBase+"baseData/";

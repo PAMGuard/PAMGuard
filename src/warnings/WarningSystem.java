@@ -12,7 +12,7 @@ import javax.swing.Timer;
 import PamController.PamController;
 
 /**
- * System for handling and displaying warnings and errors from various parts of PAMguard. 
+ * System for handling and displaying warnings and errors from various parts of PAMGuard. 
  * @author Douglas Gillespie
  *
  */

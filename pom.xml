@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pamguard</groupId>
 	<artifactId>Pamguard</artifactId>
-	<version>2.02.18b</version>
+	<version>2.02.18c</version>
 	<name>Pamguard</name>
 	<description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -659,6 +659,12 @@
 			<artifactId>jdl4pam</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		
+		<dependency>
+		  	<groupId>org.eclipse.paho</groupId>
+		  	<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+		  	<version>1.2.5</version>
+		</dependency>
 
 		<dependency>
 		  	<groupId>org.eclipse.paho</groupId>
@@ -671,6 +677,19 @@
 			<groupId>gov.nist.math</groupId>
 			<artifactId>jama</artifactId>
 			<version>1.0.3</version>
+		</dependency>
+		
+		<!-- Source: openCV for camera frame grabbing - Doens't work very well. '
+		<dependency>
+    		<groupId>org.bytedeco</groupId>
+    		<artifactId>javacv-platform</artifactId>
+    		<version>1.5.13</version>
+		</dependency>-->
+		<!-- https://github.com/sarxos/webcam-capture seems to be a lot easier to use -->
+		<dependency>
+  			<groupId>com.github.sarxos</groupId>
+  			<artifactId>webcam-capture</artifactId>
+  			<version>0.3.12</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
@@ -1395,13 +1414,15 @@
 			<version>5.2.3.RELEASE</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
-		<!-- For global hotkeys, especially in Logger -->
+		<!-- Source: https://mvnrepository.com/artifact/com.github.kwhat/jnativehook 
+		no way is nativehook going to get past any virus checker since it allows logging of 
+		every key stroke across the entire system, so will have to live iwithout. 
 		<dependency>
-			<groupId>com.1stleg</groupId>
-			<artifactId>jnativehook</artifactId>
-			<version>2.1.0</version>
-		</dependency>
+   		 	<groupId>com.github.kwhat</groupId>
+    		<artifactId>jnativehook</artifactId>
+    		<version>2.2.2</version>
+    		<scope>compile</scope>
+		</dependency>-->
 
 		<!-- https://mvnrepository.com/artifact/org.swinglabs.swingx/swingx-all -->
 		<!-- For new Network Receive Module -->

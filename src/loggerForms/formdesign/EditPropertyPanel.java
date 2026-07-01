@@ -1,7 +1,6 @@
 package loggerForms.formdesign;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -40,7 +39,14 @@ public class EditPropertyPanel implements PamDialogPanel {
 		
 		FormEditor formEditor = formEditDialog.getFormEditor();
 		JLabel label;
-		for (PropertyTypes propType:PropertyTypes.values()) {
+		PropertyTypes[] allowedTypes = null;
+		if (formDescription.isUDF()) {
+			allowedTypes = PropertyTypes.getUDFProperties();
+		}
+		else {
+			allowedTypes = PropertyTypes.getUDBProperties();
+		}
+		for (PropertyTypes propType : allowedTypes) {
 			PropertyPanel panel = formEditor.makePropertyPanel(propType);
 			if (panel == null) {
 				continue;
@@ -61,7 +67,7 @@ public class EditPropertyPanel implements PamDialogPanel {
 		scrollPane.setPreferredSize(new Dimension(0, 450));
 		
 		propertyPanel.setLayout(new BorderLayout());
-		propertyPanel.add(BorderLayout.CENTER, scrollPane);
+		propertyPanel.add(BorderLayout.NORTH, scrollPane);
 	}
 
 

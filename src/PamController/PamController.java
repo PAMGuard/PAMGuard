@@ -1153,7 +1153,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-	 * Restart PAMguard. Can be called when something is mildly wrong such as a DAQ
+	 * Restart PAMGuard. Can be called when something is mildly wrong such as a DAQ
 	 * glitch, so that acquisition is stopped and restarted.
 	 */
 	public void restartPamguard() {

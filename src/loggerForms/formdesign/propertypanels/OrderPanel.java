@@ -21,7 +21,7 @@ public class OrderPanel extends PropertyPanel {
 		addItem(new JLabel(" Form Order "));
 		addItem(orderList = new JComboBox<Integer>());
 		orderList.setToolTipText("Order position of form on the display");
-		getUseProperty().setEnabled(false);
+		getUseProperty().setEnabled(true);
 		getUseProperty().setSelected(true);
 		fillList();
 		orderList.addActionListener(new ActionListener() {
@@ -38,8 +38,8 @@ public class OrderPanel extends PropertyPanel {
 	 */
 	private void fillList() {
 		int n = formEditor.getFormsControl().getNumFormDescriptions();
-		for (int i = 0; i < n; i++) {
-			orderList.addItem(new Integer(i+1));
+		for (int i = 0; i <= n; i++) {
+			orderList.addItem(new Integer(i));
 		}
 	}
 
@@ -79,7 +79,7 @@ public class OrderPanel extends PropertyPanel {
 	public void pushProperty(ItemInformation itemInformation) {
 		// get the order number of this form. It should be in the list, 
 		// but check and add it if necessary. 
-		int formOrder = 0;
+		Integer formOrder = 0;
 		if (itemInformation != null) {
 			Integer lVal = itemInformation.getIntegerProperty(UDColName.Length.toString());
 			if (lVal != null) {
@@ -96,7 +96,7 @@ public class OrderPanel extends PropertyPanel {
 		if (formOrder == 0) {
 			return;
 		}
-		orderList.setSelectedItem(formOrder);
+		orderList.setSelectedIndex(formOrder);
 	}
 
 	/* (non-Javadoc)
