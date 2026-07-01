@@ -20,6 +20,7 @@
  */
 package Map;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -241,9 +242,12 @@ public class Vessel extends PamSymbol implements Serializable, Cloneable, Manage
 		 */
 		Color currentColor;
 		currentColor = g2d.getColor();
-		(g2d).setColor(getShipColor());
-		(g2d).fillPolygon(shipPoly);
+		if (isFill()) {
+			(g2d).setColor(getShipColor());
+			(g2d).fillPolygon(shipPoly);
+		}
 		(g2d).setColor(getLineColor());
+		g2d.setStroke(new BasicStroke(getLineThickness()));
 		(g2d).drawPolygon(shipPoly);
 		g2d.setColor(Color.WHITE);
 		g2d.drawOval((int)shipPosition.x-2, (int) shipPosition.y-2, 4, 4); 
