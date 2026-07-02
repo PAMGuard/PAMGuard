@@ -1668,6 +1668,21 @@ public class DBProcess extends PamProcess {
 	 * @param clear reset data counts to zero when called. 
 	 * @return summary string
 	 */
+	public String getModuleSummary(boolean clear) {
+		DBSystem dbSystem = databaseControll.databaseSystem;
+		String name = "No database systen";
+		if (dbSystem != null) {
+			name = dbSystem.getShortDatabaseName(); 
+		}
+		int autoCommit = databaseControll.dbParameters.getUseAutoCommit() ? 1 : 0;
+		String summary = String.format("<DBNAME>%s</DBNAME><AUTOCOMMIT>%d</AUTOCOMMIT><WRITES>%d</WRITES><FAILS>%d</FAILS>", 
+					name, autoCommit, summaryWriteOK, summaryWriteErr);
+
+		if (clear) {
+			summaryWriteOK = summaryWriteErr = 0;
+		}
+		return summary;
+	}
 	public String getModuleSummary(boolean clear, String format) {
 		String summaryStr = null;
 		

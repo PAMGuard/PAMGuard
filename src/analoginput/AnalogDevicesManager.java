@@ -32,7 +32,11 @@ public class AnalogDevicesManager implements PamSettings {
 	public AnalogDevicesManager(SettingsNameProvider settingsNameProvider, AnalogSensorUser sensorUser) {
 		this.settingsNameProvider = settingsNameProvider;
 		this.sensorUser = sensorUser;
-		availableTypes.add(new MCCAnalogDevices(this, settingsNameProvider, sensorUser));
+		
+		String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+			availableTypes.add(new MCCAnalogDevices(this, settingsNameProvider, sensorUser));
+        }
 		availableTypes.add(new BrainBoxDevices(this, settingsNameProvider, sensorUser));
 		/**
 		 * Load plugins by accessing the list for this module

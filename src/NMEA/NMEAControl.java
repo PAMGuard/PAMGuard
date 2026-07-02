@@ -39,6 +39,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.command.SummaryCommand;
 import PamController.status.BaseProcessCheck;
 import nmeaEmulator.NMEAFrontEnd;
 import pamguard.GlobalArguments;
@@ -246,7 +247,8 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	
 	@Override
 	public String getModuleSummary(boolean clear, String format) {
-		if(format.equals("json")) {
+		switch (format) {
+		case SummaryCommand.JSON:
 			NMEADataUnit lastUnit = acquireNmeaData.getOutputDatablock().getLastUnit();
 			if(lastUnit==null) {
 				return "";
@@ -255,8 +257,11 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 			json.put("LastDataTime", lastUnit.getTimeMilliseconds());
 			json.put("LastDataString", lastUnit.getCharData().toString());
 			return json.toString();
+		case SummaryCommand.XML:
+			return getXMLModuleSummary(clear);
+		default:
+			return null;
 		}
-		return "";
 	}
 
 	/* (non-Javadoc)
@@ -293,5 +298,25 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	public AcquireNmeaData getAcquireNmeaData() {
 		return acquireNmeaData;
 	}
+	
+	public String getXMLModuleSummary(boolean clear) {
+		NMEADataUnit data = getNMEADataBLock().getLastUnit();
+		
+		String NMEAString;
+		if (data ==null) {
+			NMEAString = "none";
+		}
+		else {
+			NMEAString = data.getCharData().toString();
+		}
+				
+		StringBuilder sb = new StringBuilder();
+		sb.append("<NMEAraw>");
+		sb.append(NMEAString);
+		sb.append("</NMEAraw>");
+		
+		return NMEAString;
+	}
+
 	
 }

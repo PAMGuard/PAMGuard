@@ -46,6 +46,8 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 	public static final String oldCardName = "SMRU Ltd DAQ Card";
 
 	public static final int VERBOSELEVEL = 0;
+
+	private hfDaqCard.layoutFX.SmruDaqPane smruDaqPane;
 	
 
 	/**
@@ -591,6 +593,14 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 	public SmruDaqParameters getSmruDaqParameters() {
 		return smruDaqParameters;
+	}
+
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (smruDaqPane == null) {
+			smruDaqPane = new hfDaqCard.layoutFX.SmruDaqPane(this);
+		}
+		return smruDaqPane;
 	}
 
 

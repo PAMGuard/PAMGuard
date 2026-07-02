@@ -26,6 +26,7 @@ import javafx.scene.paint.Color;
 import pamViewFX.PamGuiTabFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSplitPane;
 import pamViewFX.fxNodes.connectionPane.ConnectionNode;
 import pamViewFX.fxNodes.connectionPane.ConnectionPane;
@@ -224,11 +225,15 @@ public class DataModelPaneFX extends PamBorderPane {
 		zoomOut.getStyleClass().add("transparent-button");
 		zoomOut.setStyle(" -fx-background-radius: 50;");
 
-		// want to alter the toolbar at the a bit
-		// remove all children
-		pamTab.getContentToolbar().getRightHBox().getChildren()
-		.removeAll(pamTab.getContentToolbar().getRightHBox().getChildren());
-		pamTab.getContentToolbar().getRightHBox().getChildren().addAll(zoomIn, zoomOut);
+		// Create a custom right-side panel with zoom controls for the data model tab
+		PamHBox zoomControls = new PamHBox();
+		zoomControls.setSpacing(5);
+		zoomControls.setAlignment(javafx.geometry.Pos.CENTER);
+		zoomControls.setPadding(new javafx.geometry.Insets(0, 10, 0, 20));
+		zoomControls.getChildren().addAll(zoomIn, zoomOut);
+		
+		// Set this as the custom toolbar right content for the data model tab
+		pamTab.setCustomToolbarRight(zoomControls);
 	}
 
 	// /**

@@ -112,6 +112,13 @@ public class AISGraphics extends PamDetectionOverlayGraphics {
 		int staticType = 0;
 		if (staticData != null) staticType = staticData.shipType;
 		PamSymbol plotSymbol = getSymbol(aisDataUnit.stationType, staticType);
+		PamSymbol colourSymbol = getPamSymbol(pamDataUnit, generalProjector);
+		if (plotSymbol != null && colourSymbol != null) {
+			plotSymbol.setFillColor(colourSymbol.getFillColor());
+			plotSymbol.setLineColor(colourSymbol.getLineColor());
+			plotSymbol.setFill(colourSymbol.isFill());
+			plotSymbol.setLineThickness(colourSymbol.getLineThickness());
+		}
 
 		// need to bodge things a little to make a gps object in the right place,
 		// then set the ship dimensions, then draw it.
@@ -134,8 +141,9 @@ public class AISGraphics extends PamDetectionOverlayGraphics {
 		//		aisGPSPosition.setSpeed(aisDataUnit.positionReport.)
 		//		aisVessel.setShipGps(aisGPSPosition.getPredictedGPSData(PamCalendar.getTime()));
 		if (aisVessel != null) {
-			aisVessel.setFillColor(Color.BLUE);
-			aisVessel.setLineColor(Color.BLUE);
+			aisVessel.setFillColor(plotSymbol.getFillColor());
+			aisVessel.setLineColor(plotSymbol.getLineColor());
+			aisVessel.setFill(plotSymbol.isFill());
 			aisVessel.setShipGps(aisGPSPosition);
 			if (staticData != null) {
 				aisVessel.setVesselDimension(staticData.dimA, staticData.dimB,

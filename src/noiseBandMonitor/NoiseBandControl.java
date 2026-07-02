@@ -17,12 +17,15 @@ import Filters.FilterMethod;
 import Filters.FilterParams;
 import Filters.FilterType;
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamControllerInterface;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
 import PamguardMVC.PamDataBlock;
+import noiseBandMonitor.layoutFX.NoiseBandGUIFX;
 import noiseMonitor.NoiseTabPanel;
 
 public class NoiseBandControl extends PamControlledUnit implements PamSettings {
@@ -36,6 +39,11 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	private NoiseTabPanel tabPanel;
 
 	private BandData bandData;
+
+	/**
+	 * The JavaFX GUI for the noise band module.
+	 */
+	private NoiseBandGUIFX noiseBandGUIFX;
 	/** 
 	 * Third octave band centres using exact base 2 option 
 	 * from ANSI S1.11-2004
@@ -57,6 +65,13 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	 */
 	public NoiseBandSettings getNoiseBandSettings() {
 		return noiseBandSettings;
+	}
+
+	/**
+	 * @param noiseBandSettings the noiseBandSettings to set
+	 */
+	public void setNoiseBandSettings(NoiseBandSettings noiseBandSettings) {
+		this.noiseBandSettings = noiseBandSettings;
 	}
 
 	/**
@@ -314,7 +329,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 		return true;
 	}
 
-	protected void sortBandEdges() {
+	public void sortBandEdges() {
 		if (bandData == null) {
 			return;
 		}
@@ -340,6 +355,17 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 
 	public BandData getBandData() {
 		return bandData;
+	}
+
+	@Override
+	public PamControlledUnitGUI getGUI(int flag) {
+		if (flag == PamGUIManager.FX) {
+			if (noiseBandGUIFX == null) {
+				noiseBandGUIFX = new NoiseBandGUIFX(this);
+			}
+			return noiseBandGUIFX;
+		}
+		return null;
 	}
 
 	@Override

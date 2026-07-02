@@ -105,6 +105,14 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected AcquisitionDialog acquisitionDialog;
 
 	protected FileInputParameters fileInputParameters = new FileInputParameters(sysType);
+	
+	/**
+	 * Get the file input parameters.
+	 * @return the file input parameters.
+	 */
+	public FileInputParameters getFileInputParameters() {
+		return fileInputParameters;
+	}
 
 	protected AcquisitionControl acquisitionControl;
 
@@ -155,6 +163,22 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	long readFileSamples;
 
 	long millisToSkip;
+	
+	/**
+	 * Get the total number of samples in the current file.
+	 * @return total samples in the current file.
+	 */
+	public long getFileSamples() {
+		return fileSamples;
+	}
+	
+	/**
+	 * Get the number of samples read so far from the current file.
+	 * @return samples read from the current file.
+	 */
+	public long getReadFileSamples() {
+		return readFileSamples;
+	}
 
 	protected JCheckBox repeat;
 

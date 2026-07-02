@@ -67,6 +67,8 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 	private int dataUnitSamples;
 
 	private PlaybackSystem playBackSystem = null;
+
+	private nidaqdev.layoutFX.NIDAQPane nidaqPane;
 	
 	public NIDAQProcess (AcquisitionControl daqControl) {
 		this.daqControl = daqControl;
@@ -704,6 +706,14 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 
 	public ArrayList<NIDeviceInfo> getNiDevices() {
 		return niDevices;
+	}
+
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (nidaqPane == null) {
+			nidaqPane = new nidaqdev.layoutFX.NIDAQPane(this);
+		}
+		return nidaqPane;
 	}
 
 

@@ -49,6 +49,8 @@ public class ASIOSoundSystem extends DaqSystem implements PamSettings {
 
 	private AudioDataQueue newDataUnits;
 
+	private asiojni.layoutFX.ASIOSoundDAQPane asioSoundDAQPane;
+
 	private volatile boolean stopCapture;
 
 	private AcquisitionControl acquisitionControl;
@@ -418,6 +420,14 @@ public class ASIOSoundSystem extends DaqSystem implements PamSettings {
 	public Serializable getSettingsReference() {
 		return soundCardParameters;
 	}
+	
+	/**
+	 * Get the sound card parameters.
+	 * @return the sound card parameters.
+	 */
+	public SoundCardParameters getSoundCardParameters() {
+		return soundCardParameters;
+	}
 
 	@Override
 	public long getSettingsVersion() {
@@ -623,6 +633,14 @@ public class ASIOSoundSystem extends DaqSystem implements PamSettings {
 	@Override
 	public String getDeviceName() {
 		return String.format("%d", soundCardParameters.deviceNumber);
+	}
+	
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (asioSoundDAQPane == null) {
+			asioSoundDAQPane = new asiojni.layoutFX.ASIOSoundDAQPane(this);
+		}
+		return asioSoundDAQPane;
 	}
 
 

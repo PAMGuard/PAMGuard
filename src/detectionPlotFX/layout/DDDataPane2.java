@@ -12,7 +12,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
 
 /**
- * ComboBox which holds the options for different plots to be displayed. This pane is much redcuded in szie
+ * ComboBox which holds the options for different plots to be displayed. This pane is much reduced in size
  * compared to DDataPane which uses radio buttons. 
  * 
  * 

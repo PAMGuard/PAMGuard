@@ -3254,9 +3254,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 		String sum = "";
 		// system time
 		String t = PamCalendar.formatDBDateTime(System.currentTimeMillis(), true);
-		sum += String.format("\n<SYSTIME>%s<\\SYSTIME>", t);
-		sum += String.format("\n<STATUS>%d<\\STATUS>", getPamStatus());
-		sum += String.format("\n<STATE>%d<\\STATE>", getRealStatus());
+		sum += String.format("<SYSTIME>%s<\\SYSTIME>", t);
+		sum += String.format("<STATUS>%d<\\STATUS>", getPamStatus());
+		sum += String.format("<STATE>%d<\\STATE>", getRealStatus());
+
+		//sum += String.format("\n<SYSTIME>%s<\\SYSTIME>", t);
+		//sum += String.format("\n<STATUS>%d<\\STATUS>", getPamStatus());
+	//	sum += String.format("\n<STATE>%d<\\STATE>", getRealStatus());
 		sum += "\n";
 		return sum;
 	}

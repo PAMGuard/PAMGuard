@@ -586,6 +586,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 				long[] startEndTimes = getSecondaryLoadTimes(mapPoint); 
 				
+
 //				System.out.println(String.format("Processing map point %s with data from %s to %s", mapPoint.toString(), 
 //						PamCalendar.formatDateTime(startEndTimes[0]), PamCalendar.formatDateTime(startEndTimes[1])));
 				//					if (procDataEnd - procDataStart < maxSecondaryLoad) {
@@ -651,6 +652,7 @@ public class OfflineTaskGroup implements PamSettings {
 		//but the secondary data may have different start and end times.
 		long minTime = mapPoint.getStartTime();
 		long maxTime = mapPoint.getEndTime();
+
 
 		synchronized (primaryDataBlock.getSynchLock()) {
 			ListIterator<PamDataUnit> iterator = primaryDataBlock.getListIterator(0);

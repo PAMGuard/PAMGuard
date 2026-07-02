@@ -14,7 +14,9 @@ import PamguardMVC.superdet.SuperDetection;
 import dataPlotsFX.data.DataTypeInfo;
 import dataPlotsFX.data.FFTPlotManager;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
+import detectionPlotFX.layout.AbstractDetectionPlot;
 import detectionPlotFX.layout.DetectionPlot;
+import detectionPlotFX.layout.DetectionPlotContext;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.plots.RawFFTPlot.FreqTimeProjector;
 import detectionPlotFX.projector.DetectionPlotProjector;
@@ -37,7 +39,7 @@ import javafx.scene.shape.Rectangle;
  *
  * @param <D> - the detection type. 
  */
-public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D> {
+public abstract class FFTPlot<D extends PamDataUnit> extends AbstractDetectionPlot<D> {
 
 	/**
 	 * Plot kHz instead of 
@@ -47,7 +49,9 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 
 	/**
 	 * Reference to the detection plot display. 
+	 * @deprecated Use {@link #getContext()} instead. Kept for backward compatibility with subclasses.
 	 */
+	@Deprecated
 	protected DetectionPlotDisplay detectionPlotDisplay;
 
 
@@ -92,6 +96,7 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 	private boolean useKHz = false;
 
 	public FFTPlot(DetectionPlotDisplay displayPlot, DetectionPlotProjector projector) {
+		super(displayPlot);
 		this.detectionPlotDisplay=displayPlot; 
 	
 		//set the FFT params. 
@@ -106,8 +111,8 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 
 	@Override
 	public void setupPlot() {
-		detectionPlotDisplay.setAxisVisible(false, false, true, true);
-		detectionPlotDisplay.getAxisPane(Side.LEFT).setnPlots(1); //TODO- make two panels?
+		getContext().setAxisVisible(false, false, true, true);
+		getContext().getAxisPane(Side.LEFT).setnPlots(1); //TODO- make two panels?
 		//		timeFreqProjector.setTimeAxis(detectionPlotDisplay.getAxis(Side.BOTTOM));
 	}
 
@@ -151,7 +156,7 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 
 		
 		//double sampleRate = pamDetection.getParentDataBlock().getSampleRate();
-		double sampleRate= this.detectionPlotDisplay.getCurrentDataInfo().getHardSampleRate();
+		double sampleRate= this.getContext().getCurrentDataInfo().getHardSampleRate();
 
 		//plotProjector.setAxisLabel("Time (samples)", Side.TOP);
 
@@ -515,13 +520,6 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 		}
 	}
 
-
-	/**
-	 * Repaint  the current data unit. 
-	 */
-	public void reDrawLastUnit() {
-		detectionPlotDisplay.drawCurrentUnit();
-	}
 
 	/**
 	 * Set the FFT params.
