@@ -8,12 +8,14 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamModel.PamModuleInfo;
+import metadata.layoutFX.MetaDataGUIFX;
 import metadata.swing.MetaDataDialog;
 
 /**
@@ -31,6 +33,11 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 	private PamguardMetaData pamguardMetaData = new PamguardMetaData();
 	
 //	private ParameterSetManager<DeploymentData> deploymentSetManager;
+	
+	/**
+	 * The JavaFX GUI for the metadata module.
+	 */
+	private MetaDataGUIFX metaDataGUIFX;
 	
 	
 	private MetaDataContol(String unitName) {
@@ -112,6 +119,17 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 			// send around a notification 
 			PamController.getInstance().notifyModelChanged(PamController.PROJECT_META_UPDATE);
 		}
+	}
+	
+	@Override
+	public PamControlledUnitGUI getGUI(int flag) {
+		if (flag == PamGUIManager.FX) {
+			if (metaDataGUIFX == null) {
+				metaDataGUIFX = new MetaDataGUIFX(this);
+			}
+			return metaDataGUIFX;
+		}
+		return null;
 	}
 	
 	/**

@@ -79,6 +79,8 @@ public class SimProcess extends DaqSystem implements PamSettings {
 
 	private SimGraphics simGraphics;
 
+	private simulatedAcquisition.layoutFX.SimDAQPane simDAQPane;
+
 	private volatile boolean dontStop;
 
 	private volatile boolean stillRunning;
@@ -647,6 +649,38 @@ public class SimProcess extends DaqSystem implements PamSettings {
 
 	public PamDataBlock getSimObjectsDataBlock() {
 		return simObjectsDataBlock;
+	}
+	
+	/**
+	 * Get the simulation parameters.
+	 * @return the simulation parameters.
+	 */
+	public SimParameters getSimParameters() {
+		return simParameters;
+	}
+	
+	/**
+	 * Get the list of available propagation models.
+	 * @return list of propagation models.
+	 */
+	public ArrayList<PropagationModel> getPropagationModels() {
+		return propagationModels;
+	}
+	
+	/**
+	 * Get the available simulated signal types.
+	 * @return the SimSignals manager.
+	 */
+	public SimSignals getSimSignals() {
+		return simSignals;
+	}
+
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (simDAQPane == null) {
+			simDAQPane = new simulatedAcquisition.layoutFX.SimDAQPane(this);
+		}
+		return simDAQPane;
 	}
 
 	/* (non-Javadoc)

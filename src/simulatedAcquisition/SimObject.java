@@ -99,7 +99,7 @@ public class SimObject implements Serializable, Cloneable, ManagedParameters {
 	private transient MovementModels movementModels;
 
 	@Override
-	protected SimObject clone() {
+	public SimObject clone() {
 		try {
 			SimObject newObject = (SimObject) super.clone();
 			/** 

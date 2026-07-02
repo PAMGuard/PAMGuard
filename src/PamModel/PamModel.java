@@ -697,6 +697,7 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Measure noise in octave, third octave, decade bands, etc. using filter banks");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/NoiseBands/Docs/NoiseBands.html");
+		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 
 		mi = PamModuleInfo.registerControlledUnit("dbht.DbHtControl", "dBHt Measurement");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));

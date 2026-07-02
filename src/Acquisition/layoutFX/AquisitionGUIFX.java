@@ -6,10 +6,7 @@ import Acquisition.DaqSystem;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.SettingsPane;
-import javafx.scene.layout.Pane;
 import pamViewFX.PamControlledGUIFX;
-import pamViewFX.PamGuiManagerFX;
-import pamViewFX.fxNodes.PamBorderPane;
 
 /**
  * FX GUI for the SoundAquisition module. 
@@ -39,10 +36,11 @@ public class AquisitionGUIFX extends PamControlledGUIFX {
 	
 	private void setDaqSpecificPane() {
 		DaqSystem currentDaqSystem = aquisitionControl.findDaqSystem(aquisitionControl.getAcquisitionParameters().getDaqSystemType()); 
+		if (currentDaqSystem == null) return;
 		getSettingsPane();
-		PamGuiManagerFX pamGuiManager = PamGuiManagerFX.getInstance();
-		pamGuiManager.addStatusBarPane(currentDaqSystem.getDAQSpecificPane(acquisitionPane).getStatusBarFactory());
 		
+		// Use the new direct pane approach via the AcquisitionPaneFX
+		acquisitionPane.showStatusBarPane(currentDaqSystem);
 	}
 
 	@Override

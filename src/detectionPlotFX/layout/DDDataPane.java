@@ -19,8 +19,9 @@ import pamViewFX.fxNodes.PamVBox;
 /**
  * Pane which allows users to select parent data blocks. 
  * @author Jamie Macaulay
- *
+ * @deprecated Use {@link DDDataPane2} instead, which provides a more compact ChoiceBox-based UI.
  */
+@Deprecated
 public class DDDataPane extends PamBorderPane {
 
 	/**

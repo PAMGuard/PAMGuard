@@ -6,10 +6,38 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
 /**
- * An interface to satisfy basic plots. Note that this does not have to be used in a DetectionDisplay
- * @author Jamie Macaulay
+ * Interface for rendering a single detection on a plot canvas.
+ * <p>
+ * A {@code DetectionPlot} knows how to set up axes and paint data for one particular 
+ * visualisation of a data unit (e.g. waveform, spectrum, spectrogram, Wigner plot).
+ * Multiple {@code DetectionPlot} implementations are typically registered with a 
+ * {@link detectionPlotFX.data.DDDataInfo DDDataInfo}, which lets the user switch between 
+ * different plot types for the same data.
+ * <p>
+ * <b>Architecture overview:</b>
+ * <pre>
+ *   DetectionPlotDisplay ──implements──▶ DetectionPlotContext
+ *          │                                    ▲
+ *          ├── DDDataInfo (wraps a data block)   │ (plots interact via context)
+ *          │       └── DetectionPlot[]           │
+ *          │              └── AbstractDetectionPlot ───uses───┘
+ *          └── DDPlotPane (canvas + axes)
+ * </pre>
+ * <p>
+ * <b>Implementing a new plot type:</b>
+ * <ol>
+ *   <li>Extend {@link AbstractDetectionPlot} rather than implementing this interface directly.</li>
+ *   <li>The abstract base class provides a {@link DetectionPlotContext} reference, 
+ *       {@code requestRedraw()}, {@code requestScrollBarSetup()}, and a default 
+ *       {@code getSettingsPane()} returning null.</li>
+ *   <li>Override {@link #setupPlot()}, {@link #setupAxis}, and {@link #paintPlot} at minimum.</li>
+ * </ol>
+ * <p>
+ * This interface does <i>not</i> require a reference to any display — it can be used standalone 
+ * for testing or in alternative display contexts.
  *
- * @param <D> - the type of data that is input for plotting
+ * @param <D> the type of data that is input for plotting
+ * @author Jamie Macaulay
  */
 public interface DetectionPlot<D> {
 	
@@ -55,9 +83,11 @@ public interface DetectionPlot<D> {
 	/**
 	 * Get the settings pane for the particular plot. This sits on the right hand side of the display
 	 * inside a hiding pane. 
-	 * @return a pane with controls for changing settings in a node. 
+	 * @return a pane with controls for changing settings in a node. Returns null by default. 
 	 */
-	public Pane getSettingsPane();
+	default Pane getSettingsPane() {
+		return null;
+	}
 
 
 }

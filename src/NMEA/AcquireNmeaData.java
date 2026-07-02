@@ -202,13 +202,16 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		activeNMEAsource.start();
 	}
 	
-	public void makeEmptyThread() {
-		timer.stop();
-		activeNMEAsource = null;
-		activeNMEAsource = new Thread(new EmptyThread());
-		timer.start();
-		activeNMEAsource.start();
-	}
+//	public void makeEmptyThread() {
+//		timer.stop();
+////		autoPortTimer.stop();
+//		autoPortTimer.start();
+//		activeNMEAsource = null;
+//		activeNMEAsource = new Thread(new EmptyThread());
+//		timer.start();
+//		activeNMEAsource.start();
+//		Possible error. Need to check if some of the code from below should be here
+//	}
 
 	public void makeSerialThread() {
 		timer.stop();

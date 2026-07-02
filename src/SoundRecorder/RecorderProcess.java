@@ -36,6 +36,12 @@ public class RecorderProcess extends PamProcess {
 	private long lastRecordedSample;
 
 	private double[][] soundData;
+	
+	/**
+	 * THe last amplitude in dB for each channel. 
+	 */
+	private double[] lastAmplitudedB;
+
 
 	private RecordingInfo recordingInfo;
 
@@ -215,6 +221,7 @@ public class RecorderProcess extends PamProcess {
 	}
 	
 	int bCount = 0;
+
 	/**
 	 * RecordData has to stack up all the channels so that we've a full 
 	 * set, then sends on to recordSoundData. 
@@ -233,6 +240,7 @@ public class RecorderProcess extends PamProcess {
 		int nChannels = PamUtils.getNumChannels(wantedChannels);
 		if (soundData == null || soundData.length != nChannels) {
 			soundData = new double[nChannels][];
+			lastAmplitudedB = new double[nChannels];
 		}
 		/*
 		 * there is a mapping of channel numbers if not all are being used
@@ -250,6 +258,8 @@ public class RecorderProcess extends PamProcess {
 		sampleStartTime = rawDataUnit.getStartSample();
 		collectedChannels = PamUtils.SetBit(collectedChannels, thisChannel, true);
 		soundData[channelPos] = rawDataUnit.getRawData();
+		//record the last amplitudes. 
+		lastAmplitudedB[channelPos] = 20*Math.log10(rawDataUnit.getMeasuredAmplitude()); 
 
 		if (collectedChannels == wantedChannels) {
 			lastRecordedSample = rawDataUnit.getTimeMilliseconds();
@@ -259,7 +269,7 @@ public class RecorderProcess extends PamProcess {
 			soundData = new double[soundData.length][];
 		}
 	}
-	
+
 	/**
 	 * Writes sound data to file or files - makes checks to see that the 
 	 * file size limits have not been exceeded, opening new files as necessary
@@ -409,6 +419,16 @@ public class RecorderProcess extends PamProcess {
 	public boolean isDataComing() {
 		return dataComing;
 	}
+	
+	
+	/**
+	 * Get the last amplitude in dB for each channel. This is updated as each new data unit comes in, so will be the most recent value for each channel, even if the channels are not all synchronised. 
+	 * @return array of last amplitudes in dB for each channel, in the order of the channels in the recording. 
+	 */
+	public double[] getLastAmplitudedB() {
+		return lastAmplitudedB;
+	}
+
 
 
 }

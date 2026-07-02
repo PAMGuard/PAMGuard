@@ -87,6 +87,7 @@ public class NewAsioSoundSystem extends DaqSystem implements PamSettings {
 	
 	private int[] currentPlayPos = new int[PamConstants.MAX_CHANNELS];
 
+	private asiojni.layoutFX.NewAsioDAQPane newAsioDAQPane;
 	
 	public NewAsioSoundSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
@@ -187,6 +188,14 @@ public class NewAsioSoundSystem extends DaqSystem implements PamSettings {
 	@Override
 	public String getDeviceName() {
 		return "ASIO";
+	}
+	
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (newAsioDAQPane == null) {
+			newAsioDAQPane = new asiojni.layoutFX.NewAsioDAQPane(this);
+		}
+		return newAsioDAQPane;
 	}
 
 	@Override
@@ -403,6 +412,23 @@ public class NewAsioSoundSystem extends DaqSystem implements PamSettings {
 	@Override
 	public Serializable getSettingsReference() {
 		return soundCardParameters;
+	}
+	
+	/**
+	 * Get the sound card parameters.
+	 * @return the sound card parameters.
+	 */
+	public SoundCardParameters getSoundCardParameters() {
+		return soundCardParameters;
+	}
+	
+	/**
+	 * Get the available ASIO driver names.
+	 * @return list of driver names.
+	 * @throws AsioException if there is an error getting driver names.
+	 */
+	public List<String> getDriverNames() throws AsioException {
+		return AsioDriver.getDriverNames();
 	}
 
 	@Override

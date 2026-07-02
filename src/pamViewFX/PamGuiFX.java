@@ -23,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -101,6 +102,10 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 */
 	private HidingPane hidingPaneLeft;
 
+	private PamVBox leftPaneWrapper;
+	private PamVBox settingsContentPane;
+	private PamBorderPane mainLayout;
+
 	/**
 	 * Pane which shows load progress. 
 	 */
@@ -117,6 +122,12 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	private boolean showingLoadMode;
 
 	private ObservableList<Node> children;
+
+	/**
+	 * The single shared toolbar that sits between tab headers and tab content.
+	 * This replaces the per-tab toolbars that were previously duplicated for each tab.
+	 */
+	private ToolBarPane sharedToolbar;
 
 
 	/**
@@ -217,8 +228,23 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		/**create settings pane. This allows access to primary PAMGUARD settings.**/
 		settingsPane=new PamSettingsMenuPane();
 		settingsPane.setPrefWidth(250);
-		hidingPaneLeft=new HidingPane(Side.LEFT, settingsPane, this, false);
+		
+		leftPaneWrapper = new PamVBox();
+		leftPaneWrapper.setPrefWidth(250);
+		settingsContentPane = settingsPane;
+		leftPaneWrapper.getChildren().add(settingsContentPane);
+		
+		hidingPaneLeft=new HidingPane(Side.LEFT, leftPaneWrapper, this, false);
 		hidingPaneLeft.showHidePane(false);
+		
+		mainLayout = layout;
+		
+		hidingPaneLeft.showingProperty().addListener((obs, wasShowing, isShowing) -> {
+			if (!isShowing) {
+				restoreLeftPane();
+			}
+		});
+		
 		
 		hidingPaneLeft.getStylesheets().addAll(pamGuiManagerFX.getPamSettingsCSS());
 
@@ -252,6 +278,15 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		mainTabPane.setTabStartRegion(showButtonLeft);
 //		mainTabPane.getStyleClass().add(Styles.TABS_FLOATING);
 
+		//create the single shared toolbar and set it on the tab pane
+		sharedToolbar = new ToolBarPane(PamGuiFX.this);
+		mainTabPane.setToolbarRegion(sharedToolbar);
+		
+		//update the toolbar's resize controls when the selected tab changes
+		mainTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+			updateToolbarForTab((PamGuiTabFX) newTab);
+		});
+
 		mainTabPane.getAddTabButton().setOnAction((value)->{
 		    addPamTab(new TabInfo("Display " + (this.getNumTabs()+1)), null ,true); 
 		    mainTabPane.layout();
@@ -279,6 +314,32 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	public PamLoadingPane getLoadPane() {
 		return loadPane;
 	}
+	
+	/**
+	 * Update the shared toolbar controls to reflect the currently selected tab.
+	 * For example, the resize toggle should reflect the current tab's editable state,
+	 * and the resize controls should be shown/hidden based on whether the tab has
+	 * resizable displays. If the tab has custom right-side toolbar content 
+	 * (e.g. zoom controls for the data model), that will be shown instead.
+	 * @param tab - the newly selected tab. Can be null.
+	 */
+	private void updateToolbarForTab(PamGuiTabFX tab) {
+		if (sharedToolbar == null) return;
+		if (tab != null) {
+			// Swap right-side content if the tab has custom content
+			sharedToolbar.swapRightContent(tab.getCustomToolbarRight());
+			// Update the resize toggle state
+			sharedToolbar.showResizableControl(tab.isStaticDisplay());
+		}
+	}
+	
+	/**
+	 * Get the single shared toolbar for this PamGuiFX.
+	 * @return the shared ToolBarPane.
+	 */
+	public ToolBarPane getSharedToolbar() {
+		return sharedToolbar;
+	}
 
 	/**
 	 * Show this PamGUIFX. 
@@ -296,8 +357,6 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	public PamGuiTabFX addPamTab(TabInfo tabInfo, UserDisplayNodeFX content, boolean detachable ){        
         //create holder pane and add to tab
 		PamGuiTabFX newTab = new PamGuiTabFX(tabInfo, this);
-		
-		newTab.setToolbar(new ToolBarPane(newTab));
 		
 		//static displays have non closable tabs and non resizable displays
         if (content!=null){
@@ -344,7 +403,6 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	public DataModelPaneFX addDataModelTab() {
 		
 		PamGuiTabFX newTab = new PamGuiTabFX(new TabInfo("Data Model"), this);
-		newTab.setToolbar(new ToolBarPane(newTab));
 		
         newTab.setClosable(false); //can't close a data model
         newTab.setDetachable(false);
@@ -454,9 +512,9 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		private double prefHeight=45;
 
 		/**
-		 * The tab pane which the toolbar belongs to. 
+		 * Reference to the PamGuiFX that owns this toolbar.
 		 */
-		private PamGuiTabFX pamGuiTab;
+		private PamGuiFX pamGuiFX;
 
 		/**
 		 * HBox whihc by default holds a toggle switch on the right of the toolbar to change window sizes
@@ -474,10 +532,15 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		 */
 		private MenuButton autoSortChoice;
 	
-		public ToolBarPane(PamGuiTabFX pamGuiTab){
+		/**
+		 * Create a ToolBarPane for a PamGuiFX. This is a single shared toolbar
+		 * that sits between the tab headers and the tab content for all tabs.
+		 * @param pamGuiFX - the PamGuiFX this toolbar belongs to.
+		 */
+		public ToolBarPane(PamGuiFX pamGuiFX){
 			super();
 			
-			this.pamGuiTab=pamGuiTab;
+			this.pamGuiFX=pamGuiFX;
 		
 			//create record and play buttons. 
 			Pane playControls;
@@ -505,8 +568,11 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			editWindows.setPadding(new Insets(8,0,0,0));
 			//editWindows.setAlignment(Pos.CENTER);		
 			editWindows.selectedProperty().addListener((listen)->{
-				boolean editable=!pamGuiTab.getEditable();
-				pamGuiTab.setPanesEditable(editable);
+				PamGuiTabFX selectedTab = getSelectedTab();
+				if (selectedTab != null) {
+					boolean editable=!selectedTab.getEditable();
+					selectedTab.setPanesEditable(editable);
+				}
 			});
 			
 			//add a choice box to allow users to automatically resize windows. 
@@ -518,17 +584,20 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			
 			MenuItem tile=new MenuItem("Tile");
 			tile.setOnAction((action)->{
-				pamGuiTab.autoSortPanes(PamGuiTabFX.SORT_TILE);
+				PamGuiTabFX selectedTab = getSelectedTab();
+				if (selectedTab != null) selectedTab.autoSortPanes(PamGuiTabFX.SORT_TILE);
 			});
 			
 			MenuItem vertical=new MenuItem("Horizontal");
 			vertical.setOnAction((action)->{
-				pamGuiTab.autoSortPanes(PamGuiTabFX.SORT_HORIZONTAL);
+				PamGuiTabFX selectedTab = getSelectedTab();
+				if (selectedTab != null) selectedTab.autoSortPanes(PamGuiTabFX.SORT_HORIZONTAL);
 			});
 			
 			MenuItem horizontal=new MenuItem("Vertical");
 			horizontal.setOnAction((action)->{
-				pamGuiTab.autoSortPanes(PamGuiTabFX.SORT_VERTICAL);
+				PamGuiTabFX selectedTab = getSelectedTab();
+				if (selectedTab != null) selectedTab.autoSortPanes(PamGuiTabFX.SORT_VERTICAL);
 			});
 			
 			autoSortChoice.getItems().addAll(tile, vertical, horizontal); 
@@ -548,13 +617,27 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.setRight(rightHBox);
 			
 			this.setPrefHeight(prefHeight);
-//			this.getStyleClass().add("pane-opaque");
+			this.getStyleClass().add("pane-opaque");
 
 
 			//this.setPadding(new Insets(0,0,0,0));
 			
 			this.toFront();
 
+		}
+		
+		/**
+		 * Get the currently selected PamGuiTabFX from the parent PamGuiFX.
+		 * @return the currently selected tab, or null if none.
+		 */
+		private PamGuiTabFX getSelectedTab() {
+			if (pamGuiFX != null && pamGuiFX.mainTabPane != null) {
+				javafx.scene.control.Tab selected = pamGuiFX.mainTabPane.getSelectionModel().getSelectedItem();
+				if (selected instanceof PamGuiTabFX) {
+					return (PamGuiTabFX) selected;
+				}
+			}
+			return null;
 		}
 		
 		
@@ -566,16 +649,14 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			PamButton reProcess=new PamButton("Reprocess");
 			reProcess.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", PamGuiManagerFX.iconSize));
 			reProcess.setOnAction((action)->{
-				//Open reprocess dialog. 
-				
+				showReprocessPane();
 			});
 			
 			
 			PamButton exportButton = new PamButton("Export data");
 			exportButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-database-export", PamGuiManagerFX.iconSize));
 			exportButton.setOnAction((action)->{
-				//export dialog
-				
+				showExportPane();
 			});
 			
 			PamButton importButton = new PamButton("Import data");
@@ -695,6 +776,20 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.rightHBox = rightHBox;
 		}
 
+		/**
+		 * Swap the right-side content of the toolbar. This allows different tabs to show
+		 * different controls on the right side (e.g. the data model shows zoom controls 
+		 * while normal tabs show resize controls).
+		 * @param customRight - the custom right content, or null to restore the default.
+		 */
+		public void swapRightContent(Region customRight) {
+			if (customRight != null) {
+				this.setRight(customRight);
+			} else {
+				// Restore the default right content (resize toggle + sort options)
+				this.setRight(rightHBox);
+			}
+		}
 
 		/**
 		 * Show the controls which allows manula resizing of the pane. 
@@ -710,18 +805,74 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	}
 	
 	/**
-	 * Get all record buttons from the different toolbars in this stage.
-	 * @return list of record buttons. 
+	 * Get the record button from the shared toolbar.
+	 * @return list of record buttons (single button in a list for backward compatibility). 
 	 */
 	protected ArrayList<Button> getRecordButtons(){
-		ArrayList<PamGuiTabFX> tabs=getTabs();
 		ArrayList<Button> buttons=new ArrayList<Button>();
-		for (int i=0; i<tabs.size(); i++){
-			buttons.add(tabs.get(i).getContentToolbar().getRecordButton()); 
+		if (sharedToolbar != null && sharedToolbar.getRecordButton() != null) {
+			buttons.add(sharedToolbar.getRecordButton()); 
 		}
 		return buttons; 
 	}
-	
+
+	/**
+	 * Show the offline reprocessing pane in the left hiding pane and disable
+	 * the rest of the GUI until the user closes or finishes processing.
+	 */
+	private void showReprocessPane() {
+		offlineProcessing.fx.OfflineProcessPaneFX processPaneFX =
+				new offlineProcessing.fx.OfflineProcessPaneFX();
+		processPaneFX.setOnClose(() -> restoreLeftPane());
+		Node content = processPaneFX.createContentPane();
+		showLeftPaneContent(content);
+	}
+
+	/**
+	 * Show the data export pane in the left hiding pane and disable
+	 * the rest of the GUI until the user closes or finishes exporting.
+	 */
+	private void showExportPane() {
+		export.layoutFX.ExportPaneFX exportPaneFX =
+				new export.layoutFX.ExportPaneFX();
+		exportPaneFX.setOnClose(() -> restoreLeftPane());
+		Node content = exportPaneFX.createContentPane();
+		showLeftPaneContent(content);
+	}
+
+	/**
+	 * Swap the left hiding pane content with the given node, open the pane,
+	 * and disable the main tab area so the user must interact with the left
+	 * pane before returning to PAMGuard.
+	 *
+	 * @param content the content node to display.
+	 */
+	private void showLeftPaneContent(Node content) {
+		leftPaneWrapper.getChildren().clear();
+		leftPaneWrapper.getChildren().add(content);
+		leftPaneWrapper.setPrefWidth(450);
+		hidingPaneLeft.showHidePane(true);
+		mainTabPane.setDisable(true);
+		if (sharedToolbar != null) {
+			sharedToolbar.setDisable(true);
+		}
+	}
+
+	/**
+	 * Restore the left hiding pane to its original settings content and
+	 * re-enable the main GUI.
+	 */
+	private void restoreLeftPane() {
+		leftPaneWrapper.getChildren().clear();
+		leftPaneWrapper.getChildren().add(settingsContentPane);
+		leftPaneWrapper.setPrefWidth(250);
+		hidingPaneLeft.showHidePane(false);
+		mainTabPane.setDisable(false);
+		if (sharedToolbar != null) {
+			sharedToolbar.setDisable(false);
+		}
+	}
+
 	/**
 	 * Remove an internal pane if it is contained within any tabs within the PamGuiFX
 	 * @param removeNode - remove the pane if it contains this node. 
@@ -774,60 +925,55 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	}
 	
 	/**
-	 * Set the state of the record button in all tabs.
+	 * Set the state of the record button in the shared toolbar.
 	 * @param running - true if PAMGuard is running
 	 */
 	public void setRecordbuttonState(boolean running) {
-		for (int i=0; i<this.getNumTabs(); i++){
-			this.getTab(i).getContentToolbar().setRecordButtonState(running);
+		if (sharedToolbar != null) {
+			sharedToolbar.setRecordButtonState(running);
 		}
 	}
 	
 	
 	/**
-	 * Add a pane to the tool bar of all tabs.
+	 * Add a pane to the shared toolbar.
 	 * @param paneFactory
 	 */
 	public boolean addStatusBarPane(PaneFactory paneFactory) {
 		
 		System.out.println("PamGuiFX: addToolBarPane: adding pane factory " + paneFactory.getPaneFactoryName());
 		
-		boolean statusPaneAdded=false;
-		for (int i=0; i<this.getNumTabs(); i++){
-			//check that a pane factory of this type does not exist.
-			children = this.getTab(i).getContentToolbar().getCenterHBox().getChildren();
-			
-			boolean add=true;
-			//we want to searc h through all the children in the pane and see if they were created by the same factory.
-			//If so, don't add another. 
-			for (int j=0; j<children.size(); j++) {
-				if (children.get(j) instanceof PaneFactoryPane) {
-					PaneFactory factory = ((PaneFactoryPane) children.get(j)).getFactoryRef();
-					if (factory.equals(paneFactory)) {
-						//pane factory of this instance already exists- do not add another. 
-						add = false;
-					}
+		if (sharedToolbar == null) return false;
+		
+		//check that a pane factory of this type does not already exist.
+		children = sharedToolbar.getCenterHBox().getChildren();
+		
+		for (int j=0; j<children.size(); j++) {
+			if (children.get(j) instanceof PaneFactoryPane) {
+				PaneFactory factory = ((PaneFactoryPane) children.get(j)).getFactoryRef();
+				if (factory.equals(paneFactory)) {
+					//pane factory of this instance already exists- do not add another. 
+					return false;
 				}
 			}
-			
-			if (add) {
-				this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory.createPane());
-				statusPaneAdded= add;
-			}
-			
 		}
 		
-		//return true if at least one pane was added.
-		return statusPaneAdded;
-
+		sharedToolbar.getCenterHBox().getChildren().add(paneFactory.createPane());
+		return true;
 	}
 	
 
 	public void removeStatusBarPane(PaneFactory statusPaneFactory) {
-		//TODO
-//		for (int i=0; i<this.getNumTabs(); i++){
-//			this.getTab(i).getContentToolbar().getCenterHBox().getChildren().add(paneFactory);
-//		}
+		if (sharedToolbar == null) return;
+		children = sharedToolbar.getCenterHBox().getChildren();
+		for (int j = children.size() - 1; j >= 0; j--) {
+			if (children.get(j) instanceof PaneFactoryPane) {
+				PaneFactory factory = ((PaneFactoryPane) children.get(j)).getFactoryRef();
+				if (factory.equals(statusPaneFactory)) {
+					children.remove(j);
+				}
+			}
+		}
 	}
 
 
