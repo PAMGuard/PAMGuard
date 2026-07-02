@@ -47,11 +47,11 @@ import fftManager.layoutFX.FFTGuiFX;
 import fftManager.newSpectrogram.SpectrogramPlotProvider;
 import spectrogramNoiseReduction.SpectrogramNoiseProcess;
 
-public class PamFFTControl extends PamControlledUnit implements PamSettings {
+public class PamFFTControl extends PamNotFFTControl implements PamSettings {
 
 	protected PamFFTProcess fftProcess;
 
-	protected FFTParameters fftParameters = new FFTParameters();
+	private FFTParameters fftParameters = new FFTParameters();
 
 	private FFTPluginPanelProvider fFTPluginPanelProvider;
 
@@ -262,6 +262,11 @@ public class PamFFTControl extends PamControlledUnit implements PamSettings {
 	 */
 	public PamFFTProcess getFFTProcess() {
 		return fftProcess;
+	}
+
+	@Override
+	public FFTParameters getFFTParameters() {
+		return this.fftParameters;
 	}
 
 }

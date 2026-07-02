@@ -78,10 +78,8 @@ public class PamFFTProcess extends PamProcess {
 
 	private double[] fftRealBlock;
 
-	private PamFFTControl fftControl;
-	
-	private FFTParameters fftParameters;
-	
+	private PamNotFFTControl fftControl;
+		
 	private ClickRemoval clickRemoval = new ClickRemoval();
 	
 	private int[] rawBlocks = new int[PamConstants.MAX_CHANNELS];
@@ -103,14 +101,14 @@ public class PamFFTProcess extends PamProcess {
 
 	private PamRawDataBlock rawDataBlock;
 
-	public PamFFTProcess(PamFFTControl pamControlledUnit,
+	//Sam T (June 2026): Modified Constructor to accept a more general 'PamNotFFTControl', simply acting as an interface to get FFT Parameters from a controller that is deploying the FFT Process. 
+	//Included to support a plugin. 
+	public PamFFTProcess(PamNotFFTControl pamControlledUnit,
 			PamDataBlock parentDataBlock) {
 		super(pamControlledUnit, parentDataBlock);
 
 		fftControl = pamControlledUnit;
-		
-		fftParameters =  fftControl.fftParameters;
-		
+				
 		//sourceDataBlock.addObserver(this);
 		
 		setParentDataBlock(parentDataBlock);
@@ -120,15 +118,15 @@ public class PamFFTProcess extends PamProcess {
 //		addOutputDataBlock(outputData = new RecyclingDataBlock<FFTDataUnit>(FFTDataUnit.class, "Raw FFT Data", 
 //				this, fftControl.fftParameters.channelMap));
 		outputData = new FFTDataBlock(fftControl.getUnitName(), this, 
-				fftControl.fftParameters.channelMap, fftControl.fftParameters.fftHop,
-				fftControl.fftParameters.fftLength);
+				fftControl.getFFTParameters().channelMap, fftControl.getFFTParameters().fftHop,
+				fftControl.getFFTParameters().fftLength);
 		outputData.setRecycle(true);
 		addOutputDataBlock(outputData);
 	
 		setupFFT();
 	}
 	
-	public PamFFTProcess(FFTParameters fftParams, PamDataBlock parentDataBlock,PamControlledUnit parentUnit) {
+	/*public PamFFTProcess(FFTParameters fftParams, PamDataBlock parentDataBlock,PamControlledUnit parentUnit) {
 		super(parentUnit, parentDataBlock);
 		fftParameters =  fftParams;
 		setParentDataBlock(parentDataBlock);
@@ -140,7 +138,7 @@ public class PamFFTProcess extends PamProcess {
 	
 		setupFFT();
 		
-	}
+	}*/
 
 	public synchronized void setupFFT() {
 		
@@ -149,12 +147,7 @@ public class PamFFTProcess extends PamProcess {
 		// then find the new one and subscribe to that instead. 
 		channelCounts = new int[PamConstants.MAX_CHANNELS];
 		// since it's used so much, make a local reference
-		FFTParameters fftParameters;
-		if (fftControl == null) {
-			fftParameters = this.fftParameters;
-		}else {
-			fftParameters = fftControl.fftParameters;
-		}
+		FFTParameters fftParameters = this.fftControl.getFFTParameters();
 
 		
 		int[] chanList = PamUtils.getChannelArray(fftParameters.channelMap);
@@ -218,12 +211,8 @@ public class PamFFTProcess extends PamProcess {
 		//		
 		// and for each channel, make a double array
 		// and set the pointer to zero
-		int outputChannelMap = 0 ;
-		if(fftControl==null) {
-			outputChannelMap = this.fftParameters.channelMap;
-		}else {
-			outputChannelMap = fftControl.fftParameters.channelMap;
-		}
+		int outputChannelMap = fftParameters.channelMap ;
+
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
 			if (((1 << i) & outputChannelMap) != 0) {
 				windowedData[i] = new double[fftParameters.fftLength];
@@ -243,31 +232,19 @@ public class PamFFTProcess extends PamProcess {
 	}
 
 	public int getFftLength() {
-		if(fftControl==null) {
-			return this.fftParameters.fftLength;
-		}
-		return fftControl.fftParameters.fftLength;
+		return fftControl.getFFTParameters().fftLength;
 	}
 
 	public int getFftHop() {
-		if(fftControl==null) {
-			return this.fftParameters.fftHop;
-		}
-		return fftControl.fftParameters.fftHop;
+		return fftControl.getFFTParameters().fftHop;
 	}
 
 	public int getChannelMap() {
-		if(fftControl==null) {
-			return this.fftParameters.channelMap;
-		}
-		return fftControl.fftParameters.channelMap;
+		return fftControl.getFFTParameters().channelMap;
 	}
 	
 	public boolean isClickRemoval() {
-		if(fftControl==null) {
-			return this.fftParameters.clickRemoval;
-		}
-		return fftControl.fftParameters.clickRemoval;
+		return fftControl.getFFTParameters().clickRemoval;
 	}
 
 	/*
@@ -313,12 +290,7 @@ public class PamFFTProcess extends PamProcess {
 		int dataPointer = channelPointer[iChan];
 		
 		//local copy
-		FFTParameters fftParameters;
-		if(this.fftControl==null) {
-			fftParameters = this.fftParameters;
-		}else {
-			fftParameters = fftControl.fftParameters;
-		}
+		FFTParameters fftParameters = fftControl.getFFTParameters();
 		
 		/**
 		 * Work out how many milliseconds per typical
@@ -500,7 +472,7 @@ public class PamFFTProcess extends PamProcess {
 
 		setupFFT();
 
-		int fftChannelMap = fftControl.fftParameters.channelMap;
+		int fftChannelMap = fftControl.getFFTParameters().channelMap;
 		int sourceChannelMap = this.parentDataBlock.getChannelMap();
 		int unavailableSelectedChannels = fftChannelMap & ~sourceChannelMap;
 
@@ -550,7 +522,7 @@ public class PamFFTProcess extends PamProcess {
 		else {
 			fftAnnotations.clear();
 		}
-		if (this.isClickRemoval()) {
+		if (fftControl.getFFTParameters().clickRemoval) {
 			fftAnnotations.add(new ProcessAnnotation(this, clickRemoval, fftControl.getUnitType(), "Click Removal"));
 		}
 		fftAnnotations.add(super.getAnnotation(outputData, 0));
@@ -610,10 +582,6 @@ public class PamFFTProcess extends PamProcess {
 		
 	}
 
-	public PamFFTControl getFftControl() {
-		return fftControl;
-	}
-	
 	@Override
 	public ArrayList getCompatibleDataUnits(){
 		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
