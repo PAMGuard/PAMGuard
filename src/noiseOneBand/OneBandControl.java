@@ -181,16 +181,14 @@ public class OneBandControl extends PamControlledUnit implements PamSettings {
 
 	@Override
 	public String getModuleSummary(boolean clear, String format) {
-		// TODO Auto-generated method stub
 		OneBandDataUnit lastUnit = (OneBandDataUnit) oneBandProcess.getMeasureDataBlock().getLastUnit();
+		if (lastUnit == null) {
+			return null;
+		}
 		if(format.equals("json")) {
-			if (lastUnit == null) {
-				return "{}";
-				
-			}
-			System.out.println(lastUnit.getTimeMilliseconds()+" "+oneBandParameters.measurementInterval);
+			long t = lastUnit.getTimeMilliseconds();
 			String jsonString = String.format("{\"rms\":%3.1f,\"zeroPeak\":%3.1f,\"peakPeak\":%3.1f,\"timestamp\":%d,\"intervalSeconds\":%d}", 
-					lastUnit.getRms(),lastUnit.getZeroPeak(),lastUnit.getPeakPeak(),lastUnit.getTimeMilliseconds(),oneBandParameters.measurementInterval);
+					lastUnit.getRms(),lastUnit.getZeroPeak(),lastUnit.getPeakPeak(),t,oneBandParameters.measurementInterval);
 			return jsonString;
 		}
 		
