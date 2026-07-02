@@ -722,28 +722,28 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		
 		double[] lastAmplitudes = recorderProcess.getLastAmplitudedB();
 		
-		StringBuilder sb = new StringBuilder();
-		sb.append("<RecorderSummary>");
-		sb.append(String.format("<button>%s</button>", buttonName));
-		sb.append(String.format("<state>%s</state>", stateName));
-		sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
-		sb.append(String.format("<fileSizeMB>%.1f</fileSizeMB>", fileSizeMB));
-
-		sb.append("<channelAmplitudesdB>");
-		if (lastAmplitudes != null) {
-			for (int i = 0; i < lastAmplitudes.length; i++) {
-				sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
-			}
-		}
-		sb.append("</channelAmplitudesdB>");
-		sb.append("</RecorderSummary>");
-		return sb.toString();
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("<RecorderSummary>");
+//		sb.append(String.format("<button>%s</button>", buttonName));
+//		sb.append(String.format("<state>%s</state>", stateName));
+//		sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
+//		sb.append(String.format("<fileSizeMB>%.1f</fileSizeMB>", fileSizeMB));
+//
+//		sb.append("<channelAmplitudesdB>");
+//		if (lastAmplitudes != null) {
+//			for (int i = 0; i < lastAmplitudes.length; i++) {
+//				sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
+//			}
+//		}
+//		sb.append("</channelAmplitudesdB>");
+//		sb.append("</RecorderSummary>");
+//		return sb.toString();
 //=======
 		int currButton = pressedButton;
 		int currState = recorderStatus;
 		switch (format) {
 		case SummaryCommand.CSV:
-			summaryStr = String.format("%d,%d,%3.1f", currButton, currState, freeSpace);;
+			summaryStr = String.format("%d,%d,%3.1f", currButton, currState, freeSpaceMB);;
 			break;
 		case SummaryCommand.JSON:
 			String state = "";
@@ -753,12 +753,26 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			if(currState==RECORDING) currentFilePath = recorderStorage.getFileName();
 			if(currentFilePath!=null) currentFilePath = currentFilePath.replace("\\", "\\\\");
 			
-			summaryStr = String.format("{\"state\":\"%s\",\"freeSpaceKB\":%3.1f,\"currentFile\":\"%s\"}",
-							state,freeSpace,currentFilePath);
+			summaryStr = String.format("{\"state\":\"%s\",\"freeSpaceMB\":%3.1f,\"currentFile\":\"%s\"}",
+							state,freeSpaceMB,currentFilePath);
 			break;
 		case SummaryCommand.XML:
-			summaryStr = null;
-//			summaryStr = getModuleXMLSummary();
+			StringBuilder 		sb = new StringBuilder();
+			sb.append("<RecorderSummary>");
+			sb.append(String.format("<button>%s</button>", buttonName));
+			sb.append(String.format("<state>%s</state>", stateName));
+			sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
+			sb.append(String.format("<fileSizeMB>%.1f</fileSizeMB>", fileSizeMB));
+
+			sb.append("<channelAmplitudesdB>");
+			if (lastAmplitudes != null) {
+				for (int i = 0; i < lastAmplitudes.length; i++) {
+					sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
+				}
+			}
+			sb.append("</channelAmplitudesdB>");
+			sb.append("</RecorderSummary>");
+			summaryStr = sb.toString();
 			break;
 		default:
 			summaryStr = null;

@@ -202,16 +202,16 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		activeNMEAsource.start();
 	}
 	
-	public void makeEmptyThread() {
-		timer.stop();
-//		autoPortTimer.stop();
-		autoPortTimer.start();
-		activeNMEAsource = null;
-		activeNMEAsource = new Thread(new EmptyThread());
-		timer.start();
-		activeNMEAsource.start();
-		Possible error. Need to check if some of the code from below should be here
-	}
+//	public void makeEmptyThread() {
+//		timer.stop();
+////		autoPortTimer.stop();
+//		autoPortTimer.start();
+//		activeNMEAsource = null;
+//		activeNMEAsource = new Thread(new EmptyThread());
+//		timer.start();
+//		activeNMEAsource.start();
+//		Possible error. Need to check if some of the code from below should be here
+//	}
 
 	public void makeSerialThread() {
 		timer.stop();
@@ -983,25 +983,6 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 		if(nmeaControl.nmeaParameters.sourceType==NMEAParameters.NmeaSources.TIMESTAMP_FILE) {
 			stopNMEASource();
-		}
-	}
-	
-	/**
-	 * Say error string, but stop printing them after the first 20. 
-	 * @param err
-	 */
-	private void sayErrorString(String err) {
-		errorCount++;
-		if (errorCount == 20) {
-			System.out.println("NMEA Error count exceeds 20, stop reporting NMEA Errors from " + nmeaControl.getUnitName());
-			return;
-		}
-		if (errorCount % 200 == 0) {
-			System.out.println("NMEA Error count " + errorCount + ": " + err);
-			return;
-		}
-		if (errorCount < 20) {
-			System.out.println(err);
 		}
 	}
 	
