@@ -15,6 +15,11 @@ public class ClickBackgroundJSONDataSource extends JSONObjectDataSource<ClickBac
 		super();
 		objectData = new ClickBackgroundJSONData();
 	}
+	
+	protected ClickBackgroundJSONData initializeObjectData() {
+		return new ClickBackgroundJSONData();
+
+	}
 
 	
 	@Override

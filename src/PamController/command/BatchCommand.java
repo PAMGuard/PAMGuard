@@ -1,5 +1,6 @@
 package PamController.command;
 
+import networkTransfer.send.NetSendCommandParam;
 import networkTransfer.send.NetworkSender;
 import pamguard.GlobalArguments;
 
@@ -38,8 +39,8 @@ public class BatchCommand extends ExtCommand {
 			System.out.println("Invalid BatchCommand: " + command);
 			return null;
 		}
-		String nid1 = GlobalArguments.getParam(NetworkSender.ID1);
-		String nid2 = GlobalArguments.getParam(NetworkSender.ID2);
+		String nid1 = GlobalArguments.getParam(NetSendCommandParam.ID1.arg);
+		String nid2 = GlobalArguments.getParam(NetSendCommandParam.ID2.arg);
 		if (bits[1].trim().equals(nid1) == false) {
 			return null;
 		}

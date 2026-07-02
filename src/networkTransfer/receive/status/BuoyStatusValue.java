@@ -1,4 +1,4 @@
-package networkTransfer.receive;
+package networkTransfer.receive.status;
 
 import java.io.Serializable;
 

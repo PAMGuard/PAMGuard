@@ -363,6 +363,17 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 			}
 		}
 	}
+	
+	public void setAutoSettings(AcquisitionParameters newParameters) {
+		if (newParameters != null) {
+			acquisitionParameters = newParameters.clone();
+			setSelectedSystem();
+			acquisitionProcess.setupDataBlock();
+			setupStatusBar();
+			fillStatusBarText();
+			PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_PROCESS_SETTINGS);
+		}
+	}
 
 	private DaqSystem lastSelSystem = null;
 	public void setSelectedSystem() {
@@ -864,8 +875,8 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	}
 
 	@Override
-	public String getModuleSummary(boolean clear) {
-		return getDaqProcess().getRawDataBlock().getSummaryString(clear);
+	public String getModuleSummary(boolean clear, String format) {
+		return getDaqProcess().getRawDataBlock().getSummaryString(clear, format);
 	}
 
 	/**
@@ -938,6 +949,12 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 			return null;
 		}
 		return daqSys.getStartButtonToolTip();
+	}
+	/**
+	 * @return the lastSelSystem
+	 */
+	public DaqSystem getLastSelSystem() {
+		return lastSelSystem;
 	}
 
 }

@@ -477,6 +477,12 @@ public class BasicClickIdentifier implements ClickIdentifier, PamSettings {
 	public SymbolData[] getSymbolsData() {
 		return pamSymbol2SymbolData(getSymbols()) ;
 	}
+
+	@Override
+	public String getClassificationSummary(boolean clear) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 		

@@ -1,9 +1,9 @@
 package loggerForms;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 
-import PamView.ColorManaged;
 import PamView.PamColors;
 import PamView.panel.PamPanel;
 
@@ -13,6 +13,7 @@ public class LoggerFormPanel extends PamPanel {
 	public LoggerFormPanel(LoggerForm loggerForm) {
 		super();
 		this.loggerForm = loggerForm;
+		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
 	}
 
 	public LoggerFormPanel(LoggerForm loggerForm, LayoutManager layout) {

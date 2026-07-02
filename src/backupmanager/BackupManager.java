@@ -22,6 +22,7 @@ import PamController.PamSettings;
 import backupmanager.BackupProgress.STATE;
 import backupmanager.bespoke.BespokeBackups;
 import backupmanager.bespoke.BespokeFileStream;
+import backupmanager.network.PamFtpClient;
 import backupmanager.schedule.BackupSchedule;
 import backupmanager.schedule.SmallHoursSchedule;
 import backupmanager.stream.BackupStream;
@@ -50,6 +51,8 @@ public class BackupManager extends PamControlledUnit implements PamSettings {
 	
 	private BackupSchedule backupSchedule;
 	
+	private PamFtpClient ftpClient;
+	
 	private BackupParams backupParams = new BackupParams();
 
 	public BackupManager(String unitName) {
@@ -57,11 +60,16 @@ public class BackupManager extends PamControlledUnit implements PamSettings {
 		bespokeBackups = new BespokeBackups(this);
 		UserDisplayControl.addUserDisplayProvider(new BackupDisplayProvider(this));
 		backupSchedule = new SmallHoursSchedule(this);
+		ftpClient = new PamFtpClient(this);
 		PamSettingManager.getInstance().registerSettings(this);
 	}
 
 	public static BackupManager getBackupManager() {
 		return (BackupManager) PamController.getInstance().findControlledUnit(BackupManager.class, null);
+	}
+	
+	public PamFtpClient getFtpClient() {
+		return this.ftpClient;
 	}
 
 	@Override
@@ -81,6 +89,7 @@ public class BackupManager extends PamControlledUnit implements PamSettings {
 		});
 		menu.add(menuItem);
 		
+		ftpClient.addMenuItems(menu,parentFrame);
 		bespokeBackups.addMenuItems(menu);
 		
 		return menu;

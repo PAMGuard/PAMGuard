@@ -1177,11 +1177,6 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 		return dataBlockPrefix;
 	}
 
-	@Override
-	public String getModuleSummary() {
-		// TODO Auto-generated method stub
-		return super.getModuleSummary();
-	}
 
 	@Override
 	public Object getShortUnitType() {
@@ -1337,6 +1332,19 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 	public LocalizationCreator getTethysCreator() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	@Override
+	public String getModuleSummary(boolean clear, String format) {
+		
+		if(!format.equals("csv")) return null;
+		
+		ClickIdentifier clickId = getClickIdentifier();
+		if (clickId == null) {
+			return null;
+		}
+		return clickId.getClassificationSummary(clear);
 	}
 
 

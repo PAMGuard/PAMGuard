@@ -261,6 +261,20 @@ public class ErrorEllipse {
 		
 	}
 	
+	@Override
+	public String toString() {
+		String str;
+		if (angles == null || ellipseDim == null) {
+			return super.toString();
+		}
+//		int nDim = Math.min(angles.length, ellipseDim.length);
+//		if (nDim == 2) {
+//			str = "Error ellipse, a"
+//		}
+		return new EllipticalError(this).getJsonErrorString();
+	}
+
+
 	/**
 	 * Calculate the heading pitch and roll of the ellipse from two vectors. 
 	 * @param first_eignevector - vector of largest radii. 
@@ -363,7 +377,7 @@ public class ErrorEllipse {
 				data[2]=angles[0];
 			}
 			else {
-				if(errorEllipseXY==null){
+				if(errorEllipseXY==null || true){
 					//here we calculate and save the projection- once saved the projection is never
 					//recalculated. 
 					errorEllipseXY = calc2DEllipse(planeType); 
@@ -436,8 +450,8 @@ public class ErrorEllipse {
 			
 			//22 Aug 2023 - dim[1] was using sin instead of cos - for projecting onto a 2d plane cos 
 			//is the correct trig function to use. 
-			dim[0]=this.ellipseDim[0]*Math.cos(this.angles[1]); //the major axis on 2D
-			dim[1]=this.ellipseDim[1]*Math.cos(this.angles[2]); //the minor Axis. 
+			dim[0]=this.ellipseDim[0]*Math.cos(this.angles[0]); //the major axis on 2D
+			dim[1]=this.ellipseDim[1]*Math.cos(this.angles[1]); //the minor Axis. 
 			angles[0]=this.angles[0]; 
 			
 			break;

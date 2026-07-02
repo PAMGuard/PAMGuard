@@ -27,7 +27,12 @@ public class LtsaParameters implements Cloneable, Serializable, ManagedParameter
 	@Override
 	protected LtsaParameters clone() {
 		try {
-			return (LtsaParameters) super.clone();
+			LtsaParameters params = (LtsaParameters) super.clone();
+			params.intervalSeconds = this.intervalSeconds;
+			params.longerFactor = this.longerFactor;
+			params.dataSource = this.dataSource;
+			params.channelMap = this.channelMap;
+			return params;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;

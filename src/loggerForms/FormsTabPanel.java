@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -12,9 +14,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+//
+//import org.jnativehook.keyboard.NativeKeyEvent;
+//import org.jnativehook.keyboard.NativeKeyListener;
 
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
+//import com.fasterxml.jackson.core.format.DataFormatDetector;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import PamView.PamTabPanel;
 import PamView.panel.PamPanel;
@@ -83,16 +89,48 @@ public class FormsTabPanel implements PamTabPanel {
 	
 	public void createForms() {
 		int nForms = formsControl.getNumFormDescriptions();
-		FormDescription fD;
 		JComponent formComponent;
 		
+		// make a list of form descriptions, then sort it sensibly. 
+		ArrayList<FormDescription> formDescriptions = new ArrayList();
 		for (int i = 0; i < nForms; i++) {
-			fD = formsControl.getFormDescription(i);
+			FormDescription fD = formsControl.getFormDescription(i);
+			formDescriptions.add(fD);
+		}
+		
+		formDescriptions.sort(new FormSorter());
+		
+		for (FormDescription fD : formDescriptions) {
 			formComponent = fD.getTabComponent();
 			if (formComponent != null) {
 				mainTabbedPane.addTab(fD.getFormTabName(), null, formComponent, fD.getTabToolTip());
 			}
 		}
+	}
+	
+	private class FormSorter implements Comparator<FormDescription> {
+
+		@Override
+		public int compare(FormDescription f1, FormDescription f2) {
+			Integer o1 = f1.getFormOrderProperty();
+			Integer o2 = f2.getFormOrderProperty();
+			String n1 = f1.getFormName();
+			String n2 = f2.getFormName();
+			if (o1 != null && o2 != null) {
+				if (o2 != o1) {
+					return o1-o2;
+				}
+			}
+			else if (o1 != null) {
+				return 1;
+			}
+			else if (o2 != null) {
+				return -1;
+			}
+			// arrive here if both order properties are null.			
+			return n1.compareToIgnoreCase(n2);
+		}
+		
 	}
 	
 	/**
@@ -216,49 +254,68 @@ public class FormsTabPanel implements PamTabPanel {
 	 * @author brian_mil
 	 *
 	 */
-	private class GlobalKeyListenerExample implements NativeKeyListener {
+//	private class GlobalKeyListenerExample implements NativeKeyListener {
+//
+//		@Override
+//		public void nativeKeyPressed(NativeKeyEvent e) {
+//			int nForms = formsControl.getNumFormDescriptions();
+//			FormDescription fD;
+//			JComponent formComponent;
+//
+//			KeyStroke keyPressed = KeyStroke.getKeyStroke(
+//					e.getRawCode(),e.getModifiers());
+//
+//			for (int i = 0; i < nForms; i++) {
+//				fD = formsControl.getFormDescription(i);
+//
+//
+//				// System.out.println(String.format("nativekey %s ",keyPressed));
+//				// Loop over all forms to see if the hotkey matches
+//				String formHotkey = fD.getHOTKEY();
+//				if (formHotkey == null) continue;
+//				KeyStroke k = KeyStroke.getKeyStroke(formHotkey);
+//				if (k==keyPressed){
+//					formsControl.getGuiFrame().setExtendedState(Frame.NORMAL);
+//					fD.processHotkeyPress();
+//					getMainTabbedPane().setSelectedIndex(i);
+//
+//					//TODO: Focus first input component within the tab
+//				}
+//			}
+//
+//		}
+//
+//		@Override
+//		public void nativeKeyReleased(NativeKeyEvent arg0) {
+//			// TODO Auto-generated method stub
+//
+//		}
+//
+//		@Override
+//		public void nativeKeyTyped(NativeKeyEvent arg0) {
+//			// TODO Auto-generated method stub
+//
+//		}
+//
+//
+//	}
 
-		@Override
-		public void nativeKeyPressed(NativeKeyEvent e) {
-			int nForms = formsControl.getNumFormDescriptions();
-			FormDescription fD;
-			JComponent formComponent;
-
-			KeyStroke keyPressed = KeyStroke.getKeyStroke(
-					e.getRawCode(),e.getModifiers());
-
-			for (int i = 0; i < nForms; i++) {
-				fD = formsControl.getFormDescription(i);
-
-
-				// System.out.println(String.format("nativekey %s ",keyPressed));
-				// Loop over all forms to see if the hotkey matches
-				String formHotkey = fD.getHOTKEY();
-				if (formHotkey == null) continue;
-				KeyStroke k = KeyStroke.getKeyStroke(formHotkey);
-				if (k==keyPressed){
-					formsControl.getGuiFrame().setExtendedState(Frame.NORMAL);
-					fD.processHotkeyPress();
-					getMainTabbedPane().setSelectedIndex(i);
-
-					//TODO: Focus first input component within the tab
-				}
+	/**
+	 * Goto the form for the given tab. 
+	 * @param formDescription
+	 */
+	public void gotoForm(FormDescription formDescription) {
+		JComponent tabComponent = formDescription.getTabComponent();
+		if (tabComponent == null) {
+			return; // there is no tab for this form (probably hidden or popup)
+		}
+		int nTbs = mainTabbedPane.getTabCount();
+		for (int i = 0; i < nTbs; i++) {
+			String tabTit = mainTabbedPane.getTitleAt(i);
+			if (tabTit.equalsIgnoreCase(formDescription.getFormTabName())) {
+				mainTabbedPane.setSelectedIndex(i);
+				break;
 			}
-
 		}
-
-		@Override
-		public void nativeKeyReleased(NativeKeyEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void nativeKeyTyped(NativeKeyEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-
 	}
 }

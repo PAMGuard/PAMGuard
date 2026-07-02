@@ -163,6 +163,7 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 		//		private LatLongDialogStrip latStrip;
 		//		private LatLongDialogStrip longStrip;
 		private JTextField latitude, longitude;
+		private JTextField siteName;
 		private JButton menuButton;
 
 		public StaticHydrophoneDialogComponent() {
@@ -195,6 +196,11 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 			PamDialog.addComponent(mainPanel, longitude = new JTextField(12), c);
 			longitude.setEditable(false);
 			c.gridx+=c.gridwidth;
+			c.gridx = 0;
+			c.gridy++;
+			PamDialog.addComponent(mainPanel, new JLabel("Site Name: ", JLabel.RIGHT), c);
+			c.gridx ++;
+			PamDialog.addComponent(mainPanel, siteName = new JTextField(20), c);
 
 			outerPanel = new JPanel(new BorderLayout());
 			outerPanel.add(BorderLayout.WEST, mainPanel);
@@ -208,6 +214,11 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 
 		@Override
 		public void setParams() {
+			if(staticOriginSettings.getSiteName()!=null) {
+				this.siteName.setText(staticOriginSettings.getSiteName());
+			}else {
+				this.siteName.setText("Unknown");
+			}
 			GpsDataUnit dataUnit = staticOriginSettings.getStaticPosition();
 			if (dataUnit == null) {
 				return;
@@ -250,6 +261,8 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 			//				}
 			//			}
 			boolean ok =  staticOriginSettings != null && staticOriginSettings.getStaticPosition() != null;
+			
+			staticOriginSettings.setSiteName(this.siteName.getText());
 
 			return ok;
 		}

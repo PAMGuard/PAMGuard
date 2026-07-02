@@ -1,9 +1,9 @@
-package loggerForms.formdesign;
+package loggerForms.formdesign.controlpropsets;
 
 import loggerForms.FormDescription;
 import loggerForms.FormsControl;
 import loggerForms.UDColName;
-import loggerForms.formdesign.controlpropsets.BasePropertySet;
+import loggerForms.formdesign.ControlTitle;
 import loggerForms.formdesign.itempanels.CtrlColPanel;
 import loggerForms.formdesign.itempanels.SubformTopicPanel;
 

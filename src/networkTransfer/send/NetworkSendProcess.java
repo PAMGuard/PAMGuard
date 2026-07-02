@@ -4,11 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import networkTransfer.receive.NetworkReceiver;
+import javax.swing.Timer;
+
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryObjectData;
 import jsonStorage.JSONObjectData;
 import jsonStorage.JSONObjectDataSource;
+import networkTransfer.receive.NetworkReceiver;
 import PamController.PamControlledUnit;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
@@ -26,14 +28,13 @@ public class NetworkSendProcess extends PamProcess {
 	private boolean commandProcess;
 	private int outputFormat;
 
-	public NetworkSendProcess(NetworkSender networkSender,
-			PamDataBlock parentDataBlock, int sendingFormat) {
+	public NetworkSendProcess(NetworkSender networkSender, PamDataBlock parentDataBlock, int sendingFormat) {
 		super(networkSender, parentDataBlock);
 		this.networkSender = networkSender;
 		this.outputFormat = sendingFormat;
 		if (parentDataBlock != null) {
 			binarySource = parentDataBlock.getBinaryDataSource();
-			quickId = parentDataBlock.getQuickId();
+			quickId = parentDataBlock.getQuickId2();
 			jsonSource = parentDataBlock.getJSONDataSource();
 		}
 		networkObjectPacker = new NetworkObjectPacker();
@@ -42,10 +43,7 @@ public class NetworkSendProcess extends PamProcess {
 
 	@Override
 	public void prepareProcess() {
-//		outputFormat = networkSender.networkSendParams.sendingFormat;
-		if (commandProcess && outputFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
-			sendPamCommand(NetworkReceiver.NET_PAM_COMMAND_PREPARE);
-		}
+		
 	}
 
 	@Override
@@ -53,6 +51,7 @@ public class NetworkSendProcess extends PamProcess {
 		if (commandProcess && outputFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
 			sendPamCommand(NetworkReceiver.NET_PAM_COMMAND_START);
 		}
+		//this.networkSender.runClientCheckTimer();
 	}
 
 	@Override
@@ -60,6 +59,7 @@ public class NetworkSendProcess extends PamProcess {
 		if (commandProcess && outputFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
 			sendPamCommand(NetworkReceiver.NET_PAM_COMMAND_STOP);
 		}
+		this.networkSender.closeClient();
 	}
 
 	private void sendPamCommand(int command) {
@@ -80,8 +80,8 @@ public class NetworkSendProcess extends PamProcess {
 			e.printStackTrace();
 		}
 		byte[] data = networkObjectPacker.packData(id1, id2, (short) NetworkReceiver.NET_PAM_COMMAND, command, timeData);
-		NetworkQueuedObject qo = new NetworkQueuedObject(id1, id2, NetworkReceiver.NET_PAM_COMMAND, command, data);
-		networkSender.queueDataObject(qo);
+		NetworkQueuedObject qo = new NetworkQueuedObject(id1, id2, NetworkReceiver.NET_PAM_COMMAND, command, data,"command");
+		networkSender.transmitData(qo);
 	}
 
 	@Override
@@ -94,11 +94,35 @@ public class NetworkSendProcess extends PamProcess {
 		}
 		return null;
 	}
+	
+	@Override 
+	public void updateData(PamObservable dataBlock, PamDataUnit dataUnit) {
+
+		try {
+			packAndSendData(dataBlock,dataUnit.cloneIfAllowed());
+		} catch (CloneNotSupportedException e) {
+			packAndSendData(dataBlock,dataUnit);
+		}
+	}
 
 	@Override
 	public void newData(PamObservable dataBlock, PamDataUnit dataUnit) {
 		
+		try {
+			packAndSendData(dataBlock,dataUnit.cloneIfAllowed());
+		} catch (CloneNotSupportedException e) {
+			packAndSendData(dataBlock,dataUnit);
+		}
+		
+	}
+	
+	private synchronized void packAndSendData(PamObservable dataBlock, PamDataUnit dataUnit) {
 		NetworkQueuedObject qo = null;
+		
+		int quickId = this.quickId;
+		if(dataBlock instanceof PamDataBlock) {
+			quickId = ((PamDataBlock) dataBlock).getQuickId2();
+		}
 
 		// pack the data into a byte array
 		if (outputFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
@@ -106,23 +130,23 @@ public class NetworkSendProcess extends PamProcess {
 			int id2 = networkSender.networkSendParams.stationId2;
 			
 			byte[] data = networkObjectPacker.packDataUnit(id1,id2, (PamDataBlock) dataBlock, dataUnit);
-			qo = new NetworkQueuedObject(id1, id2, NetworkReceiver.NET_PAM_DATA, quickId, data);
+			qo = new NetworkQueuedObject(id1, id2, NetworkReceiver.NET_PAM_DATA, quickId, data,dataUnit.getParentDataBlock().getDataName());
 		}
 
 		// pack the data into a json string
 		else if (outputFormat == NetworkSendParams.NETWORKSEND_JSON) {
 			String jsonString = networkObjectPacker.packDataUnit((PamDataBlock) dataBlock, dataUnit);
 			if (jsonString==null) {
-				System.out.println("Error creating json string from " + dataBlock.getClass());
+				//System.out.println("Error creating json string from " + dataBlock.getClass());
 			} else {
-				qo = new  NetworkQueuedObject(jsonString);
+				qo = new  NetworkQueuedObject(jsonString,dataUnit.getParentDataBlock().getDataName());
 			}
 //			System.out.print("***" + jsonString);
 		}
 		
 		// Add to the output queue
 		if (qo!=null) {
-			networkSender.queueDataObject(qo);
+			networkSender.transmitData(qo);
 		}
 	}
 

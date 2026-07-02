@@ -64,6 +64,9 @@ public class OneBandPulseProcess extends PamProcess {
 	public void newData(PamObservable o, PamDataUnit arg) {
 		OneBandDataUnit du = (OneBandDataUnit) arg;
 		int chan = PamUtils.getSingleChannel(du.getChannelBitmap());
+		if(chan<0 || chan > channelProcesses.length-1) {
+			return;
+		}
 		if (channelProcesses[chan] != null) {
 			channelProcesses[chan].newData(du);
 		}

@@ -1,5 +1,7 @@
 package noiseOneBand;
 
+
+import noiseOneBand.offline.OneBandDatagramProvider;
 import Acquisition.AcquisitionProcess;
 import Filters.Filter;
 import Filters.FilterMethod;
@@ -15,7 +17,7 @@ import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 import noiseOneBand.offline.OneBandDatagramProvider;
 
 public class OneBandProcess extends PamProcess {
@@ -38,6 +40,8 @@ public class OneBandProcess extends PamProcess {
 		addOutputDataBlock(waveOutDataBlock);
 		measureDataBlock = new OneBandDataBlock(oneBandControl.getUnitName(), oneBandControl, this, 1);
 		measureDataBlock.setBinaryDataSource(new OneBandDataSource(oneBandControl, measureDataBlock, "Noise"));
+		measureDataBlock.setJSONDataSource(new OneBandJsonDataSource());
+
 		measureDataBlock.SetLogging(new OneBandLogging(oneBandControl, measureDataBlock));
 		measureDataBlock.setDatagramProvider(new OneBandDatagramProvider(oneBandControl));
 		measureDataBlock.addObserver(new SelfObserver());

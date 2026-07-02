@@ -28,6 +28,8 @@ public class ClipDisplayParameters implements Cloneable, Serializable, ManagedPa
 	int newClipOrder = 0; // Location of new clips in the clip display. 0 is first (top-left). -1 is last (bottom-right);
 	
 	boolean showControlPanel = false;
+	
+	boolean showFullSummary = true;
 
 	/**
 	 * Values used to set max and min values for the controls. 

@@ -172,6 +172,8 @@ public abstract class PamSymbolBase implements Serializable, Cloneable {
 			return PamSymbolType.SYMBOL_CIRCLE;
 		} else if (textCode.equalsIgnoreCase("Diamond")) {
 			return PamSymbolType.SYMBOL_DIAMOND;
+		} else if (textCode.equalsIgnoreCase("CAB") || textCode.equalsIgnoreCase("C")) {
+			return PamSymbolType.SYMBOL_CAB;
 		} else
 			return null;
 	}
@@ -236,6 +238,8 @@ public abstract class PamSymbolBase implements Serializable, Cloneable {
 			return 'p';
 		case SYMBOL_HEXAGRAM:
 			return 'h';
+		case SYMBOL_CAB:
+			return 'c';
 		}
 		return 0;
 	}

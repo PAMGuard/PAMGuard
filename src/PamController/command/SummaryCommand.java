@@ -1,7 +1,11 @@
 package PamController.command;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamController.statusManager.ModuleSummarizer;
 import PamUtils.PamCalendar;
 
 /**
@@ -13,6 +17,16 @@ import PamUtils.PamCalendar;
 public class SummaryCommand extends ExtCommand {
 	
 	private long lastCallTime = 0;
+	
+	/**
+	 * Some of the summary commands now return data in three different formats. 
+	 * There are historical reasons for this, which we'll not go into, but 
+	 * we'll just say that it's a form of divergent evolution and we need
+	 * to support all three. 
+	 */
+	public static final String CSV = "csv";
+	public static final String JSON = "json";
+	public static final String XML = "xml";
 
 	public SummaryCommand() {
 		super("summary", true);
@@ -30,10 +44,14 @@ public class SummaryCommand extends ExtCommand {
 //			}
 //			
 //		}
-		return getModulesSummary(true);
+		String [] splitCommand = command.split(" ");
+		String format = CSV;
+		if(splitCommand.length>1) format = splitCommand[1];
+		return ModuleSummarizer.getModulesSummary(true,format);
 	}
 	
-	public String getModulesSummary(boolean clear) {
+
+	public String getModulesSummary(boolean clear, String format) {
 		PamController pamController = PamController.getInstance();
 		int nMod = pamController.getNumControlledUnits();
 		PamControlledUnit aModule;
@@ -51,7 +69,7 @@ public class SummaryCommand extends ExtCommand {
 		int usedModules = 0;
 		for (int i = 0; i < nMod; i++) {
 			aModule = pamController.getControlledUnit(i);
-			aString = aModule.getModuleSummary(clear);
+			aString = aModule.getModuleSummary(clear,format);
 			if (aString == null) {
 				continue;
 			}

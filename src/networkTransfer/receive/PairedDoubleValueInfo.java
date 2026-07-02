@@ -1,5 +1,8 @@
 package networkTransfer.receive;
 
+import networkTransfer.receive.status.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusValue;
+
 public class PairedDoubleValueInfo extends PairedValueInfo {
 
 	private String format;

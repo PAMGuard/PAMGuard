@@ -73,7 +73,7 @@ public class NetworkObjectPacker {
 		 */
 		short dataType1 = NetworkReceiver.NET_PAM_DATA;
 		BinaryDataSource binarySource = dataBlock.getBinaryDataSource();
-		int dataType2 = dataBlock.getQuickId();
+		int dataType2 = dataBlock.getQuickId2();
 		
 		BinaryObjectData packedObject = null;
 		synchronized (BinaryDataSource.packSynchObject) {

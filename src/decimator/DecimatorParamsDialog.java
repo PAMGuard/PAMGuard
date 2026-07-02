@@ -243,7 +243,7 @@ public class DecimatorParamsDialog extends PamDialog {
 	public boolean getParams() {
 		try {
 //			ArrayList<PamDataBlock> rawBlocks = PamController.getInstance().getRawDataBlocks();
-			decimatorParams.rawDataSource =  sourcePanel.getSource().getDataName();
+			decimatorParams.rawDataSource =  sourcePanel.getSource().getLongDataName();
 			decimatorParams.channelMap = sourcePanel.getChannelList();
 			decimatorParams.newSampleRate = java.lang.Float.valueOf(newSampleRate.getText());
 		}

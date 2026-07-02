@@ -22,7 +22,10 @@ package NMEA;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -101,6 +104,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 	private Thread activeNMEAsource;
 	private volatile boolean stopActiveNMEAsource = false;
+	private boolean readFile = false;
 	//private SerialThread serialThread;
 	private PamWarning serialPortWarning;
 
@@ -175,6 +179,15 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		activeNMEAsource.start();
 	}
 	
+	public void makeTimestampFileThread() {
+		timer.stop();
+		activeNMEAsource = null;
+		activeNMEAsource = new Thread(new TimestampFileThread());
+		timer.start();
+		activeNMEAsource.start();
+
+	}
+	
 	public void makeMulticastThread() {
 //		if(serialPortInterface!=null){
 //			if (serialPortInterface.serialPortCom != null) {
@@ -187,6 +200,17 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		activeNMEAsource = new Thread(new MulticastThread());
 		timer.start();
 		activeNMEAsource.start();
+	}
+	
+	public void makeEmptyThread() {
+		timer.stop();
+//		autoPortTimer.stop();
+		autoPortTimer.start();
+		activeNMEAsource = null;
+		activeNMEAsource = new Thread(new EmptyThread());
+		timer.start();
+		activeNMEAsource.start();
+		Possible error. Need to check if some of the code from below should be here
 	}
 
 	public void makeSerialThread() {
@@ -270,8 +294,8 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 			if (aLine == null || aLine.length() == 0) {
 				return;
 			}
-			if (aLine.startsWith("$") == false) {
-				sayErrorString("Invalid NMEA string (no $): " + aLine);
+			if (aLine.startsWith("$") == false && aLine.startsWith("!") == false) {
+				sayErrorString("Invalid NMEA string (no $ or !): " + aLine);
 				return;
 			}
 			StringBuffer sb = new StringBuffer(aLine);
@@ -322,6 +346,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	
 	protected void stopNMEASource() {
 		if(activeNMEAsource != null) {
+			autoPortTimer.stop();
 //			Debug.out.println("active source = " + activeNMEAsource.getName());
 //			Debug.out.println("Stopping Current GPS thread.");
 			stopActiveNMEAsource=true;
@@ -344,15 +369,23 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 		
 		stopNMEASource();
+		
+		if(runMode == PamController.RUN_NETWORKRECEIVER) {
+			//makeEmptyThread();
+			return;
+		}
 
-		if(sourceType == NmeaSources.SERIAL){
+		else if(sourceType == NmeaSources.SERIAL){
 			makeSerialThread();
 		}else if(sourceType == NmeaSources.UDP){
 			if (nmeaControl.nmeaParameters.multicast)
 				makeMulticastThread();
 			else
 				makeUdpThread();
-		}else{
+		}else if(sourceType == NmeaSources.TIMESTAMP_FILE) {
+			makeTimestampFileThread();
+		}
+		else{
 			makeSimThread();
 		}
 		
@@ -604,8 +637,64 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 //		}
 //
 //	}
+	
+	class EmptyThread implements Runnable {
 
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					Thread.sleep(20000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		
+	}
 
+	class TimestampFileThread implements Runnable {
+
+		@Override
+		public void run() {
+			
+			try {
+				FileInputStream instream = new FileInputStream(nmeaControl.nmeaParameters.nmeaSourceFile);
+				InputStreamReader fileIn = new InputStreamReader(instream);
+				BufferedReader reader = new BufferedReader(fileIn);
+				String nextLine;
+				long lastMessageMillis = 0;
+				while(!stopActiveNMEAsource && !readFile) {
+					Thread.sleep(500);
+				}
+				while (!stopActiveNMEAsource && (nextLine=reader.readLine())!=null) {
+					//System.out.println(nextLine);
+				    String[] tokens = nextLine.split(",", 2);
+				    long thisMessageMillis = Long.valueOf(tokens[0]);
+				    if(lastMessageMillis!=0 && lastMessageMillis<thisMessageMillis) {
+				    	long waitTime = thisMessageMillis-lastMessageMillis;
+				    	Thread.sleep(waitTime);
+				    }
+				    //processNmeaStringWithTimestamp(thisMessageMillis,tokens[1]);
+				    processNmeaString(new StringBuffer(tokens[1]));
+				    lastMessageMillis = thisMessageMillis;
+				}
+				while(!stopActiveNMEAsource) {
+					
+				}
+				reader.close();
+			}catch(IOException | InterruptedException   e) {
+				e.printStackTrace();
+			}
+			
+			stopActiveNMEAsource=false;
+			
+			
+		}
+		
+	}
 
 	class UdpThread implements Runnable {
 		@Override
@@ -766,6 +855,14 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		outputDatablock.addPamData(newUnit);
 	}
 	
+	private void processNmeaStringWithTimestamp(long timeMillis, String nmeaString) {
+		lastSigTime = timeMillis;
+		StringBuffer nmeaSringBuffer = new StringBuffer(nmeaString);
+		NMEADataUnit newUnit = new NMEADataUnit(timeMillis, nmeaSringBuffer);
+		outputDatablock.addPamData(newUnit);
+
+	}
+	
 	/**
 	 * Checks the checksum of an NMEA data string. 
 	 * <p>the checksum is an exclusive OR of all characters
@@ -871,7 +968,11 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	public void pamStart() {
 		lastSigTime = System.currentTimeMillis();
 		signalCheckTimer = new Timer(10000, new SignalTimerAction());
-		signalCheckTimer.start();
+		if(nmeaControl.nmeaParameters.sourceType==NMEAParameters.NmeaSources.TIMESTAMP_FILE) {
+			readFile=true;
+		}else {
+			signalCheckTimer.start();
+		}
 
 	}
 
@@ -879,6 +980,28 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	public void pamStop() {
 		if (signalCheckTimer!=null) {
 			signalCheckTimer.stop();
+		}
+		if(nmeaControl.nmeaParameters.sourceType==NMEAParameters.NmeaSources.TIMESTAMP_FILE) {
+			stopNMEASource();
+		}
+	}
+	
+	/**
+	 * Say error string, but stop printing them after the first 20. 
+	 * @param err
+	 */
+	private void sayErrorString(String err) {
+		errorCount++;
+		if (errorCount == 20) {
+			System.out.println("NMEA Error count exceeds 20, stop reporting NMEA Errors from " + nmeaControl.getUnitName());
+			return;
+		}
+		if (errorCount % 200 == 0) {
+			System.out.println("NMEA Error count " + errorCount + ": " + err);
+			return;
+		}
+		if (errorCount < 20) {
+			System.out.println(err);
 		}
 	}
 	
@@ -910,8 +1033,10 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	private class SignalTimerAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (System.currentTimeMillis() - lastSigTime > 10000) {
-				restartNMEA();
+			if(PamController.getInstance().getRunMode()!=PamController.RUN_NETWORKRECEIVER) {
+				if (System.currentTimeMillis() - lastSigTime > 10000) {
+					restartNMEA();
+				}
 			}
 		}
 	}
@@ -927,7 +1052,15 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 	@Override
 	public ModuleStatus getStatus() {
+		
 		ModuleStatus status = processCheck.getStatus();
+		
+		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+			status.setStatus(ModuleStatus.STATUS_OK);
+			return status;
+		}
+		
+		
 		
 		if (status.getStatus() == ModuleStatus.STATUS_OK && nmeaControl.nmeaParameters.sourceType == NmeaSources.SIMULATED) {
 			status.setStatus(ModuleStatus.STATUS_WARNING);

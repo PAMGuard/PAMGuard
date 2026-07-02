@@ -19,6 +19,12 @@ import javafx.scene.paint.Color;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
+import PamController.PAMStartupEnabler;
+import PamController.PamController;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamObservable;
+import PamguardMVC.PamObserverAdapter;
+import PamguardMVC.PamRawDataBlock;
 
 /**
  * TDControlFX acts as a wrapper class for a time base display programmed in JavaFX.
@@ -58,7 +64,11 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 	 * Create the vital components for the display. 
 	 */
 	private void create(){
-		dataObserver = new DataObserver();
+		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+			dataObserver = new NetRxDataObserver();
+		}else {
+			dataObserver = new DataObserver();
+		}
 	}
 
 
@@ -211,6 +221,40 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 			fxPanel.scrollDisplayEnd(milliSeconds);
 		}
 
+	}
+	
+	public void addNetObservable(PamObservable o) {
+		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+			o.addObserver(dataObserver);
+		}
+	}
+	
+	private class NetRxDataObserver extends DataObserver {
+
+		
+			@Override
+			public long getRequiredDataHistory(PamObservable o, Object arg) {
+				if (PamRawDataBlock.class == o.getClass()) {
+					return 0;
+				}
+				//			return 0;
+				////			//TODO- this should be the range, not the visible range. 
+				// should really be the maximum of the two. 
+				return (long) (fxPanel.getScrollableRange());
+			}
+
+
+			@Override
+			public String getObserverName() {
+				return "Time Display FX NetRx";
+			}
+			
+			@Override
+			public void addData(PamObservable o, PamDataUnit u) {
+				fxPanel.scrollDisplayEnd(u.getEndTimeInMilliseconds());
+			}
+		
+	
 	}
 
 	/**

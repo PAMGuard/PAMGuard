@@ -172,6 +172,8 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 				}
 			});
 		}
+		
+		
 
 		initializationComplete = PamController.getInstance().isInitializationComplete();
 

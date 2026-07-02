@@ -43,7 +43,7 @@ public abstract class BinaryDataSource {
 
 	/**
 	 * Create a binary data source. These are used both to store data in binary 
-	 * files, and possibly also to send data to other PAMguard instances over the network. 
+	 * files, and possibly also to send data to other PAMGuard instances over the network. 
 	 * @param sisterDataBlock dataBlock for data to store / send
 	 */
 	public BinaryDataSource(PamDataBlock sisterDataBlock) {
@@ -53,7 +53,7 @@ public abstract class BinaryDataSource {
 
 	/**
 	 * Create a binary data source. These are used both to store data in binary 
-	 * files, and possibly also to send data to other PAMguard instances over the network. 
+	 * files, and possibly also to send data to other PAMGuard instances over the network. 
 	 * @param sisterDataBlock dataBlock for data to store / send
 	 * @param doBinaryStore true if data to be stored by default, false otherwise. 
 	 */

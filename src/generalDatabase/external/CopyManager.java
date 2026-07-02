@@ -573,7 +573,7 @@ public class CopyManager {
 		// really simple query to see how many records there are in the table. 
 		int nRec = 0;
 		SQLTypes sqlTypes = dbControl.getConnection().getSqlTypes();
-		// use * since some non PAMguard tables may not have an Id column 
+		// use * since some non PAMGuard tables may not have an Id column 
 		String qStr = "SELECT COUNT(*) FROM "  + sqlTypes.formatColumnName(tableName);
 		if (minUTC != null) {
 			qStr += String.format(" WHERE UTC > %s", sqlTypes.formatDBDateTimeQueryString(minUTC));

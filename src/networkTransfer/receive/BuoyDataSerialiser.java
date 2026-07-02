@@ -6,6 +6,9 @@ import java.util.ListIterator;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettings;
+import networkTransfer.receive.status.BuoyStatusData;
+import networkTransfer.receive.status.BuoyStatusDataBlock;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 
 /**
  * Clas for saving buoystatus data into the serialised settings. 

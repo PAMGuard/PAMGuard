@@ -275,7 +275,7 @@ public class SQLTypes {
 			return Types.TINYINT;
 		case "VARBINARY":
 			return Types.VARBINARY;
-		case "VARCHAR": // not used in PAMguard, always CHAR. 
+		case "VARCHAR": // not used in PAMGuard, always CHAR. 
 			return Types.CHAR;
 		}
 		return 0;

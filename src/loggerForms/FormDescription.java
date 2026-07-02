@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +47,9 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamCalendar;
 import PamUtils.XMLUtils;
+import PamView.PamGui;
 import PamView.PamTabPanel;
+import PamView.PamView;
 import PamView.panel.PamPanel;
 import PamView.panel.PamSplitPane;
 import PamguardMVC.PamDataBlock;
@@ -81,7 +84,7 @@ import pamScrollSystem.ScrollPaneAddon;
  */
 public class FormDescription implements Cloneable, Comparable<FormDescription> {
 
-	private UDFTableDefinition udfTableDefinition;
+	private EmptyTableDefinition udfTableDefinition;
 	private FormsControl formsControl;
 	private DBControlUnit dbControl;
 	private boolean udfTableOK;
@@ -151,7 +154,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		this.formsControl = existingDescription.formsControl;
 		this.dbControl = existingDescription.dbControl;		
 		this.udfName = existingDescription.udfName;
-		udfTableDefinition = new UDFTableDefinition(existingDescription.udfTableDefinition.getTableName());
+		udfTableDefinition = createTableDefinition(existingDescription.udfTableDefinition.getTableName());
 
 
 		createControlDescriptions(itemInfos);
@@ -173,7 +176,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		dbControl = DBControlUnit.findDatabaseControl();
 		formSettingsControl = new FormSettingsControl(this, udfName);
 
-		udfTableDefinition = new UDFTableDefinition(udfName);
+		udfTableDefinition = createTableDefinition(udfName);
 
 		udfTableOK = dbControl.getDbProcess().checkTable( udfTableDefinition);
 
@@ -182,6 +185,31 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		ArrayList<ItemInformation> itemInfos = readUDFTable();
 
 		buildForm(itemInfos);
+	}
+	
+	private EmptyTableDefinition createTableDefinition(String tableName) {
+		if (isUDB()) {
+			return new UDBTableDefinition(tableName);
+		}
+		else {
+			return new UDFTableDefinition(tableName);
+		}
+	}
+	
+	/**
+	 * It's a UDB (button) form
+	 * @return
+	 */
+	public boolean isUDB() {
+		return this.udfName.startsWith("UDB_");
+	}
+	
+	/**
+	 * It's a UDF (normal) form
+	 * @return
+	 */
+	public boolean isUDF() {
+		return this.udfName.startsWith("UDF_");
 	}
 
 	private void reBuildForm(ArrayList<ItemInformation> itemInfos) {
@@ -582,6 +610,23 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		}
 		return -1;
 	}
+	
+	/**
+	 * Find a control description from it's title. 
+	 * @param name
+	 * @return
+	 */
+	public ControlDescription findControlDescription(String name) {
+		if (name == null) { 
+			return null;
+		}
+		for (ControlDescription controlDescription : controlDescriptions) {
+			if (name.equals(controlDescription.getTitle())) {
+				return controlDescription;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Get the index of the control in the list of input controls, this will 
@@ -631,6 +676,17 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 			return false;
 		}
 		return (findProperty(PropertyTypes.SUBTABS) != null);
+	}
+	
+	/**
+	 * Is it a popup form ? 
+	 * @return
+	 */
+	boolean isPopup() {
+		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
+			return false;
+		}
+		return (findProperty(PropertyTypes.POPUP) != null);
 	}
 	/**
 	 * 
@@ -1119,6 +1175,37 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		}
 		return newLines;
 	}
+	
+	/***
+	 * Called from BUTTONS and SUBFORM button controls to get an activated form. This
+	 * should normally be a popup form, or a subtabs form, in which case, a new form 
+	 * will be created and added to the subtab, or popped up. If it's a normal form, then 
+	 * we just go to that tab and don't do anything else. 
+	 * @return
+	 */
+	public LoggerForm activateForm() {
+		LoggerForm activeForm = null;
+		if (isSubTabs()) {
+			activeForm = createSubtabForm();
+		}
+		else if (isPopup()) {
+			activeForm = createForm();
+		}
+		else {
+			activeForm = normalForm;
+//			if ()
+		}
+		// try to go to this tab. 
+		formsControl.getFormsTabPanel().gotoForm(this);
+		
+		// and also tell the main GUI to go to the forms tab. 
+		PamView view = formsControl.getPamView();
+		if (view != null) {
+			view.showControlledUnit(formsControl);
+		}		
+		
+		return activeForm;
+	}
 
 	public LoggerForm createForm() {
 		boolean viewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
@@ -1129,7 +1216,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 	/**
 	 * @return the udfTableDefinition
 	 */
-	public UDFTableDefinition getUdfTableDefinition() {
+	public EmptyTableDefinition getUdfTableDefinition() {
 		return udfTableDefinition;
 	}
 
@@ -1249,7 +1336,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 	/**
 	 * Create a new subtab form on the appropriate sub tab panel. 
 	 */
-	private void createSubtabForm() {
+	private LoggerForm createSubtabForm() {
 		LoggerForm newForm = createForm();
 		String subtabName = getFormNiceName();
 
@@ -1265,6 +1352,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 			subtabForms = new ArrayList<LoggerForm>();
 		}
 		subtabForms.add(newForm);
+		return newForm;
 	}
 
 	/**
@@ -1312,7 +1400,9 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 	 * removes the Subtabform that the loggerForm calling it is on
 	 */
 	void removeSubtabform(LoggerForm loggerForm){
-
+if (subTabPane == null) {
+	return;
+}
 		//removes the Subtabform that is currently selected(it will be the one this command is called from)
 
 		//		subTabs.removeTabAt(subTabs.getSelectedIndex());

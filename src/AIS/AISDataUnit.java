@@ -2,6 +2,7 @@ package AIS;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import NMEA.NMEABitArray;
 import NMEA.NMEADataBlock;
@@ -54,12 +55,13 @@ public class AISDataUnit extends PamDataUnit implements Serializable, Cloneable 
 	 */
 	protected boolean isInRange = true;
 	protected boolean newUnit = true;
+	public boolean lastUnitStaticOnly = false;
 	/**
 	 * AIVDM, etc.
 	 */
 	protected String dataType;
 
-	protected StationType stationType;
+	public StationType stationType;
 	/**
 	 * Pulled out from the start of the AIVDM string. 
 	 */
@@ -150,7 +152,9 @@ may not be null.
 				if (bitData.size() < POSITIONREPORTBITS) {
 					return false;
 				}
-				positionReports.add(new AISPositionReport(messageId, getTimeMilliseconds(), bitData));
+				synchronized (positionReports) {
+					positionReports.add(new AISPositionReport(messageId, getTimeMilliseconds(), bitData));
+				}
 				stationType = StationType.A;
 				return true;
 			case 4:
@@ -175,7 +179,9 @@ may not be null.
 				stationType = StationType.B;
 				positionReport = new AISPositionReport(messageId, getTimeMilliseconds(), bitData);
 				if (positionReport.reportOk) {
-					positionReports.add(positionReport);
+					synchronized (positionReports) {
+						positionReports.add(positionReport);
+					}
 					return true;
 				}
 				return false;
@@ -184,7 +190,9 @@ may not be null.
 				positionReport = new AISPositionReport(messageId, getTimeMilliseconds(), bitData);
 				if (positionReport.reportOk) {
 					staticData = new AISStaticData(messageId, bitData);
-					positionReports.add(positionReport);
+					synchronized (positionReports) {
+						positionReports.add(positionReport);
+					}
 					return true;
 				}
 				return false;
@@ -196,7 +204,9 @@ may not be null.
 				positionReport = new AISPositionReport(messageId, getTimeMilliseconds(), bitData);
 				if (positionReport.reportOk) {
 					staticData = new AISStaticData(messageId, bitData);
-					positionReports.add(positionReport);
+					synchronized (positionReports) {
+						positionReports.add(positionReport);
+					}
 					return true;
 				}
 				return false;
@@ -219,7 +229,9 @@ may not be null.
 	private boolean unpackBaseStationReport(int messageId2,
 			NMEABitArray bitData2) {
 		//		staticData = new AISStaticData("", "Base Station", 0, 0, 0, null);
-		positionReports.add(new AISPositionReport(messageId2, getTimeMilliseconds(), bitData2));
+		synchronized (positionReports) {
+			positionReports.add(new AISPositionReport(messageId2, getTimeMilliseconds(), bitData2));
+		}
 		return true;
 	}
 
@@ -233,8 +245,12 @@ may not be null.
 	 */
 	public void update(AISDataUnit newAISUnit) {
 		newUnit = false;
+		lastUnitStaticOnly = true;
 		if (newAISUnit.positionReports.size() != 0) {
-			this.positionReports.add(newAISUnit.getPositionReport());
+			lastUnitStaticOnly = false;
+			synchronized (this.positionReports) {
+				this.positionReports.add(newAISUnit.getPositionReport());
+			}
 			aisLocalisation.getLocContents().setLocContent(LocContents.HAS_BEARING | LocContents.HAS_DEPTH |
 					LocContents.HAS_LATLONG | LocContents.HAS_RANGE);
 		}
@@ -289,7 +305,11 @@ may not be null.
 		if (positionReports.size() == 0) {
 			return null;
 		}
-		return positionReports.get(positionReports.size()-1);
+		AISPositionReport lastRep = null;
+		synchronized (positionReports) {
+			lastRep = positionReports.getLast();
+		}
+		return lastRep;
 	}
 
 	public AISPositionReport findPositionReport(long timeMillis) {
@@ -297,36 +317,74 @@ may not be null.
 		if (positionReports.size() == 0) {
 			return null;
 		}
-		long bestT = Math.abs(positionReports.get(0).timeMilliseconds - timeMillis);
-		long newT;
-		int bestInd = 0;
-		for (int i = 1; i < positionReports.size(); i++) {
-			newT = Math.abs(positionReports.get(i).timeMilliseconds - timeMillis);
-			if (newT < bestT) {
-				bestT = newT;
-				bestInd = i;
+		synchronized (positionReports) {
+			long bestT = Math.abs(positionReports.get(0).timeMilliseconds - timeMillis);
+			long newT;
+			int bestInd = 0;
+			for (int i = 1; i < positionReports.size(); i++) {
+				newT = Math.abs(positionReports.get(i).timeMilliseconds - timeMillis);
+				if (newT < bestT) {
+					bestT = newT;
+					bestInd = i;
+				}
 			}
+			return positionReports.get(bestInd);
 		}
-		return positionReports.get(bestInd);
 	}
 
 	public AISStaticData getStaticData() {
 		return staticData;
 	}
 
+	/**
+	 * Gets a copy of the position reports. Has to be a copy or 
+	 * will get a concurrentmodificationexception if the list
+	 * is trimmed (new trimPositions function) while it's drawing. 
+	 * @return
+	 */
 	public ArrayList<AISPositionReport> getPositionReports() {
-		return positionReports;
+		if (positionReports == null) {
+			return null;
+		}
+		ArrayList<AISPositionReport> repCopy = new ArrayList<>(positionReports);
+		return repCopy;
 	}
 
 	public void addPositionReport(AISPositionReport positionReport) {
 		if (positionReports == null) {
 			positionReports = new ArrayList<AISPositionReport>();
 		}
-		positionReports.add(positionReport);
+		synchronized (positionReports) {
+			positionReports.add(positionReport);
+		}
 	}
 
 	public void setStaticData(AISStaticData staticData) {
 		this.staticData = staticData;
+	}
+
+	/**
+	 * Delete all position reports before the firstWantedTime, this is 
+	 * to ensure that in a static monitoring or a fixed fleet situation, 
+	 * a single vessel doesn't make an infinitely long list of position reports. 
+	 * @param firstWantedTime
+	 */
+	public void trimPositionReports(long firstWantedTime) {
+		if (positionReports == null || positionReports.size() == 0) {
+			return;
+		}
+		synchronized (positionReports) {
+		ListIterator<AISPositionReport> it = positionReports.listIterator();
+		while (it.hasNext()) {
+			AISPositionReport pr = it.next();
+			if (pr.timeMilliseconds < firstWantedTime) {
+				it.remove();
+			}
+			else {
+				break;
+			}
+		}
+		}
 	}
 
 

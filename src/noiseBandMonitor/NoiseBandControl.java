@@ -353,6 +353,10 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 		tabPanel.newSettings();
 	}
 
+	public BandData getBandData() {
+		return bandData;
+	}
+
 	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag == PamGUIManager.FX) {

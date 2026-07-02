@@ -462,6 +462,12 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	public SymbolData[] getSymbolsData() {
 		return BasicClickIdentifier.pamSymbol2SymbolData(getSymbols()) ;
 	}
+
+	@Override
+	public String getClassificationSummary(boolean clear) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

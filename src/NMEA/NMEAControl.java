@@ -28,11 +28,18 @@ import java.io.Serializable;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.json.JSONObject;
+
+import Acquisition.FolderInputSystem;
+import nmeaEmulator.NMEAFrontEnd;
+import pamguard.CommandLine;
+import pamguard.GlobalArguments;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.status.BaseProcessCheck;
 import nmeaEmulator.NMEAFrontEnd;
 import pamguard.GlobalArguments;
 
@@ -62,6 +69,8 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 //	JMenuItem nmeaMenu;
 	private NMEAControl nmeaControl;
 	
+	public static final String GlobalPortFlag = "-serialPort";
+	
 	public static final String nmeaUnitType = "NMEA Data";
 	
 	/**
@@ -87,9 +96,15 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	}
 
 	private void checkGlobalArguments() {
-		String globArg = GlobalArguments.getParam(NMEACOMCOMMAND);
+		// try the new command line way of getting these things ...
+		String globArg = CommandLine.getCommandLine().getCommandParameter(NMEACOMCOMMAND); // dougs way
+		if (globArg == null) {
+			globArg = CommandLine.getCommandLine().getCommandParameter(NMEAControl.GlobalPortFlag); // Sam's way
+		}
+		if (globArg == null) {
+			globArg = GlobalArguments.getParam(NMEACOMCOMMAND); // old way !
+		}
 		if (globArg != null) {
-
 			System.out.printf("Setting %s serial port to %s\n", getUnitName(), globArg);
 			if (globArg.equalsIgnoreCase("auto")) {
 				nmeaParameters.autoSerialPort = true;
@@ -98,6 +113,12 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 				nmeaParameters.serialPortName = globArg;
 			}
 		}
+//		
+//		//Sam's way -- (Doug's is better)
+//		String portArg = GlobalArguments.getParam(NMEAControl.GlobalPortFlag);
+//		if (portArg != null) {
+//			this.nmeaParameters.serialPortName=portArg;
+//		}
 		
 	}
 
@@ -221,6 +242,21 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public String getModuleSummary(boolean clear, String format) {
+		if(format.equals("json")) {
+			NMEADataUnit lastUnit = acquireNmeaData.getOutputDatablock().getLastUnit();
+			if(lastUnit==null) {
+				return "";
+			}
+			JSONObject json = new JSONObject();
+			json.put("LastDataTime", lastUnit.getTimeMilliseconds());
+			json.put("LastDataString", lastUnit.getCharData().toString());
+			return json.toString();
+		}
+		return "";
 	}
 
 	/* (non-Javadoc)

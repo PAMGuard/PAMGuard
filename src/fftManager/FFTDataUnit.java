@@ -10,6 +10,9 @@ import PamguardMVC.superdet.SuperDetection;
 
 public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implements AcousticDataUnit {
 
+	/**
+	 * The values of this complex array are scaled to 1/n
+	 */
 	private ComplexArray fftData;
 
 	private int fftSlice;
@@ -52,6 +55,10 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 		}
 	}
 
+	/**
+	 * The data contained in the complex array are scaled to 1/n
+	 * @return
+	 */
 	public ComplexArray getFftData() {
 		return fftData;
 	}
@@ -63,13 +70,44 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 	public int getFftSlice() {
 		return fftSlice;
 	}
-
+	
+	
 	/**
-	 * Return the values in decibels (spectrum level I think).  
-	 * Should be good to go for plotting on the spectrogram.
+	 * Calculate and return the magnitude of the of the FFT expressed in dBFS
+	 * 
+	 * @return magnitude in dB
 	 */
-	@Override
-	public double[] getMagnitudeData() {
+	public double[] magToDecibels(){
+		double[] mag = this.fftData.mag();
+		double[] out = new double[mag.length];
+		for(int i=0;i<out.length;i++) {
+			double dB = 20 * Math.log10(mag[i]);
+			if (!Double.isFinite(dB)) out[i] = 0;
+			else out[i] = dB;
+		}		
+		return out;
+	}
+	
+	
+	
+	public double[] psdFullScale() {
+		double[] magSq = this.fftData.magsq();
+		double[] psd = new double[magSq.length];
+		float fs = getParentDataBlock().getSampleRate();
+		double N = magSq.length;
+		double df = fs/N;
+		for(int i=0;i<magSq.length;i++) {
+			psd[i] = magSq[i]/df;
+		}
+		return psd;
+	}
+	
+	/**
+	 * ADC output spectral density. 
+	 * 
+	 * @return
+	 */
+	public double[] getADCVoltageInputSpectralDensity() {
 		/**
 		 * Return the values in decibels (spectrum level I think). 
 		 */
@@ -77,6 +115,85 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 			return null;
 		}
 
+		double[] magSqData =  fftData.magsq();
+		AcquisitionProcess daqProcess = null;
+
+		//		int iChannel = PamUtils.getSingleChannel(getChannelBitmap());
+	
+		int iChannel = this.getParentDataBlock().getARealChannel(PamUtils.getSingleChannel(getChannelBitmap()));
+		
+		double gain = getParentDataBlock().getCumulativeGain(iChannel);
+		if (gain == 0) {
+			getParentDataBlock().getCumulativeGain(iChannel);
+		}
+
+		// get the acquisition process. 
+		try {
+			daqProcess = (AcquisitionProcess) (getParentDataBlock().getSourceProcess());
+			daqProcess.prepareFastAmplitudeCalculation(iChannel);
+		}
+		catch (ClassCastException e) {
+			return magSqData;
+		}
+		double mGain = gain/gain;
+		for (int i = 0; i < magSqData.length; i++) {
+			magSqData[i] = daqProcess.fftAmplitude2dB(magSqData[i]/mGain, iChannel, 
+					getParentDataBlock().getSampleRate(), magSqData.length*2, true, true);
+		}
+		return magSqData;
+	}
+	
+	/*public double[] getMagitudeStage(String stage) {
+		if (fftData == null) {
+			return null;
+		}
+
+		//Parseval's Theorem says 'the mean-square of the function is equal to the sum of the square of its transform'
+		//So, the returned array summed is the mean-square ADC output.
+		double[] magSqData =  fftData.magsq();
+		AcquisitionProcess daqProcess = null;
+
+		//		int iChannel = PamUtils.getSingleChannel(getChannelBitmap());
+	
+		int iChannel = this.getParentDataBlock().getARealChannel(PamUtils.getSingleChannel(getChannelBitmap()));
+		
+		double gain = getParentDataBlock().getCumulativeGain(iChannel);
+		if (gain == 0) {
+			getParentDataBlock().getCumulativeGain(iChannel);
+		}
+
+		// get the acquisition process. 
+		try {
+			daqProcess = (AcquisitionProcess) (getParentDataBlock().getSourceProcess());
+			daqProcess.prepareFastAmplitudeCalculation(iChannel);
+		}
+		catch (ClassCastException e) {
+			return magSqData;
+		}
+		double mGain = gain/gain;
+		for (int i = 0; i < magSqData.length; i++) {
+			magSqData[i] = daqProcess.getPSD(magSqData[i]/mGain, iChannel, 
+					getParentDataBlock().getSampleRate(), magSqData.length*2, true, true, stage);
+		}
+		return magSqData;
+	}*/
+
+	/**
+	 * Return the values in decibels (spectrum level I think).  
+	 * Should be good to go for plotting on the spectrogram.
+	 * <br><br>
+	 * Reviewed by ST on 8/15/24:
+	 * This returns the Power Spectral Density of the signal in dB re: 1 microPascal^2/hz
+	 * Compliant with ISO/DIS 7605 
+	 */
+	@Override
+	public double[] getMagnitudeData() {
+		if (fftData == null) {
+			return null;
+		}
+
+		//Parseval's Theorem says 'the mean-square of the function is equal to the sum of the square of its transform'
+		//So, the returned array summed is the mean-square ADC output.
 		double[] magSqData =  fftData.magsq();
 		AcquisitionProcess daqProcess = null;
 

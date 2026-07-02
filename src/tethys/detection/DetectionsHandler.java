@@ -480,10 +480,13 @@ public class DetectionsHandler extends CollectionHandler {
 				if (mapPoint.getStartTime() >= deployment.getAudioEnd()) {
 					break;
 				}
-				dataBlock.loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), null);
+				dataBlock.loadMapPointData(mapPoint, null);
+//				dataBlock.loadViewerData(mapPoint, null);
 				SuperDetDataBlock.reattachAllSubDetections();
 				
-				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+//				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+				// export all loaded data. Solves problem of minor mismatches at start and end of binary files. 
+				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(Long.MIN_VALUE/2, Long.MAX_VALUE/2, true, dataSelector);
 				Collections.sort(dataCopy);
 				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
 				for (PamDataUnit dataUnit : dataCopy) {
@@ -530,7 +533,7 @@ public class DetectionsHandler extends CollectionHandler {
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 				exportObserver.update(prog);
 
-				if (documentCount > 50000000 && mapPoint != dataMap.getLastMapPoint()) {
+				if (documentCount > streamExportParams.getMaxDetectionItems() && mapPoint != dataMap.getLastMapPoint()) {
 					prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 					exportObserver.update(prog);
@@ -556,6 +559,7 @@ public class DetectionsHandler extends CollectionHandler {
 						}
 						localizationBuilder = null;
 					}
+					documentCount = 0;
 				}
 
 				if (viewerLoadPolicy == ViewerLoadPolicy.LOAD_ALWAYS_EVERYTHING) {

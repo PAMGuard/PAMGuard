@@ -11,6 +11,10 @@ import java.util.Arrays;
 
 import javax.swing.JFrame;
 
+import pamMaths.PamQuaternion;
+import pamMaths.PamVector;
+import pamguard.GlobalArguments;
+import userDisplay.UserDisplayControl;
 import Array.importHydrophoneData.HydrophoneImport;
 import Array.importHydrophoneData.StreamerImport;
 import Array.layoutFX.ArrayGUIFX;
@@ -110,6 +114,8 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 
 	public static final double DEFAULT_HYDROPHONE_SENSITIVITY = -170;
 	public static final double DEFAULT_PREAMP_GAIN = 0;
+	
+	public static final String FIRST_IDX_SENS = "-array.firstHydrophone";
 
 
 	private ArrayManager(String unitName) {
@@ -336,6 +342,14 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 			Ex.printStackTrace();
 			return false;
 		}
+		
+		String sens = GlobalArguments.getParam(FIRST_IDX_SENS);
+		
+		if(sens!=null) {
+			double sensitivity = Double.valueOf(sens);
+			this.recentArrays.get(0).getHydrophone(0).setSensitivity(sensitivity);
+		}
+		
 		return true;
 	}
 	
@@ -761,6 +775,40 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 			arrayVectors[i] = array.getAbsHydrophoneVector(iPhone,0);
 		}
 		return arrayVectors;
+	}
+	
+	/**
+	 * Get the outer limits of the array in x,y,z
+	 * @param array
+	 * @param phones
+	 * @return 3 element array
+	 */
+	public double[] getArrayDimension(PamArray array, int phones) { 
+		double[] dim = new double[3];
+		int nPhones = PamUtils.getNumChannels(phones);
+		if (nPhones <= 1) {
+			return dim;
+		}
+		double[] dMin, dMax;
+		int iPhone = PamUtils.getNthChannel(0, phones);
+		PamVector hydVec = array.getAbsHydrophoneVector(iPhone,0);
+		dMin = Arrays.copyOf(hydVec.getVector(), 3);
+		dMax = Arrays.copyOf(hydVec.getVector(), 3);
+		
+		for (int i = 0; i < nPhones; i++) {
+			iPhone = PamUtils.getNthChannel(i, phones);
+			hydVec = array.getAbsHydrophoneVector(iPhone,0);
+			double[] hA = hydVec.getVector();
+			for (int j = 0; j < 3; j++) {
+				dMin[j] = Math.min(dMin[j], hA[j]);
+				dMax[j] = Math.max(dMax[j], hA[j]);
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			dim[i] = dMax[i]-dMin[i];
+		}
+		
+		return dim;
 	}
 
 	public static String getArrayTypeString(int arrayType) {

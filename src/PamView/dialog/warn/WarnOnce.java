@@ -191,6 +191,9 @@ public class WarnOnce implements PamSettings {
 	 * otherwise OK_OPTION will always be returned. 
 	 */
 	public static int showWarning(Window parent, String title, String message, int messageType) {
+		if(parent==null) {
+			return WarnOnce.OK_OPTION;
+		}
 		 return singleInstance.showWarningDialog(parent, title, message, messageType, null, null, null, null, false);
 	}
 

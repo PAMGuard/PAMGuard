@@ -9,7 +9,7 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamCalendar;
 
-public class AISStaticData extends AISReport implements Serializable, ManagedParameters{
+public class AISStaticData extends AISReport implements Serializable, ManagedParameters, Cloneable{
 
 	public static final long serialVersionUID = 0;
 	
@@ -37,7 +37,12 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 
 	public int classBPart = -1;
 	
+	private NMEABitArray bitData;
+	private int messageId;
+	
 	AISStaticData(int messageId, NMEABitArray bitData) {
+		this.bitData = bitData;
+		this.messageId = messageId;
 		switch(messageId) {
 		case 5: // standard static data
 			unpackStandardStaticData(bitData);
@@ -58,8 +63,8 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 	boolean unpackStandardStaticData(NMEABitArray bitData) {
 		//07/08/2017 - this sometimes causes a comple PG freeze. Have used try catch to solve for now. 
 		try {
-		int dataSetIndicator = bitData.getUnsignedInteger(38, 39);
-		switch (dataSetIndicator) {
+		//int dataSetIndicator = bitData.getUnsignedInteger(38, 39);
+		/*switch (dataSetIndicator) {
 		case 0:
 			return unpackStandardStaticShipData(bitData);
 		case 1:
@@ -68,8 +73,9 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 			break;
 		case 3:
 			break;
-		}
-		return false;
+		}*/
+		return unpackStandardStaticShipData(bitData);
+		//return false;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -100,6 +106,7 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 	private void unpackClassBStaticData(NMEABitArray bitData) {
 		dataClass = "B";
 		shipName = bitData.getString(143, 262);
+		shipName = shipName.replace("@", " ");
 		shipType = bitData.getUnsignedInteger(263, 270);
 		dimA = bitData.getUnsignedInteger(271, 279);
 		dimB = bitData.getUnsignedInteger(280, 288);
@@ -114,6 +121,7 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 		switch(classBPart) {
 		case 0:
 			shipName = bitData.getString(40, 159);
+			shipName = shipName.replace("@", " ");
 			break;
 		case 1:
 			shipType = bitData.getUnsignedInteger(40, 47);
@@ -396,6 +404,22 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
+	}
+	
+	@Override
+	public AISStaticData clone() {
+		try {
+			AISStaticData newUnit = (AISStaticData) super.clone();
+			return newUnit;
+		}
+		catch (CloneNotSupportedException Ex) {
+			Ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	public AISStaticData copy() {
+		return new AISStaticData(messageId,bitData);
 	}
 
 }

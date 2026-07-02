@@ -29,13 +29,14 @@ public class BinaryStoreProcess extends PamProcess {
 		return "Binary store file control";
 	}
 
-	public synchronized void checkFileTime(long masterClockTime) {
+	public synchronized void checkFileTime(long masterClockTime, String source) {
 		//		if (binaryStore.binaryStoreSettings.autoNewFiles && 
 		//				 PamCalendar.getTimeInMillis() >= nextFileTime) {
 		//			startNewFiles();
 		//		}
 		if (binaryStore.binaryStoreSettings.autoNewFiles && 
 				masterClockTime >= nextFileTime) {
+//			System.out.println("Reopen files based on " + source);
 			startNewFiles(masterClockTime);
 		}
 
@@ -94,7 +95,7 @@ public class BinaryStoreProcess extends PamProcess {
 	class FileTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			checkFileTime(PamCalendar.getTimeInMillis());
+			checkFileTime(PamCalendar.getTimeInMillis(), "Timer");
 		}
 	}
 

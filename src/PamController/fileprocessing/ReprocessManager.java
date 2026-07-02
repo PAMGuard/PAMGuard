@@ -45,7 +45,8 @@ public class ReprocessManager {
 		checkWorker.execute();	
 		
 		//TODO - JavaFX GUI crashes here
-		if (PamGUIManager.getGUIType() == PamGUIManager.FX) {
+		//		Headless does too
+		if (PamGUIManager.getGUIType() == PamGUIManager.FX || PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
 			//do nothing - progress messages will be sent to PamController via the monitor interface.
 		}
 		else {

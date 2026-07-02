@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -28,7 +29,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import Array.Hydrophone;
+//import Array.streamerOrigin.StaticOriginMethod.StaticHydrophoneDialogComponent.MenuButton;
 import Map.gridbaselayer.GridDialogPanel;
+import PamUtils.LatLong;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SettingsButton;
@@ -88,6 +91,11 @@ public class MapParametersDialog extends PamDialog {
 	private EffortSourcePanel effortSourcePanel;
 	
 	private SettingsButton effortSettings;
+	
+	//JPanel Objects for static mooring map settings. 
+	//Ability to lock all map params and positions between runs 
+	//for active static mooring mitigation projects
+	private StaticMapOptions staticMapOptionsPanel;
 
 	private MapParametersDialog(java.awt.Window parentFrame, SimpleMap simpleMap) {
 
@@ -99,6 +107,7 @@ public class MapParametersDialog extends PamDialog {
 		hydrophonePanel = new HydrophonePanel();
 		filePanel = new FilePanel(this);
 		gridDialogPanel = new GridDialogPanel(parentFrame, simpleMap.getGridBaseControl());
+		staticMapOptionsPanel = new StaticMapOptions();
 		
 		JPanel outerOptionsPanel = new JPanel();
 		outerOptionsPanel.setLayout(new BoxLayout(outerOptionsPanel, BoxLayout.Y_AXIS));
@@ -107,6 +116,7 @@ public class MapParametersDialog extends PamDialog {
 		outerOptionsPanel.add(hydrophonePanel);
 		outerOptionsPanel.add(new RotationPanel());
 		outerOptionsPanel2.add(BorderLayout.NORTH, outerOptionsPanel);
+		outerOptionsPanel.add(staticMapOptionsPanel);
 				
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add("Options", outerOptionsPanel2);
@@ -170,6 +180,8 @@ public class MapParametersDialog extends PamDialog {
 		showGrid.setSelected(!mapParameters.hideGrid);
 		
 		gridDialogPanel.setParams();
+		
+		this.staticMapOptionsPanel.initFields(mapParameters);
 
 		enableControls();
 	}
@@ -197,8 +209,21 @@ public class MapParametersDialog extends PamDialog {
 			}
 			mapParameters.colourByEffort = colourByEffort.isSelected();
 			mapParameters.effortDataSource = effortSourcePanel.getSourceName();
+			mapParameters.lockMap = this.staticMapOptionsPanel.isStaticToggledOn();
+			if(mapParameters.lockMap) {
+				mapParameters.lockedMapCenter = this.staticMapOptionsPanel.getLatLon();
+				mapParameters.lockedMapScale = this.staticMapOptionsPanel.getScale();
+				/*if(this.simpleMap!=null) {
+					this.simpleMap.disableMapMouseControl();
+				}*/
+			}else {
+				/*if(this.simpleMap!=null) {
+					this.simpleMap.enableMapMouseControl();
+				}*/
+			}
 		}
 		catch (Exception Ex) {
+			System.out.println("Error setting new map params. Error: "+Ex.getMessage());
 			return false;
 		}
 		mapParameters.mapFile = filePanel.getMapFile();
@@ -307,6 +332,112 @@ public class MapParametersDialog extends PamDialog {
 				return;
 			}
 			effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
+		}
+	}
+
+	
+	
+	class StaticMapOptions extends JPanel {
+		
+		private JCheckBox lockMapBox = new JCheckBox("Lock Map",false);
+		
+		private JTextField latitude, longitude, initHeightKM;
+		
+		private boolean isSet;
+		
+		public StaticMapOptions() {
+			super();
+			setBorder(new TitledBorder("Static Map Options"));
+			setLayout(new GridBagLayout());
+			GridBagConstraints c = new PamGridBagContraints();
+			c.gridx = 0;
+			c.gridy ++;
+			c.gridwidth = 3;
+			addComponent(this,lockMapBox, c);
+			lockMapBox.addActionListener(new AnyAction());
+			addMapCenterFields(c);
+			PamDialog.addComponent(this, new JLabel("Locked Map Height (meters): ", JLabel.RIGHT), c);
+			c.gridx ++;
+			c.gridwidth = 2;
+			PamDialog.addComponent(this, initHeightKM = new JTextField(12), c);
+			isSet = false;
+		}
+		
+		public int getScale() {
+			return Integer.parseInt(this.initHeightKM.getText());
+		}
+
+		public LatLong getLatLon() {
+			double lat = Double.parseDouble(this.latitude.getText());
+			double lon = Double.parseDouble(this.longitude.getText());
+			return new LatLong(lat,lon);
+		}
+
+		public void alignWithToggle() {
+			this.setEditable(this.lockMapBox.isSelected());
+		}
+		
+		public void setEditable(boolean setEdible) {
+			this.latitude.setEditable(setEdible);
+			this.longitude.setEditable(setEdible);
+			this.initHeightKM.setEditable(setEdible);
+		}
+		
+		public boolean isStaticToggledOn() {
+			return this.lockMapBox.isSelected();
+		}
+		
+		public void unSetFields() {
+			isSet = false;
+			this.latitude.setText("");
+			this.longitude.setText("");
+			this.initHeightKM.setText("");
+		}
+		
+		public void initFields(MapParameters mapParams) {
+			this.lockMapBox.setSelected(mapParams.lockMap);
+			if(mapParams.lockMap) {
+				setFields(mapParams.lockedMapCenter,mapParams.lockedMapScale);
+			}else{
+				unSetFields();
+			}
+		}
+		
+		public void setFields(LatLong center, int heightM) {
+			isSet = true;
+			this.latitude.setText(Double.toString(center.getLatitude()));
+			this.longitude.setText(Double.toString(center.getLongitude()));
+			this.initHeightKM.setText(Integer.toString(heightM));
+		}
+		
+		public boolean isSet() {
+			return this.isSet;
+		}
+		
+		private void addMapCenterFields(GridBagConstraints c) {
+			c.gridx+=c.gridwidth;
+			c.gridheight = 2;
+			c.gridheight = 1;
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 1;
+			PamDialog.addComponent(this, new JLabel("Center Latitude (decimal degrees): ", JLabel.RIGHT), c);
+			c.gridx ++;
+			c.gridwidth = 2;
+			PamDialog.addComponent(this, latitude = new JTextField(12), c);
+			c.gridx+=c.gridwidth;
+			c.gridheight = 2;
+			c.gridheight = 1;
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 1;
+			PamDialog.addComponent(this, new JLabel("Center Longitude (decimal degrees): ", JLabel.RIGHT), c);
+			c.gridx ++;
+			c.gridwidth = 2;
+			PamDialog.addComponent(this, longitude = new JTextField(12), c);
+			c.gridx+=c.gridwidth;
+			c.gridx = 0;
+			c.gridy++;
 		}
 	}
 
@@ -551,6 +682,19 @@ public class MapParametersDialog extends PamDialog {
 		boolean ec = colourByEffort.isSelected();
 		effortSettings.setSelected(ec);
 		effortSourcePanel.setEnabled(ec);
+		
+		if(this.staticMapOptionsPanel.isStaticToggledOn() && !this.staticMapOptionsPanel.isSet) {
+			LatLong centerNow = this.simpleMap.mapPanel.getMapCentreDegrees();
+			int rangeNow = this.simpleMap.mapPanel.getMapRangeMetres();
+			this.staticMapOptionsPanel.setEditable(true);
+			this.staticMapOptionsPanel.setFields(centerNow, rangeNow);
+		}else if(!this.staticMapOptionsPanel.isStaticToggledOn()) {
+			this.staticMapOptionsPanel.unSetFields();
+		}else {
+			this.staticMapOptionsPanel.alignWithToggle();
+		}
+		
+		
 	}
 
 

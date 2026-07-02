@@ -6,7 +6,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -428,6 +430,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 			//			if ((localisation.getLocContents() & AbstractLocalisation.HAS_AMBIGUITY) != 0) {
 			//				n = 2;
 			//			}
+			boolean drawBearingError = showBearingError(generalProjector);
 			for (int i = 0; i < n; i++) {
 				range = getDefaultRange(generalProjector);
 				if (localisation.getLocContents().hasLocContent(LocContents.HAS_RANGE)) {
@@ -452,6 +455,13 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 				//				System.out.println("Range: " + range + " m, bearing " + bearing*180/Math.PI + " degrees.");
 				// draw lines from the centreLatLong to the true location and put a symbol at the end of 
 				// the line.
+				double bearingError = 0;
+				if (drawBearingError) {
+					double[] bearingErrors = localisation.getAngleErrors();
+					if (bearingErrors != null ) {
+						bearingError = bearingErrors[0];
+					}
+				}
 				if (locVectors != null && locVectors.length > i) {
 					bearing = PamVector.vectorToSurfaceBearing(locVectors[i]);
 					referenceBearing = 0;//localisation.getBearingReference();
@@ -479,8 +489,8 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 				}
 				PamSymbol symbol = getPerspectiveSymbol(pamDetection, generalProjector, endPoint);
 				if (drawLine) {
-				bounds = drawLineOnly(g, pamDetection, detectionCentre.getXYPoint(), 
-						endPoint.getXYPoint(), symbol, drawingOptions);
+					bounds = drawLineWithError(g, pamDetection, detectionCentre.getXYPoint(), 
+							endPoint.getXYPoint(), bearingError, symbol, drawingOptions);
 				}
 				else {
 					bounds = symbol.draw(g, endPoint.getXYPoint(), drawingOptions);
@@ -647,8 +657,47 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 		}
 		return r;
 	}
+	
 
-	protected Rectangle drawLineOnly(Graphics g, PamDataUnit pamDataUnit, Point p1, Point p2, PamSymbol symbol, ProjectorDrawingOptions drawingOptions) {
+	protected Rectangle drawLineWithError(Graphics g, PamDataUnit pamDataUnit, Point p1, Point p2, 
+			double angleError, PamSymbol symbol, ProjectorDrawingOptions drawingOptions) {
+		if (angleError == 0 || angleError > Math.PI) {
+			return drawLineOnly(g, pamDataUnit, p1, p2, symbol, drawingOptions);
+		}
+		
+//		angleError = 0;
+		Graphics2D g2d = (Graphics2D) g;
+		// keep it simple with only a few points at different angles. 
+		int nAng = Math.max((int) Math.round(180*angleError/10), 2);
+		int[] x = new int[nAng+2];
+		int[] y = new int[nAng+2];
+		x[0] = p1.x;
+		y[0] = p1.y;
+		double r = Math.sqrt(Math.pow(p2.x-p1.x, 2) + Math.pow(p2.y-p1.y, 2));
+		double aStart = Math.atan2(p2.y-p1.y, p2.x-p1.x);
+		aStart -= angleError;
+		double aStep = 2*angleError/nAng;
+		for (int i = 0; i <= nAng; i++) {
+			double a = aStart + i*aStep;
+			x[i+1] = (int) (x[0] + r * Math.cos(a));
+			y[i+1] = (int) (y[0] + r * Math.sin(a));
+		}
+		Polygon p = new Polygon(x, y, nAng+2);
+		if (symbol.isFill() && angleError < Math.PI) {
+			g2d.setColor(symbol.getFillColor());
+			g2d.fill(p);
+		}
+		g2d.setColor(symbol.getLineColor());
+		g2d.draw(p);
+		
+//		symbol.setLineColor(Color.black);
+//		drawLineOnly(g2d, pamDataUnit, p1, p2, symbol, drawingOptions);
+		
+		return null;
+	}
+
+	protected Rectangle drawLineOnly(Graphics g, PamDataUnit pamDataUnit, Point p1, Point p2, 
+			PamSymbol symbol, ProjectorDrawingOptions drawingOptions) {
 		Color col = symbol.getLineColor();
 		if (drawingOptions != null) {
 			col = drawingOptions.createColor(col, drawingOptions.getLineOpacity());
@@ -715,8 +764,11 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 		Coordinate3d botRight = generalProjector.getCoord3d(pamDetection.getTimeMilliseconds() + 
 				dur, frequency[0], 0);
 				
+		boolean isWrapped = false;
 		if (botRight.x < topLeft.x){
-			botRight.x = g.getClipBounds().width;
+			// this means it's wrapped.
+			isWrapped = true;
+			botRight.x += g.getClipBounds().width;
 		}
 		if (generalProjector.isViewer()) {
 			Coordinate3d middle = new Coordinate3d();
@@ -738,8 +790,13 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 			// Not actually drawing on a spectrogramProjector, so don't have any info on the background color
 		}
 
+		if (isWrapped) {
+			g.drawRect((int) topLeft.x-g.getClipBounds().width, (int) topLeft.y, 
+					(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
+		}
 		g.drawRect((int) topLeft.x, (int) topLeft.y, 
 				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
+		
 		return new Rectangle((int) topLeft.x, (int) topLeft.y, 
 				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
 	}
@@ -1170,6 +1227,23 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 		else {
 			return defaultRange;
 		}
+	}
+	
+	public boolean showBearingError(GeneralProjector generalProjector) {
+		if (generalProjector == null) {
+			return false;
+		}
+		if (generalProjector.getPamSymbolChooser() == null) {
+			return false;
+		}
+		PamSymbolChooser symbolChooser = generalProjector.getPamSymbolChooser();
+		if (StandardSymbolChooser.class.isAssignableFrom(symbolChooser.getClass())) {
+			return ((StandardSymbolChooser) symbolChooser).getSymbolOptions().drawBearingError;
+		}
+		else {
+			return false;
+		}
+		
 	}
 
 	public void setDefaultRange(double defaultRange) {

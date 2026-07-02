@@ -43,6 +43,8 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 	private JCheckBox useAnnotation;
 
 	private JTextField lineLength;
+	
+	private JCheckBox drawBearingError;
 
 	private JCheckBox showLinesToLatLongs;
 
@@ -173,10 +175,13 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 			c.gridy++;
 			c.gridx = 0;
 			c.gridwidth = 3;
+			linePanel.add(drawBearingError = new JCheckBox("Draw bearing error"), c); 
+			c.gridy ++;
 			linePanel.add(showLinesToLatLongs = new JCheckBox("Draw lines to detections with Lat Long"), c);
 			lineLength.setToolTipText("Standard length of lines to detections that have bearing but no range information");
 			showLinesToLatLongs.setToolTipText("<html>Show lines to detections that have range or lat long information.<br>" + 
 					"Hiding the lines can make the map less cluttered.</html>");
+			drawBearingError.setToolTipText("If an estimate of bearing error is available, bearings will be drawn as a shaded cone shape");
 			mainPanel.add(linePanel);
 		}
 		setParams();
@@ -260,6 +265,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 		if (lineLengthOption) {
 			lineLength.setText(String.format("%3.1f", params.mapLineLength));
 			showLinesToLatLongs.setSelected(!params.hideLinesWithLatLong);
+			drawBearingError.setSelected(params.drawBearingError);
 		}
 
 //		if (useAnnotation != null) {
@@ -321,6 +327,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 				return PamDialog.showWarning(null, "Error", "Invalid line length value: " + lineLength.getText());
 			}
 			params.hideLinesWithLatLong = !showLinesToLatLongs.isSelected();
+			params.drawBearingError = drawBearingError.isSelected();
 		}
 
 //		if (useAnnotation != null) {
