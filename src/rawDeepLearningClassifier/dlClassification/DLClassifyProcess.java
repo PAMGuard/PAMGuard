@@ -338,8 +338,10 @@ public class DLClassifyProcess extends PamProcess {
 		}
 		
 		//so we have at least one segment in the buffer. Check whether the new segment is contiguous with the last one.
-		
-		long timeMillis1 = groupDetectionBuffer[i].getLast().getSegmentStartMillis();
+		// don't use getLast() since we're running Java 18 on some devices, which doesnt' support it
+		ArrayList<SegmenterDetectionGroup> buffI = groupDetectionBuffer[i];
+		SegmenterDetectionGroup last = buffI.get(buffI.size()-1);
+		long timeMillis1 = last.getSegmentStartMillis();
 		long timeMillis2 = detectionGroup.getSegmentStartMillis();
 		
 		//now, does this fall within the max gap time?

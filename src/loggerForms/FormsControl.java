@@ -32,6 +32,7 @@ import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import loggerForms.monitor.FormsMonitorMaster;
 import loggerForms.network.LoggerNetworkManager;
+import loggerForms.network.LoggerNetworkSystem;
 
 /**
  * 
@@ -406,7 +407,8 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 		detMenu.add(editMenu);
 //		}
 		
-		JMenuItem netItem = LoggerNetworkManager.getInstance().getConfigMenu();
+//		JMenuItem netItem = LoggerNetworkManager.getInstance().getConfigMenu();
+		JMenuItem netItem = LoggerNetworkSystem.getInstance().getMenuItem(parentFrame);
 		if (netItem != null) {
 			detMenu.add(netItem);
 		}
