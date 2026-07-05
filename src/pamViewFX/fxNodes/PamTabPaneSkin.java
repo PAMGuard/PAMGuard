@@ -15,6 +15,9 @@ import javafx.scene.layout.StackPane;
  * 1) The ability to have a button which adds new tabs.
  * <p>
  * 2) Regions (e.g. buttons, labels etc.) Can be added directly into the tab pane. The regions sit at the start (left/top) and end (right/bottom) of the header pane, which sits at the top of the tab pane. 
+ * <p>
+ * 3) An optional toolbar region that sits between the tab headers and the tab content area. This toolbar
+ * is shared across all tabs - there is only one instance regardless of how many tabs exist.
  * @author Jamie Macaulay
  */
 public class PamTabPaneSkin extends TabPaneSkin {
@@ -44,6 +47,17 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	 * How many pixels the tab button 'floats' in the header area. 
 	 */
 	public double addButtonInsets=3; 
+	
+	/**
+	 * The shared toolbar region that sits between the tab headers and the tab content.
+	 * Can be null if no toolbar is set.
+	 */
+	private Region toolbarRegion;
+	
+	/**
+	 * Cached reference to the tab content area (where tab content is displayed).
+	 */
+	private StackPane cachedContentArea;
 
 
 	public PamTabPaneSkin(PamTabPane tabPane) {
@@ -54,6 +68,7 @@ public class PamTabPaneSkin extends TabPaneSkin {
 		headerArea = (StackPane) tabPane.lookup(".tab-header-area");
 		//contentArea = (StackPane) tabPane.lookup(".tab-container");
 		tabContentArea = (StackPane) tabPane.lookup(".headers-region");
+		cachedContentArea = (StackPane) tabPane.lookup(".tab-content-area");
 		//this is a bit hacky. Because tabs are animated there are issues with the layout function calling
 		//after the animation has finished. Therefore the add tab button tends to not layout properly- similar 
 		//to not calling validate in swing- this solves issue. 
@@ -134,10 +149,74 @@ public class PamTabPaneSkin extends TabPaneSkin {
 
 	}
 
+	/**
+	 * Set the toolbar region that sits between the tab headers and the tab content area.
+	 * This toolbar is shared across all tabs - only one instance exists.
+	 * 
+	 * @param toolbar - the toolbar region to set. Can be null to remove the toolbar.
+	 */
+	public void setToolbarRegion(Region toolbar) {
+		// Remove old toolbar if present
+		if (this.toolbarRegion != null) {
+			getChildren().remove(this.toolbarRegion);
+		}
+		
+		this.toolbarRegion = toolbar;
+		
+		if (toolbar != null) {
+			// Add the toolbar as a child of the skin so it participates in layout
+			getChildren().add(toolbar);
+		}
+		
+		pamTabPane.requestLayout();
+	}
+	
+	/**
+	 * Get the toolbar region.
+	 * @return the toolbar region, or null if none set.
+	 */
+	public Region getToolbarRegion() {
+		return toolbarRegion;
+	}
+
 	@Override 
 	protected void layoutChildren(final double x, final double y,
 			final double w, final double h) {
+		
+		// Calculate toolbar height and apply top padding to the content area so that
+		// the base skin's layout naturally leaves space for the toolbar. This avoids
+		// fighting with the base TabPaneSkin's internal sizing/clipping of the content area.
+		double toolbarHeight = 0;
+		if (toolbarRegion != null && toolbarRegion.isVisible()) {
+			toolbarHeight = snapSizeY(toolbarRegion.prefHeight(w));
+		}
+		
+		if (cachedContentArea == null) {
+			cachedContentArea = (StackPane) pamTabPane.lookup(".tab-content-area");
+		}
+		
+		// Set top padding on the content area to reserve space for the toolbar.
+		// The base skin will lay out the tab content below this padding.
+		if (cachedContentArea != null) {
+			Insets currentPadding = cachedContentArea.getPadding();
+			if (currentPadding.getTop() != toolbarHeight) {
+				cachedContentArea.setPadding(new Insets(
+						toolbarHeight, 
+						currentPadding.getRight(), 
+						currentPadding.getBottom(), 
+						currentPadding.getLeft()));
+			}
+		}
+		
+		// Let the base skin lay out everything. The content area now has top padding
+		// that reserves space for the toolbar, so the tab content will be pushed down.
 		super.layoutChildren(x, y, w, h);
+
+		// Position the toolbar in the padding space at the top of the content area.
+		if (toolbarRegion != null && toolbarRegion.isVisible() && toolbarHeight > 0) {
+			double headerHeight = headerArea.getHeight();
+			toolbarRegion.resizeRelocate(x, headerHeight, w, toolbarHeight);
+		}
 
 		//check to make sure region have been added to stack pane. 
 		if (pamTabPane.getTabStartRegion()!=null && !headerArea.getChildren().contains(pamTabPane.getTabStartRegion())){
@@ -239,6 +318,18 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	 */
 	public double getHeaderHeight() {
 		return headerArea.getHeight();
+	}
+	
+	/**
+	 * Get the total height of the header area plus the toolbar (if present).
+	 * @return the combined height of header and toolbar.
+	 */
+	public double getHeaderAndToolbarHeight() {
+		double height = headerArea.getHeight();
+		if (toolbarRegion != null && toolbarRegion.isVisible()) {
+			height += toolbarRegion.getHeight();
+		}
+		return height;
 	}
 
 	/**

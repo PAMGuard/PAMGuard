@@ -1069,7 +1069,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * a pane factory is used to create the pane in each window.
 	 * <p>
 	 * This will add the pane to all current windows and any future windows. If you wish to add to a specific window 
-	 * the get a reference to the tab and use tab.addToolBarPane(PaneFactory); 
+	 * get a reference to the PamGuiFX stage and use stage.addStatusBarPane(PaneFactory); 
 	 * @param statusPaneFactory - the pane factory which creates the pane. 
 	 */
 	public void addStatusBarPane(PaneFactory statusPaneFactory) {

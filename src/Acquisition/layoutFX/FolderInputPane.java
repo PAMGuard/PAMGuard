@@ -150,7 +150,10 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 	private PamBorderPane audioHolderloader;
 
-	public DAQStatusPaneFactory folderStatusPaneFactory = new SimpleStatusPaneFactory("This is folder input DAQ");
+	/**
+	 * The folder progress status pane for the toolbar.
+	 */
+	private FolderProgressPane folderProgressPane;
 
 	//	/**
 	//	 * The folder input system. 
@@ -722,10 +725,153 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	}
 
 	@Override
-	public DAQStatusPaneFactory getStatusBarFactory() {
-		return folderStatusPaneFactory;
+	public Pane getStatusBarPane() {
+		if (folderProgressPane == null) {
+			folderProgressPane = new FolderProgressPane(folderInputSystem);
+		}
+		return folderProgressPane;
 	}
-
-
+	
+	/**
+	 * A compact pane showing file/folder progress for the FolderInputSystem.
+	 * Displays a progress bar showing progress through the current file and 
+	 * a label showing the current file index out of total files.
+	 * Designed to fit within the narrow control bar below the tabs.
+	 */
+	public static class FolderProgressPane extends PamHBox {
+		
+		/**
+		 * Progress bar for the current file.
+		 */
+		private javafx.scene.control.ProgressBar fileProgressBar;
+		
+		/**
+		 * Label showing file index / total.
+		 */
+		private Label fileCountLabel;
+		
+		/**
+		 * Label showing current file name.
+		 */
+		private Label fileNameLabel;
+		
+		/**
+		 * The folder input system.
+		 */
+		private FolderInputSystem folderInputSystem;
+		
+		/**
+		 * Timer for periodic UI updates.
+		 */
+		private javafx.animation.AnimationTimer updateTimer;
+		
+		/**
+		 * Last update time for throttling.
+		 */
+		private long lastUpdateNanos = 0;
+		
+		/**
+		 * Update interval (~4 Hz).
+		 */
+		private static final long UPDATE_INTERVAL_NS = 250_000_000L;
+		
+		public FolderProgressPane(FolderInputSystem folderInputSystem) {
+			this.folderInputSystem = folderInputSystem;
+			
+			this.setSpacing(8);
+			this.setAlignment(Pos.CENTER_LEFT);
+			this.setPadding(new javafx.geometry.Insets(2, 10, 2, 10));
+			
+			// File count label: "File 3/25"
+			fileCountLabel = new Label("File 0/0");
+			fileCountLabel.setStyle("-fx-font-size: 11px;");
+			fileCountLabel.setMinWidth(65);
+			
+			// Progress bar for current file
+			fileProgressBar = new javafx.scene.control.ProgressBar(0);
+			fileProgressBar.setPrefHeight(12);
+			fileProgressBar.setMaxHeight(14);
+			fileProgressBar.setPrefWidth(120);
+			fileProgressBar.setStyle("-fx-accent: dodgerblue;");
+			
+			// Current file name label (truncated)
+			fileNameLabel = new Label("");
+			fileNameLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
+			fileNameLabel.setMaxWidth(200);
+			fileNameLabel.setEllipsisString("...");
+			
+			this.getChildren().addAll(fileCountLabel, fileProgressBar, fileNameLabel);
+			
+			// Start/stop the update timer based on scene attachment
+			this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+				if (newScene != null) {
+					startUpdating();
+				} else {
+					stopUpdating();
+				}
+			});
+		}
+		
+		/**
+		 * Start periodic updates of the progress display.
+		 */
+		private void startUpdating() {
+			if (updateTimer != null) return;
+			updateTimer = new javafx.animation.AnimationTimer() {
+				@Override
+				public void handle(long now) {
+					if (now - lastUpdateNanos > UPDATE_INTERVAL_NS) {
+						lastUpdateNanos = now;
+						updateProgress();
+					}
+				}
+			};
+			updateTimer.start();
+		}
+		
+		/**
+		 * Stop the periodic updates.
+		 */
+		private void stopUpdating() {
+			if (updateTimer != null) {
+				updateTimer.stop();
+				updateTimer = null;
+			}
+		}
+		
+		/**
+		 * Update the progress display from the FolderInputSystem state.
+		 */
+		private void updateProgress() {
+			int currentIndex = folderInputSystem.getCurrentFileIndex();
+			int totalFiles = folderInputSystem.getTotalFiles();
+			
+			// Update file count label
+			fileCountLabel.setText(String.format("File %d/%d", 
+					Math.min(currentIndex + 1, totalFiles), totalFiles));
+			
+			// Update file progress bar
+			long fileSamples = folderInputSystem.getFileSamples();
+			long readSamples = folderInputSystem.getReadFileSamples();
+			if (fileSamples > 0) {
+				fileProgressBar.setProgress((double) readSamples / fileSamples);
+			} else {
+				// If no sample info, show folder-level progress
+				if (totalFiles > 0) {
+					fileProgressBar.setProgress((double) currentIndex / totalFiles);
+				} else {
+					fileProgressBar.setProgress(0);
+				}
+			}
+			
+			// Update file name label
+			if (folderInputSystem.getCurrentFile() != null) {
+				String name = folderInputSystem.getCurrentFile().getName();
+				fileNameLabel.setText(name);
+			} else {
+				fileNameLabel.setText("");
+			}
+		}
+	}
 
 }

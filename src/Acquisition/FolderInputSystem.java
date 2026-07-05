@@ -827,6 +827,22 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 		return null;
 	}
+	
+	/**
+	 * Get the index of the current file being processed.
+	 * @return the current file index (0-based).
+	 */
+	public int getCurrentFileIndex() {
+		return currentFileIndex;
+	}
+	
+	/**
+	 * Get the total number of files to process.
+	 * @return the total file count.
+	 */
+	public int getTotalFiles() {
+		return allFiles == null ? 0 : allFiles.size();
+	}
 
 	//	private float currentSampleRate;
 

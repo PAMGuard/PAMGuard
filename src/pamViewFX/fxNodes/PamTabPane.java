@@ -32,6 +32,11 @@ public class PamTabPane extends TabPane {
 	 */
 	private boolean addTabButton=false; 
 	
+	/**
+	 * The shared toolbar region that sits between the tab headers and the tab content area.
+	 */
+	private Region toolbarRegion;
+	
 
 	public PamTabPane() {
 		super();
@@ -129,6 +134,27 @@ public class PamTabPane extends TabPane {
 	 */
 	public PamButton getAddTabButton(){
 		return tabPaneSkin.getAddTabButton();
+	}
+	
+	/**
+	 * Set the shared toolbar region that sits between the tab headers and the tab content.
+	 * There is only one toolbar instance regardless of how many tabs exist - like a browser toolbar.
+	 * 
+	 * @param toolbar - the toolbar region to set. Can be null to remove the toolbar.
+	 */
+	public void setToolbarRegion(Region toolbar) {
+		this.toolbarRegion = toolbar;
+		if (tabPaneSkin != null) {
+			tabPaneSkin.setToolbarRegion(toolbar);
+		}
+	}
+	
+	/**
+	 * Get the shared toolbar region.
+	 * @return the toolbar region, or null if none set.
+	 */
+	public Region getToolbarRegion() {
+		return toolbarRegion;
 	}
 	
 	/**

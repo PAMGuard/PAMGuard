@@ -584,6 +584,25 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		}
 
 	}
+	
+//	public String getSummaryString(boolean clear) {
+//		int nChan = PamUtils.getNumChannels(getChannelMap());
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("<RawDataSummary>");
+//		synchronized(summaryTotals) {
+//			for (int i = 0; i < nChan; i++) {
+//				double rms  = Math.sqrt(summaryTotals2[i] / summaryCount[i]) + 1e-6;
+//				double max  = summaryMaxVal[i] + 1e-6;
+//				double mean = summaryTotals[i] / summaryCount[i];
+//				sb.append(String.format("<channel index=\"%d\">", i));
+//				sb.append(String.format("<mean>%.1f</mean>", mean));
+//				sb.append(String.format("<peakdB>%.1f</peakdB>", 20. * Math.log10(max)));
+//				sb.append(String.format("<rmsdB>%.1f</rmsdB>", 20. * Math.log10(rms)));
+//				sb.append("</channel>");
+//			}
+//		}
+//		sb.append("</RawDataSummary>");
+//	}
 
 	public String getSummaryString(boolean clear, String format) {
 		String summaryStr;

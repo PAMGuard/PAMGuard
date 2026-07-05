@@ -91,7 +91,7 @@ public class ModuleIconFactory {
 		case NMEA:
 			iconNode = createNMEASymbol();
 		case NOISE_BAND:
-			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurementBank.png")));
+			iconNode = getSVGIcon("/Resources/modules/noise_band_monitor.svg", Color.BLACK, 2);
 			break;
 		case NOISE_FILT:
 			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurement.png")));
@@ -266,6 +266,9 @@ public class ModuleIconFactory {
 			break; 
 		case "decimator.DecimatorControl":
 			icon=ModuleIcon.DECIMATOR; 
+			break; 
+		case "noiseBandMonitor.NoiseBandControl":
+			icon=ModuleIcon.NOISE_BAND; 
 			break; 
 		case "cpod.CPODControl2":
 			icon=ModuleIcon.CPOD; 

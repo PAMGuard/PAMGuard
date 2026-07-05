@@ -659,6 +659,14 @@ public class SoundCardSystem extends DaqSystem implements PamSettings {
 	public SoundCardParameters getSoundCardParameters() {
 		return this.soundCardParameters;
 	}
+	
+	/**
+	 * Get the acquisition control that owns this sound card system.
+	 * @return the acquisition control.
+	 */
+	public AcquisitionControl getAcquisitionControl() {
+		return acquisitionControl;
+	}
 
 	@Override
 	public int getSampleBits() {

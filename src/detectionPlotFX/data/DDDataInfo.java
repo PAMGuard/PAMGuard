@@ -6,6 +6,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import detectionPlotFX.DDScaleInfo;
 import detectionPlotFX.layout.DetectionPlot;
+import detectionPlotFX.layout.DetectionPlotContext;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.scene.canvas.GraphicsContext;
@@ -182,8 +183,19 @@ public abstract class DDDataInfo<T extends PamDataUnit> {
 	/**
 	 * Get the detection plot display
 	 * @return the detection plot display. 
+	 * @deprecated Use {@link #getContext()} for decoupled access.
 	 */
+	@Deprecated
 	public DetectionPlotDisplay getDetectionPlotDisplay() {
+		return dDPlot;
+	}
+
+	/**
+	 * Get the display context. This provides decoupled access to display 
+	 * functionality without depending on the concrete {@link DetectionPlotDisplay}.
+	 * @return the context (which is the DetectionPlotDisplay)
+	 */
+	public DetectionPlotContext getContext() {
 		return dDPlot;
 	}
 

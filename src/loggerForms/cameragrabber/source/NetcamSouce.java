@@ -12,6 +12,7 @@ import loggerForms.cameragrabber.GrabberProcess;
 import loggerForms.network.LoggerNetworkManager;
 import loggerForms.network.LoggerNetworkMessage;
 import loggerForms.network.LoggerNetworkReceiver;
+import loggerForms.network.LoggerNetworkSystem;
 
 public class NetcamSouce extends CameraSource implements LoggerNetworkReceiver {
 
@@ -23,7 +24,7 @@ public class NetcamSouce extends CameraSource implements LoggerNetworkReceiver {
 
 	@Override
 	public boolean prepare(CameraParams cameraParams) {
-		LoggerNetworkManager netManager = LoggerNetworkManager.getInstance();
+		LoggerNetworkManager netManager = LoggerNetworkSystem.getManager();
 		netName = "CameraFrame" + "/" + cameraParams.cameraName;
 		netManager.subsribeTopic(netName, this);
 		return false;
@@ -31,7 +32,7 @@ public class NetcamSouce extends CameraSource implements LoggerNetworkReceiver {
 
 	@Override
 	public boolean shutdown() {
-		LoggerNetworkManager netManager = LoggerNetworkManager.getInstance();
+		LoggerNetworkManager netManager = LoggerNetworkSystem.getManager();
 		netManager.unsubscribeTopic(netName, this);
 		return true;
 	}

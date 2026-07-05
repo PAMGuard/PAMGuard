@@ -307,7 +307,7 @@ may not be null.
 		}
 		AISPositionReport lastRep = null;
 		synchronized (positionReports) {
-			lastRep = positionReports.getLast();
+			lastRep = positionReports.get(positionReports.size()-1);
 		}
 		return lastRep;
 	}

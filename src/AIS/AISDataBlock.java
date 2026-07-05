@@ -93,14 +93,16 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 		AISDataUnit pamUnit;
 		long firstWantedTime = currentTimeMS - Math.max(this.getNaturalLifetimeMillis(), 1000);
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
-
+		// tail time for position reports. Earliest of data keep time and now - tail time. 
+		long firstPosTime2 = currentTimeMS - aisControl.aisParameters.tailLength * 60000;
+		firstPosTime2 = Math.min(firstPosTime2, firstWantedTime);
 		int unitsJustRemoved = 0;
 		synchronized (getSynchLock()) {
 			ListIterator<AISDataUnit> it = pamDataUnits.listIterator();
 			while (it.hasNext()) {
 				pamUnit = it.next();
 				if (pamUnit.getTimeMilliseconds() > firstWantedTime) {
-					pamUnit.trimPositionReports(firstWantedTime);
+					pamUnit.trimPositionReports(firstPosTime2);
 					continue; // don't break since we want to check all units. 
 				}
 				// System.out.printf("%s Remove %s at %s, first wanted is %s\n",

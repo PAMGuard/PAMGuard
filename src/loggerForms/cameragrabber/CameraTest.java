@@ -3,26 +3,25 @@ package loggerForms.cameragrabber;
 import java.awt.Dimension;
 import java.util.List;
 
-import com.github.sarxos.webcam.Webcam;
 
 public class CameraTest {
 
 	public static void main(String[] args) {
-
-		List<Webcam> cams = Webcam.getWebcams();
-		for (Webcam cam : cams) {
-			System.out.println(cam.getName());
-			Dimension[] sizes = cam.getViewSizes();
-			for (int i = 0; i < sizes.length; i++) {
-				System.out.println("   Size " + sizes[i].toString());
-			}
-			Dimension[] sizes2 = cam.getCustomViewSizes();
-			for (int i = 0; i < sizes2.length; i++) {
-				System.out.println("   Cust Size " + sizes2[i].toString());
-			}
-
-		}
-//		String[] desc = null;
+//
+//		List<Webcam> cams = Webcam.getWebcams();
+//		for (Webcam cam : cams) {
+//			System.out.println(cam.getName());
+//			Dimension[] sizes = cam.getViewSizes();
+//			for (int i = 0; i < sizes.length; i++) {
+//				System.out.println("   Size " + sizes[i].toString());
+//			}
+//			Dimension[] sizes2 = cam.getCustomViewSizes();
+//			for (int i = 0; i < sizes2.length; i++) {
+//				System.out.println("   Cust Size " + sizes2[i].toString());
+//			}
+//
+//		}
+//		//		String[] desc = null;
 //		try {
 //			desc = OpenCVFrameGrabber.getDeviceDescriptions();
 //		} catch (Exception e) {

@@ -23,12 +23,7 @@ import userDisplayFX.UserDisplayNodeFX;
 public class PamGuiTabFX extends PamTabFX {
 	
 	/**
-	 * Pane which sits just below the tab which can contain quick access controls. 
-	 */
-	private ToolBarPane toolbar;
-	
-	/**
-	 * Holds the tab content and the content tool bar. 
+	 * Holds the tab content. 
 	 */
 	private PamBorderPane contentHolder; 
 	
@@ -86,6 +81,12 @@ public class PamGuiTabFX extends PamTabFX {
 	private TabInfo tabInfo;
 	
 	/**
+	 * Custom right-side content for the shared toolbar when this tab is selected.
+	 * If null, the default right-side content (resize toggle) will be shown.
+	 */
+	private Region customToolbarRight;
+	
+	/**
 	 * Constructor for a new tab
 	 * @param tabInfo - info on the tab such as name
 	 * @param pamGui - reference to the PamGuiFX the pane belongs to.
@@ -108,7 +109,7 @@ public class PamGuiTabFX extends PamTabFX {
 		
 		contentHolder=new PamBorderPane(); 
 		
-		//needs to be in this order so toolbar pane sits on top of center pane. 
+		//create the holder pane for internal display panes
 		holder=new Pane();
 		contentHolder.setCenter(holder);
 		
@@ -121,22 +122,26 @@ public class PamGuiTabFX extends PamTabFX {
 	}
 	
 	/**
-	 * Set the toolbar pane. This is a narrow bar which sits just under the tab contians both generic and 
-	 * possibly tab specific controls. 
-	 * @param toolBarPane - the ToolBarPane to add. 
+	 * Set the toolbar pane. 
+	 * @deprecated The toolbar is now shared across all tabs via PamGuiFX.getSharedToolbar(). 
+	 * This method is kept for backward compatibility but has no effect.
+	 * @param toolBarPane - the ToolBarPane (ignored).
 	 */
+	@Deprecated
 	public void setToolbar(ToolBarPane toolBarPane){
-		this.toolbar=toolBarPane;
-		contentHolder.setTop(toolBarPane);
+		//no-op: toolbar is now shared and set on PamTabPane via setToolbarRegion()
 	}
 	
 	/**
 	 * Set the displays within the tab to be manually resized. 
-	 * @param toolBarPane - true to allow manual resizing
+	 * @param resize - true to allow manual resizing
 	 */
 	public void setResizableDisplays(boolean  resize){
 		this.isResizable=resize; 
-		toolbar.showResizableControl(resize);
+		ToolBarPane sharedToolbar = pamGui.getSharedToolbar();
+		if (sharedToolbar != null) {
+			sharedToolbar.showResizableControl(resize);
+		}
 	}
 	
 	/**
@@ -355,7 +360,7 @@ public class PamGuiTabFX extends PamTabFX {
 	}
 	
 	/**
-	 * Get the content holder which holds the toolbar pane and the main tab content pane. 
+	 * Get the content holder which holds the main tab content pane. 
 	 * @return the content pane. 
 	 */
 	public PamBorderPane getContentHolder(){
@@ -364,27 +369,31 @@ public class PamGuiTabFX extends PamTabFX {
 	
 	
 	/**
-	 * Set the content holder which holds the toolbar pane and the main tab content pane.  
-	 * @param contentToolBar - the content pane
+	 * Set the content holder which holds the main tab content pane.  
+	 * @param contentHolder - the content pane
 	 */
 	protected void setContentHolder(PamBorderPane contentHolder){
 		this.contentHolder=contentHolder;
 	}
 	
 	/**
-	 * Get the content tool bar. This sits just below the tab
-	 * @return the content tool bar for this tab. 
+	 * Get the content tool bar. This returns the single shared toolbar from PamGuiFX
+	 * which sits between the tab headers and the tab content area.
+	 * @return the shared toolbar for all tabs.
 	 */
 	public ToolBarPane getContentToolbar(){
-		return toolbar;
+		return pamGui.getSharedToolbar();
 	}
 	
 	/**
 	 * Set the content tool bar. 
-	 * @param contentToolBar - the content toolBar pane
+	 * @deprecated The toolbar is now shared across all tabs via PamGuiFX.getSharedToolbar().
+	 * This method is kept for backward compatibility but has no effect.
+	 * @param contentToolBar - the content toolBar pane (ignored)
 	 */
+	@Deprecated
 	protected void setContentToolbar(ToolBarPane contentToolBar){
-		this.toolbar=contentToolBar;
+		//no-op: toolbar is now shared and set on PamTabPane via setToolbarRegion()
 	}
 	
 	/**
@@ -393,6 +402,32 @@ public class PamGuiTabFX extends PamTabFX {
 	 */
 	public boolean getEditable() {
 		return editable;
+	}
+	
+	/**
+	 * Set custom right-side content for the shared toolbar when this tab is selected.
+	 * This allows individual tabs (e.g. data model) to display tab-specific controls
+	 * in the toolbar's right area.
+	 * @param rightContent - the custom right content, or null to use the default.
+	 */
+	public void setCustomToolbarRight(Region rightContent) {
+		this.customToolbarRight = rightContent;
+	}
+	
+	/**
+	 * Get the custom right-side content for the shared toolbar.
+	 * @return the custom right content, or null if the default should be used.
+	 */
+	public Region getCustomToolbarRight() {
+		return customToolbarRight;
+	}
+	
+	/**
+	 * Get the PamGuiFX that this tab belongs to.
+	 * @return the parent PamGuiFX.
+	 */
+	public PamGuiFX getPamGuiFX() {
+		return pamGui;
 	}
 
 	public boolean isStaticDisplay() {

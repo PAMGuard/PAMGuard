@@ -8,4 +8,4 @@ export TEAM_ID="7365S9DZ34"
 export APPLE_PASSWORD="aqnu-fcyf-itol-dsgq"
 
 # The exact name of your certificate from Keychain
-export CERT_NAME="Apple Distribution: Jamie Macaulay (7365S9DZ34)"
+CERT_NAME="Developer ID Application: Jamie Macaulay (7365S9DZ34)"

@@ -58,6 +58,8 @@ public class MCCDaqSystem extends DaqSystem implements PamSettings {
 	private long totalSampleCount;
 	
 	private PamWarning mccWarning = new PamWarning("MCC Acquisition", "", 0);
+
+	private mcc.mccacquisition.layoutFX.MCCDAQPane mccDAQPane;
 	
 	/**
 	 * @param acquisitionControl 
@@ -405,6 +407,14 @@ public class MCCDaqSystem extends DaqSystem implements PamSettings {
 	@Override
 	public Serializable getSettingsReference() {
 		return mccDaqParams;
+	}
+	
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (mccDAQPane == null) {
+			mccDAQPane = new mcc.mccacquisition.layoutFX.MCCDAQPane(this);
+		}
+		return mccDAQPane;
 	}
 
 	@Override
