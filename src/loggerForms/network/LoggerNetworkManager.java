@@ -14,13 +14,7 @@ import javax.swing.JMenuItem;
 abstract public class LoggerNetworkManager {
 
 	private static LoggerNetworkManager singleInstance;
-	
-	public static LoggerNetworkManager getInstance() {
-		if (singleInstance == null) {
-			singleInstance = new LoggerMQTTManager();
-		}
-		return singleInstance;
-	}
+
 	
 	/**
 	 * Send data

@@ -44,6 +44,7 @@ import loggerForms.hotkey.HotKeyManager;
 import loggerForms.network.LoggerNetworkManager;
 import loggerForms.network.LoggerNetworkMessage;
 import loggerForms.network.LoggerNetworkReceiver;
+import loggerForms.network.LoggerNetworkSystem;
 
 public class ButtonControl extends LoggerControl implements LoggerNetworkReceiver {
 	
@@ -105,12 +106,12 @@ public class ButtonControl extends LoggerControl implements LoggerNetworkReceive
 			Toolkit.getDefaultToolkit().removeAWTEventListener(thisListener);
 		}
 		if (udpTopic != null) {
-			LoggerNetworkManager.getInstance().unsubscribeTopic(null, this);
+			LoggerNetworkSystem.getManager().unsubscribeTopic(null, this);
 		}
 	}
 
 	private void setupUDPInput() {
-		LoggerNetworkManager netManager = LoggerNetworkManager.getInstance();
+		LoggerNetworkManager netManager = LoggerNetworkSystem.getManager();
 		netManager.subsribeTopic(udpTopic, this);
 	}
 

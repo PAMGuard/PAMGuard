@@ -706,7 +706,6 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		catch (SecurityException e) {
 			freeSpaceMB = -9999;
 		}
-//<<<<<<< HEAD
 
 		String buttonName;
 		switch (pressedButton) {
@@ -719,26 +718,8 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 
 		String stateName = (recorderStatus == RECORDING) ? "recording" : "idle";
 
-		
 		double[] lastAmplitudes = recorderProcess.getLastAmplitudedB();
 		
-//		StringBuilder sb = new StringBuilder();
-//		sb.append("<RecorderSummary>");
-//		sb.append(String.format("<button>%s</button>", buttonName));
-//		sb.append(String.format("<state>%s</state>", stateName));
-//		sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
-//		sb.append(String.format("<fileSizeMB>%.1f</fileSizeMB>", fileSizeMB));
-//
-//		sb.append("<channelAmplitudesdB>");
-//		if (lastAmplitudes != null) {
-//			for (int i = 0; i < lastAmplitudes.length; i++) {
-//				sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
-//			}
-//		}
-//		sb.append("</channelAmplitudesdB>");
-//		sb.append("</RecorderSummary>");
-//		return sb.toString();
-//=======
 		int currButton = pressedButton;
 		int currState = recorderStatus;
 		switch (format) {
@@ -777,21 +758,8 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		default:
 			summaryStr = null;
 		}
-//		if(format.equals("json")) {
-//			String state = "";
-//			if(currState==IDLE) state="IDLE";
-//			if(currState==RECORDING) state="RECORDING";
-//			String currentFilePath = "System not recording";
-//			if(currState==RECORDING) currentFilePath = recorderStorage.getFileName();
-//			if(currentFilePath!=null) currentFilePath = currentFilePath.replace("\\", "\\\\");
-//			
-//			String jsonString = String.format("{\"state\":\"%s\",\"freeSpaceKB\":%3.1f,\"currentFile\":\"%s\"}",
-//							state,freeSpace,currentFilePath);
-//			return jsonString;
-//		}
 		
 		return summaryStr;
-//>>>>>>> refs/remotes/upstream/main
 	}
 	
 	/*
