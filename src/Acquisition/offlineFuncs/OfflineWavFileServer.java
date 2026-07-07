@@ -1,5 +1,6 @@
 package Acquisition.offlineFuncs;
 
+import java.awt.Window;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -13,6 +14,11 @@ import org.jflac.FLACDecoder;
 import org.jflac.metadata.Metadata;
 import org.jflac.metadata.StreamInfo;
 import org.jflac.sound.spi.FlacAudioFileReader;
+
+import Acquisition.AcquisitionControl;
+import Acquisition.DaqSystem;
+import Acquisition.FolderInputParameters;
+import Acquisition.FolderInputSystem;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileTimeData;
 import Acquisition.pamAudio.PamAudioFileManager;
@@ -28,6 +34,7 @@ import dataMap.OfflineDataMap;
 import dataMap.filemaps.FileDataMapPoint;
 import dataMap.filemaps.FileMapProgress;
 import dataMap.filemaps.FileSubSection;
+import dataMap.filemaps.OfflineFileParameters;
 import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.ViewLoadObserver;
 import wavFiles.ByteConverter;
@@ -62,6 +69,37 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			return null;
 		}
 		return ftd.getStartandEnd();
+	}
+
+	@Override
+	public void createOfflineDataMap(Window parentFrame) {
+		/**
+		 * Do some checks and if this is being controlled by the acquisition and the acquisition is 
+		 * set to folder input, then set the params to be the daq folder. 
+		 */
+		checkDaqParams();
+		super.createOfflineDataMap(parentFrame);
+	}
+
+	private void checkDaqParams() {
+		if (getOfflineRawDataStore() instanceof AcquisitionControl == false) {
+			return;
+		}
+		OfflineFileParameters fileParams = getOfflineFileParameters();
+		if (fileParams.enable == true && fileParams.folderName != null) {
+			return;
+		}
+		AcquisitionControl daq = (AcquisitionControl) getOfflineRawDataStore();
+		DaqSystem selSystem = daq.findDaqSystem(null);
+		if (selSystem instanceof FolderInputSystem == false) {
+			return;
+		}
+		FolderInputSystem fis = (FolderInputSystem) selSystem;
+		FolderInputParameters folderParams =  fis.getFolderInputParameters();
+		fileParams.enable = true;
+		fileParams.folderName = folderParams.getMostRecentFile();
+		fileParams.includeSubFolders = folderParams.subFolders;
+		System.out.printf("Setting offline wav file folder to %s with subfolders %s\n", fileParams.folderName, Boolean.valueOf(fileParams.includeSubFolders).toString());
 	}
 
 	@Override
