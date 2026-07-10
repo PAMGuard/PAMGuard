@@ -104,5 +104,13 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public String getStatus() {
+		LoggerMqttClient client = mqttClient;
+		if (client == null) {
+			return "No MQTT Client";
+		}
+		return client.getStatus();
+	}
 
 }

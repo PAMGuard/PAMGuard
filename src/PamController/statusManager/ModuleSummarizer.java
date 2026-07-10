@@ -36,16 +36,23 @@ public class ModuleSummarizer {
 			totalString += String.format("\n<%s>%s:%s<\\%s>", aModule.getShortUnitType(), 
 					aModule.getUnitName(), aString, aModule.getShortUnitType());
 			if(format.equals("json")) {
-				JSONObject moduleSummary = new JSONObject();
-				moduleSummary.put("moduleType", aModule.getUnitType());
-				moduleSummary.put("moduleName", aModule.getUnitName());
-				if(aString.startsWith("{")) {
-					moduleSummary.put("moduleSummary", new JSONObject(aString));
+				try {
+					JSONObject moduleSummary = new JSONObject();
+					moduleSummary.put("moduleType", aModule.getUnitType());
+					moduleSummary.put("moduleName", aModule.getUnitName());
+					if(aString.startsWith("{")) {
+						moduleSummary.put("moduleSummary", new JSONObject(aString));
 
-				}else {
-					moduleSummary.put("moduleSummary", new JSONObject("{\"Pamguard Module has no summary\":\"None\"}"));
+					}else {
+						moduleSummary.put("moduleSummary", new JSONObject("{\"Pamguard Module has no summary\":\"None\"}"));
+					}
+					jsonSummaries.put(moduleSummary);
 				}
-				jsonSummaries.put(moduleSummary);
+				catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Json error in " + aString);
+					return null;
+				}
 			}
 			
 		}
