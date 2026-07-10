@@ -214,6 +214,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		 */
 		newFileTimer = new Timer(1000, new RestartTimer());
 		newFileTimer.setRepeats(false);
+		
+		checkComandLineFolder();
 		//		timer = new Timer(1000, new TimerAction());
 	}
 
