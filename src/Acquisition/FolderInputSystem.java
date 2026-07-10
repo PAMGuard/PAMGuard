@@ -214,6 +214,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		 */
 		newFileTimer = new Timer(1000, new RestartTimer());
 		newFileTimer.setRepeats(false);
+		
+		checkComandLineFolder();
 		//		timer = new Timer(1000, new TimerAction());
 	}
 
@@ -233,6 +235,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			//			return null;
 		}
 		String[] selList = {globalFolder};
+		// put this into the folderparameters so that it's held and comes up in Viewer
+		folderInputParameters.setSelectedFiles(selList);
 		//		folderInputParameters.setSelectedFiles(selList);
 		// need to immediately make the allfiles list since it's about to get used by the reprocess manager
 		// need to worry about how to wait for this since it's starting in a different thread.
