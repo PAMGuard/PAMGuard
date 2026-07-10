@@ -1349,6 +1349,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		boolean prepError = (runMode == PamController.RUN_NORMAL && prepErrors > 0);
 		if (prepError) {
+			if (GlobalArguments.getParam(AUTOEXIT) != null) {
+				/*
+				 * Batch run with no user present: if processing can't start, exit with an
+				 * error code rather than leaving the JVM idling forever (nothing else
+				 * would ever trigger the -autoexit System.exit).
+				 */
+				System.out.println("Unable to prepare processes for automatic processing. Exiting.");
+				System.exit(1);
+			}
 			return false;
 		}
 
