@@ -121,7 +121,9 @@ public class WavListWorker extends FileListWorker<WavFileType> {
 //					e.printStackTrace();
 					continue;
 				}
-				pamWorker.update(new PamWorkProgressMessage(ind*100/n, path));
+				if (pamWorker != null) {
+					pamWorker.update(new PamWorkProgressMessage(ind*100/n, path));
+				}
 			}
 			else {
 				fileList.addFile(aFile); // just put it back. 
