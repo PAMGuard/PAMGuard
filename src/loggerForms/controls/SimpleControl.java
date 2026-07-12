@@ -12,6 +12,7 @@ import NMEA.NMEADataUnit;
 import PamView.component.PamFormattedTextField;
 import loggerForms.LoggerForm;
 import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.network.LoggerNetworkObserver;
 
 
 /**
@@ -58,39 +59,7 @@ public abstract class SimpleControl extends LoggerControl {
 		textField.addFocusListener(new ComponentFocusListener());
 //		textField.addPropertyChangeListener("value",new CommitListener());
 		setToolTipToAllSubJComponants(component);
-
-
 	}
-//	class CommitListener implements PropertyChangeListener{
-//
-//		/* (non-Javadoc)
-//		 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-//		 */
-//		@Override
-//		public void propertyChange(PropertyChangeEvent evt) {
-//			if (evt.getPropertyName()=="value"){
-//				try {
-//
-//					textField.commitEdit();
-//				} catch (ParseException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//
-//		}
-//
-//	}
-
-
-	/* (non-Javadoc)
-	 * @see loggerForms.controls.LoggerControl#getData()
-	 */
-//	@Override
-//	public Object getData() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 
 	/* (non-Javadoc)
 	 * @see loggerForms.controls.LoggerControl#setData(java.lang.Object)

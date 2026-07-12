@@ -39,9 +39,9 @@ public class LoggerNetworkSystem implements PamSettings {
 	}
 
 	public JMenuItem getMenuItem(Window window) { 
-		if (CommandLine.getCommandLine().hasCommand("-SMRU") == false) {
-			return null;
-		}
+//		if (CommandLine.getCommandLine().hasCommand("-SMRU") == false) {
+//			return null;
+//		}
 		JMenuItem item = new JMenuItem("Logger network options ...");
 		item.addActionListener(new ActionListener() {
 
