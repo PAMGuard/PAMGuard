@@ -188,13 +188,13 @@ public class DisplayControlPanel {
 			GridBagConstraints c = new PamGridBagContraints();
 			historyPanel.setLayout(new GridBagLayout());
 			
-			ScrollPaneAddon sco = new ScrollPaneAddon(clipDisplayPanel.getScrollPane(), clipDisplayParent.getDisplayName(),
+			scrollButtons = new ScrollPaneAddon(clipDisplayPanel.getScrollPane(), clipDisplayParent.getDisplayName(),
 					AbstractPamScrollerAWT.HORIZONTAL, 1000, 3600*1000, true);
-			sco.addDataBlock(clipDisplayParent.getClipDataBlock());
+			scrollButtons.addDataBlock(clipDisplayParent.getClipDataBlock());
 			c.gridwidth = 1;
 			c.gridx = 1;
 			c.fill = GridBagConstraints.NONE;
-			PamDialog.addComponent(historyPanel, sco.getButtonPanel(), c);
+			PamDialog.addComponent(historyPanel, scrollButtons.getButtonPanel(), c);
 			c.gridx = 0;
 			c.gridy++;
 			PamDialog.addComponent(historyPanel, new PamLabel("Start: ", JLabel.LEFT), c);
@@ -211,7 +211,7 @@ public class DisplayControlPanel {
 //			historyPanel.add(viewerStart = new PamLabel("1970-01-01 12:00:00"));
 //			historyPanel.add(new PamLabel("End"));
 //			historyPanel.add(viewerEnd = new PamLabel("1970-01-01 12:00:00"));
-			sco.addObserver(new ScrollObserver());
+			scrollButtons.addObserver(new ScrollObserver());
 			
 		}
 		controlPanel.add(historyPanel);
