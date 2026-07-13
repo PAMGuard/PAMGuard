@@ -2,6 +2,9 @@ package loggerForms.network;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -27,6 +30,8 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 	
 	private Timer reconnectTimer;
 	
+	private HashMap<String, Long> loggerContacts = new HashMap<>();
+	
 	public LoggerMQTTManager() {
 		
 		networkParams = new NetworkReceiveParams();
@@ -45,9 +50,18 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 			}
 		});
 		reconnectTimer.start();
+		
+		Timer contactTime = new Timer(60000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				checkContacts();
+			}
+		});
+		contactTime.start();
 	}
 
 	
+
 	protected void reconnect() {
 		if (mqttClient.isConnected()) {
 			reconnectTimer.stop();
@@ -91,9 +105,59 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 					return true;
 				}
 			});
+			
+			subsribeTopic("Hello/Logger/#", new LoggerNetworkReceiver() {
+				
+				@Override
+				public boolean newMessage(LoggerNetworkMessage message) {
+					helloMessage(message);
+					return true;
+				}
+			});
 		}
 		return isCon;
 	}
+
+	/**
+	 * Called from each scansapp every 30s. Will weed any that haven't called in one minute
+	 * on a separate time. 
+	 * @param message
+	 */
+	protected void helloMessage(LoggerNetworkMessage message) {
+		synchronized (loggerContacts) {
+			try {
+				String str = new String(message.getData());
+				loggerContacts.put(str, System.currentTimeMillis());
+			}
+			catch (Exception e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		if (mqttSidePanel != null) {
+			mqttSidePanel.updateContacts();
+		}
+	}
+
+	protected void checkContacts() {
+		boolean removed = false;
+		long now = System.currentTimeMillis();
+		synchronized (loggerContacts) {
+			Set<String> keys = loggerContacts.keySet();
+			for (String key : keys) {
+				Long t = loggerContacts.get(key);
+				if (now - t > 60000) {
+					loggerContacts.remove(key);
+					removed = true;
+				}
+			}
+		}
+		if (removed && mqttSidePanel != null) {
+			mqttSidePanel.updateContacts();
+		}
+		
+	}
+
+
 
 	@Override
 	public boolean sendData(String station, String topic, byte[] payload) {
@@ -190,6 +254,15 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 //		client.
 		return 0;
 	}
+	/**
+	 * @return the loggerContacts
+	 */
+	public HashMap<String, Long> getLoggerContacts() {
+		return loggerContacts;
+	}
+
+
+
 	/**
 	 * notify all observers
 	 */
