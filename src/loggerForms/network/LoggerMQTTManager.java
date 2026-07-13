@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -51,7 +53,7 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		});
 		reconnectTimer.start();
 		
-		Timer contactTime = new Timer(60000, new ActionListener() {
+		Timer contactTime = new Timer(30000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				checkContacts();
@@ -138,18 +140,30 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		}
 	}
 
+	/**
+	 * Check times of last hello messages and remove any entries > 1 minute old. 
+	 */
 	protected void checkContacts() {
 		boolean removed = false;
 		long now = System.currentTimeMillis();
 		synchronized (loggerContacts) {
-			Set<String> keys = loggerContacts.keySet();
-			for (String key : keys) {
-				Long t = loggerContacts.get(key);
-				if (now - t > 60000) {
-					loggerContacts.remove(key);
+			Set<Entry<String, Long>> entries = loggerContacts.entrySet();
+			Iterator<Entry<String, Long>> it = entries.iterator();
+			while (it.hasNext()) {
+				Entry<String, Long> e = it.next();
+				if (now - e.getValue() > 60000) {
+					it.remove();
 					removed = true;
 				}
 			}
+//			Set<String> keys = loggerContacts.keySet();
+//			for (String key : keys) {
+//				Long t = loggerContacts.get(key);
+//				if (now - t > 60000) {
+//					loggerContacts.remove(key);
+//					removed = true;
+//				}
+//			}
 		}
 		if (removed && mqttSidePanel != null) {
 			mqttSidePanel.updateContacts();
