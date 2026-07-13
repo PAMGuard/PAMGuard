@@ -61,6 +61,7 @@ import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
 import landMarks.LandmarkControl;
 import loggerForms.cameragrabber.CameraGrabber;
+import loggerForms.loggeraudio.LoggerAudioControl;
 import mel.MelControl;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
@@ -1005,6 +1006,12 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Grab and store still frames from a webcam or other connected camera");
 //		mi.setMaxNumber(1);
 //		mi.setHelpPoint("visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html");
+		
+		mi = PamModuleInfo.registerControlledUnit(LoggerAudioControl.class.getName(), LoggerAudioControl.unitTupe);
+		mi.setModulesMenuGroup(visualGroup);
+		mi.setToolTipText("Capture audio input from sound cards or external app used by observers");
+		mi.setMaxNumber(1);
+		
 		//		}
 
 		//		mi = PamModuleInfo.registerControlledUnit("autecPhones.AutecPhonesControl", "AUTEC Phones");
