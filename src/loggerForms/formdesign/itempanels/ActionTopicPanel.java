@@ -45,6 +45,7 @@ public class ActionTopicPanel extends CtrlColPanel {
 	public boolean fetchProperty(ItemInformation itemDescription) {
 		String selItem = (String) actionsList.getSelectedItem();
 		itemDescription.setProperty(UDColName.Topic.toString(), selItem);
+		itemDescription.setProperty(UDColName.Title.toString(), selItem);
 		return selItem != null;
 	}
 

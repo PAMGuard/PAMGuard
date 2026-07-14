@@ -20,6 +20,7 @@ public class PlatformSettings implements Serializable {
 
 	public PlatformSettings(String senderName) {
 		this.platform = senderName;
+		outputChannel = platform.startsWith("P") ? 0 : 1;
 	}
 	
 }
