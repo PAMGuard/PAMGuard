@@ -236,7 +236,7 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 		/**
 		 * If that failed, try something else. 
 		 */
-		if (snrErrors == null) {
+		if (snrErrors == null && snr != null) {
 			snrErrors = new double[snr.length];
 			if (snr != null && snr.length > 0) {
 				// need the array dimension ... take biggest x,y value
@@ -248,8 +248,10 @@ public class WrappedBeamFormAlgorithm extends BaseFFTBearingAlgorithm {
 				}
 			}
 		}
-		for (int i = 0; i < angleErrors.length; i++) {
-			angleErrors[i] = snrErrors[Math.min(snrErrors.length-1, i)];
+		if (snrErrors != null) {
+			for (int i = 0; i < angleErrors.length; i++) {
+				angleErrors[i] = snrErrors[Math.min(snrErrors.length-1, i)];
+			}
 		}
 
 		/*

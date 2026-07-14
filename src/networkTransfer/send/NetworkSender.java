@@ -33,11 +33,20 @@ import warnings.WarningSystem;
  *
  */
 public class NetworkSender extends PamControlledUnit implements PamSettings {
-	
+
+	/**
+	 * These two left in since they are used in the BathProcessing plugin. 
+	 * The batch processor has been updated to use the newer definitions in 
+	 * the NetSendCommandParam enum, so will be OK in new releases, but current
+	 * versions of the BP will fail with this PG. So leave these in for a couple
+	 * of years until people are likely to have updated their BP. DG 2026-07-09
+	 */
+	@Deprecated
+	public static final String ID1 = "-netSend.id1";
+	@Deprecated
+	public static final String ID2 = "-netSend.id2";
 	/*public static final String ADDRESS = "-netSend.address";
 	public static final String PORT = "-netSend.port";
-	public static final String ID1 = "-netSend.id1";
-	public static final String ID2 = "-netSend.id2";
 	public static final String USER = "-netSend.user";
 	public static final String PASSWORD = "-netSend.password";
 

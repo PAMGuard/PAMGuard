@@ -120,6 +120,10 @@ public class LogSettings extends DbSpecial {
 		 * that byte array to 6 bit ascii, then chom it up into bits that aren't
 		 * too large, then add these to PDU's and send them off to the database. 
 		 */
+		/*
+		 * Do a table check. 
+		 */
+		getDbControl().getDbProcess().checkTable(getTableDefinition());
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		try {
