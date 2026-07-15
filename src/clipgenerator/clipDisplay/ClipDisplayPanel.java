@@ -13,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.ListIterator;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -350,7 +351,8 @@ public class ClipDisplayPanel extends UserDisplayComponentAdapter implements Pam
 
 	public void newViewerTimes(long start, long end) {
 		removeAllClips();
-		ListIterator<ClipDataUnit> it = clipDisplayParent.getClipDataBlock().getListIterator(0);
+		ArrayList<ClipDataUnit> clipCopy = clipDisplayParent.getClipDataBlock().getDataCopy();
+		Iterator<ClipDataUnit> it = clipCopy.iterator();
 		while (it.hasNext()) {
 			ClipDataUnit cdu = it.next();
 			long clipTime = cdu.getTimeMilliseconds();
