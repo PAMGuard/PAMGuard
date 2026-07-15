@@ -305,7 +305,7 @@ public class LoggerAudioProcess extends PamProcess {
 		rawOutDataBlock.setNaturalLifetime(loggerAudioControl.getLoggerAudioSettings().bufferSeconds);
 		long now = System.currentTimeMillis();
 		
-		while ((rdu = pfa.getBlock()) != null) {
+		while ((rdu = pfa.getUnit()) != null) {
 			
 			pfa.storeDataUnit(rdu);
 

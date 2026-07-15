@@ -41,13 +41,18 @@ public class PlatformAudio {
 	private LoggerRawAudioDataBlock rawOutDataBlock;
 	
 	private WavFileWriter wavFileWriter;
-	private long fileEndTime;
+	private volatile long fileEndTime;
 	private Timer fileEndTimer; // only needed in case data collection stops. Otherwise will happen when new data are added. 
 	private Object writeLock = new Object();
 
 	private long recordingStart;
 	
 
+	/**
+	 * PlatformAudio manages data for a single platform (i.e. a single mobile phone app)
+	 * @param loggerAudioProcess
+	 * @param platform
+	 */
 	public PlatformAudio(LoggerAudioProcess loggerAudioProcess, String platform) {
 		this.loggerAudioProcess = loggerAudioProcess;
 		this.platform = platform;
@@ -98,6 +103,11 @@ public class PlatformAudio {
 		return sourceDataLine;
 	}
 
+	/**
+	 * Called when new data arrive and on a timer to check 
+	 * it it's time to stop a file. 
+	 * @param now
+	 */
 	protected void checkFileEndTime(long now) {
 		if (now < fileEndTime) {
 			return;
@@ -120,6 +130,9 @@ public class PlatformAudio {
 		}
 	}
 
+	/**
+	 * Make initials from the platform name, e.g. 'Port Tracker' becomes PT.
+	 */
 	private void makeInitials() {
 		String[] split = platform.split(" ");
 		initials = new String(split[0].substring(0, 1));
@@ -179,6 +192,10 @@ public class PlatformAudio {
 		return n;
 	}
 
+	/**
+	 * Get the size of the queue in samples. 
+	 * @return
+	 */
 	public int getQueueSize() {
 		int sz = 0;
 		synchronized (audioQueue) {
@@ -189,7 +206,11 @@ public class PlatformAudio {
 		return sz;
 	}
 	
-	public RawDataUnit getBlock() {
+	/**
+	 * Get a fresh data unit from the incoming queue from the Network. 
+	 * @return a unit if there is one in the queue, or null. 
+	 */
+	public RawDataUnit getUnit() {
 		trimQueue();
 		synchronized (audioQueue) {
 			if (audioQueue.size() > 0) {
@@ -199,6 +220,14 @@ public class PlatformAudio {
 		return null;
 	}
 
+	/**
+	 * Get an audio data line for outputting. 
+	 * Each platform has it's own line, and we allow the mixer to do it's 
+	 * stuff and combine the multiple lines into the single sound card output
+	 * @param mixer
+	 * @param outputFormat
+	 * @return
+	 */
 	public SourceDataLine getSourceDataLine(Mixer mixer, AudioFormat outputFormat) {
 		if (mixer == null) {
 			return null;
@@ -221,6 +250,9 @@ public class PlatformAudio {
 		return sourceDataLine;
 	}
 
+	/**
+	 * Clear the output data line
+	 */
 	public void clearLine() {
 		if (sourceDataLine == null) {
 			return;
@@ -238,6 +270,9 @@ public class PlatformAudio {
 		
 	}
 
+	/**
+	 * Clear the queue of incoming data from the network. 
+	 */
 	public void clearQueue() {
 		synchronized (audioQueue) {
 			System.out.printf("Removing %d items from line %s\n", audioQueue.size(), platform);
@@ -246,6 +281,11 @@ public class PlatformAudio {
 		
 	}
 
+	/**
+	 * Get the datablock used to store data in a buffer after they have
+	 * been removed from the input queue. 
+	 * @return
+	 */
 	public LoggerRawAudioDataBlock getRawOutDataBlock() {
 		return rawOutDataBlock;
 	}
