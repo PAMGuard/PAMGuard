@@ -337,8 +337,12 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		
 	}
 	
-	public void subscribeListener(String topic, IMqttMessageListener listener) throws MqttException {
+	public boolean subscribeListener(String topic, IMqttMessageListener listener) throws MqttException {
+		if (mqttClient.isConnected() == false) {
+			return false;
+		}
 		mqttClient.subscribe(topic, 2, listener);
+		return true;
 	}
 	
 	public String getBaseTransmitTopic() {
