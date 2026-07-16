@@ -43,6 +43,7 @@ public class SpectrogramNoiseProcess extends PamProcess {
 	
 	private ComplexArray[] delayedInputData;
 	
+	
 	public SpectrogramNoiseProcess(PamControlledUnit pamControlledUnit) {
 		super(pamControlledUnit, null);
 		this.setProcessName(pamControlledUnit.getUnitName() + " Noise reduction");
@@ -95,6 +96,9 @@ public class SpectrogramNoiseProcess extends PamProcess {
 		FFTDataUnit fftDataUnit = (FFTDataUnit) arg;
 		ComplexArray fftData = fftDataUnit.getFftData();
 		
+		if (delayedInputData == null) {
+			return;
+		}
 //		shuffle along delayed data
 		delayedInputData[totalDelay] = fftData;
 		for (int i = 0; i < totalDelay; i++) {

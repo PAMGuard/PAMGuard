@@ -314,6 +314,12 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		return dataUnits;
 	}
 
+	@Override
+	public void setSampleRate(float sampleRate, boolean notify) {
+		// TODO Auto-generated method stub
+		super.setSampleRate(sampleRate, notify);
+	}
+
 	/**
 	 * Get data based on millisecond times. 
 	 * @param startMillis

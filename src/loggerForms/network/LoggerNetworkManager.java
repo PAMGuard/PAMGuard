@@ -1,5 +1,8 @@
 package loggerForms.network;
 
+import java.util.ArrayList;
+
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 
 /**
@@ -11,11 +14,12 @@ import javax.swing.JMenuItem;
  * <p>
  * Significantly, this is simpler, doesn't have a GUI (or not much of one), etc. 
  */
-abstract public class LoggerNetworkManager {
+abstract public class LoggerNetworkManager implements LoggerNetworkObserver {
 
 	private static LoggerNetworkManager singleInstance;
-
 	
+	private ArrayList<LoggerNetworkObserver> netObservers = new ArrayList();
+
 	/**
 	 * Send data
 	 * @param station sending station id (e.g. base)
@@ -54,6 +58,43 @@ abstract public class LoggerNetworkManager {
 	abstract public boolean closeListener();
 	
 	abstract public JMenuItem getConfigMenu();
+	
+	/**
+	 * get a component to include in the logger side panel.
+	 * @return
+	 */
+	public JComponent getSideComponent() {
+		return null;
+	}
+	
+	/**
+	 * Add a network state observer
+	 * @param netObserver
+	 */
+	public void addNetworkObserver(LoggerNetworkObserver netObserver) {
+		if (netObservers.contains(netObserver) == false) {
+			netObservers.add(netObserver);
+		}
+	}
+
+	/**
+	 * Remove a network state observer
+	 * @param netObserver
+	 */
+	public boolean removeNetworkObserver(LoggerNetworkObserver netObserver) {
+		return netObservers.remove(netObserver);
+	}
+
+	/**
+	 * notify all observers
+	 */
+	@Override
+	public void updateState(boolean connected, int nClient) {
+		for (LoggerNetworkObserver obs : netObservers) {
+			obs.updateState(connected, nClient);
+		}
+	}
+	
 	
 	
 }
