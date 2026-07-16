@@ -1,6 +1,7 @@
 package Localiser.algorithms.locErrors;
 
 import Localiser.algorithms.locErrors.json.EllipseJsonConverter;
+import PamUtils.LatLong;
 import pamMaths.PamVector;
 
 /**
@@ -140,7 +141,9 @@ public class EllipticalError implements LocaliserError {
 	 */
 	@Override
 	public String toString() {
-		return getStringResult();
+		String s = getStringResult();
+		s = s.replace("&#176", LatLong.deg);
+		return s;
 	}
 
 	@Override
