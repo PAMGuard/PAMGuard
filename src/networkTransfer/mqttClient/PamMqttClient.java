@@ -413,6 +413,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 
 	public static void test(NetworkParams networkParams) throws ClientConnectFailedException {
 		PamMqttClient testClient = new PamMqttClient(networkParams);
+		testClient.configureClient(networkParams);
 		testClient.connect();
 		testClient.testClient();
 		testClient.disconnect();
