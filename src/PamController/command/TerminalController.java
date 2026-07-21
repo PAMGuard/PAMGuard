@@ -34,6 +34,7 @@ public class TerminalController extends CommandManager {
 
 	public void getTerminalCommands() {
 		Thread t = new Thread(new TerminalTread());
+		t.setDaemon(true); // don't stop the JVM from exiting at the end of batch processing
 		t.start();
 	}
 	
@@ -53,7 +54,14 @@ public class TerminalController extends CommandManager {
         try {
         	while (true) {
         		String command = reader.readLine();
-        		if (command != null && command.length() > 0) {
+        		if (command == null) {
+        			/*
+        			 * End of stream - stdin is closed (e.g. batch / container run with no
+        			 * terminal attached). Without this check the loop spins at 100% CPU.
+        			 */
+        			break;
+        		}
+        		if (command.length() > 0) {
         			interpretCommand(command);
         		}
 //        		System.out.println("you typed: " + inLine);
@@ -63,7 +71,7 @@ public class TerminalController extends CommandManager {
         	}
         } catch (IOException e) {
         	e.printStackTrace();
-        } 
+        }
         System.out.println("Exiting PAMGuard, leave control thread");
 	}
 }
