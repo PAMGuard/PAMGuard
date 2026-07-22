@@ -7,6 +7,8 @@ import export.MLExport.MLWhistleMoanExport;
 import org.renjin.sexp.ListVector.NamedBuilder;
 
 import PamUtils.PamArrayUtils;
+import PamguardMVC.PamDataBlock;
+import whistlesAndMoans.AbstractWhistleDataBlock;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 import whistlesAndMoans.SliceData;
 
@@ -130,6 +132,25 @@ public class RWhistleExport extends RDataUnitExport<ConnectedRegionDataUnit> {
 		
 	}
 	
+	@Override
+	protected NamedBuilder detectionHeader(PamDataBlock pamDataBlock) {
+
+		try {
+			AbstractWhistleDataBlock<?> whistleDataBlock = (AbstractWhistleDataBlock<?>) pamDataBlock;
+
+			ListVector.NamedBuilder rData = new ListVector.NamedBuilder();
+
+			rData.add("fftLength", whistleDataBlock.getFftLength());
+			rData.add("fftHop", whistleDataBlock.getFftHop());
+
+			return rData;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	@Override
 	public Class<?> getUnitClass() {
 		return ConnectedRegionDataUnit.class;

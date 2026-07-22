@@ -98,6 +98,11 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	}
 	
 	
+	@Override
+	public String getDescription() {
+		return this.getDataBlock().getLongDataName();
+	}
+	
 
 	/**
 	 * Called at the end of the thread which executes this task. 
