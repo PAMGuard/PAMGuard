@@ -546,7 +546,8 @@ PamSettingsSource {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {	
+		public void actionPerformed(ActionEvent e) {
+			commitChanges(); // do a commit before opening. Makes life better for everyone. 
 			if (databaseSystem != null) {
 				databaseSystem.openCurrentDatabase();
 			}

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import PamController.AWTScheduler;
@@ -64,6 +65,17 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 		//			PamSettingManager.getInstance().registerSettings(this, PamSettingManager.LIST_DATABASESTUFF);
 		//		}
 		backupInformation = new BackupInformation(new DatabaseBackupStream(this));
+		
+		if (PamController.getInstance().isInitializationComplete()) {
+			// we're clearly adding a database to an open configuration, so pop up the 
+			// dialog to allow the user to set the database. 
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					selectDatabase(getGuiFrame(), getUnitName());
+				}
+			});
+		}
 	}
 
 	private static int whichStore() {
