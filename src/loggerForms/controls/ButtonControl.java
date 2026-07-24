@@ -323,7 +323,7 @@ public class ButtonControl extends LoggerControl implements LoggerNetworkReceive
 		try {
 			ran = LoggerActions.getInstance().runAction(topic, loggerForm, this);
 		} catch (ActionException e) {
-			e.printStackTrace();
+			System.out.printf("Error executing button action %s: %s\n", topic, e.getLocalizedMessage());
 			return false;
 		}
 		return ran;
