@@ -64,7 +64,7 @@ import warnings.PamWarning;
  *         PamProcess for NMEA data acquisition.
  * 
  */
-public class AcquireNmeaData extends PamProcess implements ActionListener, ModuleStatusManager {
+public class AcquireNmeaData extends PamProcess implements ModuleStatusManager {
 
 
 	private NMEAControl nmeaControl;
@@ -79,7 +79,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	/** timer to check for incoming signal and restart if required*/
 	private Timer signalCheckTimer;
 
-
+	private NMEAProvider currentNMEAProvider;
 	/**
 	 * Ouput data block for NMEA data strings
 	 */
@@ -96,7 +96,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 */
 	private Timer timer;
 	
-	private Timer autoPortTimer;
+//	private Timer autoPortTimer;
 
 	/**
 	 * Thread references for NMEA capture.
@@ -130,55 +130,50 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		addOutputDataBlock((outputDatablock = new NMEADataBlock(
 				nmeaControl.getUnitName(), this, 1)));
 
-		timer = new Timer(100, this);
-		
-		autoPortTimer = new Timer(5000, new ActionListener() {
+		timer = new Timer(100, new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				checkAutoComPort();				
+				stringReadTimer();
 			}
-		});
+		} );
+		
+//		autoPortTimer = new Timer(5000, new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				checkAutoComPort();				
+//			}
+//		});
 		
 		setProcessCheck(processCheck = new NMEAProcessCheck(this, .2));
 		processCheck.setOutputAveraging(5);
 	}
 
-	public void makeSimThread() {
-		closeSerialThread();
-		timer.stop();
-		activeNMEAsource = null;
-		activeNMEAsource = new Thread(new SimThread());
-		timer.start();
-		activeNMEAsource.start();
-	}
+//	public void makeSimThread() {
+//		closeSerialThread();
+//		timer.stop();
+//		activeNMEAsource = null;
+//		activeNMEAsource = new Thread(new SimThread());
+//		timer.start();
+//		activeNMEAsource.start();
+//	}
 
-	synchronized void closeSerialThread()  {
-//		if(serialPortInterface!=null){
-//			if (serialPortInterface.serialPortCom != null) {
-//				serialPortInterface.serialPortCom.close();
-//			}
-//			serialPortInterface = null;
+//	synchronized void closeSerialThread()  {
+//		if (pjSerialComm != null) {
+//			pjSerialComm.closePort();
+//			pjSerialComm = null;
 //		}
-		if (pjSerialComm != null) {
-			pjSerialComm.closePort();
-			pjSerialComm = null;
-		}
-	}
+//	}
 
-	public void makeUdpThread() {
-//		if(serialPortInterface!=null){
-//			if (serialPortInterface.serialPortCom != null) {
-//				serialPortInterface.serialPortCom.close();
-//			}
-//			serialPortInterface = null;
-//		}
-		timer.stop();
-		activeNMEAsource = null;
-		activeNMEAsource = new Thread(new UdpThread());
-		timer.start();
-		activeNMEAsource.start();
-	}
+//	public void makeUdpThread() {
+//		timer.stop();
+//		activeNMEAsource = null;
+//		activeNMEAsource = new Thread(new UdpThread());
+//		timer.start();
+//		activeNMEAsource.start();
+//	}
 	
+
 	public void makeTimestampFileThread() {
 		timer.stop();
 		activeNMEAsource = null;
@@ -188,19 +183,13 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 	}
 	
-	public void makeMulticastThread() {
-//		if(serialPortInterface!=null){
-//			if (serialPortInterface.serialPortCom != null) {
-//				serialPortInterface.serialPortCom.close();
-//			}
-//			serialPortInterface = null;
-//		}
-		timer.stop();
-		activeNMEAsource = null;
-		activeNMEAsource = new Thread(new MulticastThread());
-		timer.start();
-		activeNMEAsource.start();
-	}
+//	public void makeMulticastThread() {
+//		timer.stop();
+//		activeNMEAsource = null;
+//		activeNMEAsource = new Thread(new MulticastThread());
+//		timer.start();
+//		activeNMEAsource.start();
+//	}
 	
 //	public void makeEmptyThread() {
 //		timer.stop();
@@ -213,119 +202,119 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 //		Possible error. Need to check if some of the code from below should be here
 //	}
 
-	public void makeSerialThread() {
-		timer.stop();
-//		autoPortTimer.stop();
-		autoPortTimer.start();
-		activeNMEAsource = null;
-
-		closeSerialThread();
-		NMEAParameters params = nmeaControl.getNmeaParameters();
-		try {
-			pjSerialComm = PJSerialComm.openSerialPort(getComPortName(), params.serialPortBitsPerSecond);
-		} catch (PJSerialException e) {
-			sayErrorString("PJSerialException in AcquireNMEAData" + e.getMessage());
-//			checkAutoComPort(); /// just do off timer. Slower, but less manic
-			return;
-		}
-		pjSerialComm.addLineListener(new SerialListener());
-		timer.start();
-	}
+//	public void makeSerialThread() {
+//		timer.stop();
+////		autoPortTimer.stop();
+//		autoPortTimer.start();
+//		activeNMEAsource = null;
+//
+//		closeSerialThread();
+//		NMEAParameters params = nmeaControl.getNmeaParameters();
+//		try {
+//			pjSerialComm = PJSerialComm.openSerialPort(getComPortName(), params.serialPortBitsPerSecond);
+//		} catch (PJSerialException e) {
+//			sayErrorString("PJSerialException in AcquireNMEAData" + e.getMessage());
+////			checkAutoComPort(); /// just do off timer. Slower, but less manic
+//			return;
+//		}
+//		pjSerialComm.addLineListener(new SerialListener());
+//		timer.start();
+//	}
 	
-	private void checkAutoComPort() {
-		if (nmeaControl.getNmeaParameters().autoSerialPort == false) {
-			return;
-		}
-		// current com port is failing, so try a different one and see if things improve. 
-		long pause = System.currentTimeMillis() - lastValidStringTime;
-		if (pause > 5000) {
-			String newPort = findAnotherPort();
-			if (newPort != null) {
-				autoComPortName = newPort;
-				restartNMEA();
-			}
-		}
-	}
+//	private void checkAutoComPort() {
+//		if (nmeaControl.getNmeaParameters().autoSerialPort == false) {
+//			return;
+//		}
+//		// current com port is failing, so try a different one and see if things improve. 
+//		long pause = System.currentTimeMillis() - lastValidStringTime;
+//		if (pause > 5000) {
+//			String newPort = findAnotherPort();
+//			if (newPort != null) {
+//				autoComPortName = newPort;
+//				restartNMEA();
+//			}
+//		}
+//	}
 	
-	private String findAnotherPort() {
-		String[] commPortIds = PJSerialComm.getSerialPortNames();
-		if (commPortIds == null || commPortIds.length == 0) {
-			return null;
-		}
-		// first find the index of the current port. 
-		if (autoComPortName == null) {
-			return commPortIds[0];
-		}
-		int ind = 0;
-		for (int i = 0; i < commPortIds.length; i++) {
-			if (commPortIds[i].equals(autoComPortName)) {
-				ind = i;
-				break;
-			}
-		}
-		// go to the next one. looping back to the first if at end of list. 
-		ind++;
-		if (ind >= commPortIds.length) {
-			ind = 0; 
-		}
-		return commPortIds[ind];
-	}
+//	private String findAnotherPort() {
+//		String[] commPortIds = PJSerialComm.getSerialPortNames();
+//		if (commPortIds == null || commPortIds.length == 0) {
+//			return null;
+//		}
+//		// first find the index of the current port. 
+//		if (autoComPortName == null) {
+//			return commPortIds[0];
+//		}
+//		int ind = 0;
+//		for (int i = 0; i < commPortIds.length; i++) {
+//			if (commPortIds[i].equals(autoComPortName)) {
+//				ind = i;
+//				break;
+//			}
+//		}
+//		// go to the next one. looping back to the first if at end of list. 
+//		ind++;
+//		if (ind >= commPortIds.length) {
+//			ind = 0; 
+//		}
+//		return commPortIds[ind];
+//	}
 
-	private String getComPortName() {
-		if (nmeaControl.getNmeaParameters().autoSerialPort == false) {
-			return nmeaControl.getNmeaParameters().serialPortName;
-		}
-		if (autoComPortName == null) {
-			// first time around, it will get current selected port, then it will scan. 
-			autoComPortName = nmeaControl.getNmeaParameters().serialPortName;
-		}
-		return autoComPortName;
-	}
+//	private String getComPortName() {
+//		if (nmeaControl.getNmeaParameters().autoSerialPort == false) {
+//			return nmeaControl.getNmeaParameters().serialPortName;
+//		}
+//		if (autoComPortName == null) {
+//			// first time around, it will get current selected port, then it will scan. 
+//			autoComPortName = nmeaControl.getNmeaParameters().serialPortName;
+//		}
+//		return autoComPortName;
+//	}
 
-	private class SerialListener implements PJSerialLineListener {
-
-		@Override
-		public void newLine(String aLine) {
-			/*
-			 * Do a couple more checks, now that we're allowing auto port detection
-			 * to be sure that it's NMEA data coming through, and not some other junk. 
-			 */
-			// check the first character is a $
-			if (aLine == null || aLine.length() == 0) {
-				return;
-			}
-			if (aLine.startsWith("$") == false && aLine.startsWith("!") == false) {
-				sayErrorString("Invalid NMEA string (no $ or !): " + aLine);
-				return;
-			}
-			StringBuffer sb = new StringBuffer(aLine);
-			boolean ok = checkStringCheckSum(sb);
-			if (ok == false) {
-				sayErrorString("Invalid NMEA string checksum: " + aLine);
-				return;
-			}
-			processNmeaString(sb);
-		}
-
-		@Override
-		public void portClosed() {
-//			Debug.out.println("NMEA serial line listener stopped");
-		}
-
-		@Override
-		public void readException(Exception e) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
+//	private class SerialListener implements PJSerialLineListener {
+//
+//		@Override
+//		public void newLine(String aLine) {
+//			/*
+//			 * Do a couple more checks, now that we're allowing auto port detection
+//			 * to be sure that it's NMEA data coming through, and not some other junk. 
+//			 */
+//			// check the first character is a $
+//			if (aLine == null || aLine.length() == 0) {
+//				return;
+//			}
+//			if (aLine.startsWith("$") == false && aLine.startsWith("!") == false) {
+//				sayErrorString("Invalid NMEA string (no $ or !): " + aLine);
+//				return;
+//			}
+//			StringBuffer sb = new StringBuffer(aLine);
+//			boolean ok = checkStringCheckSum(sb);
+//			if (ok == false) {
+//				sayErrorString("Invalid NMEA string checksum: " + aLine);
+//				return;
+//			}
+//			processNmeaString(sb);
+//		}
+//
+//		@Override
+//		public void portClosed() {
+////			Debug.out.println("NMEA serial line listener stopped");
+//		}
+//
+//		@Override
+//		public void readException(Exception e) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//		
+//	}
 	
 	/**
 	 * Restart the NMEA thread using the Swing utilitiy
 	 * invokeLater(...)
 	 */
 	private void restartNMEA() {
-		sayErrorString("Problem with NMEA signal - Restarting NMEA source on port " + getComPortName());
+		sayErrorString("Problem with NMEA signal - Restarting NMEA source  ");
 		SwingUtilities.invokeLater(new RestartNMEASource());
 	}
 	
@@ -339,29 +328,47 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 		@Override
 		public void run() {
-			startNmeaSource(nmeaControl.nmeaParameters.sourceType);
+			startNmeaSource();
 		}
 		
 	}
 	
 	protected void stopNMEASource() {
-		if(activeNMEAsource != null) {
-			autoPortTimer.stop();
-//			Debug.out.println("active source = " + activeNMEAsource.getName());
-//			Debug.out.println("Stopping Current GPS thread.");
-			stopActiveNMEAsource=true;
-			while(stopActiveNMEAsource)
-				try {
-					Thread.sleep(500);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-		} 
-
-		activeNMEAsource = null;
+		if (currentNMEAProvider != null) {
+			currentNMEAProvider.stopAcquisition();
+			currentNMEAProvider = null;
+		}
+		timer.stop();
+//		if(activeNMEAsource != null) {
+//			autoPortTimer.stop();
+////			Debug.out.println("active source = " + activeNMEAsource.getName());
+////			Debug.out.println("Stopping Current GPS thread.");
+//			stopActiveNMEAsource=true;
+//			while(stopActiveNMEAsource)
+//				try {
+//					Thread.sleep(500);
+//				} catch (Exception ex) {
+//					ex.printStackTrace();
+//				}
+//		} 
+//
+//		activeNMEAsource = null;
 	}
 
-	public synchronized void startNmeaSource(NmeaSources sourceType) {
+	public synchronized void startNmeaSource() {
+		stopNMEASource();
+		
+		String providerClass = nmeaControl.getNmeaParameters().getProviderClass();
+		currentNMEAProvider = nmeaControl.getNMEAProvider(providerClass);
+		if (currentNMEAProvider == null) {
+			sayErrorString("Unable to find NMEA system of type " + providerClass);
+		}
+		else {
+			currentNMEAProvider.startAcquisition();
+			timer.start();
+		}
+	}
+	/*public synchronized void startNmeaSourceOld(NmeaSources sourceType) {
 
 		int runMode = PamController.getInstance().getRunMode();
 		if (runMode != PamController.RUN_NORMAL && runMode != PamController.RUN_NETWORKRECEIVER) {
@@ -390,159 +397,159 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 		
 		processCheck.reset();
-	}
+	}*/
 
 
 
 
 	// Start pdu packaging timer
-	class SimThread implements Runnable {
-		@Override
-		public void run() {
-
-			//System.out.println("********GPS SIM THREAD*********");
-			GpsData gpsSim = new GpsData();
-			int timeOnCurrentHeading;
-			Date date = new Date();
-			
-			AISDataSet aisData = new ChannelAISData();
-			
-			MagneticVariation magneticVariation = MagneticVariation.getInstance();
-			double magVar;
-
-//			SimpleDateFormat gpsDateFormat = new SimpleDateFormat("ddMMyy");
-//			SimpleDateFormat gpsTimeFormat = new SimpleDateFormat("hhmmss");
-			// NumberFormat.
-
-			nmeaControl.nmeaParameters.simTimeInterval = 
-				Math.max(nmeaControl.nmeaParameters.simTimeInterval, .5);
-			int simTimeInterval = (int) (nmeaControl.nmeaParameters.simTimeInterval * 1000);
-			boolean drunkCaptain = (nmeaControl.nmeaParameters.drunkenness != 0);
-			boolean continousChange = nmeaControl.nmeaParameters.continousChange ;
-			double courseChangeRate = 0;
-			double courseRateRandom = nmeaControl.nmeaParameters.drunkenness;
-			double courseRateDecay = nmeaControl.nmeaParameters.drunkenness / 3;
-			double newCCR;
-			Random random = new Random();
-			double currentCourse;
-
-
-			gpsSim.setLatitude(nmeaControl.nmeaParameters.simStartLatitude);
-			gpsSim.setLongitude(nmeaControl.nmeaParameters.simStartLongitude);
-			gpsSim.setSpeed(nmeaControl.nmeaParameters.simStartSpeed);
-			gpsSim.setCourseOverGround(nmeaControl.nmeaParameters.simStartHeading);
-			//gpsSim.setSpeed(0.0);
-//			gpsSim.setTrueCourse(170.0);
-//			gpsSim.setVariation(0.0);
-
-			currentCourse = gpsSim.getCourseOverGround();
-			double angle = Math.PI / 180 * (90 - currentCourse);
-			double latStep = gpsSim.getSpeed() / 3600 * Math.sin(angle) / 60.;
-			double longStep = gpsSim.getSpeed() / 3600 * Math.cos(angle)
-			/ Math.cos(Math.abs(gpsSim.getLatitude()) * Math.PI / 180.)
-			/ 60.;
-
-			//System.out.println("gpsSim.getLongitude(): "  + gpsSim.getLongitude());
-
-			long lastSimTime = PamCalendar.getTimeInMillis();
-			long nowTime = 0;
-			double stepTime;
-			while (!stopActiveNMEAsource) {
-				nowTime = PamCalendar.getTimeInMillis();
-				stepTime = (nowTime - lastSimTime) / 1000.;
-				if (stepTime < 0) {
-					/* 
-					 * this will happen if a wav file is started from 
-					 * some time ago - and will cause a very big backwards step
-					 * so set it to zero and should be OK or at least better. 
-					 */
-					stepTime = 0;
-				}
-//				if (Math.abs(stepTime) > 10) stepTime = 1;
-				lastSimTime = nowTime;
-
-				angle = Math.PI / 180 * (90 - currentCourse);
-				latStep = gpsSim.getSpeed() / 3600 * Math.sin(angle) / 60.;
-				longStep = gpsSim.getSpeed() / 3600 * Math.cos(angle)
-				/ Math.cos(Math.abs(gpsSim.getLatitude()) * Math.PI / 180.)
-				/ 60.;
-				gpsSim.setCourseOverGround(currentCourse);
-				gpsSim.setLatitude(gpsSim.getLatitude() + latStep * stepTime);
-				gpsSim.setLongitude(gpsSim.getLongitude() + longStep * stepTime);
-
-				gpsSim.setTimeInMillis(PamCalendar.getTimeInMillis());
-
-				StringBuffer sb = new StringBuffer(gpsSim.gpsDataToRMC(nmeaControl.nmeaParameters.getLatLongDecimalPlaces()));
-				newStrings.add(sb);
-				sb = new StringBuffer(gpsSim.gpsDataToGGA(nmeaControl.nmeaParameters.getLatLongDecimalPlaces()));
-				newStrings.add(sb);
-				
-				if (nmeaControl.nmeaParameters.simHeadingData == NMEAParameters.SIM_HEADING_MAGNETIC) {
-					magVar = magneticVariation.getVariation(gpsSim);
-					newStrings.add(createMagneticNMEAString(gpsSim.getCourseOverGround(), magVar));
-				}
-				else if (nmeaControl.nmeaParameters.simHeadingData == NMEAParameters.SIM_HEADING_TRUE) {
-					newStrings.add(createTrueNMEAString(gpsSim.getCourseOverGround()));
-				}
-
-				if (drunkCaptain) {
-					//either a random change or a continous change.
-					if (!continousChange){
-						//random change in direction with a specified amgnitude. 
-						newCCR = courseChangeRate + random.nextGaussian() * courseRateRandom * stepTime;
-						newCCR *= Math.exp(-courseRateDecay * stepTime);
-						courseChangeRate = newCCR;
-					}
-					else {
-						//continous change in heading. 
-						courseChangeRate=courseRateRandom;
-					}
-					
-					currentCourse += courseChangeRate * stepTime;
-					
-					//wrap to 360.
-					while (currentCourse >= 360) {
-						currentCourse -= 360;
-					}
-					while (currentCourse < 0) {
-						currentCourse += 360;
-					}
-					
-					
-				}
-				
-				if (nmeaControl.nmeaParameters.generateAIS) {
-					newStrings.add(new StringBuffer(aisData.getNext()));
-				}
-				
-				try {
-					Thread.sleep(simTimeInterval);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-
-			stopActiveNMEAsource=false;
-		}
-
-		private StringBuffer createTrueNMEAString(double courseOverGround) {
-			courseOverGround = PamUtils.constrainedAngle(courseOverGround);
-			StringBuffer s = new StringBuffer(String.format("$GPHDT,%03.1f,T,", courseOverGround));
-			int checkSum = createStringChecksum(s);
-			s.append(String.format("*%02X", checkSum));
-			return s;
-		}
-
-		private StringBuffer createMagneticNMEAString(double courseOverGround,
-				double magVar) {
-			courseOverGround = PamUtils.constrainedAngle(courseOverGround - magVar);
-			StringBuffer s = new StringBuffer(String.format("$GPHDG,%03.1f,,,,", courseOverGround));
-			int checkSum = createStringChecksum(s);
-			s.append(String.format("*%02X", checkSum));
-			return s;
-		}
-	}
-	
+//	class SimThread implements Runnable {
+//		@Override
+//		public void run() {
+//
+//			//System.out.println("********GPS SIM THREAD*********");
+//			GpsData gpsSim = new GpsData();
+//			int timeOnCurrentHeading;
+//			Date date = new Date();
+//			
+//			AISDataSet aisData = new ChannelAISData();
+//			
+//			MagneticVariation magneticVariation = MagneticVariation.getInstance();
+//			double magVar;
+//
+////			SimpleDateFormat gpsDateFormat = new SimpleDateFormat("ddMMyy");
+////			SimpleDateFormat gpsTimeFormat = new SimpleDateFormat("hhmmss");
+//			// NumberFormat.
+//
+//			nmeaControl.nmeaParameters.simTimeInterval = 
+//				Math.max(nmeaControl.nmeaParameters.simTimeInterval, .5);
+//			int simTimeInterval = (int) (nmeaControl.nmeaParameters.simTimeInterval * 1000);
+//			boolean drunkCaptain = (nmeaControl.nmeaParameters.drunkenness != 0);
+//			boolean continousChange = nmeaControl.nmeaParameters.continousChange ;
+//			double courseChangeRate = 0;
+//			double courseRateRandom = nmeaControl.nmeaParameters.drunkenness;
+//			double courseRateDecay = nmeaControl.nmeaParameters.drunkenness / 3;
+//			double newCCR;
+//			Random random = new Random();
+//			double currentCourse;
+//
+//
+//			gpsSim.setLatitude(nmeaControl.nmeaParameters.simStartLatitude);
+//			gpsSim.setLongitude(nmeaControl.nmeaParameters.simStartLongitude);
+//			gpsSim.setSpeed(nmeaControl.nmeaParameters.simStartSpeed);
+//			gpsSim.setCourseOverGround(nmeaControl.nmeaParameters.simStartHeading);
+//			//gpsSim.setSpeed(0.0);
+////			gpsSim.setTrueCourse(170.0);
+////			gpsSim.setVariation(0.0);
+//
+//			currentCourse = gpsSim.getCourseOverGround();
+//			double angle = Math.PI / 180 * (90 - currentCourse);
+//			double latStep = gpsSim.getSpeed() / 3600 * Math.sin(angle) / 60.;
+//			double longStep = gpsSim.getSpeed() / 3600 * Math.cos(angle)
+//			/ Math.cos(Math.abs(gpsSim.getLatitude()) * Math.PI / 180.)
+//			/ 60.;
+//
+//			//System.out.println("gpsSim.getLongitude(): "  + gpsSim.getLongitude());
+//
+//			long lastSimTime = PamCalendar.getTimeInMillis();
+//			long nowTime = 0;
+//			double stepTime;
+//			while (!stopActiveNMEAsource) {
+//				nowTime = PamCalendar.getTimeInMillis();
+//				stepTime = (nowTime - lastSimTime) / 1000.;
+//				if (stepTime < 0) {
+//					/* 
+//					 * this will happen if a wav file is started from 
+//					 * some time ago - and will cause a very big backwards step
+//					 * so set it to zero and should be OK or at least better. 
+//					 */
+//					stepTime = 0;
+//				}
+////				if (Math.abs(stepTime) > 10) stepTime = 1;
+//				lastSimTime = nowTime;
+//
+//				angle = Math.PI / 180 * (90 - currentCourse);
+//				latStep = gpsSim.getSpeed() / 3600 * Math.sin(angle) / 60.;
+//				longStep = gpsSim.getSpeed() / 3600 * Math.cos(angle)
+//				/ Math.cos(Math.abs(gpsSim.getLatitude()) * Math.PI / 180.)
+//				/ 60.;
+//				gpsSim.setCourseOverGround(currentCourse);
+//				gpsSim.setLatitude(gpsSim.getLatitude() + latStep * stepTime);
+//				gpsSim.setLongitude(gpsSim.getLongitude() + longStep * stepTime);
+//
+//				gpsSim.setTimeInMillis(PamCalendar.getTimeInMillis());
+//
+//				StringBuffer sb = new StringBuffer(gpsSim.gpsDataToRMC(nmeaControl.nmeaParameters.getLatLongDecimalPlaces()));
+//				newStrings.add(sb);
+//				sb = new StringBuffer(gpsSim.gpsDataToGGA(nmeaControl.nmeaParameters.getLatLongDecimalPlaces()));
+//				newStrings.add(sb);
+//				
+//				if (nmeaControl.nmeaParameters.simHeadingData == NMEAParameters.SIM_HEADING_MAGNETIC) {
+//					magVar = magneticVariation.getVariation(gpsSim);
+//					newStrings.add(createMagneticNMEAString(gpsSim.getCourseOverGround(), magVar));
+//				}
+//				else if (nmeaControl.nmeaParameters.simHeadingData == NMEAParameters.SIM_HEADING_TRUE) {
+//					newStrings.add(createTrueNMEAString(gpsSim.getCourseOverGround()));
+//				}
+//
+//				if (drunkCaptain) {
+//					//either a random change or a continous change.
+//					if (!continousChange){
+//						//random change in direction with a specified amgnitude. 
+//						newCCR = courseChangeRate + random.nextGaussian() * courseRateRandom * stepTime;
+//						newCCR *= Math.exp(-courseRateDecay * stepTime);
+//						courseChangeRate = newCCR;
+//					}
+//					else {
+//						//continous change in heading. 
+//						courseChangeRate=courseRateRandom;
+//					}
+//					
+//					currentCourse += courseChangeRate * stepTime;
+//					
+//					//wrap to 360.
+//					while (currentCourse >= 360) {
+//						currentCourse -= 360;
+//					}
+//					while (currentCourse < 0) {
+//						currentCourse += 360;
+//					}
+//					
+//					
+//				}
+//				
+//				if (nmeaControl.nmeaParameters.generateAIS) {
+//					newStrings.add(new StringBuffer(aisData.getNext()));
+//				}
+//				
+//				try {
+//					Thread.sleep(simTimeInterval);
+//				} catch (Exception ex) {
+//					ex.printStackTrace();
+//				}
+//			}
+//
+//			stopActiveNMEAsource=false;
+//		}
+//
+//		private StringBuffer createTrueNMEAString(double courseOverGround) {
+//			courseOverGround = PamUtils.constrainedAngle(courseOverGround);
+//			StringBuffer s = new StringBuffer(String.format("$GPHDT,%03.1f,T,", courseOverGround));
+//			int checkSum = createStringChecksum(s);
+//			s.append(String.format("*%02X", checkSum));
+//			return s;
+//		}
+//
+//		private StringBuffer createMagneticNMEAString(double courseOverGround,
+//				double magVar) {
+//			courseOverGround = PamUtils.constrainedAngle(courseOverGround - magVar);
+//			StringBuffer s = new StringBuffer(String.format("$GPHDG,%03.1f,,,,", courseOverGround));
+//			int checkSum = createStringChecksum(s);
+//			s.append(String.format("*%02X", checkSum));
+//			return s;
+//		}
+//	}
+//	
 
 //
 //	class SerialPortInterface{
@@ -696,141 +703,140 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		
 	}
 
-	class UdpThread implements Runnable {
-		@Override
-		public void run() {
-			/*
-			 * Sit here reading data from the port. Every time a new NMEA string
-			 * arrives, make it into a StringBuffer and add that StringBuffer to
-			 * the newStrings array list. the timer in the main thread will take
-			 * them out and pass them onto the rest of Pamguard.
-			 */
-			DatagramSocket GPSsocket = null;
-			byte[] buffer = new byte[150];
-			int nmeaCount = 1;
-			StringBuffer nmeaStringBuffer = new StringBuffer();
-			try {
+//	class UdpThread implements Runnable {
+//		@Override
+//		public void run() {
+//			/*
+//			 * Sit here reading data from the port. Every time a new NMEA string
+//			 * arrives, make it into a StringBuffer and add that StringBuffer to
+//			 * the newStrings array list. the timer in the main thread will take
+//			 * them out and pass them onto the rest of Pamguard.
+//			 */
+//			DatagramSocket GPSsocket = null;
+//			byte[] buffer = new byte[150];
+//			int nmeaCount = 1;
+//			StringBuffer nmeaStringBuffer = new StringBuffer();
+//			try {
+//
+//				// Create Datagram Socket
+//				GPSsocket = new DatagramSocket(nmeaControl.nmeaParameters.port);
+//				GPSsocket.setSoTimeout(2000); // Allows GPS source to be changed even when no udp is being received.
+//
+//				// Create empty Datagram Packet
+//				DatagramPacket GPSpacket = new DatagramPacket(buffer,
+//						buffer.length);
+//				// receive request from client and get client info
+//				while (!stopActiveNMEAsource) {
+//					// TODO: Validate NMEA content - how ?
+//					// Not much to go on, nmea max len is 82char starting with
+//					// '$'
+//					// Maybe also able to check the gps'server' ip
+//					// InetAddress NMEAServer = GPSpacket.getAddress();
+//
+//					//System.out.println("nmeaControl port:"+ nmeaControl.nmeaParameters.port);		
+//					try {
+//						GPSsocket.receive(GPSpacket);
+//					} catch (SocketTimeoutException e) {
+////						System.out.println("NMEA Time out");
+//						continue; // otherwise the same string jut gets sent again every 2s !
+//					}
+//
+//					// TODO: Recode following line to avoid String creation (may
+//					// ArrayList newString can hold CharSequence?)
+//					StringBuffer sb = new StringBuffer(new String(buffer)
+//					.substring(0, GPSpacket.getLength()));
+//					// StringBuffer sb = new StringBuffer("Test" +nmeaCount++);
+//					newStrings.add(sb);
+//				}
+//			} catch (UnknownHostException e) {
+//				// System.out.println(e);
+//			} catch (IOException e) {
+//				// System.out.println(e);
+//			}
+//			stopActiveNMEAsource=false;
+//			// the socket must be closed on exiting the thread, otherwise, it can't
+//			// be started again. DG. 27/3/06
+//			if (GPSsocket != null) GPSsocket.close();
+//		}
+//	}
+//
+//	class MulticastThread implements Runnable {
+//		@Override
+//		public void run() {
+//			/*
+//			 * Sit here reading data from the port. Every time a new NMEA string
+//			 * arrives, make it into a StringBuffer and add that StringBuffer to
+//			 * the newStrings array list. the timer in the main thread will take
+//			 * them out and pass them onto the rest of Pamguard.
+//			 */
+//			MulticastSocket GPSsocket = null;
+//			byte[] buffer = new byte[150];
+//			int nmeaCount = 1;
+//			StringBuffer nmeaStringBuffer = new StringBuffer();
+//			InetAddress group = null;
+//			try {
+//				group = InetAddress.getByName(nmeaControl.nmeaParameters.multicastGroup);
+//			} catch (UnknownHostException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			try {
+//
+//				// Create Datagram Socket
+//				GPSsocket =  new MulticastSocket(nmeaControl.nmeaParameters.port);
+//
+//				GPSsocket.setSoTimeout(2000); // Allows GPS source to be changed even when no udp is being received.
+//				GPSsocket.joinGroup(group);
+//
+//				// Create empty Datagram Packet
+//				DatagramPacket GPSpacket = new DatagramPacket(buffer,
+//						buffer.length);
+//				// receive request from client and get client info
+//				while (!stopActiveNMEAsource) {
+//					// TODO: Validate NMEA content - how ?
+//					// Not much to go on, nmea max len is 82char starting with
+//					// '$'
+//					// Maybe also able to check the gps'server' ip
+//					// InetAddress NMEAServer = GPSpacket.getAddress();
+//
+//					//System.out.println("nmeaControl port:"+ nmeaControl.nmeaParameters.port);		
+//					try {
+//						GPSsocket.receive(GPSpacket);
+//					} catch (SocketTimeoutException e) {
+////						System.out.println("NMEA Time out");
+//						continue; // otherwise the same string jut gets sent again every 2s !
+//					}
+//
+//					// TODO: Recode following line to avoid String creation (may
+//					// ArrayList newString can hold CharSequence?)
+//					StringBuffer sb = new StringBuffer(new String(buffer)
+//					.substring(0, GPSpacket.getLength()));
+//					// StringBuffer sb = new StringBuffer("Test" +nmeaCount++);
+//					newStrings.add(sb);
+//				}
+//				
+//			} catch (UnknownHostException e) {
+//				// System.out.println(e);
+//			} catch (IOException e) {
+//				// System.out.println(e);
+//			}
+//			stopActiveNMEAsource=false;
+//			// the socket must be closed on exiting the thread, otherwise, it can't
+//			// be started again. DG. 27/3/06
+//
+//			if (GPSsocket != null) {
+//				try {
+//					GPSsocket.leaveGroup(group);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				GPSsocket.close();
+//			}
+//		}
+//	}
 
-				// Create Datagram Socket
-				GPSsocket = new DatagramSocket(nmeaControl.nmeaParameters.port);
-				GPSsocket.setSoTimeout(2000); // Allows GPS source to be changed even when no udp is being received.
-
-				// Create empty Datagram Packet
-				DatagramPacket GPSpacket = new DatagramPacket(buffer,
-						buffer.length);
-				// receive request from client and get client info
-				while (!stopActiveNMEAsource) {
-					// TODO: Validate NMEA content - how ?
-					// Not much to go on, nmea max len is 82char starting with
-					// '$'
-					// Maybe also able to check the gps'server' ip
-					// InetAddress NMEAServer = GPSpacket.getAddress();
-
-					//System.out.println("nmeaControl port:"+ nmeaControl.nmeaParameters.port);		
-					try {
-						GPSsocket.receive(GPSpacket);
-					} catch (SocketTimeoutException e) {
-//						System.out.println("NMEA Time out");
-						continue; // otherwise the same string jut gets sent again every 2s !
-					}
-
-					// TODO: Recode following line to avoid String creation (may
-					// ArrayList newString can hold CharSequence?)
-					StringBuffer sb = new StringBuffer(new String(buffer)
-					.substring(0, GPSpacket.getLength()));
-					// StringBuffer sb = new StringBuffer("Test" +nmeaCount++);
-					newStrings.add(sb);
-				}
-			} catch (UnknownHostException e) {
-				// System.out.println(e);
-			} catch (IOException e) {
-				// System.out.println(e);
-			}
-			stopActiveNMEAsource=false;
-			// the socket must be closed on exiting the thread, otherwise, it can't
-			// be started again. DG. 27/3/06
-			if (GPSsocket != null) GPSsocket.close();
-		}
-	}
-
-	class MulticastThread implements Runnable {
-		@Override
-		public void run() {
-			/*
-			 * Sit here reading data from the port. Every time a new NMEA string
-			 * arrives, make it into a StringBuffer and add that StringBuffer to
-			 * the newStrings array list. the timer in the main thread will take
-			 * them out and pass them onto the rest of Pamguard.
-			 */
-			MulticastSocket GPSsocket = null;
-			byte[] buffer = new byte[150];
-			int nmeaCount = 1;
-			StringBuffer nmeaStringBuffer = new StringBuffer();
-			InetAddress group = null;
-			try {
-				group = InetAddress.getByName(nmeaControl.nmeaParameters.multicastGroup);
-			} catch (UnknownHostException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
-
-				// Create Datagram Socket
-				GPSsocket =  new MulticastSocket(nmeaControl.nmeaParameters.port);
-
-				GPSsocket.setSoTimeout(2000); // Allows GPS source to be changed even when no udp is being received.
-				GPSsocket.joinGroup(group);
-
-				// Create empty Datagram Packet
-				DatagramPacket GPSpacket = new DatagramPacket(buffer,
-						buffer.length);
-				// receive request from client and get client info
-				while (!stopActiveNMEAsource) {
-					// TODO: Validate NMEA content - how ?
-					// Not much to go on, nmea max len is 82char starting with
-					// '$'
-					// Maybe also able to check the gps'server' ip
-					// InetAddress NMEAServer = GPSpacket.getAddress();
-
-					//System.out.println("nmeaControl port:"+ nmeaControl.nmeaParameters.port);		
-					try {
-						GPSsocket.receive(GPSpacket);
-					} catch (SocketTimeoutException e) {
-//						System.out.println("NMEA Time out");
-						continue; // otherwise the same string jut gets sent again every 2s !
-					}
-
-					// TODO: Recode following line to avoid String creation (may
-					// ArrayList newString can hold CharSequence?)
-					StringBuffer sb = new StringBuffer(new String(buffer)
-					.substring(0, GPSpacket.getLength()));
-					// StringBuffer sb = new StringBuffer("Test" +nmeaCount++);
-					newStrings.add(sb);
-				}
-				
-			} catch (UnknownHostException e) {
-				// System.out.println(e);
-			} catch (IOException e) {
-				// System.out.println(e);
-			}
-			stopActiveNMEAsource=false;
-			// the socket must be closed on exiting the thread, otherwise, it can't
-			// be started again. DG. 27/3/06
-
-			if (GPSsocket != null) {
-				try {
-					GPSsocket.leaveGroup(group);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				GPSsocket.close();
-			}
-		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent event) {
+	public void stringReadTimer() {
 		/*
 		 * As called by Timer this gets called every 100ms or so. Look in the
 		 * newStrings array list to see if the acquisition thread has put
@@ -843,11 +849,18 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	}
 
 	/**
+	 * Add a new string from any source. Will be reread from buffer in a separate timer. 
+	 * @param string
+	 */
+	public void addNewString(StringBuffer string) {
+		newStrings.add(string);
+	}
+	/**
 	 * Convert a string buffer into an NMEA data unit and output
 	 * to the datablock. 
 	 * @param stringBuffer
 	 */
-	private void processNmeaString(StringBuffer stringBuffer) {
+	public void processNmeaString(StringBuffer stringBuffer) {
 //		checkStringCheckSum(stringBuffer);
 		lastValidStringTime  = System.currentTimeMillis();
 		lastSigTime = System.currentTimeMillis();
@@ -871,12 +884,12 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 * @param nmeaString
 	 * @return
 	 */
-	static boolean checkStringCheckSum(StringBuffer nmeaString) {
-		byte sum = createStringChecksum(nmeaString);
-		byte checkSum = getStringChecksum(nmeaString);
-		return (checkSum == sum);
-		
-	}
+//	static boolean checkStringCheckSum(StringBuffer nmeaString) {
+//		byte sum = createStringChecksum(nmeaString);
+//		byte checkSum = getStringChecksum(nmeaString);
+//		return (checkSum == sum);
+//		
+//	}
 	/**
 	 * Calculate the correct string buffer for an NMEA sentence.
 	 * <p>The checksum is an exclusive OR of all characters between, but 
@@ -884,26 +897,26 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 * @param nmeaString NMEA sentence
 	 * @return checksum  value. 
 	 */
-	public static byte createStringChecksum(StringBuffer nmeaString) {
-		char[] nmeaSentence = new char[nmeaString.length()];
-		nmeaString.getChars(0, nmeaString.length(), nmeaSentence, 0);
-		char[] checkSumChars = null;
-		byte sum = (byte) nmeaSentence[1]; // ignore the 0'th character. 
-		byte b;
-		for (int i = 2; i < nmeaString.length(); i++) {
-			b = (byte) nmeaSentence[i];
-			if (b == '*') {
-//				if (i < nmeaSentence.length - 2) {
-//					//				int nChar = nmeaSentence.length - 1 - i;
-//					checkSumChars = new char[2];
-//					nmeaString.getChars(i+1, i+3, checkSumChars, 0);
-//				}
-				break;
-			}
-			sum ^= b;
-		}		
-		return sum;
-	}
+//	public static byte createStringChecksum(StringBuffer nmeaString) {
+//		char[] nmeaSentence = new char[nmeaString.length()];
+//		nmeaString.getChars(0, nmeaString.length(), nmeaSentence, 0);
+//		char[] checkSumChars = null;
+//		byte sum = (byte) nmeaSentence[1]; // ignore the 0'th character. 
+//		byte b;
+//		for (int i = 2; i < nmeaString.length(); i++) {
+//			b = (byte) nmeaSentence[i];
+//			if (b == '*') {
+////				if (i < nmeaSentence.length - 2) {
+////					//				int nChar = nmeaSentence.length - 1 - i;
+////					checkSumChars = new char[2];
+////					nmeaString.getChars(i+1, i+3, checkSumChars, 0);
+////				}
+//				break;
+//			}
+//			sum ^= b;
+//		}		
+//		return sum;
+//	}
 	
 	/**
 	 * Gets the checksum from the end of a string. 
@@ -911,22 +924,22 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 * @param nmeaString NMEA string
 	 * @return Checksum value
 	 */
-	static public byte getStringChecksum(StringBuffer nmeaString) {
-		int starPos = nmeaString.lastIndexOf("*");
-		if (starPos < 0) {
-			return 0;
-		}
-		char[] checkSumChars = new char[2];
-		nmeaString.getChars(starPos+1, starPos+3, checkSumChars, 0);
-		int checkSum;
-		try {
-			checkSum = Integer.parseInt(new String(checkSumChars), 16);
-		}
-		catch (NumberFormatException e) {
-			return 0;
-		}
-		return (byte) checkSum;
-	}
+//	static public byte getStringChecksum(StringBuffer nmeaString) {
+//		int starPos = nmeaString.lastIndexOf("*");
+//		if (starPos < 0) {
+//			return 0;
+//		}
+//		char[] checkSumChars = new char[2];
+//		nmeaString.getChars(starPos+1, starPos+3, checkSumChars, 0);
+//		int checkSum;
+//		try {
+//			checkSum = Integer.parseInt(new String(checkSumChars), 16);
+//		}
+//		catch (NumberFormatException e) {
+//			return 0;
+//		}
+//		return (byte) checkSum;
+//	}
 	
 
 	@Override
@@ -990,7 +1003,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	 * Say error string, but stop printing them after the first 20. 
 	 * @param err
 	 */
-	private void sayErrorString(String err) {
+	public void sayErrorString(String err) {
 		errorCount++;
 		if (errorCount == 20) {
 			System.out.println("NMEA Error count exceeds 20, stop reporting NMEA Errors from " + nmeaControl.getUnitName());
@@ -1052,7 +1065,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					nmeaControl.showNMEADialog(nmeaControl.getGuiFrame());
+					nmeaControl.showDialog2(nmeaControl.getGuiFrame());
 				}
 			}));
 		}

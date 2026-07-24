@@ -28,6 +28,7 @@ import java.util.TimeZone;
 import Array.sensors.ArraySensorDataUnit;
 import Array.sensors.ArraySensorFieldType;
 import NMEA.AcquireNmeaData;
+import NMEA.NMEAProvider;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -726,7 +727,7 @@ public class GpsData extends LatLong implements Cloneable, ManagedParameters, Ar
 		nmea.append("W");
 
 		// 12: checksum
-		int checkSum = AcquireNmeaData.createStringChecksum(nmea);
+		int checkSum = NMEAProvider.createStringChecksum(nmea);
 		nmea.append(String.format("*%02X", checkSum));
 
 		//System.out.println("Fabricated String:" + nmea);
@@ -848,7 +849,7 @@ public class GpsData extends LatLong implements Cloneable, ManagedParameters, Ar
 		//		nmea.append(","); // don't need a ',' after the last field !
 
 		// 12: checksum
-		int checkSum = AcquireNmeaData.createStringChecksum(nmea);
+		int checkSum = NMEAProvider.createStringChecksum(nmea);
 		nmea.append(String.format("*%02X", checkSum));
 
 		//System.out.println("Fabricated String:" + nmea);
