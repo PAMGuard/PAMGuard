@@ -88,7 +88,31 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 	
 	
 	/**
-	 * Create a file list worker.  
+	 * Make a list from multiple files or root directories, running synchronously
+	 * on the calling thread. For nogui operation, where the file list must be
+	 * complete before automatic processing starts: the threaded version races
+	 * -autostart and can lose on slow (e.g. network mounted) file systems, leaving
+	 * the acquisition to start with an empty file list. No dialog is ever created.
+	 * @param rootList list of files or root directories to search
+	 * @param subFolders true to also search sub folders
+	 * @param useOldIfPossible use the previous list if the roots are unchanged
+	 */
+	public final void startFileListProcessSync(String[] rootList, boolean subFolders, boolean useOldIfPossible) {
+		this.fileList = rootList;
+		this.subFolders = subFolders;
+		this.useOldIfPossible = useOldIfPossible;
+		for (int i = 0; i < rootList.length; i++) {
+			Debug.out.println(">>>>>>>>Starting synchronous file search in " + rootList[i]);
+		}
+		if (noChange(rootList, subFolders, useOldIfPossible)) {
+			taskFinished(oldFileList);
+			return;
+		}
+		taskFinished(runBackgroundTask(null));
+	}
+
+	/**
+	 * Create a file list worker.
 	 * @param rootList - the list of folders to search in
 	 * @param subFolders - true to look for files in sub folders
 	 * @param useOldIfPossible
@@ -179,7 +203,9 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 
 	private void addFiles(PamWorker<FileListData<T>> pamWorker, FileListData<T> newFileList, File folder) {
 		newFileList.addFolder();
-		pamWorker.update(new PamWorkProgressMessage(-1, "Searching folder " + folder.getAbsolutePath()));
+		if (pamWorker != null) {
+			pamWorker.update(new PamWorkProgressMessage(-1, "Searching folder " + folder.getAbsolutePath()));
+		}
 		Debug.out.println(">>>> Searching for files in abs path " + folder.getAbsolutePath());
 		//		System.out.println(folder.getAbsolutePath());
 		File[] moreFiles = folder.listFiles(fileFilter);
@@ -207,12 +233,17 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 		
 		//Now all files in this folder have been added, so do any final tasks including checking for duplicates
 		String message = String.format("Found %d files - removing duplicates", newFileList.getFileCount());
-		pamWorker.update(new PamWorkProgressMessage(null, null, message));
+		if (pamWorker != null) {
+			pamWorker.update(new PamWorkProgressMessage(null, null, message));
+		}
 		newFileList.removeDuplicates("wav"); // remove duplicates and preferentially keep wav files
 	}
 
 	private void sayProgress(PamWorker<FileListData<T>> pamWorker, FileListData<T> newFileList, File folder) {
-		String msg = String.format("%d folders searched; %d sound files found in %d seconds...", 
+		if (pamWorker == null) {
+			return;
+		}
+		String msg = String.format("%d folders searched; %d sound files found in %d seconds...",
 				newFileList.getFoldersSearched(), newFileList.getFileCount(), (System.currentTimeMillis()-searchStartTime)/1000);
 		pamWorker.update(new PamWorkProgressMessage(null, null, msg));
 	}

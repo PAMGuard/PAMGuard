@@ -380,7 +380,7 @@ public class OLProcessDialog extends PamDialog {
 				taskCheckBox[i].setToolTipText(aTask.whyNot());
 			}
 			else {
-				taskCheckBox[i].setToolTipText(null);
+				taskCheckBox[i].setToolTipText(aTask==null ? null : aTask.getDescription());
 			}
 		}
 		getOkButton().setEnabled(selectedTasks > 0 && nr && !batchMode);

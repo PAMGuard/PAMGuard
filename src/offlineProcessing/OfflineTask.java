@@ -608,4 +608,12 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		return config.getSettingsOwners(parentControlledUnit.getUnitName());
 	}
 
+	/**
+	 * Get a description of the task. This is used in the offline task dialog to give more information about the task. 
+	 * @return a string description of the task. 
+	 */
+	public String getDescription() {
+		return null;
+	}
+
 }

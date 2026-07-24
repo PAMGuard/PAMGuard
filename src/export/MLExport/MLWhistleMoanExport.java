@@ -7,6 +7,7 @@ import PamguardMVC.PamDataBlock;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
+import whistlesAndMoans.AbstractWhistleDataBlock;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 import whistlesAndMoans.SliceData;
 
@@ -126,8 +127,24 @@ public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUni
 
 	@Override
 	protected Struct detectionHeader(PamDataBlock pamDataBlock) {
-		// TODO Auto-generated method stub
-		return null;
+
+		try {
+			AbstractWhistleDataBlock<?> whistleDataBlock = (AbstractWhistleDataBlock<?>) pamDataBlock;
+
+			Struct struct = Mat5.newStruct(1, 1);
+
+			Matrix fftLength = Mat5.newScalar(whistleDataBlock.getFftLength());
+			Matrix fftHop = Mat5.newScalar(whistleDataBlock.getFftHop());
+
+			struct.set("fftLength", 0, fftLength);
+			struct.set("fftHop", 0, fftHop);
+
+			return struct;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
