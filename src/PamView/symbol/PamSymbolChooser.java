@@ -1,5 +1,6 @@
 package PamView.symbol;
 
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -88,7 +89,7 @@ abstract public class PamSymbolChooser {
 	 * @param projector - the geenral projector
 	 * @return the JavaFX options pane for symbols. 
 	 */
-	public SwingSymbolOptionsPanel getSwingOptionsPanel(GeneralProjector projector) {
+	public SwingSymbolOptionsPanel getSwingOptionsPanel(Window parent, GeneralProjector projector) {
 		return null;
 	}
 	

@@ -29,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import Array.Hydrophone;
+import GPS.GPSControl;
 //import Array.streamerOrigin.StaticOriginMethod.StaticHydrophoneDialogComponent.MenuButton;
 import Map.gridbaselayer.GridDialogPanel;
 import PamUtils.LatLong;
@@ -36,7 +37,10 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SettingsButton;
 import PamView.panel.PamNorthPanel;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelectDialog;
 import effort.EffortProvider;
 import effort.swing.EffortSourcePanel;
 
@@ -328,10 +332,16 @@ public class MapParametersDialog extends PamDialog {
 				return;
 			}
 			EffortProvider effortProvider = effortBlock.getEffortProvider();
-			if (effortProvider == null) {
-				return;
+			if (!colourByEffort.isSelected()) {
+				effortProvider = null;
 			}
-			effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
+			if (effortProvider == null) {
+				// use the button to do the standard track symbol
+				showStandardGpsSymbolOption();
+			}
+			else {
+				effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
+			}
 		}
 	}
 
@@ -525,6 +535,20 @@ public class MapParametersDialog extends PamDialog {
 		return ans*2;
 	}
 	
+	public void showStandardGpsSymbolOption() {
+		GPSControl gps = GPSControl.getGpsControl();
+		if (gps == null) {
+			return;
+		}
+		PamSymbolManager symbolManager = gps.getGpsDataBlock().getPamSymbolManager();
+		if (symbolManager == null) {
+			return;
+		}
+		PamSymbolChooser symbolChooser = symbolManager.getSymbolChooser(simpleMap.getSelectorName(), null);
+		DataSelectDialog dataSelectDialog = new DataSelectDialog(this, gps.getGpsDataBlock(), null, symbolChooser);
+		boolean ans = dataSelectDialog.showDialog();
+	}
+
 	class FilePanel extends JPanel {
 		private JTextField mapName;
 		JButton browseButton, clearButton, allButton, noneButton;

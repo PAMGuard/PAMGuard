@@ -22,6 +22,7 @@ package GPS;
 
 import javax.swing.SwingUtilities;
 
+import GPS.symbol.GPSSymbolManager;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.PamController;
@@ -102,6 +103,9 @@ public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 			gpsDataBlock.setOverlayDraw(new GPSOverlayGraphics(gpsControl));
 			gpsDataBlock.setPamSymbolManager(new StandardSymbolManager(gpsDataBlock, GPSOverlayGraphics.defSymbol, false));
 		}
+		else {
+			gpsDataBlock.setPamSymbolManager(new GPSSymbolManager(gpsDataBlock));
+		}
 
 
 		//		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
@@ -112,6 +116,7 @@ public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 		if (PamModel.getPamModel() != null) {
 			PamModel.getPamModel().setGpsDataBlock(gpsDataBlock);
 		}
+		
 
 		gpsDataBlock.SetLogging(new GpsLogger(gpsDataBlock));
 		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER || SMRUEnable.isEnableDecimus()) {

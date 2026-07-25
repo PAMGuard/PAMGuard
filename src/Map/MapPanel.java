@@ -849,10 +849,19 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			}
 		}
 		Graphics2D g2d = (Graphics2D) g;
-		long mapStartTime = getMapStartTime();
 		Color defaultColour = PamColors.getInstance().getColor(PamColor.GPSTRACK);
+		long mapStartTime = getMapStartTime();
+		// get the gps symbol manager
+		PamSymbolChooser sChooser = gpsDataBlock.getPamSymbolManager().getSymbolChooser(simpleMapRef.getSelectorName(), rectProj);
+		PamSymbol gpsSymbol = sChooser.getPamSymbol(rectProj, null);
+		if (gpsSymbol != null) {
+			defaultColour = gpsSymbol.getLineColor();
+		}
 		if (effortSymbol != null) {
 			g2d.setStroke(new BasicStroke(effortSymbol.getLineThickness()));
+		}
+		else if (gpsSymbol != null) {
+			g2d.setStroke(new BasicStroke(gpsSymbol.getLineThickness()));
 		}
 		else {
 			g2d.setStroke(new BasicStroke(1));
