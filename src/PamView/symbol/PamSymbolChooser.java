@@ -86,7 +86,19 @@ abstract public class PamSymbolChooser {
 
 	/**
 	 * Swing version of option pane. Panel which contains options to change symbol types and colours depending on detection type. 
+	 * <br>Deprecated - use getSwingOptionsPanel(Window parent, GeneralProjector projector) 
 	 * @param projector - the geenral projector
+	 * @return the JavaFX options pane for symbols. 
+	 */
+	@Deprecated
+	public SwingSymbolOptionsPanel getSwingOptionsPanel(GeneralProjector projector) {
+		return getSwingOptionsPanel(null, projector);
+	}
+	
+	/**
+	 * Swing version of option pane. Panel which contains options to change symbol types and colours depending on detection type. 
+	 * @param parent - parent AWT window / frame / dialog, etc. 
+	 * @param projector - the general projector
 	 * @return the JavaFX options pane for symbols. 
 	 */
 	public SwingSymbolOptionsPanel getSwingOptionsPanel(Window parent, GeneralProjector projector) {
