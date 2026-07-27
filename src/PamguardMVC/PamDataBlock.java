@@ -1826,15 +1826,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	//ST 7/17/26 -- Introduced after AIS memory leak was fixed by Doug June/July '26. 
 	public Tunit getLastUpdatedUnit() {
-		synchronized (synchronizationLock) {
-			int trueReference = this.lastUnitUpdatedAbsoluteIndex - unitsRemoved;
-			synchronized (synchronizationLock) {
-				if (trueReference >= 0 && trueReference < pamDataUnits.size()) {
-					return pamDataUnits.get(trueReference);
-				}else {
-					return getLastUnit();
-				}
-			}
+		int trueReference = this.lastUnitUpdatedAbsoluteIndex - unitsRemoved;
+		if (trueReference >= 0 && trueReference < pamDataUnits.size()) {
+			return getCurrentDataUnit(trueReference);
+		}else {
+			return getLastUnit();
 		}
 	}
 
