@@ -16,7 +16,7 @@ import serialComms.jserialcomm.PJSerialException;
 import serialComms.jserialcomm.PJSerialLineListener;
 
 public class SerialNMEAProvider extends NMEAProvider {
-	
+
 	public static final String name = "Serial NMEA data";
 
 	private PJSerialComm pjSerialComm;
@@ -24,8 +24,12 @@ public class SerialNMEAProvider extends NMEAProvider {
 	private Timer autoPortTimer;
 
 	private String autoComPortName;
+	
+	private boolean newAutoPort = false;
 
 	private volatile long lastValidStringTime;
+	
+	private int stringCount = 0;
 
 	public SerialNMEAProvider(NMEAControl nmeaControl) {
 		super(nmeaControl);
@@ -51,19 +55,26 @@ public class SerialNMEAProvider extends NMEAProvider {
 	@Override
 	public boolean startAcquisition() {
 		stopAcquisition();
+		boolean ok = true;
+		stringCount = 0;
 		NMEAParameters params = getNmeaControl().getNmeaParameters();
 		try {
 			pjSerialComm = PJSerialComm.openSerialPort(getComPortName(), params.serialPortBitsPerSecond);
+			pjSerialComm.addLineListener(new SerialListener());
 		} catch (PJSerialException e) {
-		 getNMEAProcess().sayErrorString("PJSerialException in AcquireNMEAData" + e.getMessage());
-//			checkAutoComPort(); /// just do off timer. Slower, but less manic
-			return false;
+			String msg = "NMEA Serial acquisition: " + e.getMessage();
+			if (params.autoSerialPort) {
+				msg += " - will automatically try other ports ...";
+			}
+			getNMEAProcess().sayErrorString(msg);
+			
+			//			checkAutoComPort(); /// just do off timer. Slower, but less manic
+			ok = false;
 		}
-		pjSerialComm.addLineListener(new SerialListener());
-		if (params.autoSerialPort) {
+//		if (params.autoSerialPort) {
 			autoPortTimer.start();
-		}
-		return true;
+//		}
+		return ok;
 	}
 
 	@Override
@@ -98,49 +109,59 @@ public class SerialNMEAProvider extends NMEAProvider {
 			if (aLine == null || aLine.length() == 0) {
 				return;
 			}
-			if (aLine.startsWith("$") == false && aLine.startsWith("!") == false) {
+			stringCount++; // first couple of strings can be corrupt
+			if (aLine.startsWith("$") == false && aLine.startsWith("!") == false && stringCount > 2) {
 				sayErrorString("Invalid NMEA string (no $ or !): " + aLine);
 				return;
 			}
 			StringBuffer sb = new StringBuffer(aLine);
 			boolean ok = checkStringCheckSum(sb);
-			if (ok == false) {
+			if (ok == false && stringCount > 2) {
 				sayErrorString("Invalid NMEA string checksum: " + aLine);
 				return;
 			}
 			lastValidStringTime = PamCalendar.getTimeInMillis();
+			if (newAutoPort) {
+				newAutoPort = false;
+				sayErrorString("Success reading NMEA data on port " + autoComPortName);
+			}
 			getNMEAProcess().processNmeaString(sb);
 		}
 
 		@Override
 		public void portClosed() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void readException(Exception e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
 	private void checkAutoComPort() {
-		if (getNmeaControl().getNmeaParameters().autoSerialPort == false) {
-			return;
-		}
+//		always do this even of not on auto, to restart if there was a USB proble,
+//		if (getNmeaControl().getNmeaParameters().autoSerialPort == false) {
+//			return;
+//		}
 		// current com port is failing, so try a different one and see if things improve. 
 		long pause = System.currentTimeMillis() - lastValidStringTime;
 		if (pause > 5000) {
 			String newPort = findAnotherPort();
 			if (newPort != null) {
 				autoComPortName = newPort;
+				newAutoPort = true;
 				startAcquisition();
 			}
 		}
 	}
-	
+
 	private String findAnotherPort() {
+		if (getNmeaControl().getNmeaParameters().autoSerialPort == false) {
+			return getNmeaControl().getNmeaParameters().serialPortName;
+		}
 		String[] commPortIds = PJSerialComm.getSerialPortNames();
 		if (commPortIds == null || commPortIds.length == 0) {
 			return null;

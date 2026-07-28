@@ -83,7 +83,7 @@ public class SerialNMEAPanel implements PamDialogPanel {
 		//simNmeaGpsRadio.setSelected(nmeaParameters.simThread);
 		//populatePortList();
 		populateComboBoxes();
-		
+		autoComPort.setSelected(nmeaParameters.autoSerialPort);
 		bitsPerSecondComboBox.setSelectedItem(nmeaParameters.serialPortBitsPerSecond);
 //		ArrayList<CommPortIdentifier> commPortIds = SerialPortCom.getPortArrayList();
 		String[] commPortIds = PJSerialComm.getSerialPortNames();

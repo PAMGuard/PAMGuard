@@ -65,6 +65,18 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 
 	private Window parent;
 
+
+	@Deprecated
+	public StandardSymbolOptionsPanel(StandardSymbolManager standardSymbolManager, StandardSymbolChooser standardSymbolChooser) {
+		this(null, standardSymbolManager, standardSymbolChooser);
+	}
+	
+	/**
+	 * Constructor for standard options panel. 
+	 * @param parent
+	 * @param standardSymbolManager
+	 * @param standardSymbolChooser
+	 */
 	public StandardSymbolOptionsPanel(Window parent, StandardSymbolManager standardSymbolManager, StandardSymbolChooser standardSymbolChooser) {
 		this.parent = parent;
 		this.standardSymbolManager = standardSymbolManager;
