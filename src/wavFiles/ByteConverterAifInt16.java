@@ -16,7 +16,8 @@ public class ByteConverterAifInt16 extends ByteConverter {
 			iPos = iChan*2;
 			for (iSamp = 0; iSamp < nSamples; iSamp++) {
 				doubleData[iChan][iSamp] = (short)((byteData[iPos]&0xFF)<<8 |
-						(byteData[iPos+1]&0xFF))/32768.;
+						(byteData[iPos+1]&0xFF));
+				doubleData[iChan][iSamp] /= 32768.;
 				iPos += blockSize;
 			}
 		}

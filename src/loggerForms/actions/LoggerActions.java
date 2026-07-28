@@ -3,8 +3,10 @@ package loggerForms.actions;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import loggerForms.LoggerForm;
 import loggerForms.controls.LoggerControl;
@@ -19,11 +21,11 @@ public class LoggerActions {
 
 	private static LoggerActions singleInstance;
 
-	private HashMap<String, LoggerAction> actionsMap;
+	private Map<String, LoggerAction> actionsMap;
 
 	private LoggerActions() {
 		super();
-		actionsMap = new HashMap<>();
+		actionsMap = new TreeMap<>();
 	}
 
 	public static LoggerActions getInstance() {

@@ -13,7 +13,6 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
 import likelihoodDetectionModule.normalizer.NormalizedDataUnit;
 import likelihoodDetectionModule.LikelihoodDetectionUnit;
 import likelihoodDetectionModule.SignalBand;

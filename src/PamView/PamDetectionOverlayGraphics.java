@@ -339,7 +339,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 //				}
 		if (localisation == null || 
 				((localisation.getLocContents().getLocContent() & 
-						(LocContents.HAS_BEARING | LocContents.HAS_RANGE)) == 0)) {
+						(LocContents.HAS_BEARING | LocContents.HAS_RANGE | LocContents.HAS_LATLONG)) == 0)) {
 			// no localisation information, so draw the symbol and return.
 			generalProjector.addHoverData(detectionCentre, pamDetection);
 			return getPamSymbol(pamDetection, generalProjector).draw(g, detectionCentre.getXYPoint(), drawingOptions);

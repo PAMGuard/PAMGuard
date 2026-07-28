@@ -21,6 +21,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import PamController.PamController;
@@ -596,13 +597,18 @@ public class ClipDisplayUnit extends PamPanel {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 //			System.out.println("Mouse clicked " + e.toString());
+			/*
+			 *  2026-07-15: Need to call these two lines before the popuptrigger and call
+			 *  the mouseClicked function so that the correct unit get's highlighted before
+			 *  the popup menu get's shown. 
+			 */			
+			clipDisplayPanel.getClipDataProjector().setCurrentClickedUnit(ClipDisplayUnit.this);
+//			if (e.getButton() == MouseEvent.BUTTON1) {
+				clipDisplayPanel.mouseClicked(e, ClipDisplayUnit.this);
+//			}
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
-			}
-			clipDisplayPanel.getClipDataProjector().setCurrentClickedUnit(ClipDisplayUnit.this);
-			if (e.getButton() == MouseEvent.BUTTON1) {
-				clipDisplayPanel.mouseClicked(e, ClipDisplayUnit.this);
 			}
 			if (e.getComponent() == imagePanel) {
 				clipDisplayPanel.getClipDisplayMarker().mouseClicked(e);

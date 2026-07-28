@@ -1,6 +1,8 @@
 package loggerForms.formdesign.itempanels;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Set;
 
 import javax.swing.JComboBox;
@@ -25,6 +27,16 @@ public class ActionTopicPanel extends CtrlColPanel {
 		for (String key : actionKeys) {
 			actionsList.addItem(key);
 		}
+		actionsList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actionSelected();
+			}
+		});
+	}
+
+	protected void actionSelected() {
+		String action = (String) actionsList.getSelectedItem();
 		
 	}
 
@@ -45,6 +57,7 @@ public class ActionTopicPanel extends CtrlColPanel {
 	public boolean fetchProperty(ItemInformation itemDescription) {
 		String selItem = (String) actionsList.getSelectedItem();
 		itemDescription.setProperty(UDColName.Topic.toString(), selItem);
+		itemDescription.setProperty(UDColName.Title.toString(), selItem);
 		return selItem != null;
 	}
 

@@ -14,56 +14,60 @@ import loggerForms.FormDescription;
 import loggerForms.LoggerForm;
 import loggerForms.PropertyTypes;
 import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.network.LoggerNetworkObserver;
+import loggerForms.network.LoggerNetworkSystem;
 
 public class CounterControl extends SimpleControl {
-//	ControlDescription controlDescription;
-//	LoggerForm loggerForm;
-	
+	//	ControlDescription controlDescription;
+	//	LoggerForm loggerForm;
+
 	Character suffix;
-	
+
 	public enum CounterSuffix {NOSUFFIX, CHARSUFFIX};
-	
+
 	public CounterControl(ControlDescription controlDescription,
 			LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
-		
+
 		suffix = controlDescription.getFormDescription().getFormsControl().getOutputTableNameCounterSuffix(controlDescription.getFormDescription());
-		
+
 		updateCounter();
-		
+
 		//append counter numberto tab name
-		loggerForm.setHasCounter(this);
-		textField.setFocusable(false);
-		
+		if (loggerForm != null) {
+			loggerForm.setHasCounter(this);
+			textField.setFocusable(false);
+		}
+
 	}
-	
+
 	private String calculateCounter() {
 		int num = FormCounterManagement.getInstance().getCounterNumber(this,controlDescription.getFormDescription().getDBTABLENAME());
-		
+
 		String numSt = String.format("%03d", num);
-//		int nZeros = 3-numSt.length();
-//		
-//		String tSt = "";
-//		for (int i=0;i<nZeros;i++){
-//			tSt+="0";
-////			System.out.println(tSt);
-//		}
-//		
-//		numSt = tSt+numSt;
-//		System.out.println(tSt);
-//		System.out.println(numSt);
-		
+		//		int nZeros = 3-numSt.length();
+		//		
+		//		String tSt = "";
+		//		for (int i=0;i<nZeros;i++){
+		//			tSt+="0";
+		////			System.out.println(tSt);
+		//		}
+		//		
+		//		numSt = tSt+numSt;
+		//		System.out.println(tSt);
+		//		System.out.println(numSt);
+
 		if (suffix!=null){
 			numSt+= suffix.toString();
 		}else{
-//			System.out.println("SUFFIX NULL");
+			//			System.out.println("SUFFIX NULL");
 		}
-		
-//		System.out.println("numSt"+numSt);
-//
-//		System.out.println("numStS"+suffix);
+
+		//		System.out.println("numSt"+numSt);
+		//
+		//		System.out.println("numStS"+suffix);
 		return numSt;
-	
+
 	}
 
 
@@ -84,7 +88,7 @@ public class CounterControl extends SimpleControl {
 		}else{
 			try {
 				dataWarning=controlDescription.getTitle()+": Only the first "+leng+" character will be saved.";
-//				System.out.println(textField.getText(0,leng));
+				//				System.out.println(textField.getText(0,leng));
 				return textField.getText(0,leng);
 			} catch (BadLocationException e) {
 				dataError=controlDescription.getTitle()+": field not saved, data entry too long and could not truncate";
@@ -93,30 +97,34 @@ public class CounterControl extends SimpleControl {
 			}
 		}
 	}
-	
+
 	@Override
 	public void setDefault() {
-		
+
 	}
-	
+
 	@Override
 	public void clear(){
-		
+
 	}
-	
+
 	@Override
 	AbstractFormatter getAbstractformatter() {
-		
+
 		DefaultFormatter formatter = new DefaultFormatter();
 		return formatter;
-		
+
 	}
 
 	public void updateCounter() {
+		if (loggerForm == null) {
+			return; // happend when intialising the counter. 
+		}
 		if (loggerForm.getNewOrEdit()==LoggerForm.EditDataForm) return;
-//		System.out.println("updateCounter");
+		//		System.out.println("updateCounter");
 		setData(calculateCounter());
 	}
+
 
 }
 

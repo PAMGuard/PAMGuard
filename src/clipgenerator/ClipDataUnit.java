@@ -143,6 +143,9 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	 * @return double array of mag squared data or null if the clip waveform cannot be found
 	 */
 	public double[][] getSpectrogramData(int channel, int fftLength, int fftHop) {
+		if (channel < 0) {
+			return null;
+		}
 		if (clipSpecData[channel] == null 
 				|| clipSpecData[channel].fftLength != fftLength 
 				|| clipSpecData[channel].fftHop != fftHop) {

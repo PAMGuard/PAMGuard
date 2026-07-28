@@ -347,6 +347,12 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 		for (PamDataBlock aBlock:allDataBlocks) {
 			
+			Boolean hasJson = aBlock.getJSONDataSource() != null;
+			Boolean hasBytes = aBlock.getBinaryDataSource() != null;
+			if (hasJson | hasBytes) {
+				System.out.printf("Block %s has JSON: %s, has Binary: %s\n", aBlock.getDataName(), hasJson.toString(), hasBytes.toString());
+			}
+			
 			// if the data block has a binary source, add it to the list of potential outputs
 			if ( (outputFormat == NetworkSendParams.NETWORKSEND_BYTEARRAY && aBlock.getBinaryDataSource() != null) ||
 				 (outputFormat == NetworkSendParams.NETWORKSEND_JSON && aBlock.getJSONDataSource() != null)) {
