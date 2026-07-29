@@ -56,6 +56,8 @@ public class NMEADialog2 extends PamDialog {
 				newSourceType();
 			}
 		});
+
+		setHelpPoint("mapping.NMEA.docs.configuringNMEADataSource");
 		
 		setDialogComponent(mainPanel);
 	}
