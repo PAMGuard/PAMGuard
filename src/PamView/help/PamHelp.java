@@ -523,17 +523,20 @@ public class PamHelp {
 		if (hs == null) {
 			return false;
 		}
+		URL url = null;
+		ClassLoader cl = null;
 		try {
 			HelpSet dum = new HelpSet();
 			dum.setTitle("Test Item");
 //			helpsetName = "WindowsSound/help/WinSoundHelp.hs";
-			URL url = ClassLoader.getSystemResource(helpsetName);
-			ClassLoader cl = PamHelp.class.getClassLoader();
+			url = ClassLoader.getSystemResource(helpsetName);
+			cl = PamHelp.class.getClassLoader();
 			HelpSet helpSet = new HelpSet(cl,url);
 			dum.add(helpSet);
 			hs.add(dum);
+//			System.out.printf("Success loading help set %s, URI %s Classloader %s\n", helpsetName, url, cl);
 		}catch (HelpSetException e) {
-			System.err.println("Error loading help set " + helpsetName + ": " + e.getMessage());
+			System.err.printf("Error loading help set %s, URI %s, Clssloader %s, Error: %s\n", helpsetName, url, cl, e.getMessage());
 //			System.err.println(e.getMessage());
 			return false;
 		}

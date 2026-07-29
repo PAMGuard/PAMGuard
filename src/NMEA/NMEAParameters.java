@@ -23,6 +23,9 @@ package NMEA;
 import java.io.File;
 import java.io.Serializable;
 
+import NMEA.serial.SerialNMEAProvider;
+import NMEA.simulated.SimulatedNMEAProvider;
+import NMEA.udp.UdpNMEAProvider;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
@@ -33,6 +36,12 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	static public final long serialVersionUID = 2;
 	
 	String name;
+	
+	/**
+	 * Class of source provider. Replaces old enums and allows
+	 * for future plugins
+	 */
+	private String providerClass;
 
 	/**
 	 * Port for UDP comms
@@ -91,7 +100,7 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	
 	public int serialPortBitsPerSecond = 4800;
 	
-	public String nmeaSource = "Sim";
+//	public String nmeaSource = "Sim";
 	
 	public int simHeadingData;
 	
@@ -176,6 +185,53 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
+	}
+
+	/**
+	 * @return the providerClass
+	 */
+	public String getProviderClass() {
+		if (providerClass == null) {
+			switch (sourceType) {
+			case MULTICAST:
+				break;
+			case SERIAL:
+				providerClass = SerialNMEAProvider.class.getName();
+				break;
+			case SIMULATED:
+				providerClass = SimulatedNMEAProvider.class.getName();
+				break;
+			case TIMESTAMP_FILE:
+				break;
+			case UDP:
+				providerClass = UdpNMEAProvider.class.getName();
+				break;
+			default:
+				break;
+			
+			}
+		}
+		return providerClass;
+	}
+
+	
+	/**
+	 * Set the provider class from the class of the provider
+	 * @param clss
+	 */
+	public void setProviderClass(Class clss) {
+		if (clss == null) {
+			providerClass = null;
+		}
+		else {
+			providerClass = clss.getName();
+		}
+	}
+	/**
+	 * @param providerClass the providerClass to set
+	 */
+	public void setProviderClass(String providerClass) {
+		this.providerClass = providerClass;
 	}
 
 }
