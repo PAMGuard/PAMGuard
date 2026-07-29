@@ -3,7 +3,10 @@ package networkTransfer.send;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
@@ -16,6 +19,7 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamModel.SMRUEnable;
+import PamUtils.FileFunctions;
 import PamView.PamSidePanel;
 import PamguardMVC.PamDataBlock;
 import networkTransfer.NetworkClient;
@@ -23,6 +27,7 @@ import networkTransfer.NetworkParams;
 import networkTransfer.emulator.NetworkEmulator;
 import networkTransfer.mqttClient.PamMqttClient;
 import pamguard.GlobalArguments;
+import pamguard.Pamguard;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 
@@ -192,6 +197,28 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	public long getSettingsVersion() {
 		return NetworkSendParams.serialVersionUID;
 	}
+	
+	private boolean isWindowsPGHomeDir(String dir) {
+		boolean users_there = false;
+		boolean pg_there = false;
+		int levels = 0;
+		for (Path p : Paths.get(dir)) {
+			if(levels==0 && p.toString().equals("Users")) {users_there=true;}
+			if(levels==2 && p.toString().equals("Pamguard")) {pg_there=true;}
+		    levels++;
+		}
+		if(levels == 3 && users_there && pg_there) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isLinuxFilepath(String path) {
+		if(path.charAt(1)==':') {
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	public boolean restoreSettings(
@@ -263,6 +290,23 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		if(persistenceDir!=null) {
 			networkSendParams.persistenceDirectory = persistenceDir;
+		}
+		
+		//Check if the configured directory is Pamguard Home. If so, make sure that it is the correct path for the machine being used. 
+		if(networkSendParams.persistenceDirectory!=null) {
+			if(FileFunctions.isWindows()) {
+				if(isLinuxFilepath(networkSendParams.persistenceDirectory)) {
+					networkSendParams.persistenceDirectory = Pamguard.getSettingsFolder();
+				}else if(isWindowsPGHomeDir(networkSendParams.persistenceDirectory)) {
+					networkSendParams.persistenceDirectory = Pamguard.getSettingsFolder();
+				}
+			}else {
+				if(!isLinuxFilepath(networkSendParams.persistenceDirectory)) {
+					networkSendParams.persistenceDirectory = Pamguard.getSettingsFolder();
+				}
+			}
+		}else {
+			networkSendParams.persistenceDirectory = Pamguard.getSettingsFolder();
 		}
 		
 		boolean isSetJson = networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_JSON;

@@ -24,6 +24,7 @@ import networkTransfer.send.ClientConnectFailedException;
 import networkTransfer.send.NetworkSendDialog;
 import networkTransfer.send.NetworkSendParams;
 import networkTransfer.send.TCPSendClient;
+import pamguard.Pamguard;
 
 public class NetworkParamsPanel extends PamPanel{
 	
@@ -52,6 +53,8 @@ public class NetworkParamsPanel extends PamPanel{
 	private JPanel primaryPanel;
 	
 	private TlsCheckListener tlsCheckListener;
+	
+	private MqttCheckListener mqttCheckListener;
 	
 	public JPanel panel;
 	
@@ -110,11 +113,14 @@ public class NetworkParamsPanel extends PamPanel{
 		addComponent(ipPanel, new JLabel("Persistance Directory ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(ipPanel, persistenceDir = new JTextField(60), c);
+		
 		c.gridx = 0;
 		c.gridy++;
 		
 		if(this.showMqttSelect) {
 			addComponent(ipPanel,useMqtt = new JCheckBox("Use Mqtt Transmission"),c);
+			mqttCheckListener = new MqttCheckListener();
+			useMqtt.addActionListener(mqttCheckListener);
 			c.gridx = 1;
 			c.gridy++;
 			c.gridwidth = 1;
@@ -146,11 +152,21 @@ public class NetworkParamsPanel extends PamPanel{
 		password.setText(networkParams.password);
 		rememberPassword.setSelected(networkParams.savePassword);
 		baseTopic.setText(networkParams.baseTopic);
-		stationId.setText(networkParams.stationId);
+		if(networkParams.stationId!=null && !networkParams.stationId.isBlank()) {
+			stationId.setText(networkParams.stationId);
+		}else {
+			stationId.setText("");
+		}
+		
 		useSSL.setSelected(networkParams.useSSL);
-		persistenceDir.setText(networkParams.persistenceDirectory);
+		if(networkParams.persistenceDirectory!=null && !networkParams.persistenceDirectory.isBlank()) {
+			persistenceDir.setText(networkParams.persistenceDirectory);
+		}else {
+			persistenceDir.setText(Pamguard.getSettingsFolder());
+		}
 		if(this.useMqtt!=null) {
 			useMqtt.setSelected(networkParams.mqtt);
+			mqttCheckListener.setMqttConfigVisability();
 		}
 		tlsConfigurePanel.setParams(networkParams);
 		tlsCheckListener.setTlsConfigVisability();
@@ -185,6 +201,28 @@ public class NetworkParamsPanel extends PamPanel{
 		}
 	}
 	
+	private class MqttCheckListener implements ActionListener{
+		
+		public void setMqttConfigVisability() {
+			
+			if(useMqtt.isSelected()) {
+				baseTopic.setEnabled(true);
+				stationId.setEnabled(true);
+				persistenceDir.setEnabled(true);
+			}else {
+				baseTopic.setEnabled(false);
+				stationId.setEnabled(false);
+				persistenceDir.setEnabled(false);
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setMqttConfigVisability();
+		}
+		
+	}
+	
 	private class TlsCheckListener implements ActionListener{
 		
 		public void setTlsConfigVisability() {
@@ -212,6 +250,7 @@ public class NetworkParamsPanel extends PamPanel{
 				PamMqttClient.test(this.networkParams);
 			}else {
 				client = new TCPSendClient(this.networkParams);
+				client.testClient();
 			}
 		}catch(ClientConnectFailedException e) {
 			testFailed = true;

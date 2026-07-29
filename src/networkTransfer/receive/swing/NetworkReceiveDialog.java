@@ -130,8 +130,11 @@ public class NetworkReceiveDialog extends PamDialog {
 				portPanel.panel.setVisible(false);
 				networkParamsPanel.panel.setVisible(true);
 			}
-			mainPanel.repaint();
-			mainPanel.revalidate();
+			singleInstance.repaint();
+			singleInstance.revalidate();
+//			singleInstance.setSi;
+//			mainPanel.repaint();
+//			mainPanel.revalidate();
 		}
 
 		@Override
@@ -150,8 +153,9 @@ public class NetworkReceiveDialog extends PamDialog {
 		singleInstance.networkReceiveParams = networkReceiver.getNetworkReceiveParams().clone();
 		//singleInstance.networkReceiveParams.stationName = "base";
 		singleInstance.setParams();
+		singleInstance.setResizable(true);
 		singleInstance.setVisible(true);
-		singleInstance.runSwap();
+//		singleInstance.runSwap();
 		return (NetworkReceiveParams) singleInstance.networkReceiveParams;
 	}
 	
@@ -168,6 +172,7 @@ public class NetworkReceiveDialog extends PamDialog {
 			connectionStandard.setSelected(false);
 			connectionMqtt.setSelected(true);
 		}
+		methods.runSwap();
 		//
 	}
 	
