@@ -130,8 +130,9 @@ public class NetworkReceiveDialog extends PamDialog {
 				portPanel.panel.setVisible(false);
 				networkParamsPanel.panel.setVisible(true);
 			}
-			singleInstance.repaint();
 			singleInstance.revalidate();
+			singleInstance.pack();
+			singleInstance.repaint();
 //			singleInstance.setSi;
 //			mainPanel.repaint();
 //			mainPanel.revalidate();
