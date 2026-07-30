@@ -97,6 +97,16 @@ public class NetworkParamsPanel extends PamPanel{
 		addComponent(ipPanel, rememberPassword = new JCheckBox("Remember Password"), c);
 		c.gridx = 1;
 		c.gridy++;
+		if(this.showMqttSelect) {
+			addComponent(ipPanel,useMqtt = new JCheckBox("Use Mqtt Transmission"),c);
+			mqttCheckListener = new MqttCheckListener();
+			useMqtt.addActionListener(mqttCheckListener);
+			c.gridx = 1;
+			c.gridy++;
+			c.gridwidth = 1;
+		}
+		c.gridx = 1;
+		c.gridy++;
 		addComponent(ipPanel,useSSL = new JCheckBox("Use TLS Protocol"),c);
 		c.gridx = 0;
 		c.gridy++;
@@ -117,14 +127,7 @@ public class NetworkParamsPanel extends PamPanel{
 		c.gridx = 0;
 		c.gridy++;
 		
-		if(this.showMqttSelect) {
-			addComponent(ipPanel,useMqtt = new JCheckBox("Use Mqtt Transmission"),c);
-			mqttCheckListener = new MqttCheckListener();
-			useMqtt.addActionListener(mqttCheckListener);
-			c.gridx = 1;
-			c.gridy++;
-			c.gridwidth = 1;
-		}
+		
 		
 		addComponent(ipPanel, testConnection = new JButton("Test connection"), c);
 		
@@ -155,7 +158,13 @@ public class NetworkParamsPanel extends PamPanel{
 		if(networkParams.stationId!=null && !networkParams.stationId.isBlank()) {
 			stationId.setText(networkParams.stationId);
 		}else {
-			stationId.setText("");
+			stationId.setText("BaseStation");
+		}
+		
+		if(networkParams.baseTopic!=null && !networkParams.baseTopic.isBlank()) {
+			stationId.setText(networkParams.stationId);
+		}else {
+			stationId.setText("APS");
 		}
 		
 		useSSL.setSelected(networkParams.useSSL);
