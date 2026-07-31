@@ -101,7 +101,7 @@ public class DatabaseBackupStream extends FileBackupStream {
 			availableActions = new ArrayList<ActionMaker>();
 			availableActions.add(new CopyDatabaseMaker());
 			availableActions.add(new SQLCloneMaker());
-			availableActions.add(new SQLiteFtpMaker());
+//			availableActions.add(new SQLiteFtpMaker());
 		}
 		return availableActions;
 	}
