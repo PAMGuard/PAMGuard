@@ -22,17 +22,17 @@ public class LoggerNetworkDialog extends PamDialog {
 	
 	private LoggerNetworkSettings settings;
 	
-	private JRadioButton none, mqtt, udp;
+	private JRadioButton none, mqtt;// udp;
 	
 	private LoggerNetworkDialog(Window parentFrame) {
 		super(parentFrame, "Logger Network", true);
 		none = new JRadioButton("None");
 		mqtt = new JRadioButton("MQTT");
-		udp = new JRadioButton("UDP");
+//		udp = new JRadioButton("UDP");
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(none);
 		bg.add(mqtt);
-		bg.add(udp);
+//		bg.add(udp);
 		
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
@@ -41,8 +41,8 @@ public class LoggerNetworkDialog extends PamDialog {
 		c.gridy++;
 		mainPanel.add(mqtt, c);
 		c.gridy++;
-		mainPanel.add(udp, c);
-		c.gridy++;
+//		mainPanel.add(udp, c);
+//		c.gridy++;
 		
 		setDialogComponent(new PamAlignmentPanel(mainPanel, BorderLayout.WEST, true));
 	}
@@ -60,7 +60,7 @@ public class LoggerNetworkDialog extends PamDialog {
 		this.settings = settings;
 		none.setSelected(settings.loggerNetworkType == LoggerNetworkSettings.LOG_NET_NONE);
 		mqtt.setSelected(settings.loggerNetworkType == LoggerNetworkSettings.LOG_NET_MQTT);
-		udp.setSelected(settings.loggerNetworkType == LoggerNetworkSettings.LOG_NET_UDP);
+//		udp.setSelected(settings.loggerNetworkType == LoggerNetworkSettings.LOG_NET_UDP);
 	}
 
 	@Override
@@ -71,9 +71,9 @@ public class LoggerNetworkDialog extends PamDialog {
 		if (mqtt.isSelected()) {
 			settings.loggerNetworkType = LoggerNetworkSettings.LOG_NET_MQTT;
 		}
-		if (udp.isSelected()) {
-			settings.loggerNetworkType = LoggerNetworkSettings.LOG_NET_UDP;
-		}
+//		if (udp.isSelected()) {
+//			settings.loggerNetworkType = LoggerNetworkSettings.LOG_NET_UDP;
+//		}
 		
 		return true;
 	}

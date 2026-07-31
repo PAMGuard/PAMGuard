@@ -25,7 +25,7 @@ public class NetcamSouce extends CameraSource implements LoggerNetworkReceiver {
 	@Override
 	public boolean prepare(CameraParams cameraParams) {
 		LoggerNetworkManager netManager = LoggerNetworkSystem.getManager();
-		netName = "CameraFrame" + "/" + cameraParams.cameraName;
+		netName = "Logger/CameraFrame" + "/" + cameraParams.cameraName;
 		netManager.subsribeTopic(netName, this);
 		return false;
 	}

@@ -15,17 +15,28 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 
 	public static final long serialVersionUID = 1L;
 	
-	public static final int NETWORKSEND_BYTEARRAY = 0;
+	/*
+	 * 
+	 */
+	public static final int NETWORKSEND_BYTEARRAY = 1;
 	
-	public static final int NETWORKSEND_JSON = 1;
+	public static final int NETWORKSEND_JSON = 2;
 	
-	public static final int NETWORKSEND_BOTH = 2;
+	public static final int NETWORKSEND_BOTH = 3;
 	
 	public int stationId1;
 	
 	public int stationId2;
 		
-	public int sendingFormat = NETWORKSEND_BYTEARRAY;	
+	/*
+	 * 29/7/26 DG changed these so the options are 1,2,3 instead of 0,1,2. 
+	 * Hid the old parameter, and added a new one, which should never be 0, 
+	 * so in the getter for sendingformatNew, if it's zero, it can take
+	 * the old value and add 1 to it. 
+	 */
+	private int sendingFormat = NETWORKSEND_BYTEARRAY;	
+	
+	private int sendingFormatNew = NETWORKSEND_BYTEARRAY;
 	
 	/**
 	 * Max number of queued Objects. 
@@ -112,5 +123,24 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 		return ps;
 	}
 
+	public int getSendingFormat() {
+		if (sendingFormatNew == 0) {
+			sendingFormatNew = sendingFormat + 1;
+		}
+		return sendingFormatNew;
+	}
+
+	public void setSendingFormat(int sendingFormatNew) {
+		this.sendingFormatNew = sendingFormatNew;
+	}
+
+	/**
+	 * Check to see if the params have a specific send format set (NETWORKSEND_BYTEARRAY or NETWORKSEND_JSON)
+	 * @param format
+	 * @return
+	 */
+	public boolean hasSendFormat(int format) {
+		return (getSendingFormat() & format) != 0;
+	}
 
 }

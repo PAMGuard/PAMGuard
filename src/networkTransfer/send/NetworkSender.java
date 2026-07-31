@@ -70,16 +70,111 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	
 	public NetworkSender(String unitName) {
 		super("Network Sender", unitName);
-		if(this.networkSendParams.sendingFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
+
+		PamSettingManager.getInstance().registerSettings(this);
+		
+		checkCommandLineOptions();
+		
+		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
 			commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
 			commandProcess.setCommandProcess(true);
 			addPamProcess(commandProcess);
 		}
-		PamSettingManager.getInstance().registerSettings(this);
+		
 		sidePanel = new NetworkSendSidePanel(this);
 		initializeClient();
 	}
 	
+	/**
+	 * Do this here, not in restore settings, otherwise it's not called the first time the module is added. 
+	 */
+	private void checkCommandLineOptions() {
+		String address = GlobalArguments.getParam(NetSendCommandParam.ADDRESS.arg);
+		String portString = GlobalArguments.getParam(NetSendCommandParam.PORT.arg);
+		String id1String = GlobalArguments.getParam(NetSendCommandParam.ID1.arg);
+		String id2String = GlobalArguments.getParam(NetSendCommandParam.ID2.arg);
+		String usesslString = GlobalArguments.getParam(NetSendCommandParam.USESSL.arg);
+		String usemqttString = GlobalArguments.getParam(NetSendCommandParam.USEMQTT.arg);
+		String trustStorePathString = GlobalArguments.getParam(NetSendCommandParam.TRUSTPATH.arg);
+		String trustStorePassString = GlobalArguments.getParam(NetSendCommandParam.TRUSTPASS.arg);
+		String keyPathString = GlobalArguments.getParam(NetSendCommandParam.KEYPATH.arg);
+		String keyPassString = GlobalArguments.getParam(NetSendCommandParam.KEYPASS.arg);
+		String user = GlobalArguments.getParam(NetSendCommandParam.USER.arg);
+		String password = GlobalArguments.getParam(NetSendCommandParam.PASSWORD.arg);
+		String useJson = GlobalArguments.getParam(NetSendCommandParam.SENDJSON.arg);
+		String persistenceDir = GlobalArguments.getParam(NetSendCommandParam.PERSISTANCE_DIRECTORY.arg);
+
+		if(user!=null) {
+			networkSendParams.userId = user;
+		}
+		
+		if(password!=null) {
+			networkSendParams.password = password;
+		}
+	
+		if (address != null) {
+			networkSendParams.ipAddress = address; // remember it. 
+		}
+		
+		if(portString != null) {
+			networkSendParams.portNumber = Integer.valueOf(portString);
+		}
+		
+		if(id1String!=null) {
+			networkSendParams.stationId1 = Integer.valueOf(id1String);
+		}
+		
+		if(id2String!=null) {
+			networkSendParams.stationId2 = Integer.valueOf(id2String);
+		}
+		
+		if(usesslString != null) {
+			networkSendParams.useSSL = Boolean.valueOf(usesslString);
+		}
+		
+		if(usemqttString!=null) {
+			networkSendParams.mqtt = Boolean.valueOf(usemqttString);
+		}
+		
+		if(trustStorePathString!=null) {
+			networkSendParams.trustStorePath = trustStorePathString;
+		}
+		
+		if(trustStorePassString!=null) {
+			networkSendParams.trustStorePassword = trustStorePassString;
+		}
+		
+		if(keyPathString!=null) {
+			networkSendParams.keyStorePath = keyPathString;
+		}
+		
+		if(keyPassString!=null) {
+			networkSendParams.keyStorePassword = keyPassString;
+		}
+		
+		if(persistenceDir!=null) {
+			networkSendParams.persistenceDirectory = persistenceDir;
+		}
+		
+		/**
+		 * Do we need code here that will allow both ? 
+		 */
+		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
+		if(useJson!=null) {
+			isSetJson = Boolean.valueOf(useJson);
+		}
+		
+		
+		int sendFmt = 0;
+		if(isSetJson) {
+			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
+		}
+		else {
+			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
+		}
+		networkSendParams.setSendingFormat(sendFmt);		
+	}
+
 	public void initializeClient() {
 		if(client!=null && !client.requireReconnect) {
 			return;
@@ -198,83 +293,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		networkSendParams = (NetworkSendParams) ((NetworkParams) pamControlledUnitSettings.getSettings()).clone();
 		
-		String address = GlobalArguments.getParam(NetSendCommandParam.ADDRESS.arg);
-		String portString = GlobalArguments.getParam(NetSendCommandParam.PORT.arg);
-		String id1String = GlobalArguments.getParam(NetSendCommandParam.ID1.arg);
-		String id2String = GlobalArguments.getParam(NetSendCommandParam.ID2.arg);
-		String usesslString = GlobalArguments.getParam(NetSendCommandParam.USESSL.arg);
-		String usemqttString = GlobalArguments.getParam(NetSendCommandParam.USEMQTT.arg);
-		String trustStorePathString = GlobalArguments.getParam(NetSendCommandParam.TRUSTPATH.arg);
-		String trustStorePassString = GlobalArguments.getParam(NetSendCommandParam.TRUSTPASS.arg);
-		String keyPathString = GlobalArguments.getParam(NetSendCommandParam.KEYPATH.arg);
-		String keyPassString = GlobalArguments.getParam(NetSendCommandParam.KEYPASS.arg);
-		String user = GlobalArguments.getParam(NetSendCommandParam.USER.arg);
-		String password = GlobalArguments.getParam(NetSendCommandParam.PASSWORD.arg);
-		String useJson = GlobalArguments.getParam(NetSendCommandParam.SENDJSON.arg);
-		String persistenceDir = GlobalArguments.getParam(NetSendCommandParam.PERSISTANCE_DIRECTORY.arg);
-
-		if(user!=null) {
-			networkSendParams.userId = user;
-		}
-		
-		if(password!=null) {
-			networkSendParams.password = password;
-		}
-	
-		if (address != null) {
-			networkSendParams.ipAddress = address; // remember it. 
-		}
-		
-		if(portString != null) {
-			networkSendParams.portNumber = Integer.valueOf(portString);
-		}
-		
-		if(id1String!=null) {
-			networkSendParams.stationId1 = Integer.valueOf(id1String);
-		}
-		
-		if(id2String!=null) {
-			networkSendParams.stationId2 = Integer.valueOf(id2String);
-		}
-		
-		if(usesslString != null) {
-			networkSendParams.useSSL = Boolean.valueOf(usesslString);
-		}
-		
-		if(usemqttString!=null) {
-			networkSendParams.mqtt = Boolean.valueOf(usemqttString);
-		}
-		
-		if(trustStorePathString!=null) {
-			networkSendParams.trustStorePath = trustStorePathString;
-		}
-		
-		if(trustStorePassString!=null) {
-			networkSendParams.trustStorePassword = trustStorePassString;
-		}
-		
-		if(keyPathString!=null) {
-			networkSendParams.keyStorePath = keyPathString;
-		}
-		
-		if(keyPassString!=null) {
-			networkSendParams.keyStorePassword = keyPassString;
-		}
-		
-		if(persistenceDir!=null) {
-			networkSendParams.persistenceDirectory = persistenceDir;
-		}
-		
-		boolean isSetJson = networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_JSON;
-		if(useJson!=null) {
-			isSetJson = Boolean.valueOf(useJson);
-		}
-		
-		if(isSetJson) {
-			networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_JSON;
-		}else {
-			networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-		}
 		
 		return (networkSendParams != null);
 	}
@@ -320,18 +338,18 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			removePamProcess(getPamProcess(i));
 		}
 		for (PamDataBlock aBlock:wanted) {
-			addPamProcess(new NetworkSendProcess(this, aBlock,networkSendParams.sendingFormat));
+			addPamProcess(new NetworkSendProcess(this, aBlock,networkSendParams.getSendingFormat()));
 
 		}
 		
 		// set the command process to use the same format as all of the new processes
 		if(this.commandProcess!=null) {
-			commandProcess.setOutputFormat(networkSendParams.sendingFormat);
+			commandProcess.setOutputFormat(networkSendParams.getSendingFormat());
 		}
 	}
 
 	public ArrayList<PamDataBlock> listWantedDataSources() {
-		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.sendingFormat);
+		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.getSendingFormat());
 		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
 		for (PamDataBlock aBlock:possibles) {
 			if (networkSendParams.findDataBlock(aBlock) != null) {
@@ -345,6 +363,8 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	public ArrayList<PamDataBlock> listPossibleDataSources(int outputFormat) {
 		ArrayList<PamDataBlock> possibles = new ArrayList<PamDataBlock>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		boolean sendBytes = ((outputFormat & NetworkSendParams.NETWORKSEND_BYTEARRAY) != 0);
+		boolean sendJson = ((outputFormat & NetworkSendParams.NETWORKSEND_JSON) != 0);
 		for (PamDataBlock aBlock:allDataBlocks) {
 			
 			Boolean hasJson = aBlock.getJSONDataSource() != null;
@@ -354,14 +374,14 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			}
 			
 			// if the data block has a binary source, add it to the list of potential outputs
-			if ( (outputFormat == NetworkSendParams.NETWORKSEND_BYTEARRAY && aBlock.getBinaryDataSource() != null) ||
-				 (outputFormat == NetworkSendParams.NETWORKSEND_JSON && aBlock.getJSONDataSource() != null)) {
+			if ( (sendJson && hasJson) ||
+				 (sendBytes && hasBytes)) {
 				possibles.add(aBlock);
 			}
 			
 			// if the data block also has a background manager, add it's data block to the list as well (json-output only for now)
 			if (aBlock.getBackgroundManager()!=null) {
-				if (outputFormat == NetworkSendParams.NETWORKSEND_JSON && aBlock.getBackgroundManager().getBackgroundDataBlock().getJSONDataSource() != null) {
+				if (sendJson && aBlock.getBackgroundManager().getBackgroundDataBlock().getJSONDataSource() != null) {
 					possibles.add(aBlock.getBackgroundManager().getBackgroundDataBlock());
 				}
 			}
