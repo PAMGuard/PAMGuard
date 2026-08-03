@@ -197,7 +197,7 @@ public class WavFileStorage implements RecorderStorage {
 	/**
 	 * Create lock file to flag transfer that this file is actively being written to for APS.
 	 * Linux does not handle file locks well, so explicitly building them in. 
-	 * @param wavFile2
+	 * @param fileToLock
 	 */
 	private void createLock(File fileToLock) {
 		File lockFile = getLockFile(fileToLock);
@@ -211,7 +211,7 @@ public class WavFileStorage implements RecorderStorage {
 	/**
 	 * Delete lock file to flag transfer that this file is not longer being written to for APS.
 	 * Linux does not handle file locks well, so explicitly building them in. 
-	 * @param wavFile2
+	 * @param fileToUnlock
 	 */
 	private void deleteLock(File fileToUnlock) {
 		File wavFileLock = getLockFile(fileToUnlock);

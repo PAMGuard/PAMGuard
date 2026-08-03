@@ -1,13 +1,9 @@
 package wavFiles;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.sound.sampled.AudioFormat;
 
-import PamController.PamGUIManager;
-import PamUtils.PamFileFilter;
 import clickDetector.WindowsFile;
 import warnings.RepeatWarning;
 
