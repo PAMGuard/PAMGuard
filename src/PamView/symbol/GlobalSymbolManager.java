@@ -91,7 +91,8 @@ public class GlobalSymbolManager {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SwingSymbolOptionsPanel optsPanel = symbolManager.getSwingOptionsPanel(displayName, projector);
+		// TODO find a way to get a Window ref through here.  
+			SwingSymbolOptionsPanel optsPanel = symbolManager.getSwingOptionsPanel(null, displayName, projector);
 			if (optsPanel == null) {
 				return;
 			}

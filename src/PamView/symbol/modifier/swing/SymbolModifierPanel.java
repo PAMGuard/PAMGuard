@@ -1,6 +1,7 @@
 package PamView.symbol.modifier.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -40,8 +41,11 @@ public class SymbolModifierPanel implements PamDialogPanel {
 
 	private SymbolTreeModel treeModel;
 
-	public SymbolModifierPanel(StandardSymbolChooser symbolChooser) {
+	private Window parent;
+
+	public SymbolModifierPanel(Window parent, StandardSymbolChooser symbolChooser) {
 		super();
+		this.parent = parent;
 		this.symbolChooser = symbolChooser;
 		mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(new TitledBorder("Modifiers"));

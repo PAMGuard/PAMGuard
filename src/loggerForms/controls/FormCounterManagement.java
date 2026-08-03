@@ -135,7 +135,7 @@ public class FormCounterManagement implements LoggerNetworkObserver {
 			//			System.out.println("tInt"+tInt);
 			//			System.out.println("Counter hash code="+this.hashCode());
 			if (tInt==null){
-				number = -1;
+				number = 0;
 			}else{
 				number = tInt;
 			}

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.ListIterator;
 
 import NMEA.AcquireNmeaData;
+import NMEA.NMEAProvider;
 import PamController.masterReference.MasterReferencePoint;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
@@ -205,7 +206,7 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 //		}
 		long dataTime = aisLogger.getLastTime();
 		String aivdm = String.format("!AIVDM,1,1,,A,%s,%d", dataString, fillBits);
-		int checkSum = AcquireNmeaData.createStringChecksum(new StringBuffer(aivdm));
+		int checkSum = NMEAProvider.createStringChecksum(new StringBuffer(aivdm));
 		aivdm += String.format("*%02X", checkSum);
 		
 		return new EmulatedData(dataTime, dataTime+emulatorTimeOffset, aivdm);

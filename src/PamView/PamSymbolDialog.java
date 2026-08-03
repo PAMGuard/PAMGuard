@@ -20,11 +20,14 @@
  */
 package PamView;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -72,6 +75,12 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	private PamSymbol givenSymbol, returnedSymbol;
 
 	private JPanel fillColourPanel;
+
+	private boolean lineOnly;
+
+	private JLabel widthLab;
+
+	private JLabel heightLab;
 
 	private static JPopupMenu typeMenu;
 
@@ -123,7 +132,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 		con.gridy++;
 		con.gridx = 0;
 		con.gridwidth = 1;
-		addComponent(l, new JLabel("Width"), con);
+		addComponent(l, widthLab = new JLabel("Width"), con);
 		con.gridx++;
 		addComponent(l, symbolWidth = new JSpinner(), con);
 		//		lineThickness.setMaximumSize(new Dimension(100, 30));
@@ -132,7 +141,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 		con.gridy++;
 		con.gridx = 0;
 		con.gridwidth = 1;
-		addComponent(l, new JLabel("Height"), con);
+		addComponent(l, heightLab = new JLabel("Height"), con);
 		con.gridx++;
 		addComponent(l, symbolHeight = new JSpinner(), con);
 		//		lineThickness.setMaximumSize(new Dimension(100, 30));
@@ -191,6 +200,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 		this.setModal(true);
 		//
 		//		this.setResizable(false);
+		
 	}
 
 
@@ -216,15 +226,23 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	 * @param pamSymbol Existing Symbol
 	 * @return modified or new symbol
 	 */
-	static public PamSymbol show(Window parentFrame, PamSymbol pamSymbol) {
+	static public PamSymbol show(Window parentFrame, PamSymbol pamSymbol) {	
+		return show(parentFrame, pamSymbol, false);
+	}
+	
+	/**
+	 * Show the dialog at a default (or most recent) location
+	 * @param pamSymbol Existing Symbol
+	 * @return modified or new symbol
+	 */
+	static public PamSymbol show(Window parentFrame, PamSymbol pamSymbol, boolean lineOnly) {
 		if (pamSymbolDialog == null || parentFrame != pamSymbolDialog.getOwner()) {
-			pamSymbolDialog = new PamSymbolDialog(null);
+			pamSymbolDialog = new PamSymbolDialog(parentFrame);
 		}
 		if (pamSymbol == null) {
 			pamSymbol = new PamSymbol();
 		}
 		pamSymbolDialog.givenSymbol = pamSymbol.clone();
-		
 		pamSymbolDialog.fillCheckBox.setSelected(pamSymbol.isFill());
 		pamSymbolDialog.lineThickness.setValue(pamSymbol.getLineThickness());
 		pamSymbolDialog.symbolHeight.setValue(pamSymbol.getHeight());
@@ -232,9 +250,24 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 		pamSymbolDialog.lineColorChooser.setColor(pamSymbol.getLineColor());
 		pamSymbolDialog.fillColorChooser.setColor(pamSymbol.getFillColor());
 		pamSymbolDialog.enableControls();
+		pamSymbolDialog.setLineOnly(lineOnly);
 		pamSymbolDialog.setVisible(true);
 		return pamSymbolDialog.returnedSymbol;
 	}
+
+	private void setLineOnly(boolean lineOnly) {
+		this.lineOnly = lineOnly;
+		boolean shape = !lineOnly;
+		fillColorChooser.setVisible(shape);
+		fillColourPanel.setVisible(shape);
+		fillCheckBox.setVisible(shape);
+		symbolHeight.setVisible(shape);
+		symbolWidth.setVisible(shape);
+		widthLab.setVisible(shape);
+		heightLab.setVisible(shape);
+		symbolButton.setVisible(shape);
+	}
+
 
 	/*
 	 *  (non-Javadoc)
@@ -406,22 +439,28 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 			int w = getWidth();
 			int h = getHeight();
 			int size = Math.min(w, h) - 10;
-			// Draw it in the centre of the window and also a small one above it
-			givenSymbol.draw(g, new Point(w / 2, h / 2), size, size);
-			givenSymbol.draw(g, new Point(w / 2 - size / 2 + (int) givenSymbol.getWidth(), 
-					h / 2 - size / 2 - (int) givenSymbol.getHeight() / 2),
-					(int) givenSymbol.getWidth(), (int) givenSymbol.getHeight());
-			//			PamSymbol.draw(g, new Point(w / 2, h / 2), givenSymbol.getSymbol(),
-			//					size, size, givenSymbol.isFill(), givenSymbol
-			//							.getLineThickness(), givenSymbol.getFillColor(),
-			//					givenSymbol.getLineColor());
-			//			PamSymbol.draw(g, new Point(w / 2 - size / 2
-			//					+ givenSymbol.getIconWidth(), h / 2 - size / 2
-			//					- givenSymbol.getIconHeight() / 2),
-			//					givenSymbol.getSymbol(), givenSymbol.getIconWidth(),
-			//					givenSymbol.getIconHeight(), givenSymbol.isFill(),
-			//					givenSymbol.getLineThickness(), givenSymbol.getFillColor(),
-			//					givenSymbol.getLineColor());
+			if (lineOnly) {
+				Graphics2D g2d = (Graphics2D) g;
+				g2d.setStroke(new BasicStroke(givenSymbol.getLineThickness()));
+				Insets inset = getInsets();
+				int x = 0;
+				int y = 0;
+				if (inset != null) {
+					x = inset.left;
+					y = inset.top;
+					w -= (inset.right);
+					h -= (inset.bottom);
+				}
+				g2d.setColor(givenSymbol.getLineColor());
+				g2d.drawLine(x, y, w, h);
+			}
+			else {
+				// Draw it in the centre of the window and also a small one above it
+				givenSymbol.draw(g, new Point(w / 2, h / 2), size, size);
+				givenSymbol.draw(g, new Point(w / 2 - size / 2 + (int) givenSymbol.getWidth(), 
+						h / 2 - size / 2 - (int) givenSymbol.getHeight() / 2),
+						(int) givenSymbol.getWidth(), (int) givenSymbol.getHeight());
+			}
 		}
 	}
 

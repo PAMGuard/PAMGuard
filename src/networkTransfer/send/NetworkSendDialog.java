@@ -84,7 +84,7 @@ public class NetworkSendDialog extends PamDialog {
 
 		formatPanel.setParams();
 		queuePanel.setParams();
-		dataPanel.setParams(networkSendParams.sendingFormat);
+		dataPanel.setParams(networkSendParams.getSendingFormat());
 		netParamsPanel.setParams(networkSendParams);
 		tabbedPane.invalidate();
 		
@@ -288,32 +288,25 @@ public class NetworkSendDialog extends PamDialog {
 			
 
 		public void setParams() {
-			if (networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_BYTEARRAY) {
-				byteArray.setSelected(true);
-				jsonString.setSelected(false);
+			int sendFmt = networkSendParams.getSendingFormat();
+			
+			byteArray.setSelected((sendFmt & NetworkSendParams.NETWORKSEND_BYTEARRAY) != 0);
 
-			} 
+			jsonString.setSelected((sendFmt & NetworkSendParams.NETWORKSEND_JSON) != 0);	
 			
-			if (networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_JSON) {
-				byteArray.setSelected(false);
-				jsonString.setSelected(true);
-			}
-			
-			if(networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_BOTH) {
-				byteArray.setSelected(true);
-				jsonString.setSelected(true);
-			}
 		}
 
 		public boolean getParams() {
-			if (byteArray.isSelected() && !jsonString.isSelected()) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-			} else if (jsonString.isSelected() && !byteArray.isSelected()) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_JSON;
-			}else if(jsonString.isSelected() && byteArray.isSelected()) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BOTH;
-
-			}else {
+			int format = 0;
+			if (byteArray.isSelected()) {
+				format |= NetworkSendParams.NETWORKSEND_BYTEARRAY;
+			}
+			if (jsonString.isSelected()) {
+				format |= NetworkSendParams.NETWORKSEND_JSON;
+			}
+			networkSendParams.setSendingFormat(format);
+	
+			if (format == 0) {
 				return showWarning("Must select one or both of data format options :)");
 			}
 			return true;

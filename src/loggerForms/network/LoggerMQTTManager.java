@@ -108,7 +108,7 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 				}
 			});
 			
-			subsribeTopic("Hello/Logger/#", new LoggerNetworkReceiver() {
+			subsribeTopic("Logger/Hello/#", new LoggerNetworkReceiver() {
 				
 				@Override
 				public boolean newMessage(LoggerNetworkMessage message) {

@@ -2,6 +2,7 @@ package PamView.symbol;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
@@ -62,7 +63,22 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 	
 	private SymbolModifierPanel symbolModifierPanel;
 
+	private Window parent;
+
+
+	@Deprecated
 	public StandardSymbolOptionsPanel(StandardSymbolManager standardSymbolManager, StandardSymbolChooser standardSymbolChooser) {
+		this(null, standardSymbolManager, standardSymbolChooser);
+	}
+	
+	/**
+	 * Constructor for standard options panel. 
+	 * @param parent
+	 * @param standardSymbolManager
+	 * @param standardSymbolChooser
+	 */
+	public StandardSymbolOptionsPanel(Window parent, StandardSymbolManager standardSymbolManager, StandardSymbolChooser standardSymbolChooser) {
+		this.parent = parent;
 		this.standardSymbolManager = standardSymbolManager;
 		this.standardSymbolChooser = standardSymbolChooser;
 		dataBlock = standardSymbolManager.getPamDataBlock();
@@ -89,7 +105,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 //		if (annotationTypes.size() == 0) {
 //			optionButtons[StandardSymbolOptions.COLOUR_ANNOTATION].setVisible(false);
 //		}
-		symbolModifierPanel = new SymbolModifierPanel(standardSymbolChooser);
+		symbolModifierPanel = new SymbolModifierPanel(parent, standardSymbolChooser);
 
 		JPanel symbolPanel = new JPanel(new GridBagLayout());
 		symbolPanel.setBorder(new TitledBorder("Base Symbol"));
@@ -219,7 +235,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 	}
 
 	protected void choseSymbol() {
-		PamSymbol newSymbol = PamSymbolDialog.show(null, currentSymbol.clone());
+		PamSymbol newSymbol = PamSymbolDialog.show(parent, currentSymbol.clone(), standardSymbolManager.isLineOnly());
 		if (newSymbol != null) {
 			setCurrentSymbol(newSymbol);
 		}
