@@ -2,9 +2,7 @@ package rawDeepLearningClassifier.dataPlotFX;
 
 
 import PamView.symbol.modifier.SymbolModifierParams;
-import javafx.scene.paint.Color;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
-import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 
 /**
  * Parameters for colouring symbols by deep learning probability. 
@@ -74,42 +72,18 @@ public class DLSymbolModifierParams extends SymbolModifierParams {
 	public boolean showOnlyBinary = false;
 
 	/**
-	 * Set the default colours. 
-	 * @param num - the number of colours to set. 
+	 * Set the default colours. Note that these are shared with the prediction
+	 * display so that the same class has the same default colour on both.
+	 * @param num - the number of colours to set.
 	 */
 	public void setDefaultClassColors(int num) {
 		if (classColors==null || classColors.length<num) {
-			classColors = new int[32];
+			classColors = new int[Math.max(32, num)];
 		}
-		
+
 		//run through default colours
 		for (int i=0; i<classColors.length; i++) {
-			switch (i%8) {
-			case 0:
-				classColors[i]=PamUtilsFX.colorToInt(Color.RED);
-				break;
-			case 1:
-				classColors[i]=PamUtilsFX.colorToInt(Color.GREEN);
-				break;
-			case 2:
-				classColors[i]=PamUtilsFX.colorToInt(Color.BLUE);
-				break;
-			case 3:
-				classColors[i]=PamUtilsFX.colorToInt(Color.CYAN);
-				break;
-			case 4:
-				classColors[i]=PamUtilsFX.colorToInt(Color.MAGENTA);
-				break;
-			case 5:
-				classColors[i]=PamUtilsFX.colorToInt(Color.YELLOW);
-				break;
-			case 6:
-				classColors[i]=PamUtilsFX.colorToInt(Color.ORANGE);
-				break;
-			case 7:
-				classColors[i]=PamUtilsFX.colorToInt(Color.PURPLE);
-				break;
-			}
+			classColors[i]=DLClassColours.getClassColourInt(i);
 		}
 	}
 

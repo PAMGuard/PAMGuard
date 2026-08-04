@@ -713,6 +713,8 @@ public class TDGraphFX extends PamBorderPane {
 	private void clearChannelIterators() {
 		for (int i = 0; i < this.dataList.size(); i++) {
 			dataList.get(i).getDataBlock().clearChannelIterators();
+			// also drop the iterators the data info holds between repaints.
+			dataList.get(i).clearIteratorCache();
 		}
 	}
 
