@@ -139,8 +139,8 @@ public class SpectrogramNoiseProcess extends PamProcess {
 		}
 		
 		ThresholdParams p = (ThresholdParams) thresholdMethod.getParams();
-		if (p.finalOutput == SpectrogramThreshold.OUTPUT_RAW) {
-			thresholdMethod.pickEarlierData(fftData, newFFTUnit.getFftData());
+		if (noiseSettings.isRunMethod(methods.indexOf(thresholdMethod)) && p.finalOutput == SpectrogramThreshold.OUTPUT_RAW) {
+		    thresholdMethod.pickEarlierData(fftData, newFFTUnit.getFftData());
 		}
 		
 		// and output the data unit. 
