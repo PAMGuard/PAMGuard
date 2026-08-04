@@ -865,6 +865,9 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		networkReceiveParams = ((NetworkReceiveParams) pamControlledUnitSettings.getSettings()).clone();
+		networkReceiveParams.verifyCorrectPersistanceDirectory();
+		networkReceiveParams.checkBaseTopic();
+		networkReceiveParams.checkStationID();
 		return true;
 	}
 

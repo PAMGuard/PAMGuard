@@ -156,6 +156,23 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			networkSendParams.persistenceDirectory = persistenceDir;
 		}
 		
+		/*
+		 * In most contexts the persistence directory is just going to be pamguard home. 
+		 * With configs passed back and forth between windows and linux machines, just set the persistence dir to PG home if the filepath format is the wrong OS type
+		 * If the path is a windows-like path, and looks like it is a pamguard home path, make sure that it is the pamguard home path for the current machine
+		 * (annoying when a new user folder is created when a config is passed to a new computer)
+		 * 
+		 * If persistence directory is NOT set, then set it to pamguard home
+		 * If persistence directory is set, and the filepath is consistent with the current OS, and it is not a pamguard home-like directory, then move on
+		 */
+		networkSendParams.verifyCorrectPersistanceDirectory();
+		//Make it easy on users who may not know the details of MQTT -- if station ID is NOT set, then just set it to 'BaseStation' (the CAB/APS will set its ID to the pb###)
+		//If stationID is set, then move on
+		networkSendParams.checkStationID();
+		//Make it easy on users who may not know the details of MQTT -- if base topic is NOT set, then just set it to 'APS'
+		//If base topic is set, then move on.
+		networkSendParams.checkBaseTopic();
+		
 		/**
 		 * Do we need code here that will allow both ? 
 		 */
