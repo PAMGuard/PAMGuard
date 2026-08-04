@@ -8,10 +8,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.swing.SwingUtilities;
+
+import PamController.PamGUIManager;
+import javafx.application.Platform;
 
 import PamController.PamController;
 import PamUtils.PamCalendar;
@@ -195,10 +201,40 @@ public class CPODImporter {
 
 	/**
 	 * Run the tasks
-	 * @param task - the tasks. 
+	 * @param task - the tasks.
 	 */
 	public void runTasks(Task<Integer> task) {
 		this.exec.execute(task);
+	}
+
+
+	/**
+	 * Show a warning message to the user from the import thread.
+	 * <p>
+	 * Note that this must use the GUI aware version of WarnOnce.showWarning(...) - the version
+	 * which takes a parent window does nothing at all if that window is null. The dialog also
+	 * has to be created on the correct GUI thread, which is not the thread the import runs on.
+	 *
+	 * @param title - the dialog title.
+	 * @param message - the message to show. Use \n for line breaks - these are converted for
+	 * whichever type of dialog ends up being shown.
+	 */
+	private void showImportWarning(String title, String message) {
+		//always print to the console so there is a record of this even with no GUI at all.
+		System.out.println(title + ": " + message);
+
+		if (PamGUIManager.isFX()) {
+			Platform.runLater(() -> {
+				WarnOnce.showWarning(title, message, WarnOnce.WARNING_MESSAGE);
+			});
+		}
+		else {
+			//the Swing dialog wraps the message in html, so line breaks have to be html too.
+			String htmlMessage = message.replace("\n", "<br>");
+			SwingUtilities.invokeLater(() -> {
+				WarnOnce.showWarning(title, htmlMessage, WarnOnce.WARNING_MESSAGE);
+			});
+		}
 	}
 
 
@@ -235,7 +271,13 @@ public class CPODImporter {
 		 */
 		private CPODClickTrainDataBlock clickTrainDataBlock;
 
-		private ArrayList<CPODClick> cpodTrainList; 
+		private ArrayList<CPODClick> cpodTrainList;
+
+		/**
+		 * Files which we've already warned the user about, so that we only show a warning
+		 * once per file rather than once per chunk of imported data.
+		 */
+		private HashSet<String> warnedFiles = new HashSet<String>();
 
 		/**
 		 * 
@@ -256,10 +298,9 @@ public class CPODImporter {
 				BinaryDataSource binarySource = cpodDataBlock.getBinaryDataSource();
 				binaryStore = (BinaryStore) PamController.getInstance().findControlledUnit(BinaryStore.defUnitType);
 				if (binaryStore == null) {
-					String msg = "<html>Error: Can't convert CPOD files unless you have a Binary Storage module.<br>" + 
-							"Please close this dialog and add/configure a binary store first.</html>";
-					WarnOnce.showWarning(null, "CPOD Import",	msg, WarnOnce.OK_OPTION);
-					System.out.println("Can't convert CPOD files unless you have a binary storage module");
+					String msg = "Error: Can't convert CPOD files unless you have a Binary Storage module.\n"
+							+ "Please close this dialog and add/configure a binary store first.";
+					showImportWarning("CPOD Import", msg);
 					return null;
 				}
 
@@ -275,6 +316,19 @@ public class CPODImporter {
 					}
 
 					final int ii = i;
+
+					/*
+					 * Check the files are readable before we start. Any file which fails is set to
+					 * null so that the rest of the import carries on with whatever is left - e.g. if
+					 * the CP3 file is corrupt we can still import the CP1 detections, just without
+					 * the click train classifications.
+					 */
+					CPODFile cpodFile = cpxFile.get(i);
+					if (!checkFileOK(cpodFile.cp1File)) cpodFile.cp1File = null;
+					if (!checkFileOK(cpodFile.cp3File)) cpodFile.cp3File = null;
+					if (cpodFile.cp1File==null && cpodFile.cp3File==null) {
+						continue;
+					}
 
 					System.out.println(("Importing CPOD file: " + (ii+1) + "  " +cpxFile.get(i)));
 					this.updateMessage(("Importing CPOD file: " + (ii+1) + "  " +cpxFile.get(i).getName()));
@@ -359,10 +413,15 @@ public class CPODImporter {
 
 							data =  cpodDataBlock.getBinaryDataSource().getPackedData(click);
 							this.binaryStream.storeData(data.getObjectType(), click.getBasicData(), data);
-							nClicks++;
 						}
 
-						nClicks=nClicks+1; //so we start at the right click. 
+						/*
+						 * Move on to the click after the last one we read. Note that this counts the
+						 * clicks read out of the file, not the ones written to the binary store, since
+						 * it's an index into the file. 'from' is inclusive, so no +1 here - adding one
+						 * would silently drop a click at every chunk boundary.
+						 */
+						nClicks = nClicks + importClicksN;
 						cpodDataBlock.clearAll();
 
 					}
@@ -380,6 +439,33 @@ public class CPODImporter {
 		}
 
 
+
+		/**
+		 * Check that a CPOD or FPOD file can be imported and, if it can't, tell the user why.
+		 * The warning is only shown once per file.
+		 *
+		 * @param cpxFile - a CP1, CP3, FP1 or FP3 file. Can be null, in which case there is
+		 * simply no file of that type to import.
+		 * @return true if the file exists and holds valid data.
+		 */
+		private boolean checkFileOK(File cpxFile) {
+			if (cpxFile==null) {
+				return false;
+			}
+
+			String problem = CPODUtils.checkFileOK(cpxFile);
+			if (problem==null) {
+				return true;
+			}
+
+			if (warnedFiles.add(cpxFile.getAbsolutePath())) {
+				String msg = "The file " + cpxFile.getName() + " cannot be imported because " + problem + ".\n\n"
+						+ "This file will be skipped. Any other files, including the matching CP1/CP3 file, will still be imported.";
+				showImportWarning("CPOD Import", msg);
+			}
+
+			return false;
+		}
 
 		/**
 		 * Rounds millis to start of da=y

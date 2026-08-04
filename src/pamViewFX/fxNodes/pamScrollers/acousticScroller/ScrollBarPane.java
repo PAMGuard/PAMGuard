@@ -261,52 +261,43 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	private Pane createDragRectangle(){
 
-		double dragWidth=5; 
-		double lineInset=5; 
-		double minPixelWidth=10; 
+		double dragWidth=8;
+		double lineInset=4;
+		double minPixelWidth=10;
 
-		String cursorColour = "-fx-background-color: rgba(255, 255, 255, 0.5)";
+		//translucent dark grey body for the visible-range rectangle.
+		String bodyColour = "-fx-background-color: rgba(70, 70, 70, 0.45)";
+		//handles are a darker, more solid grey so they stand out as grab points.
+		String handleColour = "-fx-background-color: rgba(40, 40, 40, 0.75)";
 
-		Pane rectangle=new Pane(); 
+		Pane rectangle=new Pane();
 		//rectangle.setStrokeWidth(10);
 		rectangle.layoutYProperty().setValue(0);
 		rectangle.prefHeightProperty().bind(scrollBarPane.heightProperty());
-		rectangle.setStyle(cursorColour);
+		rectangle.setStyle(bodyColour);
 		rectangle.setPrefWidth(100);
 
-		//create two panes either side of this pane. 
+		//create two panes either side of this pane.
 		Pane leftDrag=new Pane();
 		leftDrag.setCursor(Cursor.W_RESIZE);
 		leftDrag.prefHeightProperty().bind(rectangle.heightProperty());
 		//the layout of the left rectangle is 0,0;
 		leftDrag.setPrefWidth(dragWidth);
-		leftDrag.setStyle(cursorColour); 
+		leftDrag.setStyle(handleColour);
 
-		//add line decoration to left drag. 
-		Line leftdragLine=new Line(); 
-		leftdragLine.startXProperty().bind(leftDrag.widthProperty().divide(2));
-		leftdragLine.startYProperty().setValue(5);
-		leftdragLine.endXProperty().bind(leftDrag.widthProperty().divide(2));
-		leftdragLine.endYProperty().bind(leftDrag.heightProperty().subtract(lineInset));
-
-		leftDrag.getChildren().add(leftdragLine); 
-		rectangle.getChildren().add(leftDrag); 
+		//add grip line decoration to left drag.
+		addGripLines(leftDrag, lineInset);
+		rectangle.getChildren().add(leftDrag);
 
 		Pane rightDrag=new Pane();
 		rightDrag.setCursor(Cursor.E_RESIZE);
 		rightDrag.prefHeightProperty().bind(rectangle.heightProperty());
 		rightDrag.layoutXProperty().bind(rectangle.widthProperty().subtract(rightDrag.widthProperty()));
 		rightDrag.setPrefWidth(dragWidth);
-		rightDrag.setStyle(cursorColour); 
-		//add line decoration to left drag. 
-		Line rightdragLine=new Line(); 
-		rightdragLine.startXProperty().bind(rightDrag.widthProperty().divide(2));
-		rightdragLine.startYProperty().setValue(5);
-		rightdragLine.endXProperty().bind(rightDrag.widthProperty().divide(2));
-		rightdragLine.endYProperty().bind(rightDrag.heightProperty().subtract(lineInset));
-
-		rightDrag.getChildren().add(rightdragLine); 
-		rectangle.getChildren().add(rightDrag); 
+		rightDrag.setStyle(handleColour);
+		//add grip line decoration to right drag.
+		addGripLines(rightDrag, lineInset);
+		rectangle.getChildren().add(rightDrag);
 
 		rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
 
@@ -435,6 +426,27 @@ public class ScrollBarPane extends PamBorderPane {
 	
 
 		return rectangle; 
+	}
+
+
+	/**
+	 * Add a pair of vertical grip lines to a drag handle so the resize handles are
+	 * more obvious to the user.
+	 * @param dragPane - the handle pane to decorate.
+	 * @param lineInset - the vertical inset of the lines from the top and bottom of the handle.
+	 */
+	private void addGripLines(Pane dragPane, double lineInset){
+		double offset = 1.8; //horizontal spacing of the grip lines either side of centre.
+		for (int i = -1; i <= 1; i += 2){
+			Line gripLine = new Line();
+			gripLine.setStroke(Color.rgb(235, 235, 235, 0.9));
+			gripLine.setStrokeWidth(1.4);
+			gripLine.startXProperty().bind(dragPane.widthProperty().divide(2).add(i*offset));
+			gripLine.startYProperty().setValue(lineInset);
+			gripLine.endXProperty().bind(dragPane.widthProperty().divide(2).add(i*offset));
+			gripLine.endYProperty().bind(dragPane.heightProperty().subtract(lineInset));
+			dragPane.getChildren().add(gripLine);
+		}
 	}
 
 

@@ -23,7 +23,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 
 	public int nChannels = 2;
 
-	public double voltsPeak2Peak = 5;
+	public double voltsPeak2Peak = 2;
 
 	private transient boolean isNetReceive;
 

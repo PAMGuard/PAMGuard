@@ -73,26 +73,17 @@ public class FPODReader {
 
 	public static FPODHeader readHeader(File cpFile) {
 
-		BufferedInputStream bis = null;
-		int bytesRead;
-		FileInputStream fileInputStream = null;
-		int totalBytes = 0;
-		try {
-			bis = new BufferedInputStream(fileInputStream = new FileInputStream(cpFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-
 		FPODHeader header = new FPODHeader();
-		try {
+
+		//try with resources so that the file is always closed, including when the header
+		//is too short to read.
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(cpFile))) {
 			if (readHeader(bis, header) != FPOD_HEADER) {
 				return null;
 			}
-			bis.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 
 		return header;
@@ -379,7 +370,10 @@ public class FPODReader {
 
 							fpodClick.setMinute(nMinutes);
 
-							if (from<0 || (nClicks>from && nClicks<(from+maxNum))) {
+							//note that 'from' is inclusive - the click at index 'from' is the first one we want.
+							//this must match CPODReader.importCPODFile, since CPODImporter chunks both
+							//through the same loop.
+							if (from<0 || (nClicks>=from && (long) nClicks < (long) from+maxNum)) {
 								//add the click to the FPODdata.
 								fpodData.add(fpodClick);
 							}

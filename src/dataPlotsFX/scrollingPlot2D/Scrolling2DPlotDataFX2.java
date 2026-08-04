@@ -1,6 +1,7 @@
 package dataPlotsFX.scrollingPlot2D;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -33,6 +34,16 @@ import pamViewFX.fxNodes.pamAxis.PamAxisFX;
  * tiles up to half the visible range either side so that small scrolls show no
  * loading.
  * <p>
+ * A change of visible time range does not necessarily throw the images away. Each
+ * tile carries the geometry it was built with, so it can be drawn at any scale.
+ * Moderate changes of range are absorbed without touching the tiles at all (see
+ * {@link #TILE_SPAN_TOLERANCE}); a change big enough to alter the rendered
+ * resolution retires the tiles to a draw-only store where they carry on being
+ * displayed, scaled, until new tiles cover the same time (see
+ * {@link #MAX_RETAIN_SCALE}). Only a very large change discards everything. This
+ * matters most in real time, where nothing re-loads old data, so a discarded image
+ * leaves the display blank until new data arrive.
+ * <p>
  * This class is a drop-in replacement for {@link Scrolling2DPlotDataFX}: it extends
  * it (so it fits the existing {@code Scrolling2DPlotDataFX[]} arrays and
  * {@code makeScrolling2DPlotData} factory) and overrides the full public surface
@@ -55,6 +66,26 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	 * budget used by the single-image base class.
 	 */
 	private static final long MAXSTORAGESIZE = 50 * 1024 * 1024;
+
+	/** Max total storage for retained (stale-geometry) tiles, in bytes. */
+	private static final long MAXLEGACYSIZE = MAXSTORAGESIZE / 2;
+
+	/**
+	 * How far the ideal tile span may drift from the current tile span before the
+	 * tiling is rebuilt. Tile span only affects how the data is chopped up, not the
+	 * rendered resolution (that is set by the time compression), so as long as the
+	 * tiles are within this factor of the ideal size for the visible range they are
+	 * kept exactly as they are and simply drawn at the new scale.
+	 */
+	private static final double TILE_SPAN_TOLERANCE = 4.;
+
+	/**
+	 * Maximum change in rendered resolution (millis per image pixel) over which
+	 * existing tile images are retained and re-drawn at the new scale. Beyond this
+	 * the images are too coarse (or too over-sampled) to be worth keeping and are
+	 * discarded, as they were before retention was added.
+	 */
+	private static final double MAX_RETAIN_SCALE = 4.;
 
 	/** Max width of a single tile image in pixels (some graphics cards dislike huge images). */
 	private static final int MAXIMAGESIZE = 3092;
@@ -94,6 +125,17 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	/** The tiles, keyed by tile index ({@code floor(absTimeMillis / tileMillis)}). */
 	private final TreeMap<Long, SpecTile> tiles = new TreeMap<>();
 
+	/**
+	 * Tiles built with an older geometry (tile span and/or time compression), kept
+	 * for drawing only. When the visible time range changes the tiling has to be
+	 * rebuilt, but the images themselves are still perfectly good data - they are
+	 * simply drawn at whatever scale the new time axis demands until fresh tiles
+	 * cover the same time (which in real time means as new data arrive, and in
+	 * viewer mode as the re-order completes). They take no part in load-state
+	 * tracking. Oldest generation first, so newer images draw on top.
+	 */
+	private final List<SpecTile> legacyTiles = new ArrayList<>();
+
 	/** Number of vertical bins (= fftLength/2 for a spectrogram). */
 	private int dataWidth;
 
@@ -117,6 +159,9 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 	/** Max number of tiles to keep in memory. */
 	private int maxTiles = 64;
+
+	/** Visible time range (millis) the tile memory budget was last worked out for. */
+	private double lastVisibleMillis = -1;
 
 	/** Tile holding the in-progress (un-finalised) accumulation column. */
 	private SpecTile pendingTile;
@@ -164,11 +209,26 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 	/**
 	 * A single spectrogram tile covering a fixed span of absolute time.
+	 * <p>
+	 * A tile keeps a copy of the geometry it was built with (span, image width, bin
+	 * count, compression) rather than reading the enclosing class's current values.
+	 * That way a tile built for one visible time range can still be drawn correctly
+	 * (just at a different scale) after the display resolution has changed.
 	 */
 	private class SpecTile {
 		final long tileIndex;
 		final long startMillis;
 		final long endMillis;
+		/** Time span of this tile, in millis (the {@code tileMillis} it was built with). */
+		final long spanMillis;
+		/** Width of this tile's image, in pixels. */
+		final int imgWidth;
+		/** Number of frequency bins (image height) of this tile. */
+		final int nBins;
+		/** Number of FFT slices this tile spans. */
+		final int slices;
+		/** Number of FFT slices averaged into one column of this tile. */
+		final int compression;
 		final WritableImage image;
 		final PixelWriter writer;
 		/** Averaged scaled-dB values per [column][bin], retained for re-colouring. */
@@ -186,13 +246,28 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 		SpecTile(long tileIndex) {
 			this.tileIndex = tileIndex;
-			this.startMillis = tileIndex * tileMillis;
-			this.endMillis = startMillis + tileMillis;
-			this.image = new WritableImage(Math.max(1, tileImgWidth), Math.max(1, dataWidth));
+			this.spanMillis = tileMillis;
+			this.imgWidth = Math.max(1, tileImgWidth);
+			this.nBins = Math.max(1, dataWidth);
+			this.slices = Math.max(1, tileSlices);
+			this.compression = Math.max(1, timeCompression);
+			this.startMillis = tileIndex * spanMillis;
+			this.endMillis = startMillis + spanMillis;
+			this.image = new WritableImage(imgWidth, nBins);
 			this.writer = image.getPixelWriter();
-			this.colData = new short[tileImgWidth][dataWidth];
-			this.colWritten = new boolean[tileImgWidth];
-			this.accum = new double[dataWidth];
+			this.colData = new short[imgWidth][nBins];
+			this.colWritten = new boolean[imgWidth];
+			this.accum = new double[nBins];
+		}
+
+		/** Approximate memory used by this tile (image + power store), in bytes. */
+		long byteSize() {
+			return (long) imgWidth * nBins * 6L;
+		}
+
+		/** The rendered resolution of this tile - millis of data per image pixel. */
+		double millisPerPixel() {
+			return spanMillis / (double) imgWidth;
 		}
 	}
 
@@ -252,21 +327,143 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 		}
 		long newTileMillis = Math.max(1, Math.round(slices * newTimeScale * 1000.));
 
-		boolean changed = newDataWidth != dataWidth || newTimeScale != timeScale
-				|| newComp != timeCompression || newTileMillis != tileMillis;
+		// A change of data width or FFT rate invalidates the images themselves; a change
+		// of time compression changes the resolution they are rendered at; a change of
+		// tile span only changes where the tile boundaries fall.
+		boolean dataChanged = newDataWidth != dataWidth || newTimeScale != timeScale;
+		boolean compChanged = newComp != timeCompression;
+		boolean spanChanged = newTileMillis != tileMillis;
+		boolean configured = tileMillis > 0 && dataWidth > 0;
 
-		if (changed) {
-			synchronized (tileLock) {
-				this.dataWidth = newDataWidth;
-				this.hopSamples = newHop;
-				this.timeScale = newTimeScale;
-				this.timeCompression = newComp;
-				this.tileSlices = slices;
-				this.tileImgWidth = imgW;
-				this.tileMillis = newTileMillis;
-				clearTiles();
-				computeMaxTiles(visibleMillis);
+		if (!dataChanged && !compChanged && !spanChanged) {
+			checkMaxTiles(visibleMillis);
+			return;
+		}
+
+		if (!dataChanged && !compChanged && configured) {
+			// Only the ideal tile span has moved (i.e. the visible range changed but not
+			// enough to alter the time compression). The existing tiles hold data at
+			// exactly the right resolution and simply need drawing across a different
+			// number of pixels, so leave everything alone as long as the tiles are still
+			// a sensible size for the new range. This is what stops the whole image being
+			// thrown away every time the user nudges the visible time range.
+			double spanRatio = (double) newTileMillis / (double) tileMillis;
+			if (spanRatio <= TILE_SPAN_TOLERANCE && spanRatio >= 1. / TILE_SPAN_TOLERANCE) {
+				checkMaxTiles(visibleMillis);
+				return;
 			}
+		}
+
+		synchronized (tileLock) {
+			// checkConfig() is called from both the data thread and the FX thread, so
+			// re-check inside the lock: another thread may have applied the same change
+			// already and we must not throw its new tiles away.
+			if (newDataWidth == dataWidth && newTimeScale == timeScale && newComp == timeCompression
+					&& newTileMillis == tileMillis) {
+				computeMaxTiles(visibleMillis);
+				lastVisibleMillis = visibleMillis;
+				return;
+			}
+
+			// Can the existing images be kept (drawn at the new scale) while the new
+			// tiling fills in? Only if they are still valid data at a comparable
+			// resolution - a huge change of visible range makes them useless, in which
+			// case everything is discarded as it always was.
+			double scaleRatio = (timeCompression > 0) ? (double) newComp / (double) timeCompression : Double.MAX_VALUE;
+			boolean retain = !dataChanged && configured && scaleRatio <= MAX_RETAIN_SCALE
+					&& scaleRatio >= 1. / MAX_RETAIN_SCALE;
+			if (retain) {
+				retireTiles();
+			}
+			else {
+				legacyTiles.clear();
+			}
+
+			this.dataWidth = newDataWidth;
+			this.hopSamples = newHop;
+			this.timeScale = newTimeScale;
+			this.timeCompression = newComp;
+			this.tileSlices = slices;
+			this.tileImgWidth = imgW;
+			this.tileMillis = newTileMillis;
+			clearTiles();
+			computeMaxTiles(visibleMillis);
+			lastVisibleMillis = visibleMillis;
+			pruneLegacy();
+		}
+	}
+
+	/**
+	 * Move the current tiles into the legacy (draw only) store so that they carry on
+	 * being shown, scaled to the new time axis, until new tiles cover the same time.
+	 * Must be called with {@link #tileLock} held and before the tiles are cleared.
+	 */
+	private void retireTiles() {
+		flushAccum(pendingTile, true);
+		for (SpecTile tile : tiles.values()) {
+			if (tile.hasData) {
+				legacyTiles.add(tile);
+			}
+		}
+	}
+
+	/**
+	 * Drop legacy tiles which are no longer worth keeping - either rendered at a very
+	 * different resolution to the current tiling, or over the legacy memory budget
+	 * (oldest generation dropped first). Must be called with {@link #tileLock} held.
+	 */
+	private void pruneLegacy() {
+		if (legacyTiles.isEmpty()) {
+			return;
+		}
+		double mPerPix = (tileImgWidth > 0) ? tileMillis / (double) tileImgWidth : 0;
+		if (mPerPix > 0) {
+			for (int i = legacyTiles.size() - 1; i >= 0; i--) {
+				double ratio = legacyTiles.get(i).millisPerPixel() / mPerPix;
+				if (ratio > MAX_RETAIN_SCALE || ratio < 1. / MAX_RETAIN_SCALE) {
+					legacyTiles.remove(i);
+				}
+			}
+		}
+		long bytes = 0;
+		for (SpecTile tile : legacyTiles) {
+			bytes += tile.byteSize();
+		}
+		while (bytes > MAXLEGACYSIZE && !legacyTiles.isEmpty()) {
+			bytes -= legacyTiles.remove(0).byteSize();
+		}
+	}
+
+	/**
+	 * Drop legacy tiles which are well outside the window being drawn. Called from
+	 * the draw, which is the only place the current scroll position is known. Must be
+	 * called with {@link #tileLock} held.
+	 */
+	private void pruneLegacyByTime(double scrollStart, double visibleMillis) {
+		if (legacyTiles.isEmpty() || visibleMillis <= 0) {
+			return;
+		}
+		double keepStart = scrollStart - visibleMillis;
+		double keepEnd = scrollStart + 2 * visibleMillis;
+		for (int i = legacyTiles.size() - 1; i >= 0; i--) {
+			SpecTile tile = legacyTiles.get(i);
+			if (tile.endMillis < keepStart || tile.startMillis > keepEnd) {
+				legacyTiles.remove(i);
+			}
+		}
+	}
+
+	/**
+	 * Update the tile memory budget if the visible range has changed, without
+	 * touching the tiles themselves.
+	 */
+	private void checkMaxTiles(double visibleMillis) {
+		if (visibleMillis == lastVisibleMillis) {
+			return;
+		}
+		synchronized (tileLock) {
+			computeMaxTiles(visibleMillis);
+			lastVisibleMillis = visibleMillis;
 		}
 	}
 
@@ -333,11 +530,11 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 		if (slice < 0) {
 			slice = 0;
 		}
-		if (slice >= tileSlices) {
-			slice = tileSlices - 1;
+		if (slice >= tile.slices) {
+			slice = tile.slices - 1;
 		}
-		int col = slice / timeCompression;
-		if (col < 0 || col >= tileImgWidth) {
+		int col = slice / tile.compression;
+		if (col < 0 || col >= tile.imgWidth) {
 			return;
 		}
 
@@ -351,7 +548,7 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 		double[] magData = fftDataUnit.getMagnitudeData();
 		if (magData != null) {
-			int n = Math.min(dataWidth, magData.length);
+			int n = Math.min(tile.nBins, magData.length);
 			for (int i = 0; i < n; i++) {
 				int idx = reverse ? n - 1 - i : i;
 				tile.accum[i] += magData[idx];
@@ -369,19 +566,19 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	 *                 false for a preview flush that leaves accumulation running.
 	 */
 	private void flushAccum(SpecTile tile, boolean finalise) {
-		if (tile == null || tile.accumCount == 0 || tile.accumCol < 0 || tile.accumCol >= tileImgWidth) {
+		if (tile == null || tile.accumCount == 0 || tile.accumCol < 0 || tile.accumCol >= tile.imgWidth) {
 			return;
 		}
 		int col = tile.accumCol;
-		for (int i = 0; i < dataWidth; i++) {
+		for (int i = 0; i < tile.nBins; i++) {
 			double avg = tile.accum[i] / tile.accumCount;
-			tile.writer.setColor(col, dataWidth - 1 - i, specColors.getColours(avg));
+			tile.writer.setColor(col, tile.nBins - 1 - i, specColors.getColours(avg));
 			tile.colData[col][i] = (short) (avg * DECIBEL_INT_SCALE);
 		}
 		tile.colWritten[col] = true;
 		tile.hasData = true;
 		if (finalise) {
-			for (int i = 0; i < dataWidth; i++) {
+			for (int i = 0; i < tile.nBins; i++) {
 				tile.accum[i] = 0;
 			}
 			tile.accumCount = 0;
@@ -473,6 +670,8 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	public void resetForLoad(boolean newWritableImage) {
 		synchronized (tileLock) {
 			clearTiles();
+			// a reset means start again from scratch, so the retained images go too.
+			legacyTiles.clear();
 			setLastPowerSpecTime(0);
 		}
 		if (newWritableImage) {
@@ -487,7 +686,7 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			PamAxisFX timeAxis, double scrollStart, boolean wrap) {
 
 		synchronized (tileLock) {
-			if (dataWidth <= 0 || tileMillis <= 0 || tiles.isEmpty()) {
+			if (dataWidth <= 0 || tileMillis <= 0 || (tiles.isEmpty() && legacyTiles.isEmpty())) {
 				return;
 			}
 
@@ -549,51 +748,60 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 			double wrapPix = (wrap && specPlotInfo != null) ? specPlotInfo.getTDGraph().getWrapPix() : 0;
 
-			for (SpecTile tile : tiles.values()) {
-				if (!tile.hasData) {
-					continue;
-				}
-				if (!wrap) {
-					// Snap both tile edges to whole pixels using the same time->pixel
-					// mapping. Because one tile's end time equals the next tile's start
-					// time, their shared edge rounds to the same integer pixel, so the
-					// tiles abut exactly with no sub-pixel gap (which would otherwise show
-					// as a dark line of background between the images).
-					double leftEdge = Math.round((tile.startMillis - scrollStart) * tScalePixPerMs);
-					double rightEdge = Math.round((tile.endMillis - scrollStart) * tScalePixPerMs);
-					if (rightEdge < 0 || leftEdge > timePixels) {
+			// forget any retained images which have scrolled well out of the way.
+			pruneLegacyByTime(scrollStart, visibleMillis);
+
+			// Two passes: the retained (old geometry) images first, then the current
+			// tiles over the top of them. A current tile is transparent wherever it has
+			// no data yet, so the retained image shows through until it is replaced.
+			for (int pass = 0; pass < 2; pass++) {
+				Collection<SpecTile> passTiles = (pass == 0) ? legacyTiles : tiles.values();
+				for (SpecTile tile : passTiles) {
+					if (!tile.hasData) {
 						continue;
 					}
-					drawTilePiece(g2d, tile, 0, tileImgWidth, leftEdge, rightEdge - leftEdge, freqBinRange[1],
-							freqWidth, imageFP1, imageFP2);
-				}
-				else {
-					// in wrap mode only the most recent visible window of data is valid.
-					if (tile.endMillis <= scrollStart || tile.startMillis >= scrollStart + visibleMillis) {
-						continue;
-					}
-					double leftEdge = Math.round(wrapPix + (tile.startMillis - scrollStart) * tScalePixPerMs);
-					double rightEdge = Math.round(wrapPix + (tile.endMillis - scrollStart) * tScalePixPerMs);
-					double w = rightEdge - leftEdge;
-					if (w <= 0) {
-						continue;
-					}
-					double s0 = leftEdge % timePixels;
-					if (s0 < 0) {
-						s0 += timePixels;
-					}
-					if (s0 + w <= timePixels) {
-						drawTilePiece(g2d, tile, 0, tileImgWidth, s0, w, freqBinRange[1], freqWidth, imageFP1,
-								imageFP2);
+					if (!wrap) {
+						// Snap both tile edges to whole pixels using the same time->pixel
+						// mapping. Because one tile's end time equals the next tile's start
+						// time, their shared edge rounds to the same integer pixel, so the
+						// tiles abut exactly with no sub-pixel gap (which would otherwise show
+						// as a dark line of background between the images).
+						double leftEdge = Math.round((tile.startMillis - scrollStart) * tScalePixPerMs);
+						double rightEdge = Math.round((tile.endMillis - scrollStart) * tScalePixPerMs);
+						if (rightEdge < 0 || leftEdge > timePixels) {
+							continue;
+						}
+						drawTilePiece(g2d, tile, 0, tile.imgWidth, leftEdge, rightEdge - leftEdge, freqBinRange[1],
+								freqWidth, imageFP1, imageFP2);
 					}
 					else {
-						double firstW = timePixels - s0;
-						double frac = firstW / w;
-						double srcSplit = frac * tileImgWidth;
-						drawTilePiece(g2d, tile, 0, srcSplit, s0, firstW, freqBinRange[1], freqWidth, imageFP1,
-								imageFP2);
-						drawTilePiece(g2d, tile, srcSplit, tileImgWidth - srcSplit, 0, w - firstW, freqBinRange[1],
-								freqWidth, imageFP1, imageFP2);
+						// in wrap mode only the most recent visible window of data is valid.
+						if (tile.endMillis <= scrollStart || tile.startMillis >= scrollStart + visibleMillis) {
+							continue;
+						}
+						double leftEdge = Math.round(wrapPix + (tile.startMillis - scrollStart) * tScalePixPerMs);
+						double rightEdge = Math.round(wrapPix + (tile.endMillis - scrollStart) * tScalePixPerMs);
+						double w = rightEdge - leftEdge;
+						if (w <= 0) {
+							continue;
+						}
+						double s0 = leftEdge % timePixels;
+						if (s0 < 0) {
+							s0 += timePixels;
+						}
+						if (s0 + w <= timePixels) {
+							drawTilePiece(g2d, tile, 0, tile.imgWidth, s0, w, freqBinRange[1], freqWidth, imageFP1,
+									imageFP2);
+						}
+						else {
+							double firstW = timePixels - s0;
+							double frac = firstW / w;
+							double srcSplit = frac * tile.imgWidth;
+							drawTilePiece(g2d, tile, 0, srcSplit, s0, firstW, freqBinRange[1], freqWidth, imageFP1,
+									imageFP2);
+							drawTilePiece(g2d, tile, srcSplit, tile.imgWidth - srcSplit, 0, w - firstW,
+									freqBinRange[1], freqWidth, imageFP1, imageFP2);
+						}
 					}
 				}
 			}
@@ -613,12 +821,19 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	/**
 	 * Draw a (sub-)rectangle of a tile image to the screen. {@code srcX}/{@code srcW}
 	 * are in tile-image pixels (time axis); the vertical range uses the same bin
-	 * coordinates as the single-image base class.
+	 * coordinates as the single-image base class. The vertical coordinates are given
+	 * in current-{@code dataWidth} bins and scaled to the tile's own bin count, so
+	 * that a retained tile built with a different data width still draws correctly.
 	 */
 	private void drawTilePiece(GraphicsContext g2d, SpecTile tile, double srcX, double srcW, double destX,
 			double destW, double srcY, double srcH, double destY, double destH) {
 		if (srcW <= 0 || destW <= 0) {
 			return;
+		}
+		if (tile.nBins != dataWidth && dataWidth > 0) {
+			double binScale = tile.nBins / (double) dataWidth;
+			srcY *= binScale;
+			srcH *= binScale;
 		}
 		g2d.drawImage(tile.image, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
 	}
@@ -651,17 +866,22 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			if (dataWidth <= 0) {
 				return false;
 			}
-			for (SpecTile tile : tiles.values()) {
-				if (task != null && task.isCancelled()) {
-					return false;
-				}
-				for (int col = 0; col < tileImgWidth; col++) {
-					if (!tile.colWritten[col]) {
-						continue;
+			// retained tiles are recoloured too, else they would be left showing the old
+			// colour map / amplitude scale until they are replaced.
+			for (int pass = 0; pass < 2; pass++) {
+				Collection<SpecTile> passTiles = (pass == 0) ? legacyTiles : tiles.values();
+				for (SpecTile tile : passTiles) {
+					if (task != null && task.isCancelled()) {
+						return false;
 					}
-					for (int i = 0; i < dataWidth; i++) {
-						double avg = tile.colData[col][i] / DECIBEL_INT_SCALE;
-						tile.writer.setColor(col, dataWidth - 1 - i, specColors.getColours(avg));
+					for (int col = 0; col < tile.imgWidth; col++) {
+						if (!tile.colWritten[col]) {
+							continue;
+						}
+						for (int i = 0; i < tile.nBins; i++) {
+							double avg = tile.colData[col][i] / DECIBEL_INT_SCALE;
+							tile.writer.setColor(col, tile.nBins - 1 - i, specColors.getColours(avg));
+						}
 					}
 				}
 			}

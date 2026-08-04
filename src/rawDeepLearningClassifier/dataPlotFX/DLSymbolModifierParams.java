@@ -109,7 +109,6 @@ public class DLSymbolModifierParams extends SymbolModifierParams {
 			case 7:
 				classColors[i]=PamUtilsFX.colorToInt(Color.PURPLE);
 				break;
-
 			}
 		}
 	}

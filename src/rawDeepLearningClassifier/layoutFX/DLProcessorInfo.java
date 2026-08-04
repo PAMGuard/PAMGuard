@@ -11,12 +11,13 @@ import javafx.scene.paint.Color;
  * accent colours for display in the user interface.
  * <p>
  * The deep learning models are loaded by the underlying <a
- * href="https://djl.ai">Deep Java Library (DJL)</a> engine onto its default
- * device. The default device is a CUDA capable graphics card (GPU) if one is
- * available, otherwise the computer's main processor (CPU). DJL does not
- * currently expose Apple's Neural Engine / Metal devices, so on Apple Silicon
- * Macs models run on the CPU cores of the Apple chip - this is reported
- * explicitly so the user is not misled into thinking the Neural Engine is used.
+ * href="https://djl.ai">Deep Java Library (DJL)</a> engine. On most platforms
+ * the default device is a CUDA capable graphics card (GPU) if one is available,
+ * otherwise the computer's main processor (CPU). On Apple Silicon Macs PyTorch
+ * models are loaded onto the Apple GPU using Metal Performance Shaders (MPS),
+ * which is much faster than the CPU for large models; TensorFlow models run on
+ * the CPU there because the bundled TensorFlow library has no Metal support. The
+ * Apple Neural Engine is not used by either engine.
  *
  * @author Jamie Macaulay
  */
@@ -114,12 +115,27 @@ public class DLProcessorInfo {
 				info.detail = "Hardware accelerated on the Apple Silicon GPU using "
 						+ "Metal Performance Shaders (MPS).";
 			} else if (isAppleSilicon()) {
-				info.processorType = ProcessorType.APPLE_SILICON;
-				info.iconString = "mdi2a-apple";
-				info.accentColor = Color.web("#E0E0E0");
-				info.friendlyName = "Apple Silicon CPU";
-				info.detail = "Running on the CPU cores of the Apple Silicon chip. "
-						+ "The Apple Neural Engine is not used by the deep learning engine.";
+				//DJL's default device on Apple Silicon is the CPU, but PyTorch models are
+				//explicitly loaded onto the Apple GPU (MPS) - see jdl4pam's model loaders.
+				//TensorFlow has no Metal support so those models run on the CPU.
+				boolean pyTorch = info.engineName != null && info.engineName.toLowerCase().contains("pytorch");
+				if (pyTorch) {
+					info.processorType = ProcessorType.MPS;
+					info.iconString = "mdi2a-apple";
+					info.accentColor = Color.web("#CE93D8");
+					info.friendlyName = "Apple GPU (Metal / MPS)";
+					info.detail = "PyTorch models run on the Apple Silicon GPU using Metal "
+							+ "Performance Shaders (MPS), with an automatic fall back to the CPU "
+							+ "if a model cannot run on the GPU.";
+				} else {
+					info.processorType = ProcessorType.APPLE_SILICON;
+					info.iconString = "mdi2a-apple";
+					info.accentColor = Color.web("#E0E0E0");
+					info.friendlyName = "Apple Silicon CPU";
+					info.detail = "Running on the CPU cores of the Apple Silicon chip. This "
+							+ "engine (e.g. TensorFlow) has no Apple GPU support. The Apple "
+							+ "Neural Engine is not used.";
+				}
 			} else {
 				info.processorType = ProcessorType.CPU;
 				info.iconString = "mdi2c-cpu-64-bit";

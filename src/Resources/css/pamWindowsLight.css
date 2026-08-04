@@ -34,7 +34,24 @@
  * keep the two section structures in sync when editing.
  */
 
-.root {
+/*
+ * The Windows palette is declared on '.root, .gui-css-root' rather than on '.root'
+ * alone. This sheet is attached two ways: to a Scene (dialogs, main GUI), where
+ * '.root' matches the scene root, AND node-by-node to individual content nodes of
+ * the time display (see TDDisplayFX.addGUICSS - it must not cascade into the graph
+ * hiding panes). A '.root' selector only matches a node carrying the 'root' style
+ * class (the scene root), so when the sheet is attached to an ordinary content node
+ * every '-win-*' lookup would fail to resolve and JavaFX floods the log with
+ * "Could not resolve '-win-foreground'" warnings and String->Paint cast errors.
+ * TDDisplayFX.addGUICSS adds the 'gui-css-root' style class to each decorated node,
+ * so the palette resolves there too. NB: do NOT use the universal '*' selector for
+ * this - that would define the palette on every node and shadow the dark-mode
+ * override (pamWindowsDark.css) which redefines the palette on '.root' and relies
+ * on descendants resolving it from the nearest ancestor. The actual paint
+ * properties (-fx-background-color / -fx-text-fill) stay under '.root' below so
+ * they are not forced onto every node.
+ */
+.root, .gui-css-root {
     /* ---- Windows palette as looked-up colours ---- */
     -win-background:            #f0f0f0;
     -win-foreground:            #000000;
@@ -81,13 +98,18 @@
     -fx-mark-highlight-color:        transparent;
     -fx-shadow-highlight-color:      transparent;
 
-    -fx-background-color: -win-background;
-    -fx-text-fill: -win-foreground;
-
     /* legacy PAMGuard names, kept for panes that reference them */
     -fx-icon_col: #4d4d4d;
     -icons-color: -fx-icon_col;
     -fx-disabled-opacity: 0.6;
+}
+
+/* Paint the scene root only. These are actual painted properties (not lookups), so
+   they must stay scoped to '.root' - adding them to the palette selector above would
+   force a grey background and black text onto every node the sheet decorates. */
+.root {
+    -fx-background-color: -win-background;
+    -fx-text-fill: -win-foreground;
 }
 
 .text {
@@ -203,6 +225,32 @@
 
 .button:default:hover {
     -fx-background-color: -win-accent, -win-hover-face;
+}
+
+/* Opaque, square icon button used in the acoustic scroller strip. Like the
+   normal .button it keeps the 1px border line (outer background layer + 1px
+   inset), but with an opaque panel-coloured face and no size/border change on
+   focus, so the scroll arrows sit flush against the scroll bar while staying
+   visually delineated. Windows buttons are already square. Sizing/padding is
+   left to .icon-button, which these buttons also carry. Declared after the
+   .button rules so it wins on equal specificity. */
+.opaque-button-square {
+    -fx-background-color: -win-button-border, -win-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-effect: null;
+}
+
+.opaque-button-square:hover {
+    -fx-background-color: -win-accent, -win-hover-face;
+}
+
+.opaque-button-square:focused {
+    -fx-background-color: -win-accent, -win-background;
+}
+
+.opaque-button-square:armed {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
 }
 
 .button:default:armed {

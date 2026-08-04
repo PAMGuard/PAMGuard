@@ -33,7 +33,24 @@
  * on Windows, system font 13px on macOS) matches the FlatLaf defaults.
  */
 
-.root {
+/*
+ * The FlatLaf palette is declared on '.root, .gui-css-root' rather than on '.root'
+ * alone. This sheet is attached two ways: to a Scene (dialogs, main GUI), where
+ * '.root' matches the scene root, AND node-by-node to individual content nodes of
+ * the time display (see TDDisplayFX.addGUICSS - it must not cascade into the graph
+ * hiding panes). A '.root' selector only matches a node carrying the 'root' style
+ * class (the scene root), so when the sheet is attached to an ordinary content node
+ * every '-flat-*' lookup would fail to resolve and JavaFX floods the log with
+ * "Could not resolve '-flat-foreground'" warnings and String->Paint cast errors.
+ * TDDisplayFX.addGUICSS adds the 'gui-css-root' style class to each decorated node,
+ * so the palette resolves there too. NB: do NOT use the universal '*' selector for
+ * this - that would define the palette on every node and shadow the dark-mode
+ * override (pamFlatLafDark.css) which redefines the palette on '.root' and relies
+ * on descendants resolving it from the nearest ancestor. The actual paint
+ * properties (-fx-background-color / -fx-text-fill) stay under '.root' below so
+ * they are not forced onto every node.
+ */
+.root, .gui-css-root {
     /* ---- FlatLaf palette as looked-up colours (usable everywhere) ---- */
     -flat-background:            #f2f2f2;
     -flat-foreground:            #000000;
@@ -81,14 +98,19 @@
     -fx-mark-highlight-color:        transparent;
     -fx-shadow-highlight-color:      transparent;
 
-    -fx-background-color: -flat-background;
-    -fx-text-fill: -flat-foreground;
-
     /* legacy PAMGuard names, kept for panes that reference them.
        Dark grey to match the FlatLaf Swing icon colour. */
     -fx-icon_col: #4d4d4d;
     -icons-color: -fx-icon_col;
     -fx-disabled-opacity: 0.6;
+}
+
+/* Paint the scene root only. These are actual painted properties (not lookups), so
+   they must stay scoped to '.root' - adding them to the palette selector above would
+   force a grey background and black text onto every node the sheet decorates. */
+.root {
+    -fx-background-color: -flat-background;
+    -fx-text-fill: -flat-foreground;
 }
 
 .text {
@@ -205,6 +227,32 @@
     -fx-text-fill: -flat-foreground;
 }
 
+/* Opaque, square icon button used in the acoustic scroller strip. Like the
+   normal .button it keeps the 1px border line (outer background layer + 1px
+   inset), but with square corners, an opaque panel-coloured face and no
+   size/border change on focus, so the scroll arrows sit flush against the
+   scroll bar while staying visually delineated. Sizing/padding is left to
+   .icon-button, which these buttons also carry. Declared after the .button
+   rules so it wins on equal specificity. */
+.opaque-button-square {
+    -fx-background-color: -flat-border, -flat-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-effect: null;
+}
+
+.opaque-button-square:hover {
+    -fx-background-color: -flat-focused-border, -flat-pressed;
+}
+
+.opaque-button-square:focused {
+    -fx-background-color: -flat-focused-border, -flat-background;
+}
+
+.opaque-button-square:armed {
+    -fx-background-color: -flat-focused-border, -flat-selected;
+}
+
 .button:default:hover {
     -fx-background-color: -flat-checkmark, -flat-hover;
 }
@@ -225,6 +273,22 @@
 .button:disabled > .text,
 .toggle-button:disabled > .text {
     -fx-fill: -flat-disabled-foreground;
+}
+
+/* Zero the vertical padding on the inner label / arrow-button regions so a
+   menu- or split-menu-button is the same height as a plain Button. A Button
+   renders its text directly (no inner region), so only the outer 4 14 4 14
+   padding applies; the menu/split variants wrap the content in a .label and
+   an .arrow-button that keep Modena's ~0.5em vertical padding, which would
+   otherwise stack on top of the outer padding and make them taller. */
+.menu-button > .label,
+.split-menu-button > .label {
+    -fx-padding: 0 0.5em 0 0;
+}
+
+.menu-button > .arrow-button,
+.split-menu-button > .arrow-button {
+    -fx-padding: 0 0 0 0.5em;
 }
 
 /* arrow of menu / split-menu buttons */

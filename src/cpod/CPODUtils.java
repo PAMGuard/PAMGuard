@@ -3,6 +3,8 @@ package cpod;
 import java.io.File;
 
 import cpod.CPODClassification.CPODSpeciesType;
+import cpod.CPODReader.CPODHeader;
+import cpod.FPODReader.FPODHeader;
 
 
 /**
@@ -77,7 +79,66 @@ public class CPODUtils {
 			}
 		}
 
-		return null; 
+		return null;
+	}
+
+	/**
+	 * Check that a CP1, CP3, FP1 or FP3 file looks like it holds valid data before trying to
+	 * import it. This is a quick check on the file size and the header only - it does not read
+	 * the detection data. It mainly catches empty or corrupt files, e.g. files which have been
+	 * created but never written to, which otherwise import as a large number of nonsense
+	 * detections dated 1899.
+	 *
+	 * @param cpxFile - a CP1, CP3, FP1 or FP3 file. A null file is not an error - it simply means
+	 * that there is no file of that type to import.
+	 * @return null if the file is OK, otherwise a short description of why it cannot be imported.
+	 */
+	public static String checkFileOK(File cpxFile) {
+		if (cpxFile==null) {
+			return null;
+		}
+		if (!cpxFile.exists()) {
+			return "the file does not exist";
+		}
+
+		CPODFileType fileType = getFileType(cpxFile);
+		if (fileType==null) {
+			return "this is not a recognised CPOD or FPOD file type";
+		}
+
+		if (cpxFile.length() <= CPODReader.getHeadSize(fileType)) {
+			return "the file is empty - it contains a header but no data";
+		}
+
+		//the header holds the time the POD started logging. If that's not sensible then
+		//there is no point in reading any of the data.
+		long fileStart;
+		switch (fileType) {
+		case CP1:
+		case CP3:
+			CPODHeader cpodHeader = CPODReader.readHeader(cpxFile);
+			if (cpodHeader==null) {
+				return "the file header could not be read";
+			}
+			fileStart = cpodHeader.fileStart;
+			break;
+		case FP1:
+		case FP3:
+			FPODHeader fpodHeader = FPODReader.readHeader(cpxFile);
+			if (fpodHeader==null) {
+				return "the file header could not be read";
+			}
+			fileStart = podTimeToMillis(fpodHeader.FirstLoggedMin);
+			break;
+		default:
+			return null;
+		}
+
+		if (fileStart<=0) {
+			return "the file header has no valid start time - the file is probably empty or corrupt";
+		}
+
+		return null;
 	}
 
 	/**

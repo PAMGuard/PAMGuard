@@ -36,17 +36,14 @@ public class CPODReader  {
 
 	public static CPODHeader readHeader(File cpFile) {
 
-		BufferedInputStream bis = null;
-		FileInputStream fileInputStream = null;
-
-		try {
-			bis = new BufferedInputStream(fileInputStream = new FileInputStream(cpFile));
-		} catch (FileNotFoundException e) {
+		//try with resources so that the file is always closed - this can get called
+		//once per file when checking a long list of files before an import.
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(cpFile))) {
+			return readHeader( bis,  CPODUtils.getFileType(cpFile));
+		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
-
-		return readHeader( bis,  CPODUtils.getFileType(cpFile));
 
 	}
 
@@ -169,23 +166,40 @@ public class CPODReader  {
 		try {
 			while (true) {
 				bytesRead = bis.read(byteData);
+				if (bytesRead < dataSize) {
+					/*
+					 * End of file, or a truncated final record. Note that this MUST be checked -
+					 * some files (e.g. corrupt files which contain no data) do not have the two
+					 * 0xFF records at the end which normally terminate this loop. Without this
+					 * check, read() returns -1 forever, byteData keeps the contents of the last
+					 * read and clicks get added to the list until we run out of memory.
+					 */
+					break;
+				}
 				for (int i = 0; i < bytesRead; i++) {
 					shortData[i] = CPODUtils.toUnsigned(byteData[i]);
 				}
 				if (isFileEnd(byteData)) {
 					fileEnds++;
+					if (fileEnds == 2) {
+						break;
+					}
+					/*
+					 * An all 0xFF record is padding at the end of the file, not data. It must be
+					 * skipped here - it isn't a minute mark, so the isClick test below would
+					 * otherwise import it as a bogus click (nCyc, kHz, SPL etc. all 255) at the
+					 * end of every file.
+					 */
+					totalBytes += dataSize;
+					continue;
 				}
-				else {
-					fileEnds = 0;
-				}
-				if (fileEnds == 2) {
-					break;
-				}
+				fileEnds = 0;
 
 				isClick = byteData[dataSize-1] != -2;
 				if (isClick) {
 
-					if (from<0 || (nClicks>from && nClicks<(from+maxNum))) {
+					//note that 'from' is inclusive - the click at index 'from' is the first one we want.
+					if (from<0 || (nClicks>=from && (long) nClicks < (long) from+maxNum)) {
 
 						//System.out.println("Create a new CPOD click: ");
 						CPODClick cpodClick = processCPODClick(nMinutes, shortData, header);

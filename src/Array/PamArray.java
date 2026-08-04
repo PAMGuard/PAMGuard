@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import Acquisition.AcquisitionControl;
 import Array.streamerOrigin.OriginSettings;
@@ -234,6 +235,31 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Swap the positions of two hydrophones in the array, i.e. exchange their
+	 * channel numbers. Hydrophone id's are renumbered so that they remain in
+	 * sequential order.
+	 * @param index1 index of the first hydrophone
+	 * @param index2 index of the second hydrophone
+	 * @return true if the two hydrophones were swapped
+	 */
+	public boolean swapHydrophones(int index1, int index2) {
+		synchronized (hydrophoneArray) {
+			if (index1 < 0 || index1 >= hydrophoneArray.size()) {
+				return false;
+			}
+			if (index2 < 0 || index2 >= hydrophoneArray.size()) {
+				return false;
+			}
+			if (index1 == index2) {
+				return false;
+			}
+			Collections.swap(hydrophoneArray, index1, index2);
+			checkHydrophoneIds();
+		}
+		return true;
 	}
 
 	public int updateHydrophone(int oldIndex, Hydrophone hydrophone) {

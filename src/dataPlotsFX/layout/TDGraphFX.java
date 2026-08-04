@@ -274,6 +274,10 @@ public class TDGraphFX extends PamBorderPane {
 		// create pane for plot panels.
 		plotPanels = new PamGridPane();
 		plotPanels.setCursor(Cursor.CROSSHAIR);
+		// decorate the plot area with the default GUI (pamCSS) style. plotPanels is a sibling of the
+		// hiding panes inside mainStackPane, so styling it directly gives the plot the GUI style while
+		// keeping the GUI CSS out of the hiding panes (which are styled only by the sliding dialog CSS).
+		TDDisplayFX.addGUICSS(plotPanels);
 
 		// create the graph projector. Has to be done here, so also need to set in
 		// marker.
@@ -289,6 +293,9 @@ public class TDGraphFX extends PamBorderPane {
 
 		// create pane to hold axis.
 		axisPanel = new PamAxisPane2(graphAxis, Side.LEFT);
+		// decorate the data axis with the default GUI (pamCSS) style. It sits in the border pane's
+		// left/top slot, not within the hiding-pane subtree, so styling it directly is safe.
+		TDDisplayFX.addGUICSS(axisPanel);
 
 		layoutPlotPanes(tdDisplay.getTDParams().orientation);
 

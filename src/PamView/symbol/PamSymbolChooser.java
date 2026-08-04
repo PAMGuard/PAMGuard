@@ -151,50 +151,107 @@ abstract public class PamSymbolChooser {
 	
 	/**
 	 * Add a symbol modifier. Don't add if one of same class already exists. Generally
-	 * this function is called from the symbol manager which will add the 
-	 * appropriate additional modifiers. 
+	 * this function is called from the symbol manager which will add the
+	 * appropriate additional modifiers.
 	 * @param symbolModifier
 	 */
 	public void addSymbolModifier(SymbolModifier symbolModifier) {
+		addSymbolModifier(symbolModifier, false);
+	}
+
+	/**
+	 * Add a symbol modifier. Don't add if one of same class already exists. Generally
+	 * this function is called from the symbol manager which will add the
+	 * appropriate additional modifiers.
+	 * @param symbolModifier
+	 * @param defaultOn true to turn on all of the modifiers options by default. Note that
+	 * this is only a default: any settings which have been saved by the user will overwrite
+	 * this once they are restored.
+	 */
+	public void addSymbolModifier(SymbolModifier symbolModifier, boolean defaultOn) {
 		if (hasSymbolModifier(symbolModifier) != null) {
 			return;
 		}
+		setDefaultOn(symbolModifier, defaultOn);
 		symbolModifiers.add(symbolModifier);
 	}
-	
+
 	/**
-	 * Add a symbol modifier at a specific position in the list. Can be used to 
-	 * get a module specific modifier higher up the list, e.g. click type modifier 
-	 * coming before click event modifier. 
+	 * Add a symbol modifier at a specific position in the list. Can be used to
+	 * get a module specific modifier higher up the list, e.g. click type modifier
+	 * coming before click event modifier.
 	 * @param symbolModifier symbol modifier
-	 * @param position position, 0 = first in list 
+	 * @param position position, 0 = first in list
 	 */
 	public void addSymbolModifier(SymbolModifier symbolModifier, int position) {
+		addSymbolModifier(symbolModifier, position, false);
+	}
+
+	/**
+	 * Add a symbol modifier at a specific position in the list. Can be used to
+	 * get a module specific modifier higher up the list, e.g. click type modifier
+	 * coming before click event modifier.
+	 * @param symbolModifier symbol modifier
+	 * @param position position, 0 = first in list
+	 * @param defaultOn true to turn on all of the modifiers options by default. Note that
+	 * this is only a default: any settings which have been saved by the user will overwrite
+	 * this once they are restored.
+	 */
+	public void addSymbolModifier(SymbolModifier symbolModifier, int position, boolean defaultOn) {
 		if (hasSymbolModifier(symbolModifier) != null) {
 			return;
 		}
+		setDefaultOn(symbolModifier, defaultOn);
 		int pos = Math.min(symbolModifiers.size(), position);
-		
+
 		symbolModifiers.add(pos, symbolModifier);
 	}
-	
+
 	/**
-	 * Add a symbol modifier directly after a different symbol modifier of a given class. 
-	 * Can use this function to put a symbol modifier as a specific position in the list. 
-	 * If a modifier of the other class can't be found, it will be put at the end of the list. 
+	 * Add a symbol modifier directly after a different symbol modifier of a given class.
+	 * Can use this function to put a symbol modifier as a specific position in the list.
+	 * If a modifier of the other class can't be found, it will be put at the end of the list.
 	 * @param symbolModifier Symbol modifier
-	 * @param insertAfter Class of the symbol modifier that should be immediately before this one. 
+	 * @param insertAfter Class of the symbol modifier that should be immediately before this one.
 	 */
 	public void addSymbolModifier(SymbolModifier symbolModifier, Class insertAfter) {
+		addSymbolModifier(symbolModifier, insertAfter, false);
+	}
+
+	/**
+	 * Add a symbol modifier directly after a different symbol modifier of a given class.
+	 * Can use this function to put a symbol modifier as a specific position in the list.
+	 * If a modifier of the other class can't be found, it will be put at the end of the list.
+	 * @param symbolModifier Symbol modifier
+	 * @param insertAfter Class of the symbol modifier that should be immediately before this one.
+	 * @param defaultOn true to turn on all of the modifiers options by default. Note that
+	 * this is only a default: any settings which have been saved by the user will overwrite
+	 * this once they are restored.
+	 */
+	public void addSymbolModifier(SymbolModifier symbolModifier, Class insertAfter, boolean defaultOn) {
 		int modPos = findSymbolModifier(insertAfter);
 		if (modPos >= 0) {
 			// put at position
-			addSymbolModifier(symbolModifier, modPos); 
+			addSymbolModifier(symbolModifier, modPos, defaultOn);
 		}
 		else {
 			// put at end
-			addSymbolModifier(symbolModifier);
+			addSymbolModifier(symbolModifier, defaultOn);
 		}
+	}
+
+	/**
+	 * Turn on every option the modifier is capable of modifying. This only sets the
+	 * modifiers default parameters, which are used until (and unless) settings saved
+	 * by the user are restored on top of them, so it will never override a user selection.
+	 * @param symbolModifier symbol modifier
+	 * @param defaultOn true to switch everything on. False leaves the modifiers own defaults alone.
+	 */
+	private void setDefaultOn(SymbolModifier symbolModifier, boolean defaultOn) {
+		if (defaultOn == false) {
+			return;
+		}
+		symbolModifier.getSymbolModifierParams().modBitMap = symbolModifier.getModifyableBits();
 	}
 	
 	/**

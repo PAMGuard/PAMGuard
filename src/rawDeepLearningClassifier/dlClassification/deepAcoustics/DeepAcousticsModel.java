@@ -17,7 +17,6 @@ import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
 import ai.djl.inference.Predictor;
 import ai.djl.ndarray.types.Shape;
-import ai.djl.translate.TranslateException;
 import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveModel;
 
 /**
@@ -152,16 +151,32 @@ public class DeepAcousticsModel extends SimpleArchiveModel {
 	 */
 	public List<DeepAcousticResultArray> runModel(float[][][][] specImage) {
 		try {
-			List<DeepAcousticResultArray> results  = objectPredictor.predict(specImage);
-			//DLUtils.printArray(results);
-			return results;
-		} catch (TranslateException e) {
-			System.err.println("Error running deep acoustics model. The model graph failed to execute - "
-					+ "this usually indicates the exported model itself is broken (e.g. a channel-split/route "
-					+ "slice exported with a batch size of 0 instead of -1) rather than a problem with the input data.");
-			e.printStackTrace();
+			return objectPredictor.predict(specImage);
+		} catch (Throwable e) {
+			//if the model failed on the GPU (Apple MPS), reload on the CPU and retry once.
+			if (fallbackToCpu()) {
+				try {
+					return objectPredictor.predict(specImage);
+				} catch (Throwable e2) {
+					e2.printStackTrace();
+				}
+			} else {
+				System.err.println("Error running deep acoustics model. The model graph failed to execute - "
+						+ "this usually indicates the exported model itself is broken (e.g. a channel-split/route "
+						+ "slice exported with a batch size of 0 instead of -1) rather than a problem with the input data.");
+				e.printStackTrace();
+			}
 		}
 		return null;
+	}
+
+	/**
+	 * Rebuild the object detection predictor against the reloaded model (called when
+	 * the model falls back from the GPU to the CPU).
+	 */
+	@Override
+	protected void onModelReloaded() {
+		objectPredictor = getModel().newPredictor(deepAcousticsTranslator);
 	}
 
 	/**

@@ -39,6 +39,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -245,7 +246,11 @@ public class TDDisplayFX extends PamBorderPane {
 		hidingControlPane=new HidingPane(Side.TOP, controlPane, this, false );
 		hidingControlPane.showHidePane(tdParametersFX.showControl);
 //		hidingControlPane.getStylesheets().clear();
-		controlPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); //style as a settings pane. 
+		//decorate the top control pane (and its hiding pane wrapper) with the default GUI style. This
+		//is added to the nodes directly rather than the scene so it does not cascade into the graph
+		//hiding panes, which must be styled only by the sliding dialog CSS.
+		addGUICSS(hidingControlPane);
+		addGUICSS(controlPane); //style as a settings pane.
 		hidingControlPane.getHideButton().setStyle("-fx-border-color: none; -fx-background-radius: 5 5 0 0;  -fx-border-radius: 5 5 0 0;");
 
 		hidingControlPane.showingProperty().addListener((valProp, oldVal, newVal)->{
@@ -265,6 +270,9 @@ public class TDDisplayFX extends PamBorderPane {
 		showButton.getStyleClass().add("icon-button");
 		showButton.setPrefWidth(30);
 		showButton.setMaxHeight(timeAxisSize-20);
+		//the show button is re-parented into mainGraphPane below, so it no longer inherits the GUI
+		//style from the control pane - add it directly.
+		addGUICSS(showButton);
 
 		//create the time axis for the display. 
 		timeAxis = new PamAxisFX(0, 1, 0, 1, 0, tdParametersFX.visibleTimeRange/1000., PamAxis.ABOVE_LEFT, null, PamAxis.LABEL_NEAR_CENTRE, null);
@@ -442,11 +450,16 @@ public class TDDisplayFX extends PamBorderPane {
 
 		} 
 
-		//Set background so that same as the axis colour-fills in box on corner between x and y axis. 
+		//Set background so that same as the axis colour-fills in box on corner between x and y axis.
 		//timeAxisHolder.getStyleClass().add("pane");
 
+		//decorate the time axis holder with the default GUI style. It is a sibling of the graph area
+		//(not an ancestor of the graph hiding panes), so styling it here keeps the GUI CSS out of the
+		//hiding panes. timeAxisHolder is recreated on each layout so there is no risk of duplicates.
+		addGUICSS(timeAxisHolder);
+
 		//layout the graphs within the main panel
-		layoutTDGraphs(tdParametersFX.orientation); 
+		layoutTDGraphs(tdParametersFX.orientation);
 	}
 
 
@@ -779,6 +792,11 @@ public class TDDisplayFX extends PamBorderPane {
 		/**Create the scroll bar**/
 		timeScrollerFX = new TDAcousticScroller("Time display", tdParametersFX.orientation, 100, 120000L, true, this);
 
+		//decorate the scroller with the default GUI style. It is a sibling of the graph area (not an
+		//ancestor of the graph hiding panes), so styling its node directly keeps the GUI CSS out of
+		//the hiding panes. Done once here at creation to avoid duplicate sheets on re-layout.
+		addGUICSS(timeScrollerFX.getNode());
+
 		//System.out.println("Time Scroller: " + timeScrollerFX.getRangeMillis()  + "   " + tdParametersFX.scrollableTimeRange);
 
 		//repaint the graph when the scroller has finished moving
@@ -1054,6 +1072,41 @@ public class TDDisplayFX extends PamBorderPane {
 
 	public ArrayList<String> getCSSSettingsResource() {
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
+	}
+
+	/**
+	 * Get the default GUI (pamCSS) style sheet(s) used to decorate the display's
+	 * content nodes (plots, axes, controls etc.).
+	 *
+	 * @return the resource paths of the GUI CSS style sheets.
+	 */
+	public ArrayList<String> getGUICSSResource() {
+		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS();
+	}
+
+	/**
+	 * Decorate a node with the default GUI (pamCSS) style. This is added directly
+	 * to the individual content nodes rather than to the scene or a common ancestor
+	 * of the hiding panes: JavaFX stylesheets cascade into the whole descendant
+	 * subtree and cannot be un-inherited, so putting the GUI CSS on an ancestor of
+	 * a hiding pane would leak it into that pane. The hiding panes must be styled
+	 * only by the sliding dialog CSS (see
+	 * {@link pamViewFX.fxPlotPanes.PamHiddenSidePane}), so the GUI CSS is applied
+	 * node-by-node to everything that is <em>not</em> an ancestor of a hiding pane.
+	 *
+	 * @param node - the node to decorate with the GUI CSS.
+	 */
+	public static void addGUICSS(Parent node) {
+		if (node == null) return;
+		//The GUI style sheet defines its colour palette on '.root, .gui-css-root'. When the sheet is
+		//attached to the scene the '.root' selector matches the scene root, but when it is attached
+		//node-by-node like this the node is not '.root', so it must carry the 'gui-css-root' style class
+		//for the palette (-flat-*/-win-* looked-up colours) to resolve - otherwise JavaFX floods the log
+		//with "Could not resolve" warnings and String->Paint cast errors.
+		if (!node.getStyleClass().contains("gui-css-root")) {
+			node.getStyleClass().add("gui-css-root");
+		}
+		node.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS());
 	}
 
 
