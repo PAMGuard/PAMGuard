@@ -902,16 +902,16 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		}
 	}
 	
-	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
-		if (isViewer) {
-			// I think this might always be true, but get it from the offlineFileServer
-			return offlineFileServer.getStoreInfo(detail);
-		}
-		else {
-			return getDaqProcess().getStoreInfo(detail);
-		}
-	}
+//	@Override
+//	public InputStoreInfo getStoreInfo(boolean detail) {
+//		if (isViewer) {
+//			// I think this might always be true, but get it from the offlineFileServer
+//			return offlineFileServer.getStoreInfo(detail);
+//		}
+//		else {
+//			return getDaqProcess().getStoreInfo(null, detail);
+//		}
+//	}
 	
 	@Override
 	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {

@@ -51,6 +51,7 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
+import PamUtils.worker.PamWorkMonitor;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -121,7 +122,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	}
 		
 
-	private class MapMaker extends SwingWorker<Integer, FileMapProgress> {
+	protected class MapMaker extends SwingWorker<Integer, FileMapProgress> {
 
 		private OfflineFileServer fileServer;
 
@@ -173,7 +174,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 				}
 
 				
-				sortMapEndTimes();
+				sortMapEndTimes(mapMaker);
 				mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_CHECKINGFILES, dataMap.getDataCount(), dataMap.getDataCount(), ""));
 				
 				long t3 = System.currentTimeMillis();
@@ -350,7 +351,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	 * Get the end times of map points. In most cases the data will have come back from 
 	 * the serialised file, so will already have this information so it can be skipped. 
 	 */
-	public abstract void sortMapEndTimes();
+	public abstract void sortMapEndTimes(MapMaker mapMaker);
 	
 	@Override
 	public String getDataSourceName() {
@@ -463,7 +464,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 
 
 	@Override
-	public InputStoreInfo getStoreInfo(boolean detail) {
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workerMonitor, boolean detail) {
 		if (dataMap == null || dataMap.getNumMapPoints() == 0) {
 			return null;
 		}

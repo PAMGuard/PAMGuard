@@ -221,13 +221,13 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 
 	@Override
 	public void disconnect() {
-		System.out.println("Disconnecting from MQTT broker.");
 		if(mqttClient==null) {
 			return;
 		}
 		if(!this.mqttClient.isConnected()) {
 			return;
 		}
+		System.out.println("Disconnecting from MQTT broker.");
 		try {
 			IMqttToken disconnectToken = mqttClient.disconnect();
 			disconnectToken.waitForCompletion(1000L);
