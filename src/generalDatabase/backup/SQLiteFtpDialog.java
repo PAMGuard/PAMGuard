@@ -12,14 +12,14 @@ import backupmanager.swing.FileLocationComponent.LocationType;
 
 public class SQLiteFtpDialog implements PamDialogPanel{
 
-	private SQLiteSafeFTPBackup ftpFile; 
+//	private SQLiteSafeFTPBackup ftpFile; 
 	
 	private Window owner;
 
 	private FileLocationComponent remoteLocationComponent;
 	
 	public SQLiteFtpDialog(SQLiteSafeFTPBackup ftpFile, Window owner) {
-		this.ftpFile = ftpFile;
+//		this.ftpFile = ftpFile;
 		this.owner = owner;
 	}
 	
@@ -39,18 +39,19 @@ public class SQLiteFtpDialog implements PamDialogPanel{
 
 	@Override
 	public void setParams() {
-		FileLocation destLoc = ftpFile.getFtpSettings().destLocation;
-		remoteLocationComponent.setParams(destLoc);
+//		FileLocation destLoc = ftpFile.getFtpSettings().destLocation;
+//		remoteLocationComponent.setParams(destLoc);
 	}
 
 	@Override
 	public boolean getParams() {
-		FileLocation destLoc = ftpFile.getFtpSettings().destLocation;
-		FileLocation newLoc = remoteLocationComponent.getParams(destLoc);
-		if (newLoc != null) {
-			ftpFile.getFtpSettings().destLocation = newLoc;
-			return true;
-		}
-		return PamDialog.showWarning(owner, ftpFile.getName(), "Destination location is not defined");
+//		FileLocation destLoc = ftpFile.getFtpSettings().destLocation;
+//		FileLocation newLoc = remoteLocationComponent.getParams(destLoc);
+//		if (newLoc != null) {
+//			ftpFile.getFtpSettings().destLocation = newLoc;
+//			return true;
+//		}
+//		return PamDialog.showWarning(owner, ftpFile.getName(), "Destination location is not defined");
+		return false;
 	}
 }

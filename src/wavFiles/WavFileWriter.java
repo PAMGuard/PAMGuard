@@ -1,11 +1,9 @@
 package wavFiles;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.sound.sampled.AudioFormat;
 
-import PamController.PamGUIManager;
 import clickDetector.WindowsFile;
 import warnings.RepeatWarning;
 
@@ -30,9 +28,6 @@ public class WavFileWriter extends WavFile {
 	 * @param audioFormat
 	 */
 	private void openForWriting(AudioFormat audioFormat) {
-		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
-			createLock();
-		}
 		try {
 			windowsFile = new WindowsFile(fileName, "rw");
 		} catch (IOException e) {
@@ -47,20 +42,6 @@ public class WavFileWriter extends WavFile {
 		byteConverter = ByteConverter.createByteConverter(audioFormat);
 		wavHeader = new WavHeader(audioFormat);
 		wavHeader.writeHeader(windowsFile);
-	}
-	
-	/**
-	 * Create lock file to flag transfer that this file is actively being written to for APS.
-	 * Linux does not handle file locks well, so explicitly building them in. 
-	 * @param wavFile2
-	 */
-	private void createLock() {
-		File lockFile = new File(fileName+".lck");
-		try {
-			lockFile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	
@@ -272,20 +253,7 @@ public class WavFileWriter extends WavFile {
 	@Override
 	public void close() {
 		writeHeader(false);
-		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
-			deleteLock();
-		}
 		super.close();
-	}
-	
-	/**
-	 * Delete lock file to flag transfer that this file is not longer being written to for APS.
-	 * Linux does not handle file locks well, so explicitly building them in. 
-	 * @param wavFile2
-	 */
-	private void deleteLock() {
-		File wavLock = new File(fileName+".lck");
-		wavLock.delete();
 	}
 
 

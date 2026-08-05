@@ -199,7 +199,7 @@ public abstract class FileBackupStream extends BackupStream {
 			availableActions.add(new CopyActionMaker());
 			availableActions.add(new MoveActionMaker());
 			availableActions.add(new DeleteActionMaker());
-			availableActions.add(new FtpActionMaker());
+//			availableActions.add(new FtpActionMaker());
 		}
 		return availableActions;
 	}

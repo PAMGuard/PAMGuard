@@ -95,13 +95,13 @@ public abstract class BackupStream implements PamSettings, BackupFunction {
 	private boolean runAction(BackupManager backupManager, List<StreamItem> sourceItems, BackupAction action) {
 		// need to find database entries that have a null or value for this action
 
-		if(action.requiresFTPConnection()) {
-			try {
-				backupManager.getFtpClient().connect();
-			} catch (TransferLoginException e) {
-				System.out.println("Could not connect to ftp server. Error: "+e.getMessage());
-			}
-		}
+//		if(action.requiresFTPConnection()) {
+//			try {
+//				backupManager.getFtpClient().connect();
+//			} catch (TransferLoginException e) {
+//				System.out.println("Could not connect to ftp server. Error: "+e.getMessage());
+//			}
+//		}
 		
 		List<StreamItem> toDoList = getToDoList(sourceItems, action);
 		
@@ -146,9 +146,9 @@ public abstract class BackupStream implements PamSettings, BackupFunction {
 		}
 		backupManager.updateProgress(new BackupProgress(this, action, STATE.STREAMDONE));
 		
-		if(action.requiresFTPConnection()) {
-			backupManager.getFtpClient().disconnect();
-		}
+//		if(action.requiresFTPConnection()) {
+//			backupManager.getFtpClient().disconnect();
+//		}
 		
 		return ok;
 	}

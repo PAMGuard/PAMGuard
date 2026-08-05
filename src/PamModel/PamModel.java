@@ -121,6 +121,21 @@ final public class PamModel implements PamSettings {
 	 * Subclass of URLClassLoader, to handle loading of plugins 
 	 */
 	private final PluginClassloader classLoader;
+	
+	/**
+	 * Default names for all the groups so that they can more easily be replicated
+	 * within plugin modules. 
+	 */
+	public static final String _MapGroup = "Maps and Mapping"; 
+	public static final String _SoundGroup = "Sound Processing"; 
+	public static final String _DetectorGroup = "Detectors"; 
+	public static final String _ClassifierGroup = "Classifiers"; 
+	public static final String _LocaliserpGroup = "Localisers"; 
+	public static final String _DisplaysGroup = "Displays"; 
+	public static final String _UtilitiesGroup = "Utilities"; 
+	public static final String _VisualGroup = "Visual Methods"; 
+	public static final String _SensorsGroup = "Sensors"; 
+	public static final String _SoundMeasurementGroup = "Sound Measurements"; 
 
 	/**
 	 * @param pamController
@@ -173,25 +188,25 @@ final public class PamModel implements PamSettings {
 		 * Make a series of module menu groups and add most of the 
 		 * modules to one group or another
 		 */
-		ModulesMenuGroup mapsGroup = new ModulesMenuGroup("Maps and Mapping");
+		ModulesMenuGroup mapsGroup = new ModulesMenuGroup(_MapGroup);
 		modulesMenuGroups.add(mapsGroup);
-		ModulesMenuGroup processingGroup = new ModulesMenuGroup("Sound Processing");
+		ModulesMenuGroup processingGroup = new ModulesMenuGroup(_SoundGroup);
 		modulesMenuGroups.add(processingGroup);
-		ModulesMenuGroup detectorsGroup = new ModulesMenuGroup("Detectors");
+		ModulesMenuGroup detectorsGroup = new ModulesMenuGroup(_DetectorGroup);
 		modulesMenuGroups.add(detectorsGroup);
-		ModulesMenuGroup classifierGroup = new ModulesMenuGroup("Classifiers");
+		ModulesMenuGroup classifierGroup = new ModulesMenuGroup(_ClassifierGroup);
 		modulesMenuGroups.add(classifierGroup);
-		ModulesMenuGroup localiserGroup = new ModulesMenuGroup("Localisers");
+		ModulesMenuGroup localiserGroup = new ModulesMenuGroup(_LocaliserpGroup);
 		modulesMenuGroups.add(localiserGroup);
-		ModulesMenuGroup displaysGroup = new ModulesMenuGroup("Displays");
+		ModulesMenuGroup displaysGroup = new ModulesMenuGroup(_DisplaysGroup);
 		modulesMenuGroups.add(displaysGroup);
-		ModulesMenuGroup utilitiesGroup = new ModulesMenuGroup("Utilities");
+		ModulesMenuGroup utilitiesGroup = new ModulesMenuGroup(_UtilitiesGroup);
 		modulesMenuGroups.add(utilitiesGroup);
-		ModulesMenuGroup visualGroup = new ModulesMenuGroup("Visual Methods");
+		ModulesMenuGroup visualGroup = new ModulesMenuGroup(_VisualGroup);
 		modulesMenuGroups.add(visualGroup);
-		ModulesMenuGroup sensorsGroup = new ModulesMenuGroup("Sensors");
+		ModulesMenuGroup sensorsGroup = new ModulesMenuGroup(_SensorsGroup);
 		modulesMenuGroups.add(sensorsGroup);
-		ModulesMenuGroup measurementGroup = new ModulesMenuGroup("Sound Measurements");
+		ModulesMenuGroup measurementGroup = new ModulesMenuGroup(_SoundMeasurementGroup);
 		modulesMenuGroups.add(measurementGroup);
 
 		//		ModulesMenuGroup smruGroup = new ModulesMenuGroup("SMRU Stuff");		
