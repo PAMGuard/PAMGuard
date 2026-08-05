@@ -12,7 +12,7 @@ import javax.swing.Timer;
 import PamController.PamController;
 
 /**
- * System for handling and displaying warnings and errors from various parts of PAMguard. 
+ * System for handling and displaying warnings and errors from various parts of PAMGuard. 
  * @author Douglas Gillespie
  *
  */
@@ -114,6 +114,15 @@ public class WarningSystem {
 			notifyDisplays();
 		}
 		return r;
+	}
+	
+	public synchronized boolean forceRemoveWarning(PamWarning warning) {
+		for(PamWarning listWarning:warnings) {
+			if(listWarning.getWarningMessage().equals(warning.getWarningMessage())) {
+				return warnings.remove(listWarning);
+			}
+		}
+		return false;
 	}
 	
 	/**

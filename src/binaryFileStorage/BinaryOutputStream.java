@@ -7,8 +7,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.util.ArrayList;
 
+import PamController.PamController;
+import PamController.PamGUIManager;
+import dataGram.Datagram;
+import warnings.RepeatWarning;
 import PamUtils.PamCalendar;
+import PamUtils.PamFileFilter;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.uid.DataBlockUIDHandler;
@@ -57,6 +63,8 @@ public class BinaryOutputStream {
 	private BinaryOfflineDataMapPoint currentDataMapPoint;
 	
 	private int lastObjectType = Integer.MIN_VALUE;
+	
+	private File outputFile;
 
 	public BinaryOutputStream(BinaryStore binaryStore,
 			PamDataBlock parentDataBlock) {
@@ -65,6 +73,9 @@ public class BinaryOutputStream {
 		this.parentDataBlock = parentDataBlock;
 		binaryDataSource = parentDataBlock.getBinaryDataSource();
 		binaryDataSource.setBinaryStorageStream(this);
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			clearOldLockFiles();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -111,7 +122,7 @@ public class BinaryOutputStream {
 		uidHandler.roundUpUID(DataBlockUIDHandler.ROUNDINGFACTOR);		
 		fileStartUID = parentDataBlock.getUidHandler().getCurrentUID();
 		
-		File outputFile = new File(mainFileName);
+		outputFile = new File(mainFileName);
 
 		boolean open = openPGDFFile(outputFile);
 		
@@ -128,9 +139,120 @@ public class BinaryOutputStream {
 			noiseOutputStream = null;
 		}
 		
+		if(open && PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			makeLock(outputFile);
+		}
 		
 		
 		return open;
+	}
+	
+	
+	/**
+	 * File type for lock files.
+	 */
+	private static final String lockingFileExtension = "lck";
+	
+	/**
+	 * For a given file, return the corresponding lock file object.
+	 * @param outputFile the output file for which we want the lock file
+	 * @return the lock file object
+	 */
+	private File getLockFile(File outputFile) {
+		return new File(outputFile.toString() + "." + lockingFileExtension);
+	}
+	
+	/**
+	 * Generate lock file to flag that a file is actively being written on Linux systems.
+	 * Linux does not handle file locks well, so explicitly building them in as empty files with the same name with '.lck' extension. 
+	 * @param pgdfFile the name of the file being written
+	 */
+	private void makeLock(File pgdfFile) {
+		try {
+			File mainLockFile = getLockFile(pgdfFile);
+			mainLockFile.createNewFile();
+			File pgdxFile = binaryStore.swapFileType(pgdfFile, BinaryStore.indexFileType);
+			File pgdxLockFile = getLockFile(pgdxFile);
+			pgdxLockFile.createNewFile();
+			if(wantNoiseOutputFile()) {
+				File noiseFile = binaryStore.swapFileType(pgdfFile, BinaryStore.noiseFileType);
+				File noiseLockFile = getLockFile(noiseFile);
+				noiseLockFile.createNewFile();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Delete lock file to flag transfer that this file is no longer being written to for APS.
+	 * Linux does not handle file locks well, so explicitly building them in. 
+	 * @param pgdfFile
+	 */
+	private void deleteLock(File pgdfFile) {
+		File mainLockFile = getLockFile(pgdfFile);
+		mainLockFile.delete();
+		File pgdxFile = binaryStore.swapFileType(pgdfFile, BinaryStore.indexFileType);
+		File pgdxLockFile = getLockFile(pgdxFile);
+		pgdxLockFile.delete();
+		if(wantNoiseOutputFile()) {
+			File noiseFile = binaryStore.swapFileType(pgdfFile, BinaryStore.noiseFileType);
+			File noiseLockFile = getLockFile(noiseFile);
+			noiseLockFile.delete();
+		}
+	}
+	
+	/**
+	 * With lock files for headless operation, we need to clear out any old lock files that may exist. 
+	 * In normal operation these files delete automatically, but if the program crashes, they will still exist, though no longer actively writing.
+	 */
+	private void clearOldLockFiles() {
+		ArrayList<File> existingLockFiles = listLockFiles();
+		File currentLockFile = null;
+		File noiseLockFile = null;
+		File pgdxLockFile = null;
+		
+		if (this.outputFile != null){
+			currentLockFile = getLockFile(this.outputFile);
+			File pgdxFile = binaryStore.swapFileType(this.outputFile, BinaryStore.indexFileType);
+			pgdxLockFile = getLockFile(pgdxFile);
+			File noiseFile = binaryStore.swapFileType(this.outputFile, BinaryStore.noiseFileType);
+			noiseLockFile = getLockFile(noiseFile);
+		}
+		
+		for(File existingLockFile : existingLockFiles) {
+			if(this.outputFile!=null) {
+				if (existingLockFile.equals(currentLockFile) || existingLockFile.equals(pgdxLockFile) || existingLockFile.equals(noiseLockFile)) {
+					continue; // don't delete the current lock files
+				}
+			}
+			if (existingLockFile.exists()) {
+				//Make absolute certain that this is a lock file and not a real data file before deleting it.
+				if (existingLockFile.getName().endsWith("." + lockingFileExtension) && existingLockFile.getTotalSpace()==0) {
+//					System.out.println("Deleting old lock file: " + existingLockFile.getAbsolutePath());
+					existingLockFile.delete();
+				}
+			}
+        }
+	}
+	
+	
+	/**
+	 * List all lock files in the binary storage folder.
+	 */
+	private ArrayList<File> listLockFiles(){
+		ArrayList<File> fileList = new ArrayList<File>();
+		String root = this.binaryStore.binaryStoreSettings.getStoreLocation();
+		if (root == null) {
+			return null;
+		}
+		File rootFolder = new File(root);
+		PamFileFilter lockFileFilter = new PamFileFilter("Binary Data File Locks", lockingFileExtension);
+		lockFileFilter.setAcceptFolders(true);
+
+		this.binaryStore.listDataFiles(fileList, rootFolder, lockFileFilter);
+
+		return fileList;
 	}
 
 	/**
@@ -180,7 +302,8 @@ public class BinaryOutputStream {
 			dataOutputStream = new DataOutputStream(new BufferedOutputStream(fileOutputStream = new 
 					FileOutputStream(outputFile)));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 		
@@ -208,7 +331,8 @@ public class BinaryOutputStream {
 			try {
 				noiseOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(noiseFile)));
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				noiseOutputStream = null;
 				return false;
 			}
@@ -259,6 +383,9 @@ public class BinaryOutputStream {
 	}
 
 	public synchronized boolean closeFile() {
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			deleteLock(outputFile);
+		}
 		boolean ok = true;
 //		System.out.println("Close output file " + mainFileName);
 		if (dataOutputStream != null) {
@@ -268,7 +395,8 @@ public class BinaryOutputStream {
 			try {
 				dataOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				ok = false;
 			}
 			dataOutputStream = null;
@@ -277,7 +405,8 @@ public class BinaryOutputStream {
 			try {
 				noiseOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				reportStreamError(e);
 				ok = false;
 			}
 		}
@@ -360,7 +489,8 @@ public class BinaryOutputStream {
 				outputStream.write(headerData);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 
@@ -424,7 +554,8 @@ public class BinaryOutputStream {
 				outputStream.write(footerData);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 			return false;
 		}
 		lastObjectType = BinaryTypes.MODULE_FOOTER;
@@ -571,8 +702,15 @@ public class BinaryOutputStream {
 			return false;
 		}
 
-
-
+		
+		try {
+			outputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		storedObjects++;
+		
 		return true;
 	}
 
@@ -620,7 +758,8 @@ public class BinaryOutputStream {
 		try {
 			opStream.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			reportStreamError(e);
 		}
 
 		return true;

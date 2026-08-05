@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -25,7 +27,11 @@ import javax.swing.Timer;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamFolders;
+import PamController.PamguardVersionInfo;
+import PamController.command.SummaryCommand;
 import PamController.fileprocessing.StoreStatus;
+import PamModel.CommonPluginInterface;
+import PamModel.PamModel;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamView.dialog.warn.WarnOnce;
@@ -39,6 +45,9 @@ import generalDatabase.clauses.FromClause;
 import generalDatabase.clauses.PAMSelectClause;
 import generalDatabase.pamCursor.PamCursor;
 import generalDatabase.ucanAccess.UCanAccessSystem;
+import generalDatabase.version.VersionDataBlock;
+import generalDatabase.version.VersionDataUnit;
+import generalDatabase.version.VersionLogging;
 import loggerForms.FormDescription;
 import loggerForms.FormsControl;
 import warnings.PamWarning;
@@ -52,9 +61,17 @@ public class DBProcess extends PamProcess {
 
 	private javax.swing.Timer timer;
 
+	/**
+	 * These two are used by the sidepanel and get zeroed every 
+	 * second or so, each time the side panel updates. 
+	 */
 	private int dbWriteOKs;
-
 	private int dbWriteErrors;
+	
+	/**
+	 * These two get used by the getModuleSummary function. 
+	 */
+	private int summaryWriteOK, summaryWriteErr;
 
 	private ArrayList<DbSpecial> dbSpecials = new ArrayList<DbSpecial>();
 
@@ -71,6 +88,10 @@ public class DBProcess extends PamProcess {
 	private PamWarning writeWarning;
 
 	private DBCommitter dbCommitter;
+
+	private VersionDataBlock versionDataBlock;
+
+	private VersionLogging versionLogging;
 
 	public DBProcess(DBControl databaseControll) {
 		super(databaseControll, null);
@@ -95,6 +116,8 @@ public class DBProcess extends PamProcess {
 		
 		dbSpecials.add(new LogXMLSettings(databaseControll));
 
+		versionDataBlock = new VersionDataBlock(this);
+		versionDataBlock.SetLogging(versionLogging = new VersionLogging(versionDataBlock));
 	}
 
 	@Override
@@ -1271,6 +1294,13 @@ public class DBProcess extends PamProcess {
 	}
 
 	public void updateProcessList() {
+		if (getPamControlledUnit().getPamConfiguration() != PamController.getInstance().getPamConfiguration()) {
+			/*
+			 * Normally the DB subsribes to everything, but if it's the external configuration we 
+			 * don't want it to since it won't have opened a database and shouldn't do anything. 
+			 */
+			return;
+		}
 		ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDataBlocks();
 		PamDataBlock dataBlock;
 		for (int i = 0; i < dataBlocks.size(); i++) {
@@ -1327,8 +1357,10 @@ public class DBProcess extends PamProcess {
 		boolean ok = logger.logData(databaseControll.getConnection(), unit);
 		if (ok) {
 			dbWriteOKs++;
+			summaryWriteOK++;
 		} else {
 			dbWriteErrors++;
+			summaryWriteErr++;
 			writeWarning.setWarningMessage("Write error for " + block.getDataName());
 			writeWarning.setEndOfLife(unit.getTimeMilliseconds() + 5000);
 			WarningSystem.getWarningSystem().addWarning(writeWarning);
@@ -1355,6 +1387,9 @@ public class DBProcess extends PamProcess {
 		} else {
 			dbWriteErrors++;
 		}
+
+		dbCommitter.checkCommit(databaseControll.getConnection());
+		
 		return ok;
 	}
 
@@ -1580,5 +1615,113 @@ public class DBProcess extends PamProcess {
 		}
 		return ok;
 	}
+
+	/** 
+	 * write version info for PAMGuard and all plugins to the database. 
+	 */
+	public void storeVersionInfo() {
+		String v = PamguardVersionInfo.version;
+		VersionDataUnit vdu;
+		long now = System.currentTimeMillis();
+		PamConnection con = databaseControll.getConnection();
+		if (con == null) {
+			return;
+		}
+		checkTable(versionLogging.getTableDefinition());
+		// PAMGuard
+		String runMode = PamController.getInstance().getRunModeName();
+		vdu = new VersionDataUnit(now, "PAMGuard", runMode, v);
+//		versionDataBlock.addPamData(vdu);
+		versionLogging.logData(con, vdu);
+		// can we get the users ? 
+//		Properties props = System.getProperties();
+		String user = System.getProperty("user.name");
+		String os = System.getProperty("os.name");
+		if (user != null || os != null) {
+			vdu = new VersionDataUnit(now, "User", user, os);
+//			versionDataBlock.addPamData(vdu);
+			versionLogging.logData(con, vdu);
+		}
+		//JAVA
+		v = System.getProperty("java.vm.version");
+		String name = System.getProperty("java.vm.name");
+		vdu = new VersionDataUnit(now, "Java", name, v);
+//		versionDataBlock.addPamData(vdu);
+		versionLogging.logData(con, vdu);
+		
+		// and all the plugins
+		List<CommonPluginInterface> plugins = PamModel.getPamModel().getPluginList();
+		for (CommonPluginInterface aPlug : plugins) {
+			vdu = new VersionDataUnit(now, aPlug.getDefaultName(), aPlug.getClass().getName(), aPlug.getVersion());
+//			versionDataBlock.addPamData(vdu);
+			versionLogging.logData(con, vdu);
+		}
+		
+		databaseControll.commitChanges();
+		
+	}
+
+	/**
+	 * 
+	 * Get a module summary for the database, so can check remotely
+	 * Returned fields will be name, autocommit (0 or 1), number of writes, number of fails. 
+	 * @param clear reset data counts to zero when called. 
+	 * @return summary string
+	 */
+	public String getModuleSummary(boolean clear) {
+		DBSystem dbSystem = databaseControll.databaseSystem;
+		String name = "No database systen";
+		if (dbSystem != null) {
+			name = dbSystem.getShortDatabaseName(); 
+		}
+		int autoCommit = databaseControll.dbParameters.getUseAutoCommit() ? 1 : 0;
+		String summary = String.format("<DBNAME>%s</DBNAME><AUTOCOMMIT>%d</AUTOCOMMIT><WRITES>%d</WRITES><FAILS>%d</FAILS>", 
+					name, autoCommit, summaryWriteOK, summaryWriteErr);
+
+		if (clear) {
+			summaryWriteOK = summaryWriteErr = 0;
+		}
+		return summary;
+	}
+	public String getModuleSummary(boolean clear, String format) {
+		String summaryStr = null;
+		
+		DBSystem dbSystem = databaseControll.databaseSystem;
+		String name = "No database systen";
+		if (dbSystem != null) {
+			name = dbSystem.getShortDatabaseName(); 
+		}
+		int autoCommit = databaseControll.dbParameters.getUseAutoCommit() ? 1 : 0;
+		
+		switch (format) {
+		case SummaryCommand.XML:
+			summaryStr = String.format("\n<DBNAME>%s<\\DBNAME>,\n<AUTOCOMMIT>%d<\\AUTOCOMMIT>,\n<WRITES>%d<\\WRITES>,\n<FAILS>%d<\\FAILS>", 
+					name, autoCommit, summaryWriteOK, summaryWriteErr);
+			break;
+		default:
+			summaryStr = null;
+		}
+		
+		
+		if (clear) {
+			summaryWriteOK = summaryWriteErr = 0;
+		}
+		return summaryStr;
+	}
+	/*
+	public String getModuleSummary(boolean clear) {
+		DBSystem dbSystem = databaseControll.databaseSystem;
+		String name = "No database systen";
+		if (dbSystem != null) {
+			name = dbSystem.getShortDatabaseName(); 
+		}
+		int autoCommit = databaseControll.dbParameters.getUseAutoCommit() ? 1 : 0;
+		String summary = String.format("\n<DBNAME>%s<\\DBNAME>,\n<AUTOCOMMIT>%d<\\AUTOCOMMIT>,\n<WRITES>%d<\\WRITES>,\n<FAILS>%d<\\FAILS>", 
+				name, autoCommit, summaryWriteOK, summaryWriteErr);
+		if (clear) {
+			summaryWriteOK = summaryWriteErr = 0;
+		}
+		return summary;
+	}*/
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 import PamguardMVC.PamDataBlock;
+import dataPlots.data.TDDataProvider;
 
 /**
  * Static holder of information about plottable data. 
@@ -22,6 +23,10 @@ public class TDDataProviderRegisterFX {
 			singleInstance = new TDDataProviderRegisterFX();
 		}
 		return singleInstance;
+	}
+	
+	synchronized public void resetDataProviders() {
+		dataProviders = new ArrayList<TDDataProviderFX>();
 	}
 	
 	/**

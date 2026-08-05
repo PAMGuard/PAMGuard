@@ -21,6 +21,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import PamController.PamController;
@@ -31,6 +32,7 @@ import PamUtils.PamUtils;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.PamSymbol;
+import PamView.PanelOverlayDraw;
 import PamView.panel.CornerLayout;
 import PamView.panel.CornerLayoutContraint;
 import PamView.panel.PamPanel;
@@ -109,6 +111,7 @@ public class ClipDisplayUnit extends PamPanel {
 //		axisPanel.addMouseMotionListener(imageMouse);
 		imagePanel = new ImagePanel(new BorderLayout());
 		imagePanel.addMouseListener(imageMouse);
+		imagePanel.addMouseMotionListener(imageMouse);
 //		imagePanel.addMouseListener(imageMouse);
 //		imagePanel.addMouseMotionListener(imageMouse);
 		JLayeredPane layeredPane = new LayeredPane();
@@ -260,7 +263,7 @@ public class ClipDisplayUnit extends PamPanel {
 			}
 		}
 		
-		clipDisplayPanel.addPopupMenuItems(popupMenu, e);
+		int nAdded = clipDisplayPanel.addPopupMenuItems(popupMenu, e);
 		
 		PamSymbolChooser symbolChooser = clipDisplayPanel.getSymbolChooser();
 		if (symbolChooser instanceof StandardSymbolChooser) {
@@ -401,9 +404,14 @@ public class ClipDisplayUnit extends PamPanel {
 			}
 			ClipDataProjector proj = clipDisplayPanel.getClipDataProjector();
 			PamDataBlock dataBlock = triggerDataUnit.getParentDataBlock();
+			PanelOverlayDraw overlayDraw = dataBlock.getOverlayDraw();
 			if (dataBlock == null || dataBlock.canDraw(proj) == false) {
 				return;
 			}
+			if (overlayDraw != null) {
+				overlayDraw.preDrawAnything(g, dataBlock, proj);
+			}
+			proj.clearHoverList();
 			proj.setClipStart(clipDataUnit.getTimeMilliseconds());
 			dataBlock.drawDataUnit(g, triggerDataUnit, proj);
 			
@@ -423,7 +431,14 @@ public class ClipDisplayUnit extends PamPanel {
 		@Override
 		public String getToolTipText(MouseEvent event) {
 			// TODO Auto-generated method stub
-		return clipDataUnit.getSummaryString();
+			if(clipDisplayPanel.clipDisplayParameters.showFullSummary) {
+				return clipDataUnit.getSummaryString();
+			} else {
+				String shortSummary = "<html><p>Clip UID: "+String.valueOf(clipDataUnit.getUID())+"</p>";
+				shortSummary=shortSummary+"<p>Clip UTC: "+PamCalendar.formatTime(clipDataUnit.getLastUpdateTime(), 3, false)+"</p>";
+				return shortSummary;
+			}
+			
 //			return "Boo";
 		}
 		
@@ -545,51 +560,88 @@ public class ClipDisplayUnit extends PamPanel {
 	 */
 	class ImageMouse extends MouseAdapter {
 		
+		/**
+		 * These get picked up on the outer panel, but not the inner one. Dammit!
+		 */
 		public ImageMouse() {
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+//			System.out.println("Mouse pressed " + e.toString());
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
 			}
+			clipDisplayPanel.getClipDataProjector().setClipStart(clipDataUnit.getTimeMilliseconds());
 			clipDisplayPanel.mousePressed(e, ClipDisplayUnit.this);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mousePressed(e);
+				imagePanel.repaint();
+			}
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+//			System.out.println("Mouse released " + e.toString());
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
 			}
 			clipDisplayPanel.mouseReleased(e, ClipDisplayUnit.this);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseReleased(e);
+			}
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+//			System.out.println("Mouse clicked " + e.toString());
+			/*
+			 *  2026-07-15: Need to call these two lines before the popuptrigger and call
+			 *  the mouseClicked function so that the correct unit get's highlighted before
+			 *  the popup menu get's shown. 
+			 */			
+			clipDisplayPanel.getClipDataProjector().setCurrentClickedUnit(ClipDisplayUnit.this);
+//			if (e.getButton() == MouseEvent.BUTTON1) {
+				clipDisplayPanel.mouseClicked(e, ClipDisplayUnit.this);
+//			}
 			if (e.isPopupTrigger()) {
 				showPopupMenu(e);
 				return;
 			}
-			if (e.getButton() == MouseEvent.BUTTON1) {
-				clipDisplayPanel.mouseClicked(e, ClipDisplayUnit.this);
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseClicked(e);
 			}
 //			toggleHighlight();
 		}
 		
-//		@Override
-//		public void mouseDragged(MouseEvent e) {
-//		}
+		@Override
+		public void mouseDragged(MouseEvent e) {
+//			System.out.println("Mouse dragged " + e.toString());
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseDragged(e);
+			}
+			imagePanel.repaint();
+		}
 
-//		@Override
-//		public void mouseEntered(MouseEvent e) {
-////			clipDisplayPanel.selectClip(theUnit);
-//		}
+		@Override
+		public void mouseEntered(MouseEvent e) {
+//			System.out.println("Mouse entered " + e.toString());
+			clipDisplayPanel.getClipDataProjector().setClipStart(clipDataUnit.getTimeMilliseconds());
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseEntered(e);
+			}
+//			clipDisplayPanel.selectClip(theUnit);
+		}
 
-//		@Override
-//		public void mouseMoved(MouseEvent e) {
-//		}
+		@Override
+		public void mouseMoved(MouseEvent e) {
+//			System.out.println("Mouse moved " + e.toString());
+			if (e.getComponent() == imagePanel) {
+				clipDisplayPanel.getClipDisplayMarker().mouseMoved(e);
+			}
+		}
 	}
 
 //	/**
@@ -631,5 +683,17 @@ public class ClipDisplayUnit extends PamPanel {
 	public boolean toggleHighlight() {
 		setHighlight(!isHighlight());
 		return isHighlight();
+	}
+	/**
+	 * @return the clipDisplayPanel
+	 */
+	public ClipDisplayPanel getClipDisplayPanel() {
+		return clipDisplayPanel;
+	}
+	/**
+	 * @return the triggerDataUnit
+	 */
+	public PamDataUnit getTriggerDataUnit() {
+		return triggerDataUnit;
 	}
 }

@@ -1,17 +1,14 @@
 package rawDeepLearningClassifier.dlClassification.genericModel;
 
+import java.io.File;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jamdev.jdl4pam.genericmodel.GenericModel;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
-import org.jamdev.jpamutils.JamArr;
-
-import PamModel.PamModel;
-import PamModel.PamModel.PluginClassloader;
-import PamUtils.PamArrayUtils;
 import ai.djl.engine.EngineException;
+import pamguard.GlobalArguments;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
@@ -97,6 +94,9 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 				//System.out.println(Paths.get(genericParams.modelPath)); 
 				
 				//create a new model.
+				if(GlobalArguments.getParam(DLControl.MODELPATH)!=null) {
+					genericParams.modelPath = new File(GlobalArguments.getParam(DLControl.MODELPATH)).toString();
+				}
 				genericModel = new GenericModel(genericParams.modelPath); 
 
 				//System.out.println("LOAD A NEW MODEL: "); 

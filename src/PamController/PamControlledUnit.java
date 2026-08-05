@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import PamController.status.ModuleStatus;
 import PamController.status.ModuleStatusManager;
 import PamController.status.ProcessCheck;
+import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.PamPluginInterface;
@@ -511,7 +512,6 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * to use for a dialog, better to use PamController.getGuiFrame() which handles null automatically. 
 	 * @return
 	 */
-	@Deprecated
 	public PamView getPamView() {
 		return pamView;
 	}
@@ -522,6 +522,9 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * @return frame. 
 	 */
 	public Frame getGuiFrame() {
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			return null;
+		}
 		if (pamView != null) {
 			return pamView.getGuiFrame();
 		}
@@ -744,24 +747,18 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		return unitTaskManager.get(i);
 	}
 
-	/**
-	 * Get a module summary text string for shorthand output to anyting wanting a 
-	 * short summary of data state / numbers of detections. <br> You should not 
-	 * override this version of the function, but instead override getModuleSummary(boolean clear)
-	 * which allows for optional clearing of summary data. 
-	 * @return module summary string - goings on since the last call to this function
-	 */
-	public String getModuleSummary() {
-		return getModuleSummary(true);
-	}
+//	public String getModuleSummary(boolean clear) {
+//		return getModuleSummary(clear,"csv");
+//	}
+	
 
 	/**
-	 * Get a module summary text string for shorthand output to anyting wanting a 
+	 * Get a module summary text string for shorthand output to anything wanting a 
 	 * short summary of data state / numbers of detections. 
 	 * @param clear clear data after generating string, so that counts of detections, etc. start again from 0. 
 	 * @return module summary string - goings on since the last call to this function
 	 */
-	public String getModuleSummary(boolean clear) {
+	public String getModuleSummary(boolean clear, String format) {
 		return null;
 	}
 	
@@ -927,13 +924,14 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * @return plugin detail, or null if it's not a plugin. 
 	 */
 	public PamPluginInterface getPlugin() {
-		List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
+		List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginType(PamPluginInterface.class);
 		if (pluginList == null) {
 			return null;
 		}
-		for (PamPluginInterface plugin : pluginList) {
-			if (plugin.getClassName().equals(this.getClass().getName())) {
-				return plugin;
+		for (CommonPluginInterface plugin : pluginList) {
+			PamPluginInterface pf = (PamPluginInterface) plugin;
+			if (pf.getClassName().equals(this.getClass().getName())) {
+				return pf;
 			}
 		}
 		return null;

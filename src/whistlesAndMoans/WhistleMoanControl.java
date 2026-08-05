@@ -226,8 +226,8 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 	}
 
 	@Override
-	public String getModuleSummary(boolean clear) {
-		return whistleToneProcess.getModuleSummary(clear);
+	public String getModuleSummary(boolean clear, String format) {
+		return whistleToneProcess.getModuleSummary(clear, format);
 	}
 	
 	@Override

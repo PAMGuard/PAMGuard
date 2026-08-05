@@ -9,10 +9,12 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
+import noiseBandMonitor.BandType;
 
 public class NoiseSettings implements Serializable, Cloneable, ManagedParameters {
 
 	public static final long serialVersionUID = 1L;
+	
 	
 	public String dataSource;
 	
@@ -36,7 +38,7 @@ public class NoiseSettings implements Serializable, Cloneable, ManagedParameters
 	 * Tells PAMGUARD to use every single FFT data coming in. 
 	 * <p> Overrides nMeasures.
 	 */
-	public boolean useAll;
+	public boolean useAll = true;
 	
 	private ArrayList<NoiseMeasurementBand> measurementBands;
 	

@@ -2,6 +2,7 @@ package loggerForms;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -20,9 +21,12 @@ import PamUtils.PamCalendar;
 import PamView.PamSidePanel;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorderPanel;
+import PamView.panel.PamPanel;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserverAdapter;
+import loggerForms.network.LoggerNetworkManager;
+import loggerForms.network.LoggerNetworkSystem;
 
 public class FormsAlertSidePanel extends PamObserverAdapter implements PamSidePanel {
 	
@@ -31,18 +35,51 @@ public class FormsAlertSidePanel extends PamObserverAdapter implements PamSidePa
 //	private ArrayList<FormsDataBlock> formsDataBlocks;
 	private ArrayList<FormDescription> formDescriptions;
 	private FormsAlertPanel formsAlertPanel;
+	private PamPanel outerPanel;
 	
+	private JComponent networkPanel;
+	
+	public static  Color warningColour = new Color(255, 117, 117);
+
 	
 	public FormsAlertSidePanel(FormsControl formsControl) {
 		super();
+		
+		outerPanel = new PamPanel(new BorderLayout());
+//
+//		float[] col = Color.RGBtoHSB(255, 117, 117, null);		
+//		warningColour = Color.getHSBColor(col[0], col[1], col[2]);
 		
 		this.formsControl = formsControl;
 		formDescriptions= new ArrayList<FormDescription>();
 //		formsDataBlocks=new ArrayList<FormsDataBlock>();
 		formsAlertPanel=new FormsAlertPanel();
+		
+		outerPanel.add(BorderLayout.NORTH, formsAlertPanel);
+		
+		checkNetworkPanel();
+		
 		setupAutoUpdate();
 	}
 	
+	/**
+	 * Check to see if there is a panel from the Network system. 
+	 */
+	public void checkNetworkPanel() {
+		JComponent netComponent =  null;
+		LoggerNetworkManager netManager = LoggerNetworkSystem.getManager();
+		if (netManager != null) {
+			netComponent = netManager.getSideComponent();
+		}
+		if (netComponent == networkPanel) {
+			return;
+		}
+		if (networkPanel != null) {
+			outerPanel.remove(networkPanel);
+		}
+		networkPanel = netComponent;
+		outerPanel.add(networkPanel, BorderLayout.SOUTH);
+	}
 
 	@Override
 	public void addData(PamObservable o, PamDataUnit arg) {
@@ -90,7 +127,7 @@ public class FormsAlertSidePanel extends PamObserverAdapter implements PamSidePa
 //		if (){
 //			
 //		}
-		return formsAlertPanel;
+		return outerPanel;
 	}
 
 	@Override
@@ -176,9 +213,10 @@ public class FormsAlertSidePanel extends PamObserverAdapter implements PamSidePa
 				long timeLeft = formDescriptions.get(fd).getTimeOfNextSave()-timeNow;
 				
 				if (timeLeft<0){
-					float[] col = Color.RGBtoHSB(255, 117, 117, null);
-					
-					timesLeft[fd].setBackground(Color.getHSBColor(col[0], col[1], col[2]));
+//					float[] col = Color.RGBtoHSB(255, 117, 117, null);
+//					
+//					timesLeft[fd].setBackground(Color.getHSBColor(col[0], col[1], col[2]));
+					timesLeft[fd].setBackground(warningColour);
 				}else{
 					timesLeft[fd].setBackground(null);
 				}

@@ -1,5 +1,7 @@
 package dataMap.filemaps;
 
+import java.io.Serializable;
+
 /**
  * information added to a FileDataMapPoint when only part of the file
  * is associated with this map point. Start and end points are in bytes
@@ -7,8 +9,10 @@ package dataMap.filemaps;
  * @author dg50
  *
  */
-public class FileSubSection {
+public class FileSubSection implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private long startByte, endByte;
 	
 	public FileSubSection(long startByte, long endByte) {

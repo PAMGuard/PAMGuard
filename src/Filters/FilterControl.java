@@ -43,41 +43,41 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 
 	@Override
 	public JMenuItem createDetectionMenu(Frame parentFrame) {
-		JMenu menu = new JMenu(getUnitName());
+//		JMenu menu = new JMenu(getUnitName());
 		JMenuItem menuItem;
 		
-		menuItem = new JMenuItem("Data source...");
-		menuItem.addActionListener(new DataSourceAction(parentFrame));
-		menu.add(menuItem);
+//		menuItem = new JMenuItem("Data source...");
+//		menuItem.addActionListener(new DataSourceAction(parentFrame));
+//		menu.add(menuItem);
 		
-		menuItem = new JMenuItem("Filter Settings...");
+		menuItem = new JMenuItem(getUnitName() + " Settings...");
 		menuItem.addActionListener(new DetectionMenuAction(parentFrame));
-		menu.add(menuItem);
+//		menu.add(menuItem);
 		
-		return menu;
+		return menuItem;
 	}
 
-	class DataSourceAction implements ActionListener {
-
-		Frame parentFrame;
-		
-		public DataSourceAction(Frame parentFrame) {
-			super();
-			this.parentFrame = parentFrame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			FilterParameters_2 newParams = FilterDataSourceDialog.showDialog(filterParams, parentFrame, filterProcess.outputData);
-			
-			if (newParams != null) {
-				filterParams = newParams.clone();
-				filterProcess.setupProcess();
-			}
-		}
-		
-	}
+//	class DataSourceAction implements ActionListener {
+//
+//		Frame parentFrame;
+//		
+//		public DataSourceAction(Frame parentFrame) {
+//			super();
+//			this.parentFrame = parentFrame;
+//		}
+//
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//
+//			FilterParameters_2 newParams = FilterDataSourceDialog.showDialog(filterParams, parentFrame, filterProcess.outputData);
+//			
+//			if (newParams != null) {
+//				filterParams = newParams.clone();
+//				filterProcess.setupProcess();
+//			}
+//		}
+//		
+//	}
 	class DetectionMenuAction implements ActionListener {
 
 		Frame parentFrame;
@@ -89,10 +89,10 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			FilterParams newParams = FilterDialog.showDialog(parentFrame,
-					filterParams.filterParams, filterProcess.getSampleRate());
+			FilterParameters_2 newParams = FilterDialog.showDialog(parentFrame,
+					filterParams, filterProcess.getSampleRate());
 			if (newParams != null) {
-				filterParams.filterParams = newParams.clone();
+				filterParams = newParams;
 				filterProcess.setupProcess();
 			}
 		}

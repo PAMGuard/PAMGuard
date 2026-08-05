@@ -17,12 +17,12 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 	/**
 	 * Pane containing controls to set up the OrcaSPot classifier. 
 	 */
-	private StandardModelPane standardSettingsPane;
+	protected StandardModelPane standardSettingsPane;
 
 	/**
 	 * The sound spot classifier. 
 	 */
-	private ArchiveModelClassifier archiveModel;
+	private ArchiveModelClassifier archiveModelClassifier;
 
 	/**
 	 * The extension filter. 
@@ -36,7 +36,7 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 	 * @param soundSpotClassifier
 	 */
 	public ArchiveModelUI(ArchiveModelClassifier archiveClassifier) {
-		this.archiveModel=archiveClassifier; 
+		this.archiveModelClassifier=archiveClassifier; 
 
 //		extensionFilters = new ArrayList<ExtensionFilter>(); 
 //
@@ -49,22 +49,22 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 	@Override
 	public SettingsPane<StandardModelParams> getSettingsPane() {
 		if (standardSettingsPane==null) {
-			standardSettingsPane = new  ArchiveModelPane(archiveModel); 
+			standardSettingsPane = new  ArchiveModelPane(archiveModelClassifier); 
 		}
 		return standardSettingsPane;
 	}
 
 	@Override
 	public void getParams() {
-		StandardModelParams params =  getSettingsPane().getParams(archiveModel.getDLParams()); 
-		archiveModel.setDLParams(params); 
+		StandardModelParams params =  getSettingsPane().getParams(archiveModelClassifier.getDLParams()); 
+		archiveModelClassifier.setDLParams(params); 
 	}
 
 
 	@Override
 	public void setParams() {
 		//		System.out.println("Set model params: " + genericModelClassifier.getGenericDLParams().dlTransfromParams.size()); 
-		getSettingsPane().setParams(archiveModel.getDLParams());
+		getSettingsPane().setParams(archiveModelClassifier.getDLParams());
 	}
 
 
@@ -78,7 +78,7 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 	public List<ExtensionFilter> getModelFileExtensions() {
 		if (extensionFilters == null) {
 			extensionFilters = new ArrayList<ExtensionFilter>(); 
-			extensionFilters.add(new ExtensionFilter(archiveModel.getName(), archiveModel.getFileExtensions())); 
+			extensionFilters.add(new ExtensionFilter(archiveModelClassifier.getName(), archiveModelClassifier.getFileExtensions())); 
 		} 
 		return extensionFilters;
 	}
@@ -96,6 +96,15 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/**
+	 * Get the archive model classifier. 
+	 * @return the archive model classifier.
+	 */
+	public ArchiveModelClassifier getArchiveModelClassifier() {
+		return archiveModelClassifier;
+	}
+
 
 
 

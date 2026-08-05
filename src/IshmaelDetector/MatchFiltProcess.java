@@ -61,7 +61,7 @@ public class MatchFiltProcess extends IshDetFnProcess
      */
 	@Override
 	public float getDetSampleRate() {
-		return sampleRate;
+		return getSampleRate();
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class MatchFiltProcess extends IshDetFnProcess
 		//But if buffer is too long, then the display gets jumpy.  The compromise
 		//is to use the longer of kernel.length*2 (thus repeating roughly 
 		//kernel.length samples in each FFT) and 1/10 second.
-		int bufLen = Math.max((int)Math.round(sampleRate * 0.1), kernel.length * 2);
+		int bufLen = Math.max((int)Math.round(getSampleRate() * 0.1), kernel.length * 2);
 		bufLen = FFT.nextBinaryExp(bufLen);
 		buffer = new double[bufLen];
 	}
@@ -190,7 +190,7 @@ public class MatchFiltProcess extends IshDetFnProcess
 	
 	@Override
 	public float getHiFreq() {
-		return sampleRate / 2;
+		return getSampleRate() / 2;
 	}
 
 	@Override

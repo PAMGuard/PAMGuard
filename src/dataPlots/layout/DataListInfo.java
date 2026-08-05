@@ -8,7 +8,7 @@ import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * TDDataInfo objects can't be serialised since they contain 
- * references back into datablocks and everything else in PAMguard, 
+ * references back into datablocks and everything else in PAMGuard, 
  * so have to hold a summary of what's in each one to save into psf files. 
  * @author Doug Gillespie
  *

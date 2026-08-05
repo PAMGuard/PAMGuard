@@ -29,7 +29,7 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 	private String xmlString;
 	
 	private transient T nilusObject;
-	
+		
 	/**
 	 * construct an empty nilus wrapper
 	 */

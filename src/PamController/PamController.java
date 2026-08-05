@@ -45,16 +45,18 @@ import PamController.fileprocessing.ReprocessManager;
 import PamController.fileprocessing.ReprocessManagerMonitor;
 import PamController.fileprocessing.ReprocessStoreChoice;
 import PamController.masterReference.MasterReferencePoint;
+import PamController.memory.PamMemory;
+import PamController.pamWizard.PamWizardManager;
 import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.XMLWriterDialog;
 import PamController.soundMedium.GlobalMediumManager;
+import PamController.status.ModuleStatus;
 import PamDetection.PamDetection;
 import PamDetection.RawDataUnit;
 import PamModel.PamModel;
 import PamModel.PamModelSettings;
 import PamModel.PamModuleInfo;
 import PamModel.SMRUEnable;
-import PamModel.PamModel.PluginClassloader;
 import PamUtils.PamCalendar;
 import PamUtils.time.GlobalTimeManager;
 import PamView.GeneralProjector;
@@ -123,6 +125,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int PAM_COMPLETE = 6;
 	public static final int PAM_MAPMAKING = 7;
 	public static final int PAM_OFFLINETASK = 8;
+	//Treat this the same as pam stalled for now. 
+	public static final int PAM_MEMORYLEAK = 3;
 
 	public static final int BUTTON_START = 1;
 	public static final int BUTTON_STOP = 2;
@@ -216,6 +220,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * through.
 	 */
 	private GlobalMediumManager globalMediumManager;
+	
+	/**
+	 * Manager for PamWizard functionality
+	 */
+	private PamWizardManager pamWizardManager;
 
 	/**
 	 * A reference to the module currently being loaded. Used by the
@@ -270,6 +279,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		globalTimeManager = new GlobalTimeManager(this);
 		globalMediumManager = new GlobalMediumManager(this);
+		pamWizardManager = new PamWizardManager(this);
 
 		setPamStatus(PAM_IDLE);
 
@@ -374,6 +384,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * modules will have received INITIALISATION_COMPLETE and should be good to run
 	 */
 	private void creationComplete() {
+		
+		MarkRelationships.getInstance().subscribeAllMarkers();
+		
 		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {
 			if (getRunMode() == RUN_NORMAL) {
 				startLater(); // may as well give AWT time to loop it's queue once more
@@ -792,7 +805,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public void shutDownPamguard() {
 		// force close the javaFX thread (because it won't close by itself - see
 		// Platform.setImplicitExit(false) in constructor
-		Platform.exit();
+		try {
+			Platform.exit();
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 
 		// terminate the JVM
 		System.exit(getPamStatus());
@@ -1135,7 +1153,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-	 * Restart PAMguard. Can be called when something is mildly wrong such as a DAQ
+	 * Restart PAMGuard. Can be called when something is mildly wrong such as a DAQ
 	 * glitch, so that acquisition is stopped and restarted.
 	 */
 	public void restartPamguard() {
@@ -1331,6 +1349,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		boolean prepError = (runMode == PamController.RUN_NORMAL && prepErrors > 0);
 		if (prepError) {
+			if (GlobalArguments.getParam(AUTOEXIT) != null) {
+				/*
+				 * Batch run with no user present: if processing can't start, exit with an
+				 * error code rather than leaving the JVM idling forever (nothing else
+				 * would ever trigger the -autoexit System.exit).
+				 */
+				System.out.println("Unable to prepare processes for automatic processing. Exiting.");
+				System.exit(1);
+			}
 			return false;
 		}
 
@@ -1351,8 +1378,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//				System.out.println("Invalid reprocess choice command: " + reprocessString);
 		//			}
 		//		}
-
-		if (saveSettings && getRunMode() == RUN_NORMAL) { // only true on a button press or network start.
+		
+		/*
+		 *  only want to run the reprocess manager if it's file analysis, not for real time, since in real
+		 *  time, things can only move forwards.  
+		 */
+		boolean isRT = globalTimeManager.isRealTime();
+		if (saveSettings && getRunMode() == RUN_NORMAL && isRT == false) { // only true on a button press or network start and it's not real time
 			checkReprocessManager(saveSettings, startTime);
 		}
 		else {
@@ -1535,11 +1567,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 			long t1 = System.currentTimeMillis();
 			while (checkRunStatus()) {
 				long t2 = System.currentTimeMillis();
-				if (t2 - t1 > 5000) {
-					System.out.printf("Stopping, but stuck in loop for CheckRunStatus for %3.1fs\n",
-							(double) (t2 - t1) / 1000.);
+				if (t2 - t1 > 5000 & Math.abs(t2-t1)%10000<5) {
+					System.out.printf("Stopping, but stuck in loop for CheckRunStatus for %3.1fs\n", (double) (t2-t1)/1000.);
 					dumpBufferStatus("Stopping stuck in loop", false);
 					break; // crap out anyway.
+				}
+				if((double) (t2-t1)/1000.>20.) {
+					PamController.getInstance().setPamStatus(PamController.PAM_STALLED);
 				}
 				try {
 					Thread.sleep(100);
@@ -2261,6 +2295,17 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public int getPamStatus() {
 		return pamStatus;
 	}
+	
+	public double getMemoryAvailablePercent() {
+		PamMemory mem = new PamMemory();
+		double freeMem = (double)mem.getAvailable();
+		double maxMem = (double)Runtime.getRuntime().maxMemory();
+		double freeMemoryPercent = 100.0*(freeMem/maxMem);
+		if(freeMemoryPercent<5.0) {
+			System.out.println("Memory available is less than 5 percent. Maximum allocation is "+mem.formatMemory(mem.getMax())+" and there are "+mem.formatMemory(mem.getAvailable())+" left.");
+		}
+		return freeMemoryPercent;
+	}
 
 	public void setPamStatus(int pamStatus) {
 		this.pamStatus = pamStatus;
@@ -2278,6 +2323,34 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		showStatusWarning(pamStatus);
 	}
+	
+	public int getNetReceiveStatus() {
+		double freeMemPercent = getMemoryAvailablePercent();
+		if(freeMemPercent<5.0) {
+			System.out.println("Less than 5% of JVM Memory left. Attempting to garbage collect. Current free memory percent: "+freeMemPercent);
+			Runtime.getRuntime().gc();
+			if((freeMemPercent=getMemoryAvailablePercent())<5.0) {
+				System.out.println("Garbage collection did not sufficiently make room. Current free memory percent: "+freeMemPercent+" Sending 'PAM_STALLED' signal.");
+				//Will implement unique status behavior truly eventually, but for now this is just the same as pam stalled. 
+				return PAM_MEMORYLEAK;
+			}else {
+				System.out.println("Garbage collection moved the memory usage from the alert threshold (<5%) to "+freeMemPercent);
+			}
+		}
+		for (PamControlledUnit aUnit : pamConfiguration.getPamControlledUnits()) {
+			if(aUnit.getModuleStatus()!=null) {
+				if(aUnit instanceof AcquisitionControl) {
+					continue;
+				}
+				if(aUnit.getModuleStatus().getStatus()!=ModuleStatus.STATUS_OK) {
+					System.out.println("Module status reported not okay. Module name: "+aUnit.getUnitName()+". Issue: "+aUnit.getModuleStatus().toString()+". Sending 'PAM_STALLED' signal.");
+					return PAM_STALLED;
+				}
+			}
+		}
+		return getPamStatus();
+		
+	}
 
 	/**
 	 * This was within the StatusCommand class, but useful to have it here since
@@ -2294,7 +2367,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		int runMode = PamController.getInstance().getRunMode();
 		if (runMode == PamController.RUN_NETWORKRECEIVER) {
-			return PamController.PAM_RUNNING;
+			return getNetReceiveStatus();
 		}
 		int status = pamController.getPamStatus();
 		if (status == PamController.PAM_IDLE) {
@@ -3054,6 +3127,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return reference to main GUI frame.
 	 */
 	public static Frame getMainFrame() {
+		
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			return null;
+		}
 
 		PamController c = getInstance();
 		if (c.guiFrameManager == null) {
@@ -3129,6 +3206,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public WatchdogComms getWatchdogComms() {
 		return watchdogComms;
 	}
+	
+	
+	/**
+	 * Get the PAMWizard manager - manages creating configurations
+	 * @return the pamWizardManager
+	 */
+	public PamWizardManager getPamWizardManager() {
+		return pamWizardManager;
+	}
 
 	/**
 	 * Get the global medium manager. This indicates whether PG is being used in air
@@ -3162,8 +3248,30 @@ public class PamController implements PamControllerInterface, PamSettings {
 		ArrayList<PamControlledUnit> bs = findControlledUnits(BinaryStore.class);
 		for (PamControlledUnit aBS : bs) {
 			BinaryStore binStore = (BinaryStore) aBS;
-			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis);
+			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis, "Master Clock");
 		}
+	}
+
+	/**
+	 * Addition to getmodulesummary command, to add some more general system 
+	 * information to the summary string availale through the command interface
+	 * (udp, terminal, etc) .
+	 * @param clear
+	 * @return
+	 */
+	public String getMainSummary(boolean clear) {
+		String sum = "";
+		// system time
+		String t = PamCalendar.formatDBDateTime(System.currentTimeMillis(), true);
+		sum += String.format("<SYSTIME>%s<\\SYSTIME>", t);
+		sum += String.format("<STATUS>%d<\\STATUS>", getPamStatus());
+		sum += String.format("<STATE>%d<\\STATE>", getRealStatus());
+
+		//sum += String.format("\n<SYSTIME>%s<\\SYSTIME>", t);
+		//sum += String.format("\n<STATUS>%d<\\STATUS>", getPamStatus());
+	//	sum += String.format("\n<STATE>%d<\\STATE>", getRealStatus());
+		sum += "\n";
+		return sum;
 	}
 
 

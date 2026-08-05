@@ -70,8 +70,11 @@ public class CountingInputStream extends InputStream {
 	 */
 	@Override
 	public int read(byte[] arg0, int arg1, int arg2) throws IOException {
+		// be careful, since this may call into the other write functions and
+		// end up incrementing the count multiple times.
+		long currPos = pos;
 		int read =  parentStream.read(arg0, arg1, arg2);
-		pos += read;
+		pos = currPos + read;
 		return read;
 	}
 
@@ -80,8 +83,11 @@ public class CountingInputStream extends InputStream {
 	 */
 	@Override
 	public int read(byte[] arg0) throws IOException {
+		// be careful, since this may call into the other write functions and
+		// end up incrementing the count multiple times.
+		long currPos = pos;
 		int read = parentStream.read(arg0);
-		pos += read;
+		pos = currPos + read;
 		return read;
 	}
 
@@ -99,16 +105,17 @@ public class CountingInputStream extends InputStream {
 	 */
 	@Override
 	public long skip(long arg0) throws IOException {
+		long currPos = pos;
 		long skipped = parentStream.skip(arg0);
-		pos += skipped;
+		pos = currPos + skipped;
 		return skipped;
 	}
-
+	
 	/**
 	 * @return the pos
 	 */
 	public long getPos() {
 		return pos;
 	}
-
+	
 }

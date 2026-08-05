@@ -3,6 +3,8 @@
  */
 package loggerForms;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -22,8 +24,10 @@ import javax.swing.table.AbstractTableModel;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.PamTable;
+import PamView.component.PamScrollPane;
 import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
+import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
@@ -53,7 +57,7 @@ public class FormsDataDisplayTable {
 		this.formDescription=formDescription;
 		
 //		GridLayout(rows,columns)
-		mainPanel = new JPanel(new GridLayout(1, 0));
+		mainPanel = new PamPanel(new BorderLayout());
 		mainPanel.setOpaque(true);
 
 		formsTableDataModel = new FormsTableDataModel();
@@ -75,9 +79,10 @@ public class FormsDataDisplayTable {
 			formsTable.addMouseListener(new EditDataListener());
 //		}
 
-		scrollPane = new JScrollPane(formsTable);
+		scrollPane = new PamScrollPane(formsTable);
+//		scrollPane.setBackground(Color.RED);
 		
-		mainPanel.add(scrollPane);
+		mainPanel.add(scrollPane, BorderLayout.CENTER);
 		
 	}
 

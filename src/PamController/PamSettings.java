@@ -62,6 +62,9 @@ public interface PamSettings extends SettingsNameProvider {
 //			PamControlledUnitSettings pamControlledUnitSettings);
 
 	/**
+	 * Called when settings are loaded, or when a new module implementing PamSettings registers
+	 * itself with the global settings manager. If settings for the module exist, the global
+	 * settings manager will call this function so that saved settings can be restored. 
 	 * @param pamControlledUnitSettings
 	 * @return true if successful The object performs final checks (if needed)
 	 *         and then casts the settings data

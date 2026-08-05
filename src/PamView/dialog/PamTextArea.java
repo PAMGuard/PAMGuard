@@ -1,6 +1,7 @@
 package PamView.dialog;
 
 import java.awt.Color;
+import java.awt.Cursor;
 
 import javax.swing.JTextArea;
 import javax.swing.text.Document;
@@ -40,8 +41,8 @@ public class PamTextArea extends JTextArea implements ColorManaged {
 		// TODO Auto-generated constructor stub
 	}
 
-	private PamColor defaultColor = PamColor.PlOTWINDOW;
-//	private PamColor defaultColor = PamColor.BORDER;
+	private PamColor defaultColor = PamColor.EDITCTRL;
+	private Cursor cursor;
 	
 	public PamColor getDefaultColor() {
 		return defaultColor;
@@ -57,6 +58,7 @@ public class PamTextArea extends JTextArea implements ColorManaged {
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
+		cursor = this.getCursor();
 		this.setForeground(PamColors.getInstance().getColor(PamColor.AXIS));
 	}
 

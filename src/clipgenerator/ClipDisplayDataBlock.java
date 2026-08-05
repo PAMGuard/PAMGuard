@@ -1,6 +1,9 @@
 package clipgenerator;
 
+import java.util.ListIterator;
+
 import PamguardMVC.AcousticDataBlock;
+import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 
 /**
@@ -17,5 +20,23 @@ abstract public class ClipDisplayDataBlock<TUnit extends ClipDataUnit> extends A
 			PamProcess clipProcess, int channelMap) {
 		super(ClipDataUnit.class, dataName, clipProcess, 0);
 	}
-
+	
+	/**
+	 * Find the Clip data unit that has the given trigger data unit.  
+	 * @param triggerDataUnit
+	 * @return
+	 */
+	public TUnit findDataForTrigger(PamDataUnit triggerDataUnit) {
+		synchronized (getSynchLock()) {
+			ListIterator<TUnit> it = getListIterator(0);
+			while (it.hasNext()) {
+				TUnit dvU = it.next();
+				if (dvU.getTriggerDataUnit() == triggerDataUnit) {
+					return dvU;
+				}
+			}
+		}
+		return null;
+	}
+	
 }

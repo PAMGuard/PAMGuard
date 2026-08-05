@@ -15,7 +15,7 @@ import PamguardMVC.PamDataUnit;
 
 /**
  * Version of SQLLogging which buffers up the data units for a few seconds before writing them
- * so that other parts of PAMguard get a chance to modify them before they go into the 
+ * so that other parts of PAMGuard get a chance to modify them before they go into the 
  * database. If a unit is updated AFTER it's been written, it will still get updated in the 
  * normal way  
  * <p>This is causing a few issues with the need to subclass 

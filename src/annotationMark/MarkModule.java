@@ -41,6 +41,10 @@ public abstract class MarkModule extends PamController.PamControlledUnit {
 		return annotationProcess;
 	}
 
+	/**
+	 * Gets the Mark data block from the MarkProcess 
+	 * @return
+	 */
 	public MarkDataBlock getAnnotationDataBlock() {
 		return annotationProcess.getMarkDataBlock();
 	}

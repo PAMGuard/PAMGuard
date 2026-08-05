@@ -20,6 +20,8 @@
  */
 package Spectrogram;
 
+import java.util.HashMap;
+
 /**
  * Window function for use with FFT. 
  * 
@@ -70,6 +72,28 @@ public class WindowFunction {
 		}
 	}
 	
+	static HashMap<Integer, Double> BMap = new HashMap<Integer, Double>();
+	
+	public static double getHannScaling(int length) {
+		
+		if(BMap.keySet().contains(length)) {
+			return BMap.get(length);
+		}
+		return addHannScaling(length);
+	}
+	
+	private static double addHannScaling(int length) {
+		double[] hann = hann(length);
+		double sum = 0;
+		for(double w_j:hann) {
+			sum = sum+(w_j*w_j/(.5*.5));
+		}
+		double B = sum/length;
+		BMap.put(length, B);
+		return B;
+		
+	}
+	
 	public static double[] hamming(int length) {
 		double[] window = new double[length];
 
@@ -85,7 +109,7 @@ public class WindowFunction {
 
 		for (int i = 0; i < length; i++) {
 			window[i] = (0.5 - 0.5 * Math.cos(2.0 * Math.PI
-					* ((double) (i) / (double) (length - 1))));
+					* ((double) (i) / (double) (length))));
 		}
 		return (window);
 	}

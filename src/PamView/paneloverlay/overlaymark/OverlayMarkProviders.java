@@ -33,8 +33,9 @@ public class OverlayMarkProviders {
 	}
 
 	/**
-	 * Remove a provider of spectrogram marks. 
-	 * @param overlayMarkProvider provider to remove
+	 * Add a provider of spectrogram marks. 
+	 * Ensure this is not a duplicate of an existing mark first.
+	 * @param overlayMarkProvider provider to add
 	 */
 	public void addProvider(OverlayMarker overlayMarkProvider) {
 		if (overlayMarkProvider == null) {

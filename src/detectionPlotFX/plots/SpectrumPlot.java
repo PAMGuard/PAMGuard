@@ -3,7 +3,9 @@ package detectionPlotFX.plots;
 import Layout.PamAxis;
 import PamUtils.Coordinate3d;
 import PamguardMVC.PamDataUnit;
+import detectionPlotFX.layout.AbstractDetectionPlot;
 import detectionPlotFX.layout.DetectionPlot;
+import detectionPlotFX.layout.DetectionPlotContext;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.geometry.Side;
@@ -22,7 +24,7 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
  * @param <D> - the input data unit type
  */
 @SuppressWarnings("rawtypes")
-public abstract class  SpectrumPlot <D extends PamDataUnit> implements DetectionPlot<D>{
+public abstract class  SpectrumPlot <D extends PamDataUnit> extends AbstractDetectionPlot<D>{
 
 	/**
 	 * The default line width. 
@@ -33,11 +35,6 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	 * Parameters for the click spectrum. 
 	 */
 	private SpectrumPlotParams spectrumPlotParams=new SpectrumPlotParams();
-
-	/**
-	 * Reference to the detection display
-	 */
-	private DetectionPlotDisplay detectionPlotDisplay; 
 
 	/**
 	 * Used to prevent threading issues. 
@@ -96,8 +93,20 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 
 	//end of average spectrum of event//
 
+	/**
+	 * Constructor.
+	 * @param context - the display context
+	 */
+	public SpectrumPlot(DetectionPlotContext context){
+		super(context);
+	}
+
+	/**
+	 * @deprecated Use {@link #SpectrumPlot(DetectionPlotContext)} instead.
+	 */
+	@Deprecated
 	public SpectrumPlot(DetectionPlotDisplay detectionPlotDisplay){
-		this.detectionPlotDisplay=detectionPlotDisplay; 
+		super(detectionPlotDisplay);
 	}
 
 	@Override
@@ -122,8 +131,8 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 
 	@Override
 	public void setupPlot() {
-		detectionPlotDisplay.setAxisVisible(false, false, true, true);
-		detectionPlotDisplay.getAxisPane(Side.LEFT).setnPlots(1);
+		getContext().setAxisVisible(false, false, true, true);
+		getContext().getAxisPane(Side.LEFT).setnPlots(1);
 
 	}
 
@@ -512,13 +521,6 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	 */
 	public SpectrumPlotParams getSpectrumParams() {
 		return spectrumPlotParams;
-	}
-
-	/**
-	 * Re paint the last data unit. 
-	 */
-	public void reDrawLastUnit() {
-		detectionPlotDisplay.drawCurrentUnit();
 	}
 
 	/**

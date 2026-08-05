@@ -76,11 +76,13 @@ import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
 import binaryFileStorage.BinaryStore;
 import binaryFileStorage.SecondaryBinaryStore;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
 import effort.EffortProvider;
 import effort.binary.DataMapEffortProvider;
 import generalDatabase.SQLLogging;
@@ -225,9 +227,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	/**
 	 * Used in offline analysis when data are being reloaded. this list gets used to
-	 * distribute data being loaded from upstream processes.
+	 * distribute data being loaded from upstream processes. No it doesn't. 
+	 * All handled in the OfflineDataLoading
 	 */
-	private Vector<PamObserver> requestingObservers;
+//	private Vector<PamObserver> requestingObservers;
 
 	/**
 	 * Natural lifetime of data in seconds.
@@ -239,6 +242,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	protected int unitsAdded = 0;
 
 	protected int unitsUpdated = 0;
+	
+	protected int lastUnitUpdatedAbsoluteIndex = -1;
 
 	int channelMap;
 	
@@ -327,7 +332,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * Class of any super detections referenced by the data units held in this data
 	 * block
 	 */
-	private Class<?> superDetectionClass;
+//	private Class<?> superDetectionClass;
 
 	//	/**
 	//	 * Class of any sub detections referenced by the data units held in this data
@@ -444,8 +449,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		try {
 			Class[] superDetArgs = { Class.class };
 			method = unitClass.getMethod("getSuperDetection", superDetArgs);
-			superDetectionClass = GenericTypeResolver.resolveReturnType(method, unitClass);
-		} catch (NoSuchMethodException | SecurityException e) {
+//			superDetectionClass = GenericTypeResolver.resolveReturnType(method, unitClass);
+		} catch (Exception e) {
 			//			ok = false;
 		}
 		//		try {
@@ -1063,7 +1068,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public boolean loadViewerData(long dataStart, long dataEnd, ViewLoadObserver loadObserver) {
 		return loadViewerData(new OfflineDataLoadInfo(dataStart, dataEnd), loadObserver);
 	}
-
+	
 	/**
 	 * Do we need to reload offline data ? Default behaviour is to reurn true if the
 	 * time periods of the data load have changed, false otherwise.
@@ -1090,6 +1095,90 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public boolean clearOnViewerLoad() {
 		return true;
+	}
+
+	/**
+	 * Load all data for a map point. Slightly varied behaviour for binary map points
+	 * to ensure entire file is loaded in case footer and header times don't perfectly match data.  
+	 * @param mapPoint
+	 * @param loadObserver
+	 * @return
+	 */
+	public boolean loadMapPointData(OfflineDataMapPoint mapPoint, ViewLoadObserver loadObserver) {
+		if (mapPoint instanceof BinaryOfflineDataMapPoint) {
+			return loadBinaryDataMapPont((BinaryOfflineDataMapPoint) mapPoint, loadObserver);
+		}
+		else {
+			return loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), loadObserver);
+		}
+	}
+
+	/**
+	 * special behaviour for loading binary map point data in offline tasks (and Tethys) to 
+	 * ensure entire file is loaded. 
+	 * @param mapPoint
+	 * @param loadObserver
+	 */
+	private boolean loadBinaryDataMapPont(BinaryOfflineDataMapPoint mapPoint, ViewLoadObserver loadObserver) {
+		if (!PamController.getInstance().isInitializationComplete()) {
+			System.err.printf("Not loading %s since initialisation not yet complete\n", getDataName());
+			return false;
+		}
+//		long tenDays = 3600L*24L*1000L*10L;
+//		if (offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis() > tenDays) {
+//			System.out.printf("Big many day data load %s to %s in %s", PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()),
+//					PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()) ,getLongDataName());
+//		}
+
+		if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+			return false;
+		}
+		saveViewerData();
+
+//		if (!needViewerDataLoad(offlineDataLoadInfo)) {
+//			return true;
+//		}
+
+		clearChannelIterators();
+
+		if (clearOnViewerLoad()) {
+			clearAll();
+		}
+
+		currentViewDataStart = mapPoint.getStartTime();
+		currentViewDataEnd = mapPoint.getEndTime();
+
+		// run the garbage collector immediately.
+		Runtime.getRuntime().gc();
+
+		BinaryStore binaryStore = mapPoint.getBinaryStore();
+		
+		boolean loadOk = binaryStore.loadOneFile(this, mapPoint, loadObserver);
+
+//		if (dataMap.getClass() == BinaryOfflineDataMap.class) {
+//			//			System.out.println(getLongDataName() + " uses binary store");
+//			loadSecondaryBinaryData(offlineDataLoadInfo, loadObserver);
+//		}
+
+		ListIterator<Tunit> iter = getListIterator(0);
+		long newFistTime = Long.MAX_VALUE;
+		long newLastTime = 0;
+		while (iter.hasNext()) {
+			Tunit dat = iter.next();
+			long uid = dat.getUID();
+			firstViewerUID = Math.min(firstViewerUID, uid);
+			lastViewerUID = Math.max(lastViewerUID, uid);
+			currentViewDataStart = Math.min(currentViewDataStart, dat.getTimeMilliseconds());
+			currentViewDataEnd = Math.max(currentViewDataEnd, dat.getTimeMilliseconds());
+		}
+		
+		EffortProvider effProv = getEffortProvider();
+		if (effProv != null) {
+			effProv.viewerLoadData();
+		}
+
+		return loadOk;
+		
 	}
 
 	/**
@@ -1388,7 +1477,16 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void updatePamData(Tunit pamDataUnit, long updateTimeMillis) {
 		pamDataUnit.updateDataUnit(updateTimeMillis);
+		
+		/*
+		 * ST Added 7/17/26 -- the last data unit in the data block is no longer the last unit updated. 
+		 * Rather than looping through the block to find the last unit updated, just set this var for reference. 
+		 * Then if getLastUpdatedUnit() is called, it will know exactly where to look.
+		 */
+		//
+		lastUnitUpdatedAbsoluteIndex = pamDataUnit.getAbsBlockIndex();
 		setChanged();
+		
 		if (!isOffline && !pamDataUnit.isEmbryonic()) {
 			/*
 			 * Save it if it't not been saved already or we're saving updates. 
@@ -1457,7 +1555,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		synchronized (synchronizationLock) {
 			//			if (isdebug()) {
 			//				Debug.out.println("Removing data unit " + aDataUnit);
-			//			}
+			//			
+			aDataUnit.setDeleted(true);
 			boolean rem = pamDataUnits.remove(aDataUnit);
 			if (!rem) {
 				return false;
@@ -1712,6 +1811,26 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			if (ref >= pamDataUnits.size())
 				return null;
 			return pamDataUnits.get(ref);
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * Gets the data unit that was last updated (if still available). 
+	 * This is not necessarily the last data unit in the list, but rather the last one that was updated.
+	 * If data unit that was last updated isn't available, or no data units have been updated, 
+	 * just return the last data unit in the list.
+	 * 
+	 * @return
+	 */
+	//ST 7/17/26 -- Introduced after AIS memory leak was fixed by Doug June/July '26. 
+	public Tunit getLastUpdatedUnit() {
+		int trueReference = this.lastUnitUpdatedAbsoluteIndex - unitsRemoved;
+		if (trueReference >= 0 && trueReference < pamDataUnits.size()) {
+			return getCurrentDataUnit(trueReference);
+		}else {
+			return getLastUnit();
 		}
 	}
 
@@ -3705,8 +3824,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			int ib = i % 4;
 			bytes[ib] ^= chars[i];
 		}
-		int intVal = ((bytes[0] & 0xFF) << 24) + ((bytes[1] & 0xFF) << 16) + ((bytes[2] & 0xFF) << 8)
-				+ (bytes[3] & 0xFF);
+		if(bytes[0]==0 && bytes[1]==0) {
+			bytes[0] = Math.min(254, chars.length);
+			bytes[1] = chars[0];
+		}
+		int intVal = ((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
 		return intVal;
 	}
 
@@ -4222,12 +4344,12 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		this.currentViewDataEnd = currentViewDataEnd;
 	}
 
-	/**
-	 * @return the superDetectionClass
-	 */
-	public Class<?> getSuperDetectionClass() {
-		return superDetectionClass;
-	}
+//	/**
+//	 * @return the superDetectionClass
+//	 */
+//	public Class<?> getSuperDetectionClass() {
+//		return superDetectionClass;
+//	}
 
 	//	/**
 	//	 * @return the subDetectionClass
@@ -4484,6 +4606,13 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		else {
 			return config;
 		}
+	}
+
+	/**
+	 * @return the offlineDataLoading
+	 */
+	public OfflineDataLoading<Tunit> getOfflineDataLoading() {
+		return offlineDataLoading;
 	}
 
 }

@@ -29,10 +29,13 @@ package PamguardMVC;
 
 import java.util.ListIterator;
 
+import org.json.JSONObject;
+
 import Acquisition.AcquisitionProcess;
 import Acquisition.DCFilter;
 import Acquisition.RawDataBinaryDataSource;
 import PamController.PamController;
+import PamController.command.SummaryCommand;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
 import effort.EffortProvider;
@@ -49,29 +52,37 @@ import effort.EffortProvider;
  *
  */
 public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
-	
+
 	private long desiredSample = -1;
 	private long[] prevChannelSample = new long[PamConstants.MAX_CHANNELS];
-	
+
 	private double[] summaryTotals = new double[PamConstants.MAX_CHANNELS];
 	private double[] summaryTotals2 = new double[PamConstants.MAX_CHANNELS];
 	private double[] summaryMaxVal = new double[PamConstants.MAX_CHANNELS];
 	private int[] summaryCount = new int[PamConstants.MAX_CHANNELS];
-	
+
 	private DCFilter dcFilter;
 
 	/**
 	 * Keep a record of the last sample added. 
 	 */
-//	long latestSample = 0;
-	
+	//	long latestSample = 0;
+
 	@Override
 	protected int removeOldUnitsT(long currentTimeMS) {
 		// TODO Auto-generated method stub
 		if (pamDataUnits.isEmpty())
 			return 0;
 		int n = super.removeOldUnitsT(getLastUnitMillis());
-//		checkIntegrity();
+		//		System.out.printf("%d units removed from %s in removeOldUnitsT\n", n, getLongDataName());
+		//		checkIntegrity();
+		return n;
+	}
+
+	@Override
+	protected int removeOldUnitsS(long mastrClockSample) {
+		int n = super.removeOldUnitsS(mastrClockSample);
+		//		System.out.printf("%d units removed from %s in removeOldUnitsS\n", n, getLongDataName());
 		return n;
 	}
 
@@ -104,7 +115,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				reportProblem(++errors, unitIndex, String.format("Got channel %d, expected %d", singleChannel, expectedChannel)
 						, dataUnit);
 			}
-			
+
 			// check the sample number
 			if (expectedSample[channelIndex] > 0) {
 				if (expectedSample[channelIndex] != dataUnit.getStartSample()) {
@@ -112,13 +123,13 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 							dataUnit.getStartSample(), expectedSample[channelIndex]), dataUnit);
 				}
 			}
-			
+
 			// check the length
 			if (dataUnit.getSampleDuration() != dataUnit.getRawData().length) {
 				reportProblem(++errors, unitIndex, String.format("Have %d samples, expected %d", 
 						dataUnit.getSampleDuration(), dataUnit.getRawData().length), dataUnit);
 			}
-			
+
 			// move expectations.
 			expectedSample[channelIndex] = dataUnit.getStartSample() + dataUnit.getSampleDuration();
 			if (++channelIndex >= nChannels) {
@@ -126,7 +137,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			}
 			unitIndex++;
 		}
-		
+
 		return errors == 0;
 	}
 	private void reportProblem(int nErrors, int index, String str, RawDataUnit unit) {
@@ -140,7 +151,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		new RawDataDisplay(this);
 		setBinaryDataSource(new RawDataBinaryDataSource(this));
 	}
-	
+
 	public PamRawDataBlock(String name, PamProcess parentProcess, 
 			int channelMap, float sampleRate, boolean autoDisplay) {
 		super(RawDataUnit.class, name, parentProcess, channelMap);
@@ -148,19 +159,20 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			new RawDataDisplay(this);
 		}
 	}
-	
+
 	/**
 	 * Reset data integrity checking counters. 
 	 */
 	@Override
 	public void reset() {
+		desiredSample = -1;
 		prevChannelSample = new long[PamConstants.MAX_CHANNELS];
 		summaryTotals = new double[PamConstants.MAX_CHANNELS];
 		summaryTotals2 = new double[PamConstants.MAX_CHANNELS];
 		summaryMaxVal = new double[PamConstants.MAX_CHANNELS];
 		summaryCount = new int[PamConstants.MAX_CHANNELS];
 	}
-	
+
 	@Override
 	public void addPamData(RawDataUnit pamDataUnit) {
 		/*
@@ -181,9 +193,9 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		}
 		else if (desiredSample != pamDataUnit.getStartSample()) {
 			// don't add this data unit since its probably out of synch
-			System.out.println(String.format("Sample %d channel %d in %s out of synch - expected sample %d, previously got %d",
-					pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample, prevChannelSample[thisChannel]));
-//			return; add the data anyway, may get back into synch !!!! 
+			//			System.out.println(String.format("Sample %d channel %d in %s out of synch - expected sample %d, previously got %d",
+			//					pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample, prevChannelSample[thisChannel]));
+			//			return; add the data anyway, may get back into synch !!!! 
 		}
 		prevChannelSample[thisChannel] = pamDataUnit.getStartSample();
 		if (dcFilter != null) {
@@ -194,13 +206,13 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				dcFilter.filterData(thisChannel, pamDataUnit.getRawData());
 			}
 		}
-//		System.out.println(String.format("Sample %d channel %d in %s is in  synch - expected sample %d",
-//				pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample));
+		//		System.out.println(String.format("Sample %d channel %d in %s is in  synch - expected sample %d",
+		//				pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample));
 		addSummaryData(thisChannel, pamDataUnit);
-		
+
 		super.addPamData(pamDataUnit);
 	}
-	
+
 
 	/**
 	 * Get available data from the raw data block. Similar to the functionality of 
@@ -223,14 +235,14 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				// try to load some data !
 				if (parentProcess != null) {
 					this.clearAll();
-					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 1);
+					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 20);
 				}
 			}
 		}
 		// can callback into this for a second go so long as offlineLoad is false.
 		return getAvailableSamples(startMillis, durationMillis, channelMap);
 	}
-	
+
 	/**
 	 * Check to see if (all) data samples for a given time period are already in memory. 
 	 * @param startMillis
@@ -277,8 +289,8 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		RawDataUnit lastUnit = getLastUnit();
 		long lastMillis = lastUnit.getEndTimeInMilliseconds();
 		long lastSample = lastUnit.getStartSample()+lastUnit.getSampleDuration();
-		
-		
+
+
 		long firstAvailableMillis = Math.max(firstMillis, startMillis);
 		long lastAvailableMillis = Math.min(lastMillis, startMillis+durationMillis);
 		// we kinda know that these exist, so get them ...
@@ -298,8 +310,14 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			dataUnits[i].setRawData(chData);
 			dataUnits[i].setParentDataBlock(this);
 		}
-			
+
 		return dataUnits;
+	}
+
+	@Override
+	public void setSampleRate(float sampleRate, boolean notify) {
+		// TODO Auto-generated method stub
+		super.setSampleRate(sampleRate, notify);
 	}
 
 	/**
@@ -337,7 +355,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		if (duration < 0) {
 			throw new RawDataUnavailableException(this, RawDataUnavailableException.NEGATIVE_DURATION,0,0, startSample, duration);
 		}
-		
+
 		RawDataUnit dataUnit = getFirstUnit();
 		if (dataUnit == null) {
 			return null;
@@ -346,7 +364,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		long firstSample = dataUnit.getStartSample();
 		long lastSample = lastUnit.getStartSample()+lastUnit.getSampleDuration();
 		if (firstSample > startSample) {
-//			System.out.println("Earliest start sample : " + dataUnit.getStartSample());
+			//			System.out.println("Earliest start sample : " + dataUnit.getStartSample());
 			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_ALREADY_DISCARDED, 
 					firstSample, lastSample, startSample, duration);
 		}
@@ -355,16 +373,16 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED,
 					firstSample, lastSample, startSample, duration);
 		}
-		
+
 		int nChan = PamUtils.getNumChannels(channelMap);
 		double[][] wavData = new double[nChan][duration];
 		if (getTheSamples(startSample, duration, channelMap, wavData)) {
 			return wavData;
 		}
-//		getTheSamples(startSample, duration, channelMap, wavData);
+		//		getTheSamples(startSample, duration, channelMap, wavData);
 		return null;
 	}
-	
+
 	/**
 	 * Have we got the last needed sample ? 
 	 * @param lastRawUnit last raw data unit
@@ -383,14 +401,14 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			//we need to be, so all channels should have enough data. 
 			return true;
 		}
-		
+
 		/*
 		 * Final check - only need dataEndSample > lastSample IF the
 		 * data unit channel is >=the highest channel in channelMAp
 		 */
 		int highestChannel = Integer.highestOneBit(channelMap);
 		return lastRawUnit.getChannelBitmap() >= highestChannel;
-		
+
 	}
 
 	/**
@@ -427,7 +445,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	synchronized private boolean getTheSamples(long startSample, int duration, int channelMap,
 			double[][] waveData) {
 		// find the first data block
-//		int blockNo = -1;
+		//		int blockNo = -1;
 		ListIterator<RawDataUnit> rawIterator = pamDataUnits.listIterator();
 		RawDataUnit unit = null;
 		if (pamDataUnits.size() == 0) {
@@ -441,21 +459,21 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				break;
 			}
 		}
-//		for (int i = 0; i < pamDataUnits.size(); i++) {
-//			if (pamDataUnits.get(i).getLastSample() >= startSample) {
-//				blockNo = i;
-//				break;
-//			}
-////		}
+		//		for (int i = 0; i < pamDataUnits.size(); i++) {
+		//			if (pamDataUnits.get(i).getLastSample() >= startSample) {
+		//				blockNo = i;
+		//				break;
+		//			}
+		////		}
 		if (!foundStart) {
 			return false;
 		}
-//		if (blockNo < 0) {
-////			System.out.println("start sample always after last data block");
-//			return false;
-//		}
+		//		if (blockNo < 0) {
+		////			System.out.println("start sample always after last data block");
+		//			return false;
+		//		}
 		if (startSample < unit.getStartSample()) {
-//			System.out.println("start sample always less than data block start");
+			//			System.out.println("start sample always less than data block start");
 			return false;
 		}
 
@@ -466,13 +484,13 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		int offset;
 		int completeChannels = 0;
 		int[] channelSamples = new int[nChan]; // will need to keep an eye on
-												// how many samples we have for
-												// each channel
-//		RawDataUnit unit = pamDataUnits.get(blockNo);
-//		RawDataUnit prevUnit = null;
-//		if (startSample == 7309272) {
-//			System.out.println("About to crash");
-//		}
+		// how many samples we have for
+		// each channel
+		//		RawDataUnit unit = pamDataUnits.get(blockNo);
+		//		RawDataUnit prevUnit = null;
+		//		if (startSample == 7309272) {
+		//			System.out.println("About to crash");
+		//		}
 		while (true) {
 			if ((unit.getChannelBitmap() & channelMap) != 0) {
 				iChan = PamUtils.getSingleChannel(unit.getChannelBitmap());
@@ -527,16 +545,16 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		}
 	}
 
-	
+
 	@Override
 	public ChannelListManager getChannelListManager() {
 		if (getParentSourceData() != null) {
-//			System.out.println("Good ... " + getDataName() + " uses a higher level channel list manager !!!");
+			//			System.out.println("Good ... " + getDataName() + " uses a higher level channel list manager !!!");
 			return getParentSourceData().getChannelListManager();
 		}
 		// must be acquisition module, so return the master manager. 
 		if (AcquisitionProcess.class.isAssignableFrom(parentProcess.getClass())) {
-//			System.out.println("Good ... " + getDataName() + " has a channel list manager !!!");
+			//			System.out.println("Good ... " + getDataName() + " has a channel list manager !!!");
 			return ((AcquisitionProcess) parentProcess).getAcquisitionControl().getDaqChannelListManager();
 		}
 		System.out.println("Error ... " + getDataName() + " has no channel list manager !!!");
@@ -570,12 +588,81 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			summaryMaxVal[channel] = Math.max(summaryMaxVal[channel], mx);
 			summaryCount[channel] ++;
 		}
-		
+
 	}
 	
-	public String getSummaryString(boolean clear) {
+//	public String getSummaryString(boolean clear) {
+//		int nChan = PamUtils.getNumChannels(getChannelMap());
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("<RawDataSummary>");
+//		synchronized(summaryTotals) {
+//			for (int i = 0; i < nChan; i++) {
+//				double rms  = Math.sqrt(summaryTotals2[i] / summaryCount[i]) + 1e-6;
+//				double max  = summaryMaxVal[i] + 1e-6;
+//				double mean = summaryTotals[i] / summaryCount[i];
+//				sb.append(String.format("<channel index=\"%d\">", i));
+//				sb.append(String.format("<mean>%.1f</mean>", mean));
+//				sb.append(String.format("<peakdB>%.1f</peakdB>", 20. * Math.log10(max)));
+//				sb.append(String.format("<rmsdB>%.1f</rmsdB>", 20. * Math.log10(rms)));
+//				sb.append("</channel>");
+//			}
+//		}
+//		sb.append("</RawDataSummary>");
+//	}
+
+	public String getSummaryString(boolean clear, String format) {
+		String summaryStr;
+		int nChan = PamUtils.getNumChannels(getChannelMap());
+
+		switch (format) {
+		case SummaryCommand.CSV:
+			summaryStr = "";
+			for (int i = 0; i < nChan; i++) {
+				double rms = Math.sqrt(summaryTotals2[i]/summaryCount[i])+1e-6;
+				double max = summaryMaxVal[i]+1e-6;
+				double mean = summaryTotals[i]/summaryCount[i];
+				summaryStr += String.format("ch%d,%3.1f,%3.1f,%3.1f,", i, mean, 20.*Math.log10(max),
+						20.*Math.log10(rms));
+			}
+			break;
+		case SummaryCommand.JSON:
+			JSONObject summaryJSON = new JSONObject();
+			synchronized(summaryTotals) {
+				for (int i = 0; i < nChan; i++) {
+					double rms = Math.sqrt(summaryTotals2[i]/summaryCount[i])+1e-6;
+					double max = summaryMaxVal[i]+1e-6;
+					double mean = summaryTotals[i]/summaryCount[i];
+					if(format.equals("json"))
+						summaryJSON.put("channel"+i,new JSONObject(String.format("{\"rms\":%3.1f,\"zeroPeak\":%3.1f,\"mean\":%3.1f}", 20.*Math.log10(rms),20.*Math.log10(max),20.*Math.log10(mean))));
+
+				}
+			}
+			summaryStr = summaryJSON.toString();
+			break;
+		case SummaryCommand.XML:
+			StringBuilder sb = new StringBuilder();
+			sb.append("<RawDataSummary>");
+			synchronized(summaryTotals) {
+				for (int i = 0; i < nChan; i++) {
+					double rms  = Math.sqrt(summaryTotals2[i] / summaryCount[i]) + 1e-6;
+					double max  = summaryMaxVal[i] + 1e-6;
+					double mean = summaryTotals[i] / summaryCount[i];
+					sb.append(String.format("<channel index=\"%d\">", i));
+					sb.append(String.format("<mean>%.1f</mean>", mean));
+					sb.append(String.format("<peakdB>%.1f</peakdB>", 20. * Math.log10(max)));
+					sb.append(String.format("<rmsdB>%.1f</rmsdB>", 20. * Math.log10(rms)));
+					sb.append("</channel>");
+				}
+			}
+			sb.append("</RawDataSummary>");
+			summaryStr = sb.toString();
+			break;
+		default:
+			summaryStr = null;
+
+		}
 		/*
-		 * 
+		 *
 	sumString[0] = 0;
 	float rms, max, mean;
 	for (int i = 0; i < ringBufferChannels; i++) {
@@ -587,25 +674,16 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		//				20*log10(rms/32768.));
 		sprintf(sumString+strlen(sumString), "ch%d,%3.1f,%3.1f,%3.1f,", i, mean, 20.*log10(max/32768.),
 				20.*log10(rms/32768.));
-	}
-		 */
-		String str = "";
-		int nChan = PamUtils.getNumChannels(getChannelMap());
-		synchronized(summaryTotals) {
-			for (int i = 0; i < nChan; i++) {
-				double rms = Math.sqrt(summaryTotals2[i]/summaryCount[i])+1e-6;
-				double max = summaryMaxVal[i]+1e-6;
-				double mean = summaryTotals[i]/summaryCount[i];
-				str += String.format("ch%d,%3.1f,%3.1f,%3.1f,", i, mean, 20.*Math.log10(max),
-						20.*Math.log10(rms));
-			}
-		}
+	} */
+
+
 		if (clear) {
 			clearSummaryData();
 		}
-		return str;
+		
+		return summaryStr;
 	}
-	
+
 	public void clearSummaryData() {
 		synchronized(summaryTotals) {
 			for (int i = 0; i < summaryTotals.length; i++) {
@@ -642,14 +720,28 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		return dcFilter;
 	}
 
+	@Override
+	public void clearAll() {
+		//		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		//		System.out.printf("ClearAll() in %s called from %s\n", getLongDataName(), stack[2].toString());
+		super.clearAll();
+	}
+
+	@Override
+	public void clearAll(boolean andDownStream) {
+		//		System.out.printf("ClearAll(%s) called in %s\n", Boolean.valueOf(andDownStream).toString(), getLongDataName());
+		super.clearAll(andDownStream);
+	}
 
 
-//	@Override
-//	protected void findParentSource() {
-//		super.findParentSource();
-//		if (getParentSourceData() == null) {
-//			System.out.println(getDataName() + " has no source data");
-//		}
-//	}
+
+
+	//	@Override
+	//	protected void findParentSource() {
+	//		super.findParentSource();
+	//		if (getParentSourceData() == null) {
+	//			System.out.println(getDataName() + " has no source data");
+	//		}
+	//	}
 
 }

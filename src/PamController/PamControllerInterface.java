@@ -332,7 +332,7 @@ public interface PamControllerInterface {
 	 * Notification sent out when new offline data have
 	 * been loaded. This is sent in the AWT thread after the 
 	 * worker thread loading the data has completed. 
-	 * <p>Also see DATA__LOAD_COMPLETE 
+	 * <p>Also see DATA_LOAD_COMPLETE 
 	 * which is sent around 
 	 * within the same worker thread and therefore
 	 * executes BEFORE this one. 

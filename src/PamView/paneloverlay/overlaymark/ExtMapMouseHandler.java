@@ -4,11 +4,8 @@ import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-import PamguardMVC.debug.Debug;
-import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.MouseEvent;
@@ -163,7 +160,7 @@ public class ExtMapMouseHandler extends ExtMouseAdapter {
 	public boolean mousePressed(javafx.scene.input.MouseEvent e) {
 		boolean ans = false;
 		
-		//System.out.println("Show pop up: 1 press: " + e.isPopupTrigger()); 
+		//System.out.println("ExtMapMouseHandler: Show pop up: 1 press: " + e.isPopupTrigger()); 
 //		MarkRelationships links = MarkRelationships.getInstance();
 //		MarkRelationshipsData params = links.getMarkRelationshipsData();
 
@@ -174,8 +171,17 @@ public class ExtMapMouseHandler extends ExtMouseAdapter {
 		
 		//pop up menus should appear on a press and click. 
 		if (e.isPopupTrigger()) {
-			if (popMenu!=null && popMenu.showPopupMenu(e, extMouseAdapters, fxNode)) {
+			if (popMenu!=null) {
+				//added this because in FX GUI the pop up menu does not disappear properly. May need to only
+				//call when FX GUI is enabled but does not seem to do any harm in Swing GUI.
+				popMenu.closePopupMenu(e);
+				popMenu.showPopupMenu(e, extMouseAdapters, fxNode);
 				return true;
+			}
+		}
+		else {
+			if (popMenu!=null) {
+				popMenu.closePopupMenu(e);
 			}
 		}
 		
@@ -188,13 +194,14 @@ public class ExtMapMouseHandler extends ExtMouseAdapter {
 	public boolean mouseReleased(javafx.scene.input.MouseEvent e) {
 		boolean ans = false;
 
-		//System.out.println("Show pop up: 2 release: " + e.isPopupTrigger()); 
+		//System.out.println("ExtMapMouseHandler: Show pop up: 2 release: " + e.isPopupTrigger()); 
 
 		if (e.isPopupTrigger()) {
 			if (popMenu.showPopupMenu(e, extMouseAdapters, fxNode)) {
 				return true;
 			}
 		}
+	
 		
 		for (ExtMouseAdapter ma:extMouseAdapters) {
 			ans |= ma.mouseReleased(e);

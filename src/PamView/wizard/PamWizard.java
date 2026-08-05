@@ -94,6 +94,21 @@ abstract public class PamWizard extends PamDialog {
 		return getCardParams(wizardCards.get(iCard));
 	}
 	
+	private void selectNewCard() {
+		int iCard = getCardIndex();
+		if (iCard < 0) {
+			return;
+		}
+		cardSelected(wizardCards.get(iCard));
+	}
+	
+	/**
+	 * Called when a card is selected in the stack. 
+	 * @param pamWizardCard
+	 */
+	public void cardSelected(PamWizardCard pamWizardCard) {
+	}
+
 	abstract public void setCardParams(PamWizardCard wizardCard);
 	
 	abstract public boolean getCardParams(PamWizardCard wizardCard);
@@ -131,6 +146,7 @@ abstract public class PamWizard extends PamDialog {
 		int iCard = getCardIndex();
 		if (iCard < wizardCards.size()-1) {
 			cardLayout.next(cardPanel);
+			selectNewCard();
 			enableControls();
 			return false;
 		}

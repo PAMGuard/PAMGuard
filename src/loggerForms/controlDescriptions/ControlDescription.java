@@ -19,6 +19,9 @@ import loggerForms.LoggerForm;
 import loggerForms.controls.LoggerControl;
 
 /**
+ * ControlDescriptions describe specific controls and help handle their data, i.e. they only exist once a form has been
+ * designed and created. 
+ * <p>A list of possible control types is in the enum ControlType. 
  * @author GrahamWeatherup
  *
  */
@@ -141,46 +144,57 @@ public abstract class ControlDescription extends ItemDescription  {
 	public static ControlDescription makeCd(FormDescription formDescription, ItemInformation itemInformation){
 		ControlTypes ctrlType = itemInformation.getControlType();
 		switch(ctrlType){
-			case CHAR : 	return new CdChar(formDescription, itemInformation);
-			case CHECKBOX : return new CdCheckbox(formDescription, itemInformation);
-			case COUNTER : 	return new CdCounter(formDescription, itemInformation);
-			case DOUBLE : 	return new CdDouble(formDescription, itemInformation);
+			case CHAR : 	
+				return new CdChar(formDescription, itemInformation);
+			case CHECKBOX : 
+				return new CdCheckbox(formDescription, itemInformation);
+			case COUNTER : 	
+				return new CdCounter(formDescription, itemInformation);
+			case DOUBLE : 	
+				return new CdDouble(formDescription, itemInformation);
 	//		GPSTIMESTAMP,
-			case INTEGER : 	return new CdInteger(formDescription, itemInformation);
-			case LOOKUP : 	return new CdLookup(formDescription, itemInformation);
-			case LATLONG : 	return new CdLatLong(formDescription, itemInformation);
+			case INTEGER : 	
+				return new CdInteger(formDescription, itemInformation);
+			case LOOKUP : 	
+				return new CdLookup(formDescription, itemInformation);
+			case LATLONG : 	
+				return new CdLatLong(formDescription, itemInformation);
 //			case LATLONGTIME:return new CdLatLongTime(formDescription);
-			case NMEACHAR : return new CdNMEAChar(formDescription, itemInformation);
-			case NMEAFLOAT : return new CdNMEAFloat(formDescription, itemInformation);
-			case NMEAINT : 	return new CdNMEAInt(formDescription, itemInformation);
-			case SHORT : 	return new CdShort(formDescription, itemInformation);
-			case SINGLE : 	return new CdSingle(formDescription, itemInformation);
-			case TIME : 	return new CdTime(formDescription, itemInformation);
-			case TIMESTAMP : return new CdTimestamp(formDescription, itemInformation);
+			case NMEACHAR : 
+				return new CdNMEAChar(formDescription, itemInformation);
+			case NMEAFLOAT : 
+				return new CdNMEAFloat(formDescription, itemInformation);
+			case NMEAINT : 	
+				return new CdNMEAInt(formDescription, itemInformation);
+			case SHORT : 	
+				return new CdShort(formDescription, itemInformation);
+			case SINGLE : 	
+				return new CdSingle(formDescription, itemInformation);
+			case TIME : 	
+				return new CdTime(formDescription, itemInformation);
+			case TIMESTAMP : 
+				return new CdTimestamp(formDescription, itemInformation);
 	//		ANALOGUE,
 	//		DIGITAL,
-			case HSPACE : 	return new CdxHSpace(formDescription, itemInformation);
-			case NEWLINE : 	return new CdxNewline(formDescription, itemInformation);
-			case STATIC : 	return new CdxStatic(formDescription, itemInformation);
-			case VSPACE : 	return new CdxVSpace(formDescription, itemInformation);
-			case SUBFORM: return new CdSubForm(formDescription, itemInformation);
+			case HSPACE : 	
+				return new CdxHSpace(formDescription, itemInformation);
+			case NEWLINE : 	
+				return new CdxNewline(formDescription, itemInformation);
+			case STATIC : 	
+				return new CdxStatic(formDescription, itemInformation);
+			case VSPACE : 	
+				return new CdxVSpace(formDescription, itemInformation);
+			case SUBFORM: 
+				return new CdSubForm(formDescription, itemInformation);
+			case BUTTON:
+				return new CdButton(formDescription, itemInformation);
+			case ACTION:
+				return new CdAction(formDescription, itemInformation);
 		}
 		return null;
 	}
 	
-//	abstract Class getDataClasses();
-	
-//	
-//	public boolean isInput(){
-////		System.out.println(getType());
-//		if (/**/eType==ControlTypes.HSPACE||
-//				eType==ControlTypes.STATIC||
-//				eType==ControlTypes.VSPACE||
-//				eType==ControlTypes.NEWLINE){
-//			return false;
-//		}
-//		return true;
-//	}
+
 	
 	public abstract LoggerControl makeControl(LoggerForm loggerForm);
 	

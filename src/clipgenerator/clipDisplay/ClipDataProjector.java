@@ -11,6 +11,8 @@ public class ClipDataProjector extends GeneralProjector<TimeFrequencyPoint> {
 	
 	private long clipStart;
 	
+	private ClipDisplayUnit currentClickedUnit;
+	
 //	private double minFrequency = 0;
 //	private double maxFrequency = 1;
 	
@@ -55,6 +57,20 @@ public class ClipDataProjector extends GeneralProjector<TimeFrequencyPoint> {
 		
 		
 		return new Coordinate3d(tBins, fPix);
+	}
+
+	/**
+	 * @return the currentClickedUnit
+	 */
+	public ClipDisplayUnit getCurrentClickedUnit() {
+		return currentClickedUnit;
+	}
+
+	/**
+	 * @param currentClickedUnit the currentClickedUnit to set
+	 */
+	public void setCurrentClickedUnit(ClipDisplayUnit currentClickedUnit) {
+		this.currentClickedUnit = currentClickedUnit;
 	}
 
 }

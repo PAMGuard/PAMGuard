@@ -32,23 +32,26 @@ public class DLDetectionGraphics extends PamDetectionOverlayGraphics {
 	public int alpha = 64; // 25% transparent
 
 	public Color detColor = Color.GREEN; 
+	public Color fillColor = new Color(0f, 1f, 0f, .15f);
 
 	private PamSymbol defaultSymbol = new PamSymbol(PamSymbolType.SYMBOL_DIAMOND, 10, 12, false,
-			detColor, detColor ); 
+			fillColor, detColor ); 
 
 
 	public DLDetectionGraphics(PamDataBlock parentDataBlock) {
 		super(parentDataBlock,null);
-		//		this.setDefaultSymbol(defaultSymbol);
+		this.setDefaultSymbol(defaultSymbol);
 		setLineColor(detColor); 
 		setLocColour(detColor);
 	}
 
 	/**
 	 * Override to forget all symbol chooser stuff. 
+	 * No don't. It's easy to select an alpha in the symbol chooser. 
 	 */
 	public PamSymbol getPamSymbol(PamDataUnit pamDataUnit, GeneralProjector projector) {
-		return this.defaultSymbol; 
+//		return this.defaultSymbol;
+		return super.getPamSymbol(pamDataUnit, projector);
 	}
 
 
@@ -77,13 +80,14 @@ public class DLDetectionGraphics extends PamDetectionOverlayGraphics {
 			generalProjector.addHoverData(middle, pamDataUnit);
 		}
 
+		PamSymbol symbol = getPamSymbol(pamDataUnit, generalProjector);
 
 		//creates a copy of the Graphics instance
 		Graphics2D g2d = (Graphics2D) g.create();
 
 		g2d.setStroke(normal);
 
-		g2d.setColor(detColor);
+		g2d.setColor(symbol.getLineColor());
 
 		g2d.drawRect((int) topLeft.x, (int) topLeft.y, 
 				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
@@ -94,15 +98,17 @@ public class DLDetectionGraphics extends PamDetectionOverlayGraphics {
 		//so want more opacity for higher predictions to highlight more
 		//so low alpha means more opaque
 
-		//set the alpha so that better results are more opaque 
-		int alphaDet = 155 ; //  (int) ((1.0-PamUtils.PamArrayUtils.max(pamDetection.getModelResults().get(0).getPrediction()))*alpha); 
+		if (symbol.isFill()) {
+			//set the alpha so that better results are more opaque 
+//			int alphaDet = 155 ; //  (int) ((1.0-PamUtils.PamArrayUtils.max(pamDetection.getModelResults().get(0).getPrediction()))*alpha); 
 
-		//			System.out.println("Alpha Det: " + alphaDet + "  " + pamDetection.getModelResult().getPrediction()); 
-		Color detColorAlpha = new Color(detColor.getRed(), detColor.getGreen(), detColor.getBlue(), alphaDet);
-		g2d.setColor(detColorAlpha);
-		g2d.fillRect((int) topLeft.x, (int) topLeft.y, 
-				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
-
+			//			System.out.println("Alpha Det: " + alphaDet + "  " + pamDetection.getModelResult().getPrediction()); 
+//			Color detColorAlpha = new Color(detColor.getRed(), detColor.getGreen(), detColor.getBlue(), alphaDet);
+//			g2d.setColor(detColorAlpha);
+			g2d.setColor(symbol.getFillColor());
+			g2d.fillRect((int) topLeft.x, (int) topLeft.y, 
+					(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
+		}
 
 		return new Rectangle((int) topLeft.x, (int) topLeft.y, 
 				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);

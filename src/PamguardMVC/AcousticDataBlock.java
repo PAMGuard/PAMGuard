@@ -62,7 +62,7 @@ abstract public class AcousticDataBlock <Tunit extends PamDataUnit> extends PamD
 			parentSourceData = (AcousticDataBlock) parentData;
 		}
 		else {
-			System.out.println("Cannot assign " + parentData.getDataName() + " as AcousticData");
+//			System.out.println("Cannot assign " + parentData.getDataName() + " as AcousticData");
 		}
 	}
 

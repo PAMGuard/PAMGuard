@@ -24,16 +24,31 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.json.JSONObject;
+
+import Acquisition.FolderInputSystem;
+import NMEA.serial.SerialNMEAProvider;
+import NMEA.simulated.SimulatedNMEAProvider;
+import NMEA.udp.UdpNMEAProvider;
+import nmeaEmulator.NMEAFrontEnd;
+import pamguard.CommandLine;
+import pamguard.GlobalArguments;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.command.SummaryCommand;
+import PamController.status.BaseProcessCheck;
+import PamModel.CommonPluginInterface;
+import PamModel.PamModel;
 import nmeaEmulator.NMEAFrontEnd;
+import pamguard.GlobalArguments;
 
 
 /**
@@ -55,13 +70,22 @@ import nmeaEmulator.NMEAFrontEnd;
  */
 public class NMEAControl extends PamControlledUnit implements PamSettings {
 
-	AcquireNmeaData acquireNmeaData;
+	protected AcquireNmeaData acquireNmeaData;
 //	ProcessAISData processAISData;
-	NMEAParameters nmeaParameters = new NMEAParameters();
+	protected NMEAParameters nmeaParameters = new NMEAParameters();
 //	JMenuItem nmeaMenu;
-	NMEAControl nmeaControl;
+	private NMEAControl nmeaControl;
+	
+	public static final String GlobalPortFlag = "-serialPort";
 	
 	public static final String nmeaUnitType = "NMEA Data";
+	
+	/**
+	 * Command line to set com port from command start line. 
+	 */
+	public static final String NMEACOMCOMMAND = "-NMEAPORT";
+	
+	private ArrayList<NMEAProvider> nmeaProviders = new ArrayList<NMEAProvider>();
 
 	public NMEAControl(String unitName) {
 		
@@ -73,22 +97,67 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 
 		addPamProcess(acquireNmeaData);
 		setModuleStatusManager(acquireNmeaData);
-
-//		addPamProcess(new ProcessNmeaData(this, acquireNmeaData.getOutputDataBlock(0), new NMEAParameters()));
-
-//		addPamProcess(processAISData = new ProcessAISData(this, acquireNmeaData.getOutputDataBlock(0)));
+		
+		nmeaProviders.add(new SerialNMEAProvider(this));
+		nmeaProviders.add(new UdpNMEAProvider(this));
+		nmeaProviders.add(new SimulatedNMEAProvider(this));
+		// add plugins
+		ArrayList<CommonPluginInterface> plugins = PamModel.getPamModel().getPluginType(NMEAPlugin.class);
+		for (CommonPluginInterface p : plugins) {
+			NMEAPlugin nmeaPlugin = (NMEAPlugin) p;
+			nmeaProviders.add(nmeaPlugin.getNMEAProvider(this));
+		}
 		
 		PamSettingManager.getInstance().registerSettings(this);
 		
-//		nmeaMenu = createNMEAMenu();
+		checkGlobalArguments();
+		
+	}
+
+	private void checkGlobalArguments() {
+		// try the new command line way of getting these things ...
+		String globArg = CommandLine.getCommandLine().getCommandParameter(NMEACOMCOMMAND); // dougs way
+		if (globArg == null) {
+			globArg = CommandLine.getCommandLine().getCommandParameter(NMEAControl.GlobalPortFlag); // Sam's way
+		}
+		if (globArg == null) {
+			globArg = GlobalArguments.getParam(NMEACOMCOMMAND); // old way !
+		}
+		if (globArg != null) {
+			System.out.printf("Setting %s serial port to %s\n", getUnitName(), globArg);
+			if (globArg.equalsIgnoreCase("auto")) {
+				nmeaParameters.autoSerialPort = true;
+			}
+			else {
+				nmeaParameters.serialPortName = globArg;
+			}
+		}
+//		
+//		//Sam's way -- (Doug's is better)
+//		String portArg = GlobalArguments.getParam(NMEAControl.GlobalPortFlag);
+//		if (portArg != null) {
+//			this.nmeaParameters.serialPortName=portArg;
+//		}
+		
 	}
 
 	public JMenuItem createNMEAMenu(Frame parentFrame) {
 		JMenuItem menuItem;
 		JMenu subMenu = new JMenu(getUnitName());
+//		menuItem = new JMenuItem("NMEA Parameters ...");
+//		menuItem.addActionListener(new NMEASettings(parentFrame));
+//		subMenu.add(menuItem);
+		
 		menuItem = new JMenuItem("NMEA Parameters ...");
-		menuItem.addActionListener(new NMEASettings(parentFrame));
+		menuItem.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showDialog2(parentFrame);
+			}
+		});
 		subMenu.add(menuItem);
+		
 		menuItem = new JMenuItem("NMEA Strings ...");
 		menuItem.addActionListener(new NMEAStrings(parentFrame));
 		subMenu.add(menuItem);
@@ -106,35 +175,43 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 		return subMenu;
 	}
 
+
 	public NMEAParameters getNmeaParameters() {
 		return nmeaParameters;
 	}
 
-	class NMEASettings implements ActionListener {
-		Frame parentFrame;
-		
-		public NMEASettings(Frame parentFrame) {
-			super();
-			// TODO Auto-generated constructor stub
-			this.parentFrame = parentFrame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			showNMEADialog(parentFrame);
-		}		
-	}
+//	class NMEASettings implements ActionListener {
+//		Frame parentFrame;
+//		
+//		public NMEASettings(Frame parentFrame) {
+//			super();
+//			// TODO Auto-generated constructor stub
+//			this.parentFrame = parentFrame;
+//		}
+//
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//			showNMEADialog(parentFrame);
+//		}		
+//	}
 	
-	public void showNMEADialog(Frame parentFrame ) {
-		
-			NMEAParameters ans = NMEAParametersDialog
-					.showDialog(parentFrame, nmeaParameters);
-			if (ans != null) {
-				nmeaParameters = ans.clone(); // copy across new settings
-				acquireNmeaData.startNmeaSource(ans.sourceType); // restart the process with new settings
-				
-			}
+//	public void showNMEADialog(Frame parentFrame ) {
+//		
+//			NMEAParameters ans = NMEAParametersDialog
+//					.showDialog(parentFrame, nmeaParameters);
+//			if (ans != null) {
+//				nmeaParameters = ans.clone(); // copy across new settings
+//				acquireNmeaData.startNmeaSource(); // restart the process with new settings
+//				
+//			}
+//	}
+	protected void showDialog2(Frame parentFrame) {
+		boolean ans = NMEADialog2.showDialog(parentFrame, this);
+		if (ans) {
+			acquireNmeaData.startNmeaSource(); // restart the process with new settings
+		}
 	}
+
 	
 	class NMEAStrings implements ActionListener {
 		private Frame parentFrame;
@@ -204,6 +281,25 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 		
 		return true;
 	}
+	
+	@Override
+	public String getModuleSummary(boolean clear, String format) {
+		switch (format) {
+		case SummaryCommand.JSON:
+			NMEADataUnit lastUnit = acquireNmeaData.getOutputDatablock().getLastUnit();
+			if(lastUnit==null) {
+				return "";
+			}
+			JSONObject json = new JSONObject();
+			json.put("LastDataTime", lastUnit.getTimeMilliseconds());
+			json.put("LastDataString", lastUnit.getCharData().toString());
+			return json.toString();
+		case SummaryCommand.XML:
+			return getXMLModuleSummary(clear);
+		default:
+			return null;
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see PamguardMVC.PamControlledUnit#SetupControlledUnit()
@@ -211,7 +307,7 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public void setupControlledUnit() {
 		super.setupControlledUnit();
-		acquireNmeaData.startNmeaSource(this.nmeaParameters.sourceType);
+		acquireNmeaData.startNmeaSource();
 		
 	}
 
@@ -232,5 +328,63 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	public NMEADataBlock getNMEADataBLock() {
 		return acquireNmeaData.getOutputDatablock();
 	}
+
+	/**
+	 * @return the acquireNmeaData
+	 */
+	public AcquireNmeaData getAcquireNmeaData() {
+		return acquireNmeaData;
+	}
+	
+	public String getXMLModuleSummary(boolean clear) {
+		NMEADataUnit data = getNMEADataBLock().getLastUnit();
+		
+		String NMEAString;
+		if (data ==null) {
+			NMEAString = "none";
+		}
+		else {
+			NMEAString = data.getCharData().toString();
+		}
+				
+		StringBuilder sb = new StringBuilder();
+		sb.append("<NMEAraw>");
+		sb.append(NMEAString);
+		sb.append("</NMEAraw>");
+		
+		return NMEAString;
+	}
+
+	public void setNmeaParameters(NMEAParameters newParams) {
+		this.nmeaParameters = newParams;
+	}
+
+	/**
+	 * @return the nmeaProviders
+	 */
+	public ArrayList<NMEAProvider> getNmeaProviders() {
+		return nmeaProviders;
+	}
+
+	/**
+	 * Get a provider based on it's class name
+	 * @param providerClass
+	 * @return
+	 */
+	public NMEAProvider getNMEAProvider(String providerClass) {
+		for (NMEAProvider provider : nmeaProviders) {
+			if (provider.getClass().getName().equals(providerClass)) {
+				return provider;
+			}
+		}
+		return null;
+	}
+//	public NMEAProvider getNMEAProvider(String type) {
+//		if (type == null) {
+//			return null;
+//		}
+//		
+//	}
+
 	
 }

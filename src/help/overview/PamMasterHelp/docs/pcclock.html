@@ -1,0 +1,164 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Clocks and Time</title>
+</head>
+
+<body>
+
+	<h1>PAMGuard</h1>
+	<h2>Clocks and Time</h2>
+	<p><b>These notes apply to running PAMGuard in real time, acquiring data from a sound card or other acquisition device, entering data
+	manually, etc. When re-processing data from files, dates and times are always taken from the file names and the number of samples 
+	processed from the files.</b></p> 
+	
+	<p>When running PAMGuard in real time, time can be taken from several different
+		sources:</p>
+	<ol>
+		<li>The PC Clock</li>
+		<li>The GPS</li>
+		<li>The number of acquired samples from the <a
+			href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">acquisition
+				system.</a>
+	</ol>
+
+	<p>The only one of these that can be guaranteed to be accurate is
+		the GPS since GPS times are continually updates from globally accurate atomic clocks. (GPS 
+		works by measuring time differences between signals from different satellites to nanosecond 
+		accuracy, so GPS time HAS to be accurate).</p>
+	<p>If your computer is connected to the Internet, then it's also
+		likely that the PC Clock will have set itself accurately to Internet
+		Time.</p>
+	<p>
+		Earlier versions of PAMGuard were able to <a
+			href="../../../mapping/NMEA/docs/ClockOptions.html">
+			automatically set the PC Clock from the GPS</a>. Sadly, that's quite
+		tricky to do now on Windows computers since PAMGuard would have to be
+		started with admin privileges.
+		<p>Other clocks 'drift', that is they gain or lose a bit of time every day. This includes 
+		the PC internal clock, which will gradually become wrong by several seconds unless it's been 
+		connected to the Internet and is able to update itself regularly. It also applies to the 'clocks'
+		that control the sampling of your acoustic data in a sound card, or other input device. The exact number
+		of samples you get will not be exactly what you set it to, so times calculated based off counts of samples
+		will gradually become inaccurate.</p>
+	
+	<h3>UTC</h3>
+	<p>PAMGuard records all data using UTC Time (Coordinated Universal
+		Time) also known as Zulu Time in some countries.</p>
+	<p>This is a standard international time zone, that is also used as
+		Internet Time. It does not change with daylight saving and is the same
+		at every point in the world. Knowing that data are in UTC keeps things
+		simple, and you can always convert to your local time, with or without
+		daylight saving, when needed.</p>
+	<p>
+		<b>Be Careful!</b>, particularly with daylight saving. For instance,
+		I'm in the UK, so my computer is set to the time zone UTC+00.0
+		(Dublin, Edinburgh, Lisbon, London). This is NOT the same as UTC
+		(Coordinated Universal Time) since on top of that UTC+00.0, it's
+		summer, so my PC has added an additional hour for daylight saving,
+		i.e. the current time is 08:08 UTC, but 09:08 local.
+	</p>
+
+	<h3>PAMGuard Time</h3>
+	<h4>Acoustic Data</h4>
+	<p>PAMGuard assigns times to each detection, or other recorded
+		data, by reading the PC Clock when PAMGuard starts, then for each
+		acoustic detection, it simply adds on a number of seconds calculated
+		as the total number of processed samples divided by the sample rate.</p>
+	<h4>Non-Acoustic Data</h4>
+	<p>
+		For non-acoustic data, for instance <a
+			href="../../../utilities/userInputHelp/docs/userInput.html">User
+			Comments</a>, PAMGuard simply uses the current PC Clock time.
+	</p>
+
+
+
+	<h3>PC Clocks and Time Zones</h3>
+	<p>It is likely that the clock in the corner of your PC will be
+		showing local time. That is OK. So long as the time zone in the PC is
+		set correctly, then the true underlying clock within the PC will be
+		set to UTC.</p>
+	<p>One of the most common errors people make is to set their PC
+		Clock to UTC, knowing that that's what PAMGuard likes, but since there
+		is a time zone set in their PC, this pushes the PC's internal clock to
+		UTC minus whatever the PC time zone was along with any daylight
+		saving.</p>
+	<p><center><b>The best thing to do therefore, is to leave it well alone !</b></center></p>
+
+	<h4>Setting the PC Clock Manually</h4>
+	<p>Sometimes, you have no choice but to set the PC Clock manually.
+		For instance, if you're not connected to the Internet and you can't
+		get the GPS to set the PC Clock because you don't have admin rights.</p>
+	<p>If you do have to do this, then you have to worry about your
+		time zone. It's most likely that you'll need to set the correct LOCAL
+		Time on the computer, and this will then automatically set the correct
+		UTC time in the internal computer clock. i.e. I can see from my GPS that it's now
+		08:58 UTC, but I know my PC clock has an hour of daylight saving, so I should set
+		my PC clock in the system control panel to 09:58.</p>
+	<p>Alternatively, you could set the PC time zone to UTC, then set
+		the time as UTC.</p>
+
+	<h3>Checking it's Right</h3>
+	<p>This can all get quite confusing, so it's important to check
+		things are right.</p>
+	<p>The PC time in UTC is always shown in the top left corner of the
+		display. Check that this is showing the correct time in UTC.</p>
+	<p>
+		<img src="./images/mainMenu.png">
+	</p>
+
+	<p>
+		If you've a GPS, then this can be checked against the GPS time, shown
+		either on the <a
+			href="../../../mapping/mapHelp/docs/mapInformationDisplayPanel.html">Map
+			Display</a> or the <a
+			href="../../../mapping/NMEA/docs/configuringNMEADataSource.html">NMEA
+			strings list</a>.
+	</p>
+
+	<h3>Global Time settings</h3>
+	<p>
+		Additional checks on time can be set up from the <b>File > Global
+			time settings ...</b> menu.
+	</p>
+	<p>
+		<img src="images/globaltime.png">
+	</p>
+	<p>This will log times derived from the PC Clock and another
+		reliable data source, namely the GPS or an Internet time server to a
+		database table "Global_Time" which can be used both to check your data
+		and to sort out any disasters.</p>
+	<p>If you select the option to 'correct UTC in all modules', then
+		PAMGuard will attempt to correct times as data are created. Note
+		however that this option is not currently sufficiently tested for
+		reliability.</p>
+
+	<h3>Poor Sound Acquisition</h3>
+	<p>
+		Just because you've set the sample rate in your <a
+			href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound
+			Acquisition</a> module to a particular value, doesn't mean that the
+		device you're using will sample at that rate. <br>
+	<p>Cheap sound cards can just have cheap clocks in them, which
+		sample at the wrong rate. Further, Windows USB sound cards can drop
+		packets of data if the USB bus, or the computer, is too busy thereby
+		messing up any calculations of time based on counts of samples.</p>
+	<p>
+		In your <a
+			href="../../../utilities/generalDatabaseHelp/docs/database_database.html">database</a>,
+		you can check the Sound_Acquisition table, which will show any offsets
+		between times calculated from the sample count, and the actual time
+		from the PC clock, though if these differ, you'll have to use GPS data
+		to determine which is correct.
+	</p>
+
+	<br>
+	<p CLASS="previousLink">
+		<a href="mixedMode.html">Previous: Mixed Mode Operation</a>
+	</p>
+	<p CLASS="nextLink">
+		<a href="PamdogHelp.html">Next: PAMGuard Watchdog</a>
+	</p>
+</body>
+</html>

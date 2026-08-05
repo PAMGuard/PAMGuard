@@ -1,55 +1,41 @@
 package PamView.dialog;
 
 import java.awt.Color;
-import java.awt.Graphics;
 
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.plaf.ButtonUI;
 
 import PamView.ColorManaged;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
 
-//import com.sun.java.swing.plaf.windows.WindowsButtonUI;
 
 public class PamButton extends JButton implements ColorManaged {
-
-//	private PamButtonUI buttonUI;
 	
 	public PamButton() {
 		super();
 		setOpaque(true);
-//		PamColors.getInstance().registerComponent(this, PamColor.BORDER);
 	}
 
 	public PamButton(Action a) {
 		super(a);
 		setOpaque(true);
-//		PamColors.getInstance().registerComponent(this, PamColor.BORDER);
 	}
 
 	public PamButton(Icon icon) {
 		super(icon);
 		setOpaque(true);
-//		PamColors.getInstance().registerComponent(this, PamColor.BORDER);
 	}
 
 	public PamButton(String text, Icon icon) {
 		super(text, icon);
 		setOpaque(true);
-//		PamColors.getInstance().registerComponent(this, PamColor.BORDER);
 	}
 
 	public PamButton(String text) {
 		super(text);
 		setOpaque(true);
-//		ui = buttonUI = new PamButtonUI();
-//		setBorderPainted(false);
-//		set
-//		ButtonUI bui = this.getUI();
-//		PamColors.getInstance().registerComponent(this, PamColor.BORDER);
 	}
 
 	

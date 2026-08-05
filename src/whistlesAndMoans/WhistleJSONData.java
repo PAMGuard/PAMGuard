@@ -15,7 +15,10 @@ public class WhistleJSONData extends JSONObjectData {
 	int[] contWidth;
 	
 	double meanWidth;
+		
+	double bearingReN;
 	
+	double bearingErr;
 	
 	/**
 	 * Main Constructor

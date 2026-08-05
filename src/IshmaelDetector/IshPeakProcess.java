@@ -129,6 +129,12 @@ public class IshPeakProcess extends PamProcess
 	 */
 	protected void prepareMyParams() {
 		IshDetParams p = ishDetControl.ishDetParams;  //local reference
+		/**
+		 * note that this is used for all three Ish detectors, so the time set in 
+		 * "samples" might be either real samples, or it might be the FFT rate. 
+		 * Hence use dRate, which will be sample rate for things like matched filters
+		 * but will be the FFT rate for the two spectrogram based methods. 
+		 */
 		float dRate     = ishDetControl.ishDetFnProcess.getDetSampleRate();
 
 		minTimeN        = Math.max(0, (long)(dRate * p.minTime));
@@ -141,7 +147,8 @@ public class IshPeakProcess extends PamProcess
 			maxTimeN        = Math.max(0, (long)(dRate * p.maxTime));
 		}
 
-		refactoryTimeSam = Math.max(0, (long)(this.getSampleRate() * p.refractoryTime));
+//		refactoryTimeSam = Math.max(0, (long)(this.getSampleRate() * p.refractoryTime));
+		refactoryTimeSam = Math.max(0, (long)(dRate * p.refractoryTime));
 
 		activeChannels = ishDetControl.getActiveChannels(); //no need to recalc this every iteration. 
 	}

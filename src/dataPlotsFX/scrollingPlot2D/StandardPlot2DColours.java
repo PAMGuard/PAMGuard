@@ -52,11 +52,18 @@ public class StandardPlot2DColours implements Plot2DColours {
 	 * 
 	 */
 	public StandardPlot2DColours(PlotParams2D spectParams) {
-		amplitudeLimits[0]=new SimpleDoubleProperty(84); 
-		amplitudeLimits[1]=new SimpleDoubleProperty(115); 
+//		amplitudeLimits[0]=new SimpleDoubleProperty(84); 
+//		amplitudeLimits[1]=new SimpleDoubleProperty(115); 
 		DoubleProperty[] al = spectParams.getAmplitudeLimits();
-		amplitudeLimits[0].bind(al[0]);
-		amplitudeLimits[1].bind(al[1]);
+		for (int i = 0; i < 2; i++) {
+			amplitudeLimits[i] = new SimpleDoubleProperty(al[i].doubleValue());
+			amplitudeLimits[i].bind(al[i]);
+//			amplitudeLimits[i].addListener((obsVal, oldVal, newVal)->{
+//				System.out.println("Color ampligude update to " + newVal);
+//			});
+//			amplitudeLimits[i].set(al[i].doubleValue());
+//		amplitudeLimits[1].bind(al[1]);
+		}
 		this.setColourMap(spectParams.getColourMap());
 		this.spectParams=spectParams; 
 	}

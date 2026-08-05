@@ -71,7 +71,7 @@ public class SgramCorrProcess extends IshDetFnProcess
 	@Override
 	public float getDetSampleRate() {
 		FFTDataBlock fftDataSource = (FFTDataBlock)getInputDataBlock();
-		return sampleRate / fftDataSource.getFftHop();
+		return getSampleRate() / fftDataSource.getFftHop();
 	}
 
 	//Calculate any subsidiary values needed for processing.  These get recalculated
@@ -97,8 +97,8 @@ public class SgramCorrProcess extends IshDetFnProcess
 			 */
 			FFTDataBlock fftDataSource =
 				(FFTDataBlock)inputDataBlock;
-			double fRate = sampleRate / fftDataSource.getFftHop(); 
-			makeKernel(p, sampleRate, fRate, savedGramHeight); //sets kernel, binOffset
+			double fRate = getSampleRate() / fftDataSource.getFftHop(); 
+			makeKernel(p, getSampleRate(), fRate, savedGramHeight); //sets kernel, binOffset
 			renewPerChannelInfo();
 		} else {
 			savedGramHeight = -1;	//special case: force recalculation later

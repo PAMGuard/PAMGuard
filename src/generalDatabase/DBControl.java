@@ -118,12 +118,18 @@ PamSettingsSource {
 	}
 
 	protected boolean addDatabaseSystem(DBSystem dbSystem) {
+		try {
 		if (dbSystem.hasDriver()) {
 			databaseSystems.add(dbSystem);
 		}
 		else {
 			System.out.println(String.format("%s Database system is unavailable on this platform", 
 					dbSystem.getSystemName()));
+			return false;
+		}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -244,13 +250,15 @@ PamSettingsSource {
 				System.out.println("Database system     : " + databaseSystem.getSystemName());
 				DatabaseMetaData metaData = connection.getConnection().getMetaData();
 				System.out.println("Driver              : " + metaData.getDriverName());
-				System.out.println("ANSI92EntryLevelSQL : " + metaData.supportsANSI92EntryLevelSQL());
-				System.out.println("Keywords            : " + metaData.getSQLKeywords());
-				System.out.println("Add Column          : " + metaData.supportsAlterTableWithAddColumn());
-				System.out.println("Auto Commit         : " + connection.getConnection().getAutoCommit());
-				System.out.println("Updatable resultset : " + metaData.supportsResultSetConcurrency(
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_UPDATABLE));
+				if (SMRUEnable.isEnable()) {
+					System.out.println("ANSI92EntryLevelSQL : " + metaData.supportsANSI92EntryLevelSQL());
+					System.out.println("Keywords            : " + metaData.getSQLKeywords());
+					System.out.println("Add Column          : " + metaData.supportsAlterTableWithAddColumn());
+					System.out.println("Auto Commit         : " + connection.getConnection().getAutoCommit());
+					System.out.println("Updatable resultset : " + metaData.supportsResultSetConcurrency(
+							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_UPDATABLE));
+				}
 			}
 			catch (SQLException ex) {
 
@@ -355,6 +363,7 @@ PamSettingsSource {
 		synchronized (DBControl.class) {
 			try {
 				if (!connection.getConnection().getAutoCommit()) {
+//					System.out.println("Database commit");
 					connection.getConnection().commit();
 				}
 			} catch (SQLException e) {
@@ -537,7 +546,8 @@ PamSettingsSource {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {	
+		public void actionPerformed(ActionEvent e) {
+			commitChanges(); // do a commit before opening. Makes life better for everyone. 
 			if (databaseSystem != null) {
 				databaseSystem.openCurrentDatabase();
 			}
@@ -886,6 +896,20 @@ PamSettingsSource {
 	public int getLastErrorCount() {
 		return lastErrorCount;
 	}
+
+	@Override
+	public String getModuleSummary(boolean clear, String format) {
+		/**
+		 * Get a module summary for the database, so can check remotely
+		 * Returned fields will be name, autocommit (0 or 1), number of writes, number of fails. 
+		 */
+		if (dbProcess == null) {
+			return null;
+		}
+		
+		return dbProcess.getModuleSummary(clear, format);
+	}
+	
 
 
 }

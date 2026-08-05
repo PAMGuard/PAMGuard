@@ -51,6 +51,7 @@ public class SudAudioFileReader {
 //		 sudParams.saveMeta = false;
 		 sudParams.setFileSave(false, false, false, false);
 		 sudParams.zeroPad = zeroPad;
+
 	} 
 	
 	/**
@@ -61,6 +62,7 @@ public class SudAudioFileReader {
 	 * @throws IOException
 	 */
 	public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
+
 		try {
 			sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, false); 
 		} catch (Exception e) {
@@ -79,7 +81,7 @@ public class SudAudioFileReader {
 	 */
 	public AudioInputStream getAudioInputStream(File file, SudMapListener mapListener) throws UnsupportedAudioFileException, IOException {
 		
-//		System.out.println("Get SUD getAudioInputStream");
+		//System.out.println("Get SUD getAudioInputStream" + sudParams.zeroPad);
  
 		try {
 			sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, mapListener, false);

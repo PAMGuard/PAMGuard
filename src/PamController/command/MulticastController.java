@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 import PamController.PamController;
 import PamController.pamBuoyGlobals;
+import networkTransfer.send.NetSendCommandParam;
 import networkTransfer.send.NetworkSender;
 import pamguard.GlobalArguments;
 
@@ -128,8 +129,8 @@ public class MulticastController extends CommandManager {
 		 *  for multicast, we need to send a slightly different string back which has the station id as part of
 		 *  the returned string. These will be 0 if they weren't passed in at the command line.  
 		 */
-		String id1 = GlobalArguments.getParam(NetworkSender.ID1);
-		String id2 = GlobalArguments.getParam(NetworkSender.ID2);
+		String id1 = GlobalArguments.getParam(NetSendCommandParam.ID1.arg);
+		String id2 = GlobalArguments.getParam(NetSendCommandParam.ID2.arg);
 		String bigString = String.format("%s,%s,%s,%s", commandName, id1, id2, dataString);
 		
 //		dataString += "\n";

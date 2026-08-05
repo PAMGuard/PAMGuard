@@ -143,7 +143,7 @@ public class AzigramProcess extends PamProcess {
 			
 			freqBins = new Double[outputFftLength];
 			for (int i = 0; i < outputFftLength; i++) {
-				freqBins[i] = (double) (sampleRate * i / outputFftLength);  
+				freqBins[i] = (double) (getSampleRate() * i / outputFftLength);  
 			}
 
 			azigramData.sortOutputMaps(sourceData.getChannelMap(), sourceData.getSequenceMapObject(), channelMap);

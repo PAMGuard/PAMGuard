@@ -64,6 +64,9 @@ public class OneBandPulseProcess extends PamProcess {
 	public void newData(PamObservable o, PamDataUnit arg) {
 		OneBandDataUnit du = (OneBandDataUnit) arg;
 		int chan = PamUtils.getSingleChannel(du.getChannelBitmap());
+		if(chan<0 || chan > channelProcesses.length-1) {
+			return;
+		}
 		if (channelProcesses[chan] != null) {
 			channelProcesses[chan].newData(du);
 		}
@@ -116,7 +119,7 @@ public class OneBandPulseProcess extends PamProcess {
 					// start a pulse
 					peakMax = rms;
 					pulseOn = true;
-					pulseSEL = Math.pow(10., rms/10.)*newUnit.getSampleDuration()/sampleRate;
+					pulseSEL = Math.pow(10., rms/10.)*newUnit.getSampleDuration()/getSampleRate();
 					pulseP2P = newUnit.getPeakPeak();
 					pulse02P = newUnit.getZeroPeak();
 					pulseEnd = pulseStart = newUnit.getTimeMilliseconds();
@@ -141,7 +144,7 @@ public class OneBandPulseProcess extends PamProcess {
 				}
 				else {
 					// continue the pulse
-					pulseSEL += Math.pow(10., rms/10.)*newUnit.getSampleDuration()/sampleRate;
+					pulseSEL += Math.pow(10., rms/10.)*newUnit.getSampleDuration()/getSampleRate();
 					pulseP2P = Math.max(pulseP2P, newUnit.getPeakPeak());
 					pulse02P = Math.max(pulse02P, newUnit.getZeroPeak());
 					pulseEnd = newUnit.getTimeMilliseconds();

@@ -6,35 +6,48 @@
 
 <body>
 
-<h1>FFT Engine</h1>
-<h2>Overview</h2><br>
+	<h1>FFT Engine</h1>
+	<h2>Overview</h2>
+	<br>
 
-<p>
-Spectrograms of sound data are used throughout the PAMGuard system. 
-They provide the basic data for many detectors and also play an essential role 
-in the PAMGuard display. The FFT (spectrogram) Engine in PAMGuard provides a 
-powerful tool for generating spectrogram data from a raw data source. 
-<p>
-Data from a single FFT engine may be shared between multiple displays and detectors 
-in order that processor intensive calculations are not repeated.  
-</p>
-<br>
+	<p>Spectrograms of sound data are used throughout the PAMGuard
+		system. They provide the basic data for many detectors and also play
+		an essential role in the PAMGuard display. The FFT (spectrogram)
+		Engine in PAMGuard provides a powerful tool for generating spectrogram
+		data from a raw data source.
+	<p>Data from a single FFT engine may be shared between multiple
+		displays and detectors in order that processor intensive calculations
+		are not repeated.</p>
+	<p>
+		Note that this module does not create a <a
+			href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">spectrogram
+			display</a>, it just generates the data for the display, so you'll need
+		to add the FFT Engine AND a <a
+			href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">spectrogram
+			display</a> to your configuration. <br>
+	<h2>Output</h2>
+	<br>
+	<p>
+		Versions Beta 1.5.00 and later include a number of <a
+			href="noise_removal.html">noise reduction</a> options as part of the
+		FFT Engine. The FFT Engine therefore now has two output data streams
+		which other PAMGuard modules can subscribe to.
+	</p>
+	<p>The first is the raw FFT data</p>
+	<p>The second is the FFT data after it's passed through the noise
+		reduction processes</p>
+	<p>Both of these data streams should appear automatically in drop
+		down lists of data sources when you configure other modules.</p>
+	<p>(If no noise reduction is enabled, then the output of the two
+		streams will be identical)</p>
 
-<h2>Output</h2><br>
-<p>Versions Beta 1.5.00 and later include a number of 
-<a href="noise_removal.html">noise reduction</a> options as part
-of the FFT Engine. The FFT Engine therefore now has two output 
-data streams which other PAMGuard modules can subscribe to.</p>
-<p>The first is the raw FFT data</p>
-<p>The second is the FFT data after it's passed through the noise reduction processes</p>
-<p>Both of these data streams should appear automatically in drop down lists of data sources 
-when you configure other modules.</p>
-<p>(If no noise reduction is enabled, then the output of the two streams will be identical)</p>
-  
 
-<br><br>
+	<br>
+	<br>
 
-<p CLASS="nextLink"><a href="FFTEngine_Creating.html">Next:	Creating an FFT Engine </a></p>
+	<p CLASS="nextLink">
+		<a href="FFTEngine_Creating.html">Next: Creating an FFT Engine </a>
+	</p>
 
 </body>
 </html>

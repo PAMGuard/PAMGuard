@@ -1,5 +1,7 @@
 package rawDeepLearningClassifier.layoutFX;
 
+import PamDetection.LocContents;
+import PamDetection.LocalisationInfo;
 import PamView.GeneralProjector;
 import PamView.symbol.StandardSymbolChooser;
 import PamView.symbol.StandardSymbolManager;
@@ -27,6 +29,13 @@ public class DLSymbolManager extends StandardSymbolManager {
 
 	@Override
 	protected StandardSymbolChooser createSymbolChooser(String displayName, GeneralProjector projector) {
+		// if there is a localiser, then need to add appropriate additional symbol options
+		PamDataBlock db = getPamDataBlock();
+		LocalisationInfo locCont = db.getLocalisationContents();
+		boolean hasBearing = locCont.hasLocContent(LocContents.HAS_BEARING);
+		if (hasBearing) {
+			addSymbolOption(HAS_LINE_LENGTH);
+		}
 		return new StandardSymbolChooser(this, getPamDataBlock(), displayName, getDefaultSymbol(), projector);
 	}
 	

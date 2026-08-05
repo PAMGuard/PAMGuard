@@ -57,11 +57,13 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.RawInputControlledUnit;
+import PamModel.CommonPluginInterface;
 import PamModel.SMRUEnable;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
 import PamUtils.PlatformInfo;
 import PamUtils.PlatformInfo.OSType;
+import PamUtils.worker.PamWorkMonitor;
 import PamView.MenuItemEnabler;
 import PamView.PamStatusBar;
 import PamView.dialog.PamLabel;
@@ -84,6 +86,8 @@ import hfDaqCard.SmruDaqSystem;
 //import mcc.mccacquisition.MCCDaqSystem;
 import mcc.mccacquisition.MCCDaqSystem;
 import nidaqdev.NIDAQProcess;
+//import nidaqdev.networkdaq.NINetworkDaq;
+//import nidaqdev.networkdaq.NINetworkDaq;
 import pamScrollSystem.ViewLoadObserver;
 import simulatedAcquisition.SimProcess;
 
@@ -189,9 +193,9 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		registerDaqSystem(new SmruDaqSystem(this));
 		registerDaqSystem(new SimProcess(this));
 //		registerDaqSystem(new XArrayDaq(this));
+//		registerDaqSystem(new NINetworkDaq(this));
 		if (SMRUEnable.isEnable()) {
 //			registerDaqSystem(new icListenSystem());
-//			registerDaqSystem(new NINetworkDaq(this));
 			registerDaqSystem(new MCCDaqSystem(this));
 //			registerDaqSystem(new RonaInputSystem(this));
 		}
@@ -357,6 +361,17 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 					offlineFileServer.createOfflineDataMap(parentFrame);
 				}
 			}
+		}
+	}
+	
+	public void setAutoSettings(AcquisitionParameters newParameters) {
+		if (newParameters != null) {
+			acquisitionParameters = newParameters.clone();
+			setSelectedSystem();
+			acquisitionProcess.setupDataBlock();
+			setupStatusBar();
+			fillStatusBarText();
+			PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_PROCESS_SETTINGS);
 		}
 	}
 
@@ -766,13 +781,14 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	public void loadExternalDaqSystems() {
 
 		// get a list of plugins
-		List<DaqSystemInterface> daqList = PamController.getInstance().getModelInterface().getDaqList();
+		List<CommonPluginInterface> daqList = PamController.getInstance().getModelInterface().getPluginType(DaqSystemInterface.class);
 
 		// if there are no plugins, return
 		if (daqList.isEmpty()) {
 			return;
 		}
-		for (DaqSystemInterface dsi : daqList ) {
+		for (CommonPluginInterface cpi : daqList) {
+			DaqSystemInterface dsi = (DaqSystemInterface) cpi;
 			registerDaqSystem(dsi.createDAQControl(this));
 		}
 	}
@@ -859,8 +875,8 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	}
 
 	@Override
-	public String getModuleSummary(boolean clear) {
-		return getDaqProcess().getRawDataBlock().getSummaryString(clear);
+	public String getModuleSummary(boolean clear, String format) {
+		return getDaqProcess().getRawDataBlock().getSummaryString(clear, format);
 	}
 
 	/**
@@ -885,6 +901,7 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 			return system.isRealTime() ? RAW_INPUT_REALTIME : RAW_INPUT_FILEARCHIVE;
 		}
 	}
+	
 	@Override
 	public InputStoreInfo getStoreInfo(boolean detail) {
 		if (isViewer) {
@@ -893,6 +910,17 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		}
 		else {
 			return getDaqProcess().getStoreInfo(detail);
+		}
+	}
+	
+	@Override
+	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
+		if (isViewer) {
+			// I think this might always be true, but get it from the offlineFileServer
+			return offlineFileServer.getStoreInfo(workMonitor, detail);
+		}
+		else {
+			return getDaqProcess().getStoreInfo(workMonitor, detail);
 		}
 	}
 
@@ -933,6 +961,12 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 			return null;
 		}
 		return daqSys.getStartButtonToolTip();
+	}
+	/**
+	 * @return the lastSelSystem
+	 */
+	public DaqSystem getLastSelSystem() {
+		return lastSelSystem;
 	}
 
 }

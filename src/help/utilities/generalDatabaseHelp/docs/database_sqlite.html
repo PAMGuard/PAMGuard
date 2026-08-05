@@ -26,12 +26,27 @@
 	</p>
 
 	<h3>Configuring an SQLite database</h3>
-	<img alt="SQLite Configuration" src="Images/databaseSQLite.png" />
+	<img src="Images/databaseSQLite.png" />
 	<br>
 	<p>PAMGuard will automatically create the necessary .sqlite3
 		database file on your computer.</p>
 	<p>You do not need to add tables to the database, PAMGuard will
 		automatically create the tables it needs.</p>
+	<h4>Auto commit</h4>
+	<p>If Auto commit is selected, the database file will be updated every time a new record is written
+	to the database. This can have a serious impact on overall performance, so it not recommended.</p>
+	<p> If you have NOT
+	selected auto commit, then changes will be written to the database at the following times:</p>
+	<ol>
+	<li>Every three seconds</li>
+	<li>Whenever the number of uncommitted records reaches 10
+	<li>Whenever PAMGuard stops</li>
+	<li>Whenever PAMGuard exits</li>
+	<li>Whenever tables are added to the database, or the database structure changed in any way</li>
+	<li>In <a href="../../../overview/PamMasterHelp/docs/viewerMode.html">Viewer Mode</a>, whenever the data about to be reloaded.</li>
+	</ol>
+	<p>You can also commit changes at any time, using the menu command 
+	<b>File/Database/Commit Changes</b>.</p>
 	<br>
 	<a href="database_database.html">Back to database main page</a>
 	</p>

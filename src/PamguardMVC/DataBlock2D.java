@@ -3,12 +3,17 @@ package PamguardMVC;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import dataPlotsFX.data.DataTypeInfo;
 
 abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDataBlock<Tunit> {
+	
+	private DataTypeInfo dataTypeInfo;
 
 	public DataBlock2D(Class unitClass, String dataName, PamProcess parentProcess, int channelMap) {
 		super(unitClass, dataName, parentProcess, channelMap);
+		dataTypeInfo = new DataTypeInfo(ParameterType.FREQUENCY, ParameterUnits.HZ);
 	}
 
 	/**
@@ -36,6 +41,47 @@ abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDat
 	 * @return the data's maximum value
 	 */
 	abstract public double getMaxDataValue();
+	
+	/**
+	 * Are the data on a log scale
+	 * @return true if log, default is false. 
+	 */
+	public boolean isLogScale() {
+		return false;
+	}
+	
+	/**
+	 * Convert a bin to a value. e.g. a fft bin to a frequency
+	 * @param bin bin number, e.g. pos in fft. 
+	 * @param sequenceNumnber (channel)
+	 * @return data value
+	 */
+	public double bin2Value(double bin, int sequenceNumber) {
+		if (isLogScale()) {
+			double c = Math.log(getMaxDataValue()/getMinDataValue())/getDataWidth(sequenceNumber);
+			return getMinDataValue() * Math.exp(bin*c);
+		}
+		else {
+			return (bin / getDataWidth(sequenceNumber)) * (getMaxDataValue()-getMinDataValue()) + getMinDataValue(); 
+		}
+	}
+	
+	/**
+	 * convert a data value to a bin
+	 * @param value data value
+	 * @param sequenceNumber (channel)
+	 * @return bin within data (can exceed limits if too large !)
+	 */
+	public double value2bin(double value, int sequenceNumber) {
+		if (isLogScale()) {
+			double c = Math.log(getMaxDataValue()/getMinDataValue())/getDataWidth(sequenceNumber);
+			return Math.log(value/getMinDataValue())/c;
+		}
+		else {
+			double v = (value - getMinDataValue()) / (getMaxDataValue()-getMinDataValue()) * getDataWidth(sequenceNumber);
+			return v;
+		}
+	}
 	
 	/**
 	 * Get the scale units to display on axis, etc. 

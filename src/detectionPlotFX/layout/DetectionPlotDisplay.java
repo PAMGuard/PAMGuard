@@ -37,7 +37,7 @@ import userDisplayFX.UserDisplayNodeParams;
  * @author Jamie Macaulay
  *
  */
-public class DetectionPlotDisplay extends PamBorderPane  {
+public class DetectionPlotDisplay extends PamBorderPane implements DetectionPlotContext {
 	
 
 	private static final double PREF_SETTINGS_WIDTH = 250;
@@ -364,7 +364,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 		}
 		
 		//setup the scroll bar (or not)
-		if (enableScrollBar && this.detectionPlotProjector.enableScrollBar && newDataUnit!=null) {
+		if (enableScrollBar && this.detectionPlotProjector.isEnableScrollBar() && newDataUnit!=null) {
 			
 			this.setTop(scrollBarPane);
 			
@@ -577,7 +577,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 */
 	public void setEnableScrollBar(boolean enableScrollBarPane) {
 		enableScrollBar=enableScrollBarPane;
-		this.detectionPlotProjector.enableScrollBar = enableScrollBarPane;
+		this.detectionPlotProjector.setEnableScrollBar(enableScrollBarPane);
 		setupScrollBar();
 	}
 
@@ -605,6 +605,18 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 */
 	public boolean isEnableScrollBar() {
 		return this.enableScrollBar;
+	}
+
+	// ----- DetectionPlotContext interface implementation -----
+	
+	@Override
+	public void requestRedraw() {
+		drawCurrentUnit();
+	}
+	
+	@Override
+	public void requestScrollBarSetup() {
+		setupScrollBar();
 	}
 
 

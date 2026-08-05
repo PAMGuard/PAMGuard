@@ -136,7 +136,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 		
 		//three threaded sequences. 1) Load the data
 		//2) generate the image and 3), on the FX thread, paint the image, 
-		if (reloadRaw && detectionPlotDisplay.isViewer()){
+		if (reloadRaw && getContext().isViewer()){
 			//System.out.println("Load RAW data for data unit: " +dataUnit.getUID());
 			//reset the spectrogram and clear image
 			reloadRaw=false; // really only want this called into once unless explicitly invoked. 
@@ -147,7 +147,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 			//rawDataOrder.startRawDataLoad(dataUnit,  fftParams.detPadding,  fftParams.plotChannel);
 			//on a different thread which will call repaint again			
 		}
-		else if (reloadImage && detectionPlotDisplay.isViewer()){
+		else if (reloadImage && getContext().isViewer()){
 			System.out.println("Load IMAGE data: seconds: " + this.rawDataOrder.getRawDataObserver().getRawData().length
 					+ " for data unit: " + +dataUnit.getUID());
 			spectrogram.checkConfig(); 
@@ -156,7 +156,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 		else {
 			//repaint the image!!
 			//System.out.println("PAINT the image for: " +dataUnit.getUID());
-			if (detectionPlotDisplay.isViewer()) paintSpecImage(graphicsContext,  rectangle, projector);
+			if (getContext().isViewer()) paintSpecImage(graphicsContext,  rectangle, projector);
 			paintDetections(dataUnit,  graphicsContext,  rectangle, projector) ;
 		}
 	}
@@ -204,7 +204,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 	 */
 	public void repaintSpectrogram(long dataStart) {
 		GraphicsContext graphicsContext;
-		Canvas plotCanvas = detectionPlotDisplay.getPlotPane().getPlotCanvas();
+		Canvas plotCanvas = getContext().getPlotPane().getPlotCanvas();
 		//		detectionPlotDisplay.getPlotPane().setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
 		graphicsContext = plotCanvas.getGraphicsContext2D();
 		Rectangle r = new Rectangle(plotCanvas.getWidth(), plotCanvas.getHeight());
@@ -287,7 +287,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 
 		imageTask.setOnSucceeded((workerState)->{
 			this.reloadImage=false; 
-			this.detectionPlotDisplay.drawCurrentUnit(); //repaint
+			this.requestRedraw(); //repaint
 		}); 
 
 		th = new Thread(imageTask);
@@ -433,8 +433,9 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 	/**
 	 * Repaint  the current data unit. 
 	 */
+	@Override
 	public void reDrawLastUnit() {
-		detectionPlotDisplay.drawCurrentUnit();
+		requestRedraw();
 	}
 
 	boolean rebuildImage=false;; 
@@ -534,7 +535,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 		this.fftParams=fftPlotParams;
 	
 		if (this.reloadImage || this.reloadRaw) {
-			detectionPlotDisplay.drawCurrentUnit();
+			requestRedraw();
 		}
 		// TODO Auto-generated method stub	
 
@@ -745,7 +746,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 			reloadRaw=false;
 //			System.out.println("The last raw data unit has finished loading");
 			Platform.runLater(()->{;
-				detectionPlotDisplay.drawCurrentUnit();
+				requestRedraw();
 			});
 		}
 

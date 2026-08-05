@@ -109,11 +109,20 @@ public class MarkOverlayDraw extends PanelOverlayDraw {
 		}
 		int[] xPoints = new int[nPoints];
 		int[] yPoints = new int[nPoints];
+		try {
 		for (int i = 0; i < mark.size(); i++) {
 			c = mark.getCoordinate(i);
-			p = generalProjector.getCoord3d(c).getXYPoint();
+			Coordinate3d c3d = generalProjector.getCoord3d(c);
+			if (c3d == null) {
+				return null;
+			}
+			p = c3d.getXYPoint();
 			xPoints[i] = p.x;
 			yPoints[i] = p.y;
+		}
+		}
+		catch (Exception e) {
+			return null;
 		}
 		if (currentMouse != null) {
 			p = generalProjector.getCoord3d(currentMouse).getXYPoint();

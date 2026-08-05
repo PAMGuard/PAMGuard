@@ -32,7 +32,6 @@ import java.util.List;
 import javax.swing.Timer;
 
 import PamModel.PamModel;
-import PamModel.PamProfiler;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
@@ -79,7 +78,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	 */
 	protected PanelOverlayDraw overlayDraw;
 
-	protected PamProfiler pamProfiler;
+//	protected PamProfiler pamProfiler;
 
 	/**
 	 * Sample numbers are now passed around to all observers. 
@@ -91,7 +90,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	public PamObservable() {
 		pamObservers = new ArrayList<PamObserver>();
 		instantObservers = new ArrayList<PamObserver>();
-		pamProfiler = PamProfiler.getInstance();
+//		pamProfiler = PamProfiler.getInstance();
 		cpuTimer.start();
 	}
 

@@ -287,7 +287,6 @@ public abstract class SuperDetLogging extends SQLLogging {
 
 	@Override
 	public boolean deleteData(PAMSelectClause pvp) {
-		boolean ok = super.deleteData(pvp);
 		PamConnection con = DBControlUnit.findConnection();
 		if (con == null) {
 			return false;
@@ -297,7 +296,7 @@ public abstract class SuperDetLogging extends SQLLogging {
 			String sqlStr = String.format("SELECT Id FROM %s %s", 
 					getTableDefinition().getTableName(), 
 					pvp.getSelectClause(con.getSqlTypes()));
-			System.out.println(sqlStr);
+//			System.out.println(sqlStr);
 			try {
 				Statement stmt = con.getConnection().createStatement();
 				ResultSet result = stmt.executeQuery(sqlStr);
@@ -308,10 +307,13 @@ public abstract class SuperDetLogging extends SQLLogging {
 				}
 				stmt.close();
 			} catch (SQLException e) {
-				System.out.println("Error retrieving parent IDs before deletion");
+				System.out.println("Error retrieving parent IDs before deletion: " + sqlStr);
 				e.printStackTrace();
 			}
 		}
+		
+		boolean ok = super.deleteData(pvp);
+
 		return ok;
 	}
 	

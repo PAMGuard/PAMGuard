@@ -206,7 +206,13 @@ public class BackupStreamPanel {
 			}
 			break;
 		case RUNNING:
-			runMsg = String.format(" Processing %s, %d of %d", backupProgress.getMsg(), backupProgress.getN2(), backupProgress.getN1());
+			String progressMsg = backupProgress.getMsg();
+			if (progressMsg==null) {
+				progressMsg = "";
+			}else {
+				progressMsg = progressMsg+",";
+			}
+			runMsg = String.format(" Processing %s %d of %d",progressMsg , backupProgress.getN2(), backupProgress.getN1());
 			break;
 		case PROBLEM:
 			runMsg = "Error";

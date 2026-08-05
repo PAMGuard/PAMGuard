@@ -2,6 +2,7 @@ package Acquisition.layoutFX;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
+import Acquisition.DaqSystem;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.SettingsPane;
@@ -23,9 +24,23 @@ public class AquisitionGUIFX extends PamControlledGUIFX {
 	 * Reference to the Sound Aquisition control. 
 	 */
 	private AcquisitionControl aquisitionControl;
+	
 
 	public AquisitionGUIFX(AcquisitionControl aquisitionControl) {
 		this.aquisitionControl=aquisitionControl; 
+		
+		//set the DAQ specific pane on start up. 
+		setDaqSpecificPane();
+		
+	}
+	
+	private void setDaqSpecificPane() {
+		DaqSystem currentDaqSystem = aquisitionControl.findDaqSystem(aquisitionControl.getAcquisitionParameters().getDaqSystemType()); 
+		if (currentDaqSystem == null) return;
+		getSettingsPane();
+		
+		// Use the new direct pane approach via the AcquisitionPaneFX
+		acquisitionPane.showStatusBarPane(currentDaqSystem);
 	}
 
 	@Override
@@ -34,9 +49,12 @@ public class AquisitionGUIFX extends PamControlledGUIFX {
 			acquisitionPane=new AcquisitionPaneFX(aquisitionControl);
 		}
 		acquisitionPane.setParams(aquisitionControl.getAcquisitionParameters());
+
+		
 		return acquisitionPane;
 	}
 	
+
 
 	/**
 	 * This is called whenever a settings pane is closed. If a pamControlledUnit has

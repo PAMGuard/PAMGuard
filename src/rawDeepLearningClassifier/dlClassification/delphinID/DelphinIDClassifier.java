@@ -60,7 +60,8 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	@Override
 	public void prepModel() {
 		super.prepModel();
-		//set group detections to true. 
+		
+		//set group detections to true - very important
 		getDLControl().setGroupDetections(true);
 	}
 
@@ -108,7 +109,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	}
 
 	@Override
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
+	public ArrayList<ArrayList<? extends PredictionResult>> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
 
 		//add an extra test to see if the detection pre count has passed. 
 		

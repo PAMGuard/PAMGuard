@@ -150,9 +150,9 @@ public class DbHtControl extends PamControlledUnit implements PamSettings {
 	}
 
 	@Override
-	public String getModuleSummary() {
+	public String getModuleSummary(boolean clear, String format) {
 		// TODO Auto-generated method stub
-		return super.getModuleSummary();
+		return super.getModuleSummary(clear, format);
 	}
 
 	@Override

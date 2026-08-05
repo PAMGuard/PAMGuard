@@ -179,14 +179,14 @@ public class GenericDLClassifier extends StandardClassifierModel {
 		this.genericModelParams=(GenericModelParams) clone;	
 	}
 
-	/**
-	 * Send a new result form the thread queue to the process. 
-	 * @param modelResult - the model result;
-	 * @param groupedRawData - the grouped raw data. 
-	 */
-	protected void newResult(StandardPrediction modelResult, GroupedRawData groupedRawData) {
-		this.dlControl.getDLClassifyProcess().newRawModelResult(modelResult, groupedRawData);
-	}
+//	/**
+//	 * Send a new result form the thread queue to the process. 
+//	 * @param modelResult - the model result;
+//	 * @param groupedRawData - the grouped raw data. 
+//	 */
+//	protected void newResult(StandardPrediction modelResult, GroupedRawData groupedRawData) {
+//		this.dlControl.getDLClassifyProcess().newRawModelResult(modelResult, groupedRawData);
+//	}
 
 
 

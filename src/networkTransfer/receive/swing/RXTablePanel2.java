@@ -1,18 +1,30 @@
 package networkTransfer.receive.swing;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
+import Array.ArrayManager;
+import Array.Streamer;
+import Array.streamerOrigin.OriginSettings;
+import Array.streamerOrigin.StaticOriginSettings;
 import GPS.GpsData;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.component.DataBlockTableView;
 import PamguardMVC.PamDataBlock;
-import networkTransfer.receive.BuoyStatusDataUnit;
-import networkTransfer.receive.BuoyStatusValue;
+import networkTransfer.receive.MqttNetReceiver;
+import networkTransfer.receive.MqttReceiveThread;
+import networkTransfer.receive.NetworkReceiveParams;
 import networkTransfer.receive.NetworkReceiver;
 import networkTransfer.receive.PairedValueInfo;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusValue;
 
 public class RXTablePanel2 extends DataBlockTableView<BuoyStatusDataUnit>{
 
@@ -21,6 +33,11 @@ public class RXTablePanel2 extends DataBlockTableView<BuoyStatusDataUnit>{
 	public RXTablePanel2(NetworkReceiver networkReceiver) {
 		super(networkReceiver.getBuoyStatusDataBlock(), networkReceiver.getUnitName());
 		this.networkReceiver = networkReceiver;
+	}
+	
+	//@Override
+	protected void setControlledUnit() {
+		//this.networkReceiver = (NetworkReceiver) controlledUnit;
 	}
 
 	@Override
@@ -61,12 +78,40 @@ public class RXTablePanel2 extends DataBlockTableView<BuoyStatusDataUnit>{
 		}
 		return n;
 	}
-
-	private static String[] colNames1 = {"Station Id","IP Addr", "Channel", "Status"};
+	
+	public Object getMqttColumnData(BuoyStatusDataUnit b, int cols1index) {
+		switch(cols1index) {
+		case 5:
+			MqttNetReceiver mqttThread =  (MqttNetReceiver) networkReceiver.connectionThread;
+			if(mqttThread == null) {
+				return "Disconnected";
+			}
+			MqttReceiveThread buoyReceiver = mqttThread.getBuoyReceiveThread(b.getBuoyId1());
+			boolean isAlive;
+			if(buoyReceiver==null) {
+				isAlive = false;
+			}else {
+				isAlive = buoyReceiver.isAlive();
+			}
+			if (isAlive) {
+				return String.format("Connected : %s", NetworkReceiver.getPamCommandString(b.getCommandStatus()));
+			}
+			else {
+				return "Disconnected";
+			}
+		default:
+			return 0;
+		}
+	}
+	
+	private static String[] colNames1 = {"Station Id","IP Addr", "Last Comms Ping","Last Comms Ping Strength","Channel", "Status","Site Name"};
 	private static String[] colNames2 = {"Last Data", "Position", "Tot' Packets"};
 
 	@Override
 	public Object getColumnData(BuoyStatusDataUnit b, int column) {
+		
+		boolean isMqtt = this.networkReceiver.getNetworkReceiveParams().connectionType==NetworkReceiveParams.CONNECTIONTYPE_MQTT;
+		
 		long t;
 	
 		Integer col = getCols1Index(column);
@@ -77,15 +122,30 @@ public class RXTablePanel2 extends DataBlockTableView<BuoyStatusDataUnit>{
 			case 1:
 				return b.getIPAddr();
 			case 2:
-				return b.getLowestChannel();
+				if(b.getLastCommsPing()==0) {
+					return "No Data";
+				}
+				return PamCalendar.formatDateTime2(b.getLastCommsPing());
 			case 3:
-				boolean conState = b.getSocket() != null;
+				if(b.getCommunicationsStrength()==0) {
+					return "Disconnected";
+				}
+				return Double.toString(b.getCommunicationsStrength())+" dB";
+			case 4:
+				return b.getLowestChannel();
+			case 5:
+				if(isMqtt) {
+					return getMqttColumnData(b,col);
+				}
+				boolean conState = (b.getSocket() != null);
 				if (conState) {
 					return String.format("Connected : %s", NetworkReceiver.getPamCommandString(b.getCommandStatus()));
 				}
 				else {
 					return "Disconnected";
 				}
+			case 6:
+				return b.getSiteName();
 			}
 		}
 		col = getCols2Index(column);

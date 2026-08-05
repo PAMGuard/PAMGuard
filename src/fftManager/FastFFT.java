@@ -69,6 +69,8 @@ public class FastFFT  {
 	/**
 	 * FFT of real data. Will return only the first half of
 	 * the FFT, since second is simply complex conjugate of the first. 
+	 * 
+	 * The FFT values are scaled to 1/n
 	 * @param x waveform (will be padded or truncated to length n)
 	 * @param n length of FFT
 	 * @return Complex spectrum

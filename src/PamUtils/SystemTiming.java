@@ -24,6 +24,8 @@ package PamUtils;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import PamUtils.clock.SystemClock;
+
 /**
  * Class for some system based time functions, primarily to get
  * CPU time for the process and to set the system time. These are 
@@ -31,20 +33,19 @@ import java.util.TimeZone;
  * native code in a single dll. A windows DLL has been written - 
  * we need someone to write DLL's for other OS. 
  * 
+ * Most functoins have now been moved to subclasses of OSClock, but the Windows dll that uses JNI has
+ * to be called from here, since class names are built right into the JNI function calls. 
+ * 
  * @author Doug Gillespie
  * @see PamModel.PamProfiler
  *
  */
 public class SystemTiming {
 
+	private static boolean loadTried;
+	private static boolean loadOK;
 	private static final String SILIB = "PamTiming";
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private static native long sysGetProcessCPUTime ();
-	
+
 	/**
 	 * Set the computers system time
 	 * @param year Year
@@ -57,52 +58,28 @@ public class SystemTiming {
 	 * @return true if successful
 	 */
 	private static native boolean sysSetSystemTime(int year, int month, int day, int hour, int minute, int second, int millisecond);
-	
-	private static boolean loadOK = false;
-	
-	private static boolean loadTried = false;
-	
-	public static void load() {
-		
-		try  {
-			System.loadLibrary(SILIB);
-			loadOK = true;
-		}
-		catch (UnsatisfiedLinkError e)
-        {
-            System.out.println ("native lib '" + SILIB + "' not found in 'java.library.path': "
-            + System.getProperty ("java.library.path"));
-            loadOK = false;
-        }
-		
-		loadTried = true;
-	}
+
+//	/**
+//	 * 
+//	 * @return the amount of CPU used by the current process in 100ns intervals
+//	 * 
+//	 */
+//	public static long getProcessCPUTime () {
+//		return SystemClock.getSystemClock().getProcessCPUTime();
+//	}
 
 	/**
-	 * 
-	 * @return the amount of CPU used by the current process in 100ns intervals
-	 * 
+	 * Set the system time. 
+	 * @param timeMilliseconds
+	 * @return
 	 */
-	public static long getProcessCPUTime () {
-		if (!loadTried) {
-			load();
-		}
-		if (!loadOK) return 0;
-
-		return sysGetProcessCPUTime();
-	}
-	
 	public static boolean setSystemTime(long timeMilliseconds) {
-		if (!loadTried) {
-			load();
-		}
-		if (!loadOK) return false;
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(timeMilliseconds);
-		return setSystemTime(c);
+
+		return SystemClock.getSystemClock().setSystemTime(timeMilliseconds);
+
 	}
 
-	public static boolean setSystemTime(Calendar c) {
+	public static boolean setWindowsSystemTime(Calendar c) {
 		if (!loadTried) {
 			load();
 		}
@@ -111,4 +88,21 @@ public class SystemTiming {
 		return sysSetSystemTime(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 
 				c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND), c.get(Calendar.MILLISECOND));
 	}
+	public static void load() {
+
+		try  {
+			System.loadLibrary(SILIB);
+			loadOK = true;
+		}
+		catch (UnsatisfiedLinkError e)
+		{
+			System.out.println ("native lib '" + SILIB + "' not found in 'java.library.path': "
+					+ System.getProperty ("java.library.path"));
+			loadOK = false;
+		}
+
+		loadTried = true;
+	}
+
+
 }

@@ -339,6 +339,7 @@ public class DifarProcess extends PamProcess {
 			demuxWorker.ppublish(new DemuxWorkerMessage(difarDataUnit, DemuxWorkerMessage.STATUS_START, System.currentTimeMillis()-startTime));
 		}
 
+		float sampleRate = getSampleRate();
 		int decimationFactor = (int) (sampleRate / difarDataUnit.getDisplaySampleRate());
 
 		/*

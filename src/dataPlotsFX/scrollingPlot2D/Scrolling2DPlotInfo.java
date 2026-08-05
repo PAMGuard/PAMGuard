@@ -236,8 +236,14 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		 */
 		try{
 			if (chan >= 0 && scrolling2DPlotData[chan] != null) {
+				long time0 = System.currentTimeMillis();
+
 				scrolling2DPlotData[chan].drawSpectrogram(g, tdProjector.getWindowRect(), 
 						tdProjector.getOrientation(), tdProjector.getTimeAxis(), scrollStart, tdProjector.isWrap());
+				
+				long time1 = System.currentTimeMillis();
+				//System.out.println("chan: "+plotNumber + " draw: " + (time1-time0) + " " + scrollStart); 
+
 			}
 		}
 		catch (Exception e){
@@ -401,15 +407,13 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 
 				new2DData((DataUnit2D) dataUnit); //do not put in FX thread!
 				
-
-				
-				
 				Platform.runLater(()->{
 					//only repaint the base canvas. Otherwise overlaid detections will repaint and this can take a 
 					//a very long time. 
 					if (isViewer)
 						getTDGraph().repaint(TDDisplayFX.STANDARD_REFRESH_MILLIS, TDPlotPane.BASE_CANVAS);
 					else {
+//						System.out.println("Repaint!: spec: ");
 						//01/11/2019
 						// change back to repaint everything - if we only repaint the base canvas, the spectrogram will scroll continuously but
 						// overlay data will only get updated periodically and get out of sync with the spectrogram image
@@ -485,19 +489,6 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	 * @param dataUnit2D
 	 */
 	public void new2DData(DataUnit2D dataUnit2D) {
-		
-		//TODO - added this here because sometimes a data order returns units that are from the 
-		//the wrong time. Not sure why this is but likely to do with queue issues perhaps. This 
-		//temporary fix will help but will not work when we move the spectrogram to loading sections
-		//of data outwith the visible display
-		if (dataUnit2D.getTimeMilliseconds() < (getVisibleStart() -getSmooshMillis()) ||
-				dataUnit2D.getTimeMilliseconds() > getVisibleEnd()	) {
-			//System.out.println("data unit not in range: " + PamCalendar.formatDateTime2(dataUnit2D.getTimeMilliseconds())); 
-
-			return;
-		}
-		
-
 
 		int chan = PamUtils.getSingleChannel(dataUnit2D.getSequenceBitmap());
 
@@ -611,7 +602,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		long dataStart = getVisibleStart()-getSmooshMillis();
 		long dataEnd = getVisibleEnd();
 		
-		System.out.println("Order offline data from: " + PamCalendar.formatDateTime2(dataStart) + "to : " + PamCalendar.formatDateTime2(dataEnd) + "  " + getSmooshMillis());
+		//System.out.println("Order offline data from: " + PamCalendar.formatDateTime2(dataStart) + "to : " + PamCalendar.formatDateTime2(dataEnd) + "  " + getSmooshMillis());
 
 		if (lastReqStart == dataStart && lastReqEnd == dataEnd) {
 			return true;

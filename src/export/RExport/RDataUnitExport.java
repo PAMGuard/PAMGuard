@@ -3,8 +3,10 @@ package export.RExport;
 import org.renjin.sexp.DoubleArrayVector;
 import org.renjin.sexp.IntArrayVector;
 import org.renjin.sexp.ListVector;
+import org.renjin.sexp.ListVector.NamedBuilder;
 import org.renjin.sexp.Vector;
 import PamUtils.PamCalendar;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -131,6 +133,17 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 		Vector newMatrix = DoubleArrayVector.newMatrix(concatWaveform, arr[0].length, arr.length); 
 		
 		return newMatrix;
+	}
+
+
+	/**
+	 * Get the header for a data unit. This is used to store information about the data unit
+	 * which is not specific to a detection. 
+	 * @param pamDataBlock - the data block
+	 * @return - a structure containing the header information. 
+	 */
+	protected NamedBuilder detectionHeader(PamDataBlock pamDataBlock) {
+		return null;
 	}
 
 

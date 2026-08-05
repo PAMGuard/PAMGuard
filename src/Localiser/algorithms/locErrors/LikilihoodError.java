@@ -118,9 +118,11 @@ public class LikilihoodError extends EllipticalError {
 		}
 		
 //		System.out.println("LikilihoodError: dim: "+dim[0] +" "+dim[1]+" "+dim[2]);
+		ErrorEllipse errorEllipse = new ErrorEllipse(dim, angles);
+//		System.out.printf("Error elipse for point %s is %s\n", new PamVector(point[0], point[1], 0).toString(),  errorEllipse);
 
 		//so for 2D problme that is us! 
-		return new ErrorEllipse(dim, angles);
+		return errorEllipse; 
 	}
 
 
@@ -147,6 +149,8 @@ public class LikilihoodError extends EllipticalError {
 				max=curvatureError;
 				ind=i; //record index of max value; 
 			}
+			double tstErr = getLLCurvature(point, new PamVector(0., 1., 0.));
+			double tstErr2 = getLLCurvature(point, new PamVector(1., 0., 0.));
 		}
 		
 		/**
@@ -207,6 +211,7 @@ public class LikilihoodError extends EllipticalError {
 		
 		//create an error ellipse.
 		ErrorEllipse errorEllipse=new ErrorEllipse(vectors); 
+//		System.out.printf("Error elipse for point %s is %s\n", new PamVector(point).toString(),  errorEllipse);
 
 		return errorEllipse;
 		
@@ -222,9 +227,9 @@ public class LikilihoodError extends EllipticalError {
 	}
 	
 	/**
-	 * The log likilihood. 
-	 * @param location - the point on the chi2 surface to fin dlog likilhood for.  
-	 * @return the log likilihood. 
+	 * The log likelihood. 
+	 * @param location - the point on the chi2 surface to find log likelihood for.  
+	 * @return the log likelihood. 
 	 */
 	public double logLikelihood(double[] location){
 		return -chi2.value(location) / 2;
@@ -234,7 +239,7 @@ public class LikilihoodError extends EllipticalError {
 	/**
 	 * Get chi2 error for any direction
 	 * @param chi2 - the chi2 surface
-	 * @param point - the minima of the surface i.e. the soluton
+	 * @param point - the minima of the surface i.e. the solution
 	 * @param errorVector - the direction in which to calculate the error. 
 	 * @return the error magnitude in the direction. This is the average value of the error in the 
 	 * direction specified and in the opposite direction. Curvature is expressed as 1 standard deviation
@@ -245,33 +250,46 @@ public class LikilihoodError extends EllipticalError {
 		double dis = 10; //the jump along the chi2 surface. 
 		double err = 0;
 		int nE = 0;
+		double ll1, ll2, ll3;
 		
 		PamVector locVector=new PamVector(point);
+		errorVector.normalise();
+		double[] pos2 = Arrays.copyOf(point, point.length);
+		ll2 = logLikelihood(pos2);
 	
 		//double[] vector={dis*Math.cos(direction), dis*Math.sin(direction), 0}; 
 		//PamVector pointVector=new PamVector(errorVector); 
-		
-		PamVector newloc1=locVector.add(errorVector);
-		PamVector newloc2=locVector.sub(errorVector);
+//		PamVector shiftVector = errorVector.times(dis);
+//		PamVector newloc1=locVector.add(shiftVector);
+//		PamVector newloc2=locVector.sub(shiftVector);
 		try {
 			while (true) {
-				double ll1, ll2, ll3;
-				double[] pos2 = Arrays.copyOf(point, point.length);
-				ll2 = logLikelihood(pos2);
+				PamVector shiftVector = errorVector.times(dis);
+				PamVector newloc1=locVector.add(shiftVector);
+				PamVector newloc2=locVector.sub(shiftVector);
 				ll1 = logLikelihood(Arrays.copyOf(newloc1.getVector(), pos2.length));
 				ll3 = logLikelihood(Arrays.copyOf(newloc2.getVector(), pos2.length));
-				double q = (ll1/ll2 + ll3/ll2 - 2) / (dis*dis);
+//				double[] ll = {ll1, ll2,ll3};
+				// Jamies line - I think this is wrong
+//				double q = (ll1/ll2 + ll3/ll2 - 2) / (dis*dis);
+				// replace it with this. 
+				double q = -(ll1 + ll3 - 2*ll2) / (dis*dis);
+				if (q < 0) {
+					// curve is going the wrong way. 
+					// make the step bigger to try to get around the peak. 
+					nE++;
+					dis *= 2;
+					continue;
+				}
 				err = 1./Math.sqrt(q);
 				double change = dis/err;
 				if (++nE > 8 || (change > 0.95 && change < 1.05)) {
 					break;
 				}
-				dis = err;
-				
-				errorVector.normalise();
+				dis = err;				
 	
-				newloc1=locVector.add(errorVector.times(dis));
-				newloc2=locVector.sub(errorVector.times(dis));
+//				newloc1=locVector.add(errorVector.times(dis));
+//				newloc2=locVector.sub(errorVector.times(dis));
 			}
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block

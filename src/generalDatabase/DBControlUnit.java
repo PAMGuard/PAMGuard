@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import PamController.AWTScheduler;
@@ -64,6 +65,17 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 		//			PamSettingManager.getInstance().registerSettings(this, PamSettingManager.LIST_DATABASESTUFF);
 		//		}
 		backupInformation = new BackupInformation(new DatabaseBackupStream(this));
+		
+		if (PamController.getInstance().isInitializationComplete()) {
+			// we're clearly adding a database to an open configuration, so pop up the 
+			// dialog to allow the user to set the database. 
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					selectDatabase(getGuiFrame(), getUnitName());
+				}
+			});
+		}
 	}
 
 	private static int whichStore() {
@@ -118,6 +130,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 				createOfflineDataMap(null);
 			}
 			getDbProcess().checkTables();
+			getDbProcess().storeVersionInfo();
 			break;
 		case PamControllerInterface.ADD_DATABLOCK:
 			if (initialisationComplete) {
@@ -477,7 +490,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 		PamConnection con = getConnection();
 		ModuleStatus moduleStatus;
 		if (con == null) {
-			moduleStatus = new ModuleStatus(ModuleStatus.STATUS_ERROR, "No database connection");
+			moduleStatus = new ModuleStatus(ModuleStatus.STATUS_ERROR, "DBControlledUnit:getModuleStatus() No database connection");
 			moduleStatus.setRemedialAction(new QuickRemedialAction(this, "Fix database connection", new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {

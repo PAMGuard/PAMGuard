@@ -22,7 +22,7 @@ package Filters;
 
 public enum FilterType {
 	
-	NONE, BUTTERWORTH, CHEBYCHEV, FIRWINDOW, FIRARBITRARY;
+	NONE, BUTTERWORTH, CHEBYCHEV, FIRWINDOW, FIRARBITRARY, FFT;
 	
 	boolean isIIR() {
 		switch (this) {
@@ -31,6 +31,7 @@ public enum FilterType {
 			return true;
 		case FIRARBITRARY:
 		case FIRWINDOW:
+		case FFT:
 			return false;
 		default:
 			return false;
@@ -44,9 +45,91 @@ public enum FilterType {
 			return false;
 		case FIRARBITRARY:
 		case FIRWINDOW:
+		case FFT:
 			return true;
 		default:
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		/*
+		 * 
+	private String[] filterNames = { "None", "IIR Butterworth", "IIR Chebyshev", 
+			"FIR Filter (Window Method)", "Arbitrary FIR Filter", "FFT Filter"};
+		 */
+		switch (this) {
+		case BUTTERWORTH:
+			return "IIR Butterworth";
+		case CHEBYCHEV:
+			return "IIR Chebyshev";
+		case FFT:
+			return "FFT Filter";
+		case FIRARBITRARY:
+			return "Arbitrary FIR Filter";
+		case FIRWINDOW:
+			return "FIR Filter (Window Method)";
+		case NONE:
+			return "None";
+		default:
+			break;
+		
+		}
+		return null;
+	}
+	
+	/**
+	 * Should enable the order control. 
+	 * @param filterType
+	 * @return
+	 */
+	public boolean hasOrder() {
+		switch(this) {
+		case BUTTERWORTH:
+			return true;
+		case CHEBYCHEV:
+			return true;
+		case FFT:
+			return false;
+		case FIRARBITRARY:
+			return true;
+		case FIRWINDOW:
+			return true;
+		case NONE:
+			return false;
+		default:
+			break;
+		
+		}
+		return false;
+	}
+	
+	/**
+	 * Should enable the order control. 
+	 * @param filterType
+	 * @return
+	 */
+	public boolean hasRipple() {
+		switch(this) {
+		case BUTTERWORTH:
+			return false;
+		case CHEBYCHEV:
+			return true;
+		case FFT:
+			return false;
+		case FIRARBITRARY:
+			return true;
+		case FIRWINDOW:
+			return true;
+		case NONE:
+			return false;
+		default:
+			break;
+		
+		}
+		return false;
+	}
+	
+	
 }

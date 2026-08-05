@@ -648,11 +648,25 @@ Returns something like this:
 		if (vData == null) {
 			return null;
 		}
-		// now unpack it
+		/* now unpack it
+		 * Versions have either been a number followed by a name, or a 
+		 * number only. 
+		 */
 		int sp1 = vData.indexOf(' ');
 		if (sp1 < 0) {
-			return new ServerVersion(0.0F, vData);
+			// there is only one 'thing' here, which is hopefully a
+			// number without a name.
+			try {
+				vData = vData.trim();
+				float n = Float.valueOf(vData);
+				return new ServerVersion(n, null);
+			}
+			catch (Exception e) {
+				// return it as a string version number. This shouldn't happen. 
+				return new ServerVersion(0.0F, vData);
+			}
 		}
+		// if we get here, the version is in two parts, a number and a string. 
 		String nNum = vData.substring(0, sp1);
 		Float vn = 0F;
 		try {

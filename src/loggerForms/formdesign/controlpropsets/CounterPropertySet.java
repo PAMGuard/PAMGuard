@@ -6,6 +6,7 @@ import loggerForms.controlDescriptions.ControlTypes;
 import loggerForms.formdesign.ControlTitle;
 import loggerForms.formdesign.itempanels.BooleanCtrlColPanel;
 import loggerForms.formdesign.itempanels.CtrlColPanel;
+import loggerForms.formdesign.itempanels.TextCtrlColPanel;
 
 public class CounterPropertySet extends BasePropertySet {
 
@@ -26,6 +27,8 @@ public class CounterPropertySet extends BasePropertySet {
 		case ReadOnly:
 		case AutoUpdate:
 			return null;
+		case Topic:
+			return new TextCtrlColPanel(selTitle, propertyName, 30, " (topic to send counter info to network listeners)");
 //		case Topic:
 //			return new BooleanCtrlColPanel(selTitle, new );
 		}

@@ -60,7 +60,7 @@ public class PamColors implements PamSettings {
 
 	public static enum PamColor {
 		PlOTWINDOW, BORDER, PLAIN, AXIS, GRID, MAP, WARNINGBORDER, BACKGROUND_ALPHA, HIGHLIGHT_ALPHA, HIGHLIGHT, 
-		GPSTRACK, LATLINE, LONLINE, TITLEBORDER, BUTTONFACE
+		GPSTRACK, LATLINE, LONLINE, TITLEBORDER, BUTTONFACE, EDITCTRL
 	}
 	
 
@@ -277,7 +277,7 @@ public class PamColors implements PamSettings {
 	private void setColorManagedColor(Component c) {
 		/**
 		 * Change to allow a null colour id, so that we can make components
-		 * which are used in colour managed and non colour managed parts of PAMguard. 
+		 * which are used in colour managed and non colour managed parts of PAMGuard. 
 		 */
 		if (ColorManaged.class.isAssignableFrom(c.getClass())) {
 			PamColor colourId = ((ColorManaged) c).getColorId();

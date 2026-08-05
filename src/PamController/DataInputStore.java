@@ -13,8 +13,6 @@ package PamController;
  */
 public interface DataInputStore extends DataStoreInfoHolder {
 	
-
-
 	/**
 	 * Set an analysis start time. This might get called just before
 	 * processing starts, in which case 

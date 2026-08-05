@@ -93,13 +93,15 @@ img {
     There is nothing to change in this summary.  Press Next once you
     have reviewed it. </p>
     
+	<h4>Species Codes and Call Types</h4>
     <img src="./images/stream_species.png">
     
     <br>
     <p>The second panel allows you to check <a href="tethys_speciescodes.html">ITIS species codes and call types</a> 
     and to select which call types you want to export. </p>
     
-    
+    <br>
+	<h4>Data type and granularity</h4>
     <img src="./images/stream_granularity.png">
     
     <br>
@@ -108,7 +110,25 @@ img {
     type of data. You can also select an optional data filter which will restrict the output using criteria specific to the 
     detector you're using. Note that there may be overlap between the data filter and the selections you make in the earlier species
     selection page.   </p>
-    
+	
+	<br>
+	<h4>Items per document</h4>
+	  <img src="./images/max_items.png">
+	  
+	  <p>Maximum number of items per document: Some PAMGuard output streams contain a lot of data, sometimes millions of 
+		items. We've found that exporting more than around 100,000 items to a single Tethys document can render the system 
+		unstable. This page allows you to tell PAMGuard to break the document up into smaller parts. We recommend a maximum of 
+		around 100,000 per document. </p>
+		<p>You might also consider whether or not you really want to export this many items, or would you be better off using 
+			a different granularity.</p>
+			<p>Note that the number of items to export is only an estimate for some granularities. e.g. if 'Binned' granularity
+			is selected, the the number of items is the total time of the data set divided by the bin duration. Bins with 
+			no calls are not written, If there aren't 
+			many calls, very little data will be exported.</p>
+		
+    <br>
+	
+	<h4>Study objectives, Abstract, and Method statements</h4>
     <img src="./images/stream_description.png">
     
     <br>
@@ -117,7 +137,8 @@ img {
     pre-populated the method for you.  It is recommended to populate
     the objectives and abstract with as much information as possible.
   </p>
-    
+    <br>
+	<h4>Detector configuration metadata</h4>
     <img src="./images/stream_parameters.png">
     
     <br>
@@ -155,6 +176,9 @@ img {
     </li>
   </ul>
   
+	
+  <br>
+  <h4>And finally, you are ready to export ...</h4>
     <img src="./images/stream_export.png">
     <br>
   <p>
@@ -165,7 +189,7 @@ img {
 
   </p>
   
-    
+    <br>
   <p class="prevLink">
     <a href="deployments.html">Previous: Deployments</a>
   </p>

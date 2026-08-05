@@ -1,7 +1,10 @@
 package rawDeepLearningClassifier;
 
 import java.awt.Frame;
+import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
@@ -18,14 +21,10 @@ import PamController.SettingsPane;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSidePanel;
 import PamView.WrapperControlledGUISwing;
-import PamView.symbol.StandardSymbolManager;
-import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
-import ai.djl.engine.Engine;
 import annotation.handler.AnnotationHandler;
-import clickTrainDetector.layout.ClickTrainSymbolManager;
 import clipgenerator.ClipDataUnit;
 import clipgenerator.ClipDisplayDataBlock;
 import clipgenerator.clipDisplay.ClipDisplayDecorations;
@@ -34,8 +33,8 @@ import clipgenerator.clipDisplay.ClipDisplayUnit;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import generalDatabase.SQLLoggingAddon;
-import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
+import pamguard.GlobalArguments;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLGroupSymbolManager;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
@@ -46,9 +45,9 @@ import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
-import rawDeepLearningClassifier.dlClassification.DLDetectionDataBlock;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier;
+import rawDeepLearningClassifier.dlClassification.deepAcoustics.DeepAcousticsClassifier;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
@@ -139,6 +138,12 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 	 * currently held click trains etc once processing has completed.
 	 */
 	public static final int PROCESSING_END = 2;
+	
+	
+	/**
+	 * Global flag for deep learning model name
+	 */
+	public static final String MODELPATH = "-modelPath";
 
 	/**
 	 * List of different deep learning models that are available.
@@ -244,8 +249,6 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 	private boolean groupDetections = false;
 
 
-	
-	
 	/**
 	 * Constructor for the DL Control.
 	 * 
@@ -257,6 +260,8 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		PamRawDataBlock rawDataBlock = PamController.getInstance()
 				.getRawDataBlock(rawDLParmas.groupedSourceParams.getDataSource());
 		
+		// load the previous settings
+		PamSettingManager.getInstance().registerSettings(this);
 		
 //		/**
 //		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
@@ -340,6 +345,8 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		dlModels.add(new KooguClassifier(this));
 		dlModels.add(new PamZipModelClassifier(this));
 		dlModels.add(new DelphinIDClassifier(this));
+		dlModels.add(new DeepAcousticsClassifier(this));
+
 		
 		//it is important the Generic Model is last because we need to check 
 		//for PG metadata in all other models before resorting to manually 
@@ -365,8 +372,7 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// register the DD display
 		DDPlotRegister.getInstance()
 				.registerDataInfo(new RawDLDDPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
-		// load the previous settings
-		PamSettingManager.getInstance().registerSettings(this);
+		
 
 		// because this was added after some settings classes have already been
 		// serialized
@@ -440,7 +446,10 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// things like symbol choosers that
 		// may need to know a data block contains a certian type of annotation.
 
-		this.getParentDataBlock().addDataAnnotationType(dlClassifyProcess.getDLAnnotionType());
+		PamDataBlock pDatablock = this.getParentDataBlock();
+		if (pDatablock != null) {
+			this.getParentDataBlock().addDataAnnotationType(dlClassifyProcess.getDLAnnotionType());
+		}
 
 		if (dlSidePanel != null) {
 			dlSidePanel.setupPanel();
@@ -469,8 +478,10 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		RawDLParams newParameters = (RawDLParams) pamControlledUnitSettings.getSettings();
-		
 		rawDLParmas = newParameters.clone();
+		if(GlobalArguments.getParam(MODELPATH)!=null) {
+			rawDLParmas.modelURI = new File(GlobalArguments.getParam(MODELPATH)).toURI();
+		}
 		return true;
 	}
 
@@ -523,6 +534,13 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// if cancel button is pressed then new params will be null.
 		if (newParams != null) {
 			updateParams(newParams);
+		}
+	}
+	
+	
+	public void settingsDialogChange() {
+		if (settingsDialog!=null) {
+			settingsDialog.pack();
 		}
 	}
 
@@ -691,7 +709,7 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 	
 	/**
 	 * Get the data selector. 
-	 * @param source - the source data block 
+	 * @param sourc7e - the source data block 
 	 * @return the data selector.
 	 */
 	public void createDataSelector(PamDataBlock<?> source) {
@@ -779,6 +797,17 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	public void notifyModelChanged(int changeType) {
+		super.notifyModelChanged(changeType);
+//		
+//		if (PamController.PAM_STOPPING) {
+//		
+//		}
+	}
+	
+	
 
 
 

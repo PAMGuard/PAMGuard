@@ -20,6 +20,7 @@ import PamguardMVC.PamProcess;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
+import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
 import group3dlocaliser.grouper.DetectionGroupMonitor;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import group3dlocaliser.grouper.DetectionGrouper;
@@ -165,6 +166,11 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			return;
 //		long t1 = System.currentTimeMillis();
 //		System.out.printf("New %s in Group3Dprocess", o.toString());
+		
+		if(localiserAlgorithm3D instanceof CrossedBearingGroupLocaliser && pamDataUnit.getLocalisation()==null) {
+			return;
+		}
+		
 		detectionGrouper.newData(pamDataUnit);
 //		long t2 = System.currentTimeMillis();
 //
@@ -232,7 +238,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 				}
 			}
 		
-			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
+//			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;

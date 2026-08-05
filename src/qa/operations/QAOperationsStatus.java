@@ -82,7 +82,7 @@ public class QAOperationsStatus implements QANotifyable {
 	}
 
 	/**
-	 * Load data from previous runs in case PAMguard got restarted. ...
+	 * Load data from previous runs in case PAMGuard got restarted. ...
 	 */
 	private void loadEarlyierData() {
 		QAOpsDataBlock dataBlock = qaControl.getQaGeneratorProcess().getOpsDataBlock();

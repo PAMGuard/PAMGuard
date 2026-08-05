@@ -88,7 +88,10 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 */
 	private PamDataBlock<T> parentDataBlock;
 	
-//	public GpsDataUnit gpsDataUnit;
+//	/**
+//	 * Daq source info passed around from raw data units, for info only. 
+//	 */
+//	private DaqSourceInfo daqSourceInfo;
 
 
 	
@@ -112,6 +115,12 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 * Index of any database unit that this updated. 
 	 */
 	private int databaseUpdateOf;
+	
+	/**
+	 * Mark the unit as deleted. May have want to send an update notification 
+	 * with this dataunit even after it's been deleted, so displays can update, etc. 
+	 */
+	private boolean deleted;
 	
 	/**
 	 * Information about the binary file the data unit is stored in
@@ -399,6 +408,10 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	public void updateDataUnit(long updateTime) {
 		updateCount++;
 		this.lastUpdateTime = updateTime;
+		DataUnitFileInformation finf = getDataUnitFileInformation();
+		if (finf != null) {
+			finf.setNeedsUpdate(true);
+		}
 	}
 
 	/**
@@ -1097,6 +1110,9 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 * @return a data annotation. 
 	 */
 	public DataAnnotation getDataAnnotation(int index) {
+		if (index < 0 || dataAnnotations == null || dataAnnotations.size() <= index) {
+			return null;
+		}
 		return dataAnnotations.get(index);
 	}
 	
@@ -1725,5 +1741,37 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 */
 	public void setEmbryonic(boolean embryonic) {
 		this.embryonic = embryonic;
+	}
+
+	/**
+	 * @return the deleted
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	/**
+	 * @param deleted the deleted to set
+	 */
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+//	/**
+//	 * @return the daqSourceInfo
+//	 */
+//	public DaqSourceInfo getDaqSourceInfo() {
+//		return daqSourceInfo;
+//	}
+//
+//	/**
+//	 * @param daqSourceInfo the daqSourceInfo to set
+//	 */
+//	public void setDaqSourceInfo(DaqSourceInfo daqSourceInfo) {
+//		this.daqSourceInfo = daqSourceInfo;
+//	}
+	
+	public PamDataUnit cloneIfAllowed() throws CloneNotSupportedException{
+		return (PamDataUnit) this.clone();
 	}
 }

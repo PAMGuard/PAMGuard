@@ -29,6 +29,8 @@ public class BinaryOfflineDataMapPoint extends OfflineDataMapPoint implements Se
 //	transient BinaryStore binaryStore;
 
 	private Datagram datagram;
+
+	private transient BinaryStore binaryStore;
 	
 	/*
 	 * 
@@ -51,6 +53,7 @@ public class BinaryOfflineDataMapPoint extends OfflineDataMapPoint implements Se
 							binaryFooter != null ? binaryFooter.getNObjects() : -1, 0);
 		
 //		this.binaryStore=binaryStore;
+		this.binaryStore = binaryStore;
 		String binaryStoreFolderLocation = binaryStore.binaryStoreSettings.getStoreLocation();
 		URI binaryStoreFolderURI = new File(binaryStoreFolderLocation).toURI();
 		URI binaryFileURI = file.toURI();
@@ -73,8 +76,9 @@ public class BinaryOfflineDataMapPoint extends OfflineDataMapPoint implements Se
 		setDatagram(datagram);
 	}
 	
-	public BinaryOfflineDataMapPoint() {
+	public BinaryOfflineDataMapPoint(BinaryStore binaryStore) {
 		super(0,0,0,0);
+		this.binaryStore = binaryStore;
 	}
 	
 	public void update(BinaryStore binaryStore, File file, BinaryHeader binaryHeader,
@@ -284,6 +288,31 @@ public class BinaryOfflineDataMapPoint extends OfflineDataMapPoint implements Se
 	 */
 	public void setBinaryHeader(BinaryHeader binaryHeader) {
 		this.binaryHeader = binaryHeader;
+	}
+
+	/*
+	 * 
+	 * relPathInsideBinStorage will store at pos0 the filename and the parent at pos1 etc etc.
+	 * but will stop at the binary storage folder name and not store it.
+	 * This is so we can store the relative path in the data map but it
+	 * does not depend on either the absolute path which will cause problems
+	 * when the folder is moved or a network drive is mapped to a location on
+	 * a different computer and also so it does not depend on OS by having just
+	 * a string which will contain the OS specific file separator.
+	 * 
+	 */
+	
+	
+	
+	/**
+	 * @return the binaryStore
+	 */
+	public BinaryStore getBinaryStore() {
+		// will be null in serialised old data, so will have to find it. 
+		if (binaryStore == null) {
+			binaryStore = BinaryStore.findBinaryStoreControl();
+		}
+		return binaryStore;
 	}
 
 	@Override

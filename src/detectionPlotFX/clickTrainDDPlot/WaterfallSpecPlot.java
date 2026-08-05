@@ -151,7 +151,7 @@ public class WaterfallSpecPlot<D extends DetectionGroupDataUnit> extends RawFFTP
 
 		imageTask.setOnSucceeded((workerState)->{
 			this.reloadImage=false; 
-			this.detectionPlotDisplay.drawCurrentUnit(); //repaint
+			this.requestRedraw(); //repaint
 			reloadImage=false; 
 		}); 
 
@@ -193,7 +193,7 @@ public class WaterfallSpecPlot<D extends DetectionGroupDataUnit> extends RawFFTP
 		else {
 			//run in current thread 
 			generateImage(detectionList);
-			this.detectionPlotDisplay.drawCurrentUnit(); //repaint
+			this.requestRedraw(); //repaint
 		}
 		
 	}

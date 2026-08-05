@@ -64,7 +64,8 @@ public enum UDColName {
 	Send_Control_Name(Types.CHAR, 50),
 	Control_on_Subform(Types.CHAR, 50),
 	Get_Control_Data(Types.CHAR, 50),
-	Default(Types.CHAR, 50);
+	Default(Types.CHAR, 50),
+	Hotkey(Types.CHAR, 10);
 
 	private final int sqlType;
 	

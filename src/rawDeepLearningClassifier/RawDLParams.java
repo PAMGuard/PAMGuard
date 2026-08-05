@@ -2,9 +2,11 @@ package rawDeepLearningClassifier;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import PamView.GroupedSourceParameters;
+import pamguard.GlobalArguments;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 
 /**

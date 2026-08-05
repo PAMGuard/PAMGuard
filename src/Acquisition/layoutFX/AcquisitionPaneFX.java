@@ -14,6 +14,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import pamViewFX.PamGuiFX;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamComboBox;
@@ -137,6 +138,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	 * Default spacing for VBox 
 	 */
 	private static double defaultHSpacing=5; 
+	
 
 	public AcquisitionPaneFX(AcquisitionControl aquisitionControl){
 		super(null);
@@ -167,6 +169,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//System.out.println("MAKE PANE: "  +  acquisitionParameters.getDaqSystemType());
 
 	} 
+
 	
 //	/**
 //	 * Create the advanced settings pane which can be accessed by DAQ panes if needed. 
@@ -251,6 +254,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 
 		//add listener
 		deviceTypes.setOnAction((value)->{
+			
 			systemPane.setCenter(null);
 			channelMappingHolder.setCenter(null);
 
@@ -531,7 +535,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//set specific panes for the current system 
 		showDAQSpecificPane(currentDaqSystem);
 		showHideChannelPane(currentDaqSystem);
-
+		showStatusBarPane(currentDaqSystem);
 		//newDeviceType();
 
 		setSampleRate(acquisitionParameters.sampleRate);
@@ -609,5 +613,50 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	public TextField getAdvancedLabel() {
 		return this.flipPane.getAdvLabel();
 	}
+	
+	/**
+	 * The current DAQ status bar pane shown in the toolbar.
+	 */
+	private Pane currentStatusBarPane;
+	
+	/**
+	 * Set the status bar pane for the current DAQ system. This sits near the record button in the GUI.
+	 * @param currentDaqSystem2 - the current DAQ system.
+	 */
+	public void showStatusBarPane(DaqSystem currentDaqSystem2) {
+		System.out.println("SHOW status bar pane for: " + currentDaqSystem2.getSystemType() + " "+ currentDaqSystem2.getDAQSpecificPane(this));
+		
+		PamGuiManagerFX pamGuiManager = PamGuiManagerFX.getInstance();
+		if (pamGuiManager == null) return;
+		
+		// Remove the previous status bar pane if one exists
+		if (currentStatusBarPane != null) {
+			for (int i = 0; i < pamGuiManager.getPamGuiFXList().size(); i++) {
+				PamGuiFX.ToolBarPane toolbar = pamGuiManager.getPamGuiFXList().get(i).getSharedToolbar();
+				if (toolbar != null) {
+					toolbar.getCenterHBox().getChildren().remove(currentStatusBarPane);
+				}
+			}
+			currentStatusBarPane = null;
+		}
+		
+		// Get the new status bar pane from the DAQ system
+		DAQSettingsPane<?> daqPane = currentDaqSystem2.getDAQSpecificPane(this);
+		if (daqPane != null) {
+			Pane statusPane = daqPane.getStatusBarPane();
+			if (statusPane != null) {
+				currentStatusBarPane = statusPane;
+				// Add to all stages
+				for (int i = 0; i < pamGuiManager.getPamGuiFXList().size(); i++) {
+					PamGuiFX.ToolBarPane toolbar = pamGuiManager.getPamGuiFXList().get(i).getSharedToolbar();
+					if (toolbar != null && !toolbar.getCenterHBox().getChildren().contains(statusPane)) {
+						toolbar.getCenterHBox().getChildren().add(statusPane);
+					}
+				}
+			}
+		}
+	}
+
+	
 
 }

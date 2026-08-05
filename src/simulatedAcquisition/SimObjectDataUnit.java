@@ -137,8 +137,8 @@ public class SimObjectDataUnit extends PamDataUnit {
 			pointingVectors[i] = propagationModel.getPointingVectors();
 			sigAmplitude[i] = daqProcess.dbMicropascalToSignal(i, simObject.amplitude);
 		}
-		double bearingTo = phoneLatLong[0].bearingTo(phoneLatLong[1]);
-		double distanceTo = phoneLatLong[0].distanceToMetres(phoneLatLong[1]);
+//		double bearingTo = phoneLatLong[0].bearingTo(phoneLatLong[1]);
+//		double distanceTo = phoneLatLong[0].distanceToMetres(phoneLatLong[1]);
 		simSound.setHydrophoneDelays(delays);
 		simSound.setTransmissionGains(gains);
 		simSound.setSoundAmplitude(sigAmplitude);

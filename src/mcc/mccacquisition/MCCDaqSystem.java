@@ -58,6 +58,8 @@ public class MCCDaqSystem extends DaqSystem implements PamSettings {
 	private long totalSampleCount;
 	
 	private PamWarning mccWarning = new PamWarning("MCC Acquisition", "", 0);
+
+	private mcc.mccacquisition.layoutFX.MCCDAQPane mccDAQPane;
 	
 	/**
 	 * @param acquisitionControl 
@@ -258,7 +260,7 @@ public class MCCDaqSystem extends DaqSystem implements PamSettings {
 		/**
 		 * Scaling very odd, with it looking like it's an unsigned integer returned, where 0 will be -FS 
 		 * and 2^nBits-1 will be +FS. All gets quite complicated, so easiest to pass to MCC's own function 
-		 * which converts to volts. Will then have to rescale to -1:1 scale since PAMguard will 
+		 * which converts to volts. Will then have to rescale to -1:1 scale since PAMGuard will 
 		 * expect to add the range calibration later. 
 		 */
 		short[] chanTags = new short[data.length];
@@ -405,6 +407,14 @@ public class MCCDaqSystem extends DaqSystem implements PamSettings {
 	@Override
 	public Serializable getSettingsReference() {
 		return mccDaqParams;
+	}
+	
+	@Override
+	public Acquisition.layoutFX.DAQSettingsPane getDAQSpecificPane(Acquisition.layoutFX.AcquisitionPaneFX acquisitionPaneFX) {
+		if (mccDAQPane == null) {
+			mccDAQPane = new mcc.mccacquisition.layoutFX.MCCDAQPane(this);
+		}
+		return mccDAQPane;
 	}
 
 	@Override

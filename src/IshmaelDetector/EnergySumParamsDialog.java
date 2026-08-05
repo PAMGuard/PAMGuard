@@ -42,6 +42,7 @@ public class EnergySumParamsDialog extends IshDetParamsDialog  {
 
 	private EnergySumParamsDialog(Frame parentFrame, Class<FFTDataUnit> inputDataClass) {
 		super(parentFrame, "Energy Sum Parameters", inputDataClass);
+		setHelpPoint("detectors.ishmael.docs.ishmael_energysum");
 	}
 
 	public static EnergySumParams showDialog2(Frame parentFrame, EnergySumParams oldParams) 

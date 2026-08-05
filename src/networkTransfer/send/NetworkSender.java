@@ -3,41 +3,28 @@ package networkTransfer.send;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
-import networkTransfer.emulator.NetworkEmulator;
-import networkTransfer.receive.NetworkReceiver;
-import pamguard.GlobalArguments;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import Acquisition.FolderInputSystem;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamController.PamguardVersionInfo;
 import PamModel.SMRUEnable;
 import PamView.PamSidePanel;
 import PamguardMVC.PamDataBlock;
+import networkTransfer.NetworkClient;
+import networkTransfer.NetworkParams;
+import networkTransfer.emulator.NetworkEmulator;
+import networkTransfer.mqttClient.PamMqttClient;
+import pamguard.GlobalArguments;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Send near real time data over the network to another PAMGUARD configuration.
@@ -46,32 +33,178 @@ import PamguardMVC.PamDataBlock;
  *
  */
 public class NetworkSender extends PamControlledUnit implements PamSettings {
-	
-	public static final String ADDRESS = "-netSend.address";
-	public static final String PORT = "-netSend.port";
+
+	/**
+	 * These two left in since they are used in the BathProcessing plugin. 
+	 * The batch processor has been updated to use the newer definitions in 
+	 * the NetSendCommandParam enum, so will be OK in new releases, but current
+	 * versions of the BP will fail with this PG. So leave these in for a couple
+	 * of years until people are likely to have updated their BP. DG 2026-07-09
+	 */
+	@Deprecated
 	public static final String ID1 = "-netSend.id1";
+	@Deprecated
 	public static final String ID2 = "-netSend.id2";
+	/*public static final String ADDRESS = "-netSend.address";
+	public static final String PORT = "-netSend.port";
+	public static final String USER = "-netSend.user";
+	public static final String PASSWORD = "-netSend.password";
+
+	public static final String USESSL = "-netSend.ssl";
+	public static final String USEMQTT = "-netSend.mqtt";
+	public static final String TRUSTPATH = "-netSend.trustPath";
+	public static final String TRUSTPASS = "-netSend.trustPass";
+	public static final String KEYPATH = "-netSend.keyPath";
+	public static final String KEYPASS = "-netSend.keyPass";
+	public static final String SENDJSON = "-netSend.json";
+	public static final String PERSISTANCE_DIRECTORY = "-netSend.percistanceDir";*/
+
 
 	protected NetworkSendParams networkSendParams = new NetworkSendParams();
 	private NetworkEmulator networkEmulator;
 	private boolean initialisationComplete = false;
-	List<NetworkQueuedObject> objectList;
-	int totalQueueSize = 0;
 	private NetworkSendSidePanel sidePanel;
-	private QueueWorkerThread queueWorkerThread;
-	private Socket tcpSocket;
-	private String currStatus = "Closed";
-	private DataOutputStream tcpWriter;
 	private NetworkSendProcess commandProcess;
+	//PamWarning sendWarning;
+	public NetworkClient client;
 	
 	public NetworkSender(String unitName) {
 		super("Network Sender", unitName);
-		commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
-		commandProcess.setCommandProcess(true);
-		addPamProcess(commandProcess);
+
 		PamSettingManager.getInstance().registerSettings(this);
-		objectList = Collections.synchronizedList(new LinkedList<NetworkQueuedObject>());
+		
+		checkCommandLineOptions();
+		
+		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
+			commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
+			commandProcess.setCommandProcess(true);
+			addPamProcess(commandProcess);
+		}
+		
 		sidePanel = new NetworkSendSidePanel(this);
+		initializeClient();
+	}
+	
+	/**
+	 * Do this here, not in restore settings, otherwise it's not called the first time the module is added. 
+	 */
+	private void checkCommandLineOptions() {
+		String address = GlobalArguments.getParam(NetSendCommandParam.ADDRESS.arg);
+		String portString = GlobalArguments.getParam(NetSendCommandParam.PORT.arg);
+		String id1String = GlobalArguments.getParam(NetSendCommandParam.ID1.arg);
+		String id2String = GlobalArguments.getParam(NetSendCommandParam.ID2.arg);
+		String usesslString = GlobalArguments.getParam(NetSendCommandParam.USESSL.arg);
+		String usemqttString = GlobalArguments.getParam(NetSendCommandParam.USEMQTT.arg);
+		String trustStorePathString = GlobalArguments.getParam(NetSendCommandParam.TRUSTPATH.arg);
+		String trustStorePassString = GlobalArguments.getParam(NetSendCommandParam.TRUSTPASS.arg);
+		String keyPathString = GlobalArguments.getParam(NetSendCommandParam.KEYPATH.arg);
+		String keyPassString = GlobalArguments.getParam(NetSendCommandParam.KEYPASS.arg);
+		String user = GlobalArguments.getParam(NetSendCommandParam.USER.arg);
+		String password = GlobalArguments.getParam(NetSendCommandParam.PASSWORD.arg);
+		String useJson = GlobalArguments.getParam(NetSendCommandParam.SENDJSON.arg);
+		String persistenceDir = GlobalArguments.getParam(NetSendCommandParam.PERSISTANCE_DIRECTORY.arg);
+
+		if(user!=null) {
+			networkSendParams.userId = user;
+		}
+		
+		if(password!=null) {
+			networkSendParams.password = password;
+		}
+	
+		if (address != null) {
+			networkSendParams.ipAddress = address; // remember it. 
+		}
+		
+		if(portString != null) {
+			networkSendParams.portNumber = Integer.valueOf(portString);
+		}
+		
+		if(id1String!=null) {
+			networkSendParams.stationId1 = Integer.valueOf(id1String);
+		}
+		
+		if(id2String!=null) {
+			networkSendParams.stationId2 = Integer.valueOf(id2String);
+		}
+		
+		if(usesslString != null) {
+			networkSendParams.useSSL = Boolean.valueOf(usesslString);
+		}
+		
+		if(usemqttString!=null) {
+			networkSendParams.mqtt = Boolean.valueOf(usemqttString);
+		}
+		
+		if(trustStorePathString!=null) {
+			networkSendParams.trustStorePath = trustStorePathString;
+		}
+		
+		if(trustStorePassString!=null) {
+			networkSendParams.trustStorePassword = trustStorePassString;
+		}
+		
+		if(keyPathString!=null) {
+			networkSendParams.keyStorePath = keyPathString;
+		}
+		
+		if(keyPassString!=null) {
+			networkSendParams.keyStorePassword = keyPassString;
+		}
+		
+		if(persistenceDir!=null) {
+			networkSendParams.persistenceDirectory = persistenceDir;
+		}
+		
+		/*
+		 * In most contexts the persistence directory is just going to be pamguard home. 
+		 * With configs passed back and forth between windows and linux machines, just set the persistence dir to PG home if the filepath format is the wrong OS type
+		 * If the path is a windows-like path, and looks like it is a pamguard home path, make sure that it is the pamguard home path for the current machine
+		 * (annoying when a new user folder is created when a config is passed to a new computer)
+		 * 
+		 * If persistence directory is NOT set, then set it to pamguard home
+		 * If persistence directory is set, and the filepath is consistent with the current OS, and it is not a pamguard home-like directory, then move on
+		 */
+		networkSendParams.verifyCorrectPersistanceDirectory();
+		//Make it easy on users who may not know the details of MQTT -- if station ID is NOT set, then just set it to 'BaseStation' (the CAB/APS will set its ID to the pb###)
+		//If stationID is set, then move on
+		networkSendParams.checkStationID();
+		//Make it easy on users who may not know the details of MQTT -- if base topic is NOT set, then just set it to 'APS'
+		//If base topic is set, then move on.
+		networkSendParams.checkBaseTopic();
+		
+		/**
+		 * Do we need code here that will allow both ? 
+		 */
+		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
+		if(useJson!=null) {
+			isSetJson = Boolean.valueOf(useJson);
+		}
+		
+		
+		int sendFmt = 0;
+		if(isSetJson) {
+			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
+		}
+		else {
+			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
+		}
+		networkSendParams.setSendingFormat(sendFmt);		
+	}
+
+	public void initializeClient() {
+		if(client!=null && !client.requireReconnect) {
+			return;
+		}
+		if(this.networkSendParams.mqtt) {
+			client = new PamMqttClient(this.networkSendParams);
+		}else {
+			client = new TCPSendClient(this.networkSendParams);
+		}
+	}
+	
+	public void closeClient() {
+		this.client.close();
 	}
 
 	/* (non-Javadoc)
@@ -120,7 +253,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	public void senderSettings(Frame parentFrame) {
 		NetworkSendParams p = NetworkSendDialog.showDialog(parentFrame, this, networkSendParams);
 		if (p != null) {
-			networkSendParams = p.clone();
+			networkSendParams = (NetworkSendParams) p.clone();
 			sortDataSources();
 		}
 	}
@@ -153,14 +286,14 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	 */
 	private NetworkEmulator getNetworkEmulator() {
 		if (networkEmulator == null) {
-			networkEmulator = new NetworkEmulator(this);
+			//networkEmulator = new NetworkEmulator(this);
 		}
 		return networkEmulator;
 	}
 
 	@Override
 	public Serializable getSettingsReference() {
-		NetworkSendParams p = networkSendParams.clone();
+		NetworkSendParams p = (NetworkSendParams) networkSendParams.clone();
 		if (p.savePassword == false) {
 			p.password = null;
 		}
@@ -175,28 +308,8 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
-		networkSendParams = ((NetworkSendParams) pamControlledUnitSettings.getSettings()).clone();
+		networkSendParams = (NetworkSendParams) ((NetworkParams) pamControlledUnitSettings.getSettings()).clone();
 		
-		String address = GlobalArguments.getParam(ADDRESS);
-		String portString = GlobalArguments.getParam(PORT);
-		String id1String = GlobalArguments.getParam(ID1);
-		String id2String = GlobalArguments.getParam(ID2);
-	
-		if (address != null) {
-			networkSendParams.ipAddress = address; // remember it. 
-		}
-		
-		if(portString != null) {
-			networkSendParams.portNumber = Integer.valueOf(portString);
-		}
-		
-		if(id1String!=null) {
-			networkSendParams.stationId1 = Integer.valueOf(id1String);
-		}
-		
-		if(id2String!=null) {
-			networkSendParams.stationId1 = Integer.valueOf(id2String);
-		}
 		
 		return (networkSendParams != null);
 	}
@@ -215,7 +328,9 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		switch (changeType) {
 		case PamController.INITIALIZATION_COMPLETE:
 			sortDataSources();
-			startQueueThread();
+			if(client!=null) {
+				client.notifyModelChanged(changeType);
+			}
 			initialisationComplete  = true;
 			break;
 		case PamController.REMOVE_CONTROLLEDUNIT:
@@ -223,17 +338,15 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			if (initialisationComplete) {
 				sortDataSources();
 			}
+			break;
+		case PamController.CHANGED_PROCESS_SETTINGS:
+			//this.client.updateParams(this.getNetworkSendParams());
+			//this.client.configureClient();
 		}
+		
 	}
 
-	/**
-	 * Start the queue thread, which takes data from the queue and 
-	 * attemts to send it. 
-	 */
-	private void startQueueThread() {
-		queueWorkerThread = new QueueWorkerThread();
-		queueWorkerThread.execute();		
-	}
+	
 
 	private void sortDataSources() {
 		ArrayList<PamDataBlock> wanted = listWantedDataSources();
@@ -242,16 +355,18 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			removePamProcess(getPamProcess(i));
 		}
 		for (PamDataBlock aBlock:wanted) {
-			addPamProcess(new NetworkSendProcess(this, aBlock,networkSendParams.sendingFormat));
+			addPamProcess(new NetworkSendProcess(this, aBlock,networkSendParams.getSendingFormat()));
 
 		}
 		
 		// set the command process to use the same format as all of the new processes
-		commandProcess.setOutputFormat(networkSendParams.sendingFormat);
+		if(this.commandProcess!=null) {
+			commandProcess.setOutputFormat(networkSendParams.getSendingFormat());
+		}
 	}
 
 	public ArrayList<PamDataBlock> listWantedDataSources() {
-		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.sendingFormat);
+		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.getSendingFormat());
 		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
 		for (PamDataBlock aBlock:possibles) {
 			if (networkSendParams.findDataBlock(aBlock) != null) {
@@ -265,67 +380,30 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	public ArrayList<PamDataBlock> listPossibleDataSources(int outputFormat) {
 		ArrayList<PamDataBlock> possibles = new ArrayList<PamDataBlock>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		boolean sendBytes = ((outputFormat & NetworkSendParams.NETWORKSEND_BYTEARRAY) != 0);
+		boolean sendJson = ((outputFormat & NetworkSendParams.NETWORKSEND_JSON) != 0);
 		for (PamDataBlock aBlock:allDataBlocks) {
 			
+			Boolean hasJson = aBlock.getJSONDataSource() != null;
+			Boolean hasBytes = aBlock.getBinaryDataSource() != null;
+//			if (hasJson | hasBytes) {
+//				System.out.printf("Block %s has JSON: %s, has Binary: %s\n", aBlock.getDataName(), hasJson.toString(), hasBytes.toString());
+//			}
+			
 			// if the data block has a binary source, add it to the list of potential outputs
-			if ( (outputFormat == NetworkSendParams.NETWORKSEND_BYTEARRAY && aBlock.getBinaryDataSource() != null) ||
-				 (outputFormat == NetworkSendParams.NETWORKSEND_JSON && aBlock.getJSONDataSource() != null)) {
+			if ( (sendJson && hasJson) ||
+				 (sendBytes && hasBytes)) {
 				possibles.add(aBlock);
 			}
 			
 			// if the data block also has a background manager, add it's data block to the list as well (json-output only for now)
 			if (aBlock.getBackgroundManager()!=null) {
-				if (outputFormat == NetworkSendParams.NETWORKSEND_JSON && aBlock.getBackgroundManager().getBackgroundDataBlock().getJSONDataSource() != null) {
+				if (sendJson && aBlock.getBackgroundManager().getBackgroundDataBlock().getJSONDataSource() != null) {
 					possibles.add(aBlock.getBackgroundManager().getBackgroundDataBlock());
 				}
 			}
 		}
 		return possibles;
-	}
-
-	/** 
-	 * Put data objects in a queue. A different thread will handle
-	 * emptying the queue, opening the connection, sending the data, etc. 
-	 * @param networkQueuedObject Object to add to the queue
-	 */
-	public synchronized void queueDataObject(NetworkQueuedObject networkQueuedObject) {
-		objectList.add(networkQueuedObject);
-		totalQueueSize += networkQueuedObject.dataLength;
-		checkQueueSize();
-	}
-	
-	/**
-	 * Get the size of the queue as a number of objects. 
-	 * @return number of objects in queue.
-	 */
-	public synchronized int getQueueLength() {
-		return objectList.size();
-	}
-	
-	/**
-	 * Get the current queue size in kilobytes
-	 * @return
-	 */
-	public synchronized int getQueueSize() {
-		return totalQueueSize / 1024;
-	}
-
-	/**
-	 * Check the queue size is no greater than the permitted maximum. If it is, start to throw 
-	 * away the oldest data units. 
-	 */
-	private void checkQueueSize() {
-		NetworkQueuedObject removedObject;
-		
-		while (objectList.size() > networkSendParams.maxQueuedObjects ||
-				(networkSendParams.maxQueueSize!=0 && totalQueueSize > networkSendParams.maxQueueSize * 1024)) {
-			 removedObject = objectList.remove(0);
-			 totalQueueSize -= removedObject.dataLength;
-		}
-	}
-
-	public String getStatus() {
-		return currStatus;
 	}
 	
 	/* (non-Javadoc)
@@ -334,9 +412,8 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	@Override
 	public void pamClose() {
 		super.pamClose();
-		if (queueWorkerThread != null) {
-			queueWorkerThread.stopThread(true, true);
-			queueWorkerThread = null;
+		if(client!=null) {
+			client.close();
 		}
 	}
 
@@ -345,6 +422,9 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	 */
 	@Override
 	public void pamHasStopped() {
+		if(client!=null) {
+			client.disconnect();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -353,240 +433,68 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	@Override
 	public void pamToStart() {
 		super.pamToStart();
-	}
-
-	/**
-	 * Called from within the swing worker thread to send data from the queue. 
-	 * @return The number of objects sent. 
-	 */
-	public int sendQueuedData() {
-		int objectsSent = 0;
-		NetworkQueuedObject anObject;
-		while (objectList.size() > 0) {
-			anObject = objectList.get(0);
-			if (!sendObject(anObject)) {
-				return objectsSent;				
-			}
-			totalQueueSize -= anObject.dataLength;
-			objectList.remove(0);
-		}
-		return objectsSent;
-	}
-
-	/**
-	 * Final flushing of the data queue once DAQ has stopped. 
-	 * @param flushData
-	 * @param flushCommands
-	 * @return number of objects sent. 
-	 */
-	private int flushQueue(boolean flushData, boolean flushCommands) {
-		int objectsSent = 0;
-		NetworkQueuedObject anObject;
-		while (objectList.size() > 0) {
-			anObject = objectList.get(0);
-			if (shouldFlush(anObject, flushData, flushCommands)) {
-				if (!sendObject(anObject)) {
-					return objectsSent;				
-				}
-			}
-			totalQueueSize -= anObject.dataLength;
-			objectList.remove(0);
-		}	
-		return objectsSent;
-	}
-	
-	/**
-	 * Delete everything left in the queue.
-	 * @return number of items removed. 
-	 */
-	private int deleteQueue() {
-		// now just empty anything left...
-		int n = objectList.size();
-		objectList.clear();
-		totalQueueSize = 0;		
-		return n;
-	}
-	
-	boolean shouldFlush(NetworkQueuedObject anObject, boolean flushData, boolean flushCommands) {
-		switch(anObject.dataType2) {
-		case NetworkReceiver.NET_PAM_DATA:
-			return flushData;
-		default:
-			return flushCommands;
-		}
-	}
-
-	
-	private boolean sendObject(NetworkQueuedObject anObject) {
+		this.client.configureClient(this.networkSendParams);
+		runClient();
 		
-		// open a writer if necessary. 
-		if (tcpWriter == null) {
-			if (!openConnection()) {
-				return false;
-			}
-		}
-
-		switch (anObject.format) {
-		
-		
-		// Case 0: byte array data
-		case NetworkSendParams.NETWORKSEND_BYTEARRAY:
-
-			// first, re-pack the object ...
-			byte[] data = anObject.data;
-
-			/*
-			 * Don't we here need to write out a whole load of stuff first to make
-			 * the header before the actual data ? 
-			 */
-			if (!writeByteData(data)) {
-				closeConnection();
-				if (!openConnection()) {
-					return false;
-				}
-				if (!writeByteData(data)) {
-					closeConnection();
-					return false;
-				}
-			}
-			break;
-
-			
-		// Case 1: JSON-formatted text string
-		case NetworkSendParams.NETWORKSEND_JSON:
-			
-			String dataStr = anObject.jsonString;
-			if (!writeStringData(dataStr)) {
-				closeConnection();
-				if (!openConnection()) {
-					return false;
-				}
-				if (!writeStringData(dataStr)) {
-					closeConnection();
-					return false;
-				}
-			}
-			break;
-			
-		}
-		
-		return true;
 	}
 	
-	
-	private boolean writeByteData(byte[] data) {
-		try {
-			tcpWriter.write(data);
-//			System.out.println(String.format("Wrote %d bytes to socket", data.length));
-			return true;
-		} catch (IOException e) {
-//			e.printStackTrace();
-			System.out.println("IOException in NeetworkSender.writeByteData: " + e.getMessage());
-			currStatus = "Socket Closed";
-			return false;
-		}
-	}
-	
-	private boolean writeStringData(String data) {
-		try {
-			tcpWriter.writeBytes(data);
-//			System.out.println(String.format("Wrote %d characters to socket", data.length()));
-			return true;
-		} catch (IOException e) {
-//			e.printStackTrace();
-			System.out.println("IOException in NeetworkSender.writeStringData" + e.getMessage());
-			currStatus = "Socket Closed";
-			return false;
-		}
-	}
-	
-	boolean openConnection() {
-		try {
-			tcpSocket = new Socket(networkSendParams.ipAddress, networkSendParams.portNumber);
-		} catch (UnknownHostException e) {
-//			e.printStackTrace();
-//			System.out.println(e.getMessage());
-//			currStatus = e.getMessage();
-			currStatus = "Unknown host";
-			tcpSocket = null;
-			tcpWriter = null;
-			return false;
-		} catch (IOException e) {
-//			e.printStackTrace();
-//			System.out.println(e.getMessage());
-//			currStatus = e.getMessage();
-			currStatus = "IO Exception";
-			tcpSocket = null;
-			tcpWriter = null;
-			return false;
-		}
-		try {
-			tcpWriter = new DataOutputStream(tcpSocket.getOutputStream());
-		} catch (IOException e) {
-//			currStatus = "TCP IO Exception";
-			currStatus = e.getMessage();
-			tcpSocket = null;
-			tcpWriter = null;
-			return false;
-		}
-		currStatus = "Open";
-		return true;
-	}
-	
-	void closeConnection() {
-		if (tcpSocket == null) {
+	public long lastTransmitErrorPrint = 0;
+
+	public void transmitData(NetworkQueuedObject qo) {
+		if(client==null) {
+			System.out.println("Client is null. Likely due to restarting client");
 			return;
 		}
 		try {
-			tcpSocket.close();
-			tcpWriter.close();
-		} catch (IOException e) {
-//			e.printStackTrace();
-			System.out.println("IOException in NeetworkSender.closeconnection" + e.getMessage());
-		}
-		tcpSocket = null;
-		tcpWriter = null;
-	}
-
-	private class QueueWorkerThread extends SwingWorker<Integer, QueueStatusData> {
-
-		private volatile boolean stopNow;
-		private boolean flushData;
-		private boolean flushCommands;
-
-		@Override
-		protected Integer doInBackground() {
-			while (stopNow == false) {
-				if (sendQueuedData() == 0) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+			client.sendNetworkQueuedObject(qo);
+		} catch (NetTransmitException e) {
+			if(System.currentTimeMillis()-this.lastTransmitErrorPrint>1000*60) {
+				System.out.println("Could not transmit message. Error: "+e.getMessage());
+				lastTransmitErrorPrint = System.currentTimeMillis();
 			}
-			flushQueue(flushData, flushCommands);
-			deleteQueue();
-			return null;
+			/*if(client!=null) {
+				client.setWarning("Error transmitting data. "+e.getMessage());
+			}*/
 		}
-
-		public void stopThread(boolean flushData, boolean flushCommands) {
-			stopNow = true;
-			this.flushData = flushData;
-			this.flushCommands = flushCommands;
-		}
-
-		@Override
-		protected void done() {
-			// TODO Auto-generated method stub
-			super.done();
-		}
-
-		@Override
-		protected void process(List<QueueStatusData> chunks) {
-			// TODO Auto-generated method stub
-			super.process(chunks);
-		}
-		
 	}
+
+	public String getStatus() {
+		if(client==null) {
+			return "Disconnected";
+		}
+		return client.getStatus();
+	}
+
+	public void runClient() {
+		if(client.isConnected()) {
+			return;
+		}
+		try {
+			client.connect();
+		} catch (ClientConnectFailedException e) {
+			System.out.println("Could not connect client to server. Data will exist in buffer until connection is obtained");
+		}
+	}
+
+	public String executeExternalCommand(String command) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getQueueLength() {
+		if(client==null) {
+			return -1;
+		}
+		return client.getQueueLength();
+	}
+
+	public int getQueueSize() {
+		if(client==null) {
+			return -1;
+		}
+		return client.getQueueSize();
+	}
+
+	
+	
 }

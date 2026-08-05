@@ -1402,6 +1402,18 @@ public class PamArrayUtils {
 	}
 
 
+	/**
+	 * Add a constant to all elements of data. 
+	 * @param data data array
+	 * @param val value to add to all data. 
+	 */
+	public static void add(double[] data, double val) {
+		for (int i = 0; i < data.length; i++) {
+			data[i] += val;
+		}
+	}
+
+
 
 
 

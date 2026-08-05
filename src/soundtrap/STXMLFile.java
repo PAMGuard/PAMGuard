@@ -147,12 +147,23 @@ public class STXMLFile {
 		// sensible structure. 
 		String utcStart = timeHash.get("SamplingStartTimeUTC");
 		if (utcStart == null) return null;
+		
+
 		timeInfo.samplingStartTimeUTC = stDateToMillis(utcStart);
 		String utcStop = timeHash.get("SamplingStopTimeUTC");
 		if (utcStop == null) return null;
 		timeInfo.samplingStopTimeUTC = stDateToMillis(utcStop);
 //		System.out.printf("From %s to %s\n", PamCalendar.formatDBDateTime(timeInfo.samplingStartTimeUTC)
 //				, PamCalendar.formatDBDateTime(timeInfo.samplingStopTimeUTC));
+		
+		String samplingStart = timeHash.get("SamplingStartTimeSubS");
+		if (samplingStart != null) {
+			samplingStart=samplingStart.replace("us","").stripTrailing();
+			//add millis to start time.
+			long millis = Long.parseLong(samplingStart);
+			millis=millis/1000; //convert to millis from micros
+			timeInfo.samplingStartTimeUTC=timeInfo.samplingStartTimeUTC+millis;
+		}
 		
 		return timeInfo;
 	}
@@ -265,7 +276,7 @@ public class STXMLFile {
 		return wavInfo;
 	}
 
-	/**
+	/**2453
 	 * @return the xmlFile
 	 */
 	public File getXmlFile() {

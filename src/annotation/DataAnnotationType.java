@@ -129,10 +129,22 @@ public abstract class DataAnnotationType<TDataAnnotation extends DataAnnotation<
 		return null;
 	}
 	
+	/**
+	 * Get a settings panel to configure how the annotation works. Note
+	 * that this is not the same as the dialog panel which can be used to enter
+	 * data for a specific annotation. 
+	 * @return settings panel. 
+	 */
 	public AnnotationSettingsPanel getSettingsPanel() {
 		return null;
 	}
 	
+	/**
+	 * Has a settings panel to configure how the annotation works. Note
+	 * that this is not the same as the dialog panel which can be used to enter
+	 * data for a specific annotation. 
+	 * @return
+	 */
 	public boolean hasSettingsPanel() {
 		return false;
 	}

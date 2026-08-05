@@ -30,6 +30,7 @@ public class DetectionsExportWizard extends PamWizard {
 	private GranularityCard granularityCard;
 	private DescriptionCard descriptionCard;
 	private StreamExportParams streamExportParams;
+	private MaxItemsCard maxItemsCard;
 	
 	private AlgorithmCard algorithmCard;
 	private ExportWorkerCard exportWorkerCard;
@@ -48,9 +49,19 @@ public class DetectionsExportWizard extends PamWizard {
 		tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		getMainPanel().add(BorderLayout.NORTH, new ExportStreamInfoPanel(dataBlock));
 		
+		// see how much data there is 
+		int nData = 0;
+		try {
+			nData = dataBlock.getPrimaryDataMap().getDataCount();
+		}
+		catch (Exception e) {
+			
+		}
+		
 		addCard(algorithmCard = new AlgorithmCard(this, tethysControl, dataBlock));
 		addCard(callTypeCard = new CallTypeCard(tethysControl, null, getTitle(), dataBlock));
 		addCard(granularityCard = new GranularityCard(this, tethysControl, dataBlock));
+		addCard(maxItemsCard = new MaxItemsCard( this, tethysControl,dataBlock));
 		addCard(descriptionCard = new DescriptionCard(this, tethysControl));
 		addCard(parameterCard = new ParameterCard(tethysControl, this, dataBlock));
 		if (doExport) {
@@ -93,6 +104,9 @@ public class DetectionsExportWizard extends PamWizard {
 		if (callTypeCard != null) {
 			callTypeCard.setParams(streamExportParams);
 		}
+		if (maxItemsCard != null) {
+			maxItemsCard.setParams(streamExportParams);
+		}
 		if (wizardCard == exportWorkerCard) {
 			exportWorkerCard.setParams(streamExportParams);
 		}
@@ -123,6 +137,13 @@ public class DetectionsExportWizard extends PamWizard {
 	}
 
 
+
+	@Override
+	public void cardSelected(PamWizardCard wizardCard) {
+		if (wizardCard == maxItemsCard) {
+			maxItemsCard.setParams(streamExportParams);
+		}
+	}
 
 	@Override
 	public void cancelButtonPressed() {

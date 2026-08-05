@@ -35,7 +35,7 @@ public class RecorderSettings implements Serializable, Cloneable, ManagedParamet
 	/**
 	 * Allowable bit depths. 
 	 */
-	static public final int[] BITDEPTHS = {8, 16, 24};
+	static public final int[] BITDEPTHS = {8, 16, 24, 32};
 	/**
 	 * Name of the raw data source
 	 */
@@ -44,7 +44,7 @@ public class RecorderSettings implements Serializable, Cloneable, ManagedParamet
 	/**
 	 * Bitmap of channels to be saved (need not be all available channels)
 	 */
-	private int channelBitmap = 3;
+	public int channelBitmap = 3;
 
 	/**
 	 * bit depth (NOT Byte depth) of the recording format.

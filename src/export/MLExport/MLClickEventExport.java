@@ -19,7 +19,9 @@ public class MLClickEventExport extends MLSuperDetExport {
 		OfflineEventDataUnit clickEvent = (OfflineEventDataUnit) dataUnit; 
 		
 		mlStruct.set("event_id",index,  Mat5.newScalar(clickEvent.getEventId()));
+		mlStruct.set("event_num", index, Mat5.newScalar(clickEvent.getEventNumber()));
 		mlStruct.set("event_type", index, Mat5.newString(clickEvent.getEventType()));
+
 		String comment = "";
 		if (clickEvent.getComment()!=null) comment = clickEvent.getComment();
 		mlStruct.set("comment", index, Mat5.newString(comment));

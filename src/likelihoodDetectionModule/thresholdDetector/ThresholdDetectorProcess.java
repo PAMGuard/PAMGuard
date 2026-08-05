@@ -13,7 +13,6 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
 import likelihoodDetectionModule.normalizer.NormalizedDataUnit;
 import likelihoodDetectionModule.LikelihoodDetectionUnit;
 import likelihoodDetectionModule.SignalBand;
@@ -199,7 +198,7 @@ public class ThresholdDetectorProcess extends PamProcess {
 	
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
-		this.sampleRate = sampleRate;
+		this.setSampleRate(sampleRate, false);
 	}
 	
 }

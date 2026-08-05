@@ -23,19 +23,19 @@ public class DetectionPlotProjector extends GeneralProjector<Coordinate3d> {
 	/**
 	 * The minimum limit of the scroll bar. In millis
 	 */
-	public double minScrollLimit = 0; 
+	private double minScrollLimit = 0; 
 	
 
 	/**
 	 * The maximum limit of the scroll bar. i.e. the maximum value that can be scrolled to (e.g. the length of a waveform) In millis
 	 */
-	public double maxScrollLimit = 1; 
+	private double maxScrollLimit = 1; 
 	
 	
 	/**
 	 * True to enable the scroll bar. 
 	 */
-	public boolean enableScrollBar = true; 
+	private boolean enableScrollBar = true; 
 
 	/**
 	 * Projector for the ddPlotPane. 	

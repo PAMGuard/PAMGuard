@@ -33,7 +33,9 @@ public class RWEParameters implements Serializable, Cloneable, ManagedParameters
 	@Override
 	protected RWEParameters clone() {
 		try {
-			return (RWEParameters) super.clone();
+			RWEParameters paramClone = (RWEParameters) super.clone();
+			paramClone.dataSourceName = this.dataSourceName;
+			return paramClone;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;

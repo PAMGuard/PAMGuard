@@ -3,6 +3,8 @@ package GPS;
 import java.util.ListIterator;
 
 import GPS.effort.GpsEffortProvider;
+import PamUtils.LatLong;
+import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -137,6 +139,39 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 		return true;
 	}
 
+	/**
+	 * Find the closest GPS data to the given point. 
+	 * @param latLong
+	 * @return closest GPS data
+	 */
+	public GpsDataUnit findClosestGPS(LatLong latLong) {
+		return findClosestGPS(latLong, Double.MAX_VALUE);
+	}
+	
+	/**
+	 * Find the closest GPS unit, with an optional maximum where it will
+	 * return null if nothing is that close. 
+	 * @param latLong
+	 * @paran maxR max distance in metres. 
+	 * @return closest GPS data
+	 */
+	public GpsDataUnit findClosestGPS(LatLong latLong, double maxR) {
+		double minR = maxR;
+		GpsDataUnit gpsData = null;
+		synchronized (getSynchLock()) {
+			ListIterator<GpsDataUnit> it = getListIterator(0);
+			while (it.hasNext()) {
+				GpsDataUnit current = it.next();
+				double r = current.getGpsData().distanceToMetres(latLong);
+				if (r <= minR) {
+					minR = r;
+					gpsData = current;
+				}
+			}
+		}
+		return gpsData;
+	}
+
 	/* (non-Javadoc)
 	 * @see PamguardMVC.PamDataBlock#loadViewerData(long, long, pamScrollSystem.ViewLoadObserver)
 	 */
@@ -154,5 +189,6 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 		// TODO Auto-generated method stub
 		return super.loadViewerData(offlineDataLoadInfo, loadObserver);
 	}
+
 
 }

@@ -43,6 +43,7 @@ public class SpectrogramNoiseProcess extends PamProcess {
 	
 	private ComplexArray[] delayedInputData;
 	
+	
 	public SpectrogramNoiseProcess(PamControlledUnit pamControlledUnit) {
 		super(pamControlledUnit, null);
 		this.setProcessName(pamControlledUnit.getUnitName() + " Noise reduction");
@@ -68,6 +69,9 @@ public class SpectrogramNoiseProcess extends PamProcess {
 		sourceData = (FFTDataBlock) getPamControlledUnit().getPamConfiguration().getDataBlock(FFTDataUnit.class, 
 				getNoiseSettings().dataSource);
 		setParentDataBlock(sourceData);
+		if (sourceData != null) {
+			outputData.setLogScale(sourceData.isLogScale());
+		}
 		
 		prepareProcess();
 		
@@ -92,6 +96,9 @@ public class SpectrogramNoiseProcess extends PamProcess {
 		FFTDataUnit fftDataUnit = (FFTDataUnit) arg;
 		ComplexArray fftData = fftDataUnit.getFftData();
 		
+		if (delayedInputData == null) {
+			return;
+		}
 //		shuffle along delayed data
 		delayedInputData[totalDelay] = fftData;
 		for (int i = 0; i < totalDelay; i++) {
@@ -132,8 +139,8 @@ public class SpectrogramNoiseProcess extends PamProcess {
 		}
 		
 		ThresholdParams p = (ThresholdParams) thresholdMethod.getParams();
-		if (p.finalOutput == SpectrogramThreshold.OUTPUT_RAW) {
-			thresholdMethod.pickEarlierData(fftData, newFFTUnit.getFftData());
+		if (noiseSettings.isRunMethod(methods.indexOf(thresholdMethod)) && p.finalOutput == SpectrogramThreshold.OUTPUT_RAW) {
+		    thresholdMethod.pickEarlierData(fftData, newFFTUnit.getFftData());
 		}
 		
 		// and output the data unit. 
@@ -279,6 +286,14 @@ public class SpectrogramNoiseProcess extends PamProcess {
 	@Override
 	public ArrayList getCompatibleDataUnits() {
 		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(FFTDataUnit.class));
+	}
+
+	/**
+	 * The original input to the noise process. May not be normal FFT data, e.g. Mel spectrogram. 
+	 * @return the sourceData
+	 */
+	public FFTDataBlock getSourceData() {
+		return sourceData;
 	}
 
 	

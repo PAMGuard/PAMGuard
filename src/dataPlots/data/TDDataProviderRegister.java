@@ -26,6 +26,11 @@ public class TDDataProviderRegister {
 		}
 		return singleInstance;
 	}
+	
+	synchronized public void resetDataProviders() {
+		dataProviders = new ArrayList<TDDataProvider>();
+	}
+	
 	/**
 	 * Register a source of plottable data. 
 	 * @param dataInfo info to register

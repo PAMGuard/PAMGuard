@@ -21,7 +21,9 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.command.CommandManager;
+import PamController.command.SummaryCommand;
 import PamUtils.FileFunctions;
+import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.MenuItemEnabler;
@@ -88,6 +90,8 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 
 	public static final String recorderUnitType = "Sound Recorder";
 
+	public static final String GlobalWavPrefixArg2 = "-recording.Prefix";
+
 	public RecorderControl(String name) {
 
 		super(recorderUnitType, name);
@@ -108,6 +112,10 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		recorderStorage = new PamAudioFileStorage(this);
 
 		PamSettingManager.getInstance().registerSettings(this);
+		
+		checkGlobalArguments();
+
+		newParams();
 
 		recorderTimer.start();
 
@@ -128,6 +136,39 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		enableRecording();
 		
 		backupInformation = new BackupInformation(new RecorderBackupStream(this));
+	}
+
+	/**
+	 * Check global arguments that can control the output folder and the file initials. 
+	 * Called immediately after normal settings have been restored to overwrite them. 
+	 * Called as a separate function to restoreSettings since restoreSettings won't get 
+	 * called if no settings already exist. 
+	 */
+	private void checkGlobalArguments() {
+		/*
+		 * Then check to see if there is a command line override of the currently stored folder name. 
+		 */
+		String globFolder = GlobalArguments.getParam(FolderInputSystem.GlobalWavFolderArg);
+		if (globFolder != null) {
+			boolean ok = checkGlobFolder(globFolder);
+			if (ok) {
+				recorderSettings.setOutputFolder(globFolder); // remember it. 
+			}
+			else {
+				System.err.println("Unable to set recording storage folder " + globFolder);
+			}
+		}
+		
+		String globPrefix = GlobalArguments.getParam(RecorderControl.GlobalWavPrefixArg2);
+		if (globPrefix != null) {
+			if (globPrefix.length()<6000) { // why was this restricted to 6 ? 
+				recorderSettings.fileInitials = globPrefix; // remember it. 
+			}
+			else {
+				System.err.println("Unable to set recording storage folder " + globFolder);
+			}
+		}
+		
 	}
 
 	private boolean modelComplete = false;
@@ -381,8 +422,12 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			return;
 		}
 		recorderProcess.setParentDataBlock(rawDataBlock);
-		recorderSettings.setChannelBitmap(recorderSettings.getChannelBitmap(rawDataBlock.getChannelMap()));
-
+		
+		if(recorderSettings.getChannelBitmap(rawDataBlock.getChannelMap())!=0) {
+			recorderSettings.setChannelBitmap(recorderSettings.getChannelBitmap(rawDataBlock.getChannelMap()));
+		}
+		
+		
 		for (int i = 0; i < recorderViews.size(); i++) {
 			recorderViews.get(i).newParams();
 		}
@@ -437,20 +482,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
-		/*
-		 * Then check to see if there is a command line override of the currently stored folder name. 
-		 */
-		String globFolder = GlobalArguments.getParam(FolderInputSystem.GlobalWavFolderArg);
-		if (globFolder != null) {
-			boolean ok = checkGlobFolder(globFolder);
-			if (ok) {
-				recorderSettings.setOutputFolder(globFolder); // remember it. 
-			}
-			else {
-				System.err.println("Unable to set recording storage folder " + globFolder);
-			}
-		}
-		
+				
 		return true;
 	}
 
@@ -662,20 +694,113 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	}
 
 	@Override
-	public String getModuleSummary(boolean clear) {
+	public String getModuleSummary(boolean clear, String format) {
+		String summaryStr;
 		File path = new File(recorderSettings.outputFolder);
-		long space = -1;
-		double freeSpace = -1;
+		double freeSpaceMB = -1;
+		double fileSizeMB = -1;
 		try {
-			space = path.getFreeSpace();
-			freeSpace = (double) space / 1048576.;
+			freeSpaceMB = (double) path.getFreeSpace() / 1048576.;
+			fileSizeMB = (double) recorderStorage.getFileSizeBytes()/1048576.;
 		}
 		catch (SecurityException e) {
-			freeSpace = -9999;
+			freeSpaceMB = -9999;
 		}
+
+		String buttonName;
+		switch (pressedButton) {
+		case RecorderView.BUTTON_OFF:            buttonName = "off";            break;
+		case RecorderView.BUTTON_AUTO:           buttonName = "auto";           break;
+		case RecorderView.BUTTON_START:          buttonName = "start";          break;
+		case RecorderView.BUTTON_START_BUFFERED: buttonName = "startBuffered";  break;
+		default:                                 buttonName = "unknown";        break;
+		}
+
+		String stateName = (recorderStatus == RECORDING) ? "recording" : "idle";
+
+		double[] lastAmplitudes = recorderProcess.getLastAmplitudedB();
+		
 		int currButton = pressedButton;
 		int currState = recorderStatus;
-		return String.format("%d,%d,%3.1f", currButton, currState, freeSpace);
+		switch (format) {
+		case SummaryCommand.CSV:
+			summaryStr = String.format("%d,%d,%3.1f", currButton, currState, freeSpaceMB);;
+			break;
+		case SummaryCommand.JSON:
+			String state = "";
+			if(currState==IDLE) state="IDLE";
+			if(currState==RECORDING) state="RECORDING";
+			String currentFilePath = "System not recording";
+			if(currState==RECORDING) currentFilePath = recorderStorage.getFileName();
+			if(currentFilePath!=null) currentFilePath = currentFilePath.replace("\\", "\\\\");
+			
+			summaryStr = String.format("{\"state\":\"%s\",\"freeSpaceMB\":%3.1f,\"currentFile\":\"%s\"}",
+							state,freeSpaceMB,currentFilePath);
+			break;
+		case SummaryCommand.XML:
+			StringBuilder 		sb = new StringBuilder();
+			sb.append("<RecorderSummary>");
+			sb.append(String.format("<button>%s</button>", buttonName));
+			sb.append(String.format("<state>%s</state>", stateName));
+			sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
+			sb.append(String.format("<fileSizeMB>%.1f</fileSizeMB>", fileSizeMB));
+
+			sb.append("<channelAmplitudesdB>");
+			if (lastAmplitudes != null) {
+				for (int i = 0; i < lastAmplitudes.length; i++) {
+					sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
+				}
+			}
+			sb.append("</channelAmplitudesdB>");
+			sb.append("</RecorderSummary>");
+			summaryStr = sb.toString();
+			break;
+		default:
+			summaryStr = null;
+		}
+		
+		return summaryStr;
 	}
+	
+	/*
+	private String getModuleXMLSummary() {
+		File path = new File(recorderSettings.outputFolder);
+		double freeSpaceMB = -1;
+		try {
+			freeSpaceMB = (double) path.getFreeSpace() / 1048576.;
+		}
+		catch (SecurityException e) {
+			freeSpaceMB = -9999;
+		}
+
+		String buttonName;
+		switch (pressedButton) {
+		case RecorderView.BUTTON_OFF:            buttonName = "off";            break;
+		case RecorderView.BUTTON_AUTO:           buttonName = "auto";           break;
+		case RecorderView.BUTTON_START:          buttonName = "start";          break;
+		case RecorderView.BUTTON_START_BUFFERED: buttonName = "startBuffered";  break;
+		default:                                 buttonName = "unknown";        break;
+		}
+
+		String stateName = (recorderStatus == RECORDING) ? "recording" : "idle";
+
+		double[] lastAmplitudes = recorderProcess.getLastAmplitudedB();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<RecorderSummary>");
+		sb.append(String.format("<button>%s</button>", buttonName));
+		sb.append(String.format("<state>%s</state>", stateName));
+		sb.append(String.format("<freeSpaceMB>%.1f</freeSpaceMB>", freeSpaceMB));
+		sb.append("<channelAmplitudesdB>");
+		if (lastAmplitudes != null) {
+			for (int i = 0; i < lastAmplitudes.length; i++) {
+				sb.append(String.format("<channel index=\"%d\">%.2f</channel>", i, lastAmplitudes[i]));
+			}
+		}
+		sb.append("</channelAmplitudesdB>");
+		sb.append("</RecorderSummary>");
+		return sb.toString();
+	}
+	*/
 
 }

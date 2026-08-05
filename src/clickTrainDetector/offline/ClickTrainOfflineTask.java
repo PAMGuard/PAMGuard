@@ -125,6 +125,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	public void completeTask() { 
 		clickTrainControl.update(ClickTrainControl.PROCESSING_END);
 		clickTrainControl.setNotifyProcesses(false);
+		
 		//update the data map - needed for proper linking?
 		if (super.getOfflineTaskGroup().getTaskGroupParams().dataChoice!=TaskGroupParams.PROCESS_LOADED) {
 			//FIXME - a bit of a hack here. Calling updateDataMap means the the datamap reverts to loading the first

@@ -39,7 +39,7 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 		if (formDescription == null) {
 			return;
 		}
-		UDFTableDefinition formTableDef = formDescription.getUdfTableDefinition();
+		EmptyTableDefinition formTableDef = formDescription.getUdfTableDefinition();
 		controlDescriptions = formDescription.getInputControlDescriptions();
 		/*
 		 * It's possible the controlDescriptions get rewritten, so hold references to 

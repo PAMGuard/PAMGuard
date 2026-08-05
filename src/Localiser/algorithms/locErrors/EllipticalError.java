@@ -1,6 +1,7 @@
 package Localiser.algorithms.locErrors;
 
 import Localiser.algorithms.locErrors.json.EllipseJsonConverter;
+import PamUtils.LatLong;
 import pamMaths.PamVector;
 
 /**
@@ -33,6 +34,12 @@ public class EllipticalError implements LocaliserError {
 		errorEllipse=new ErrorEllipse(points);
 		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
 	}
+	
+	public EllipticalError(ErrorEllipse errorEllipse) {
+		this.errorEllipse = errorEllipse;
+		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
+	}
+	
 	
 	/**
 	 * Create an empty elliptical error. The error ellipse needs to be set explicitly. 
@@ -134,7 +141,9 @@ public class EllipticalError implements LocaliserError {
 	 */
 	@Override
 	public String toString() {
-		return getStringResult();
+		String s = getStringResult();
+		s = s.replace("&#176", LatLong.deg);
+		return s;
 	}
 
 	@Override

@@ -96,4 +96,16 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 		this.fileSubSection = fileSubSection;
 	}
 
+	@Override
+	public String toString() {
+		String str = super.toString();
+		if (soundFile != null) {
+			str += "<br>File " + soundFile.getName();
+//			if (fileSubSection != null) {
+//				str += " (subsection)"; 
+//			}
+		}
+		return str;
+	}
+
 }

@@ -14,10 +14,8 @@ import fftManager.FastFFT;
 public class Hilbert {
 
 	private FastFFT fastFFT = new FastFFT();
-//	private Complex[] storedFFTArray = null;
-//	private Complex[] fullFFTArray = null;
+
 	private double[] storedData1221 = null;
-	
 	
 
 	/**
@@ -66,7 +64,7 @@ public class Hilbert {
 
 //	/**
 //	 * Compute a Hilbert transform from a Complex spectrum of real data. 
-//	 * for some parts of PAMguard for which the complex spectrum is already available, 
+//	 * for some parts of PAMGuard for which the complex spectrum is already available, 
 //	 * this may be a bit quicker. 
 //	 * @param fftData Complex FFT data. Only the first half (fftLength/2 long) is needed. 
 //	 * @param fftLength FFT Length
@@ -91,7 +89,7 @@ public class Hilbert {
 	
 	/**
 	 * Compute a Hilbert transform from a Complex spectrum of real data. 
-	 * for some parts of PAMguard for which the complex spectrum is already available, 
+	 * for some parts of PAMGuard for which the complex spectrum is already available, 
 	 * this may be a bit quicker. 
 	 * @param fftData Complex FFT data. Only the first half (fftLength/2 long) is needed. 
 	 * @param fftLength FFT Length

@@ -18,7 +18,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import Acquisition.filedate.FileTimeData;
 import PamUtils.FileParts;
+import PamUtils.PamCalendar;
 
 
 /**
@@ -28,6 +30,13 @@ import PamUtils.FileParts;
  *
  */
 public class D3XMLFile {
+	
+//	public static void main(String[] args) {
+//		File tstFile = new File("C:\\ProjectData\\Gibbons\\TrexTest26\\dtg\\R35260113070001.wav");
+//		D3XMLFile df = openXMLFile(tstFile);
+//		System.out.println("Time is " + PamCalendar.formatDBDateTime(df.startTime, true));
+//		System.out.println(df.getD3GNSTime());
+//	}
 
 	private static final String dateFormatString = "yyyy,MM,dd,HH,mm,ss"; //e.g. "2012,4,28,8,41,1"
 	SimpleDateFormat dateFormat = new SimpleDateFormat(dateFormatString);
@@ -38,12 +47,14 @@ public class D3XMLFile {
 	private int[] sensorList;
 	private String fullId;
 	private long shortId;
+	private FileTimeData d3GNSTime;
 
 	private D3XMLFile(Document doc, File xmlFile) {
 		this.doc = doc;
 		this.xmlFile = xmlFile;
 		findFileTimes();
 		findSensorIds();
+		d3GNSTime = findD3GNSData(doc);
 	}
 
 	/**
@@ -95,6 +106,103 @@ public class D3XMLFile {
 		doc.getDocumentElement().normalize();
 	
 		return new D3XMLFile(doc, xmlFile);
+	}
+	
+	/**
+	 * find the new records that give GNS time and clock drift in the Trex recorder data. 
+	 * @param doc
+	 * @return
+	 */
+	public FileTimeData findD3GNSData(Document doc) {
+		Element el = doc.getDocumentElement();
+		Element cue = findCueElement(el, "wav");
+		Element driftEl = findElement(el, "DRIFT");
+		String tBase = "D3 CUE";
+		Long time = null;
+		Double drift = null;
+		if (cue != null) {
+			String tStr = cue.getAttribute("TIME");
+			tBase = cue.getAttribute("TBASE");
+			String offset = cue.getTextContent();
+			if (tStr != null) {
+				time = unpackTimeString(tStr);
+				if (offset != null) {
+					try {
+						double offS = Double.valueOf(offset);
+						time += (long) (offS*1000);
+					}
+					catch (NumberFormatException e) {
+						System.out.println("Error reading dtg TBASE Time offset: " + offset);
+					}
+				}
+			}
+		}
+		if (driftEl != null) {
+			try {
+				drift = Double.valueOf(driftEl.getTextContent());
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Error reading dtg DRIFT element: " + driftEl.getTextContent());
+			}
+		}
+		if (tBase == null || tBase.length() == 0) {
+			tBase = "D3 CUE";
+		}
+		if (time != null) {
+			return new FileTimeData(xmlFile, time, endTime, tBase, drift);
+		}
+		else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Find one of MJ's Cue's with a specific SUFFIX attribute. 
+	 * @param cueSuffix
+	 * @return
+	 */
+	private Element findCueElement(Element root, String cueSuffix) {
+		NodeList childs = root.getChildNodes();
+		if (childs == null) {
+			return null;
+		}
+		int n = childs.getLength();
+		for (int i = 0; i < n; i++) {
+			Node aChild = childs.item(i);
+			if (aChild.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) aChild;
+				if (aChild.getNodeName().equals("CUE")) {
+					String suf = eElement.getAttribute("SUFFIX");
+					if (suf != null && suf.equalsIgnoreCase(cueSuffix)) {
+						return eElement;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Find an event 
+	 * @param eventName
+	 * @return
+	 */
+	private Element findElement(Element root, String eventName) {
+		NodeList childs = root.getChildNodes();
+		if (childs == null) {
+			return null;
+		}
+		int n = childs.getLength();
+		for (int i = 0; i < n; i++) {
+			Node aChild = childs.item(i);
+			if (aChild.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) aChild;
+				if (aChild.getNodeName().equals(eventName)) {
+					return eElement;
+				}
+			}
+		}
+		return null;
 	}
 
 	/*
@@ -159,12 +267,40 @@ public class D3XMLFile {
 		}
 		return dFile.getStartTime();
 	}
+	
+	/**
+	 * Get the best effort we can acheive from the CML if it exists. 
+	 * @param file
+	 * @return
+	 */
+	public static FileTimeData getXMLTimeData(File file) {
+		D3XMLFile dFile = openXMLFile(file);
+		if (dFile == null) {
+			return null;
+		}
+		else {
+			return dFile.getFileTimeData();
+		}
+		
+	}
 
 	/**
 	 * @return the startTime
 	 */
 	public long getStartTime() {
+		if (d3GNSTime != null) {
+			return d3GNSTime.getFileStart();
+		}
 		return startTime;
+	}
+	
+	public FileTimeData getFileTimeData() {
+		if (d3GNSTime != null) {
+			return d3GNSTime;
+		}
+		else {
+			return new FileTimeData(xmlFile, startTime, endTime, "D3 XML EVENT START", null);
+		}
 	}
 
 	/**
@@ -274,7 +410,7 @@ public class D3XMLFile {
 		if (timeString == null) {
 			return Long.MIN_VALUE;
 		}
-		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 		Date d;
 		try {
 			d = dateFormat.parse(timeString);
@@ -285,7 +421,7 @@ public class D3XMLFile {
 		}
 
 		Calendar cl = Calendar.getInstance();
-		cl.setTimeZone(TimeZone.getTimeZone("GMT"));
+		cl.setTimeZone(TimeZone.getTimeZone("UTC"));
 		cl.setTime(d);
 		return cl.getTimeInMillis();
 	}
@@ -303,4 +439,5 @@ public class D3XMLFile {
 	public long getShortId() {
 		return shortId;
 	}
+
 }

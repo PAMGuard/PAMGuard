@@ -268,14 +268,24 @@ public class GenericTOADCalculator implements TOADCalculator, PamSettings {
 			WarningSystem.getWarningSystem().addWarning(warning);
 			nCh = hydroList.length;
 		}
-		for (int i = 0; i < nCh; i++) {
-			for (int j = i+1; j < nCh; j++) {
-				int hi = hIndex == null ? i : hIndex[i];
-				int hj = hIndex == null ? j : hIndex[j];
-				PamVector v = geometry.getGeometry()[hydroList[hi]].
-						sub(geometry.getGeometry()[hydroList[hj]]);
-				maxDelays[i][j] = v.norm()/c;
+		try {
+			for (int i = 0; i < nCh; i++) {
+				for (int j = i+1; j < nCh; j++) {
+					/*
+					 * don't need this additional lookup since hydroList is 
+					 * already length nCh and has the correct hydrophones already
+					 * in it. 
+					 */
+//					int hi = hIndex == null ? i : hIndex[i];
+//					int hj = hIndex == null ? j : hIndex[j];
+					PamVector v = geometry.getGeometry()[hydroList[i]].
+							sub(geometry.getGeometry()[hydroList[j]]);
+					maxDelays[i][j] = v.norm()/c;
+				}
 			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		return maxDelays;
 	}

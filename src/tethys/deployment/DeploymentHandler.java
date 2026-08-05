@@ -387,7 +387,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	private void checkDeploymentOverview(DeploymentOverview overview) {
 		RecordingList rawList = overview.getRawDataList();
 		RecordingList binList = overview.getBinaryDataList();
-		if (rawList == null || binList == null) {
+		if (isEmptyList(rawList) || isEmptyList(binList)) {
 			return; // nothing to do
 		}
 		double similarity = rawList.getSimilarity(binList);
@@ -410,6 +410,24 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		if (selList != null) {
 			tethysControl.getTethysExportParams().setEffortSourceName(selList.getSourceName());
 		}
+	}
+	
+	/**
+	 * Is a recording list null or empty  ?
+	 * @param recordingList
+	 * @return
+	 */
+	private boolean isEmptyList(RecordingList recordingList) {
+		if (recordingList == null) {
+			return true;
+		}
+		if (recordingList.getEffortPeriods() == null) {
+			return true;
+		}
+		if (recordingList.getEffortPeriods().size() == 0) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -501,7 +519,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		if (dc != null) {
 			// add the duty cycle information - it will have already been added in createDeploymentDocument
 		}
-		else if (dc == null && gaps != null) {
+		else if (dc == null && gaps != null && gaps.size() > 0) {
 			/*
 			 * Only output the gaps if there is no duty cycle information
 			 */
@@ -510,7 +528,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 				deployment.setQualityAssurance(qa = new AcousticDataQAType());
 			}
 			List<Quality> qualityList = qa.getQuality();
-			for (int i = 1; i < gaps.size(); i++) {
+			for (int i = 0; i < gaps.size(); i++) {
 				RecordingPeriod gap = gaps.get(i);
 				long end = gap.getRecordStop();
 				long start = gap.getRecordStart();
@@ -677,7 +695,11 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		if (deploymentOverview == null) {
 			return matched;
 		}
-		ArrayList<RecordingPeriod> effortPeriods = deploymentOverview.getMasterList(getTethysControl()).getEffortPeriods();
+		RecordingList masterList = deploymentOverview.getMasterList(getTethysControl());
+		if (masterList == null) {
+			return matched;
+		}
+		ArrayList<RecordingPeriod> effortPeriods = masterList.getEffortPeriods();
 		for (RecordingPeriod period : effortPeriods) {
 			PDeployment deployment = period.getMatchedTethysDeployment();
 			if (deployment != null) {

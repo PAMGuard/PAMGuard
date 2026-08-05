@@ -7,7 +7,9 @@ import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataUnit;
 import clickDetector.ClickWaveform;
+import detectionPlotFX.layout.AbstractDetectionPlot;
 import detectionPlotFX.layout.DetectionPlot;
+import detectionPlotFX.layout.DetectionPlotContext;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.application.Platform;
@@ -34,7 +36,7 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
  * @param <D> the specific pamDetection type. 
  */
 @SuppressWarnings("unused")
-public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot<D>  {
+public abstract class WignerPlot<D extends PamDataUnit> extends AbstractDetectionPlot<D>  {
 
 	/**
 	 * Reference to the control pane.
@@ -57,11 +59,6 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 	 * The channel which is currently plotted.
 	 */
 	private int plottedChan;
-
-	/**
-	 * Reference to the detection display
-	 */
-	private DetectionPlotDisplay detectionPlotDisplay;
 
 
 	private double wignerMin;
@@ -116,11 +113,21 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 
 
 	/**
-	 * Constructor for the waveform plot. 
+	 * Constructor for the Wigner plot. 
+	 * @param context - the display context
 	 */
-	public WignerPlot(DetectionPlotDisplay detectionPlotDisplay){
+	public WignerPlot(DetectionPlotContext context){
+		super(context);
 		wignerData= new WignerData(); 
-		this.detectionPlotDisplay=detectionPlotDisplay; 
+	}
+
+	/**
+	 * @deprecated Use {@link #WignerPlot(DetectionPlotContext)} instead.
+	 */
+	@Deprecated
+	public WignerPlot(DetectionPlotDisplay detectionPlotDisplay){
+		super(detectionPlotDisplay);
+		wignerData= new WignerData(); 
 	}
 
 	@Override
@@ -134,7 +141,7 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 	@Override
 	public void setupPlot() {
 		//need to get rid of the right axis. 
-		detectionPlotDisplay.setAxisVisible(true, false, true, true);
+		getContext().setAxisVisible(true, false, true, true);
 		setupPlot = true; 
 	
 		
@@ -157,7 +164,7 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 
 		projector.setEnableScrollBar(true);
 
-		detectionPlotDisplay.getAxisPane(Side.LEFT).setnPlots(1); //TODO- make two panels?
+		getContext().getAxisPane(Side.LEFT).setnPlots(1); //TODO- make two panels?
 
 		setFrequencyAxis(pamDetection, projector);
 
@@ -165,7 +172,7 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 
 	private void setFrequencyAxis(D pamDetection, DetectionPlotProjector plotProjector) {
 		//System.out.println("Wigner plot samplerate: "+pamDetection.getParentDataBlock().getSampleRate());
-		double sampleRate = detectionPlotDisplay.getCurrentDataInfo().getHardSampleRate();
+		double sampleRate = getContext().getCurrentDataInfo().getHardSampleRate();
 		double maxVal = sampleRate /2;
 		if (maxVal > 2000) {
 			plotProjector.setAxisMinMax(0,maxVal / 1000, Side.LEFT, "Frequency (kHz)");
@@ -186,7 +193,7 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 	 */
 	private void setTimeAxis(D pamDetection, DetectionPlotProjector plotProjector, double bin1, double bin2) {
 		//double sampleRate = pamDetection.getParentDataBlock().getSampleRate();
-		double sampleRate= this.detectionPlotDisplay.getCurrentDataInfo().getHardSampleRate();
+		double sampleRate= this.getContext().getCurrentDataInfo().getHardSampleRate();
 
 
 		//		double msStart =  1000.*bin1/sampleRate;
@@ -208,7 +215,7 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 		//becuase bin and bin2 are only calculated after the image and that image can take a long time on a thread. 
 		if (setupPlot) {
 			setupPlot=false;
-			this.detectionPlotDisplay.setupScrollBar();
+			this.requestScrollBarSetup();
 		}
 
 //		System.out.println("Wigner Time Axis: min " + (plotProjector.getAxis(Side.BOTTOM).getMinVal()/1000.)*sampleRate + 
@@ -536,9 +543,10 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 	/**
 	 * Repaint  the current data unit. 
 	 */
+	@Override
 	public void reDrawLastUnit() {
-		detectionPlotDisplay.drawCurrentUnit();
-		detectionPlotDisplay.setupScrollBar(); 
+		requestRedraw();
+		requestScrollBarSetup(); 
 	}
 
 	public void setWignerParameters(WignerPlotParams params) {
@@ -713,8 +721,15 @@ public abstract class WignerPlot<D extends PamDataUnit> implements DetectionPlot
 		this.wignerWaveform = wignerWaveform;
 	}
 
+	/**
+	 * @deprecated Use {@link #getContext()} instead.
+	 */
+	@Deprecated
 	public DetectionPlotDisplay getDetectionPlotDisplay() {
-		return this.detectionPlotDisplay;
+		if (getContext() instanceof DetectionPlotDisplay) {
+			return (DetectionPlotDisplay) getContext();
+		}
+		return null;
 	}
 
 

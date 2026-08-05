@@ -294,6 +294,11 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
     @Override
 	public void addData(PamObservable o, PamDataUnit arg) {
         ClickDetection click = (ClickDetection) arg;
+        
+        if(this.shouldDisplayClick(click)!=true) {
+        	return;
+        }
+        
         double ici = click.getTimeMilliseconds() - prevClickTime;
 
         /* troubleshooting - print out ici value */

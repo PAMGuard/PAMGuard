@@ -1,5 +1,7 @@
 package loggerForms.controls;
 
+import java.awt.LayoutManager;
+
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -16,7 +18,7 @@ import loggerForms.controlDescriptions.CdLookup;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controls.LoggerControl.ComponentFocusListener;
 
-public class LookupControl extends LoggerControl{
+public class LookupControl extends LoggerControl {
 
 	private LookupComponent lookup;
 	
@@ -24,9 +26,9 @@ public class LookupControl extends LoggerControl{
 			LoggerForm loggerForm) {
 		super(controlDescription, loggerForm);
 		
-		lookup=new LookupComponent(controlDescription.getTopic(),((CdLookup)controlDescription).getLookupList());
+		lookup = new LookupComponent(controlDescription.getTopic(),((CdLookup)controlDescription).getLookupList(), false, true);
 //		lookup.setToolTipText(controlDescription.getHint());
-		
+		LayoutManager lout = component.getLayout();
 		component.add(new PamLabel(controlDescription.getTitle()));
 		component.add(lookup.getComponent());
 		component.add(new PamLabel(controlDescription.getPostTitle()));

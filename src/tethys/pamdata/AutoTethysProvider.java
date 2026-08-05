@@ -71,27 +71,22 @@ import whistleClassifier.WhistleContour;
  * @author dg50
  *
  */
-abstract public class AutoTethysProvider implements TethysDataProvider {
+abstract public class AutoTethysProvider extends TethysDataProvider {
 
 	private PamDataBlock pamDataBlock;
 	private PamProcess pamProcess;
 	private PamControlledUnit pamControlledUnit;
 	private TethysControl tethysControl;
-	private Helper helper;
 	private boolean addFrequencyInfo  = false;
 
 	private MarshalXML marshaller;
 
 	public AutoTethysProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
+		super();
 		this.tethysControl = tethysControl;
 		this.pamDataBlock = pamDataBlock;
 		pamProcess = pamDataBlock.getParentProcess();
 		pamControlledUnit = pamProcess.getPamControlledUnit();
-		try {
-			helper = new Helper();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
 		try {
 			marshaller = new MarshalXML();
 		} catch (JAXBException e) {
@@ -500,30 +495,6 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		return el;
 	}
 
-	public static Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
-		UserDefined userDefined = parameters.getUserDefined();
-		if (userDefined == null) {
-			userDefined = new UserDefined();
-			parameters.setUserDefined(userDefined);
-		}
-		Element el = null;
-		Helper helper = null;
-		try {
-			helper = new Helper();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-		try {
-			el = helper.AddAnyElement(userDefined.getAny(), parameterName, parameterValue);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-			return null;
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			return null;
-		}
-		return el;
-	}
 
 	/**
 	 * Get tonal sounds contour. Sadly there are two slightly different interfaces in use

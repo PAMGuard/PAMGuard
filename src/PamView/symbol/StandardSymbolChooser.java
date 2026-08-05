@@ -202,7 +202,7 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 	}
 
 	protected void fullsumbolOptionsDialog(Window frame, SymbolUpdateMonitor component) {
-		GenericSwingDialog.showDialog(frame, "Symbol Options", getSwingOptionsPanel(null));
+		GenericSwingDialog.showDialog(frame, "Symbol Options", getSwingOptionsPanel(frame, null));
 		component.symbolUpdate();
 	}
 
@@ -227,7 +227,7 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 	}
 
 	@Override
-	public SwingSymbolOptionsPanel getSwingOptionsPanel(GeneralProjector projector) {
+	public SwingSymbolOptionsPanel getSwingOptionsPanel(Window parent, GeneralProjector projector) {
 
 		//		standardSymbolManager.addSymbolOption(StandardSymbolManager.HAS_SYMBOL);
 
@@ -238,7 +238,8 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 		//			standardSymbolManager.removeSymbolOption(StandardSymbolManager.HAS_LINE_LENGTH);
 		//		}
 		standardSymbolManager.addAnnotationModifiers(this);
-		StandardSymbolOptionsPanel ssop = new StandardSymbolOptionsPanel(standardSymbolManager, this);
+		standardSymbolManager.checkLocalisationOptions(this);
+		StandardSymbolOptionsPanel ssop = new StandardSymbolOptionsPanel(parent, standardSymbolManager, this);
 
 		return ssop;
 	}

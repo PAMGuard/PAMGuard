@@ -8,6 +8,7 @@ import loggerForms.ItemInformation;
 
 /**
  * Sheet of control properties for a particular control title. 
+ * Doesn't seem to be used anywhere. 
  * @author Doug
  *
  */
@@ -19,7 +20,7 @@ public class ControlPropertySheet {
 	
 	private ControlTitle controlTitle;
 
-	public ControlPropertySheet(FormEditor formEditor, ControlTitle controlTitle) {
+	private ControlPropertySheet(FormEditor formEditor, ControlTitle controlTitle) {
 		super();
 		this.formEditor = formEditor;
 		this.controlTitle = controlTitle;

@@ -373,7 +373,7 @@ public class WaveCorrector extends PamDialog {
 		for (int i = 0; i < n; i++) {
 			gd = clickControl.getClickDetector().getChannelGroupDetector(i);
 
-			int[] phones = PamUtils.getChannelArray(gd.getGroupHydrophones());
+			int[] phones = gd.getGroupHydrophones();
 			bl = gd.getBearingLocaliser();
 			if (bl != null) {
 				bl.prepare(phones,0, Correlations.defaultTimingError(clickControl.getClickDetector().getSampleRate()));

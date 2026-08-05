@@ -25,6 +25,8 @@ import java.lang.reflect.Field;
 import java.util.Hashtable;
 
 import Array.ArrayManager;
+import PamController.soundMedium.GlobalMedium;
+import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -173,6 +175,20 @@ public class SpectrogramParameters extends UserFrameParameters implements Serial
 		boundingRectangle.width = 500;
 		boundingRectangle.height = 300;
 		channelList = new int[PamConstants.MAX_CHANNELS];
+		/*
+		 * Check the gloabl medium, and if it's air, set much lower default
+		 * amplitude limits. 
+		 */
+		try {
+			SoundMedium sm = PamController.PamController.getInstance().getGlobalMediumManager().getCurrentMedium();
+			if (sm == SoundMedium.Air) {
+				double[] scale = GlobalMedium.getDefaultAmplitudeScales(sm);
+				this.amplitudeLimits = scale;
+			}
+		}
+		catch (Exception e) {
+			
+		}
 	}
 	
 	

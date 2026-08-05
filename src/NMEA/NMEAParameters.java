@@ -20,8 +20,12 @@
  */
 package NMEA;
 
+import java.io.File;
 import java.io.Serializable;
 
+import NMEA.serial.SerialNMEAProvider;
+import NMEA.simulated.SimulatedNMEAProvider;
+import NMEA.udp.UdpNMEAProvider;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
@@ -32,7 +36,16 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	static public final long serialVersionUID = 2;
 	
 	String name;
+	
+	/**
+	 * Class of source provider. Replaces old enums and allows
+	 * for future plugins
+	 */
+	private String providerClass;
 
+	/**
+	 * Port for UDP comms
+	 */
 	public int port;
 	
 	public boolean multicast;
@@ -40,6 +53,8 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	public String multicastGroup;
 
 	public int channelMap ;
+	
+	public File nmeaSourceFile;
 
 	public boolean simThread;
 	
@@ -67,9 +82,25 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	//value now gets set in the constructor CJB 2009-06-09
 	public String serialPortName;
 	
+	/**
+	 * Scan all available serial ports and find the first that's returning NMEA like data. 
+	 */
+	public boolean autoSerialPort;
+	/**
+	 * Option to be more specific and tell the autoSerialPort search to only 
+	 * accept certain types of data - any, gps, or ais. This may not really work 
+	 * though, for AIS, so will just implement for GPS, AIS would be a problem since
+	 * if no vessels are present, no data will be received, so it would constantly
+	 * reset. 
+	 */
+//	public int serialDataType = 0;
+//	public static final int SERIAL_ANY_DATA = 0;
+//	public static final int SERIAL_GPS_DATA = 1;
+//	public static final int SERIAL_AIS_DATA = 2;
+	
 	public int serialPortBitsPerSecond = 4800;
 	
-	public String nmeaSource = "Sim";
+//	public String nmeaSource = "Sim";
 	
 	public int simHeadingData;
 	
@@ -82,7 +113,8 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 		SERIAL (0),
 		UDP (1),
 		SIMULATED (2), 
-		MULTICAST (3);
+		MULTICAST (3),
+		TIMESTAMP_FILE(4);
 		NmeaSources(int value){this.value= value;}
 		private final int value;
 		public int value(){return value;}
@@ -90,9 +122,10 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 		public final int udpValue = 1;
 		public final int simulatedValue = 2;
 		public final int multicastValue = 3;
+		public final int timestampFileValue = 4;
 	}
 	
-	public NmeaSources sourceType = NmeaSources.SIMULATED;
+	public NmeaSources sourceType = NmeaSources.SERIAL;
 
 	public String getName() {
 		return name;
@@ -152,6 +185,53 @@ public class NMEAParameters implements Serializable, Cloneable, ManagedParameter
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
+	}
+
+	/**
+	 * @return the providerClass
+	 */
+	public String getProviderClass() {
+		if (providerClass == null) {
+			switch (sourceType) {
+			case MULTICAST:
+				break;
+			case SERIAL:
+				providerClass = SerialNMEAProvider.class.getName();
+				break;
+			case SIMULATED:
+				providerClass = SimulatedNMEAProvider.class.getName();
+				break;
+			case TIMESTAMP_FILE:
+				break;
+			case UDP:
+				providerClass = UdpNMEAProvider.class.getName();
+				break;
+			default:
+				break;
+			
+			}
+		}
+		return providerClass;
+	}
+
+	
+	/**
+	 * Set the provider class from the class of the provider
+	 * @param clss
+	 */
+	public void setProviderClass(Class clss) {
+		if (clss == null) {
+			providerClass = null;
+		}
+		else {
+			providerClass = clss.getName();
+		}
+	}
+	/**
+	 * @param providerClass the providerClass to set
+	 */
+	public void setProviderClass(String providerClass) {
+		this.providerClass = providerClass;
 	}
 
 }

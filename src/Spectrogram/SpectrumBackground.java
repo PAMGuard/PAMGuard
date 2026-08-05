@@ -42,7 +42,7 @@ public class SpectrumBackground {
 		alpha1 = dT/timeConstSecs; // something small
 		nDone = 0;
 		synchronized (this) {
-			data = new double[parentFFTBlock.getFftLength()/2];		
+			data = new double[parentFFTBlock.getDataWidth(iChannel)];		
 		}
 		return true;
 	}

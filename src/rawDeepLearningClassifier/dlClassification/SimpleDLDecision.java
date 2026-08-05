@@ -26,10 +26,10 @@ public class SimpleDLDecision implements DLPredictionDecision {
 	 */
 	private static boolean isBinaryResult(PredictionResult modelResult, StandardModelParams genericModelParams) {
 		for (int i=0; i<modelResult.getPrediction().length; i++) {
-						//System.out.println("Binary Classification: "  + genericModelParams.binaryClassification.length); 
+						//System.out.println("Binary Classification: "  + modelResult.getPrediction()[i] + " thresh: " + genericModelParams.threshold); 
 
 			if (modelResult.getPrediction()[i]>genericModelParams.threshold && genericModelParams.binaryClassification[i]) {
-				//				System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
+							//System.out.println("SimpleDecision: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
 				return true; 
 			}
 		}

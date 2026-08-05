@@ -126,6 +126,9 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 		// should get here everytime there is a new raw data unit so update the
 		// appropriate bar.
 		// check it's a channel we're dealing with
+		if(this.shouldDisplayClick(newData)!=true) {
+			return;
+		}
 		if (obs == rawDataBlock) {
 			RawDataUnit newRawData = (RawDataUnit) newData;
 			if ((newRawData.getChannelBitmap() & clickControl.clickParameters.getChannelBitmap()) == 0) return;

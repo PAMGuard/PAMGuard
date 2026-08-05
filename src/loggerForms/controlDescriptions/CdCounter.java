@@ -11,6 +11,7 @@ import loggerForms.FormDescription;
 import loggerForms.ItemInformation;
 import loggerForms.LoggerForm;
 import loggerForms.controls.CounterControl;
+import loggerForms.controls.FormCounterManagement;
 import loggerForms.controls.LoggerControl;
 
 /**
@@ -29,7 +30,12 @@ public class CdCounter extends InputControlDescription {
 			setLength(5);
 		}
 		primarySQLType=Types.CHAR;
+		// immediately initialise the counter so that it will get sent to any new subscribers. 
+//		to do this we need a counter - annoying, but can't avoid. 
+		CounterControl c = new CounterControl(this, null); 
+		FormCounterManagement.getInstance().getCurrentCounterNumber(c, formDescription.getDBTABLENAME());
 	}
+
 
 
 	/* (non-Javadoc)

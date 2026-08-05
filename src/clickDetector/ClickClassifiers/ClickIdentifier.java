@@ -119,7 +119,13 @@ public interface ClickIdentifier extends ClickTypeProvider {
 	 * A pane which holds specific settings for the click classifier type selected. 
 	 * @return the classifier pane
 	 */
-	public ClassifyPaneFX getClassifierPane(); 
+	public ClassifyPaneFX getClassifierPane();
+
+	/**
+	 * Get summary counts of classified and unclassified clicks
+	 * @return
+	 */
+	public String getClassificationSummary(boolean clear); 
 
 		
 

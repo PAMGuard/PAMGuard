@@ -62,6 +62,7 @@ import GPS.GpsData;
 import GPS.GpsDataUnit;
 import GPS.ProcessNmeaData;
 import Map.gridbaselayer.GridbaseControl;
+import Map.hiddenControls.CustomCursors;
 import Map.hiddenControls.HiddenSlider;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -96,6 +97,8 @@ import pamScrollSystem.AbstractPamScrollerAWT;
 import pamScrollSystem.PamScrollObserver;
 import pamScrollSystem.PamScrollSlider;
 import userDisplay.UserDisplayComponent;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Mainly a container for map objects, holding the main MapPanel and the right
@@ -197,6 +200,8 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 	private GridbaseControl gridBaseControl;
 
 	protected PamDataBlock effortDataBlock;
+	
+	private PamWarning mapPanelWarning;
 
 	// JToolTip mouseToolTip;
 
@@ -304,6 +309,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		mapParameters = ((MapParameters) pamControlledUnitSettings.getSettings()).clone();
+		this.mapCanScroll(!mapParameters.lockMap);
 		return true;
 	}
 
@@ -437,11 +443,11 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 //		mapPanel = new MapPanel(mapController, this);
 		mapPanel.setMapRotationDegrees(45.0);
 		mapPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-
-		mapPanel.addMouseListener(mouseMotion);
-		mapPanel.addMouseMotionListener(mouseMotion);
+		
+		enableMapMouseControl();
+			
+		
 		mapPanel.addMouseListener(mouseInput);
-		mapPanel.addMouseWheelListener(mouseWheel);
 
 		panZoom.setHandler(new PamZoomOnMapPanel(mapPanel));
 
@@ -519,6 +525,31 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 
 	}
 	
+	private boolean mapControlsAdded = false;
+	
+	public void enableMapMouseControl() {
+		if(mapControlsAdded) {
+			return;
+		}
+		mapPanel.addMouseListener(mouseMotion);
+		mapPanel.addMouseMotionListener(mouseMotion);
+		mapPanel.addMouseWheelListener(mouseWheel);
+		mapControlsAdded = true;
+	}
+	
+	public void disableMapMouseControl() {
+		if(!mapControlsAdded) {
+			return;
+		}
+		if(mapPanel!=null && mouseMotion!=null && mouseInput!=null && mouseWheel!=null) {
+			mapPanel.removeMouseListener(mouseMotion);
+			mapPanel.removeMouseMotionListener(mouseMotion);
+			mapPanel.removeMouseWheelListener(mouseWheel);
+			mapControlsAdded = false;
+		}
+		
+	}
+	
 	class ViewerSelListener implements ActionListener {
 
 		private boolean showAll;
@@ -582,7 +613,12 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 		if (mapFileManager != null) {
 			mapFileManager.readFileData(mapParameters.mapFile);
 		}
-		mapPanel.setMapCentreDegrees(MasterReferencePoint.getLatLong());
+		if(this.mapParameters.lockMap) {
+			mapPanel.setMapCentreDegrees(mapParameters.lockedMapCenter);
+			mapPanel.setMapRangeMetres(mapParameters.lockedMapScale);
+		}else {
+			mapPanel.setMapCentreDegrees(MasterReferencePoint.getLatLong());
+		}
 		// mapPanel.refreshPlotableDetectorLists();
 		mapPanel.updateObservers();
 		mapPanel.createKey();
@@ -847,7 +883,13 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 				oldCursorPos.x = newCursorPos.x;
 				oldCursorPos.y = newCursorPos.y;
 				mapPanel.repaint();
-			} else {
+			} else if(mapParameters.lockMap){
+				setCursor(CustomCursors.getLockCursor());
+				mapPanelWarning = new PamWarning("Map Panel", "Map is locked. Right-click, open map options, and deselect 'map lock' if needed.", 1);
+				mapPanelWarning.setEndOfLife(System.currentTimeMillis()+5*1000L);
+				WarningSystem.getWarningSystem().addWarning(mapPanelWarning);
+				
+			}else {
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			}
 		}
@@ -896,14 +938,17 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 			if (mousedDataUnit != null) {
 				return;
 			}
-
+			
 			if (mapController.getMouseMoveAction() == MapController.MOUSE_MEASURE) {
-				mapPanel.setCursor(Cursor
-						.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 				mouseDragPoint = (Point) mouseDownPoint.clone();
 				showMapObjects();
 			} else {
-				mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				if(mapParameters.lockMap) {
+					mapPanel.setCursor(CustomCursors.getLockCursor());
+				}else {
+					mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				}
 				maybeShowPopup(e);
 			}
 			
@@ -1215,6 +1260,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 		MapParameters newParameters = MapParametersDialog.showDialog(parentFrame, this);
 		if (newParameters != null) {
 			mapParameters = newParameters.clone();
+			this.mapCanScroll(!mapParameters.lockMap);
 			mapPanel.repaint(true);
 			mapPanel.createKey();
 			checkViewerData();

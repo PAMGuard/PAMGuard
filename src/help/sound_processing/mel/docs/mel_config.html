@@ -1,0 +1,52 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Mel Spectrogram</title>
+</head>
+
+<body>
+
+	<h1>Mel Spectrogram</h1>
+	<h2>Configuration</h2>
+	<br>
+
+	<p>
+		To configure the Mel Spectrogram, , go to the <em><strong>Detection>"your
+				module name" settings ..."</strong></em> menu.
+	</p>
+
+	<p>
+		<img src="images/melsettings.png">
+	</p>
+	<p>
+		Select the FFT data source from the drop-down list at the top of the
+		dialog. If no FFT sources are available, you'll have to add a <a
+			href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
+			module</a>.
+	</p>
+	<p>The main parameters of the FFT module are displayed in the
+		middle panel. Of these, the most important is the Frequency
+		Resolution, since you can't make Mels with a finer resolution than
+		that which exists in the FFT module.</p>
+		<p>Set the frequency range and number of Mels. The lowest frequency must be
+		greater than 0, and should probably be bigger than the FFT frequency resolution. 
+		The smallest step between frequencies in the Mels is shown at the bottom of the panel. 
+		This should also be larger than the FFT frequency resolution, otherwise, all your Mels will
+		be sampling exactly the same FFT data.</p>
+		<p>Set the 'power' this is the power that samples from the FFT data will be raised to as they
+		are summed into each Mel frequency bin.</p>
+<p>When you OK the dialog, it will issue a warning if the configuration of the Mels includes frequencies
+that are simply to small and close together to make any sense. If requried, you can change the frequency 
+range of the Mel Spectrogram, the number of Mels, or adjust the FFT parameters - a larger FFT Length will 
+give a finer frequency resolution, but a courser time resolution.</p>
+
+	<br>
+	<p CLASS="nextLink">
+		<a href="mel_display.html">Next: Mel Spectrogram Displays</a>
+	</p>
+	<p CLASS="prevLink">
+		<a href="mel_overview.html">Previous: Mel Spectrogram Overview</a>
+	</p>
+	<br>
+</body>
+</html>

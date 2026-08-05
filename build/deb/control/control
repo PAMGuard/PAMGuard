@@ -1,0 +1,13 @@
+Package: PAMGuard
+Version: 2.0.18
+Section: java
+Priority: optional
+Architecture: all
+Maintainer: Jamie Macaulay <jdjm@st-andrews.ac.uk>
+Description: Process passive acoustic data for whales, dolphins and other species.
+Icon: PAMGuardIcon2.png
+Depends: openjdk-21-jre
+postinst script:
+  #!/bin/bash
+  # Set JVM options for the application
+  export JAVA_OPTS="-Xmx4g -Xms512m -Dsun.java2d.uiScale=2 -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"

@@ -38,11 +38,13 @@ import java.util.TimeZone;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
+import Acquisition.SoundCardSystem;
+import NMEA.NMEAControl;
 import PamController.PamController;
 import PamController.PamFolders;
 import PamController.PamGUIManager;
@@ -62,12 +64,19 @@ import PamView.FullScreen;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
+import SoundRecorder.RecorderControl;
 import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import generalDatabase.DBControl;
 import networkTransfer.send.NetworkSender;
 import offlineProcessing.OfflineTaskManager;
 import rocca.RoccaDev;
+
+import Array.ArrayManager;
+import NMEA.NMEAControl;
+import rawDeepLearningClassifier.DLControl;
+import networkTransfer.send.NetSendCommandParam;
+import PamUtils.PlatformInfo.OSType;
 
 /**
  * Pamguard main class. 
@@ -99,6 +108,8 @@ public class Pamguard {
 	 */
 	public static void main(String[] args) {
 		
+		CommandLine.create(args);
+		
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 		try {			
 			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
@@ -128,12 +139,19 @@ public class Pamguard {
 			//			}
 			//			PamColors.getInstance().setColors();
 		} catch (Exception e) { 
-			e.printStackTrace();
+			System.out.println("Unable to load lookAndFeel: " + e.getMessage());
+//			e.printStackTrace();
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+			}
 		}
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
-		
 
 		// set up the system to output to both a log file and the console window.  Also
 		// set up a monitor to check for the size of the folder every hour - if it gets
@@ -149,7 +167,7 @@ public class Pamguard {
 
 //		TimeZone.setDefault(PamCalendar.defaultTimeZone);
 
-		System.out.println("**********************************************************");
+		System.out.println("\n**********************************************************");
 		// print out the entire command line
 		if (args != null && args.length > 0) {
 			System.out.printf("Command line options: ");
@@ -302,6 +320,12 @@ public class Pamguard {
 					GlobalArguments.setParam(BinaryStore.GlobalFolderArg, binFolder);
 					System.out.println("Setting output folder for binary files to " + binFolder);
 				}
+				else if (anArg.equalsIgnoreCase(NMEAControl.GlobalPortFlag)) {
+					// output folder for binary files. 
+					String serialPort = args[iArg++];
+					GlobalArguments.setParam(NMEAControl.GlobalPortFlag, serialPort);
+					System.out.println("Setting nmea serial port to " + serialPort);
+				}
 				else if (anArg.equalsIgnoreCase(DBControl.GlobalDatabaseNameArg)) {
 					// database file name
 					String dbName = args[iArg++];
@@ -314,6 +338,16 @@ public class Pamguard {
 					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, wavFolder);
 					System.out.println("Setting input wav file folder to " + wavFolder);
 				}
+				else if (anArg.equalsIgnoreCase(FolderInputSystem.GlobalWavPrefixArg)) {
+					// source folder for wav files (or other supported sound files)
+					String wavPrefix = args[iArg++];
+					GlobalArguments.setParam(FolderInputSystem.GlobalWavPrefixArg, wavPrefix);
+				}else if (anArg.equalsIgnoreCase(RecorderControl.GlobalWavPrefixArg2)) {
+					// source folder for wav files (or other supported sound files)
+					String wavPrefix = args[iArg++];
+					GlobalArguments.setParam(RecorderControl.GlobalWavPrefixArg2, wavPrefix);
+					System.out.println("Setting recording prefix to " + wavPrefix);
+				}
 				else if (anArg.equalsIgnoreCase(PamController.AUTOSTART)) {
 					// auto start processing. 
 					GlobalArguments.setParam(PamController.AUTOSTART, PamController.AUTOSTART);
@@ -324,22 +358,28 @@ public class Pamguard {
 					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
 					System.out.println("Setting autoexit ON");
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.ADDRESS)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.ADDRESS, args[iArg++]);
+				else if (NetSendCommandParam.isArgRegistered(anArg)) {
+					GlobalArguments.setParam(anArg, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.ID1)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.ID1, args[iArg++]);
+				else if(anArg.equalsIgnoreCase(ArrayManager.FIRST_IDX_SENS)){
+					GlobalArguments.setParam(ArrayManager.FIRST_IDX_SENS, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.ID2)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.ID2, args[iArg++]);
+				else if(anArg.equals(DLControl.MODELPATH)) {
+					GlobalArguments.setParam(DLControl.MODELPATH, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase(NetworkSender.PORT)) {
-					// auto exit at end of processing. 
-					GlobalArguments.setParam(NetworkSender.PORT, args[iArg++]);
+				else if (anArg.equalsIgnoreCase(SoundCardSystem.SETDEVNAME)) {
+					// sound card name
+					GlobalArguments.setParam(SoundCardSystem.SETDEVNAME, args[iArg++]);
 				}
+				else if (anArg.equalsIgnoreCase(SoundCardSystem.SETDEVNUMBER)) {
+//					soundcard number
+					GlobalArguments.setParam(SoundCardSystem.SETDEVNUMBER, args[iArg++]);
+				}
+				// replace this with the commandline class. Need really to do all of them at some point. 
+//				else if (anArg.equalsIgnoreCase(NMEAControl.NMEACOMCOMMAND)) {
+//					// NMEA COM Port
+//					GlobalArguments.setParam(NMEAControl.NMEACOMCOMMAND, args[iArg++]);
+//				}
 				else if (anArg.equalsIgnoreCase(ReprocessStoreChoice.paramName)) {
 					String arg = args[iArg++];
 					ReprocessStoreChoice choice = ReprocessStoreChoice.valueOf(arg);
@@ -353,7 +393,6 @@ public class Pamguard {
 					System.out.println("--PamGuard Help");
 					System.out.println("\n--For standard GUI deployment run without any options.\n");
 					System.out.println("\n--For command line deployment the following options are valid.\n");
-
 					System.out.println("  -r                           : run as a non GUI application");
 					System.out.println("  -psf <filename>              : use psf settings from filename");
 					System.out.println("  -port  <value>               : UDP connection port.");

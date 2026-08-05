@@ -69,7 +69,7 @@ public class DataUnitSummaryPanel {
 		startTime.setText(PamCalendar.formatDateTime(dataUnit.getTimeMilliseconds()));
 		Double dur = dataUnit.getDurationInMilliseconds();
 		if (dur != null) {
-			duration.setText(String.format("Duration: %3.3fs", dur));
+			duration.setText(String.format("Duration: %3.3fs", dur/1000.));
 		}
 		else {
 			duration.setText(null);

@@ -59,6 +59,51 @@ public class AISPositionReport extends AISReport implements Serializable, Manage
 			break;
 		}
 	}
+	
+	/**
+	 * Get the know speed of the vessel. Generally, this is just the
+	 * speedoverground, but in the data unavailable case, this is set
+	 * to 102.3, in which case return 0, so avoid messing up interpolation 
+	 * on the map
+	 * @return
+	 */
+	public double getKnownSpeed() {
+		if (speedOverGround == 102.3) {
+			return 0;
+		}
+		else {
+			return speedOverGround;
+		}
+	}
+	/**
+	 * Get the speed as a string, return "Unknown" if it's set at 102.3
+	 * @return
+	 */
+	public String getSpeedString() {
+		if (speedOverGround == 102.3) {
+			return "Unavailable";
+		}
+		else if (speedOverGround == 102.2) {
+			return ">102.2";
+		}
+		else {
+			return String.format("%3.1f", speedOverGround);
+		}
+	}
+	
+	/**
+	 * Return COG string with degree symbol, or N/A if unavailable
+	 * @return
+	 */
+	public String getCOGString() {
+		if (courseOverGround >= 360) {
+			return "N/A";
+		}
+		else {
+			return String.format("%.1f\u00B0", courseOverGround);
+		}
+	}
+	
 	private boolean unpackAidToNavigationReport(NMEABitArray bitData) {
 		double longitude = bitData.getSignedInteger(164, 191) / 600000.;
 		double latitude = bitData.getSignedInteger(192, 218) / 600000.;
@@ -145,6 +190,37 @@ sensor.
 	public String toString() {
 		return String.format("Position %.6f,%.6f; COG %f; SOG %f; ROT %.3f", 
 				latLong.getLatitude(), latLong.getLongitude(), courseOverGround, speedOverGround, rateOfTurn);
+	}
+	
+	public String getNavStatusString() {
+		switch(this.navigationStatus) {
+			case 0:
+				return "underway using engine";
+			case 1:
+				return "at anchor";
+			case 2:
+				return "not under command";
+			case 3:
+				return "restricted maneuverability";
+			case 4:
+				return "constrained by draught";
+			case 5:
+				return "moored";
+			case 6:
+				return "aground";
+			case 7:
+				return "engaged in fishing";
+			case 8:
+				return "under way sailing";
+			case 11:
+				return "towing astern";
+			case 12:
+				return "pushing ahead or towing alongside";
+			case 14:
+				return "AIS-SART (active), MOB-AIS, EPIRB-AIS";
+			default:
+				return "UNKNOWN";
+		}
 	}
 	
 	public double getLatitude() {

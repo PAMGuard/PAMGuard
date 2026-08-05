@@ -450,7 +450,7 @@ public class SourcePanel implements ActionListener{
 	
 	/**
 	 * 
-	 * @return the source data block name, or null if nothing selected. 
+	 * @return the source data block long data name, or null if nothing selected. 
 	 */
 	public String getSourceName() {
 		PamDataBlock source = getSource();
@@ -494,9 +494,9 @@ public class SourcePanel implements ActionListener{
 		var availableChannels = source.getSequenceMap();
 		var toSelect = channelList & availableChannels;
 
-		if (toSelect != channelList) {
-			System.out.printf("SourcePanel: availableChannels=%d, channelList=%d, toSelect=%d - deselecting unavailable channels.\n", availableChannels, channelList, toSelect);
-		}
+//		if (toSelect != channelList) {
+//			System.out.printf("SourcePanel: availableChannels=%d, channelList=%d, toSelect=%d - deselecting unavailable channels.\n", availableChannels, channelList, toSelect);
+//		}
 
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
 			channelBoxes[i].setSelected((toSelect & (1<<i)) != 0);

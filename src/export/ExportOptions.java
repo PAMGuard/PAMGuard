@@ -105,6 +105,14 @@ public class ExportOptions implements PamSettings {
 	}
 
 	/**
+	 * Get the export manager that handles exporting data units.
+	 * @return the PamExporterManager.
+	 */
+	public PamExporterManager getExportManager() {
+		return exportManager;
+	}
+
+	/**
 	 * Get storage parameters settings. 
 	 * @return the storage paramters settings
 	 */

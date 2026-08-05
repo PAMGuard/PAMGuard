@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.util.ArrayList;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -16,6 +17,7 @@ import PamView.dialog.ChannelListScroller;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
+import PamView.panel.PamAlignmentPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamObserver;
 
@@ -27,26 +29,41 @@ public class DataKeepDialog extends PamDialog {
 	private JPanel listPanel;
 	private JTextField[] listEdits;
 	private ArrayList<PamDataBlock> dataBlockList;
+	private JCheckBox clearAtStart;
+	
+	private String mainTip = "Minimum times to hold data in memory. Downstream users of data, e.g. the map, may increase this as required";
 	
 	private DataKeepDialog(Window parentFrame) {
-		super(parentFrame, "Minimum Data Storage Times", false);
+		super(parentFrame, "Minimum Internal Data Storage Times", false);
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
-		mainPanel.setBorder(new TitledBorder("Data Storage Times"));
+		JPanel topPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		topPanel.setBorder(new TitledBorder("Global options"));
+		clearAtStart = new JCheckBox("Clear all data on restarts");
+		topPanel.add(clearAtStart);
+		clearAtStart.setToolTipText("Clear all data from memory when PAMGuard restarts");
+		
 		listPanel = new JPanel();
 		listPanel.setLayout(new GridBagLayout());
 		JPanel lnPanel = new JPanel(new BorderLayout());
 		lnPanel.add(BorderLayout.NORTH, listPanel);
+		lnPanel.setBorder(new TitledBorder("Data Block Storage Times"));
+		lnPanel.setToolTipText(mainTip);
+		
+		mainPanel.add(BorderLayout.NORTH, topPanel);
 		mainPanel.add(BorderLayout.CENTER, new ChannelListScroller(lnPanel));				
 		
 		setDialogComponent(mainPanel);
+		setResizable(true);
+		
+		setHelpPoint("overview.PamMasterHelp.docs.internalstorage");
 		
 	}
 
 	public static boolean showDialog(Window parentWindow) {
-		if (singleInstance == null || singleInstance.getOwner() != parentWindow) {
+//		if (singleInstance == null || singleInstance.getOwner() != parentWindow) {
 			singleInstance = new DataKeepDialog(parentWindow);
-		}
+//		}
 		singleInstance.setParams();
 		singleInstance.setVisible(true);
 		return singleInstance.okPressed;
@@ -55,6 +72,8 @@ public class DataKeepDialog extends PamDialog {
 	private void setParams() {
 		dataBlockList = PamController.getInstance().getDataBlocks();
 		DataKeeper dataKeeper = DataKeeper.getInstance();
+		clearAtStart.setSelected(dataKeeper.isClearAtStart());
+		
 		listPanel.removeAll();
 		GridBagConstraints c = new PamGridBagContraints();
 		c.gridx = c.gridy = 0;
@@ -82,6 +101,7 @@ public class DataKeepDialog extends PamDialog {
 				t = Math.max(t, dataBlock.getNaturalLifetime());
 			}
 			listEdits[i].setText(String.format("%d", t));
+			listEdits[i].setToolTipText(mainTip);
 			PamObserver longestObs = dataBlock.getLongestObserver();
 			if (longestObs != null) {
 				double to = (double) longestObs.getRequiredDataHistory(dataBlock, null) / 1000.;
@@ -99,6 +119,8 @@ public class DataKeepDialog extends PamDialog {
 	public boolean getParams() {
 		okPressed = true;
 		DataKeeper dataKeeper = DataKeeper.getInstance();
+		dataKeeper.setClearAtStart(clearAtStart.isSelected());
+		
 		if (dataBlockList == null) return false;
 		if (listEdits == null) return false;
 		if (dataBlockList.size() != listEdits.length) {

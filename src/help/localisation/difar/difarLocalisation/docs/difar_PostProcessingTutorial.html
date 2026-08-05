@@ -341,7 +341,7 @@ ul
 
 <p class="AbstractHeading"><span lang="EN-GB">Purpose of this tutorial</span></p>
 
-<p class="Abstracttext"><span lang="EN-GB">The purpose of this tutorial is to provide step-by-step instructions for configuring and running the PAMGuard DIFAR module in order to post-process data that have been collected from DIFAR sonobuoys. This document is not intended as a guide for real-time analysis of DIFAR data, however there is considerable overlap between these two use cases. The tutorial includes step-by-step instructions for importing voyage tracks (i.e. GPS data) into PAMGuard, importing sonobuoy deployment locations into PAMGuard, configuring PAMGuard for DIFAR Localisation, and configuration of PAMGuard&rsquo;s automated Whistle and Moan Detector for use with the DIFAR Localisation module. Post-processing of DIFAR data should yield a list of magnetic and possibly true bearings to sound sources in the DIFAR data. The list of bearings can be stored in PAMGuard binary storage files and/or the PAMGuard database.</span></p>
+<p class="Abstracttext"><span lang="EN-GB">The purpose of this tutorial is to provide step-by-step instructions for configuring and running the PAMGuard DIFAR module in order to post-process data that have been collected from DIFAR sonobuoys. This document is not intended as a guide for real-time analysis of DIFAR data, however there is considerable overlap between these two use cases. The tutorial includes step-by-step instructions for importing voyage tracks (i.e. GPS data) into PAMGuard, importing sonobuoy deployment locations into PAMGuard, configuring PAMGuard for DIFAR Localisation, and configuration of PAMGuard's automated Whistle and Moan Detector for use with the DIFAR Localisation module. Post-processing of DIFAR data should yield a list of magnetic and possibly true bearings to sound sources in the DIFAR data. The list of bearings can be stored in PAMGuard binary storage files and/or the PAMGuard database.</span></p>
 
 <p class="KEYWORDS"><span lang="EN-GB">Version 1.0 2014-08-20</span></p>
 
@@ -459,7 +459,7 @@ ul
 
 <h2><a name="_Toc396467145">Verifying installation</a></h2>
 
-<p class="MsoBodyText">To verify that the PAMGuard DIFAR module is installed, run PAMGuard using either the shortcut from the start menu or command-line, and create a new blank settings (.psf) file. If installed correctly, the module should be available from the PAMGuard Menu under <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">File -&gt; Add Modules ... -&gt; Localisers -&gt; DIFAR Localisation</span></span>, and there should be a corresponding entry under PAMGuard&rsquo;s online help system under <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Help -&gt; Help</span></span>. Since you have now gone to the trouble of opening the DIFAR Help, it might be a good time to take a few minutes to read through the PAMGuard&rsquo;s help files in order to better familiarise yourself with general operation of the DIFAR module. NB: the online help for the DIFAR module is geared towards real-time operation, rather than the aim of this tutorial: post-processing.</p>
+<p class="MsoBodyText">To verify that the PAMGuard DIFAR module is installed, run PAMGuard using either the shortcut from the start menu or command-line, and create a new blank settings (.psf) file. If installed correctly, the module should be available from the PAMGuard Menu under <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">File -&gt; Add Modules ... -&gt; Localisers -&gt; DIFAR Localisation</span></span>, and there should be a corresponding entry under PAMGuard's online help system under <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Help -&gt; Help</span></span>. Since you have now gone to the trouble of opening the DIFAR Help, it might be a good time to take a few minutes to read through the PAMGuard's help files in order to better familiarise yourself with general operation of the DIFAR module. NB: the online help for the DIFAR module is geared towards real-time operation, rather than the aim of this tutorial: post-processing.</p>
 
 <p class="MsoBodyText"><img border="0" height="400" src="difar_PostProcessingTutorial_files/image001.jpg" width="604" /></p>
 
@@ -491,7 +491,7 @@ ul
 
 <h2><a name="_Toc396467149">Hydrophone array configuration</a></h2>
 
-<p class="MsoBodyText">Before importing any GPS or sonobuoy deployment data, the hydrophone array must be configured using PAMGuard&rsquo;s Array Manager, either in Normal, Mixed, or Viewer-Mode.</p>
+<p class="MsoBodyText">Before importing any GPS or sonobuoy deployment data, the hydrophone array must be configured using PAMGuard's Array Manager, either in Normal, Mixed, or Viewer-Mode.</p>
 
 <p class="MsoBodyText"><img border="0" height="378" src="difar_PostProcessingTutorial_files/image003.jpg" width="604" /></p>
 
@@ -623,7 +623,7 @@ ul
 
 <p class="MsoBodyText"><img border="0" height="436" id="Picture 40" src="difar_PostProcessingTutorial_files/image013.jpg" width="604" /></p>
 
-<p class="MsoBodyText">If the positions aren&rsquo;t correct, or seem suspicious, then exit, re-load from your backup database, fix the CSV file, and try again.</p>
+<p class="MsoBodyText">If the positions aren't correct, or seem suspicious, then exit, re-load from your backup database, fix the CSV file, and try again.</p>
 
 <h2><a name="_Toc396467154">OPTIONAL: Import ship tracks (GPS data)</a></h2>
 
@@ -641,11 +641,11 @@ ul
 
 <p class="MsoBodyText"><img border="0" height="176" src="difar_PostProcessingTutorial_files/image015.jpg" width="331" /></p>
 
-<p class="MsoBodyText">Select the file that contains the GPS data. Data can be in NMEA 0183 strings within a text file (personally tested and verified) or presumably in other common formats such as GPS, KML (but I haven&rsquo;t actually tried these). Importing a days worth of GPS data from NMEA text (i.e. 86400 NMEA strings) may take some time.</p>
+<p class="MsoBodyText">Select the file that contains the GPS data. Data can be in NMEA 0183 strings within a text file (personally tested and verified) or presumably in other common formats such as GPS, KML (but I haven't actually tried these). Importing a days worth of GPS data from NMEA text (i.e. 86400 NMEA strings) may take some time.</p>
 
 <p class="MsoBodyText"><img border="0" height="122" src="difar_PostProcessingTutorial_files/image016.jpg" width="366" /></p>
 
-<p class="MsoBodyText">The dialog above is a good indication that your GPS data are being imported, and also that there&rsquo;s probably time for a cup of tea.</p>
+<p class="MsoBodyText">The dialog above is a good indication that your GPS data are being imported, and also that there's probably time for a cup of tea.</p>
 
 <h3><a name="_Toc396467155">Validating GPS tracks</a></h3>
 
@@ -707,7 +707,7 @@ ul
 
 <p class="MsoBodyText"><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Merge contiguous files</span></span><span lang="EN-GB"> should be checked, otherwise DIFAR data might be cleared from the queue and map for each new file that is processed.</span></p>
 
-<p class="MsoBodyText"><span lang="EN-GB">The </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Peak-Peak voltage range</span></span><span lang="EN-GB"> is important for scaling the spectrogram and ensuring that received levels measured by the DIFAR module are somewhat representative of the actual received levels. If known, enter the </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Peak-Peak voltage range</span></span><span lang="EN-GB"> of the Analog/Digital converter that was used to digitise the files. For example: The Peak-Peak Voltage of the Fireface UFX recorder used for the 2013 Antarctic Blue Whale Voyage was 8.396 V for the &ldquo;Instrument&rdquo; input with the gain was set to 20 dB. Thus one could enter either of the following which should be equivalent:</span></p>
+<p class="MsoBodyText"><span lang="EN-GB">The </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Peak-Peak voltage range</span></span><span lang="EN-GB"> is important for scaling the spectrogram and ensuring that received levels measured by the DIFAR module are somewhat representative of the actual received levels. If known, enter the </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Peak-Peak voltage range</span></span><span lang="EN-GB"> of the Analog/Digital converter that was used to digitise the files. For example: The Peak-Peak Voltage of the Fireface UFX recorder used for the 2013 Antarctic Blue Whale Voyage was 8.396 V for the ";Instrument" input with the gain was set to 20 dB. Thus one could enter either of the following which should be equivalent:</span></p>
 
 <p class="MsoBodyText"><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Peak-Peak voltage range:8.396, Preamplifier gain:0</span></span><span lang="EN-GB"> (tried and tested) or </span></p>
 
@@ -725,7 +725,7 @@ ul
 
 <p class="MsoBodyText"><img border="0" height="379" id="Picture 16" src="difar_PostProcessingTutorial_files/image025.jpg" width="604" /></p>
 
-<p class="MsoBodyText"><span lang="EN-GB">This concludes the preparation and import of metadata. It&rsquo;s a good idea at this point to Save Data and Save Configuration (in the File menu). You can then close PAMGuard Viewer.</span></p>
+<p class="MsoBodyText"><span lang="EN-GB">This concludes the preparation and import of metadata. It's a good idea at this point to Save Data and Save Configuration (in the File menu). You can then close PAMGuard Viewer.</span></p>
 
 <div style="padding: 1pt 4pt; border: 1pt solid windowtext; border-image: none;">
 <p class="MsoBodyText" style="padding: 0cm; border: currentColor; border-image: none;">At this point it is wise to make a backup copy of your data/ existing PAMGuard databases before any post-processing, since post-processing may alter tables, rows, and columns of the PAMGuard database.</p>
@@ -745,11 +745,11 @@ ul
 
 <p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">Sound Acquisition</span></span><span lang="EN-GB">: Already added and configured during Preparation and Import of Data</span></p>
 
-<p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">Decimator</span></span><span lang="EN-GB">: To reduce the sample rate of the data you&rsquo;ll actually be looking at to a few kHz or less, depending on your target species.</span></p>
+<p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">Decimator</span></span><span lang="EN-GB">: To reduce the sample rate of the data you'll actually be looking at to a few kHz or less, depending on your target species.</span></p>
 
 <p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">FFT (Spectrogram) Engine</span></span><span lang="EN-GB">:&nbsp;To display a spectrogram&nbsp;of the Decimated data&nbsp;for manually marking detections, and&nbsp;also to be used as input to an automatic detector.</span></p>
 
-<p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">User Display</span></span><span lang="EN-GB">: The DIFAR display modules and spectrograms can all be integrated into a single display module. However, if you&rsquo;ve multiple screens, you may wish to make multiple user displays and spread out a little.</span></p>
+<p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">User Display</span></span><span lang="EN-GB">: The DIFAR display modules and spectrograms can all be integrated into a single display module. However, if you've multiple screens, you may wish to make multiple user displays and spread out a little.</span></p>
 
 <p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">DIFAR Localisation</span></span><span lang="EN-GB">: Contains the DIFAR specific components</span></p>
 
@@ -759,7 +759,7 @@ ul
 
 <p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span lang="EN-GB">Additional </span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">FFT (Spectrogram) Engine</span></span><span lang="EN-GB"> processing raw data from the sound acquisition. The primary purpose of this FFT is to show the spectrum of the full signal which is a useful diagnostic to determine whether the DIFAR sonobuoy is functioning correctly. The spectrum of a&nbsp;correctly functioning DIFAR sonobuoy will show spectral&nbsp;peaks&nbsp;at the&nbsp;7.5 and 15 kHz carrier frequencies. Absence of&nbsp;these peaks is&nbsp;a good indicator that something in the recording chain is amiss.</span></p>
 
-<p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">Database</span></span><span lang="EN-GB">: DIFAR results are written to the database, so you&rsquo;ll need one if you want to store results.</span></p>
+<p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">Database</span></span><span lang="EN-GB">: DIFAR results are written to the database, so you'll need one if you want to store results.</span></p>
 
 <p class="MsoBodyText" style="margin: 0cm 0cm 0pt 36pt; line-height: normal; text-indent: -18pt;"><span lang="EN-GB" style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="font-size: 10.5pt;">Binary store</span></span><span lang="EN-GB">: Bearings, clips of audio that have been localised, and the processed DIFARGram are stored in the binary store, so like the Database, this module is useful for further analysis of localisations will be conducted.</span></p>
 
@@ -999,7 +999,7 @@ ul
 
 <p class="MsoPlainText">Processed Data Buffer (m): 10</p>
 
-<p class="MsoNormal"><span lang="EN-GB">If using the Greeneridge Sciences Demultiplexer, change </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Prepend to clip (s): 3</span></span><span lang="EN-GB">. The </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Prepend to clip</span></span><span lang="EN-GB"> setting is only required in order to allow the Greeneridge Demultiplexer to &ldquo;Lock&rdquo; onto the carrier signals before the sound of interest, and is not required by the AMMC demultiplexer.</span></p>
+<p class="MsoNormal"><span lang="EN-GB">If using the Greeneridge Sciences Demultiplexer, change </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Prepend to clip (s): 3</span></span><span lang="EN-GB">. The </span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Prepend to clip</span></span><span lang="EN-GB"> setting is only required in order to allow the Greeneridge Demultiplexer to ";Lock" onto the carrier signals before the sound of interest, and is not required by the AMMC demultiplexer.</span></p>
 
 <p class="MsoBodyText"><img border="0" height="416" id="Picture 45" src="difar_PostProcessingTutorial_files/image039.jpg" width="295" /><img border="0" height="415" id="Picture 46" src="difar_PostProcessingTutorial_files/image040.jpg" width="295" /></p>
 
@@ -1060,13 +1060,13 @@ ul
 
 <p class="MsoBodyText"><img border="0" height="485" id="Picture 49" src="difar_PostProcessingTutorial_files/image041.jpg" width="557" />&nbsp;</p>
 
-<p class="MsoBodyText">The selected <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Line Colour</span></span> of each symbol will be used for bearings to the species on the PAMGuard Map and Spectrogram, so selecting different line colours for each &ldquo;Species&rdquo; is a good idea. Click Ok, on the Lookup Editor to accept these two new &ldquo;species.&rdquo;</p>
+<p class="MsoBodyText">The selected <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Line Colour</span></span> of each symbol will be used for bearings to the species on the PAMGuard Map and Spectrogram, so selecting different line colours for each ";Species" is a good idea. Click Ok, on the Lookup Editor to accept these two new ";species."</p>
 
 <p class="MsoBodyText">NB: There are a couple of bugs regarding the symbols in the Lookup Editor: I find that filled (i.e. solid coloured) symbols are not typically desired, however The <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Fill</span></span> checkbox does not seem to influence the whether symbols are actually filled or not.&nbsp; Instead, the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Transparency</span></span> can be set to <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">100 </span></span>under the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">HSV </span></span>tab of the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Fill Colour</span></span> panel (as per the figure below). Like the Fill checkbox, the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Line thickness</span></span> setting does not appear to influence the actual thickness of the symbol or bearing lines.</p>
 
 <p class="MsoBodyText"><img border="0" height="482" id="Picture 47" src="difar_PostProcessingTutorial_files/image042.jpg" width="604" /></p>
 
-<p class="MsoBodyText">Now we need to configure the DIFAR analysis parameters for each of the newly added &ldquo;species.&rdquo; From the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Select Species</span></span> drop-down menu choose <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">abw; Antarctic blue whale song</span></span>, and enter the following parameters:</p>
+<p class="MsoBodyText">Now we need to configure the DIFAR analysis parameters for each of the newly added ";species." From the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Select Species</span></span> drop-down menu choose <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">abw; Antarctic blue whale song</span></span>, and enter the following parameters:</p>
 
 <p class="MsoPlainText">Difar Calculation BARTLETT</p>
 
@@ -1114,7 +1114,7 @@ ul
 
 <p class="MsoBodyText"><img border="0" height="464" id="Picture 51" src="difar_PostProcessingTutorial_files/image044.jpg" width="323" /></p>
 
-<p class="MsoBodyText">Additional &ldquo;species&rdquo;/call classifications can be added as required and configured in the same way as above.</p>
+<p class="MsoBodyText">Additional ";species"/call classifications can be added as required and configured in the same way as above.</p>
 
 <h2>OPTIONAL: Calibration</h2>
 
@@ -1152,7 +1152,7 @@ ul
 
 <p class="MsoBodyText">Presently no automated detectors are configured, but this top panel will need to be revisited later after adding a Whistle and Moan Detector (as per the section below).</p>
 
-<p class="MsoBodyText">For convenience, 3 <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Quick classification</span></span> &ldquo;selectors&rdquo; can be configured to appear next to audio clips in the DIFAR queue. Since we have only configured two &ldquo;species&rdquo;, we will leave the third <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Quick classification</span></span> empty.</p>
+<p class="MsoBodyText">For convenience, 3 <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Quick classification</span></span> ";selectors" can be configured to appear next to audio clips in the DIFAR queue. Since we have only configured two ";species", we will leave the third <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Quick classification</span></span> empty.</p>
 
 <p class="MsoBodyText">For new users of the DIFAR module, it is recommend not to Auto-save processed clips until you are familiar with operation of the module.</p>
 
@@ -1162,7 +1162,7 @@ ul
 
 <p class="MsoBodyText">DIFAR processing is an interactive process with the computer doing the bulk of the work, but an operator making critical decisions such as validating detections,&nbsp;classifying sounds by&nbsp;species, and selecting/rejecting sounds for further processing and localisation.</p>
 
-<p class="MsoBodyText">The DIFAR module does not have its own tab panel. Instead the various displays you&rsquo;ll need should be configured on the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Difar Display</span></span> panel.</p>
+<p class="MsoBodyText">The DIFAR module does not have its own tab panel. Instead the various displays you'll need should be configured on the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Difar Display</span></span> panel.</p>
 
 <h3>Spectrogram Overlays and Manual Detections</h3>
 
@@ -1186,7 +1186,7 @@ ul
 
 <p class="MsoBodyText">NB: Map overlays must be configured for each map module, so if you added an extra Map to the Difar Display, you will need to perform these steps on both that Map, and the one that is in the separate Map tab.</p>
 
-<p class="MsoBodyText">In addition to the Map Overlays, there are also <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Localisation display options&hellip;</span></span> under the Display menu. The default values for these options are perfectly acceptable, and further documentation for these options are available in PAMGuard&rsquo;s Help System.</p>
+<p class="MsoBodyText">In addition to the Map Overlays, there are also <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Localisation display options&hellip;</span></span> under the Display menu. The default values for these options are perfectly acceptable, and further documentation for these options are available in PAMGuard's Help System.</p>
 
 <h3>DIFAR Displays</h3>
 
@@ -1198,9 +1198,9 @@ ul
 
 <p class="MsoBodyText"><img alt="difarUserDisplayMenu" border="0" height="240" id="Picture 4" src="difar_PostProcessingTutorial_files/image050.jpg" width="376" /></p>
 
-<p class="MsoBodyText">The <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Localisation Display</span></span> does not require any configuration, and further documentation can be found in PAMGuard&rsquo;s online help system.</p>
+<p class="MsoBodyText">The <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Localisation Display</span></span> does not require any configuration, and further documentation can be found in PAMGuard's online help system.</p>
 
-<p class="MsoBodyText">The <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Localisation Queue</span></span> will likely need to be modified from the default settings in order to tailor the presentation of audio to suit the target species. Click the small downward pointing arrow below the label <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Actions</span></span> to expand the viewing options for queued clips. Clips selected for DIFAR Processing will appear in the queue as a spectrogram, and the sample rate for these clips is determined by the sample rate for the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Default</span></span> &ldquo;species.&rdquo;</p>
+<p class="MsoBodyText">The <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Localisation Queue</span></span> will likely need to be modified from the default settings in order to tailor the presentation of audio to suit the target species. Click the small downward pointing arrow below the label <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Actions</span></span> to expand the viewing options for queued clips. Clips selected for DIFAR Processing will appear in the queue as a spectrogram, and the sample rate for these clips is determined by the sample rate for the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Default</span></span> ";species."</p>
 
 <p class="MsoBodyText">Generally, the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Min Amplitude</span></span> should be adjusted to the same value that is used by the spectrogram: for the data from the 2013 ABW Voyage 40 dB works well. In my experience, DIFAR sonobuoys typically have a dynamic range of about 40-60 dB, so set the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Amplitude Range</span></span> to 40 dB. The <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">FFT Length</span></span> of the Queue will need to provide adequate frequency resolution at the sample rate of the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Default</span></span> species (which we set to 2000 Hz in the section above). The following settings are recommended for viewing clips of low-frequency sounds from blue and fin whales:</p>
 
@@ -1268,7 +1268,7 @@ ul
 
 <p class="MsoPlainText">Settings -&gt; Sound Output &hellip;</p>
 
-<p class="MsoBodyText">It is recommended that you not use the Raw input data from Sound Acquisition as the Data source. Rather, use either the Downsample to 6 kHz or Downsample to 250 Hz, as these will facilitate playback at a faster rate, and also have filtered the constant loud whistling of the 7.5 and 15 kHz DIFAR pilot tones. Make sure that at least one <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Channel</span></span> is checked to enable the sound output. Also, make sure that the checkbox to <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Use default playback rate</span></span> is unchecked. Though it may not be obvious, the post-processing speed will now be limited by the ratio of the sample rate of the Data source divided by the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Playback rate</span></span>. Thus, for the data source <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Downsample to 6 kHz</span></span> a <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Playback rate</span></span> of <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">48000 Hz</span></span> will yield a post-processing speed of approximately eight times faster than real-time (provided that your computer has sufficient CPU processing ability to maintain that speed). Additionally, the &ldquo;sped-up&rdquo; audio will be played through the output device (i.e. speakers) with pitch shifted by the same ratio. For low frequency sounds from blue and fin whales, shifting the pitch this way can facilitate aural detection of calls that would ordinarily be too low in frequency to be audible to most people.</p>
+<p class="MsoBodyText">It is recommended that you not use the Raw input data from Sound Acquisition as the Data source. Rather, use either the Downsample to 6 kHz or Downsample to 250 Hz, as these will facilitate playback at a faster rate, and also have filtered the constant loud whistling of the 7.5 and 15 kHz DIFAR pilot tones. Make sure that at least one <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Channel</span></span> is checked to enable the sound output. Also, make sure that the checkbox to <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Use default playback rate</span></span> is unchecked. Though it may not be obvious, the post-processing speed will now be limited by the ratio of the sample rate of the Data source divided by the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Playback rate</span></span>. Thus, for the data source <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Downsample to 6 kHz</span></span> a <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Playback rate</span></span> of <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">48000 Hz</span></span> will yield a post-processing speed of approximately eight times faster than real-time (provided that your computer has sufficient CPU processing ability to maintain that speed). Additionally, the ";sped-up" audio will be played through the output device (i.e. speakers) with pitch shifted by the same ratio. For low frequency sounds from blue and fin whales, shifting the pitch this way can facilitate aural detection of calls that would ordinarily be too low in frequency to be audible to most people.</p>
 
 <div style="padding: 1pt 4pt; border: 1pt solid windowtext; border-image: none;">
 <p class="MsoBodyText" style="padding: 0cm; border: currentColor; border-image: none;">NB: You can adjust the Playback rate during post-processing in order to speed up long periods with little whale activity, or to slow down post-processing if there are many sounds of interest displayed on the spectrogram.</p>
@@ -1308,7 +1308,7 @@ ul
 
 <h1>Automated Detection and DIFAR processing</h1>
 
-<p class="MsoBodyText">Using PAMGuard&rsquo;s automated detectors via post-processing is identical to using them during Normal Mode, so consult the PAMGuard Help System -&gt; DIFAR Localisation -&gt; Configure DIFAR Processing -&gt; Automation for further information.</p>
+<p class="MsoBodyText">Using PAMGuard's automated detectors via post-processing is identical to using them during Normal Mode, so consult the PAMGuard Help System -&gt; DIFAR Localisation -&gt; Configure DIFAR Processing -&gt; Automation for further information.</p>
 
 <h1>&nbsp;</h1>
 </div>

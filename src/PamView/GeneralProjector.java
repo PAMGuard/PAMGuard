@@ -447,7 +447,7 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 		hoverData.setCoordinate3D(coordinate3d); 
 		hoverData.setDataUnit(pamDataUnit); 
 		hoverData.setAmbiguity(iSide); 
-		this.hoverData.add(hoverData); 
+		addHoverData(hoverData); 
 		return true;
 	}
 
@@ -456,7 +456,7 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 		hoverData.setDataUnit(pamDataUnit); 
 		hoverData.setDrawnShape(drawnShape);
 		hoverData.setAmbiguity(0); 
-		this.hoverData.add(hoverData); 
+		addHoverData(hoverData); 
 		return true;
 	}
 
@@ -481,7 +481,7 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 		HoverData hoverData=new HoverData(); 
 		hoverData.setTransformShape(shape); 
 		hoverData.setDataUnit(pamDetection); 
-		this.hoverData.add(hoverData); 
+		addHoverData(hoverData); 
 		return true;
 	}
 

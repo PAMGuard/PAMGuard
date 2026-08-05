@@ -2,6 +2,7 @@ package PamView.symbol;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
@@ -43,6 +44,8 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 	private JCheckBox useAnnotation;
 
 	private JTextField lineLength;
+	
+	private JCheckBox drawBearingError;
 
 	private JCheckBox showLinesToLatLongs;
 
@@ -60,7 +63,22 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 	
 	private SymbolModifierPanel symbolModifierPanel;
 
+	private Window parent;
+
+
+	@Deprecated
 	public StandardSymbolOptionsPanel(StandardSymbolManager standardSymbolManager, StandardSymbolChooser standardSymbolChooser) {
+		this(null, standardSymbolManager, standardSymbolChooser);
+	}
+	
+	/**
+	 * Constructor for standard options panel. 
+	 * @param parent
+	 * @param standardSymbolManager
+	 * @param standardSymbolChooser
+	 */
+	public StandardSymbolOptionsPanel(Window parent, StandardSymbolManager standardSymbolManager, StandardSymbolChooser standardSymbolChooser) {
+		this.parent = parent;
 		this.standardSymbolManager = standardSymbolManager;
 		this.standardSymbolChooser = standardSymbolChooser;
 		dataBlock = standardSymbolManager.getPamDataBlock();
@@ -87,7 +105,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 //		if (annotationTypes.size() == 0) {
 //			optionButtons[StandardSymbolOptions.COLOUR_ANNOTATION].setVisible(false);
 //		}
-		symbolModifierPanel = new SymbolModifierPanel(standardSymbolChooser);
+		symbolModifierPanel = new SymbolModifierPanel(parent, standardSymbolChooser);
 
 		JPanel symbolPanel = new JPanel(new GridBagLayout());
 		symbolPanel.setBorder(new TitledBorder("Base Symbol"));
@@ -173,10 +191,13 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 			c.gridy++;
 			c.gridx = 0;
 			c.gridwidth = 3;
+			linePanel.add(drawBearingError = new JCheckBox("Draw bearing error"), c); 
+			c.gridy ++;
 			linePanel.add(showLinesToLatLongs = new JCheckBox("Draw lines to detections with Lat Long"), c);
 			lineLength.setToolTipText("Standard length of lines to detections that have bearing but no range information");
 			showLinesToLatLongs.setToolTipText("<html>Show lines to detections that have range or lat long information.<br>" + 
 					"Hiding the lines can make the map less cluttered.</html>");
+			drawBearingError.setToolTipText("If an estimate of bearing error is available, bearings will be drawn as a shaded cone shape");
 			mainPanel.add(linePanel);
 		}
 		setParams();
@@ -214,7 +235,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 	}
 
 	protected void choseSymbol() {
-		PamSymbol newSymbol = PamSymbolDialog.show(null, currentSymbol.clone());
+		PamSymbol newSymbol = PamSymbolDialog.show(parent, currentSymbol.clone(), standardSymbolManager.isLineOnly());
 		if (newSymbol != null) {
 			setCurrentSymbol(newSymbol);
 		}
@@ -260,6 +281,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 		if (lineLengthOption) {
 			lineLength.setText(String.format("%3.1f", params.mapLineLength));
 			showLinesToLatLongs.setSelected(!params.hideLinesWithLatLong);
+			drawBearingError.setSelected(params.drawBearingError);
 		}
 
 //		if (useAnnotation != null) {
@@ -321,6 +343,7 @@ public class StandardSymbolOptionsPanel implements SwingSymbolOptionsPanel {
 				return PamDialog.showWarning(null, "Error", "Invalid line length value: " + lineLength.getText());
 			}
 			params.hideLinesWithLatLong = !showLinesToLatLongs.isSelected();
+			params.drawBearingError = drawBearingError.isSelected();
 		}
 
 //		if (useAnnotation != null) {

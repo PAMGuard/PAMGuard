@@ -68,8 +68,8 @@ public class FilterPropertyTable {
 	
 	private class FilterTableData extends AbstractTableModel {
 
-		private final String[] colNames = {"Lo Freq", "Hi Freq", "Response"};
-		protected final int[] preferredWidth = {20, 20, 15};
+		private final String[] colNames = {"Lo Freq", "Centre", "Hi Freq", "Response"};
+		protected final int[] preferredWidth = {20, 20, 20, 15};
 		@Override
 		public int getColumnCount() {
 			return colNames.length;
@@ -99,8 +99,10 @@ public class FilterPropertyTable {
 			case 0:
 				return FrequencyFormat.formatFrequency(fParams.highPassFreq, true);
 			case 1:
-				return FrequencyFormat.formatFrequency(fParams.lowPassFreq, true);
+				return FrequencyFormat.formatFrequency(fParams.getCenterFreq(), true);
 			case 2:
+				return FrequencyFormat.formatFrequency(fParams.lowPassFreq, true);
+			case 3:
 				return String.format("%3.2f dB", bf.getFilterIntegratedResponse());
 			}
 			return null;

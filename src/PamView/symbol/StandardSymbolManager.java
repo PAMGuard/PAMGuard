@@ -2,6 +2,8 @@ package PamView.symbol;
 
 import java.util.ArrayList;
 
+import PamDetection.LocContents;
+import PamDetection.LocalisationInfo;
 import PamUtils.PamUtils;
 import PamView.GeneralProjector;
 import PamView.symbol.modifier.HydrophoneSymbolModifier;
@@ -245,6 +247,20 @@ public class StandardSymbolManager extends PamSymbolManager<StandardSymbolChoose
 	 */
 	public int getNColourChoices() {
 		return 6;
+	}
+
+	/**
+	 * Called before a dialog is shown, primarily to check if a localiser is added in 
+	 * which case some additional options may get shown. 
+	 * @param standardSymbolChooser
+	 */
+	public void checkLocalisationOptions(StandardSymbolChooser standardSymbolChooser) {
+		PamDataBlock db = getPamDataBlock();
+		LocalisationInfo locCont = db.getLocalisationContents();
+		boolean hasBearing = locCont.hasLocContent(LocContents.HAS_BEARING);
+		if (hasBearing) {
+			addSymbolOption(HAS_LINE_AND_LENGTH);
+		}
 	}
 
 

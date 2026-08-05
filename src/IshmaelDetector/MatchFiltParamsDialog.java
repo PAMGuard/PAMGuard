@@ -47,6 +47,7 @@ public class MatchFiltParamsDialog extends IshDetParamsDialog implements ActionL
 
 	private MatchFiltParamsDialog(Frame parentFrame, Class inputDataClass) {
 		super(parentFrame, "Matched Filter Parameters", inputDataClass);
+		setHelpPoint("detectors.ishmael.docs.ishmael_matchedfilter");
 	}
 
 	public static MatchFiltParams showDialog2(Frame parentFrame, MatchFiltParams oldParams) 

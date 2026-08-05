@@ -348,7 +348,7 @@ public class QAGeneratorProcess extends QADataProcess {
 			}
 		}
 		for (int i = 0; i < channelDelay.length; i++) {
-			QASound sound = qaSoundGenerator.generateSound(sourceSample, sampleRate, channelDelay[i], channelGain[i]);
+			QASound sound = qaSoundGenerator.generateSound(sourceSample, getSampleRate(), channelDelay[i], channelGain[i]);
 			double[][] wav = sound.getWave();
 			for (int w = 0; w < wav.length; w++) {
 				wav[w] = absorption.fftAbsorption(wav[w], getSampleRate(), -aSequence.getSourceLocation().getHeight(), channelRanges[i][w]);

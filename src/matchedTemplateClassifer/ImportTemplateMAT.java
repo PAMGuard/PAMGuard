@@ -121,6 +121,7 @@ public class ImportTemplateMAT implements TemplateImport {
 			if (sampleRateML==null) sampleRateML = getDouble(mfr,"sample_rate"); //try a different name for the sample rate
 			if (sampleRateML==null) sampleRateML = getDouble(mfr,"sampleRate"); //try a different name for the sample rate
 			if (sampleRateML==null) sampleRateML = getDouble(mfr,"clicks_sR"); //try a different name for the sample rate
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"sR"); //try a different name for the sample rate
 
 			
 			//get the waveform or spectrum

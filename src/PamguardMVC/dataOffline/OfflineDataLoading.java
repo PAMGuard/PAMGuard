@@ -14,6 +14,7 @@ import PamguardMVC.LoadObserver;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObserver;
+import PamguardMVC.PamRawDataBlock;
 
 /**
  * Handles the loading of offline data from a PamDataBlock. 
@@ -480,9 +481,13 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			return lastRequestAnswer | REQUEST_SAME_REQUEST;
 		}
 
-		this.currentOfflineLoadKeep = offlineDataInfo.getLoadKeepLayers() > 0;
+//		if (pamDataBlock instanceof PamRawDataBlock) {
+//			System.out.printf("Keep layers in %s is %d\n", pamDataBlock.getLongDataName(), offlineDataInfo.getLoadKeepLayers());
+//		}
+		this.currentOfflineLoadKeep = true;//offlineDataInfo.getLoadKeepLayers() > 0;
 
 		//need to keep a record of these as they change through the upstream data request process. 
+		clearRequestingObservers();
 		addRequestingObserver(offlineDataInfo.getCurrentObserver());
 
 		pamDataBlock.clearAll();
@@ -512,6 +517,15 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 		return lastRequestAnswer;
 	}
 
+	/**
+	 * Clear all requesting observers from the list. Stops them 
+	 * all adding up and everything getting everything !
+	 */
+	public void clearRequestingObservers() {
+		if (requestingObservers != null) {
+			requestingObservers.clear();
+		}
+	}
 	/**
 	 * Add observer to requesting observer list which is 
 	 * used to distribute data to selected observers when it's

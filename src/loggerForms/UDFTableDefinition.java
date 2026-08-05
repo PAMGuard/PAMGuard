@@ -49,7 +49,7 @@ public class UDFTableDefinition extends EmptyTableDefinition {
 		super(tableName);
 		//getColumnNames(tableName);
 		// no need to Id item - it's already in the EmptyTableDefinition.
-		addTableItem(order				= new PamTableItem("Order"				, Types.INTEGER)); // problems in MySQL
+		addTableItem(order				= new PamTableItem(UDColName.Order.toString()	, Types.INTEGER)); // problems in MySQL
 		addTableItem(type				= new PamTableItem("Type"				, Types.CHAR, 50));
 		addTableItem(title				= new PamTableItem("Title"				, Types.CHAR, 50));
 		addTableItem(postTitle			= new PamTableItem("PostTitle"			, Types.CHAR, 50));
@@ -304,6 +304,13 @@ public class UDFTableDefinition extends EmptyTableDefinition {
 	 */
 	public PamTableItem getDefaultValue() {
 		return defaultValue;
+	}
+
+
+	@Override
+	public int getTableItemCount() {
+		// TODO Auto-generated method stub
+		return super.getTableItemCount();
 	}
 	
 	

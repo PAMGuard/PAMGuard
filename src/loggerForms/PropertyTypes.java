@@ -1,12 +1,18 @@
 package loggerForms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/**
+ * Properties that can be applied to a entire form.
+ */
 public enum PropertyTypes {
 	STARTTIME, ENDTIME, ORDER, AUTOALERT,SUBTABS,POPUP,HIDDEN,AUTORECORD,BEARING,
 	RANGE,HEADING,FONT,DBTABLENAME,
 	FORMCOLOUR,FORMCOLOR,
 	HOTKEY,NOCLEAR,NOCANCEL,NOTOFFLINE,NOTONLINE,
 	PLOT,READONTIMER,READONGPS,READONNMEA,
-	SYMBOLTYPE;
+	SYMBOLTYPE, UDPINPUT;
 	//,BLOBSIZE;
 	
 	/**
@@ -70,10 +76,76 @@ public enum PropertyTypes {
 			return "The form opens in a separate window (not currently implemented)";
 		case ORDER:
 			return "The order forms will be displayed in on the display";
+		case UDPINPUT:
+			return "Receive UDP data with given topic name";
 		default:
 			break;
 		
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @return true if the property can be used on a UDF form
+	 */
+	public boolean isUDF() {
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @return true if the property can be used on a UDB (button) form. 
+	 */
+	public boolean isUDB() {
+		switch (this) {
+		case DBTABLENAME:
+		case FONT:
+		case FORMCOLOR:
+		case FORMCOLOUR:
+		case ORDER:
+		case UDPINPUT:
+			return true;
+//		case PLOT:
+//			break;
+//		case SYMBOLTYPE:
+//			break;
+		default:
+			break;
+		
+		}
+		return false;
+	}
+	
+	/**
+	 * Get a list of property types that can be used with UDF (normal) forms. 
+	 * @return
+	 */
+	public static PropertyTypes[] getUDFProperties() {
+		PropertyTypes[] v = values();
+		PropertyTypes[] types = new PropertyTypes[v.length];
+		int j = 0;
+		for (int i = 0; i < v.length; i++) {
+			if (v[i].isUDF()) {
+				types[j++] = v[i];
+			}
+		}
+		return Arrays.copyOf(types, j);
+	}
+	
+	/**
+	 * Get a list of property types that can be used with UDB (button) forms. 
+	 * @return
+	 */
+	public static PropertyTypes[] getUDBProperties() {
+		PropertyTypes[] v = values();
+		PropertyTypes[] types = new PropertyTypes[v.length];
+		int j = 0;
+		for (int i = 0; i < v.length; i++) {
+			if (v[i].isUDB()) {
+				types[j++] = v[i];
+			}
+		}
+		return Arrays.copyOf(types, j);
 	}
 }

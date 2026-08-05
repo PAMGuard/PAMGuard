@@ -30,7 +30,7 @@
 		to configure the click detector.
 	</p>
 	<br>
-	<img alt="Data Source" src="images/detection_parameters_source.png" />
+	<img src="images/detection_parameters_source.png">
 	<br>
 	<br>
 	<p>
@@ -69,7 +69,7 @@
 	<h3>Data flow and advanced configuration</h3>
 	<p>The data flow through the click detector is shown below</p>
 	<br>
-	<img alt="DataFlow (3K)" src="images/DataFlow.png" />
+	<img src="images/DataFlow.png">
 	<br>
 	<br>
 
@@ -118,8 +118,7 @@
 	</p>
 	<br>
 
-	<img alt="DetectionParameters-trigger (9K)"
-		src="images/DetectionParameters-trigger.png" />
+	<img src="images/DetectionParameters-trigger.png">
 
 	<p>Individual channels can be 'turned off' in the trigger by
 		un-checking the appropriate check boxes. Note however, that if a
@@ -136,15 +135,14 @@
 	</p>
 	<br>
 
-	<img alt="noiseLevelEquation (1K)" src="images/noiseLevelEquation.png" />
+	<img src="images/noiseLevelEquation.png" >
 
 	<p>
 		and the signal level <i><b>S</b></i> is measured using
 	</p>
 	<br>
 
-	<img alt="signalLevelEquation (2K)"
-		src="images/signalLevelEquation.png" />
+	<img src="images/signalLevelEquation.png">
 
 	<p>
 		where <i>&alpha;<sub>N</sub></i> is either the <i>long filter</i>
@@ -157,41 +155,64 @@
 	<br>
 
 	<h4>Click Length</h4>
-	<img alt="DetectionParameters-length (9K)"
-		src="images/DetectionParameters-length.png" />
+	<img src="images/DetectionParameters-length.png">
 	<br>
 	<br>
 
 	<p>The click only ends when all chosen channels have been below
 		threshold for the number of samples specified by &quot;Min Click
-		Separation&quot; .</p>
+		Separation&quot; . This parameter is important since most clicks will rise above
+		and fall below threshold several times, particularly if they are quiet and not
+		extending much above the detection threhsold. Further, if you're dealing with 
+		multi-channel data, clicks on different channels need to be kept together for 
+		PAMGuard to be able to estimate Time Differences of Arrival and bearings. 
+		This parameter should therefore be set to either the maximum separation of 
+		your hydrophones in samples, or the length of a typical sound from species of interest, or
+		the maximum of both. </p>
 	<p>The maximum length of a click is set such that click clips are
-		limited to a maximum number of samples.</p>
+		limited to a maximum number of samples. Set this so that it is at least greater than
+		the length of a typical click for your species of interest + the separation between 
+		hydrophones + the presample + the postsample.</p>
 	<p>When a clip is created, a number of extra samples are added to
 		the clip before the first and last samples to rise above threshold and
 		after the last sample to be above threshold (pre sample and post
-		sample in the dialog).</p>
+		sample in the dialog). Set this to about half the length of a typical click
+		for your species of interest. </p>
+	<p>To calculate the number of samples equivalent to a given time, simply multiply
+	the sample rate by the time (in seconds).</p>
+	<p>To calculate the number of samples from a distance, then you first convert the 
+	distance to a time, then convert that time to a number of samples. e.g. if you had 
+	hydrophones with a 1m separation and are sampling at 192kHz, the maximum delay between 
+	the hydrophones is about 1.0/1500 = .00067s, or .67ms.  The equivalent number of 
+	samples is therefore .00067 x 192000 = 128 samples. </p>
+	<p>If your hydrophone separation is small, and you've a limited number of species, selecting
+	these parameters is not difficult. However, if you've a larger separation and are trying to separate
+	clicks that are close together in time, e.g. small cetacean buzz clicks it might get tricky. Similarly, 
+	you're not going to be able to chose detection parameters which will separate small cetacean buzz clicks and 
+	at the same time keep together the multiple pulses in a loud sperm whale click. For this, you'd need
+	to implement multiple click detectors with different settings. </p>
 	<br>
+	
 
 	<h4>Delays</h4>
 
-	<p>TEXT</p>
-	<img alt="detection_parameters_delays"
-		src="images/detection_parameters_delays.png" />
+	<p>If you're using multi channel data, then the Click Detector will measure Time Difference of Arrival between 
+	the signals on each channel in each detected click which is the first step in estimating bearings. 
+	Several options are available to improve the robustness of delay estimation, which 
+	are described <a href="../../../localisation/docs/localisation_tdoa.html">here.</a></p>
+	<img src="images/detection_parameters_delays.png" >
 	<br>
 	<br>
-	<img alt="FFT_filtersettings" src="images/FFT_filtersettings.png" />
+	<img src="images/FFT_filtersettings.png">
 
 	<h4>Echoes</h4>
-	<p>TEXT</p>
-	<img alt="detection_parameters_echoes"
-		src="images/detection_parameters_echoes.png" />
+	<p></p>
+	<img src="images/detection_parameters_echoes.png" >
 
 
 	<h4>Noise</h4>
 	<p>TEXT</p>
-	<img alt="detection_parameters_noise"
-		src="images/detection_parameters_noise.png" />
+	<img src="images/detection_parameters_noise.png" >
 	<br>
 	<br>
 

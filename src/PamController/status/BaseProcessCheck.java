@@ -126,7 +126,7 @@ public class BaseProcessCheck implements ProcessCheck {
 	public ModuleStatus getRunningStatus() {
 		long now = PamCalendar.getTimeInMillis();
 		double rate = inputCounter.getRateAndSet(now);
-		if (rate < inputCounter.minRate) {
+		if (rate < inputCounter.minRate && PamController.getInstance().getRunMode()!=PamController.RUN_NETWORKRECEIVER) {
 			if (rate == 0) {
 			return new ModuleStatus(ModuleStatus.STATUS_ERROR, 
 					"No input data arriving in "  + pamProcess.getProcessName());
@@ -138,7 +138,7 @@ public class BaseProcessCheck implements ProcessCheck {
 			}
 		}
 		rate = outputCounter.getRateAndSet(now);
-		if (rate < outputCounter.minRate) {
+		if (rate < outputCounter.minRate && PamController.getInstance().getRunMode()!=PamController.RUN_NETWORKRECEIVER) {
 			if (rate == 0) {
 			return new ModuleStatus(ModuleStatus.STATUS_ERROR, 
 					"No output data sent from "  + pamProcess.getProcessName());

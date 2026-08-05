@@ -572,7 +572,7 @@ public class ThreadedObserver implements PamObserver {
 
 	public void clearEverything() {
 		synchronized (synchLock) { 
-			System.out.printf("Clearing %d objects from todo list in %s\n", toDoList.size(), singleThreadObserver.getObserverName());
+//			System.out.printf("Clearing %d objects from todo list in %s\n", toDoList.size(), singleThreadObserver.getObserverName());
 			toDoList.clear();
 		}		
 	}

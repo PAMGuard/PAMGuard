@@ -43,6 +43,8 @@ public class WavFileWriter extends WavFile {
 		wavHeader = new WavHeader(audioFormat);
 		wavHeader.writeHeader(windowsFile);
 	}
+	
+	
 	/**
 	 * Writes an array of double values to a WAV file.  This method only writes
 	 * single channel data.

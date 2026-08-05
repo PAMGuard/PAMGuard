@@ -68,7 +68,7 @@ public class BasePropertySet {
 		case Id:
 			break;
 		case Length:
-			return new IntegerCtlrColPanel(controlTitle, UDColName.Length, "Length of field to display on form");
+			return new IntegerCtlrColPanel(controlTitle, UDColName.Length, "Length of field on form and in database");
 		case MaxValue:
 			break;
 		case MinValue:

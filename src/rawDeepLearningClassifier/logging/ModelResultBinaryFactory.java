@@ -7,7 +7,6 @@ import java.io.IOException;
 import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotResult;
-import rawDeepLearningClassifier.dlClassification.dummyClassifier.DummyModelResult;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosResult;
 
@@ -138,9 +137,9 @@ public class ModelResultBinaryFactory {
 			case SOUND_SPOT:
 				result = new SoundSpotResult(data, classID, isBinary);  
 				break; 
-			case DUMMY_RESULT:
-				result = new DummyModelResult(data);  
-				break; 
+//			case DUMMY_RESULT:
+//				result = new DummyModelResult(data);  
+//				break; 
 			case KETOS:
 				result = new KetosResult(data);  
 				break; 
@@ -176,9 +175,9 @@ public class ModelResultBinaryFactory {
 		case SOUND_SPOT:
 			result = new SoundSpotResult(data, classID, isBinary);  
 			break; 
-		case DUMMY_RESULT:
-			result = new DummyModelResult(data);  
-			break; 
+//		case DUMMY_RESULT:
+//			result = new DummyModelResult(data);  
+//			break; 
 		case KETOS:
 			result = new KetosResult(data);  
 			break; 
@@ -207,9 +206,9 @@ public class ModelResultBinaryFactory {
 		if (modelResult instanceof StandardPrediction) {
 			return GENERIC; 
 		}
-		if (modelResult instanceof DummyModelResult) {
-			return DUMMY_RESULT; 
-		}
+//		if (modelResult instanceof DummyModelResult) {
+//			return DUMMY_RESULT; 
+//		}
 
 		return type;
 	}

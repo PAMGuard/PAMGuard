@@ -1,5 +1,7 @@
 package noiseOneBand;
 
+
+import noiseOneBand.offline.OneBandDatagramProvider;
 import Acquisition.AcquisitionProcess;
 import Filters.Filter;
 import Filters.FilterMethod;
@@ -15,7 +17,7 @@ import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
-import networkTransfer.receive.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
 import noiseOneBand.offline.OneBandDatagramProvider;
 
 public class OneBandProcess extends PamProcess {
@@ -38,6 +40,8 @@ public class OneBandProcess extends PamProcess {
 		addOutputDataBlock(waveOutDataBlock);
 		measureDataBlock = new OneBandDataBlock(oneBandControl.getUnitName(), oneBandControl, this, 1);
 		measureDataBlock.setBinaryDataSource(new OneBandDataSource(oneBandControl, measureDataBlock, "Noise"));
+		measureDataBlock.setJSONDataSource(new OneBandJsonDataSource());
+
 		measureDataBlock.SetLogging(new OneBandLogging(oneBandControl, measureDataBlock));
 		measureDataBlock.setDatagramProvider(new OneBandDatagramProvider(oneBandControl));
 		measureDataBlock.addObserver(new SelfObserver());
@@ -110,7 +114,7 @@ public class OneBandProcess extends PamProcess {
 //		faf.calculateFilter();
 		int chanMap = rawSourceDataBlock.getChannelMap();
 		measureDataBlock.setChannelMap(chanMap);
-		FilterMethod filterMethod = FilterMethod.createFilterMethod(sampleRate, params.getFilterParams());
+		FilterMethod filterMethod = FilterMethod.createFilterMethod(getSampleRate(), params.getFilterParams());
 		Filter noiseFilter;
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
 			if ((1<<i & chanMap) == 0) {

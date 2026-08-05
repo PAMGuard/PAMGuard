@@ -7,7 +7,9 @@ import loggerForms.ItemInformation;
 import loggerForms.UDColName;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
+import loggerForms.formdesign.controlpropsets.ActionPropertySet;
 import loggerForms.formdesign.controlpropsets.BasePropertySet;
+import loggerForms.formdesign.controlpropsets.ButtonPropertySet;
 import loggerForms.formdesign.controlpropsets.CharPropertySet;
 import loggerForms.formdesign.controlpropsets.CheckBoxPropertySet;
 import loggerForms.formdesign.controlpropsets.CounterPropertySet;
@@ -18,6 +20,7 @@ import loggerForms.formdesign.controlpropsets.NullPropertySet;
 import loggerForms.formdesign.controlpropsets.NumberPropertySet;
 import loggerForms.formdesign.controlpropsets.SpacePropertySet;
 import loggerForms.formdesign.controlpropsets.StaticPropertySet;
+import loggerForms.formdesign.controlpropsets.SubformPropertySet;
 import loggerForms.formdesign.itempanels.CtrlColPanel;
 import loggerForms.formdesign.itempanels.TextCtrlColPanel;
 
@@ -82,6 +85,10 @@ public class ControlEditor {
 			return new TimePropertySet(formDescription, controlTitle);
 		case VSPACE:
 			return new SpacePropertySet(formDescription, controlTitle);
+		case BUTTON:
+			return new ButtonPropertySet(formDescription, controlTitle);
+		case ACTION:
+			return new ActionPropertySet(formDescription, controlTitle);
 		default:
 			return null;
 		}

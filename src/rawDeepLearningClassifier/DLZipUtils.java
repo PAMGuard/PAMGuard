@@ -57,14 +57,22 @@ public class DLZipUtils {
 		
 		//need this incase the file is within a folder within the zip file.
 		if (new File(fileOut.getParent()).exists() == false) {
-			new File(fileOut.getParent()).mkdir();
+			boolean directory = new File(fileOut.getParent()).mkdirs();
+			if (!directory) {
+				System.err.println("Could not create directory: " + fileOut.getParent());
+				return null; // or throw an exception
+			}
 		}
+		
         OutputStream out = new FileOutputStream(fileOut);
+        
+        
         FileInputStream fileInputStream = new FileInputStream(new File(zipPackage));
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream );
         ZipInputStream zin = new ZipInputStream(bufferedInputStream);
         ZipEntry ze = null;
         while ((ze = zin.getNextEntry()) != null) {
+        	//System.out.println("Extracting: " + ze.getName());
             if (ze.getName().equals(fileToBeExtracted)) {
                 byte[] buffer = new byte[9000];
                 int len;
@@ -94,10 +102,12 @@ public class DLZipUtils {
 		try (ZipFile zipFile = new ZipFile(zipFileIn)) {
 		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		    //this iterates through all files, including in sub folders. 
+		    String name;
 		    while (entries.hasMoreElements()) {
 		        ZipEntry entry = entries.nextElement();
 		        // Check if entry is a directory
-		        if (!entry.isDirectory()) {
+		        name = new File(entry.getName()).getName();
+		        if (!entry.isDirectory() && !name.startsWith(".")) {
 		           //System.out.println(entry); 
 		           if (entry.getName().contains(filePattern)) {
 		        	   return entry.getName();

@@ -131,6 +131,9 @@ public class DatagramManager {
 	}
 
 	public boolean showDatagramDialog(boolean firstCall) {
+		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
+			return false;
+		}
 		DatagramSettings newSettings = DatagramDialog.showDialog(PamController.getMainFrame(), this);
 		if (newSettings != null) {
 			if (firstCall) {

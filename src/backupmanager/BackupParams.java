@@ -2,6 +2,7 @@ package backupmanager;
 
 import java.io.Serializable;
 
+import backupmanager.network.FTPClientParams;
 import backupmanager.schedule.ScheduleState;
 import backupmanager.schedule.SmallHoursSchedule;
 

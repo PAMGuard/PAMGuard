@@ -70,7 +70,7 @@ public class RavenProcess extends PamProcess {
 			return;
 		}
 		// need to get the detailed data map. 
-		InputStoreInfo daqInfo = daqControl.getStoreInfo(true);
+		InputStoreInfo daqInfo = daqControl.getStoreInfo(null, true);
 		if (daqInfo == null || daqInfo.getAllFileEnds() == null || daqInfo.getAllFileEnds().length == 0) {
 			WarnOnce.showWarning("No sound file info module", "Can only import RAVEN data if sound files arre present to extract absolute times", 
 					WarnOnce.WARNING_MESSAGE);

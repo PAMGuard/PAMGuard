@@ -20,9 +20,17 @@
  */
 package Filters;
 
+import java.awt.BorderLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JPanel;
+
+import PamDetection.RawDataUnit;
 import PamView.dialog.PamDialog;
+import PamView.dialog.SourcePanel;
+import PamguardMVC.PamDataBlock;
 
 public class FilterDialog extends PamDialog {
 
@@ -31,22 +39,68 @@ public class FilterDialog extends PamDialog {
 	
 	private FilterDialogPanel filterDialogPanel;
 	
-	private FilterDialog(Window ownerWindow, FilterParams filterParams, float sampleRate) {
+	private SourcePanel sourcePanel;
+
+	private FilterParameters_2 filterParams2;
+	
+	private FilterDialog(Window ownerWindow, boolean showSource) {
 		super(ownerWindow, "Filter Settings", false);
-		filterDialogPanel = new FilterDialogPanel(ownerWindow, sampleRate);
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		if (showSource) {
+			sourcePanel = new SourcePanel(this, "Data input", RawDataUnit.class, true, true);
+			mainPanel.add(BorderLayout.NORTH, sourcePanel.getPanel());
+			sourcePanel.addSelectionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					sourceSelection();
+				}
+			});
+		}
+		filterDialogPanel = new FilterDialogPanel(ownerWindow, 1);
+		mainPanel.add(BorderLayout.CENTER, filterDialogPanel.getMainPanel());
 
 		setSize(800, 500);
 		setLocation(300, 200);
 		this.setResizable(true);
+		
 
-		setDialogComponent(filterDialogPanel.getMainPanel());
+		setDialogComponent(mainPanel);
 		setHelpPoint("sound_processing.FiltersHelp.Docs.Filters_filters");
+	}
+	
+	/**
+	 * Called when source is selected
+	 */
+	protected void sourceSelection() {
+		PamDataBlock source = sourcePanel.getSource();
+		if (source == null) {
+			return;
+		}
+		filterDialogPanel.setSampleRate(source.getSampleRate());
+	}
+
+	public static FilterParameters_2 showDialog(Window ownerFrame, FilterParameters_2 filterParams2, float sampleRate) {
+		if (singleInstance == null || singleInstance.getOwner() != ownerFrame || singleInstance.sourcePanel == null) {
+			singleInstance = new FilterDialog(ownerFrame, true);
+		}
+		singleInstance.filterDialogPanel.setSampleRate(sampleRate);
+		singleInstance.filterParams2 = filterParams2;
+		singleInstance.setParams(filterParams2);
+		singleInstance.setVisible(true);
+		singleInstance.filterParams2.filterParams = singleInstance.filterDialogPanel.getFilterParams();
+		return singleInstance.filterParams2;
+	}
+	
+
+	private void setParams(FilterParameters_2 filterParams2) {
+		filterDialogPanel.setParams(filterParams2.filterParams);
+		sourcePanel.setSource(filterParams2.rawDataSource);
+		sourcePanel.setChannelList(filterParams2.channelBitmap);
 	}
 
 	public static FilterParams showDialog(Window ownerFrame, FilterParams filterParams, float sampleRate) {
-		if (singleInstance == null || singleInstance.getOwner() != ownerFrame) {
-			singleInstance = new FilterDialog(ownerFrame, filterParams, (float) Math.max(
-					sampleRate, 1.));
+		if (singleInstance == null || singleInstance.getOwner() != ownerFrame || singleInstance.sourcePanel != null) {
+			singleInstance = new FilterDialog(ownerFrame, false);
 		}
 //		singleInstance.filterDialogPanel.filterParams = filterParams.clone();
 //		singleInstance.filterDialogPanel.sampleRate = Math.max(sampleRate, 1.f);
@@ -58,6 +112,16 @@ public class FilterDialog extends PamDialog {
 
 	@Override
 	public boolean getParams() {
+		if (sourcePanel != null && filterParams2 != null) {
+			filterParams2.rawDataSource = sourcePanel.getSourceName();
+			if (filterParams2.rawDataSource == null) {
+				return showWarning("No data source selected");
+			}
+			filterParams2.channelBitmap = sourcePanel.getChannelList();
+			if (filterParams2.channelBitmap == 0) {
+				return showWarning("you must select at least one channel");
+			}
+		}
 		return filterDialogPanel.getParams();
 	}
 

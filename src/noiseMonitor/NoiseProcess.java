@@ -38,8 +38,14 @@ public class NoiseProcess extends PamProcess {
 
 	private long nextBlockStartSample;
 
+	private long measurementStartMillis;
+	private long measurementEndMillis;
+	
 	private Random r = new Random();
 
+	/**
+	 * Tripple array of data, organised by channel, band, and measurement number. 
+	 */
 	private double[][][] measurementData;
 	
 	private AcquisitionProcess daqProcess;
@@ -70,6 +76,10 @@ public class NoiseProcess extends PamProcess {
 	 * Remember the last settings
 	 */
 	private NoiseSettings lastCheckSet = null;
+
+	private int fftLength;
+
+	private int fftHop;
 
 	/**
 	 * Call when settings dialog has been used or after initialisation
@@ -107,32 +117,45 @@ public class NoiseProcess extends PamProcess {
 	 * <p>
 	 * These are initially set as evenly spread between now and the 
 	 * measurement interval. Then add some jitter at random to each. 
-	 * @param currentTime current sample number. 
+	 * @param currentSample current sample number. 
 	 */
-	private void setMeasurementTimes(long currentTime) {
-		int nMeasures = noiseControl.noiseSettings.nMeasures;
+	private void setMeasurementTimes(long currentSample) {
+		NoiseSettings noiseSettings = noiseControl.noiseSettings;
+		int nMeasures = noiseSettings.nMeasures;
+		int allMeasures = (int) (Math.ceil(getSampleRate() * noiseSettings.measurementIntervalSeconds / fftHop) + 1);
+		if (noiseSettings.useAll) { 
+			nMeasures = allMeasures;
+		}
+		else {
+			nMeasures = Math.min(nMeasures, allMeasures);
+		}
 		if (measurementTimes == null || measurementTimes.length != nMeasures) {
 			measurementTimes = new long[nMeasures];
 		}
-		long measureInterval = noiseControl.noiseSettings.measurementIntervalSeconds * 
-		(long) getSampleRate() / (nMeasures+1);
-		/**
-		 * Avoid exception on offchance that this is zero - don't see how that can 
-		 * happen, but someone managed to do it - possible through a zero length file or
-		 * something. 
-		 */
-		if (measureInterval > 0) {
-			for (int i = 0; i < nMeasures; i++) {
-				measurementTimes[i] = currentTime + i*measureInterval + r.nextInt((int) measureInterval);
+		if (!noiseSettings.useAll) {
+			long measureInterval = noiseControl.noiseSettings.measurementIntervalSeconds * 
+					(long) getSampleRate() / (nMeasures+1);
+			/**
+			 * Avoid exception on offchance that this is zero - don't see how that can 
+			 * happen, but someone managed to do it - possible through a zero length file or
+			 * something. 
+			 */
+			if (measureInterval > 0) {
+				for (int i = 0; i < nMeasures; i++) {
+					measurementTimes[i] = currentSample + i*measureInterval + r.nextInt((int) measureInterval);
+				}
 			}
 		}
 		iMeasurement = 0;
 		int nChan = PamUtils.getNumChannels(noiseControl.noiseSettings.channelBitmap);
 		measurementData = new double[nChan][noiseControl.noiseSettings.getNumMeasurementBands()][nMeasures];
-		nextBlockStartSample = currentTime + noiseControl.noiseSettings.measurementIntervalSeconds * 
+		nextBlockStartSample = currentSample + noiseControl.noiseSettings.measurementIntervalSeconds * 
 		(long) getSampleRate();
 	}
 
+	/**
+	 * find and set the parent FFT process. 
+	 */
 	private void findDataSource() {
 		PamDataBlock source = noiseControl.getPamConfiguration().getDataBlock(FFTDataUnit.class, 
 				noiseControl.noiseSettings.dataSource);
@@ -144,6 +167,8 @@ public class NoiseProcess extends PamProcess {
 		}
 		setParentDataBlock(source);
 		fftDataSource = (FFTDataBlock) source;
+		this.fftLength = fftDataSource.getFftLength();
+		this.fftHop = fftDataSource.getFftHop();
 
 		PamProcess ppp = source.getSourceProcess();
 		if (ppp == null) {
@@ -197,6 +222,7 @@ public class NoiseProcess extends PamProcess {
 	@Override
 	public void pamStart() {
 		setMeasurementTimes(0);
+		measurementStartMillis = 0;
 	}
 
 	@Override
@@ -217,20 +243,26 @@ public class NoiseProcess extends PamProcess {
 		if ((fftDataUnit.getSequenceBitmap() & noiseControl.noiseSettings.channelBitmap) == 0) {
 			return; // this channel not being used, so get out. 
 		}
+		if (measurementStartMillis == 0) {
+			measurementStartMillis = fftDataUnit.getTimeMilliseconds();
+			measurementEndMillis = measurementStartMillis + noiseControl.noiseSettings.measurementIntervalSeconds * 1000;
+		}
 //		int chanNum = PamUtils.getSingleChannel(fftDataUnit.getChannelBitmap());
 		int chanNum = PamUtils.getSingleChannel(fftDataUnit.getSequenceBitmap());
 		int highestChan = PamUtils.getHighestChannel(noiseControl.noiseSettings.channelBitmap);
+		if (chanNum == highestChan && fftDataUnit.getTimeMilliseconds() >= measurementEndMillis) {
+			createStats(iMeasurement);
+			setMeasurementTimes(fftDataUnit.getStartSample());
+			measurementStartMillis = fftDataUnit.getTimeMilliseconds();
+			measurementEndMillis = measurementStartMillis + noiseControl.noiseSettings.measurementIntervalSeconds * 1000;
+		}
 
-		if (iMeasurement < measurementTimes.length && 
-				(fftDataUnit.getStartSample() > measurementTimes[iMeasurement] || noiseControl.noiseSettings.useAll)) {
+		if (noiseControl.noiseSettings.useAll || (iMeasurement < measurementTimes.length && 
+				(fftDataUnit.getStartSample() > measurementTimes[iMeasurement]))) {
 			makeMeasurments(chanNum, iMeasurement, fftDataUnit);
 			if (chanNum == highestChan) {
 				iMeasurement ++;
 			}
-		}
-		if (iMeasurement >= measurementTimes.length) {
-			createStats();
-			setMeasurementTimes(nextBlockStartSample);
 		}
 	}
 
@@ -288,13 +320,13 @@ public class NoiseProcess extends PamProcess {
 
 	}
 
-	private void createStats() {
+	private void createStats(int nMeasurements) {
 		int nChan = PamUtils.getNumChannels(noiseControl.noiseSettings.channelBitmap);
 		for (int i = 0; i < nChan; i++) {
-			createStats(i, measurementData[i]);
+			createStats(i, measurementData[i], nMeasurements);
 		}
 	}
-	private void createStats(int channelIndex, double[][] measurementData) {
+	private void createStats(int channelIndex, double[][] measurementData, int nMeasurements) {
 
 		//		private String[] measureNames = {"mean", "median", "low95", "high95"};
 		
@@ -308,20 +340,22 @@ public class NoiseProcess extends PamProcess {
 		
 		int nBands = noiseControl.noiseSettings.getNumMeasurementBands();
 		double[][] measurementStats = new double[nBands][noiseDataBlock.getNumUsedStats()];
-		int nP = iMeasurement;
-		int medPoint = nP/2-1;
-		int low5 = nP/20-1;
+		int unUsed = measurementData[0].length - nMeasurements;
+		// when sorted, there may be a few unused records at the start, so offset by them. 
+		int nP = nMeasurements;
+		int medPoint = nP/2-1 + unUsed;
+		int low5 = nP/20-1 + unUsed;
 		low5 = Math.max(0, low5);
-		int high5 = nP-1-low5;
+		int high5 = nP-1-low5 + unUsed;
 		high5 = Math.min(nP-1, high5);
 		for (int iB = 0; iB < nBands; iB++) {
-			measurementStats[iB][0] = Mean.getMean(measurementData[iB]);
+			measurementStats[iB][0] = Mean.getMean(measurementData[iB], nP);
 			// need to sort the data for the next three measurements
 			Arrays.sort(measurementData[iB]);
 			measurementStats[iB][1] = measurementData[iB][medPoint];
 			measurementStats[iB][2] = measurementData[iB][low5];
 			measurementStats[iB][3] = measurementData[iB][high5];
-			measurementStats[iB][4] = measurementData[iB][0];
+			measurementStats[iB][4] = measurementData[iB][unUsed];
 			measurementStats[iB][5] = measurementData[iB][nP-1];
 		}
 		// now need to convert all those to dB levels re 1 muPa. 

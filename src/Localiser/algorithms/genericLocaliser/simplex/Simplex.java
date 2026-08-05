@@ -129,6 +129,7 @@ public class Simplex implements MinimisationAlgorithm {
 			double[] firstStep = chi2Minimisation.getFirstStep();
 			optimiser.setStartConfiguration(firstStep);
 			resultVal = optimiser.optimize(chi2, GoalType.MINIMIZE, start);
+			int iterations = optimiser.getIterations();
 //			System.out.println("Simplex returned after n evaluations: " + optimiser.getIterations());
 			double[] point = resultVal.getPoint();
 			//localisation result

@@ -3,7 +3,9 @@ package detectionPlotFX.plots;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import detectionPlotFX.DDScaleInfo;
+import detectionPlotFX.layout.AbstractDetectionPlot;
 import detectionPlotFX.layout.DetectionPlot;
+import detectionPlotFX.layout.DetectionPlotContext;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.geometry.Side;
@@ -21,7 +23,7 @@ import pamViewFX.fxNodes.PamColorsFX.PamColor;
  *
  */
 @SuppressWarnings("rawtypes")
-public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPlot<D> {
+public abstract class WaveformPlot<D extends PamDataUnit> extends AbstractDetectionPlot<D> {
 
 	/*
 	 * The scale info for the axis. 
@@ -29,12 +31,15 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	private DDScaleInfo waveformScaleInfo=new DDScaleInfo(0,1,-1,1);
 
 	/**
-	 * Reference to the detection display. 
+	 * @deprecated Use {@link #getContext()} instead.
+	 * @return the detection plot display
 	 */
-	private DetectionPlotDisplay detectionPlotDisplay;
-
+	@Deprecated
 	public DetectionPlotDisplay getDetectionPlotDisplay() {
-		return detectionPlotDisplay;
+		if (getContext() instanceof DetectionPlotDisplay) {
+			return (DetectionPlotDisplay) getContext();
+		}
+		return null;
 	}
 
 
@@ -71,16 +76,27 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 
 	/**
 	 * Constructor for the waveform plot. 
+	 * @param context - the display context
 	 */
+	public WaveformPlot(DetectionPlotContext context){
+		super(context);
+	}
+
+	/**
+	 * Constructor for backward compatibility.
+	 * @param detectionPlotDisplay - the detection plot display (implements DetectionPlotContext)
+	 * @deprecated Use {@link #WaveformPlot(DetectionPlotContext)} instead.
+	 */
+	@Deprecated
 	public WaveformPlot(DetectionPlotDisplay detectionPlotDisplay){
-		this.detectionPlotDisplay=detectionPlotDisplay; 
+		super(detectionPlotDisplay);
 	}
 
 
 	@Override
 	public void setupPlot() {
 		//need to get rid of the right axis. 
-		detectionPlotDisplay.setAxisVisible(true, false, true, true);
+		getContext().setAxisVisible(true, false, true, true);
 		
 	}
 
@@ -409,14 +425,6 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	public WaveformPlotParams getWaveformPlotParams() {
 		return waveformPlotParams;
 	}
-
-	/**
-	 * Repaint  the current data unit. 
-	 */
-	public void reDrawLastUnit() {
-		detectionPlotDisplay.drawCurrentUnit();
-	}
-
 
 	/**
 	 * Get the sample rate in samples per second of the last data unit. 

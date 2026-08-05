@@ -105,13 +105,18 @@ public abstract class AnnotationChoiceHandler extends AnnotationHandler {
 	 * @return menu item. 
 	 */
 	public JMenuItem createAnnotationEditMenu(PamDataUnit dataUnit) {
-		JMenu menuItem = new JMenu("Edit/Update annotations ...");
+		JMenuItem menuItem = new JMenu("Edit/Update annotations ...");
 		List<DataAnnotationType<?>> usedAnnotations = getUsedAnnotationTypes();
 		
 		for (DataAnnotationType an:usedAnnotations) {
 			JMenuItem subItem = new JMenuItem(an.getAnnotationName());
 			subItem.addActionListener(new EditAnnotationHandler(dataUnit, an));
-			menuItem.add(subItem);
+			if (usedAnnotations.size() > 1) {
+				menuItem.add(subItem);
+			}
+			else {
+				menuItem = subItem;
+			}
 		}
 		
 		return menuItem;

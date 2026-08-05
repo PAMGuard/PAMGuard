@@ -60,6 +60,8 @@ public class JSONObjectData {
 	String pamguardVersion;
 	
 	int fileFormat;
+	
+	public boolean shouldIgnoreDataUnit = false;
 
 	
 	/**

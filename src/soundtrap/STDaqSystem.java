@@ -5,11 +5,15 @@ import javax.swing.JComponent;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
 import Acquisition.DaqSystem;
+import Acquisition.layoutFX.AcquisitionPaneFX;
+import Acquisition.layoutFX.DAQSettingsPane;
+import soundtrap.layoutFX.STDAQPane;
 
 public class STDaqSystem extends DaqSystem {
 
+	private STDAQPane stDaqPane;
+
 	public STDaqSystem() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -100,8 +104,15 @@ public class STDaqSystem extends DaqSystem {
 
 	@Override
 	public String getDeviceName() {
-		// TODO Auto-generated method stub
 		return "Sound Trap detector";
+	}
+	
+	@Override
+	public DAQSettingsPane getDAQSpecificPane(AcquisitionPaneFX acquisitionPaneFX) {
+		if (stDaqPane == null) {
+			stDaqPane = new STDAQPane();
+		}
+		return stDaqPane;
 	}
 
 }

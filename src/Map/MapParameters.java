@@ -27,6 +27,7 @@ import Array.Hydrophone;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamUtils.LatLong;
 
 public class MapParameters implements Serializable, Cloneable, ManagedParameters {
 
@@ -94,6 +95,12 @@ public class MapParameters implements Serializable, Cloneable, ManagedParameters
 	public int symbolSize = Hydrophone.DefaultSymbolSize;
 	
 	public boolean colourByEffort = false;
+	
+	//ST 4/29/25
+	//parameters for static map (used for static moorings, so scale and center don't move between runs)
+	public boolean lockMap = false;
+	public int lockedMapScale = defaultMapRange;
+	public LatLong lockedMapCenter = new LatLong();
 	/**
 	 * Name of data block providing effort data. 
 	 */

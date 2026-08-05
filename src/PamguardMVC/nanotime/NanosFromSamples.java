@@ -6,7 +6,7 @@ import PamguardMVC.PamDataUnit;
 /**
  * Calculate the nanosecond time from the sample number. Generally, this will be OK
  * but there are times when it could go wrong in Viewer mode when data are loaded over
- * a PAMguard stop / start. For time matching, this should not be a problem since this will 
+ * a PAMGuard stop / start. For time matching, this should not be a problem since this will 
  * not happen over a stop/start bounday in any case (hopefully not anyway). 
  * @author dg50
  *

@@ -335,7 +335,7 @@ public class RonaInputSystem extends FolderInputSystem {
 	protected void calculateETA() {
 		long now = System.currentTimeMillis();
 		lastFileTime = now - currentFileStart;
-		eta = lastFileTime * (allFiles.size()-(currentFile));
+		eta = lastFileTime * (allFiles.size()-(currentFileIndex));
 		eta += now;
 	}
 

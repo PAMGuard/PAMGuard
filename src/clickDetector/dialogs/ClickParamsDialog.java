@@ -172,6 +172,10 @@ public class ClickParamsDialog extends PamDialog implements SourcePanelMonitor {
 		else {
 			sourcePanel.setSourceIndex(0);
 		}
+		
+		
+		
+		
 		sourcePanel.setChannelList(clickParameters.getChannelBitmap());
 		sourcePanel.setChannelGroups(clickParameters.getChannelGroups());
 		sourcePanel.setGrouping(clickParameters.getGroupingType());

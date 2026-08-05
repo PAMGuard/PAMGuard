@@ -19,6 +19,7 @@ import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 /**
  * 
@@ -107,7 +108,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 			//read the JSON string from the the file. 
 			String jsonString  = DLTransformsParser.readJSONString(new File(dlModel.getAudioReprFile()));
 			
-			System.out.println("Archive model params: \n"+ jsonString);
+			//System.out.println("Archive model params: \n"+ jsonString);
 			
 
 			//convert the JSON string to a parameters object. 
@@ -172,7 +173,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				dlParams.numClasses = (int) modelParams.defaultOutputShape.get(1);
 			}
 
-			//ok 0 the other values are not user selectable but this is. If we relaod the same model we probably want to keep it....
+			//ok 0 the other values are not user selectable but this is. If we reload the same model we probably want to keep it....
 			//So this is a little bit of a hack but will probably be OK in most cases. 
 			if (dlParams.binaryClassification==null || dlParams.binaryClassification.length!=dlParams.numClasses) {
 				dlParams.binaryClassification = new boolean[dlParams.numClasses]; 
@@ -188,6 +189,16 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				//set the number of class names from the default output shape
 				dlParams.numClasses = (int) modelParams.defaultOutputShape.get(1);
 			}
+			
+			//finally, is there an example sound
+			//is there an example sound there?
+			JSONObject jsonObject = new JSONObject(jsonString);
+			if (jsonObject.has("example_sound")) {
+				System.out.println("Example sound found in model metadata: " + jsonObject.getString("example_sound")+ "  " + ExampleSoundType.valueOf(jsonObject.getString("example_sound")));
+				//finally do we have an example model?
+				dlParams.setExampleSound(ExampleSoundType.valueOf(jsonObject.getString("example_sound")));
+			}
+			
 		}
 		catch (Exception e) {
 			dlModel=null; 
@@ -226,6 +237,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 
 		//standard format. 
 		GenericModelParams params = DLTransformParser2.readJSONParams(jsonObject);
+	
 
 		return params; 
 	}

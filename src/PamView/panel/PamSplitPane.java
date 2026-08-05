@@ -9,13 +9,15 @@ import javax.swing.SwingUtilities;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamView.ColorManaged;
+import PamView.PamColors.PamColor;
 
 /**
  * Implementation of the split pane that can remember it's position. 
  * @author dg50
  *
  */
-public class PamSplitPane extends JSplitPane implements PamSettings {
+public class PamSplitPane extends JSplitPane implements PamSettings, ColorManaged {
 
 	private static final long serialVersionUID = 1L;
 	private String settingsName;
@@ -80,6 +82,11 @@ public class PamSplitPane extends JSplitPane implements PamSettings {
 		if (pamSplitPaneParams.dividerLocation != null) {
 			setDividerLocation(pamSplitPaneParams.dividerLocation);
 		}
+	}
+
+	@Override
+	public PamColor getColorId() {
+		return PamColor.BORDER;
 	}
 
 

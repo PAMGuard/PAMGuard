@@ -100,6 +100,7 @@ public class LoadOptionsDialog extends PamDialog {
 //		pack();
 		setLocationRelativeTo(parentComponent);
 		
+		setHelpPoint("overview.PamMasterHelp.docs.viewerMode");
 		
 	}
 	

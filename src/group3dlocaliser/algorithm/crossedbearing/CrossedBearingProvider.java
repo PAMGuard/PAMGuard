@@ -7,6 +7,8 @@ public class CrossedBearingProvider extends LocaliserAlgorithmProvider {
 
 	private CrossedBearingGroupLocaliser crossedBearingLocaliser;
 	
+	public static final String algoName = "Crossed Bearings";
+	
 	@Override
 	public LocaliserAlgorithm3D createAlgorithm() {
 		return getInstance();
@@ -26,7 +28,7 @@ public class CrossedBearingProvider extends LocaliserAlgorithmProvider {
 
 	@Override
 	public String getName() {
-		return "Crossed Bearings";
+		return algoName;
 	}
 
 

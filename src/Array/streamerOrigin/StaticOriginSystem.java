@@ -21,7 +21,7 @@ public class StaticOriginSystem extends HydrophoneOriginSystem {
 	
 	protected static String systemNewName = "Fixed location (moorings and buoys)";
 	
-	private PamTableItem latItem, longItem;
+	private PamTableItem latItem, longItem, siteNameItem;
 	
 	@Override
 	public String getName() {
@@ -53,7 +53,11 @@ public class StaticOriginSystem extends HydrophoneOriginSystem {
 		if (longItem == null) {
 			tableDefinition.addTableItem(longItem = new PamTableItem("Longitude", Types.DOUBLE));
 		}
-		return 2;
+		siteNameItem = tableDefinition.findTableItem("siteName");
+		if(siteNameItem == null) {
+			tableDefinition.addTableItem(siteNameItem = new PamTableItem("Site Name", Types.CHAR,30));
+		}
+		return 3;
 	}
 
 	/* (non-Javadoc)

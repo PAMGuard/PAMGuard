@@ -372,8 +372,12 @@ abstract public class PamCursor {
 //						preparedInsertStatement.setObject(iCol+1, null);
 					}
 					else {
+						try {
 						preparedInsertStatement.setObject(iCol + 1, tableItem.getPackedValue(), 
 								connection.getSqlTypes().systemSqlType(tableItem.getSqlType()));
+						}catch(StringIndexOutOfBoundsException e) {
+							preparedInsertStatement.setNull(iCol+1, connection.getSqlTypes().systemSqlType(tableItem.getSqlType()));
+						}
 					}
 				}
 				iCol++;

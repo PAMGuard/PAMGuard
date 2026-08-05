@@ -19,6 +19,8 @@ public class STD {
 	 * flag indicating whether or not the median has already been calculated
 	 */
 	private boolean medianAlreadyCalc = false;
+
+	private double max;
 	
 	
 	/**
@@ -156,11 +158,36 @@ public class STD {
 			    median = (double) newData[n/2];
 			}
 			medianAlreadyCalc=true;
+			max = newData[newData.length-1];
 			return median;
 		}
 	}	
-
 	
+	public double getMax() {
+		if (medianAlreadyCalc) {
+			return max;
+		}
+		else {
+			max = calculatMax();
+		}
+		return max;
+	}
+
+	/**
+	 * Get the maximum value. 
+	 * @return
+	 */
+	private double calculatMax() {
+		if (data == null || data.length == 0) {
+			return Double.MIN_VALUE;
+		}
+		double nMax = data[0];
+		for (int i = 1; i < data.length; i++) {
+			nMax = Math.max(data[i], nMax);
+		}
+		return nMax;
+	}
+
 	/**
 	 * Get the median of the dataset passed to this method.  Note that the dataset passed
 	 * will replace any dataset that is currently loaded into this object, and mean and stddev

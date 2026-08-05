@@ -79,6 +79,12 @@ public class StreamExportParams implements Serializable {
 	 * Keep channels separate when using binned data. 
 	 */
 	public boolean separateChannels = true;
+
+	/**
+	 * Max items to export on one go
+	 */
+	public static final int DEFAULTMAXITEMS = 100000;
+	private int maxDetectionItems = DEFAULTMAXITEMS;
 	
 	/*
 	 * Use the wrapped description since it's serializable. 
@@ -239,6 +245,26 @@ public class StreamExportParams implements Serializable {
 		}
 		return speciesSelection;
 	}
+
+	/**
+	 * Max number of detections to be written to a single Tethys document. 
+	 * @return
+	 */
+	public int getMaxDetectionItems() {
+		if (maxDetectionItems == 0) {
+			return DEFAULTMAXITEMS; // default to 100k
+		}
+		return maxDetectionItems;
+	}
+
+	/**
+	 * Max number of detections to be written to a single Tethys document. 
+	 * @param maxDetectionItems
+	 */
+	public void setMaxDetectionItems(int maxDetectionItems) {
+		this.maxDetectionItems = maxDetectionItems;
+	}
+
 	
 //	/**
 //	 * Get the nilus detection description

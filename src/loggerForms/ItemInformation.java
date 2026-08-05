@@ -3,6 +3,7 @@ package loggerForms;
 import java.sql.Types;
 import java.util.Hashtable;
 
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableItem;
 import loggerForms.controlDescriptions.ControlTypes;
 
@@ -29,7 +30,7 @@ public  class ItemInformation implements Cloneable {
 	 * ready for writing to the database. 
 	 */
 	public void writeTableDefRecord() {
-		UDFTableDefinition udfTableDefinition = formDescription.getUdfTableDefinition();
+		EmptyTableDefinition udfTableDefinition = formDescription.getUdfTableDefinition();
 		int nItems = udfTableDefinition.getTableItemCount();
 		for (int i = 0; i <nItems; i++) {
 			PamTableItem tableItem = udfTableDefinition.getTableItem(i);
@@ -42,7 +43,7 @@ public  class ItemInformation implements Cloneable {
 	 * definition. Store in local variables for use as required when forms are created.
 	 */
 	public void readTableDefRecord() {
-		UDFTableDefinition udfTableDefinition = formDescription.getUdfTableDefinition();
+		EmptyTableDefinition udfTableDefinition = formDescription.getUdfTableDefinition();
 		int nItems = udfTableDefinition.getTableItemCount();
 		for (int i = 0; i <nItems; i++) {
 			PamTableItem tableItem = udfTableDefinition.getTableItem(i);
@@ -189,7 +190,7 @@ public  class ItemInformation implements Cloneable {
 	/**
 	 * @return the udfTableDefinition
 	 */
-	public UDFTableDefinition getUdfTableDefinition() {
+	public EmptyTableDefinition getUdfTableDefinition() {
 		return formDescription.getUdfTableDefinition();
 	}
 

@@ -38,7 +38,7 @@ import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 public class Coordinate3d implements Serializable , Cloneable, PamCoordinate, ManagedParameters {
 
 	/*
-	 * Default for back compatibility with PAMguard 1.15.##
+	 * Default for back compatibility with PAMGuard 1.15.##
 	 */
 	private static final long serialVersionUID = -5396075323830594094L;
 

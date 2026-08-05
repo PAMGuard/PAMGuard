@@ -43,6 +43,7 @@ public class SgramCorrParamsDialog extends IshDetParamsDialog  {
 
 	private SgramCorrParamsDialog(Frame parentFrame, Class inputDataClass) {
 		super(parentFrame, "Spectrogram Correlation Parameters", inputDataClass);
+		setHelpPoint("detectors.ishmael.docs.ishmael_speccorrelation");
 	}
 
 	public static SgramCorrParams showDialog2(Frame parentFrame, SgramCorrParams oldParams) 

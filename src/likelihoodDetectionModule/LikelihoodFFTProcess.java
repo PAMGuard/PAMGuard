@@ -115,6 +115,8 @@ public class LikelihoodFFTProcess extends PamProcess {
 		
 		// since it's used so much, make a local reference
 		FFTParameters fftParameters = this.params.getPamFFTParameters();
+		
+		float sampleRate = getSampleRate();
 
 		setProcessName("FFT - " + this.params.getPamFFTParameters().fftLength + " point, "
 				+ sampleRate + " Hz");

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import PamView.dialog.warn.WarnOnce;
+
 public class UDFErrors {
 	
 
@@ -48,8 +50,9 @@ public class UDFErrors {
 			for (String error:errors)
 				fullError+=error+"\n";
 			String tit = String.format("Logger table \"%s\" contains errors:", formDescription.getUdfName());
-			JOptionPane.showMessageDialog(owner, fullError, 
-					tit, JOptionPane.ERROR_MESSAGE);
+//			JOptionPane.showMessageDialog(owner, fullError, 
+//					tit, JOptionPane.ERROR_MESSAGE);
+			WarnOnce.showWarning(tit,  fullError, WarnOnce.WARNING_MESSAGE);
 			return true;
 		}
 		return false;

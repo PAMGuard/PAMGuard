@@ -9,30 +9,34 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamguardMVC.PamDataBlock;
+import networkTransfer.NetworkParams;
 
-public class NetworkSendParams implements Serializable, Cloneable, ManagedParameters {
+public class NetworkSendParams extends NetworkParams implements Serializable, Cloneable, ManagedParameters {
 
 	public static final long serialVersionUID = 1L;
 	
-	public static final int NETWORKSEND_BYTEARRAY = 0;
+	/*
+	 * 
+	 */
+	public static final int NETWORKSEND_BYTEARRAY = 1;
 	
-	public static final int NETWORKSEND_JSON = 1;
-
-	public String ipAddress = "localhost";
+	public static final int NETWORKSEND_JSON = 2;
 	
-	public int portNumber = 8011;
-	
-	public String password;
-	
-	public String userId;
+	public static final int NETWORKSEND_BOTH = 3;
 	
 	public int stationId1;
 	
 	public int stationId2;
+		
+	/*
+	 * 29/7/26 DG changed these so the options are 1,2,3 instead of 0,1,2. 
+	 * Hid the old parameter, and added a new one, which should never be 0, 
+	 * so in the getter for sendingformatNew, if it's zero, it can take
+	 * the old value and add 1 to it. 
+	 */
+	private int sendingFormat = NETWORKSEND_BYTEARRAY;	
 	
-	public boolean savePassword = true;
-	
-	public int sendingFormat = NETWORKSEND_BYTEARRAY;
+	private int sendingFormatNew = NETWORKSEND_BYTEARRAY;
 	
 	/**
 	 * Max number of queued Objects. 
@@ -91,13 +95,8 @@ public class NetworkSendParams implements Serializable, Cloneable, ManagedParame
 	
 	
 	@Override
-	protected NetworkSendParams clone() {
-		try {
-			return (NetworkSendParams) super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-			return null;
-		}
+	public NetworkSendParams clone() {
+		return (NetworkSendParams) super.clone();
 	}
 
 	public void clearDataBlocks() {
@@ -124,5 +123,24 @@ public class NetworkSendParams implements Serializable, Cloneable, ManagedParame
 		return ps;
 	}
 
+	public int getSendingFormat() {
+		if (sendingFormatNew == 0) {
+			sendingFormatNew = sendingFormat + 1;
+		}
+		return sendingFormatNew;
+	}
+
+	public void setSendingFormat(int sendingFormatNew) {
+		this.sendingFormatNew = sendingFormatNew;
+	}
+
+	/**
+	 * Check to see if the params have a specific send format set (NETWORKSEND_BYTEARRAY or NETWORKSEND_JSON)
+	 * @param format
+	 * @return
+	 */
+	public boolean hasSendFormat(int format) {
+		return (getSendingFormat() & format) != 0;
+	}
 
 }

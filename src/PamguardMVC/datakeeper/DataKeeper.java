@@ -48,8 +48,25 @@ public class DataKeeper implements PamSettings {
 		}
 	}
 	
+	/**
+	 * Should default behaviour for all blocks be to clear them at startup ?
+	 * @return
+	 */
+	public boolean isClearAtStart() {
+		return keeperSettings.isClearAtStart();
+	}
+	
+	/**
+	 * 
+	 * Should default behaviour for all blocks be to clear them at startup ?
+	 * @param clear
+	 */
+	public void setClearAtStart(boolean clear) {
+		keeperSettings.setClearAtStart(clear);
+	}
+	
 	public JMenuItem getSwingMenuItem(Window window) {
-		JMenuItem menuItem = new JMenuItem("Set Data Storage Times...");
+		JMenuItem menuItem = new JMenuItem("Internal Data Storage ...");
 		menuItem.setToolTipText("<html>Control how long data are stored in memory before they are deleted" +
 		"<p>(This does not affect storage in binary files or the database)</html>");
 		menuItem.addActionListener(new ActionListener() {
@@ -63,7 +80,7 @@ public class DataKeeper implements PamSettings {
 
 	private void setDataBlockKeepTime(PamDataBlock aDataBlock) {
 		Integer tSecs = keeperSettings.getKeepTimeSeconds(aDataBlock.getLongDataName());
-		if (tSecs != null) {
+		if (tSecs != null && tSecs>0) {
 			aDataBlock.setNaturalLifetimeMillis(tSecs*1000);
 		}
 	}

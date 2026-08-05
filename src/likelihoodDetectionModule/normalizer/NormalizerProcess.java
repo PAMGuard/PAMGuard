@@ -178,6 +178,6 @@ public long getRequiredDataHistory( PamObservable o, Object arg ) {
 
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
-		this.sampleRate = sampleRate;
+		this.setSampleRate(sampleRate, false);
 	}
 }

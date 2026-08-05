@@ -34,6 +34,7 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new StatusCommand());
 		commandsList.add(new SummaryCommand());
 		commandsList.add(new SummaryPeekCommand());
+		commandsList.add(new DiagnosticsCommand());
 		commandsList.add(new TellModuleCommand());
 		commandsList.add(new ExitCommand());
 		commandsList.add(new ExitNoSaveCommand());
@@ -43,7 +44,10 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new SetXMLSettings());
 		commandsList.add(new BatchStatusCommand());
 		commandsList.add(new BatchCommand(this));
+		commandsList.add(new JVMHeap());
+		commandsList.add(new BufferCommand());
 		commandsList.add(new FindGUICommand());
+		commandsList.add(new GeneralUptimeCommand());
 //		commandsList.add(new SetSerializedSettingsCommand());
 		
 	}
