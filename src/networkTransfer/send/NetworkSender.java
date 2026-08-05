@@ -386,9 +386,9 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			
 			Boolean hasJson = aBlock.getJSONDataSource() != null;
 			Boolean hasBytes = aBlock.getBinaryDataSource() != null;
-			if (hasJson | hasBytes) {
-				System.out.printf("Block %s has JSON: %s, has Binary: %s\n", aBlock.getDataName(), hasJson.toString(), hasBytes.toString());
-			}
+//			if (hasJson | hasBytes) {
+//				System.out.printf("Block %s has JSON: %s, has Binary: %s\n", aBlock.getDataName(), hasJson.toString(), hasBytes.toString());
+//			}
 			
 			// if the data block has a binary source, add it to the list of potential outputs
 			if ( (sendJson && hasJson) ||
