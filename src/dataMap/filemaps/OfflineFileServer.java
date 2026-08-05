@@ -4,6 +4,7 @@ import java.awt.Window;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,6 +13,10 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -22,10 +27,19 @@ import javax.swing.SwingWorker;
 //import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 //import org.kc7bfi.jflac.util.ByteData;
 
+import org.jflac.FLACDecoder;
+import org.jflac.PCMProcessor;
+import org.jflac.metadata.Metadata;
+import org.jflac.metadata.StreamInfo;
+import org.jflac.sound.spi.FlacAudioFileReader;
+import org.jflac.util.ByteData;
+
 import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
+import pamScrollSystem.ViewLoadObserver;
 import PamController.AWTScheduler;
+import PamController.DataInputStore;
 import PamController.DataStoreInfoHolder;
 import PamController.InputStoreInfo;
 import PamController.OfflineDataStore;
@@ -36,8 +50,10 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamUtils.worker.PamWorkMonitor;
+import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 
 /**
  * Functionality for handling data from files offline.
@@ -105,7 +121,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	}
 		
 
-	protected class MapMaker extends SwingWorker<Integer, FileMapProgress> {
+	private class MapMaker extends SwingWorker<Integer, FileMapProgress> {
 
 		private OfflineFileServer fileServer;
 
@@ -157,7 +173,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 				}
 
 				
-				sortMapEndTimes(mapMaker);
+				sortMapEndTimes();
 				mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_CHECKINGFILES, dataMap.getDataCount(), dataMap.getDataCount(), ""));
 				
 				long t3 = System.currentTimeMillis();
@@ -333,9 +349,8 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	/**
 	 * Get the end times of map points. In most cases the data will have come back from 
 	 * the serialised file, so will already have this information so it can be skipped. 
-	 * @param mapMaker 
 	 */
-	public abstract void sortMapEndTimes(OfflineFileServer.MapMaker mapMaker);
+	public abstract void sortMapEndTimes();
 	
 	@Override
 	public String getDataSourceName() {
@@ -448,7 +463,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 
 
 	@Override
-	public InputStoreInfo getStoreInfo(PamWorkMonitor workMonitor, boolean detail) {
+	public InputStoreInfo getStoreInfo(boolean detail) {
 		if (dataMap == null || dataMap.getNumMapPoints() == 0) {
 			return null;
 		}
