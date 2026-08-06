@@ -75,11 +75,13 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		checkCommandLineOptions();
 		
-		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
+//		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
+//		if(this.networkSendParams.getSendSelection(null, getQueueLength())) {
+		// not really got an option for this - do we always want to send the command data, or does this need to be optionsl ? 
 			commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
 			commandProcess.setCommandProcess(true);
 			addPamProcess(commandProcess);
-		}
+//		}
 		
 		sidePanel = new NetworkSendSidePanel(this);
 		initializeClient();
@@ -175,21 +177,23 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		/**
 		 * Do we need code here that will allow both ? 
+		 * This will need updated to allow both, since send fmt is now on a block by block basis, so these commands
+		 * have become irrelevent. 
 		 */
-		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
-		if(useJson!=null) {
-			isSetJson = Boolean.valueOf(useJson);
-		}
-		
-		
-		int sendFmt = 0;
-		if(isSetJson) {
-			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
-		}
-		else {
-			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-		}
-		networkSendParams.setSendingFormat(sendFmt);		
+//		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
+//		if(useJson!=null) {
+//			isSetJson = Boolean.valueOf(useJson);
+//		}
+//		
+//		
+//		int sendFmt = 0;
+//		if(isSetJson) {
+//			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
+//		}
+//		else {
+//			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
+//		}
+//		networkSendParams.setSendingFormat(sendFmt);		
 	}
 
 	public void initializeClient() {
