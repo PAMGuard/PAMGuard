@@ -35,7 +35,7 @@ import warnings.WarningSystem;
 public class NetworkSender extends PamControlledUnit implements PamSettings {
 
 	/**
-	 * These two left in since they are used in the BathProcessing plugin. 
+	 * These two left in since they are used in the BatchProcessing plugin. 
 	 * The batch processor has been updated to use the newer definitions in 
 	 * the NetSendCommandParam enum, so will be OK in new releases, but current
 	 * versions of the BP will fail with this PG. So leave these in for a couple
