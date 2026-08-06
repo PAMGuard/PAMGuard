@@ -944,6 +944,9 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 			Point pt = new Point();
 			pt.x = this.getX() + this.getWidth();
 			Component c = findComponent(dataBlock);
+			if (c == null) {
+				return null;
+			}
 			pt.y = this.getY() + getYOffset();
 			pt.y += c.getY();
 			if (!dataModifier) {
