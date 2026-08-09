@@ -53,6 +53,14 @@ public class MapParametersDialog extends PamDialog {
 	private MapParameters mapParameters;
 
 	private JTextField trackShowtime, dataKeepTime, dataShowTime;
+
+    private JTextField basemapTemplate;
+
+    private JComboBox<String> basemapPresets;
+    private JButton clearBasemapButton;
+    private JButton clearTileCacheButton;
+    private JCheckBox showAttributionCheckbox;
+    private String basemapAttributionValue = "";
 	
 	private SpinnerNumberModel symbolSize;
 
@@ -175,6 +183,8 @@ public class MapParametersDialog extends PamDialog {
 		effortSourcePanel.setSource(mapParameters.effortDataSource);
 
 		filePanel.setMapFile(mapParameters.mapFile);
+
+        basemapTemplate.setText(mapParameters.basemapUrlTemplate == null ? "" : mapParameters.basemapUrlTemplate);
 		
 		allow3D.setSelected(mapParameters.allow3D);
 		
@@ -234,6 +244,10 @@ public class MapParametersDialog extends PamDialog {
 		mapParameters.mapContours = filePanel.getContoursList();
 		mapParameters.allow3D = allow3D.isSelected();
 		mapParameters.hideGrid = !showGrid.isSelected();
+		
+		        // basemap template
+		        mapParameters.basemapUrlTemplate = basemapTemplate.getText().trim();
+		
 		if (!gridDialogPanel.getParams()) {
 			return false;
 		}
@@ -324,6 +338,81 @@ public class MapParametersDialog extends PamDialog {
 			constraints.gridy ++;
 			constraints.gridx = 0;
 			addComponent(this, showSurface, constraints);
+			
+			            // Basemap URL template
+			            constraints.gridy++;
+			            constraints.gridx = 0;
+			            constraints.gridwidth = 1;
+			            addComponent(this, new JLabel("Basemap (XYZ template): ", SwingConstants.RIGHT), constraints);
+			            constraints.gridx++;
+			            constraints.gridwidth = 2;
+			            addComponent(this, basemapTemplate = new JTextField(40), constraints);
+			            constraints.gridy++;
+	
+			            
+			                        // presets and controls
+			                        final String[] presetNames = new String[] { "None", "OpenStreetMap", "Carto Positron", "Stamen Toner" };
+			                        final String[] presetTemplates = new String[] {
+			                                "",
+			                                "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			                                "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+			                                "http://tile.stamen.com/toner/{z}/{x}/{y}.png"
+			                        };
+			                        final String[] presetAttributions = new String[] {
+			                                "",
+			                                "© OpenStreetMap contributors",
+			                                "© CARTO",
+			                                "© Stamen Design"
+			                        };
+			            
+			                        constraints.gridy++;
+			                        constraints.gridx = 0;
+			                        addComponent(this, new JLabel("Presets", SwingConstants.RIGHT), constraints);
+			                        constraints.gridx++;
+			                        addComponent(this, basemapPresets = new JComboBox<String>(presetNames), constraints);
+			                        constraints.gridx += 2;
+			                        addComponent(this, clearBasemapButton = new JButton("Disable basemap"), constraints);
+			            
+			                        constraints.gridy++;
+			                        constraints.gridx = 1;
+			                        addComponent(this, showAttributionCheckbox = new JCheckBox("Show attribution"), constraints);
+			                        constraints.gridx++;
+			                        addComponent(this, clearTileCacheButton = new JButton("Clear tile cache"), constraints);
+			            
+			                        basemapPresets.addActionListener(new ActionListener() {
+			                            @Override
+			                            public void actionPerformed(ActionEvent e) {
+			                                int idx = basemapPresets.getSelectedIndex();
+			                                if (idx >= 0 && idx < presetTemplates.length) {
+			                                    basemapTemplate.setText(presetTemplates[idx]);
+			                                    basemapAttributionValue = presetAttributions[idx];
+			                                    showAttributionCheckbox.setSelected(basemapAttributionValue != null && basemapAttributionValue.length() > 0);
+			                                }
+			                            }
+			                        });
+			            
+			                        clearBasemapButton.addActionListener(new ActionListener() {
+			                            @Override
+			                            public void actionPerformed(ActionEvent e) {
+			                                basemapTemplate.setText("");
+			                                basemapAttributionValue = "";
+			                                showAttributionCheckbox.setSelected(false);
+			                                basemapPresets.setSelectedIndex(0);
+			                            }
+			                        });
+			            
+			                        clearTileCacheButton.addActionListener(new ActionListener() {
+			                            @Override
+			                            public void actionPerformed(ActionEvent e) {
+			                                // clear cache
+			                                try {
+			                                    Map.gridbaselayer.XyzTileLayer.clearCache();
+			                                    showWarning("Tile cache cleared");
+			                                } catch (Exception ex) {
+			                                    showWarning("Failed to clear tile cache: " + ex.getMessage());
+			                                }
+			                            }
+			                        });
 		}
 
 		protected void showEffortSettings() {

@@ -59,6 +59,7 @@ import GPS.GpsData;
 import GPS.GpsDataUnit;
 import Map.gridbaselayer.GridbaseControl;
 import Map.gridbaselayer.MapRasterImage;
+import Map.gridbaselayer.XyzTileLayer;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.masterReference.MasterReferencePoint;
@@ -320,6 +321,38 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		}
 
 		drawConstantOverlays(g);
+		
+				// Draw XYZ tile baselayer if configured (OGIS branch)
+				// Draw basemap attribution if requested
+				try {
+					if (simpleMapRef.mapParameters != null && simpleMapRef.mapParameters.basemapUrlTemplate != null
+							&& simpleMapRef.mapParameters.basemapUrlTemplate.length() > 0) {
+						XyzTileLayer tileLayer = new XyzTileLayer(simpleMapRef.mapParameters.basemapUrlTemplate);
+						tileLayer.drawTiles((Graphics2D) g, rectProj, this.getWidth(), this.getHeight());
+					}
+					if (simpleMapRef != null && simpleMapRef.mapParameters != null && simpleMapRef.mapParameters.showBasemapAttribution
+							&& simpleMapRef.mapParameters.basemapAttribution != null
+							&& simpleMapRef.mapParameters.basemapAttribution.length() > 0) {
+						String attr = simpleMapRef.mapParameters.basemapAttribution;
+						Graphics2D g2 = (Graphics2D) g;
+						int padding = 6;
+						int fmHeight = g2.getFontMetrics().getHeight();
+						int textWidth = g2.getFontMetrics().stringWidth(attr);
+						int x = this.getWidth() - textWidth - padding * 2 - 4;
+						int y = this.getHeight() - fmHeight - padding;
+						// semi-transparent background
+						java.awt.Color bg = new java.awt.Color(0, 0, 0, 100);
+						java.awt.Color fg = new java.awt.Color(255, 255, 255, 220);
+						g2.setColor(bg);
+						g2.fillRect(x, y - 2, textWidth + padding * 2, fmHeight + padding);
+						g2.setColor(fg);
+						g2.drawString(attr, x + padding, y + fmHeight - 6);
+					}
+				} catch (Exception e) {
+					// don't let basemap failures break the map
+					// never let attribution drawing crash the map
+				}
+		
 	}
 
 	/**
@@ -396,6 +429,16 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			}
 
 		}
+				// Draw XYZ tile baselayer if configured (OGIS branch)
+				try {
+					if (simpleMapRef.mapParameters != null && simpleMapRef.mapParameters.basemapUrlTemplate != null
+							&& simpleMapRef.mapParameters.basemapUrlTemplate.length() > 0) {
+						XyzTileLayer tileLayer = new XyzTileLayer(simpleMapRef.mapParameters.basemapUrlTemplate);
+						tileLayer.drawTiles(g, rectProj, this.getWidth(), this.getHeight());
+					}
+				} catch (Exception e) {
+					// don't let basemap failures break the map
+				}
 
 		if (grid != null) {
 			if (!simpleMapRef.mapParameters.hideGrid) {

@@ -187,6 +187,11 @@ public class MapRectProjector extends MapProjector {
 		return (getCoord3d(LL.getLatitude(), LL.getLongitude(), 0));
 	}
 
+	public Point latLongToPanel(LatLong latLong) {
+		Coordinate3d c3d = LL2panel(latLong);
+		return new Point((int) c3d.x, (int) c3d.y);
+	}
+
 	/**
 	 * 
 	 * Get an absolute lat long from a map position
