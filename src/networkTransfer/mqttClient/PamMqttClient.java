@@ -345,6 +345,15 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		return true;
 	}
 	
+	/**
+	 * Need to modify. Prior to V2.02.19a topic was made up of two values from the Network sonfig
+	 * Base Topic (first tab) and Station id1 and pamData, i.e. if Base Topic was APS and
+	 * Station id 1 was 111 the topic would be APS/pb111/pamData
+	 * Can leave the same, but need to have pamData / jsonData for different data types. 
+	 * Not quite sure yet where the isAlsoNetRx comes in ! Presumably if also receiving. This is 
+	 * a bit of a total bodge by Sam I think.
+	 * @return
+	 */
 	public String getBaseTransmitTopic() {
 		String trueBase = this.networkParams.baseTopic+"/"+this.stationId+"/";
 		if(isAlsoNetRx) {
