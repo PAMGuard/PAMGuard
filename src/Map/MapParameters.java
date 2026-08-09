@@ -1,14 +1,19 @@
 @@
- public class MapParameters implements Serializable, Cloneable, ManagedParameters {
-@@
-     public int symbolSize = Hydrophone.DefaultSymbolSize;
-@@
      public String effortDataSource;
+     
+     private static final int defaultMapRange = 10000;
+     /**
+      * Value to store persistently between runs. 
+      */
++    
++    /**
++     * Basemap attribution string to render on the map when a basemap is enabled.
++     */
++    public String basemapAttribution = "";
 +
 +    /**
-+     * Basemap URL template for XYZ tiles. Example:
-+     * https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
-+     * If empty, no XYZ basemap will be requested.
++     * Whether to draw the basemap attribution on the map.
 +     */
-+    public String basemapUrlTemplate = "";
++    public boolean showBasemapAttribution = true;
++
 *** End Patch
