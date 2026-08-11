@@ -268,9 +268,22 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 			message.setQos(1);
 		}
 		String type = qo.streamName.replace(" ", "");
-		
-		this.sendMqttMessage(type, message);
+//		System.out.println("Send network queued object " + qo.toString());
+//		if (qo.format == NetworkSendParams.NETWORKSEND_JSON) {
+//			System.out.println(qo.jsonString);
+//		}
+		this.sendMqttMessage(type, message, getTopicExtensin(qo.format));
 
+	}
+	
+	public String getTopicExtensin(int sendType) {
+		switch (sendType) {
+		case NetworkSendParams.NETWORKSEND_BYTEARRAY:
+			return "pamData";
+		case NetworkSendParams.NETWORKSEND_JSON:
+			return "jsonData";
+		}
+		return "pamData";
 	}
 
 	@Override
@@ -346,7 +359,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	}
 	
 	/**
-	 * Need to modify. Prior to V2.02.19a topic was made up of two values from the Network sonfig
+	 * Need to modify. Prior to V2.02.19a topic was made up of two values from the Network config
 	 * Base Topic (first tab) and Station id1 and pamData, i.e. if Base Topic was APS and
 	 * Station id 1 was 111 the topic would be APS/pb111/pamData
 	 * Can leave the same, but need to have pamData / jsonData for different data types. 
@@ -355,21 +368,45 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	 * @return
 	 */
 	public String getBaseTransmitTopic() {
-		String trueBase = this.networkParams.baseTopic+"/"+this.stationId+"/";
-		if(isAlsoNetRx) {
-			return trueBase+"baseData/";
-		}else {
-			return trueBase+"pamData/";
+//		String trueBase = this.networkParams.baseTopic+"/"+this.stationId+"/";
+//		if(isAlsoNetRx) {
+//			return trueBase+"baseData/";
+//		}else {
+//			return trueBase+"pamData/";
+//		}
+		if (isAlsoNetRx) {
+			return getBaseTransmitTopic("baseData");
 		}
+		else {
+			return getBaseTransmitTopic("pamData");
+		}
+	}
+	
+	/**
+	 * Get a transmit topic, allowing user to set the end. Typical values
+	 * will be baseData, pamData, etc. Must end with a / since the data type will be appended. 
+	 * @param extension
+	 * @return ful; topic. 
+	 */
+	public String getBaseTransmitTopic(String extension) {
+		if (extension == null) {
+			return getBaseTransmitTopic();
+		}
+		String fullBase = this.networkParams.baseTopic+"/"+this.stationId+"/"+extension;
+		if (fullBase.endsWith("/") == false) {
+			fullBase += "/";
+		}
+		return fullBase;
 	}
 
 	public void sendStringMessage(String topicExtension, String string) throws NetTransmitException {
 		MqttMessage message = new MqttMessage(string.getBytes());
+		System.out.println("Send string message: " + string);
 		
-		sendMqttMessage(topicExtension,message);
+		sendMqttMessage(topicExtension,message,null);
 	}
 	
-	public void sendMqttMessage(String topicExtension, MqttMessage message) throws NetTransmitException {
+	public void sendMqttMessage(String topicExtension, MqttMessage message, String topicType) throws NetTransmitException {
 				
 		boolean persistenceOpened = true;
 		
@@ -392,8 +429,8 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 				this.setWarning("Client is not connected to broker. Messages will buffer until it is.", 1);
 			}
 		}
-		
-		String topic = getBaseTransmitTopic()+topicExtension;
+		// need to work out here if it's a binary message or a JSON message. 
+		String topic = getBaseTransmitTopic(topicType)+topicExtension;
 		
 		/*if(requireReconnect && persistenceOpened) {
 			int keyIdx = 0;
