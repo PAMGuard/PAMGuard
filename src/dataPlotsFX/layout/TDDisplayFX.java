@@ -450,8 +450,13 @@ public class TDDisplayFX extends PamBorderPane {
 
 		} 
 
-		//Set background so that same as the axis colour-fills in box on corner between x and y axis.
-		//timeAxisHolder.getStyleClass().add("pane");
+		//Give the holder the axis background colour. Its left (or top) padding is the blank
+		//square in the corner between the data axis and the time axis - see
+		//layoutTimeAxisHolder - and without a background of its own that corner showed
+		//whatever was behind it and stayed light in the dark colour schemes.
+		if (!timeAxisHolder.getStyleClass().contains(PamAxisPane2.AXIS_PANE_STYLE_CLASS)) {
+			timeAxisHolder.getStyleClass().add(PamAxisPane2.AXIS_PANE_STYLE_CLASS);
+		}
 
 		//decorate the time axis holder with the default GUI style. It is a sibling of the graph area
 		//(not an ancestor of the graph hiding panes), so styling it here keeps the GUI CSS out of the
@@ -1098,15 +1103,15 @@ public class TDDisplayFX extends PamBorderPane {
 	 */
 	public static void addGUICSS(Parent node) {
 		if (node == null) return;
-		//The GUI style sheet defines its colour palette on '.root, .gui-css-root'. When the sheet is
-		//attached to the scene the '.root' selector matches the scene root, but when it is attached
-		//node-by-node like this the node is not '.root', so it must carry the 'gui-css-root' style class
-		//for the palette (-flat-*/-win-* looked-up colours) to resolve - otherwise JavaFX floods the log
-		//with "Could not resolve" warnings and String->Paint cast errors.
-		if (!node.getStyleClass().contains("gui-css-root")) {
-			node.getStyleClass().add("gui-css-root");
-		}
-		node.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS());
+		//Registering with the style manager rather than adding the style sheets directly means the node
+		//is restyled when the user changes colour scheme (the time display lives for the whole session,
+		//so it would otherwise stay light after a switch to a dark scheme).
+		//The style manager also adds the 'gui-css-root' style class: the GUI sheets define their colour
+		//palette on '.root, .gui-css-root', and when a sheet is attached node-by-node like this the node
+		//is not '.root', so without that class the palette (-flat-*/-win-* looked-up colours) would fail
+		//to resolve and JavaFX would flood the log with "Could not resolve" warnings and String->Paint
+		//cast errors.
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(node, PamStylesManagerFX.STYLE_GUI);
 	}
 
 

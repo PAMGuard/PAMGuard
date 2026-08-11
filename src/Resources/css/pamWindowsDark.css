@@ -10,9 +10,19 @@
  * the Windows 10/11 dark app palette: #202020 background, #333333 control
  * faces, white text and glyphs, the same #0078d7 accent, and the grey
  * (#414141) menu highlight used by dark-mode Win32 menus.
+ *
+ * NOTE: not currently used by PamDefaultStyle. When a dark colour scheme is
+ * selected PamLookAndFeel installs FlatLaf Dark as the Swing look and feel on
+ * every platform (the Windows system look and feel has no dark mode), so the
+ * JavaFX side follows FlatLaf too and uses pamFlatLafDark.css. This sheet is
+ * kept for a future style which pairs a dark JavaFX theme with the Windows
+ * look and feel.
+ *
+ * The palette is declared on '.root, .gui-css-root' to match the base sheet -
+ * see the note at the top of pamWindowsLight.css.
  */
 
-.root {
+.root, .gui-css-root {
     -win-background:            #202020;
     -win-foreground:            #ffffff;
     -win-disabled-foreground:   #6d6d6d;
@@ -33,6 +43,12 @@
     -win-link:                  #75b6f3;
     -win-arrow:                 #cccccc;
     -win-progress:              #06b025;
+
+    /* ---- PAMGuard plot furniture ---- */
+    -pam-plot-background:  #101010;
+    -pam-scroller-body:    rgba(190,190,190,0.30);
+    -pam-scroller-handle:  rgba(215,215,215,0.65);
+    -pam-scroller-grip:    rgba(40,40,40,0.9);
 
     /* light grey icons for the dark background */
     -fx-icon_col: #c8c8c8;

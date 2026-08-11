@@ -25,10 +25,55 @@ public class ColorSettings implements Serializable, Cloneable{
 		
 		public void rebuildSchemes(int colourBlindPalet2) {
 			colourBlindPalet = colourBlindPalet2;
+			if (colourSchemes == null) {
+				colourSchemes = new ArrayList<>();
+			}
 			colourSchemes.clear();
 			colourSchemes.add(ColourScheme.createDefaultDayScheme(colourBlindPalet2));
+			colourSchemes.add(ColourScheme.createDefaultDarkScheme(colourBlindPalet2));
 			colourSchemes.add(ColourScheme.createDefaultNightScheme(colourBlindPalet2));
 			colourSchemes.add(ColourScheme.createDefaultPrintScheme(colourBlindPalet2));
+		}
+
+		/**
+		 * Make sure the list of schemes holds every scheme this version of PAMGuard
+		 * knows about. Settings serialised by an older version will be missing any
+		 * schemes added since, so rebuild the list if any are absent. The name of the
+		 * currently selected scheme is preserved.
+		 */
+		public void checkSchemes() {
+			String[] wanted = {ColourScheme.DAYSCHEME, ColourScheme.DARKSCHEME,
+					ColourScheme.NIGHTSCHEME, ColourScheme.PRINTSCHEME};
+			if (colourSchemes != null && colourSchemes.size() == wanted.length) {
+				boolean allThere = true;
+				for (String name : wanted) {
+					if (findScheme(name) == null) {
+						allThere = false;
+						break;
+					}
+				}
+				if (allThere) {
+					return;
+				}
+			}
+			rebuildSchemes(colourBlindPalet);
+		}
+
+		/**
+		 * Find a scheme by name without selecting it.
+		 * @param schemeName scheme name
+		 * @return the scheme, or null if there isn't one of that name.
+		 */
+		public ColourScheme findScheme(String schemeName) {
+			if (schemeName == null || colourSchemes == null) {
+				return null;
+			}
+			for (ColourScheme cs:colourSchemes) {
+				if (cs.getName().equalsIgnoreCase(schemeName)) {
+					return cs;
+				}
+			}
+			return null;
 		}
 
 		/**

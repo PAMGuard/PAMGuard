@@ -25,6 +25,28 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
  *
  */
 public class ScrollBarPane extends PamBorderPane {
+
+	/**
+	 * Style class giving the scroller the plot window colour of the current colour
+	 * scheme.
+	 */
+	public static final String SCROLLER_PANE_STYLE_CLASS = "pam-scroller-pane";
+
+	/**
+	 * Style class for the draggable visible-range rectangle.
+	 */
+	public static final String SCROLLER_BODY_STYLE_CLASS = "pam-scroller-body";
+
+	/**
+	 * Style class for the grab handles at each end of the visible-range rectangle.
+	 */
+	public static final String SCROLLER_HANDLE_STYLE_CLASS = "pam-scroller-handle";
+
+	/**
+	 * Style class for the grip lines drawn on the drag handles.
+	 */
+	public static final String SCROLLER_GRIP_STYLE_CLASS = "pam-scroller-grip";
+
 	
 	/**
 	 * Have dsiplay units in ms instead of seconds. 
@@ -112,6 +134,10 @@ public class ScrollBarPane extends PamBorderPane {
 	public ScrollBarPane(){
 		createScrollBarPane();
 		//scrollBarPane.setStyle("-fx-background-color: pink"); //TODO- TEMP
+		//the outer pane takes the plot window colour as well as the inner one: callers
+		//pad this pane (the detection display insets it by 5px top and bottom), and
+		//without a background of its own those strips show whatever is behind.
+		this.getStyleClass().add(SCROLLER_PANE_STYLE_CLASS);
 		this.setCenter(scrollBarPane);
 	}
 
@@ -121,7 +147,11 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	private void createScrollBarPane(){
 
-		scrollBarPane=new Pane(); 
+		scrollBarPane=new Pane();
+		//gives the scroller the plot window colour of the current colour scheme. Without
+		//it the pane has no background of its own and shows whatever is behind, which
+		//stayed light in the dark and night schemes.
+		scrollBarPane.getStyleClass().add(SCROLLER_PANE_STYLE_CLASS);
 
 		//create the rectangle which allows users to drag
 		rectangle=createDragRectangle();
@@ -265,16 +295,17 @@ public class ScrollBarPane extends PamBorderPane {
 		double lineInset=4;
 		double minPixelWidth=10;
 
-		//translucent dark grey body for the visible-range rectangle.
-		String bodyColour = "-fx-background-color: rgba(70, 70, 70, 0.45)";
-		//handles are a darker, more solid grey so they stand out as grab points.
-		String handleColour = "-fx-background-color: rgba(40, 40, 40, 0.75)";
+		/*
+		 * The body and handle colours come from the style sheet rather than being set
+		 * here, so that they can be inverted for the dark and night schemes - a
+		 * translucent dark grey body is invisible on a dark scroller.
+		 */
 
 		Pane rectangle=new Pane();
 		//rectangle.setStrokeWidth(10);
 		rectangle.layoutYProperty().setValue(0);
 		rectangle.prefHeightProperty().bind(scrollBarPane.heightProperty());
-		rectangle.setStyle(bodyColour);
+		rectangle.getStyleClass().add(SCROLLER_BODY_STYLE_CLASS);
 		rectangle.setPrefWidth(100);
 
 		//create two panes either side of this pane.
@@ -283,7 +314,7 @@ public class ScrollBarPane extends PamBorderPane {
 		leftDrag.prefHeightProperty().bind(rectangle.heightProperty());
 		//the layout of the left rectangle is 0,0;
 		leftDrag.setPrefWidth(dragWidth);
-		leftDrag.setStyle(handleColour);
+		leftDrag.getStyleClass().add(SCROLLER_HANDLE_STYLE_CLASS);
 
 		//add grip line decoration to left drag.
 		addGripLines(leftDrag, lineInset);
@@ -294,7 +325,7 @@ public class ScrollBarPane extends PamBorderPane {
 		rightDrag.prefHeightProperty().bind(rectangle.heightProperty());
 		rightDrag.layoutXProperty().bind(rectangle.widthProperty().subtract(rightDrag.widthProperty()));
 		rightDrag.setPrefWidth(dragWidth);
-		rightDrag.setStyle(handleColour);
+		rightDrag.getStyleClass().add(SCROLLER_HANDLE_STYLE_CLASS);
 		//add grip line decoration to right drag.
 		addGripLines(rightDrag, lineInset);
 		rectangle.getChildren().add(rightDrag);
@@ -439,7 +470,9 @@ public class ScrollBarPane extends PamBorderPane {
 		double offset = 1.8; //horizontal spacing of the grip lines either side of centre.
 		for (int i = -1; i <= 1; i += 2){
 			Line gripLine = new Line();
-			gripLine.setStroke(Color.rgb(235, 235, 235, 0.9));
+			//stroke comes from the style sheet so it can be dark on the light handles of
+			//the dark schemes and light on the dark handles of the day scheme.
+			gripLine.getStyleClass().add(SCROLLER_GRIP_STYLE_CLASS);
 			gripLine.setStrokeWidth(1.4);
 			gripLine.startXProperty().bind(dragPane.widthProperty().divide(2).add(i*offset));
 			gripLine.startYProperty().setValue(lineInset);

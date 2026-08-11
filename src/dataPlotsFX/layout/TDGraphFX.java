@@ -21,6 +21,8 @@ import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamColorsFX;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
@@ -42,6 +44,7 @@ import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.data.TDScaleInfo;
 import dataPlotsFX.data.TDScaleInfoData;
+import dataPlotsFX.overlaymark.MarkKeyHandlerFX;
 import dataPlotsFX.overlaymark.OverlayMarkerManager;
 import dataPlotsFX.overlaymark.popUpMenu.TDPopUpMenuAdv;
 import dataPlotsFX.projector.TDProjectorFX;
@@ -232,6 +235,11 @@ public class TDGraphFX extends PamBorderPane {
 	private OverlayMarkerManager overlayMarker;
 
 	/**
+	 * Handles keyboard shortcuts which act on the current mark.
+	 */
+	private MarkKeyHandlerFX markKeyHandler;
+
+	/**
 	 * The limits before the last zoom;
 	 */
 	private double[] lastLimitsZoom = null;
@@ -250,8 +258,35 @@ public class TDGraphFX extends PamBorderPane {
 
 
 	/**
+	 * Style class giving the plot area the plot window colour of the current colour
+	 * scheme.
+	 */
+	public static final String PLOT_PANE_STYLE_CLASS = PamStylesManagerFX.PLOT_PANE_STYLE_CLASS;
+
+	/**
+	 * Called when the user changes colour scheme. Held in a field rather than
+	 * registered as a lambda because the style manager holds its listeners weakly.
+	 */
+	private final PamStylesManagerFX.ColourSchemeListener colourSchemeListener = () -> {
+		graphParameters.plotFillFollowsScheme = true;
+		checkPlotFill();
+		repaint(0);
+	};
+
+	/**
+	 * Set the plot background to the plot window colour of the current colour
+	 * scheme, unless the user has picked a colour of their own since the scheme was
+	 * last changed.
+	 */
+	private void checkPlotFill() {
+		if (graphParameters.plotFillFollowsScheme) {
+			graphParameters.plotFill = PamColorsFX.getInstance().getColor(PamColorsFX.PamColor.PlOTWINDOW);
+		}
+	}
+
+	/**
 	 * Create the graph.
-	 * 
+	 *
 	 * @param tdControl   - the controlled unit for the display
 	 * @param mainDisplay - the main display holding this graph.
 	 */
@@ -261,6 +296,15 @@ public class TDGraphFX extends PamBorderPane {
 		this.graphId = graphId;
 		this.graphParameters = new TDGraphParametersFX();
 		graphParameters.autoScale = false;
+		checkPlotFill();
+
+		/*
+		 * The plot background is painted onto a Canvas, so unlike the rest of the
+		 * display it can't be handled by the style sheets - it has to be told when the
+		 * colour scheme changes. The listener is held weakly, so nothing needs
+		 * unregistering when the graph is closed.
+		 */
+		PamStylesManagerFX.getPamStylesManagerFX().addColourSchemeListener(colourSchemeListener);
 
 		// create an arrayList of dataInfos
 		dataList = new ArrayList<TDDataInfoFX>();
@@ -274,6 +318,10 @@ public class TDGraphFX extends PamBorderPane {
 		// create pane for plot panels.
 		plotPanels = new PamGridPane();
 		plotPanels.setCursor(Cursor.CROSSHAIR);
+		// the plot canvases are filled with graphParameters.plotFill, but give the pane
+		// behind them the same colour from the style sheet so that any gap between or
+		// around the canvases (e.g. while resizing) isn't a flash of the old scheme.
+		plotPanels.getStyleClass().add(PLOT_PANE_STYLE_CLASS);
 		// decorate the plot area with the default GUI (pamCSS) style. plotPanels is a sibling of the
 		// hiding panes inside mainStackPane, so styling it directly gives the plot the GUI style while
 		// keeping the GUI CSS out of the hiding panes (which are styled only by the sliding dialog CSS).
@@ -285,6 +333,9 @@ public class TDGraphFX extends PamBorderPane {
 
 		// create the overlay marker manager.
 		overlayMarker = new OverlayMarkerManager(this);
+
+		// keyboard shortcuts, e.g. Ctrl+L, for whatever is currently marked.
+		markKeyHandler = new MarkKeyHandlerFX(this);
 
 		// create the Y axis for this panel.
 		graphAxis = new PamAxisFX(0, 1, 0, 1, 0, 10, PamAxisFX.ABOVE_LEFT, "Graph Units", PamAxisFX.LABEL_NEAR_CENTRE,
@@ -1938,6 +1989,9 @@ public class TDGraphFX extends PamBorderPane {
 			graphParameters.plotFill = Color.valueOf(graphParameters.plotFillS);
 		else
 			graphParameters.plotFill = Color.WHITE;
+		//unless the saved colour was one the user picked, take the plot window colour
+		//of the colour scheme that's now selected rather than the one it was saved in.
+		checkPlotFill();
 
 		if (graphParameters.dataListInfos != null) {
 			for (DataListInfo listInfo : graphParameters.dataListInfos) {
@@ -2171,6 +2225,16 @@ public class TDGraphFX extends PamBorderPane {
 	 */
 	public OverlayMarkerManager getOverlayMarkerManager() {
 		return this.overlayMarker;
+	}
+
+	/**
+	 * Get the handler for keyboard shortcuts which act on the current mark, e.g.
+	 * Ctrl+L to label marked clicks as an event.
+	 *
+	 * @return the mark key handler for this graph.
+	 */
+	public MarkKeyHandlerFX getMarkKeyHandler() {
+		return markKeyHandler;
 	}
 
 	/**

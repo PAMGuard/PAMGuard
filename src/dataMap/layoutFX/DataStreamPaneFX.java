@@ -439,7 +439,9 @@ public class DataStreamPaneFX extends PamBorderPane {
 			axisPane.getStyleClass().add("pane");
 			axisPane.setOrientation(Orientation.VERTICAL);
 			axisPane.setPrefWidth(DataStreamPaneFX.PREF_AXIS_WIDTH);
-			axisPane.setStrokeColor(Color.BLACK);
+			//null rather than black, so the axis follows the colour scheme and stays
+			//visible in the dark and night schemes.
+			axisPane.setStrokeColor(null);
 			
 			this.setLeft(axisPane);
 			this.setCenter(canvasHolder);

@@ -387,8 +387,10 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 		
 		//System.out.println("OverlayMarker: Mouse Clicked: " + e.getClickCount() + " Current mark: " + this.currentMark + " class: " + this);
 
-		//might need to destroy a mark 
-		if (e.getClickCount() == 2 && currentMark != null) {
+		//might need to destroy a mark
+		//don't do it for an individual select: two quick Ctrl clicks on the same data
+		//unit are a select then a deselect, not a request to cancel the whole mark.
+		if (e.getClickCount() == 2 && currentMark != null && !isIndividualSelect(e)) {
 			destroyCurrentMark(e);
 			return true; // reutrn true to show that the mouse actin has done something
 		}
@@ -591,6 +593,9 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 				return null;
 			}
 		}
+		if (overlayMark.getMarkType() == OverlayMarkType.DATAUNITS) {
+			return getMarkDataUnits(overlayMark, markDataSelector);
+		}
 		MarkDataMatcher markDataMatcher = new MarkDataMatcher(overlayMark, projector);
 		List<PamDataUnit> selectedData = new ArrayList<>();
 		
@@ -640,9 +645,72 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 	//	}
 
 	/**
-	 * Get an x,y coordinate as a lat long. 
+	 * Get the data units held by a DATAUNITS mark, i.e. ones the user picked out
+	 * individually rather than by enclosing them in a shape. There is nothing to
+	 * test for overlap here since each unit was selected deliberately, so they're
+	 * simply passed through the mark data selector as fully overlapping.
+	 * @param overlayMark the mark, must be of type DATAUNITS.
+	 * @param markDataSelector selector from the mark observer, may be null.
+	 * @return selected data units, never null.
+	 */
+	private List<PamDataUnit> getMarkDataUnits(OverlayMark overlayMark, MarkDataSelector markDataSelector) {
+		List<PamDataUnit> selectedData = new ArrayList<>();
+		List<PamDataUnit> markUnits = overlayMark.getMarkedDataUnits();
+		if (markUnits == null) {
+			return selectedData;
+		}
+		synchronized (getSynchObject()) {
+			for (PamDataUnit dataUnit : markUnits) {
+				if (markDataSelector == null || markDataSelector.wantDataUnit(dataUnit, MarkDataSelector.OVERLAP_ALL)) {
+					selectedData.add(dataUnit);
+				}
+			}
+		}
+		return selectedData;
+	}
+
+	/**
+	 * Is a mouse event an individual data unit selection, i.e. the primary mouse
+	 * button with the platform selection modifier held down ?<p>
+	 * On most platforms that modifier is Ctrl, but on macOS Ctrl+click is the system
+	 * popup trigger, so JavaFX's shortcut modifier (Cmd) is used there instead.
+	 * @param e mouse event
+	 * @return true if the event should toggle an individual data unit selection.
+	 */
+	public static boolean isIndividualSelect(MouseEvent e) {
+		if (e == null || e.getButton() != MouseButton.PRIMARY || e.isPopupTrigger()) {
+			return false;
+		}
+		/*
+		 * isShortcutDown() resolves the platform modifier for us, but it depends on the
+		 * toolkit reporting the right platform shortcut key, and events which have been
+		 * rebuilt from Swing ones (ExtMouseAdapter.fxMouse) don't always carry
+		 * everything. Accepting ctrl or meta directly as well costs nothing: neither is
+		 * used for anything else on a primary button press, and a genuine macOS
+		 * ctrl+click has already been rejected above as a popup trigger.
+		 */
+		return e.isShortcutDown() || e.isControlDown() || e.isMetaDown();
+	}
+
+	/**
+	 * Describe the modifier state of a mouse event. Only for debugging displays which
+	 * aren't picking up individual selection.
+	 * @param e mouse event
+	 * @return the button and modifier state as a string.
+	 */
+	public static String mouseModifierState(MouseEvent e) {
+		if (e == null) {
+			return "null mouse event";
+		}
+		return String.format("button=%s clicks=%d popupTrigger=%b shortcut=%b ctrl=%b meta=%b alt=%b shift=%b synth=%b",
+				e.getButton(), e.getClickCount(), e.isPopupTrigger(), e.isShortcutDown(), e.isControlDown(),
+				e.isMetaDown(), e.isAltDown(), e.isShiftDown(), e.isSynthesized());
+	}
+
+	/**
+	 * Get an x,y coordinate as a lat long.
 	 * @param e Mouse event
-	 * @return coordinate. 
+	 * @return coordinate.
 	 */
 	protected PamCoordinate getCoordinate(MouseEvent e) {
 		return projector.getDataPosition(new Coordinate3d(e.getX(), e.getY()));

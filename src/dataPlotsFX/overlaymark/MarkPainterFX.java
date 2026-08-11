@@ -49,6 +49,13 @@ public class MarkPainterFX {
 		case POLYGON:
 			drawPolygon(graphicsContext2D, mark, projector, isMarking);
 			break;
+		case DATAUNITS:
+			/*
+			 * Individually selected units have no enclosing shape to draw. They show up
+			 * because TDDataInfoFX.drawHighLightData() draws every unit in the current
+			 * detection group with the highlight symbols.
+			 */
+			break;
 		}
 	}
 

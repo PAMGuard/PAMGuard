@@ -15,6 +15,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane2;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 
 /**
  * The plot pane contains 4 axis. A top and bottom x axis and a top and bottom y axis. It also contains a canvas 
@@ -169,10 +170,12 @@ public class PlotPane extends PamBorderPane {
 		hiddenSidePane.toFront();
 
 
-		canvasHolder.setCenter(hiddenSidePane); 
+		canvasHolder.setCenter(hiddenSidePane);
 		canvasHolder.setMinHeight(10);
 		canvasHolder.setMinWidth(10);
-		//canvasHolder.getStyleClass().add("pane-plot");
+		//the plot is drawn on a transparent canvas, so the pane behind it provides the
+		//background. Take the plot window colour of the current colour scheme.
+		canvasHolder.getStyleClass().add(PamStylesManagerFX.PLOT_PANE_STYLE_CLASS);
 
 		//now add all axis together
 		holderPane=new PamBorderPane();
@@ -286,12 +289,15 @@ public class PlotPane extends PamBorderPane {
 		rightPane.minWidthProperty().bind(valRight);
 
 		horzHolder.getChildren().addAll(leftPane, axisPane, rightPane);
-		//axisPane.toFront(); this changes the order of children in a PamHBox. 
+		//axisPane.toFront(); this changes the order of children in a PamHBox.
 		HBox.setHgrow(axisPane, Priority.ALWAYS);
 
-		//horzHolder.getStyleClass().add("pane");
+		//leftPane and rightPane are the blank corner squares between the horizontal and
+		//vertical axes. Give them the axis background so they don't show whatever is
+		//behind and stay light in the dark colour schemes.
+		horzHolder.getStyleClass().add(PamStylesManagerFX.AXIS_PANE_STYLE_CLASS);
 
-		return horzHolder; 
+		return horzHolder;
 
 	}
 

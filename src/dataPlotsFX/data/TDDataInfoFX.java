@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.ListIterator;
 
+import pamViewFX.fxNodes.PamSymbolFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import PamController.PamController;
 import PamUtils.Coordinate3d;
@@ -840,9 +842,49 @@ public abstract class TDDataInfoFX {
 	 * @param true if it is the last data unit in the list which is being drawn. 
 	 * @return polygon of area drawn on. 
 	 */
-	public Polygon drawDataUnit(int plotNumber,PamDataUnit pamDataUnit, GraphicsContext g, 
+	/**
+	 * Colour of the ring drawn around data units which are in the current mark but
+	 * aren't the focused one. Deliberately light, since a mark can hold a lot of
+	 * units and anything stronger clutters the display.
+	 */
+	private static final Color MARKED_RING_COLOUR = Color.LIGHTGRAY;
+
+	/**
+	 * Line width of the marked ring. Thinner than the focused unit's highlight so
+	 * that the focused unit still stands out as the strongest of the highlights.
+	 */
+	private static final double MARKED_RING_LINE_WIDTH = 1.5;
+
+	/**
+	 * How much bigger than the data unit's symbol the marked ring is drawn, pixels.
+	 */
+	private static final double MARKED_RING_PADDING = 6;
+
+	/**
+	 * Draw a thin ring around a data unit which is part of the current mark but
+	 * isn't the focused unit. Without this, marked units are drawn with exactly the
+	 * same symbol as unmarked ones on most displays, so there's no way to see what's
+	 * in the mark. Matches the highlight the click detector's bearing time display
+	 * draws around individually selected clicks.
+	 *
+	 * @param g graphics context.
+	 * @param pt centre of the data unit in pixels.
+	 * @param symbol symbol the data unit was drawn with, used to size the ring.
+	 */
+	private void drawMarkedRing(GraphicsContext g, Point2D pt, PamSymbolFX symbol) {
+		double w = symbol.getWidth() + MARKED_RING_PADDING;
+		double h = symbol.getHeight() + MARKED_RING_PADDING;
+		//save and restore, or the stroke and line width leak into whatever is drawn next.
+		g.save();
+		g.setStroke(MARKED_RING_COLOUR);
+		g.setLineWidth(MARKED_RING_LINE_WIDTH);
+		g.strokeOval(pt.getX() - w/2, pt.getY() - h/2, w, h);
+		g.restore();
+	}
+
+	public Polygon drawDataUnit(int plotNumber,PamDataUnit pamDataUnit, GraphicsContext g,
 			double scrollStart, TDProjectorFX tdProjector, int type) {
-		
+
 		Double val = getDataValue(pamDataUnit);	
 		
 		if (val == null) {
@@ -889,7 +931,13 @@ public abstract class TDDataInfoFX {
 		//System.out.println("TDDataInfoFX: dataPixelPoint: " + dataPixel + "  " + pt); 
 
 		if ((symbolchoser.getDrawTypes(pamDataUnit) & TDSymbolChooserFX.DRAW_SYMBOLS) != 0) {
-			symbolchoser.getPamSymbol(pamDataUnit,type).draw(g, pt);
+			PamSymbolFX symbol = symbolchoser.getPamSymbol(pamDataUnit,type);
+			if (symbol != null) {
+				symbol.draw(g, pt);
+				if (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL_MARKED) {
+					drawMarkedRing(g, pt, symbol);
+				}
+			}
 			if (type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL && type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL_MARKED ){
 				//System.out.println("Draw CPOD data: HOVER");
 				tdProjector.addHoverData(new HoverData(c, pamDataUnit, 0, plotNumber));

@@ -35,6 +35,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamView.PamColors;
 
 
 /**
@@ -59,12 +60,15 @@ public class PamColorsFX implements PamSettings {
 
 	static private PamColorsFX singleInstance;
 	
+	/**
+	 * Kept only so that the (unused, never registered) PamSettings implementation
+	 * below still has something to hand back. The colours actually returned by this
+	 * class all come from {@link PamColors}, which is where the user selects the
+	 * colour scheme and where it is saved with the settings.
+	 */
 	private ColorSchemeFX colourScheme = null;//ColourScheme.createDefaultDayScheme();
 
-//	private MenuItemEnabler nightMenuEnabler = new MenuItemEnabler(); 
-//	private MenuItemEnabler dayMenuEnabler = new MenuItemEnabler(); 
-//	private MenuItemEnabler printMenuEnabler = new MenuItemEnabler(); 
-	
+
 	private ColorSettingsFX colorSettings = new ColorSettingsFX();
 
 	
@@ -125,75 +129,55 @@ public class PamColorsFX implements PamSettings {
 //		}
 	}
 
-	public Color getColor(PamColor col) {
-
-//		switch (col) {
-//		case BORDER:
-//			return colorSettings.pamBorder;
-//		case PlOTWINDOW:
-//			return colorSettings.pamPlotWindow;
-//		case PLAIN:
-//			return colorSettings.plain;
-//		case AXIS:
-//			return colorSettings.axis;
-//		case GRID:
-//			return colorSettings.grid;
-//		case MAP:
-//			return colorSettings.mapColor;
-//		case WARNINGBORDER:
-//			return colorSettings.pamWarningBorder;
-//		case BACKGROUND_ALPHA:
-//			return colorSettings.pamBackgroundAlpha;
-//		case HIGHLIGHT_ALPHA:
-//			return colorSettings.pamHighlightAlpha;
-//		case HIGHLIGHT:
-//			return colorSettings.pamHighlight;
-//		case GPSTRACK:
-//			return colorSettings.gpsColor;
-//		case LATLINE:
-//			return colorSettings.latLineColor;
-//		case LONLINE:
-//			return colorSettings.lonLineColor;
-//		default:
-//			return colorSettings.plain;
-//		}
-		Color colour = colourScheme.get(col);
-		if (colour == null) {
-			colour = colourScheme.get(PamColor.PLAIN);
+	/**
+	 * Translate one of the JavaFX colour keys to the equivalent Swing one. The two
+	 * enums are kept in step by name; the Swing one has a couple of extra values
+	 * which have no JavaFX equivalent.
+	 *
+	 * @param col JavaFX colour key
+	 * @return the matching Swing colour key, or PLAIN if there isn't one.
+	 */
+	private static PamView.PamColors.PamColor toSwingColour(PamColor col) {
+		try {
+			return PamView.PamColors.PamColor.valueOf(col.name());
 		}
-		if (colour == null) {
-			colour = Color.DARKGRAY;
+		catch (IllegalArgumentException e) {
+			return PamView.PamColors.PamColor.PLAIN;
 		}
-
-		return colour;
 	}
-	
+
+	/**
+	 * Get a colour for the currently selected colour scheme.
+	 * <p>
+	 * This delegates to {@link PamColors} rather than keeping a second, parallel set
+	 * of colour schemes: {@link PamColors} is the one the user actually selects
+	 * schemes in (Display / Colour Scheme, and the dark mode toggles), and it is the
+	 * one which is saved with the settings, so anything drawn from a separate table
+	 * here would simply ignore the user's choice.
+	 *
+	 * @param col the colour key
+	 * @return the colour to use.
+	 */
+	public Color getColor(PamColor col) {
+		java.awt.Color awtColour = PamColors.getInstance().getColor(toSwingColour(col));
+		if (awtColour == null) {
+			return Color.DARKGRAY;
+		}
+		return awtColorToFx(awtColour);
+	}
+
 	public Color getForegroudColor(PamColor col) {
 		return getColor(PamColor.AXIS);
-//		switch (col) {
-//		case BORDER:
-//			return colorSettings.axis;
-//		case PlOTWINDOW:
-//			return colorSettings.axis;
-//		case PLAIN:
-//			return colorSettings.axis;
-//		case AXIS:
-//			return colorSettings.axis;
-//		case GRID:
-//			return colorSettings.axis;
-//		default:
-//			return colorSettings.axis;
-//		}
 	}
-	
+
 	public Color getWhaleColor(int col) {
-		return colourScheme.getWhaleColour(col);
+		return awtColorToFx(PamColors.getInstance().getWhaleColor(col));
 	}
 
 	public Color getChannelColor(int iChan) {
-		return colourScheme.getChannelColour(iChan);
+		return awtColorToFx(PamColors.getInstance().getChannelColor(iChan));
 	}
-	
+
 	static private Font boldFont;
 	public Font getBoldFont() {
 		if (boldFont == null) {
@@ -334,18 +318,18 @@ public class PamColorsFX implements PamSettings {
 	 * @return border colour.
 	 */
 	public Color getBorderColour() {
-		return colourScheme.get(PamColor.BORDER);
+		return getColor(PamColor.BORDER);
 	}
 	public Color getGPSColor() {
-		return colourScheme.get(PamColor.GPSTRACK);
+		return getColor(PamColor.GPSTRACK);
 	}
 
 	public int getNWhaleColours() {
-		return colourScheme.getNumWhaleColours();
+		return PamColors.getInstance().getNWhaleColours();
 	}
-	
+
 	public int getWhaleColourIndex(int iCol) {
-		return colourScheme.getWhaleColourIndex(iCol);
+		return PamColors.getInstance().getWhaleColourIndex(iCol);
 	}
 
 	/**

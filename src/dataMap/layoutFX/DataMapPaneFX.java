@@ -118,14 +118,14 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 		hidingSettingsPane.setVisibleImmediatly(false); 
 		hidingSettingsPane.showHidePane(true);
 		hidingSettingsPane.getStyleClass().add("pane-trans");
-		hidingSettingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(hidingSettingsPane, PamStylesManagerFX.STYLE_SLIDING);
 		StackPane.setAlignment(hidingSettingsPane, Pos.TOP_RIGHT);
 		hidingSettingsPane.setPrefWidth(HIDE_PANE_WIDTH);
 
 		//style the show button. 
 		showButton=hidingSettingsPane.getShowButton();
 		showButton.getStyleClass().add("close-button-left");
-		showButton.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(showButton, PamStylesManagerFX.STYLE_SLIDING);
 
 
 		//		showButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_DOWN, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));\

@@ -61,6 +61,7 @@ import PamUtils.PlatformInfo;
 import PamUtils.PlatformInfo.OSType;
 import PamUtils.Splash;
 import PamView.FullScreen;
+import PamView.PamLookAndFeel;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
@@ -143,7 +144,7 @@ public class Pamguard {
 			//			  System.out.println(keys.nextElement() + ": " + ui.get(nxt));
 			//			}
 			//			PamColors.getInstance().setColors();
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			System.out.println("Unable to load lookAndFeel: " + e.getMessage());
 //			e.printStackTrace();
 			try {
@@ -154,6 +155,15 @@ public class Pamguard {
 //				e1.printStackTrace();
 			}
 		}
+
+		/*
+		 * Remember whatever look and feel we've ended up with. Selecting a dark colour
+		 * scheme swaps in FlatLaf Dark so that text fields, check boxes, internal frame
+		 * title bars and the rest follow the scheme; selecting a light one puts this
+		 * back. Must happen before any settings (and hence any saved colour scheme) are
+		 * restored.
+		 */
+		PamLookAndFeel.recordStartupLookAndFeel();
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";

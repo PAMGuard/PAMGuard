@@ -359,7 +359,8 @@ public class VRImagePane extends PamBorderPane {
 		StackPane.setAlignment(ribbonHolder, Pos.TOP_LEFT);
 		ribbonHolder.setMaxHeight(35);
 		ribbonHolder.maxWidthProperty().bind(stackPane.widthProperty().subtract(imageControls.widthProperty()));
-		ribbonHolder.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+		//registered rather than added directly so the ribbon follows a colour scheme change.
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(ribbonHolder, PamStylesManagerFX.STYLE_DIALOG);
 		//ribbonHolder.setStyle("-fx-background-color:  -fx-darkbackground-trans"); //from dark stylesheet
 		mainHolder.getChildren().add(ribbonHolder);
 

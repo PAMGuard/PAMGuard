@@ -128,7 +128,14 @@ public class TDMenuPane extends PamBorderPane {
 	private OverlayGroupDisplay groupDetectionDisplay;
 
 	/**
-	 * Main holder for the menu pane. 
+	 * Style class for the pop up menu's control strip. Unlike the sliding panes,
+	 * which float over the display on a lighter panel face, this strip sits flush
+	 * against it and so takes the general window background of the colour scheme.
+	 */
+	public static final String MENU_PANE_STYLE_CLASS = "pam-menu-pane";
+
+	/**
+	 * Main holder for the menu pane.
 	 */
 	private PamBorderPane holder;
 
@@ -196,6 +203,8 @@ public class TDMenuPane extends PamBorderPane {
 			groupDetectionDisplay.layoutPane();
 
 			HidingPane hidingPaneLeft=new HidingPane(Side.LEFT, menuPane, this, false);
+			//its show / hide buttons sit outside menuPane, so they need the sliding style too.
+			PamStylesManagerFX.getPamStylesManagerFX().styleNode(hidingPaneLeft, PamStylesManagerFX.STYLE_SLIDING);
 			hidingPaneLeft.showHidePane(true, false);
 
 			PamButton showButtonLeft=hidingPaneLeft.getShowButton();
@@ -272,9 +281,10 @@ public class TDMenuPane extends PamBorderPane {
 	 */
 	private Pane createMenuPane(){
 
-		PamVBox menuPane = new PamVBox(); 
-		menuPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
-		menuPane.setStyle("-fx-background-color: -fx-darkbackground");
+		PamVBox menuPane = new PamVBox();
+		//background comes from the style class rather than an inline style: an inline
+		//style beats every style sheet, so the night override could never change it.
+		menuPane.getStyleClass().add(MENU_PANE_STYLE_CLASS);
 
 		//create info and toggle detection buttons that always sit at the top of the display
 
@@ -327,6 +337,7 @@ public class TDMenuPane extends PamBorderPane {
 //		reverseInfo.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.MENU, PamGuiManagerFX.iconSize));
 		reverseInfo.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", PamGuiManagerFX.iconSize));
 		infoPane= new PamBorderPane();
+		infoPane.getStyleClass().add(MENU_PANE_STYLE_CLASS);
 		infoPane.setTop(reverseInfo);
 		infoPane.setCenter(infoTextLabel=new TextArea());
 		infoTextLabel.setEditable(false);
@@ -345,9 +356,26 @@ public class TDMenuPane extends PamBorderPane {
 		flipPane.getBack().getChildren().add(infoPane); 
 		flipPane.setPrefWidth(MENU_WIDTH);
 
-		PamBorderPane holder = new PamBorderPane(flipPane); 
+		PamBorderPane holder = new PamBorderPane(flipPane);
 		holder.setPrefWidth(MENU_WIDTH);
+		holder.getStyleClass().add(MENU_PANE_STYLE_CLASS);
 
+		/*
+		 * Style the outer holder, so the flip pane and the info side get the sliding
+		 * style too - only the menu side used to, so flipping over showed an unstyled
+		 * pane.
+		 *
+		 * Register with the style manager rather than adding the style sheets directly:
+		 * the pop up menu is built once, when the time display's plot pane is created,
+		 * and reused for the rest of the session, so a plain addAll would leave it with
+		 * the style sheets of whatever colour scheme was selected at start up.
+		 *
+		 * NB style this holder, not TDMenuPane. This is a sibling of the detection
+		 * display; putting the sliding style on a common ancestor of both would demote
+		 * the detection display's own hiding panes in the cascade (see the note at the
+		 * top of pamSettingsNight.css).
+		 */
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(holder, PamStylesManagerFX.STYLE_SLIDING);
 
 		return holder;
 	}

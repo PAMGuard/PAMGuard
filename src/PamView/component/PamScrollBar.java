@@ -33,6 +33,23 @@ public class PamScrollBar extends JScrollBar implements ColorManaged {
 		setUI(pamScrollBarUI);
 	}
 
+	/**
+	 * Reinstall the PAMGuard scroll bar UI. Called by Swing whenever the look and
+	 * feel changes (which PAMGuard does when a dark colour scheme is selected) -
+	 * without this the scroll bar would revert to the look and feel's own UI and
+	 * stop following the colour scheme.
+	 */
+	@Override
+	public void updateUI() {
+		if (pamScrollBarUI == null) {
+			// called from the JScrollBar constructor, before our field is initialised
+			super.updateUI();
+			return;
+		}
+		setUI(pamScrollBarUI);
+		pamScrollBarUI.setColours(null);
+	}
+
 	/* (non-Javadoc)
 	 * @see PamView.ColorManaged#getColorId()
 	 */

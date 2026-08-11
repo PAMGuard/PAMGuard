@@ -20,6 +20,7 @@ import PamView.paneloverlay.OverlayDataManager;
 import PamView.paneloverlay.overlaymark.BasicMarkDataSelector;
 import PamView.paneloverlay.overlaymark.GeneralMarkDialog;
 import PamView.paneloverlay.overlaymark.MarkDataSelector;
+import PamView.paneloverlay.overlaymark.MarkKeyAction;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamView.paneloverlay.overlaymark.OverlayMarkDataInfo;
@@ -32,6 +33,9 @@ import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import detectiongrouplocaliser.DetectionGroupSummary;
 import fftManager.FFTDataBlock;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import warnings.PamWarning;
 import warnings.WarningSystem;
@@ -121,6 +125,38 @@ public class ClickMarkHandler implements OverlayMarkObserver {
 		clicksOffline.addBTMenuItems(popupMenu, markSummaryData.getOverlayMark(), markSummaryData.getDataList(), false, singleUnit);
 		
 		return popupMenu;
+	}
+
+	/**
+	 * The same actions as the mark popup menu offers, but on the keyboard. These are
+	 * the shortcuts the bearing time display has always had through its CtrlKeyManager,
+	 * made available to any display which chooses to listen for key presses.
+	 */
+	@Override
+	public List<MarkKeyAction> getMarkKeyActions(DetectionGroupSummary markSummaryData) {
+		ClicksOffline clicksOffline = clickControl.getClicksOffline();
+		if (clicksOffline == null || markSummaryData == null || markSummaryData.getNumDataUnits() == 0) {
+			return null;
+		}
+		OverlayMark overlayMark = markSummaryData.getOverlayMark();
+		List<PamDataUnit> dataList = markSummaryData.getDataList();
+
+		List<MarkKeyAction> keyActions = new ArrayList<>();
+
+		keyActions.add(new MarkKeyAction(new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN),
+				"Label clicks", () -> clicksOffline.labelClicks(overlayMark, dataList)));
+
+		keyActions.add(new MarkKeyAction(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN),
+				"Create new event", () -> clicksOffline.newEvent(overlayMark, dataList)));
+
+		OfflineEventDataUnit autoEvent = clicksOffline.getQuickAddEvent(dataList);
+		if (autoEvent != null) {
+			String name = String.format("Add %d clicks to event %d", dataList.size(), autoEvent.getEventNumber());
+			keyActions.add(new MarkKeyAction(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN),
+					name, () -> clicksOffline.quickAddClicks(autoEvent, overlayMark, dataList)));
+		}
+
+		return keyActions;
 	}
 
 	@Override

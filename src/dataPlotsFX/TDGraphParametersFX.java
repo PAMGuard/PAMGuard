@@ -71,15 +71,27 @@ public class TDGraphParametersFX implements Serializable, Cloneable, ManagedPara
 	int[] channels={0};
 	
 	/**
-	 * The colour of the plot panel background. 
+	 * The colour of the plot panel background.
 	 */
 	transient public Color plotFill=Color.WHITE;
-	
+
 	/**
-	 * Used only when saving as Color (javafx) is not serializable. 
+	 * Used only when saving as Color (javafx) is not serializable.
 	 */
 	public String plotFillS = "white";
-	
+
+	/**
+	 * True if {@link #plotFill} should follow the colour scheme rather than being a
+	 * colour the user picked.
+	 * <p>
+	 * Set false as soon as a colour is chosen in the graph settings pane, and back
+	 * to true whenever the colour scheme changes - selecting a scheme always wins
+	 * over a colour picked earlier, otherwise switching to a dark scheme leaves a
+	 * white plot in the middle of a dark display.
+	 */
+	public boolean plotFillFollowsScheme = true;
+
+
 	/**
 	 * Show the hide panel on the left on start up. Note only used when first opening 
 	 * saved settings or saving settings. 

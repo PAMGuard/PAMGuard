@@ -1,5 +1,7 @@
 package pamViewFX.fxNodes.sliders;
 
+import java.util.Locale;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
@@ -8,16 +10,11 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
@@ -301,29 +298,61 @@ public class ColourRangeSlider extends PamRangeSlider {
 
 		if (getTrack()!=null) {
 
-			//set the solid colours for the track and top bar. 
+			//set the solid colours for the track and top bar.
 			//		getTrack().setBackground(new Background(new BackgroundFill(trackCol, CornerRadii.EMPTY, Insets.EMPTY)));
-			//28/03/2017 - had to change to css as adding to a scroll pane seemed to override background. 
+			//28/03/2017 - had to change to css as adding to a scroll pane seemed to override background.
 			getTrack().setStyle("-fx-background-color: " + PamUtilsFX.color2Hex(trackCol));
 
-			getTopBar().setBackground(new Background(new BackgroundFill(topBarCol, CornerRadii.EMPTY, Insets.EMPTY)));
+			getTopBar().setStyle("-fx-background-color: " + PamUtilsFX.color2Hex(topBarCol));
 
 			//set the colour gradient
-			Stop[] stops =new Stop[colorList.length];
-			for (int j=0; j<colorList.length; j++){
-				stops[j]=new Stop((double) j/(colorList.length-1),colorList[j]);
-			};
-
-			LinearGradient linearGradient;
-			if (getOrientation()==Orientation.VERTICAL) {
-				linearGradient=new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE, stops);
-			}
-			else {
-				linearGradient=new LinearGradient(0,0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
-
-			}
-			getRangeBar().setBackground(new Background(new BackgroundFill(linearGradient, CornerRadii.EMPTY, Insets.EMPTY)));		
+			getRangeBar().setStyle("-fx-background-color: " + gradientCSS(colorList) + ";");
 		}
+	}
+
+	/**
+	 * Build the CSS for a linear gradient running the length of the slider through
+	 * the given colours.
+	 * <p>
+	 * The colours have to be set as inline styles rather than with
+	 * {@link Region#setBackground(Background)}. Switching colour scheme swaps the
+	 * style sheets on the live scene, which makes JavaFX re-apply CSS to every node
+	 * in it, and a background set programmatically does not survive that: the range
+	 * bar goes back to the flat <code>-fx-focus-color</code> of ControlsFX's own
+	 * rangeslider.css and the gradient becomes a block of colour. An inline style
+	 * beats any style sheet, so it survives. This is the same reason the track is
+	 * set with a style rather than a background.
+	 *
+	 * @param colorList the colours of the gradient, in order.
+	 * @return a CSS colour value for the gradient.
+	 */
+	private String gradientCSS(Color[] colorList) {
+		if (colorList.length == 1) {
+			return colourString(colorList[0]);
+		}
+		StringBuilder sb = new StringBuilder();
+		//vertical sliders run bottom (minimum) to top, horizontal ones left to right.
+		sb.append(getOrientation()==Orientation.VERTICAL ? "linear-gradient(from 0% 100% to 0% 0%"
+				: "linear-gradient(from 0% 0% to 100% 0%");
+		for (int j=0; j<colorList.length; j++){
+			sb.append(", ").append(colourString(colorList[j]));
+			sb.append(String.format(Locale.US, " %.2f%%", 100.*j/(colorList.length-1)));
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
+	/**
+	 * The web colour string for a colour, without the trailing semi colon
+	 * {@link PamUtilsFX#color2Hex(Color)} adds, so that it can be used part way
+	 * through a CSS value such as a gradient.
+	 *
+	 * @param colour the colour
+	 * @return the colour as #RRGGBB
+	 */
+	private static String colourString(Color colour) {
+		return String.format("#%02X%02X%02X", (int) (colour.getRed()*255),
+				(int) (colour.getGreen()*255), (int) (colour.getBlue()*255));
 	}
 
 

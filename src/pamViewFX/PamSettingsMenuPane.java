@@ -94,7 +94,7 @@ public class PamSettingsMenuPane extends PamVBox {
 		
 		this.setStyle("-fx-background-color: -fx-darkbackground");
 		
-		this.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(this, PamStylesManagerFX.STYLE_SLIDING);
 
 		Label settingsLabel=new Label("Settings");
 		settingsLabel.setPadding(new Insets(14,0,10,0));
@@ -272,24 +272,13 @@ public class PamSettingsMenuPane extends PamVBox {
 		// ---------- Dark mode toggle ----------
 		PamToggleSwitch darkModeToggle = new PamToggleSwitch("");
 		// Initialise toggle state from current colour scheme
-		boolean isNight = ColourScheme.NIGHTSCHEME.equalsIgnoreCase(
-				PamColors.getInstance().getColourScheme() != null
-						? PamColors.getInstance().getColourScheme().getName()
-						: "");
-		darkModeToggle.setSelected(isNight);
+		ColourScheme currentScheme = PamColors.getInstance().getColourScheme();
+		darkModeToggle.setSelected(currentScheme != null && currentScheme.isDark());
 
 		darkModeToggle.selectedProperty().addListener((obs, oldVal, dark) -> {
-			String scheme = dark ? ColourScheme.NIGHTSCHEME : ColourScheme.DAYSCHEME;
-			
+			// setColourScheme restyles the JavaFX displays and swaps the Swing look and feel.
+			String scheme = dark ? ColourScheme.DARKSCHEME : ColourScheme.DAYSCHEME;
 			PamColors.getInstance().setColourScheme(scheme);
-			System.out.println("PamSettingsMenu Colour scheme set to " + PamColors.getInstance().getColourScheme().getName());
-			// Refresh the FX scene and all known CSS entry-points
-			PamGuiManagerFX guiManager = PamController.getInstance().getGuiManagerFX();
-			if (guiManager != null) {
-				guiManager.refreshSceneCSS();
-			}
-			
-			
 		});
 
 		Label darkModeLabel = new Label("Dark Mode");

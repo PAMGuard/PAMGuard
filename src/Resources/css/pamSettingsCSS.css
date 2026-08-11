@@ -49,6 +49,16 @@
   -fx-background-color: -fx-darkbackground-trans;
 }
 
+/**
+ * The control strip of the time display's advanced pop up menu (TDMenuPane).
+ * Same face as the other sliding panes here; the night sheet gives it the
+ * general window background instead, as it sits flush against the display
+ * rather than floating over it.
+ */
+.pam-menu-pane {
+  -fx-background-color: -fx-darkbackground;
+}
+
 /*.border{
   -fx-background-color: -fx-darkbackground;
 }

@@ -34,6 +34,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -112,6 +113,7 @@ import clickDetector.ClickClassifiers.ClickIdentifier;
 import clickDetector.alarm.ClickAlarmParameters;
 import clickDetector.dataSelector.ClickDataSelector;
 import clickDetector.dialogs.ClickDisplayDialog;
+import clickDetector.offlineFuncs.ClicksOffline;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
 import clickDetector.tdPlots.ClickDetSymbolChooser;
@@ -223,6 +225,21 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	private BTOverlayMarker btMarker;
 
 	/**
+	 * Clicks which have been individually selected by Ctrl clicking on them. Once
+	 * selected, these behave exactly as if they'd been enclosed by a zoomer box or
+	 * polygon, i.e. they are returned by {@link #getMarkedClicks()} so can be
+	 * labelled as an event through the standard mark menus and Ctrl key shortcuts.
+	 */
+	private ArrayList<PamDataUnit> ctrlSelectedClicks = new ArrayList<>();
+
+	/**
+	 * Symbol drawn around individually (Ctrl) selected clicks. The same circle as
+	 * highlightSymbol, but a lighter grey and a thinner line, so that the primary
+	 * click stands out as the strongest of the highlights.
+	 */
+	private PamSymbol ctrlSelectSymbol = new PamSymbol(PamSymbolType.SYMBOL_CIRCLE, 20, 20, false, Color.WHITE, Color.LIGHT_GRAY);
+
+	/**
 	 * The symbol chooser for the BT display
 	 */
 	//	private ClickDetSymbolChooser symbolChooser;
@@ -274,6 +291,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		//		trackedClicks = clickControl.getClickDetector().getTrackedClicks();
 
 		highlightSymbol.setLineThickness(3);
+		ctrlSelectSymbol.setLineThickness(1.5f);
 
 		vScaleManagers = new VScaleManager[4];
 		vScaleManagers[0] = new BearingScaleManager();
@@ -716,7 +734,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		@Override
 		public boolean canStartZoomArea(MouseEvent mouseEvent) {
-			return true;
+			// a Ctrl drag is an individual click selection, not the start of a zoom box.
+			return !isCtrlSelect(mouseEvent);
 		}
 
 		@Override
@@ -762,6 +781,14 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		@Override
 		public void zoomPolygonComplete(ZoomShape zoomShape) {
 			//System.out.println("Zoom Polygon Complete");
+			if (zoomShape != null) {
+				/*
+				 * A new box / polygon mark takes over from any individual selection. Clear the
+				 * list directly rather than through clearCtrlSelection() since the Ctrl key
+				 * shortcuts are about to be reset for the new mark anyway.
+				 */
+				ctrlSelectedClicks.clear();
+			}
 			btPlot.setTotalRepaint();
 			btPlot.repaint();
 
@@ -2348,6 +2375,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			case 39:
 				selectClick(+1);
 				break;
+			case KeyEvent.VK_ESCAPE:
+				// escape drops any individually selected clicks.
+				if (clearCtrlSelection()) {
+					return;
+				}
+				break;
 			}
 			if (selectedClick != null) {
 				setSelectedClick(selectedClick);
@@ -2379,9 +2412,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (clickControl.getClicksOffline().addBTMenuItems(menu, oMark, this, false, clickedClick)>0) {
 				menu.addSeparator();
 			}
-			
+
 			/**
-			 * Add the additional menu items to classify all clicks in a mark. 
+			 * Add the additional menu items to classify all clicks in a mark.
 			 */
 			ArrayList<ClickDetection> markClicks = getMarkedClickClicks();
 			if (markClicks != null && markClicks.size() > 0) {
@@ -2715,10 +2748,31 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if (isCtrlSelect(e)) {
+				/*
+				 * Ctrl click adds / removes a single click from the individual selection.
+				 * Nothing else should happen: we don't want to change the currently viewed
+				 * click, start a zoom box or pop up a menu.
+				 */
+				ClickDetection ctrlClick = findClick(e.getX(), e.getY(), 10);
+				if (ctrlClick != null) {
+					toggleCtrlSelection(ctrlClick);
+				}
+				btPlot.requestFocus();
+				return;
+			}
 			if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) {
 				mouseDown = true;
 				didFollow = followCheckBox.isSelected();
 				followCheckBox.setSelected(false);
+			}
+			if (e.getButton() == MouseEvent.BUTTON1 && !e.isPopupTrigger()) {
+				/*
+				 * A plain left click cancels the individual selection, the same way it clears
+				 * a zoomer mark. Must happen before setSelectedClick below, which sets up the
+				 * single click Ctrl key shortcuts.
+				 */
+				clearCtrlSelection();
 			}
 			ClickDetection click = findClick(e.getX(), e.getY(), 10);
 			if (click != null) {
@@ -2820,8 +2874,15 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 * go / don't go need to be handled before this gets called. 
 	 * @param e mouse data. 
 	 */
-	private void showPopupMenu(MouseEvent e) {	
+	private void showPopupMenu(MouseEvent e) {
 		ClickDetection click = findClick(e.getX(), e.getY(), 10);
+		if (click != null && ctrlSelectedClicks.isEmpty() == false) {
+			/*
+			 * With an individual selection in place the menu must act on the whole
+			 * selection, not on the single click that happens to be under the mouse.
+			 */
+			click = null;
+		}
 		JPopupMenu menu = getPopupMenu(click);
 		if (menu != null) {
 			menu.show(e.getComponent(), e.getX(), e.getY());
@@ -3280,6 +3341,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			if (!isViewer) {
 				paintClicks(g, clipRectangle);
+				drawCtrlSelectedClicks(g, clipRectangle);
 				if (selectedClick != null) {
 					drawClick(g, selectedClick, clipRectangle, true);
 				}
@@ -3294,6 +3356,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			}
 
 			g2d.drawImage(dougsBufferedImage, 0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), null);
+
+			drawCtrlSelectedClicks(g, clipRectangle);
 
 			if (selectedClick != null) {
 				drawClick(g, selectedClick, clipRectangle, true);
@@ -3360,6 +3424,35 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		public int drawClick(Graphics g, ClickDetection click, Rectangle clipRegion) {
 			return drawClick(g, click, clipRegion, false);
+		}
+
+		/**
+		 * Draw a highlight around every click which has been individually selected
+		 * with a Ctrl click so that the selection is obvious on the display. The
+		 * primary click is skipped since it's about to be drawn with the stronger
+		 * highlightSymbol on top.
+		 * @param g graphics
+		 * @param clipRegion clipping region, may be null.
+		 */
+		public void drawCtrlSelectedClicks(Graphics g, Rectangle clipRegion) {
+			for (PamDataUnit dataUnit : ctrlSelectedClicks) {
+				if (dataUnit instanceof ClickDetection == false || dataUnit == selectedClick) {
+					continue;
+				}
+				ClickDetection click = (ClickDetection) dataUnit;
+				if (!shouldPlot(click)) {
+					continue;
+				}
+				Point pt = clickXYPos(click);
+				int width = (int) getClickWidth(click);
+				if (clipRegion != null) {
+					if (pt.x + width < clipRegion.x) continue;
+					if (pt.x - width > clipRegion.x + clipRegion.width) continue;
+				}
+				ctrlSelectSymbol.setWidth(width + 8);
+				ctrlSelectSymbol.setHeight((int) getClickHeight(click) + 8);
+				ctrlSelectSymbol.draw(g, pt);
+			}
 		}
 
 
@@ -3812,8 +3905,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		getPlotPanel().repaint(minPaintTime);
 
 		if (this.isViewer) {
-			///adds key listeners to single detections in viewer mode. 
-			if (zoomer.getTopMostShape()==null) { //only add a key listener if there is no mark. Otherwise the mark uses the key shortcuts. 
+			///adds key listeners to single detections in viewer mode.
+			//only add a key listener if there is no mark. Otherwise the mark uses the key shortcuts.
+			if (zoomer.getTopMostShape()==null && ctrlSelectedClicks.isEmpty()) {
 				clickControl.getClicksOffline().newMarkedClick(btMarker.getCurrentMark(), selectedClick, clickBTDisplay);
 			}
 		}
@@ -3992,25 +4086,120 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 
 	/**
-	 * 
-	 * @return a list of clicks which are within a marked area. 
+	 *
+	 * @return a list of clicks which are within a marked area, or the list of clicks
+	 * which have been individually selected with a Ctrl click if there are any. The
+	 * two are mutually exclusive, so whichever mark the user made last is the one
+	 * that's returned.
 	 */
 	public ArrayList<PamDataUnit> getMarkedClicks() {
-
+		if (ctrlSelectedClicks.isEmpty() == false) {
+			return ctrlSelectedClicks;
+		}
 		return markedClicks;
 	}
-	
+
+	/**
+	 * Is a mouse event an individual click selection, i.e. Ctrl and the primary
+	 * mouse button ?<p>
+	 * On most platforms this is Ctrl, but on macOS Ctrl+click is the system popup
+	 * trigger, so the platform menu shortcut key (Cmd) is used there instead.
+	 * @param e mouse event
+	 * @return true if the event should toggle an individual click selection.
+	 */
+	private boolean isCtrlSelect(MouseEvent e) {
+		if (e.getButton() != MouseEvent.BUTTON1 || e.isPopupTrigger()) {
+			return false;
+		}
+		return (e.getModifiersEx() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()) != 0;
+	}
+
+	/**
+	 * Add a click to the individually selected list, or remove it if it's already
+	 * there. Since only one type of mark can be active at a time, starting an
+	 * individual selection clears any box or polygon mark from the zoomer.
+	 * @param click click that was Ctrl clicked on.
+	 */
+	private void toggleCtrlSelection(ClickDetection click) {
+		if (ctrlSelectedClicks.isEmpty() && zoomer != null && zoomer.getTopMostShape() != null) {
+			zoomer.clearLatestShape();
+		}
+		if (ctrlSelectedClicks.remove(click) == false) {
+			ctrlSelectedClicks.add(click);
+		}
+		ctrlSelectionChanged();
+		/*
+		 * The primary highlight always follows the last click that was clicked on, so a
+		 * Ctrl click also brings that click up in the other click displays. This must
+		 * come after ctrlSelectionChanged(): if that click was the last one in the
+		 * selection we're back to single click mode, and setSelectedClick then puts the
+		 * single click Ctrl key shortcuts back.
+		 */
+		setSelectedClick(click);
+	}
+
+	/**
+	 * Clear the list of individually selected clicks.
+	 * @return true if there was anything to clear.
+	 */
+	public boolean clearCtrlSelection() {
+		if (ctrlSelectedClicks.isEmpty()) {
+			return false;
+		}
+		ctrlSelectedClicks.clear();
+		ctrlSelectionChanged();
+		return true;
+	}
+
+	/**
+	 * Called whenever the list of individually selected clicks changes. Sets up
+	 * exactly the same Ctrl key shortcuts (Ctrl+L, Ctrl+N, Ctrl+A) that a completed
+	 * box or polygon mark would, then repaints.
+	 */
+	private void ctrlSelectionChanged() {
+		ClicksOffline clicksOffline = clickControl.getClicksOffline();
+		if (clicksOffline != null) {
+			if (ctrlSelectedClicks.isEmpty()) {
+				getCtrlKeyManager().clearAll();
+			}
+			else {
+				clicksOffline.newMarkedClickList(getCtrlSelectionMark(),
+						new ArrayList<PamDataUnit>(ctrlSelectedClicks), this);
+			}
+		}
+		/*
+		 * The selection highlights are drawn on top of the buffered click image, so a
+		 * plain repaint is enough. Don't use repaintTotal(), which regenerates the
+		 * image and has a one second minimum paint interval - far too sluggish for
+		 * feedback on a mouse click.
+		 */
+		btPlot.repaint();
+	}
+
+	/**
+	 * Make an OverlayMark to go with the individually selected clicks. There is no
+	 * polygon to describe, so this mark has no coordinates and exists only so that
+	 * the standard mark handling code (event labelling dialogs, ClickMarkHandler etc.)
+	 * has a mark to pass around and to repaint through.
+	 * @return an empty overlay mark owned by this display.
+	 */
+	private OverlayMark getCtrlSelectionMark() {
+		return new OverlayMark(btMarker, btPlot, null, 0, btMarker.getProjector().getParameterTypes(), null);
+	}
+
+
 	/**
 	 * horrible mess of types. Get the marked clicks that are actually
 	 * click detections
 	 * @return
 	 */
 	public ArrayList<ClickDetection> getMarkedClickClicks() {
-		if (markedClicks == null) {
+		ArrayList<PamDataUnit> marked = getMarkedClicks();
+		if (marked == null) {
 			return null;
 		}
 		ArrayList<ClickDetection> clickClicks = new ArrayList<>();
-		for (PamDataUnit aUnit : markedClicks) {
+		for (PamDataUnit aUnit : marked) {
 			if (aUnit instanceof ClickDetection) {
 				clickClicks.add((ClickDetection) aUnit);
 			}

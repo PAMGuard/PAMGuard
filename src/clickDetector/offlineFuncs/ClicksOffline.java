@@ -25,7 +25,6 @@ import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.OfflineTaskManager;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
-import performanceTests.PamguardInfo;
 import binaryFileStorage.BinaryOfflineDataMap;
 import binaryFileStorage.BinaryStore;
 import clickDetector.ClickBTDisplay;
@@ -35,7 +34,6 @@ import clickDetector.ClickDataBlock;
 import clickDetector.ClickDetection;
 import clickDetector.offlineFuncs.eventtasks.EventCheckTask;
 import clickDetector.offlineFuncs.eventtasks.EventTaskGroup;
-import dataPlotsFX.JamieDev;
 import PamController.PamController;
 import PamModel.SMRUEnable;
 import PamView.CtrlKeyManager;
@@ -319,28 +317,83 @@ public class ClicksOffline {
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (event == null) {
-				return;
-			}
 			if (singleClick != null) {
-				event.addSubDetection(singleClick);
-				if (overlayMark!=null) overlayMark.repaintOwner();
-
+				quickAddClicks(event, overlayMark, singleClick);
 			}
-			else if (markedClicks != null) {
-				event.addSubDetections(markedClicks);
-				if (overlayMark!=null) overlayMark.repaintOwner();
-
+			else {
+				quickAddClicks(event, overlayMark, markedClicks);
 			}
-
-			clickControl.getClickDetector().getOfflineEventDataBlock().
-			updatePamData(event, System.currentTimeMillis());
-			notifyEventChanges(event);
-			clickControl.setLatestOfflineEvent(event);
-			//must repaint or click does not change colour
-			clickControl.getDisplayManager().findFirstBTDisplay().repaintTotal();
 		}
 
+	}
+
+	/**
+	 * Add a single data unit to an existing event.
+	 * @param event event to add to, does nothing if null.
+	 * @param overlayMark mark the unit came from, may be null.
+	 * @param singleUnit unit to add.
+	 */
+	public void quickAddClicks(OfflineEventDataUnit event, OverlayMark overlayMark, PamDataUnit singleUnit) {
+		if (event == null || singleUnit == null) {
+			return;
+		}
+		event.addSubDetection(singleUnit);
+		eventChanged(event, overlayMark);
+	}
+
+	/**
+	 * Add a list of data units to an existing event. This is what the "Add n clicks
+	 * to event x" menu item and the Ctrl+A shortcut both do.
+	 * @param event event to add to, does nothing if null.
+	 * @param overlayMark mark the units came from, may be null.
+	 * @param dataList units to add.
+	 */
+	public void quickAddClicks(OfflineEventDataUnit event, OverlayMark overlayMark, List<PamDataUnit> dataList) {
+		if (event == null || dataList == null || dataList.isEmpty()) {
+			return;
+		}
+		event.addSubDetections(dataList);
+		eventChanged(event, overlayMark);
+	}
+
+	/**
+	 * Tell everything that an event has been added to, and repaint the displays.
+	 * @param event event which changed.
+	 * @param overlayMark mark to repaint, may be null.
+	 */
+	private void eventChanged(OfflineEventDataUnit event, OverlayMark overlayMark) {
+		if (overlayMark != null) {
+			overlayMark.repaintOwner();
+		}
+		clickControl.getClickDetector().getOfflineEventDataBlock().
+		updatePamData(event, System.currentTimeMillis());
+		notifyEventChanges(event);
+		clickControl.setLatestOfflineEvent(event);
+		//must repaint or click does not change colour
+		//NB there may not be a BT display at all if the marking was done on an FX display.
+		ClickBTDisplay btDisplay = clickControl.getDisplayManager().findFirstBTDisplay();
+		if (btDisplay != null) {
+			btDisplay.repaintTotal();
+		}
+	}
+
+	/**
+	 * Work out which event a set of marked data units would be quickly added to by
+	 * the "Add n clicks to event x" menu item and the Ctrl+A shortcut. This is
+	 * either the single event the marked units already belong to, or the last event
+	 * anything was added to.
+	 * @param markedClicks marked data units, may be null.
+	 * @return event to add to, or null if there isn't an obvious one.
+	 */
+	public OfflineEventDataUnit getQuickAddEvent(List<PamDataUnit> markedClicks) {
+		OfflineEventDataUnit[] markedEvents = findMarkedEvents(markedClicks);
+		if (markedEvents == null) {
+			return clickControl.getLatestOfflineEvent();
+		}
+		if (markedEvents.length == 1) {
+			return markedEvents[0];
+		}
+		return null;
 	}
 	//	private class LabelClick implements ActionListener {
 	//		private OverlayMark overlayMark;

@@ -17,10 +17,21 @@ public class ColourScheme implements Serializable, Cloneable {
 	
 	public static final String DAYSCHEME = "Day";
 
+	/**
+	 * Neutral dark scheme, modelled on the FlatLaf dark look and feel
+	 * (com.formdev.flatlaf.FlatDarkLaf). Grey / blue, easy on the eye but,
+	 * unlike {@link #NIGHTSCHEME}, not intended to preserve night vision.
+	 */
+	public static final String DARKSCHEME = "Dark";
+
+	/**
+	 * Red on near black. Intended for use at night on a vessel where white or
+	 * blue light ruins the observers' night vision.
+	 */
 	public static final String NIGHTSCHEME = "Night";
 
 	public static final String PRINTSCHEME = "Print";
-	
+
 	private String name;
 
 	private Hashtable<PamColor, Color> colourTable;
@@ -347,20 +358,88 @@ public class ColourScheme implements Serializable, Cloneable {
 	
 	public static ColourScheme createDefaultNightScheme(int colourBlind) {
 		ColourScheme scheme = new ColourScheme(NIGHTSCHEME, colourBlind);
-		scheme.put(PamColor.PlOTWINDOW, new Color(32, 32, 32));
-		scheme.put(PamColor.BORDER, Color.BLACK);
-		scheme.put(PamColor.PLAIN, Color.WHITE);
-		scheme.put(PamColor.AXIS, Color.RED);
+		/*
+		 * The colours here are matched to the Swing look and feel installed for this
+		 * scheme by PamLookAndFeel (FlatLaf dark with @background = #1c1c1c and
+		 * @foreground = #e04a4a) so that PamColors managed panels blend into the
+		 * controls painted by the look and feel.
+		 */
+		scheme.put(PamColor.PlOTWINDOW, new Color(16, 16, 16));
+		scheme.put(PamColor.BORDER, new Color(28, 28, 28));
+		scheme.put(PamColor.PLAIN, new Color(224, 74, 74));
+		scheme.put(PamColor.AXIS, new Color(224, 74, 74));
 		scheme.put(PamColor.GRID, new Color(128, 0, 0));
-		scheme.put(PamColor.MAP, new Color(18, 18, 32));
+		scheme.put(PamColor.MAP, new Color(24, 12, 12));
 		scheme.put(PamColor.WARNINGBORDER, new Color(100, 0, 100));
+		// the defaults for these are a mid grey and a cyan, neither of which belongs
+		// in a scheme meant to preserve night vision.
+		scheme.put(PamColor.BACKGROUND_ALPHA, new Color(20, 20, 20, 180));
+		scheme.put(PamColor.HIGHLIGHT_ALPHA, new Color(200, 40, 40, 180));
+		scheme.put(PamColor.HIGHLIGHT, new Color(200, 40, 40, 60));
+		scheme.put(PamColor.LATLINE, new Color(110, 60, 60));
+		scheme.put(PamColor.LONLINE, new Color(90, 50, 50));
 		scheme.put(PamColor.GPSTRACK, new Color(255, 255, 255));
 		scheme.whaleColors[0] = new Color(192, 0, 0);
 		scheme.whaleColors[1] = new Color(255, 255, 255);
-		scheme.put(PamColor.TITLEBORDER, Color.RED);		
-		scheme.put(PamColor.BUTTONFACE, new Color(28,28,28));
-		scheme.put(PamColor.EDITCTRL, new Color(64,64,64));
+		scheme.put(PamColor.TITLEBORDER, new Color(224, 74, 74));
+		scheme.put(PamColor.BUTTONFACE, new Color(38, 38, 38));
+		scheme.put(PamColor.EDITCTRL, new Color(38, 38, 38));
 		return scheme;
+	}
+
+	/**
+	 * A neutral dark scheme built from the FlatLaf dark palette
+	 * (com.formdev.flatlaf.FlatDarkLaf / FlatDarkLaf.properties). The values used
+	 * here are the same ones the Swing look and feel installed by
+	 * {@link PamLookAndFeel} paints its own controls with, so that PamColors
+	 * managed panels sit flush against buttons, text fields etc:
+	 *
+	 * <pre>
+	 *   &#64;background          #3c3f41
+	 *   &#64;foreground          #bbbbbb
+	 *   &#64;componentBackground #46494b
+	 *   Component.borderColor  #616465
+	 *   editor background      #2b2b2b
+	 * </pre>
+	 *
+	 * @param colourBlind the colour blind palette to use for the whale / channel colours
+	 * @return the dark colour scheme
+	 */
+	public static ColourScheme createDefaultDarkScheme(int colourBlind) {
+		ColourScheme scheme = new ColourScheme(DARKSCHEME, colourBlind);
+		scheme.put(PamColor.PlOTWINDOW, new Color(43, 43, 43));      // FlatLaf dark editor background
+		scheme.put(PamColor.BORDER, new Color(60, 63, 65));          // @background
+		scheme.put(PamColor.PLAIN, new Color(187, 187, 187));        // @foreground
+		scheme.put(PamColor.AXIS, new Color(187, 187, 187));
+		scheme.put(PamColor.GRID, new Color(97, 100, 101));          // Component.borderColor
+		scheme.put(PamColor.MAP, new Color(38, 42, 54));
+		scheme.put(PamColor.WARNINGBORDER, new Color(140, 60, 60));
+		scheme.put(PamColor.BACKGROUND_ALPHA, new Color(30, 32, 33, 180));
+		scheme.put(PamColor.HIGHLIGHT_ALPHA, new Color(75, 110, 175, 180));  // @accentBaseColor
+		scheme.put(PamColor.HIGHLIGHT, new Color(75, 110, 175, 60));
+		scheme.put(PamColor.GPSTRACK, new Color(200, 200, 200));
+		scheme.put(PamColor.LATLINE, new Color(120, 80, 100));
+		scheme.put(PamColor.LONLINE, new Color(85, 85, 120));
+		scheme.put(PamColor.TITLEBORDER, new Color(187, 187, 187));
+		scheme.put(PamColor.BUTTONFACE, new Color(70, 73, 75));      // @componentBackground
+		scheme.put(PamColor.EDITCTRL, new Color(70, 73, 75));
+		/*
+		 * whaleColors[0] is black in the standard palettes, which is invisible on a
+		 * dark plot window, so lift it to the foreground grey.
+		 */
+		scheme.whaleColors[0] = new Color(187, 187, 187);
+		return scheme;
+	}
+
+	/**
+	 * Is this a dark scheme, i.e. one which needs light text on a dark
+	 * background? Used to decide which Swing look and feel and which JavaFX
+	 * style sheets to install.
+	 *
+	 * @return true for the Dark and Night schemes, false otherwise.
+	 */
+	public boolean isDark() {
+		return DARKSCHEME.equalsIgnoreCase(name) || NIGHTSCHEME.equalsIgnoreCase(name);
 	}
 
 	/**

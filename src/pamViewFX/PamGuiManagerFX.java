@@ -243,7 +243,9 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		}
 
 		scene = new Scene(sceneRoot);
-		scene.getStylesheets().addAll(getPamCSS());
+		//register with the style manager rather than adding the sheets directly, so the whole scene
+		//is restyled when the user switches colour scheme.
+		PamStylesManagerFX.getPamStylesManagerFX().styleScene(scene, PamStylesManagerFX.STYLE_GUI);
 
 		primaryStage.setScene(scene);
 	}
@@ -328,15 +330,12 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		// Dark mode toggle
 		CheckMenuItem darkModeItem = new CheckMenuItem("Dark Mode");
 		setMenuItemGraphic(darkModeItem, PamSettingsMenuPane.ICON_DARK_MODE);
-		boolean isNight = ColourScheme.NIGHTSCHEME.equalsIgnoreCase(
-				PamColors.getInstance().getColourScheme() != null
-						? PamColors.getInstance().getColourScheme().getName() : "");
-		darkModeItem.setSelected(isNight);
+		ColourScheme currentScheme = PamColors.getInstance().getColourScheme();
+		darkModeItem.setSelected(currentScheme != null && currentScheme.isDark());
 		darkModeItem.selectedProperty().addListener((obs, oldVal, dark) -> {
-			String scheme = dark ? ColourScheme.NIGHTSCHEME : ColourScheme.DAYSCHEME;
+			// setColourScheme restyles the JavaFX displays and swaps the Swing look and feel.
+			String scheme = dark ? ColourScheme.DARKSCHEME : ColourScheme.DAYSCHEME;
 			PamColors.getInstance().setColourScheme(scheme);
-			PamGuiManagerFX guiManager = PamController.getInstance().getGuiManagerFX();
-			if (guiManager != null) guiManager.refreshSceneCSS();
 		});
 
 		settingsMenu.getItems().addAll(generalSettings, moduleSettings, new SeparatorMenuItem(),
@@ -800,11 +799,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Call this after switching colour schemes so that the new CSS takes effect immediately.
 	 */
 	public void refreshSceneCSS() {
-		PamDefaultStyle style = PamStylesManagerFX.getPamStylesManagerFX().getCurStyle();
-		if (scene != null) {
-			scene.getStylesheets().clear();
-			scene.getStylesheets().addAll(style.getGUICSS());
-		}
+		PamStylesManagerFX.getPamStylesManagerFX().updateStyles();
 	}
 
 

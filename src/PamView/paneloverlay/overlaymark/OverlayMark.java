@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import PamUtils.Coordinate3d;
 import PamUtils.PamCoordinate;
 import PamView.GeneralProjector;
+import PamguardMVC.PamDataUnit;
 import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import dataPlotsFX.projector.TDProjectorFX;
@@ -18,14 +19,26 @@ import javafx.scene.input.MouseEvent;
 
 public class OverlayMark {
 
-	static public enum OverlayMarkType {POLYGON, RECTANGLE};
+	/**
+	 * Types of mark. POLYGON and RECTANGLE enclose an area of the display. DATAUNITS
+	 * has no enclosing shape at all: it holds an explicit list of data units which
+	 * the user picked out one at a time, normally by Ctrl clicking on them.
+	 */
+	static public enum OverlayMarkType {POLYGON, RECTANGLE, DATAUNITS};
 
 	private GeneralProjector.ParameterType[] parameterTypes;
 
 	private GeneralProjector.ParameterUnits[] parameterUnits;
-	
+
 	private ArrayList<PamCoordinate> coordinates = new ArrayList<>();
-	
+
+	/**
+	 * Data units explicitly selected by the user, only used by DATAUNITS marks. Kept
+	 * in step with the coordinates list, so that the mark limits and centre are the
+	 * limits and centre of the selected units.
+	 */
+	private ArrayList<PamDataUnit> markedDataUnits;
+
 	private OverlayMarkType markType = OverlayMarkType.POLYGON;
 	private PamCoordinate currentMouse;
 
@@ -84,6 +97,55 @@ public class OverlayMark {
 		}
 	}
 
+
+	/**
+	 * Add a data unit to a DATAUNITS mark, or remove it if it's already there. The
+	 * mark type is set to DATAUNITS automatically.
+	 * @param dataUnit data unit the user picked out.
+	 * @param coordinate position of that data unit in display coordinates, may be
+	 * null, in which case the mark limits and centre won't include this unit.
+	 * @return true if the unit is now in the mark, false if it was removed.
+	 */
+	public boolean toggleDataUnit(PamDataUnit dataUnit, PamCoordinate coordinate) {
+		markType = OverlayMarkType.DATAUNITS;
+		if (markedDataUnits == null) {
+			markedDataUnits = new ArrayList<>();
+		}
+		int existing = markedDataUnits.indexOf(dataUnit);
+		if (existing >= 0) {
+			markedDataUnits.remove(existing);
+			coordinates.remove(existing);
+			return false;
+		}
+		markedDataUnits.add(dataUnit);
+		// add the coordinate even if it's null, so the two lists stay index for index.
+		coordinates.add(coordinate);
+		return true;
+	}
+
+	/**
+	 * @return the data units explicitly selected by the user. Null unless this is a
+	 * DATAUNITS mark.
+	 */
+	public ArrayList<PamDataUnit> getMarkedDataUnits() {
+		return markedDataUnits;
+	}
+
+	/**
+	 * @return the number of data units explicitly selected by the user, 0 unless
+	 * this is a DATAUNITS mark.
+	 */
+	public int getMarkedDataUnitCount() {
+		return markedDataUnits == null ? 0 : markedDataUnits.size();
+	}
+
+	/**
+	 * @param dataUnit data unit to look for.
+	 * @return true if the data unit has been explicitly selected into this mark.
+	 */
+	public boolean containsDataUnit(PamDataUnit dataUnit) {
+		return markedDataUnits != null && markedDataUnits.contains(dataUnit);
+	}
 
 	/**
 	 * @return the markType
@@ -151,13 +213,20 @@ public class OverlayMark {
 	public PamCoordinate getCentre() {
 		Coordinate3d pc = new Coordinate3d();
 		double coords[] = new double[3];
+		int n = 0;
 		for (int i = 0; i < coordinates.size(); i++) {
 			PamCoordinate coord = coordinates.get(i);
+			if (coord == null) {
+				continue; // a DATAUNITS mark can hold a unit whose position isn't known.
+			}
 			for (int c = 0; c < coord.getNumCoordinates(); c++) {
 				coords[c] += coord.getCoordinate(c);
 			}
+			n++;
 		}
-		int n = coordinates.size();
+		if (n == 0) {
+			return pc;
+		}
 		for (int i = 0; i <3; i++) {
 			pc.setCoordinate(i, coords[i]/n);
 		}
@@ -178,26 +247,36 @@ public class OverlayMark {
 		double minY=Double.MAX_VALUE; 
 		double maxY=Double.NEGATIVE_INFINITY; 
 
-		//now find those maximum, and minimum values, 
+		//now find those maximum, and minimum values,
+		int nFound = 0;
 		for (int i=0; i<coordinates.size(); i++){
-			if (coordinates.get(i).getCoordinate(0)>maxX){
-				maxX=coordinates.get(i).getCoordinate(0); 
+			PamCoordinate coord = coordinates.get(i);
+			if (coord == null) {
+				continue; // a DATAUNITS mark can hold a unit whose position isn't known.
 			}
-			if (coordinates.get(i).getCoordinate(0)<minX){
-				minX=coordinates.get(i).getCoordinate(0);
+			nFound++;
+			if (coord.getCoordinate(0)>maxX){
+				maxX=coord.getCoordinate(0);
+			}
+			if (coord.getCoordinate(0)<minX){
+				minX=coord.getCoordinate(0);
 			}
 
-			if (coordinates.get(i).getCoordinate(1)>maxY){
-				maxY=coordinates.get(i).getCoordinate(1);
+			if (coord.getCoordinate(1)>maxY){
+				maxY=coord.getCoordinate(1);
 			}
-			if (coordinates.get(i).getCoordinate(1)<minY){
-				minY=coordinates.get(i).getCoordinate(1);
+			if (coord.getCoordinate(1)<minY){
+				minY=coord.getCoordinate(1);
 			}
 		}
-		
+		if (nFound == 0) {
+			// no positions at all, so don't hand back the infinities.
+			return new double[] {0, 0, 0, 0};
+		}
+
 		double[] limits = {minX, maxX, minY,maxY};
-		
-		return limits; 
+
+		return limits;
 	}
 
 	/**
@@ -218,6 +297,9 @@ public class OverlayMark {
 			return getRectangleShape(projector);
 		case POLYGON:
 			return getPolygonShape(projector);
+		case DATAUNITS:
+			// individually selected units don't enclose an area, so there is no shape.
+			return null;
 		}
 		return null;
 	}

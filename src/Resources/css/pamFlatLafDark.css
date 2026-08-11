@@ -27,9 +27,15 @@
  *   ToolTip.background             shade(@background,50%)   -> #1e2021
  *   @icon                          shade(#bbb,7%)           -> #aeaeae
  *   @buttonArrowColor              shade(#bbb,17%)          -> #9b9b9b
+ *
+ * The palette is declared on '.root, .gui-css-root', matching the base sheet:
+ * the GUI style is attached both to a Scene (where '.root' matches the scene
+ * root) and node-by-node to the time display's content nodes, which carry the
+ * 'gui-css-root' class instead (see TDDisplayFX.addGUICSS). Both sheets use the
+ * same selector, so this one - added after the base sheet - wins.
  */
 
-.root {
+.root, .gui-css-root {
     -flat-background:            #3c3f41;
     -flat-foreground:            #bbbbbb;
     -flat-disabled-foreground:   #8c8c8c;
@@ -53,6 +59,15 @@
     -flat-menu-hover:            #4b4e50;
 
     -fx-faint-focus-color:       #4b7baf44;
+
+    /* ---- PAMGuard plot furniture. -pam-axis-* follow the -flat-* values
+            redefined above; only the plot window colour needs its own value
+            (it matches PamColor.PlOTWINDOW for the Dark scheme, which is what
+            the Swing side and the plot canvases use). ---- */
+    -pam-plot-background:  #2b2b2b;
+    -pam-scroller-body:    rgba(190,190,190,0.30);
+    -pam-scroller-handle:  rgba(215,215,215,0.65);
+    -pam-scroller-grip:    rgba(40,40,40,0.9);
 
     /* FlatLaf dark icons are light grey */
     -fx-icon_col: #afb1b3;

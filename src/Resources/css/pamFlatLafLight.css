@@ -98,6 +98,17 @@
     -fx-mark-highlight-color:        transparent;
     -fx-shadow-highlight-color:      transparent;
 
+    /* ---- PAMGuard plot furniture. These are theme-neutral names (-pam-*)
+            so the rules that use them work with either base sheet; the dark
+            and night override sheets redefine them. ---- */
+    -pam-axis-background:  -flat-background;
+    -pam-axis-foreground:  -flat-foreground;
+    -pam-axis-line:        -flat-border;
+    -pam-plot-background:  #ffffff;          /* PamColor.PlOTWINDOW for the day scheme */
+    -pam-scroller-body:    rgba(70,70,70,0.45);
+    -pam-scroller-handle:  rgba(40,40,40,0.75);
+    -pam-scroller-grip:    rgba(235,235,235,0.9);
+
     /* legacy PAMGuard names, kept for panes that reference them.
        Dark grey to match the FlatLaf Swing icon colour. */
     -fx-icon_col: #4d4d4d;
@@ -1452,4 +1463,84 @@
 .navigation-drawer-button-selected .ikonli-font-icon {
     -fx-icon-color: white;
     -fx-fill: white;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * PAMGuard plot furniture                                                     *
+ *                                                                             *
+ * The axis panes, plot areas and scroll bar of the time display and of the    *
+ * data map. Unlike ordinary controls these are bare Panes and Canvases with   *
+ * no background of their own, so before these rules existed they showed       *
+ * whatever happened to be behind them and stayed light whatever the colour    *
+ * scheme.                                                                     *
+ *                                                                             *
+ * The colours come from the theme-neutral -pam-* lookups declared in the      *
+ * palette at the top of this sheet, so the same rules work in the Windows and *
+ * the FlatLaf base sheets and are re-pointed by the dark / night overrides.   *
+ *                                                                             *
+ ******************************************************************************/
+
+/* The pane an axis is drawn on - pamViewFX.fxNodes.pamAxis.PamAxisPane and
+   PamAxisPane2. Sits alongside the plot, so it takes the window background. */
+.pam-axis-pane {
+    -fx-background-color: -pam-axis-background;
+}
+
+/* The plot itself, and the acoustic scroller under the time display. Both show
+   data, so they take the plot window colour rather than the window background. */
+.pam-plot-pane,
+.pam-scroller-pane {
+    -fx-background-color: -pam-plot-background;
+}
+
+/* The draggable visible-range rectangle on the acoustic scroller. */
+.pam-scroller-body {
+    -fx-background-color: -pam-scroller-body;
+}
+
+.pam-scroller-handle {
+    -fx-background-color: -pam-scroller-handle;
+}
+
+.pam-scroller-grip {
+    -fx-stroke: -pam-scroller-grip;
+}
+
+/*
+ * JavaFX NumberAxis, used by PamAxisPane2. Modena derives all of these from
+ * -fx-background / -fx-text-background-color with derive(), which washes out
+ * against a dark background, so set them from the palette directly.
+ */
+.axis {
+    -fx-tick-label-fill: -pam-axis-foreground;
+}
+
+.axis > .axis-label,
+.axis .text {
+    -fx-fill: -pam-axis-foreground;
+    -fx-text-fill: -pam-axis-foreground;
+}
+
+.axis .axis-tick-mark,
+.axis .axis-minor-tick-mark {
+    -fx-stroke: -pam-axis-line;
+}
+
+/* keep Modena's one-sided axis lines, but in a palette colour */
+.axis:top {
+    -fx-border-color: transparent transparent -pam-axis-line transparent;
+}
+
+.axis:right {
+    -fx-border-color: transparent transparent transparent -pam-axis-line;
+}
+
+.axis:bottom {
+    -fx-border-color: -pam-axis-line transparent transparent transparent;
+}
+
+.axis:left {
+    -fx-border-color: transparent -pam-axis-line transparent transparent;
 }
