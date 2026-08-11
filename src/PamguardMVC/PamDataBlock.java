@@ -242,6 +242,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	protected int unitsAdded = 0;
 
 	protected int unitsUpdated = 0;
+	
+	protected int lastUnitUpdatedAbsoluteIndex = -1;
 
 	int channelMap;
 	
@@ -1475,6 +1477,14 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void updatePamData(Tunit pamDataUnit, long updateTimeMillis) {
 		pamDataUnit.updateDataUnit(updateTimeMillis);
+		
+		/*
+		 * ST Added 7/17/26 -- the last data unit in the data block is no longer the last unit updated. 
+		 * Rather than looping through the block to find the last unit updated, just set this var for reference. 
+		 * Then if getLastUpdatedUnit() is called, it will know exactly where to look.
+		 */
+		//
+		lastUnitUpdatedAbsoluteIndex = pamDataUnit.getAbsBlockIndex();
 		setChanged();
 		
 		if (!isOffline && !pamDataUnit.isEmbryonic()) {
@@ -1801,6 +1811,26 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			if (ref >= pamDataUnits.size())
 				return null;
 			return pamDataUnits.get(ref);
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * Gets the data unit that was last updated (if still available). 
+	 * This is not necessarily the last data unit in the list, but rather the last one that was updated.
+	 * If data unit that was last updated isn't available, or no data units have been updated, 
+	 * just return the last data unit in the list.
+	 * 
+	 * @return
+	 */
+	//ST 7/17/26 -- Introduced after AIS memory leak was fixed by Doug June/July '26. 
+	public Tunit getLastUpdatedUnit() {
+		int trueReference = this.lastUnitUpdatedAbsoluteIndex - unitsRemoved;
+		if (trueReference >= 0 && trueReference < pamDataUnits.size()) {
+			return getCurrentDataUnit(trueReference);
+		}else {
+			return getLastUnit();
 		}
 	}
 

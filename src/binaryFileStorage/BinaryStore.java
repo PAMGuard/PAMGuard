@@ -1,6 +1,7 @@
 package binaryFileStorage;
 
 import java.awt.Desktop;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import PamController.AWTScheduler;
@@ -164,6 +166,8 @@ PamSettingsSource, DataOutputStore {
 	
 	private RepeatWarning repeatWarning;
 
+	private boolean initialisationComplete;
+
 	public static int getCurrentFileFormat() { 
 		return CURRENT_FORMAT;
 	}
@@ -209,6 +213,19 @@ PamSettingsSource, DataOutputStore {
 
 		binarySettingsStorage = new BinarySettingsStorage(this);
 
+		if (PamController.getInstance().isInitializationComplete()) {
+			/*
+			 * Must be adding a bs to a configuration, so pop open the dialog to 
+			 * select the store straight away
+			 */
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					showStorageOptions(getGuiFrame());
+				}
+			});
+		}
+
 	}
 
 	@Override
@@ -219,6 +236,7 @@ PamSettingsSource, DataOutputStore {
 			if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) == null) {
 				doInitialStoreChecks(PamController.getMainFrame());
 			}
+			initialisationComplete = true;
 			break;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
 			// this gets called after INITIALIZATION_COMPLETE
@@ -577,22 +595,33 @@ PamSettingsSource, DataOutputStore {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			BinaryStoreSettings newSettings = BinaryStorageDialog.showDialog(parentFrame, BinaryStore.this);
-			if (newSettings != null) {
-				boolean immediateChanges = binaryStoreSettings.isChanged(newSettings);
-				binaryStoreSettings = newSettings.clone();
-				/*
-				 *  possible that storage location will have changed, so depending on mode, may have to close
-				 *  and reopen some files. 
-				 */
-				if (immediateChanges) {
-					if (storesOpen) {
-						reOpenStores(BinaryFooter.END_UNKNOWN, PamCalendar.getTimeInMillis());
-					}
-				}
-
-			}
+			showStorageOptions(parentFrame);
 		}
+	}
+
+	/**
+	 * Show the storage options dialog
+	 * @param frame
+	 * @return true if set
+	 */
+	private boolean showStorageOptions(Frame frame) {
+
+		BinaryStoreSettings newSettings = BinaryStorageDialog.showDialog(frame, BinaryStore.this);
+		if (newSettings != null) {
+			boolean immediateChanges = binaryStoreSettings.isChanged(newSettings);
+			binaryStoreSettings = newSettings.clone();
+			/*
+			 *  possible that storage location will have changed, so depending on mode, may have to close
+			 *  and reopen some files. 
+			 */
+			if (immediateChanges) {
+				if (storesOpen) {
+					reOpenStores(BinaryFooter.END_UNKNOWN, PamCalendar.getTimeInMillis());
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	class NewFileTask extends TimerTask {

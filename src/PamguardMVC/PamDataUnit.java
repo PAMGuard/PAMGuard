@@ -1110,6 +1110,9 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 * @return a data annotation. 
 	 */
 	public DataAnnotation getDataAnnotation(int index) {
+		if (index < 0 || dataAnnotations == null || dataAnnotations.size() <= index) {
+			return null;
+		}
 		return dataAnnotations.get(index);
 	}
 	

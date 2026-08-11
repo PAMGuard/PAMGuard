@@ -135,7 +135,7 @@ public class FormCounterManagement implements LoggerNetworkObserver {
 			//			System.out.println("tInt"+tInt);
 			//			System.out.println("Counter hash code="+this.hashCode());
 			if (tInt==null){
-				number = -1;
+				number = 0;
 			}else{
 				number = tInt;
 			}
@@ -166,6 +166,15 @@ public class FormCounterManagement implements LoggerNetworkObserver {
 				out.addTableItem(new PamTableItem(counterTitle, Types.CHAR, 5));
 
 				DBControlUnit dbControl= DBControlUnit.findDatabaseControl();
+				/*
+				 *  see if the table exists. It may not, if we're starting with a clean 
+				 *  database with just UDF tables.  
+				 */
+				boolean tableExists = dbControl.getDbProcess().tableExists(out);
+				if (tableExists == false) {
+					return null;
+				}
+				
 				PamCursor outputCursor=PamCursorManager.createCursor(out);
 
 				outputCursor.openScrollableCursor(dbControl.getConnection(), 

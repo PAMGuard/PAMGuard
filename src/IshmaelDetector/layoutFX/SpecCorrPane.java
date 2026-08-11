@@ -8,6 +8,8 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import java.util.List;
 
@@ -52,21 +54,35 @@ public class SpecCorrPane extends SettingsPane<IshDetParams> {
          root = new VBox(10);
         root.setPadding(new Insets(10));
 
+        // Stop Enter from leaking out of this pane. Without this, pressing Enter
+        // in a table cell (or anywhere else in this pane) bubbles up to the
+        // enclosing Swing dialog and triggers its default "OK" button, closing
+        // the whole dialog instead of just committing the cell edit.
+        root.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();
+            }
+        });
+
         // Table for segment data
         tableView = new TableView<>();
         tableView.setEditable(true);
         TableColumn<SegmentRow, Double> t0Col = new TableColumn<>("t0");
         t0Col.setCellValueFactory(cellData -> cellData.getValue().t0Property().asObject());
         t0Col.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
+        t0Col.setOnEditCommit(event -> event.getRowValue().t0Property().set(event.getNewValue()));
         TableColumn<SegmentRow, Double> f0Col = new TableColumn<>("f0");
         f0Col.setCellValueFactory(cellData -> cellData.getValue().f0Property().asObject());
         f0Col.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
+        f0Col.setOnEditCommit(event -> event.getRowValue().f0Property().set(event.getNewValue()));
         TableColumn<SegmentRow, Double> t1Col = new TableColumn<>("t1");
         t1Col.setCellValueFactory(cellData -> cellData.getValue().t1Property().asObject());
         t1Col.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
+        t1Col.setOnEditCommit(event -> event.getRowValue().t1Property().set(event.getNewValue()));
         TableColumn<SegmentRow, Double> f1Col = new TableColumn<>("f1");
         f1Col.setCellValueFactory(cellData -> cellData.getValue().f1Property().asObject());
         f1Col.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
+        f1Col.setOnEditCommit(event -> event.getRowValue().f1Property().set(event.getNewValue()));
         tableView.getColumns().addAll(t0Col, f0Col, t1Col, f1Col);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -205,6 +221,11 @@ public class SpecCorrPane extends SettingsPane<IshDetParams> {
 
 	@Override
 	public IshDetParams getParams(IshDetParams params) {
+		// Pull the table's current rows (and the spread/useLog fields) into
+		// this.params before handing it back. Without this call, edits made
+		// in the table (typed or pasted) are only ever reflected in the UI
+		// and never reach the saved parameters.
+		applyParams();
 		return this.params;
 	}
 

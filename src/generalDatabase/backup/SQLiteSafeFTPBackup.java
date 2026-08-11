@@ -116,17 +116,18 @@ public class SQLiteSafeFTPBackup extends SQLCloneDatabase{
 	}
 	
 	protected boolean fileAction(File source, String destDir) throws BackupException {
-		try {
-			BackupManager.getBackupManager().getFtpClient().mkdir(destDir);
-		}catch(TransferFailedException e) {
-			throw e;
-		}
-		try {
-			BackupManager.getBackupManager().getFtpClient().copyLocalToRemote(source.getParent(), destDir, source.getName());
-		} catch (TransferFailedException e) {
-			throw e;
-		}
-		return true;
+//		try {
+////			BackupManager.getBackupManager().getFtpClient().mkdir(destDir);
+//		}catch(TransferFailedException e) {
+//			throw e;
+//		}
+//		try {
+////			BackupManager.getBackupManager().getFtpClient().copyLocalToRemote(source.getParent(), destDir, source.getName());
+//		} catch (TransferFailedException e) {
+//			throw e;
+//		}
+//		return true;
+		return false;
 	}
 	
 	public boolean requiresFTPConnection() {

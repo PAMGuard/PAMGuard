@@ -24,7 +24,7 @@ public class UDPInputPanel extends TextPanel {
 		if (itemInformation != null) {
 			String str = itemInformation.getStringProperty(UDColName.Topic.toString());
 			if (str == null) {
-				itemInformation.setProperty(UDColName.Topic.toString(), "LoggerButton");	
+				itemInformation.setProperty(UDColName.Topic.toString(), "Logger/Button");	
 			}
 		}
 		// TODO Auto-generated method stub

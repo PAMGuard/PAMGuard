@@ -124,12 +124,12 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public String getModuleSummary(boolean clear, String format) {
 		if(format.equals("json")) {
-			AISDataUnit lastUnit = aisProcess.getOutputDataBlock().getLastUnit();
+			AISDataUnit lastUnit = aisProcess.getOutputDataBlock().getLastUpdatedUnit();
 			if(lastUnit==null) {
 				return "";
 			}
 			JSONObject json = new JSONObject();
-			json.put("Note", "this is a summary, only reporting the last ais unit at the time requested.");
+			json.put("Note", "this is a summary, only reporting the last ais data unit at the time requested.");
 			json.put("LastDataTime", lastUnit.getTimeMilliseconds());
 			json.put("MMSI", lastUnit.mmsiNumber);
 			if(lastUnit.getPositionReport()!=null) {
@@ -146,6 +146,8 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 				json.put("name", lastUnit.getStaticData().shipName);
 				json.put("IMO", lastUnit.getStaticData().imoNumber);
 				json.put("shipType", lastUnit.getStaticData().shipType);
+				json.put("shipName", lastUnit.getStaticData().shipName);
+
 			}else {
 				json.put("hasStaticReport", false);
 			}
