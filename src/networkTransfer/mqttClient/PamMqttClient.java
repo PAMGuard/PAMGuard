@@ -203,10 +203,10 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 			}
 			initializing = false;
 		} catch (MqttSecurityException e1) {
-			e1.printStackTrace();
+//			e1.printStackTrace();
 			throw new ClientConnectFailedException(e1);
 		} catch (MqttException e1) {
-			e1.printStackTrace();
+//			e1.printStackTrace();
 			throw new ClientConnectFailedException(e1);
 		} catch(NullPointerException e1) {
 			throw new ClientConnectFailedException(e1);
