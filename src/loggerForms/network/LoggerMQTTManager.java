@@ -229,7 +229,7 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 			System.out.println("Error sending MQTT Message: " + e.getMessage());
 			return false;
 		}
-		System.out.println("Send network data : " + topic);
+//		System.out.println("Send network data : " + topic);
 		return true;
 	}
 
