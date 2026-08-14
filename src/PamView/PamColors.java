@@ -150,7 +150,16 @@ public class PamColors implements PamSettings {
 		colorSettings.rebuildSchemes(selected);
 
 		colourScheme = colorSettings.selectScheme(colorSettings.getCurrentScheme());
+		/*
+		 * The scheme keeps its name when only the palette changes, so setColors() will
+		 * not count this as a new version. It very much is one - every whale and channel
+		 * colour has just changed, and there may not even be the same number of them -
+		 * so bump the version and tell the displays about it here, exactly as a scheme
+		 * change does.
+		 */
+		colourSchemeVersion++;
 		setColors();
+		SwingUtilities.invokeLater(this::colourSchemeChanged);
 	}
 
 //	/**

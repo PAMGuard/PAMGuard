@@ -1498,6 +1498,21 @@
 }
 
 /*
+ * The drag icon which appears on top of the visible-range rectangle when the
+ * rectangle is too narrow to grab. Takes the handle colour so that it reads as
+ * part of the scroller, but opaque so that it stands out against the text box
+ * it sits on top of.
+ */
+.pam-scroller-drag-icon {
+    -fx-background-color: -pam-scroller-handle;
+    -fx-background-radius: 3;
+}
+
+.pam-scroller-drag-glyph {
+    -fx-icon-color: -pam-scroller-grip;
+}
+
+/*
  * JavaFX NumberAxis, used by PamAxisPane2. Modena derives all of these from
  * -fx-background / -fx-text-background-color with derive(), which washes out
  * against a dark background, so set them from the palette directly.

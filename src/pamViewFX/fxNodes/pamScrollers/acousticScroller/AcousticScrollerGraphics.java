@@ -113,6 +113,42 @@ public interface AcousticScrollerGraphics {
 	}
 
 	/**
+	 * The parts of the given range which this graphics does not already hold and so
+	 * still need to be ordered. Implementations which store their preview against
+	 * absolute time (e.g. the tiled FFT spectrogram preview) can return only the gaps,
+	 * so that a range which has moved slightly - or been extended by the load margin -
+	 * re-uses everything already built and orders only the genuinely new data. This is
+	 * what stops the whole preview being rebuilt (and blanked) whenever the loaded data
+	 * range moves.
+	 * <p>
+	 * The default returns <code>null</code>, meaning "I do not track what I hold": the
+	 * scroller then falls back to {@link #prepareOfflineLoad(long, long)} and orders
+	 * the whole range from the point that returns.
+	 *
+	 * @param rangeStart the start of the range to be loaded, in millis.
+	 * @param rangeEnd   the end of the range to be loaded, in millis.
+	 * @return the intervals ({start, end} pairs) still needing to be ordered, an empty
+	 *         list if the range is already covered, or null for no incremental loading.
+	 */
+	public default java.util.List<long[]> getRequiredLoadIntervals(long rangeStart, long rangeEnd) {
+		return null;
+	}
+
+	/**
+	 * Called when an interval has been ordered and loaded to its natural end, so that
+	 * an implementation returning intervals from
+	 * {@link #getRequiredLoadIntervals(long, long)} can record it as held and not order
+	 * it again. Note that this is called even when the interval contained no data at
+	 * all, otherwise empty stretches would be re-ordered on every pass. The default
+	 * does nothing.
+	 *
+	 * @param startMillis the start of the loaded interval, in millis.
+	 * @param endMillis   the end of the loaded interval, in millis.
+	 */
+	public default void markRangeLoaded(long startMillis, long endMillis) {
+	}
+
+	/**
 	 * True if this graphics' data source is currently being loaded by another consumer
 	 * (e.g. the main spectrogram display loading the same FFT block). When true the
 	 * scroller idle-gates - it waits rather than placing a competing offline order that

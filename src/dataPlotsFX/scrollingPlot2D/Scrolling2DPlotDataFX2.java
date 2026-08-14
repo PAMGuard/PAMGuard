@@ -281,6 +281,23 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 		return tileMillis;
 	}
 
+	/**
+	 * The span of time one tile should aim to cover, in millis. A quarter of the visible
+	 * range keeps the number of tiles small while still letting a scroll re-use most of
+	 * them. The actual span is rounded to the time compression and to sensible image
+	 * widths by {@link #checkConfig()}, so this is only a target.
+	 * <p>
+	 * Overridden where the tiles must not be larger than a single offline order - the
+	 * scroll-bar preview marks tiles loaded a whole order at a time, so a tile spanning
+	 * more than one order could never be completed.
+	 *
+	 * @param visibleMillis the visible time range in millis.
+	 * @return the target span of one tile in millis.
+	 */
+	protected double targetTileMillis(double visibleMillis) {
+		return visibleMillis / 4.0;
+	}
+
 	/* ===================== configuration ===================== */
 
 	@Override
@@ -312,8 +329,9 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			newComp *= 2;
 		}
 
-		// tile span: aim for ~ a quarter of the visible range, aligned to compression.
-		double targetMillis = Math.max(visibleMillis / 4.0, 1);
+		// tile span: aim for the target span (a quarter of the visible range unless a
+		// subclass says otherwise), aligned to compression.
+		double targetMillis = Math.max(targetTileMillis(visibleMillis), 1);
 		int slices = (int) Math.max(1, Math.round((targetMillis / 1000.) / newTimeScale));
 		slices = Math.max(newComp, ((slices + newComp - 1) / newComp) * newComp);
 		int imgW = slices / newComp;

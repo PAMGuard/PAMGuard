@@ -1,4 +1,6 @@
 package pamViewFX.fxNodes.pamScrollers.acousticScroller;
+import java.util.List;
+
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -133,32 +135,10 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 	private Rectangle windowRect;
 
 	/**
-	 * The data range (millis) whose preview has been FULLY built (an offline load
-	 * completed naturally for it). Used by {@link #needsReload()} so a mere
-	 * scroll-position change within an already-loaded range does not trigger a rebuild.
+	 * Sample rate the frequency axis was last set up for, so that the axis is
+	 * (re)built when the data actually change rather than on every unit.
 	 */
-	private volatile long fullyLoadedMin = Long.MIN_VALUE;
-	private volatile long fullyLoadedMax = Long.MIN_VALUE;
-
-	/**
-	 * The range currently being loaded. Used to tell a fresh range (clear + start over)
-	 * from a continuation of the same range (resume).
-	 */
-	private volatile long currentRangeMin = Long.MIN_VALUE;
-	private volatile long currentRangeMax = Long.MIN_VALUE;
-
-	/**
-	 * Time of the furthest (latest) accepted unit for the current range - i.e. how far
-	 * the preview has been built. This is the point an interrupted load resumes from.
-	 */
-	private volatile long maxLoadedMillis = Long.MIN_VALUE;
-
-	/**
-	 * When a FRESH load starts we do not wipe the existing preview immediately (an
-	 * interrupted or empty load would otherwise blank the display); instead we arm a
-	 * clear and do the actual reset when the first new data unit of the load arrives.
-	 */
-	private volatile boolean pendingClear = false;
+	private volatile float freqAxisSampleRate = -1;
 
 	@Override
 	public void addNewData(PamDataUnit rawData) {
@@ -167,19 +147,12 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 //					&& PamUtils.hasChannel(rawData.getChannelBitmap(), channel)
 					&& PamUtils.hasChannel(rawData.getSequenceBitmap(), channel)
 					&& lastData!=rawData){
-				//Lazy clear: only wipe the previous preview now that real data has arrived
-				//to replace it. This keeps the last good image on screen through interrupted
-				//or NO_DATA load attempts (the cause of the unreliable/blank preview).
-				if (pendingClear) {
-					spectrogramPlot.resetForLoad();
+				if (freqAxisSampleRate != fftDataBlock.getSampleRate()) {
 					updateFreqLimits();
-					pendingClear = false;
+					freqAxisSampleRate = fftDataBlock.getSampleRate();
 				}
 				spectrogramPlot.new2DData((FFTDataUnit) rawData);
 				lastData=rawData;
-				//track how far the preview has been built so an interrupted load can resume.
-				long t = rawData.getTimeMilliseconds();
-				if (t > maxLoadedMillis) maxLoadedMillis = t;
 			}
 		}
 		catch (Exception e){
@@ -214,52 +187,53 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 
 	@Override
 	public void clearStore() {
-		//Defer the actual image reset until the first new data unit arrives (see addNewData).
-		//This avoids blanking the preview on interrupted/empty load attempts.
-		pendingClear = true;
+		/*
+		 * Nothing to do. The preview is held as tiles keyed on absolute time and the tiled
+		 * store retires or discards them itself when the geometry changes (see
+		 * Scrolling2DPlotDataFX2.checkConfig), so there is never a reason to blank it from
+		 * here - that would throw away exactly the data a moved range wants to re-use.
+		 */
 	}
 
 	@Override
-	public long prepareOfflineLoad(long rangeStart, long rangeEnd) {
-		//Decide whether this is a continuation of the range we were already loading. If so,
-		//resume from the furthest point already built (no clear, append to the existing
-		//image). Otherwise start fresh: remember the new range and arm a deferred clear.
-		boolean sameRange = (rangeStart == currentRangeMin && rangeEnd == currentRangeMax);
-		if (sameRange && maxLoadedMillis > rangeStart) {
-			return maxLoadedMillis;
+	public List<long[]> getRequiredLoadIntervals(long rangeStart, long rangeEnd) {
+		//Bring the tiling up to date with the current range and resolution first, or the
+		//load state below is read from a stale (or not yet configured) tiling.
+		spectrogramPlot.checkConfig();
+		return spectrogramPlot.getRequiredLoadIntervals(rangeStart, rangeEnd);
+	}
+
+	@Override
+	public void markRangeLoaded(long startMillis, long endMillis) {
+		/*
+		 * Record the interval as held - including where it held no data at all - so that it
+		 * is not ordered again. Load state is tracked per tile, so only tiles which lie
+		 * WHOLLY inside the loaded interval may be marked: marking a tile the order only
+		 * partly covered would leave a permanent gap in the preview. Orders are whole
+		 * numbers of tiles (see getLoadChunkMillis) so normally that is the whole interval;
+		 * the trimming only bites if the tiling changed while the order was in flight.
+		 */
+		long tile = spectrogramPlot.getTileMillis();
+		if (tile <= 0) {
+			return;
 		}
-		currentRangeMin = rangeStart;
-		currentRangeMax = rangeEnd;
-		maxLoadedMillis = rangeStart;
-		clearStore(); //arm deferred clear - existing image kept until first new data arrives
-		return rangeStart;
+		long from = Math.floorDiv(startMillis + tile - 1, tile) * tile;
+		long to = Math.floorDiv(endMillis, tile) * tile;
+		if (to > from) {
+			spectrogramPlot.markRangeLoaded(from, to);
+		}
 	}
 
 	@Override
 	public boolean needsReload() {
-		//Only rebuild when the fully-loaded data range has actually moved. A scroll-position
-		//change within an already fully-loaded range leaves the preview correct, so skip the
-		//expensive disk re-order that was causing the reload-on-every-move behaviour.
-		boolean reload = acousticScroller.getMinimumMillis() != fullyLoadedMin
-				|| acousticScroller.getMaximumMillis() != fullyLoadedMax;
-		return reload;
-	}
-
-	@Override
-	public void loadCompleted(boolean naturalCompletion) {
-		//Only record the range as fully loaded when the load ran to its natural end AND
-		//actually delivered data. A load that was given up while still incomplete is
-		//partial and must resume; a zero-data pass (e.g. the wav-file map still being built
-		//on first load) must not be marked, or the preview would get stuck blank/half-built
-		//until the range changes.
-		if (!naturalCompletion) {
-			return;
-		}
-		if (maxLoadedMillis <= currentRangeMin) {
-			return;
-		}
-		fullyLoadedMin = currentRangeMin;
-		fullyLoadedMax = currentRangeMax;
+		/*
+		 * Load only if some part of the range to load is not already held. A scroll
+		 * position change leaves the preview entirely correct, and a change of loaded data
+		 * range usually leaves most of it correct too - only the genuinely new part needs
+		 * ordering, and if the range moved by less than the load margin, nothing does.
+		 */
+		return !getRequiredLoadIntervals(acousticScroller.getLoadStartMillis(),
+				acousticScroller.getLoadEndMillis()).isEmpty();
 	}
 
 //	/**
@@ -340,10 +314,23 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 			super(projector, fftDataBlock, dataGramColors, i, isViewer);
 		}
 
+		/**
+		 * The scroll bar shows the whole loaded data range, so a quarter of it is a huge
+		 * span of data - far more than can be held as raw FFT units while it loads. Cap
+		 * the tiles at one order's worth so that each order completes whole tiles (which
+		 * is what lets the preview record what it holds and re-use it when the loaded
+		 * range moves). Tiles only decide how the preview is chopped up, not the
+		 * resolution it is drawn at, so more of them costs nothing visually.
+		 */
+		@Override
+		protected double targetTileMillis(double visibleMillis) {
+			return Math.min(super.targetTileMillis(visibleMillis), chunkBudgetMillis());
+		}
+
 		public void rebuildFinished(){
 			acousticScroller.repaint(0);
 		}
-		
+
 	}
 
 	@Override
@@ -360,9 +347,30 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 
 	@Override
 	public long getLoadChunkMillis() {
-		//Bound the resident FFT-unit memory by loading the range in chunks sized to the
-		//budget above. Estimate the FFT data rate from the block: an FFT data unit holds
-		//roughly fftLength complex doubles, and there are sampleRate/hop units per second.
+		/*
+		 * A whole number of tiles (at least one) no larger than the memory budget, so that
+		 * every order covers whole tiles and can be marked loaded when it completes, while
+		 * the resident FFT-unit memory stays bounded. The tiles themselves are capped at
+		 * the budget (see SpecDatagramPlot.targetTileMillis) so 'at least one tile' is not
+		 * a way round the budget - beyond the point where a tile hits its minimum image
+		 * width, which is a small enough span not to matter.
+		 */
+		long budget = chunkBudgetMillis();
+		long tile = spectrogramPlot.getTileMillis();
+		if (tile <= 0) {
+			return budget;
+		}
+		long nTiles = Math.max(1, budget / tile);
+		return nTiles * tile;
+	}
+
+	/**
+	 * The span of data which can be held in memory as raw FFT units while one order is
+	 * loaded, in millis. Estimated from the FFT data rate of the block: a unit holds
+	 * roughly fftLength complex doubles, and there are sampleRate/hop units per second.
+	 * @return the memory budget expressed as a span of time in millis.
+	 */
+	private long chunkBudgetMillis() {
 		float sr = fftDataBlock.getSampleRate();
 		int hop = fftDataBlock.getHopSamples();
 		int fftLen = fftDataBlock.getFftLength();

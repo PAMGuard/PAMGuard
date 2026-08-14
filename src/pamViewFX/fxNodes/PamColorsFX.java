@@ -333,6 +333,19 @@ public class PamColorsFX implements PamSettings {
 	}
 
 	/**
+	 * Get a counter which increments every time the colour scheme or the colour
+	 * blind palette changes. Anything which copies colours out of here (rather than
+	 * asking for them as it draws) can compare this against the version it last
+	 * read to find out whether it is out of date. See
+	 * {@link PamColors#getColourSchemeVersion()}.
+	 *
+	 * @return the current colour scheme version.
+	 */
+	public int getColourSchemeVersion() {
+		return PamColors.getInstance().getColourSchemeVersion();
+	}
+
+	/**
 	 * @return the colourScheme
 	 */
 	public ColorSchemeFX getColourScheme() {
