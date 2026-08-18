@@ -79,9 +79,13 @@ public class PamDefaultStyle {
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard sliding
-	 * dialogs
+	 * dialogs.
+	 * <p>
+	 * This is an override layered on top of the dark GUI sheets rather than a
+	 * standalone style - see {@link #getSlidingDialogCSS()}. The sliding panes are
+	 * always dark, whatever the colour scheme.
 	 */
-	protected String slidingDialogCSS = "/Resources/css/pamSettingsCSS.css";
+	protected String slidingDialogCSS = "/Resources/css/pamSettingsFlatLaf.css";
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard sliding
@@ -120,7 +124,7 @@ public class PamDefaultStyle {
 	 * Night scheme. The sliding dialogs are always dark, so they need no Dark
 	 * scheme override, only the red night one.
 	 */
-	protected String slidingNightOverrideCSS = "/Resources/css/pamSettingsNight.css";
+	protected String slidingNightOverrideCSS = "/Resources/css/pamSettingsFlatLafNight.css";
 
 	/**
 	 * Pick the default light style sheet to match the Swing look and feel set in
@@ -204,16 +208,26 @@ public class PamDefaultStyle {
 	private ArrayList<String> mainStyleSheets(String lightSheet) {
 		ArrayList<String> cssStyles = new ArrayList<String>();
 		if (isDarkScheme()) {
-			addSheet(cssStyles, darkBaseCSS);
-			addSheet(cssStyles, darkOverrideCSS);
-			if (isNightScheme()) {
-				addSheet(cssStyles, nightOverrideCSS);
-			}
+			addDarkSheets(cssStyles);
 		}
 		else {
 			addSheet(cssStyles, lightSheet);
 		}
 		return cssStyles;
+	}
+
+	/**
+	 * Add the sheets which make up the dark style: the FlatLaf base sheet, the dark
+	 * colour override, and the night override on top of that for the Night scheme.
+	 *
+	 * @param cssStyles list to add to
+	 */
+	private void addDarkSheets(ArrayList<String> cssStyles) {
+		addSheet(cssStyles, darkBaseCSS);
+		addSheet(cssStyles, darkOverrideCSS);
+		if (isNightScheme()) {
+			addSheet(cssStyles, nightOverrideCSS);
+		}
 	}
 
 	/**
@@ -254,6 +268,15 @@ public class PamDefaultStyle {
 	 * Return the CSS Style sheet to be used for the Pamguard sliding dialogs.
 	 * </p>
 	 * <p>
+	 * The sliding panes are always dark, whatever the colour scheme: a sliding pane
+	 * is a panel sitting on top of a display, and in the Day scheme a light panel
+	 * over a light plot would not read as one. So this is the dark GUI style - which
+	 * brings every ordinary control - with the settings pane sheet on top of it to
+	 * add the pane faces, hiding tabs and close buttons the GUI sheets know nothing
+	 * about, and to make the palette resolve on panes which are not scene roots (see
+	 * the header of pamSettingsFlatLaf.css). The night override goes last, as ever.
+	 * </p>
+	 * <p>
 	 * If overriding this method, do not simply return a URI String. In order for
 	 * the String to be in the proper format, the getClass.getResource... method
 	 * should be used.
@@ -263,6 +286,7 @@ public class PamDefaultStyle {
 	 */
 	public ArrayList<String> getSlidingDialogCSS() {
 		ArrayList<String> cssStyles = new ArrayList<String>();
+		addDarkSheets(cssStyles);
 		addSheet(cssStyles, slidingDialogCSS);
 		if (isNightScheme()) {
 			addSheet(cssStyles, slidingNightOverrideCSS);

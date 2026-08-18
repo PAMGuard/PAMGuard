@@ -90,6 +90,15 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	/** Max width of a single tile image in pixels (some graphics cards dislike huge images). */
 	private static final int MAXIMAGESIZE = 3092;
 
+	/**
+	 * Maximum number of consecutive empty image columns which are filled by
+	 * duplicating the previous column (see
+	 * {@link #fillColumnGap(SpecTile, int, SpecTile, int)}). Only enough to repair the
+	 * odd column stepped over by millisecond time quantisation - anything longer is a
+	 * genuine gap in the data and is left blank.
+	 */
+	private static final int MAX_GAP_FILL = 2;
+
 	/** Decibel integer scale, matching {@link Scrolling2DPlotDataFX#decibelIntScale}. */
 	private static final double DECIBEL_INT_SCALE = 25;
 
@@ -544,7 +553,15 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	 * compression.
 	 */
 	private void writeFFTToTile(SpecTile tile, long t, DataUnit2D fftDataUnit) {
-		int slice = (int) Math.round((t - tile.startMillis) / (timeScale * 1000.));
+		// Slice n of the tile covers [start + n*sliceMillis, start + (n+1)*sliceMillis),
+		// so an FFT starting at t belongs in the slice it falls in - floor, not round.
+		// Rounding would put the FFT half a slice late, and because a tile's span is a
+		// whole number of millis while a slice is generally not, the offset between the
+		// tile boundary and the first FFT in the tile drifts from tile to tile. Whenever
+		// that offset passed half a slice, rounding sent the first FFT to slice 1 and
+		// left column 0 of the image unwritten - a transparent (black) line one FFT wide
+		// at the tile boundary, visible whenever there is no time compression to hide it.
+		int slice = (int) Math.floor((t - tile.startMillis) / (timeScale * 1000.));
 		if (slice < 0) {
 			slice = 0;
 		}
@@ -558,7 +575,10 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 		// flush the previous (different) column/tile before starting a new one.
 		if (pendingTile != tile || (pendingTile != null && pendingTile.accumCol != col)) {
+			SpecTile prevTile = pendingTile;
+			int prevCol = (prevTile != null) ? prevTile.accumCol : -1;
 			flushAccum(pendingTile, true);
+			fillColumnGap(prevTile, prevCol, tile, col);
 			tile.accumCol = col;
 			tile.accumCount = 0;
 			pendingTile = tile;
@@ -601,6 +621,70 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			}
 			tile.accumCount = 0;
 		}
+	}
+
+	/**
+	 * Fill the (very few) empty columns between the last column written and the one
+	 * about to be written by duplicating the last written column.
+	 * <p>
+	 * FFT times are quantised to whole milliseconds while the FFT interval generally
+	 * is not a whole number of millis, so the mapping of time to column can
+	 * occasionally step over a column. With no time compression that leaves a single
+	 * unwritten - and therefore transparent - column in the image, which shows as a
+	 * black line one FFT wide. Only gaps of up to {@link #MAX_GAP_FILL} columns are
+	 * filled, so real breaks in the data are still drawn as blank.
+	 *
+	 * @param prevTile the tile the last column was written to (may be null).
+	 * @param prevCol  the last column written in that tile.
+	 * @param tile     the tile the next column will be written to.
+	 * @param col      the column about to be written.
+	 */
+	private void fillColumnGap(SpecTile prevTile, int prevCol, SpecTile tile, int col) {
+		if (prevTile == null || prevCol < 0 || prevCol >= prevTile.imgWidth || !prevTile.colWritten[prevCol]) {
+			return;
+		}
+		if (prevTile.imgWidth != tile.imgWidth || prevTile.nBins != tile.nBins) {
+			return; // different geometry - can't be adjacent columns.
+		}
+		int gap;
+		if (prevTile == tile) {
+			gap = col - prevCol - 1;
+		}
+		else if (tile.tileIndex == prevTile.tileIndex + 1) {
+			gap = (prevTile.imgWidth - 1 - prevCol) + col;
+		}
+		else {
+			return; // not the neighbouring tile, so any gap is a real one.
+		}
+		if (gap <= 0 || gap > MAX_GAP_FILL) {
+			return;
+		}
+		SpecTile fillTile = prevTile;
+		int fillCol = prevCol;
+		for (int i = 0; i < gap; i++) {
+			if (++fillCol >= fillTile.imgWidth) {
+				fillTile = tile;
+				fillCol = 0;
+			}
+			if (!fillTile.colWritten[fillCol]) {
+				copyColumn(prevTile, prevCol, fillTile, fillCol);
+			}
+		}
+	}
+
+	/**
+	 * Copy a rendered column from one tile to another (or within a tile). Both tiles
+	 * must have the same bin count.
+	 */
+	private void copyColumn(SpecTile srcTile, int srcCol, SpecTile dstTile, int dstCol) {
+		short[] src = srcTile.colData[srcCol];
+		short[] dst = dstTile.colData[dstCol];
+		for (int i = 0; i < dstTile.nBins; i++) {
+			dst[i] = src[i];
+			dstTile.writer.setColor(dstCol, dstTile.nBins - 1 - i, specColors.getColours(src[i] / DECIBEL_INT_SCALE));
+		}
+		dstTile.colWritten[dstCol] = true;
+		dstTile.hasData = true;
 	}
 
 	/**

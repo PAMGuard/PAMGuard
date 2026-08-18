@@ -133,9 +133,36 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 	/**
 	 * Show the modal annotation dialog. This MUST be called on the Swing EDT (see
 	 * {@link #showAnnotationDialogAndStore}) - never on the JavaFX thread.
+	 * <p>
+	 * If the user has switched off {@link SpectrogramMarkParams#isShowDialogOnNewMark()}
+	 * the dialog is skipped and the annotation is kept with whatever the automatic
+	 * annotation types have already measured.
 	 */
 	protected boolean manualAnnotate(MarkDataUnit adu, Point locOnScreen) {
+		if (!specMarkParams.isShowDialogOnNewMark()) {
+			return true;
+		}
 		return MarkAnnotationDialog.showDialog(getGuiFrame(), this, adu, locOnScreen);
+	}
+
+	/**
+	 * Is the "show annotation dialog" option offered in this module's settings
+	 * dialog? Sub classes which control the popup themselves (the Quick Annotation
+	 * module has its own control in its settings dialog and side panel) return
+	 * false so that the same option isn't presented twice.
+	 *
+	 * @return true if the option should be shown in {@link SpectrogramMarkDialog}
+	 */
+	public boolean hasShowDialogOption() {
+		return true;
+	}
+
+	/**
+	 * @return the mark parameters, which hold the annotation choices and the
+	 *         automatic dialog option.
+	 */
+	public SpectrogramMarkParams getSpecMarkParams() {
+		return specMarkParams;
 	}
 
 	/**

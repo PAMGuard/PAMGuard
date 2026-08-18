@@ -54,6 +54,7 @@ public class RExportManager implements PamDataUnitExporter {
 		rDataExport.add(new RWhistleExport()); 
 		rDataExport.add(new RCPODExport()); 
 		rDataExport.add(new RNoiseExport()); //should be last in case raw data holders have specific exporters
+		rDataExport.add(new RMarkExport());
 		//rDataExport.add(new RSudSensorExport());
 		rDataExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
 

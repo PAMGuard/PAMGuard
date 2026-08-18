@@ -373,7 +373,7 @@ public class TDMenuPane extends PamBorderPane {
 		 * NB style this holder, not TDMenuPane. This is a sibling of the detection
 		 * display; putting the sliding style on a common ancestor of both would demote
 		 * the detection display's own hiding panes in the cascade (see the note at the
-		 * top of pamSettingsNight.css).
+		 * top of pamSettingsFlatLaf.css).
 		 */
 		PamStylesManagerFX.getPamStylesManagerFX().styleNode(holder, PamStylesManagerFX.STYLE_SLIDING);
 
@@ -500,13 +500,20 @@ public class TDMenuPane extends PamBorderPane {
 				final OverlayMenuItem overlayItme=menuNodes.get(i); 
 				//				System.out.println("Overlay Items: " +overlayItme.getNodeToolTip().getText());
 				menuButton=overlayItme.menuAction(detectionSummary, detectionSummary.getDataList().indexOf(currentDataUnit), overlayMarker.getCurrentMark() );
-				if (menuButton==null) continue; 
+				if (menuButton==null) continue;
 				tilePane.getChildren().add(menuButton);
-				styleButton(menuButton, 30);
-				//				n++; 
+				/*
+				 * These are icon only buttons, so they share the width of the menu evenly
+				 * rather than taking the 30 pixels of their icon and bunching up on the left.
+				 * The .icon-button class stops the style sheet left justifying them like the
+				 * menu entries above - see pamSettingsFlatLaf.css.
+				 */
+				styleButton(menuButton, MENU_WIDTH/3.);
+				menuButton.getStyleClass().add("icon-button");
+				//				n++;
 			}
 		}
-		return tilePane; 
+		return tilePane;
 	}
 
 
