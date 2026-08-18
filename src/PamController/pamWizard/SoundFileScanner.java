@@ -34,9 +34,22 @@ public class SoundFileScanner implements PamFileTypeScanner {
 			@Override
 			public void newFileList(FileListData<WavFileType> fileListData) {
 				int count = (fileListData == null) ? 0 : fileListData.getFileCount();
-				callback.scanComplete(new PamFileTypeResult(PamImportFileType.SOUND, count, fileListData));
+				/*
+				 * The audio formats were read by the worker above, so summarising here is
+				 * cheap. Doing it now means the sample rate and channel count are known
+				 * before the user is offered any configurations.
+				 */
+				SoundFileSummary summary = SoundFileSummary.summarise(fileListData);
+				callback.scanComplete(new PamFileTypeResult(PamImportFileType.SOUND, count, fileListData, summary));
 			}
 		});
+
+		/*
+		 * Read the audio format of every file as the list is built. This happens on the
+		 * worker thread with a progress dialog, which is the right place for it - the
+		 * first read of a sud file has to build a map of the file and is slow.
+		 */
+		wavListWorker.loadAudioInfo = true;
 
 		// scan sub-folders, and re-use a previously computed list if available.
 		wavListWorker.startFileListProcess(PamController.getMainFrame(), rootList, true, true);

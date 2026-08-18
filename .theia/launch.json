@@ -68,13 +68,6 @@
     },
     {
       "type": "java",
-      "name": "PamAutoConfigDialog",
-      "request": "launch",
-      "mainClass": "PamController.pamWizard.PamAutoConfigDialog",
-      "projectName": "Pamguard"
-    },
-    {
-      "type": "java",
       "name": "TestSort",
       "request": "launch",
       "mainClass": "PamUtils.TestSort",

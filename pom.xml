@@ -107,6 +107,17 @@
 											/usr/share/pamguard/liblinux</prefix>
 									</mapper>
 								</data>
+								<!---Default configurations offered by the import wizard. Users can add their own
+									 to a 'configurations' folder in their home Pamguard directory-->
+								<data>
+									<src>${basedir}/configurations</src>
+									<type>directory</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>
+											/usr/share/pamguard/configurations</prefix>
+									</mapper>
+								</data>
 								<data>
 									<src>
 										${basedir}/build/deb/control/PAMGuardIcon2.png</src>

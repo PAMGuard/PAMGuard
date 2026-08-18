@@ -64,6 +64,17 @@ public class PamFileImport {
 	}
 
 	/**
+	 * A summary of the audio format of the imported sound files - the sample rates
+	 * and channel counts present. This is what configurations are filtered against.
+	 *
+	 * @return the sound file summary, or null if no sound files were scanned.
+	 */
+	public SoundFileSummary getSoundSummary() {
+		PamFileTypeResult result = results.get(PamImportFileType.SOUND);
+		return (result == null) ? null : result.getSoundSummary();
+	}
+
+	/**
 	 * Convenience accessor for the scanned sound files.
 	 * @return the audio file list data, or null if no sound files were found.
 	 */

@@ -13,6 +13,13 @@ import javax.swing.SwingUtilities;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamGUIManager;
+import PamController.pamWizard.configurations.BlankConfigAutoConfig;
+import PamController.pamWizard.configurations.ConfigWizardData;
+import PamController.pamWizard.configurations.FileConfigAutoConfig;
+import PamController.pamWizard.configurations.PamConfigDescription;
+import PamController.pamWizard.configurations.PamConfigRepository;
+import PamController.pamWizard.layoutFX.ConfigImportWizardFX;
+import PamController.pamWizard.swing.ConfigImportWizard;
 import PamModel.PamModuleInfo;
 import javafx.application.Platform;
 
@@ -58,6 +65,7 @@ public class PamWizardManager {
 
 	private void createScanners() {
 		scanners.add(new SoundFileScanner());
+		scanners.add(new SudClickScanner());
 		/* Future: register FPOD / CPOD / binary file scanners here. */
 	}
 
@@ -67,6 +75,34 @@ public class PamWizardManager {
 		/* Future: register combined configurations here, e.g. a config that is valid
 		 * when both FPOD detection files and sound files are present and shows the
 		 * detections alongside the spectrogram. */
+	}
+
+	/**
+	 * The configurations which can be used with a set of imported files: the code
+	 * built ones above, the file based ones from the configurations folders, and the
+	 * blank configuration, which is always last and always available.
+	 *
+	 * @param fileImport the imported and scanned files.
+	 * @param runMode    the PAMGuard run mode.
+	 * @return the available configurations, never empty.
+	 */
+	public List<PamAutoConfig> getAvailableConfigs(PamFileImport fileImport, int runMode) {
+		List<PamAutoConfig> valid = new ArrayList<>();
+
+		for (PamAutoConfig config : autoConfigs) {
+			if (config.isValid(fileImport, runMode)) {
+				valid.add(config);
+			}
+		}
+
+		for (PamConfigDescription description :
+				PamConfigRepository.getInstance().getMatching(fileImport, runMode)) {
+			valid.add(new FileConfigAutoConfig(description));
+		}
+
+		valid.add(new BlankConfigAutoConfig());
+
+		return valid;
 	}
 
 	/**
@@ -117,51 +153,49 @@ public class PamWizardManager {
 		}
 
 		int runMode = PamController.getInstance().getRunMode();
-		List<PamAutoConfig> validConfigs = new ArrayList<>();
-		for (PamAutoConfig config : autoConfigs) {
-			if (config.isValid(fileImport, runMode)) {
-				validConfigs.add(config);
-			}
-		}
+		List<PamAutoConfig> validConfigs = getAvailableConfigs(fileImport, runMode);
 		if (validConfigs.isEmpty()) {
 			return;
 		}
 
-		showOptionsDialog(validConfigs, fileImport);
+		showWizard(new ConfigWizardData(fileImport, runMode, validConfigs));
 	}
 
 	/**
-	 * Show the options dialog (FX or Swing depending on the active GUI) and build the
-	 * selected configuration.
+	 * Show the import wizard (FX or Swing depending on the active GUI) and build the
+	 * configuration the user chooses.
 	 */
-	private void showOptionsDialog(List<PamAutoConfig> configs, PamFileImport fileImport) {
+	private void showWizard(ConfigWizardData wizardData) {
 		if (PamGUIManager.isFX()) {
 			Platform.runLater(() -> {
-				PamAutoConfig selected = PamAutoConfigDialogFX.showDialog(configs);
-				buildConfiguration(selected, fileImport);
+				PamAutoConfig selected = ConfigImportWizardFX.showWizard(wizardData);
+				if (selected != null) {
+					buildConfiguration(wizardData);
+				}
 			});
 		}
 		else {
 			SwingUtilities.invokeLater(() -> {
-				PamAutoConfigDialog dlg = new PamAutoConfigDialog(PamController.getMainFrame(), configs);
-				PamAutoConfig selected = dlg.showDialog();
-				buildConfiguration(selected, fileImport);
+				if (isBlankConfiguration()) {
+					// the Swing wizard builds the configuration itself when it finishes.
+					ConfigImportWizard.showWizard(PamController.getMainFrame(), wizardData);
+				}
 			});
 		}
 	}
 
 	/**
 	 * Build the selected configuration on the Swing event thread (module management
-	 * runs through the Swing-based {@link PamController}).
+	 * runs through the Swing-based {@link PamController}), then report any warnings
+	 * back on the FX thread.
 	 */
-	private void buildConfiguration(PamAutoConfig selected, PamFileImport fileImport) {
-		if (selected == null) {
-			return;
-		}
+	private void buildConfiguration(ConfigWizardData wizardData) {
 		SwingUtilities.invokeLater(() -> {
-			if (isBlankConfiguration()) {
-				selected.createConfiguration(fileImport);
+			if (!isBlankConfiguration()) {
+				return;
 			}
+			wizardData.applySelected();
+			Platform.runLater(() -> ConfigImportWizardFX.showWarnings(wizardData));
 		});
 	}
 

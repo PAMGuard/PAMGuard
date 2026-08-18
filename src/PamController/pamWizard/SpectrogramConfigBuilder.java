@@ -6,14 +6,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.sound.sampled.AudioFormat;
 import javax.swing.Timer;
 import javafx.application.Platform;
 
 import Acquisition.AcquisitionControl;
-import Acquisition.AcquisitionParameters;
-import Acquisition.FolderInputParameters;
-import Acquisition.FolderInputSystem;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -23,8 +19,6 @@ import PamguardMVC.PamDataBlock;
 import PamUtils.worker.filelist.FileListData;
 import PamUtils.worker.filelist.WavFileType;
 import dataMap.DataMapControl;
-import dataMap.filemaps.OfflineFileParameters;
-import dataMap.filemaps.OfflineFileServer;
 import pamScrollSystem.AbstractScrollManager;
 import pamScrollSystem.ViewerScrollerManager;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
@@ -212,61 +206,7 @@ public class SpectrogramConfigBuilder {
 	 * mode also enable and point the offline file server so the data map can be built.
 	 */
 	private void configureAcquisition(PamFileImport files, boolean viewer) {
-		if (acquisitionControl == null) {
-			return;
-		}
-		FileListData<WavFileType> soundFiles = files.getSoundFiles();
-
-		AcquisitionParameters params = acquisitionControl.getAcquisitionParameters();
-		FolderInputSystem folderSystem = acquisitionControl.getFolderSystem();
-
-		// select the folder/file input system.
-		params.setDaqSystemType(folderSystem.getSystemType());
-
-		// Ensure a sane DC-subtraction time constant. The default is 0, which is
-		// normally corrected to 1.0 in AcquisitionParameters.clone() when a config is
-		// loaded - but we are building the config live and mutating the parameters
-		// directly, so we must apply it ourselves. A zero time constant with
-		// subtractDC=true makes the DC-removal filter blow up, producing infinite raw
-		// samples and hence an all-zero (blank) spectrogram.
-		if (params.dcTimeConstant <= 0) {
-			params.dcTimeConstant = 1.0;
-		}
-
-		// sample rate / channels from the first scanned file.
-		if (soundFiles != null && soundFiles.getFileCount() > 0) {
-			WavFileType first = soundFiles.getListCopy().get(0);
-			AudioFormat format = first.getAudioInfo();
-			if (format != null) {
-				params.setSampleRate(format.getSampleRate());
-				params.setNChannels(format.getChannels());
-			}
-		}
-
-		// point the folder system at the dropped files/folder.
-		FolderInputParameters folderParams = folderSystem.getFolderInputParameters();
-		List<File> dropped = files.getDroppedFiles();
-		folderParams.setSelectedFiles(dropped.toArray(new File[0]));
-
-		// viewer: enable + point the offline file server so createOfflineDataMap works.
-		if (viewer) {
-			OfflineFileServer offlineServer = acquisitionControl.getOfflineFileServer();
-			if (offlineServer != null) {
-				OfflineFileParameters ofp = offlineServer.getOfflineFileParameters();
-				ofp.enable = true;
-				ofp.includeSubFolders = true;
-				ofp.folderName = getFolderName(dropped);
-				offlineServer.setOfflineFileParameters(ofp);
-			}
-		}
-
-		// Apply the settings the same way the acquisition dialog does when it is
-		// closed (see AcquisitionControl.acquisitionSettings): select the system, set
-		// up the array channels and (re)build the raw data block so the sample rate /
-		// channels propagate to the FFT engine.
-		acquisitionControl.setSelectedSystem();
-		acquisitionControl.checkArrayChannels(PamController.getMainFrame());
-		acquisitionControl.getAcquisitionProcess().setupDataBlock();
+		AcquisitionConfigurer.configure(acquisitionControl, files, viewer);
 	}
 
 	/**
@@ -380,18 +320,6 @@ public class SpectrogramConfigBuilder {
 		display.getTimeScroller().setVisibleMillis(VISIBLE_MILLIS);
 		display.getTimeScroller().setRangeMillis(start, start + LOADED_MILLIS, true);
 		display.getTimeScroller().setValueMillis(start);
-	}
-
-	/**
-	 * The folder containing the dropped sound files: the dropped item if it is a
-	 * directory, otherwise the parent folder of the first dropped file.
-	 */
-	private String getFolderName(List<File> dropped) {
-		if (dropped == null || dropped.isEmpty()) {
-			return null;
-		}
-		File first = dropped.get(0);
-		return first.isDirectory() ? first.getAbsolutePath() : first.getParent();
 	}
 
 	/**

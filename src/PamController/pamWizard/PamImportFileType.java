@@ -21,7 +21,15 @@ public enum PamImportFileType {
 	CPOD("CPOD files"),
 
 	/** PAMGuard binary data files. */
-	BINARY("PAMGuard binary files");
+	BINARY("PAMGuard binary files"),
+
+	/**
+	 * SoundTrap sud files which were recorded with the click detector running, and
+	 * so contain click detections that can be extracted while the audio is
+	 * processed. Note that this is about the detections inside the file: a sud file
+	 * is always also a {@link #SOUND} file.
+	 */
+	SUD_CLICKS("SoundTrap sud files with click detections");
 
 	private final String name;
 

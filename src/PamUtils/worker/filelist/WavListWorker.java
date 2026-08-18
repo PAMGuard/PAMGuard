@@ -45,11 +45,15 @@ public class WavListWorker extends FileListWorker<WavFileType> {
 	@Override
 	public WavFileType createFile(File baseFile) {
 		WavFileType type = new WavFileType(baseFile);
-		
+
 		if (loadAudioInfo) {
 			type.getAudioInfo(loadListener);
 		}
-		return new WavFileType(baseFile); 
+		/*
+		 * Return the file the audio info was loaded into, not a fresh one - otherwise
+		 * the format read above is discarded and loadAudioInfo has no effect.
+		 */
+		return type;
 	}
 
 	@Override

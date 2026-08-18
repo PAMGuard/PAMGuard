@@ -16,10 +16,17 @@ public class PamFileTypeResult {
 
 	private final Object data;
 
+	private final SoundFileSummary soundSummary;
+
 	public PamFileTypeResult(PamImportFileType fileType, int fileCount, Object data) {
+		this(fileType, fileCount, data, null);
+	}
+
+	public PamFileTypeResult(PamImportFileType fileType, int fileCount, Object data, SoundFileSummary soundSummary) {
 		this.fileType = fileType;
 		this.fileCount = fileCount;
 		this.data = data;
+		this.soundSummary = soundSummary;
 	}
 
 	/**
@@ -45,6 +52,16 @@ public class PamFileTypeResult {
 	 */
 	public Object getData() {
 		return data;
+	}
+
+	/**
+	 * A summary of the audio format of the matched files. Only set for
+	 * {@link PamImportFileType#SOUND} results.
+	 *
+	 * @return the sound file summary, or null.
+	 */
+	public SoundFileSummary getSoundSummary() {
+		return soundSummary;
 	}
 
 	/**
