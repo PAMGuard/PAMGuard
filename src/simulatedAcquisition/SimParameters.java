@@ -27,6 +27,8 @@ public class SimParameters extends SoundCardParameters implements Cloneable, Ser
 	private ArrayList<SimObject> simObjects;
 	
 	public String propagationModel;
+
+	public double arrayWobble;
 	
 	
 	/**
