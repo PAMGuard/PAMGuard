@@ -74,7 +74,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import Array.ArrayManager;
 //import Logging.LogDataObserver;
@@ -99,6 +98,7 @@ import PamView.help.PamHelp;
 import PamView.panel.PamBorderPanel;
 import PamView.panel.PamTabbedPane;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
+import PamView.component.PamFontIcon;
 import PamguardMVC.datakeeper.DataKeeper;
 import annotation.tasks.AnnotationManager;
 import metadata.MetaDataContol;
@@ -222,7 +222,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		//add the ability to import files by dropping them on the import tab - note that this tab is removed as soon
 		//as a PAMControlledUnit is added (see addControlledUnit), so it is only present for blank configurations.
 
-		mainTab.addTab("Import", FontIcon.of(MaterialDesignF.FILE_IMPORT, DEFAULT_ICON_SIZE) , fileDropPanel = new PamGuiFileDropPanel());
+		mainTab.addTab("Import", PamFontIcon.of(MaterialDesignF.FILE_IMPORT, DEFAULT_ICON_SIZE) , fileDropPanel = new PamGuiFileDropPanel());
 		//		mainTab.setForeground(Color.BLUE);
 
 		centralPanel.add(BorderLayout.CENTER, mainTab);
@@ -2123,7 +2123,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		@Override
 		public Component getDefaultCenterComponent() {
 			// 1. Create the Large Icon
-	        FontIcon icon = FontIcon.of(MaterialDesignF.FILE_MULTIPLE, DEFAULT_ICON_SIZE);
+	        PamFontIcon icon = PamFontIcon.of(MaterialDesignF.FILE_MULTIPLE, DEFAULT_ICON_SIZE);
 	        //icon.setIconColor(new Color(52, 152, 219)); // A nice blue
 	        icon.setIconColor(Color.LIGHT_GRAY); // A nice blue
 	        JLabel iconLabel = new JLabel("Drag and drop sound files");

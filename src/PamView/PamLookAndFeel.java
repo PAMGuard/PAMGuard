@@ -1,9 +1,14 @@
 package PamView;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Window;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
+import javax.swing.JComponent;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -207,6 +212,64 @@ public class PamLookAndFeel {
 						window.getClass().getName(), e.getMessage());
 				e.printStackTrace();
 			}
+		}
+	}
+
+	/**
+	 * Colour scheme version each detached component was last restyled at. Weakly
+	 * keyed so that a component being thrown away doesn't leave an entry behind.
+	 */
+	private static final Map<Component, Integer> styledVersions =
+			Collections.synchronizedMap(new WeakHashMap<Component, Integer>());
+
+	/**
+	 * Bring a component which may have been off screen up to date with the current
+	 * colour scheme.
+	 * <p>
+	 * {@link #refreshWindows()} only reaches components which are in an open window
+	 * at the moment the scheme changes. Plenty of PAMGuard's Swing components are
+	 * built once and then added and removed as the user moves around - module tool
+	 * bars, the data source panels in the acquisition dialog, anything held in a
+	 * static or a cached field. One of those which was detached when the scheme
+	 * changed missed both the look and feel update and the recolouring, so it comes
+	 * back still wearing the old scheme.
+	 * <p>
+	 * Call this just before showing such a component. Nothing happens if it is
+	 * already up to date, so it is cheap to call every time.
+	 *
+	 * @param component the component about to be shown. May be null.
+	 */
+	public static void refreshComponentTheme(Component component) {
+		if (component == null) {
+			return;
+		}
+		PamColors pamColors = PamColors.getInstance();
+		int version = pamColors.getColourSchemeVersion();
+		Integer styledAt = styledVersions.get(component);
+		if (styledAt != null && styledAt.intValue() == version) {
+			return;
+		}
+		styledVersions.put(component, version);
+		try {
+			SwingUtilities.updateComponentTreeUI(component);
+			if (component instanceof Container) {
+				pamColors.notifyContianer((Container) component);
+			}
+			/*
+			 * The new look and feel can have different insets and fonts, so the component
+			 * needs laying out again as well as repainting.
+			 */
+			component.invalidate();
+			if (component instanceof JComponent) {
+				((JComponent) component).revalidate();
+			}
+			component.repaint();
+		}
+		catch (Exception e) {
+			// a component which can't be restyled mustn't stop it being shown
+			System.out.printf("Error restyling %s for the colour scheme: %s\n",
+					component.getClass().getName(), e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

@@ -14,6 +14,7 @@ import PamUtils.PamUtils;
 import fftManager.FFTDataBlock;
 import pamViewFX.fxNodes.pamScrollers.acousticScroller.FFTScrollBarGraphics;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserverAdapter;
@@ -486,8 +487,13 @@ public class TDAcousticScroller extends AcousticScrollerFX implements PamSetting
 			 */
 			if (!isViewer) addAcousticObserver(dataBlock, PamUtils.getLowestChannel(dataBlock.getSequenceMap()));
 		}
-		//else check for datagram graphics.
-		else if (dataBlock.getDatagramProvider()!=null){
+		/*
+		 * else check for datagram graphics. Raw data is excluded: it has a datagram
+		 * provider so that the data map can draw a waveform summary of the sound files,
+		 * but that datagram is made by reading the files offline and there's nothing
+		 * sensible for the scroll bar to build from live RawDataUnits.
+		 */
+		else if (dataBlock.getDatagramProvider()!=null && dataBlock instanceof PamRawDataBlock == false){
 			//check that the datagram
 			this.addAcousticScrollGraphics(new AcousticDataGramGraphics(this , dataBlock));
 			if (!isViewer) addAcousticObserver(dataBlock, -1);

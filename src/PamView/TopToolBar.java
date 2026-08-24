@@ -3,21 +3,16 @@ package PamView;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
@@ -29,6 +24,8 @@ import PamController.PamController;
 import PamController.RawInputControlledUnit;
 import PamUtils.PamCalendar;
 import PamView.PamColors.PamColor;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamButton;
 import PamView.dialog.PamLabel;
@@ -61,21 +58,21 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 
 		pamController = PamController.getInstance();
 		if (pamController.getRunMode() == PamController.RUN_PAMVIEW) {
-			add(startButton = new PamButton(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-			startButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			add(startButton = new PamButton(PamFontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE)));
+			startButton.setDisabledIcon(PamFontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 			startButton.setToolTipText("Start sound playback");
-			add(stopButton = new PamButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			add(stopButton = new PamButton(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE)));
+			stopButton.setDisabledIcon(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 
 			stopButton.setToolTipText("Stop sound playback");
 		}
 		else {
 			add(startButton = new PamButton(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.RED)));
-			startButton.setDisabledIcon(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			startButton.setDisabledIcon(PamFontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 			startButton.setToolTipText("Start processing");
 			startButton.addMouseListener(new StartButtonMouse());
-			add(stopButton = new PamButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			add(stopButton = new PamButton(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE)));
+			stopButton.setDisabledIcon(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 			stopButton.setToolTipText("Stop processing");
 		}
 		startButton.addActionListener(new StartButton());
@@ -217,53 +214,17 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 			currentPCUComponent = null;
 		}
 		if (newComponent != null) {
-			refreshComponentTheme(newComponent);
+			/*
+			 * Module tool bar components are only in the window while their own tab is
+			 * showing, so one which was detached when the colour scheme changed needs
+			 * bringing up to date before it goes back in.
+			 */
+			PamLookAndFeel.refreshComponentTheme(newComponent);
 			moduleBit.add(newComponent);
 			currentPCUComponent = newComponent;
 		}
 	}
 
-	/**
-	 * Colour scheme version each module tool bar component was last styled at.
-	 * Weakly keyed so a module being removed doesn't leave an entry behind.
-	 */
-	private static final Map<Component, Integer> styledVersions =
-			Collections.synchronizedMap(new WeakHashMap<Component, Integer>());
-
-	/**
-	 * Bring a module's tool bar component up to date with the current colour scheme.
-	 * <p>
-	 * These components are only in the window while their own tab is showing - they
-	 * are added and removed by {@link #setActiveControlledUnit}. A component which
-	 * was detached when the user changed colour scheme missed both the look and feel
-	 * update and the recolouring, so it would otherwise come back still wearing the
-	 * old scheme. Nothing happens if it is already up to date.
-	 *
-	 * @param component the tool bar component about to be shown.
-	 */
-	private void refreshComponentTheme(Component component) {
-		PamColors pamColors = PamColors.getInstance();
-		int version = pamColors.getColourSchemeVersion();
-		Integer styledAt = styledVersions.get(component);
-		if (styledAt != null && styledAt.intValue() == version) {
-			return;
-		}
-		styledVersions.put(component, version);
-		try {
-			SwingUtilities.updateComponentTreeUI(component);
-			if (component instanceof Container) {
-				pamColors.notifyContianer((Container) component);
-			}
-			component.invalidate();
-			component.repaint();
-		}
-		catch (Exception e) {
-			// a tool bar which can't be restyled mustn't stop the tab being shown
-			System.out.printf("Error restyling tool bar component %s: %s\n",
-					component.getClass().getName(), e.getMessage());
-			e.printStackTrace();
-		}
-	}
 	/**
 	 * Enable all start buttons in all top menu bars. 
 	 * In normal mode, this is generally controlled

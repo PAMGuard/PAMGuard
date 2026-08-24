@@ -17,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
@@ -35,12 +36,11 @@ import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
-import binaryFileStorage.BinaryOfflineDataMap;
-import binaryFileStorage.BinaryStore;
 import dataGram.DatagramImageData;
 import dataGram.DatagramManager;
 import dataGram.DatagramProvider;
 import dataGram.DatagramScaleInformation;
+import dataMap.filemaps.SoundFileDatagramManager;
 
 /**
  * Panelette to go into the main DataPanel to show the data for a single data
@@ -101,7 +101,20 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 
 	private boolean showDataCounts = false;
 
-	private JCheckBoxMenuItem showDatagramMenu, showDataCountsMenu;
+	private boolean showFileBounds;
+
+	private JCheckBoxMenuItem showDatagramMenu, showDataCountsMenu, showFileBoundsMenu;
+
+	/**
+	 * Minimum separation in pixels between drawn file boundary lines.
+	 */
+	private static final int MIN_FILE_BOUND_SEPARATION = 3;
+
+	/**
+	 * Colour of the file boundary lines. Semi transparent so that it reads over both the
+	 * rainbow of a 3D datagram and the plain background of a 2D one.
+	 */
+	private static final Color fileBoundsColour = new Color(0, 0, 0, 120);
 
 	public DataStreamPanel(DataMapControl dataMapControl, ScrollingDataPanel scrollingDataPanel,
 			PamDataBlock dataBlock) {
@@ -109,6 +122,13 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		this.scrollingDataPanel = scrollingDataPanel;
 		this.dataBlock = dataBlock;
 		hasDatagram = (dataBlock.getDatagramProvider() != null);
+		/*
+		 * Sound file streams get file boundary lines by default - the whole point of the
+		 * waveform datagram is to be able to see where one file stops and the next starts.
+		 * Everything else has one map point per binary file, which is much less
+		 * interesting, so leave those off.
+		 */
+		showFileBounds = isSoundFileStream();
 
 		dataGraph = new DataGraph();
 		dataName = new DataName();
@@ -254,18 +274,28 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			if (bsg != null) {
 				bsg.paint(g, this);
 			} else {
-				if (hasDatagram && showDatagram) {
+				if (hasDatagram && showDatagram && isDatagramAvailable()) {
 					datagramPaint(g);
 				} else {
 					standardPaint(g);
+					if (showFileBounds) {
+						drawFileBounds(g, dataBlock.getDatagrammedMap());
+					}
 				}
 				showLoadPeriod(g);
 			}
 		}
 
 		private void datagramPaint(Graphics g) {
+			/*
+			 * getMinAndMax returns {Double.MAX_VALUE, Double.MIN_VALUE} when it finds no
+			 * data at all, so MAX_VALUE in element 0 is the 'nothing found' marker. It
+			 * used to test for MIN_VALUE here, which meant that once an empty scale had
+			 * been cached in viewer mode it was never recalculated - a problem for
+			 * datagrams which get created after the data map is already on screen.
+			 */
 			if (PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW || minMaxVal == null
-					|| minMaxVal[0] == Double.MIN_VALUE) {
+					|| minMaxVal[0] == Double.MAX_VALUE) {
 				minMaxVal = calcMinMax(false);
 			}
 
@@ -273,6 +303,56 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 				datagramPaint3D(g);
 			} else {
 				datagramPaint2D(g);
+			}
+			if (showFileBounds) {
+				drawFileBounds(g, dataBlock.getDatagrammedMap());
+			}
+		}
+
+		/**
+		 * Draw a vertical line at the start and end of every data map point, which for
+		 * sound files means a line at every file boundary so that it's easy to see how
+		 * long the files are.
+		 * <p>
+		 * Lines are dropped when the map points get closer together than a few pixels,
+		 * otherwise a zoomed out view of a few thousand short files is just a solid block
+		 * of lines.
+		 * 
+		 * @param g graphics handle
+		 * @param offlineDataMap map to take the boundaries from. May be null.
+		 */
+		private void drawFileBounds(Graphics g, OfflineDataMap offlineDataMap) {
+			if (offlineDataMap == null) {
+				return;
+			}
+			int h = getHeight();
+			g.setColor(fileBoundsColour);
+			synchronized (offlineDataMap) {
+				long startMillis = scrollingDataPanel.getScreenStartMillis();
+				long endMillis = scrollingDataPanel.getScreenEndMillis();
+				Iterator<OfflineDataMapPoint> iterator = offlineDataMap.getListIterator();
+				int lastDrawnX = -MIN_FILE_BOUND_SEPARATION;
+				while (iterator.hasNext()) {
+					OfflineDataMapPoint mapPoint = iterator.next();
+					long pointStart = mapPoint.getStartTime();
+					long pointEnd = mapPoint.getEndTime();
+					if (pointEnd < startMillis) {
+						continue;
+					}
+					if (pointStart > endMillis) {
+						break;
+					}
+					int x1 = (int) ((pointStart - startMillis) * pixelsPerMilli);
+					int x2 = (int) ((pointEnd - startMillis) * pixelsPerMilli);
+					if (x1 - lastDrawnX >= MIN_FILE_BOUND_SEPARATION) {
+						g.drawLine(x1, 0, x1, h);
+						lastDrawnX = x1;
+					}
+					if (x2 - lastDrawnX >= MIN_FILE_BOUND_SEPARATION) {
+						g.drawLine(x2, 0, x2, h);
+						lastDrawnX = x2;
+					}
+				}
 			}
 		}
 
@@ -300,16 +380,12 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			long endMillis = scrollingDataPanel.getScreenEndMillis();
 			endMillis = startMillis + (long) (scrollingDataPanel.getScreenSeconds() * 1000.);
 			double millisPerPixel = 1. / pixelsPerMilli;
-			// find a first datagram point and hope that all the rest are the same.
-			BinaryStore binaryStore = (BinaryStore) PamController.getInstance().findOfflineDataStore(BinaryStore.class);
-			if (binaryStore == null) {
-				return;
-			}
-			BinaryOfflineDataMap binaryDataMap = (BinaryOfflineDataMap) dataBlock.getOfflineDataMap(binaryStore);
-			if (binaryDataMap == null) {
-				return;
-			}
-			DatagramManager datagramManager = binaryStore.getDatagramManager();
+			/*
+			 * This used to look the datagram manager up from the binary store, which meant
+			 * 2D datagrams only worked for data stored in binary files. Sound file
+			 * waveform datagrams come from the OfflineFileServer instead.
+			 */
+			DatagramManager datagramManager = findDatagramManager();
 			if (datagramManager == null) {
 				return;
 			}
@@ -919,6 +995,19 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			showDataCountsMenu = new JCheckBoxMenuItem("Show data counts", showDataCounts);
 			showDataCountsMenu.addActionListener(new ShowDataCounts());
 			graphMenu.add(showDataCountsMenu);
+
+			SoundFileDatagramManager soundFileDgm = getSoundFileDatagramManager();
+			if (soundFileDgm != null) {
+				showFileBoundsMenu = new JCheckBoxMenuItem("Show file boundaries", showFileBounds);
+				showFileBoundsMenu.addActionListener(new ShowFileBounds());
+				graphMenu.add(showFileBoundsMenu);
+
+				if (soundFileDgm.hasAnyDatagram(dataBlock) == false) {
+					JMenuItem createItem = new JMenuItem("Create waveform summary ...");
+					createItem.addActionListener(new CreateSoundFileDatagram());
+					graphMenu.add(createItem);
+				}
+			}
 		}
 	}
 
@@ -954,6 +1043,21 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		}
 	}
 
+	class CreateSoundFileDatagram implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			checkSoundFileDatagram();
+		}
+	}
+
+	class ShowFileBounds implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			showFileBounds = showFileBoundsMenu.isSelected();
+			repaintAll();
+		}
+	}
+
 	class ShowDataCounts implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -963,6 +1067,72 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			}
 			repaintAll();
 		}
+	}
+
+	/**
+	 * @return true if there is actually a datagram to draw. Sound file datagrams are only
+	 * created when the user asks for them, so until then the stream has to fall back on
+	 * the standard effort drawing rather than showing an empty graph.
+	 */
+	private boolean isDatagramAvailable() {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm == null) {
+			return true;
+		}
+		return dgm.hasAnyDatagram(dataBlock);
+	}
+
+	/**
+	 * @return true if this stream is raw sound files, i.e. its datagram comes from a
+	 * SoundFileDatagramManager rather than the binary store.
+	 */
+	private boolean isSoundFileStream() {
+		return getSoundFileDatagramManager() != null;
+	}
+
+	/**
+	 * @return the sound file datagram manager for this stream, or null if this stream
+	 * isn't sound files.
+	 */
+	private SoundFileDatagramManager getSoundFileDatagramManager() {
+		OfflineDataMap dataMap = dataBlock.getDatagrammedMap();
+		if (dataMap == null || dataMap.getOfflineDataSource() == null) {
+			return null;
+		}
+		DatagramManager dgm = dataMap.getOfflineDataSource().getDatagramManager();
+		if (dgm instanceof SoundFileDatagramManager) {
+			return (SoundFileDatagramManager) dgm;
+		}
+		return null;
+	}
+
+	/**
+	 * Sound file datagrams aren't made automatically since reading every sound file can
+	 * take a long time (particularly for sud files, which have to be decompressed). Ask
+	 * the user, then set it going in the background.
+	 * 
+	 * @return true if datagram creation was started.
+	 */
+	private boolean checkSoundFileDatagram() {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm == null || dgm.hasAnyDatagram(dataBlock)) {
+			return false;
+		}
+		OfflineDataMap dataMap = dataBlock.getDatagrammedMap();
+		int nFiles = dataMap == null ? 0 : dataMap.getNumMapPoints();
+		if (nFiles == 0) {
+			return false;
+		}
+		String msg = String.format("<html>To show a waveform summary of the sound data, PAMGuard needs to read "
+				+ "all %d sound files.<br>This may take some time, but only has to be done once since the "
+				+ "result is saved<br>alongside the sound files.<br><br>Read the sound files now ?</html>", nFiles);
+		int ans = JOptionPane.showConfirmDialog(PamController.getMainFrame(), msg, "Sound file datagram",
+				JOptionPane.YES_NO_OPTION);
+		if (ans != JOptionPane.YES_OPTION) {
+			return false;
+		}
+		dgm.createDatagrams(dataBlock);
+		return true;
 	}
 
 	public boolean isGraphVisible() {
@@ -1119,6 +1289,14 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		if (!showDatagram) {
 			return null;
 		}
+		/*
+		 * A sound file stream has a datagram provider from the moment the viewer opens,
+		 * but no actual datagram until the user asks for one. Until then the graph draws
+		 * effort and counts, so the axis must go with it.
+		 */
+		if (isDatagramAvailable() == false) {
+			return null;
+		}
 		return dp.getScaleInformation();
 	}
 
@@ -1143,6 +1321,12 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 
 	@Override
 	public void updateDataMap(OfflineDataMap dataMap, OfflineDataMapPoint dataMapPoint) {
+		/*
+		 * The scale is cached, so throw it away whenever the map changes - datagrams get
+		 * created after the data map is already on screen, so a scale worked out from an
+		 * empty datagram would otherwise stick.
+		 */
+		minMaxVal = null;
 		scrollingDataPanel.updateDataMap(dataMap, dataMapPoint);
 	}
 }

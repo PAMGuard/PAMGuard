@@ -39,6 +39,12 @@ public class DataMapParametersFX implements Cloneable, Serializable, ManagedPara
 	 */
 	public int selectedColourDatagram = 0; 
 	
+	/**
+	 * Show a vertical line at the start and end of every sound file on data streams which
+	 * are made up of files, so that it's easy to see how long the files are.
+	 */
+	public boolean showFileBoundaries = true; 
+	
 
 	@Override
 	protected DataMapParametersFX clone() {

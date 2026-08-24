@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
 import Acquisition.gpstiming.PPSDialogPanel;
 import PamController.PamController;
 import PamModel.SMRUEnable;
+import PamView.PamLookAndFeel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamAlignmentPanel;
@@ -647,6 +648,12 @@ public class AcquisitionDialog extends PamDialog {
 
 		deviceSpecificPanel = currentDaqSystem.getDaqSpecificDialogComponent(this);
 		if (deviceSpecificPanel != null) {
+			/*
+			 * Each DaqSystem builds its panel once and hangs on to it, so a panel for a
+			 * system which wasn't the selected one when the colour scheme changed was
+			 * detached from every window at the time and still has the old look and feel.
+			 */
+			PamLookAndFeel.refreshComponentTheme(deviceSpecificPanel);
 			mainPanel.add(deviceSpecificPanel, 1);
 			currentDaqSystem.dialogSetParams();
 		}

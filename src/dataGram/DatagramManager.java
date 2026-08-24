@@ -21,11 +21,8 @@ import PamView.CancelObserver;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
-import binaryFileStorage.BinaryOfflineDataMap;
-import binaryFileStorage.BinaryOfflineDataMapPoint;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import javafx.concurrent.Task;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamViewFX.pamTask.SimplePamTaskUpdate;
 import pamguard.GlobalArguments;
@@ -39,11 +36,28 @@ public class DatagramManager {
 	private DatagramSettingsStore settingsStore;
 
 	/**
-	 * @param binaryOfflineDataMap
+	 * Name used when registering the datagram settings. Different data stores must use
+	 * different names or their settings will overwrite each other.
+	 */
+	private String settingsName;
+
+	/**
+	 * @param offlineDataStore the data store these datagrams belong to.
 	 */
 	public DatagramManager(OfflineDataStore offlineDataStore) {
+		this(offlineDataStore, offlineDataStore.getDataSourceName());
+	}
+
+	/**
+	 * @param offlineDataStore the data store these datagrams belong to.
+	 * @param settingsName name to register the datagram settings under. Several data
+	 * stores can share a data source name (e.g. every OfflineFileServer is called
+	 * "Sound Files"), in which case they must pass something unique here.
+	 */
+	public DatagramManager(OfflineDataStore offlineDataStore, String settingsName) {
 		super();
 		this.offlineDataStore = offlineDataStore;
+		this.settingsName = settingsName;
 		PamSettingManager.getInstance().registerSettings(settingsStore = new DatagramSettingsStore());
 	}
 
@@ -116,18 +130,43 @@ public class DatagramManager {
 			return false;
 		}
 
-		int nMapPoints = dm.getNumMapPoints();
-		BinaryOfflineDataMapPoint dmp;
-		Datagram datagram;
-		Iterator<BinaryOfflineDataMapPoint> it = dm.getListIterator();
+		OfflineDataMapPoint dmp;
+		Iterator<OfflineDataMapPoint> it = dm.getListIterator();
 		while (it.hasNext()) {
 			dmp = it.next();
-			datagram = dmp.getDatagram();
-			if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
+			if (isDatagramValid(dmp, getDatagram(dmp)) == false) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Get the datagram held by a data map point, or null if this type of map point
+	 * can't hold one.
+	 * @param dmp data map point
+	 * @return the datagram, or null.
+	 */
+	protected Datagram getDatagram(OfflineDataMapPoint dmp) {
+		if (dmp instanceof DatagramPoint) {
+			return ((DatagramPoint) dmp).getDatagram();
+		}
+		return null;
+	}
+
+	/**
+	 * Is an existing datagram still valid, or does it need recalculating ? Subclasses
+	 * may override to add additional checks (e.g. on the number of points in each
+	 * datagram line).
+	 * @param dmp the data map point the datagram came from
+	 * @param datagram existing datagram, may be null
+	 * @return true if the datagram is up to date and doesn't need recalculating.
+	 */
+	protected boolean isDatagramValid(OfflineDataMapPoint dmp, Datagram datagram) {
+		if (datagram == null) {
+			return false;
+		}
+		return datagram.getIntervalSeconds() == datagramSettings.datagramSeconds;
 	}
 
 	public boolean showDatagramDialog(boolean firstCall) {
@@ -197,184 +236,96 @@ public class DatagramManager {
 	}
 
 
-	class DatagramCreatorTask extends Task<Integer> {
+	/**
+	 * Process a single data map point, creating a datagram for it and attaching it
+	 * to the map point.
+	 * <p>
+	 * The default implementation loads the data units for the map point back out of
+	 * the data store and passes them to the data block's {@link DatagramProvider}.
+	 * Subclasses which can summarise their data more directly (e.g. by reading sound
+	 * files) should override this and must NOT call super.
+	 * 
+	 * @param dataBlock data block being summarised
+	 * @param dmp data map point to process
+	 * @param workMonitor progress reporting and cancellation
+	 */
+	protected void processDataMapPoint(PamDataBlock dataBlock, OfflineDataMapPoint dmp, DatagramWorkMonitor workMonitor) {
+		
+		long startTime = dmp.getStartTime();
+		long endTime = dmp.getEndTime();
 
-		private ArrayList<PamDataBlock> updateList;
+		DatagramProvider datagramProvider = dataBlock.getDatagramProvider();
+		int nPoints = datagramProvider.getNumDataGramPoints();
+		float[] tempData = new float[nPoints]; // temp holder - gets converted to float later on
+		float[] gramData;
 
-		private volatile boolean cancelNow = false;
-
-		public DatagramCreatorTask(ArrayList<PamDataBlock> updateList) {
-			super();
-			this.updateList = updateList;
-		}
-
-		@Override
-		protected Integer call() throws Exception {
-			try {
-				updateProgress(new DatagramProgress(DatagramProgress.STATUS_BLOCKCOUNT, updateList.size()));
-
-				for (int i = 0; i < updateList.size(); i++) {
-					processDataBlock(updateList.get(i));
-				}
-			}
-			catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			return null;
-		}
-
-		private void processDataBlock(PamDataBlock pamDataBlock) {
-			DatagramProvider datagramProvider = pamDataBlock.getDatagramProvider();
-			System.out.println("DataGramManager: Creating a datagram for "+ pamDataBlock.getDataName());
-			if (datagramProvider == null) {
-				return;
-			}
-			BinaryOfflineDataMap dm = (BinaryOfflineDataMap) pamDataBlock.getOfflineDataMap(offlineDataStore);
-			if (dm == null) {
-				return;
-			}
-
-			int nMapPoints = dm.getNumMapPoints();
-			BinaryOfflineDataMapPoint dmp;
-			Datagram datagram;
-			/**
-			 * Loop through a first time to see now many map points need updating. 
-			 */
-			Iterator<BinaryOfflineDataMapPoint> it = dm.getListIterator();
-			int nToUpdate = 0;
-			while (it.hasNext()) {
-				dmp = it.next();
-				datagram = dmp.getDatagram();
-				if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
-					nToUpdate++;
-				}
-			}
-			updateProgress(new DatagramProgress(DatagramProgress.STATUS_STARTINGBLOCK, pamDataBlock, nToUpdate));
-
-			/*
-			 * then loop through again and update the actual map points...
-			 */
-			it = dm.getListIterator();
-			int iPoint = 0;
-			while (it.hasNext()) {
-				dmp = it.next();
-				datagram = dmp.getDatagram();
-				if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
-					updateProgress(new DatagramProgress(DatagramProgress.STATUS_STARTINGFILE, dmp, ++iPoint));
-					processDataMapPoint(pamDataBlock, dmp);
-					updateProgress(new DatagramProgress(DatagramProgress.STATUS_ENDINGFILE, dmp, iPoint));
-				}
-				if (cancelNow) {
+		/**
+		 * Create a new datagram class which will be given to this individual dmp
+		 */
+		Datagram datagram = new Datagram(datagramSettings.datagramSeconds);
+		long datagramMillis = datagramSettings.datagramSeconds*1000;
+		long currentStart = startTime;
+		long currentEnd = currentStart + datagramMillis;
+		DatagramDataPoint datagramPoint;
+		/*
+		 * first load all the data from a single file ...
+		 */
+		dataBlock.clearAll();
+		Runtime.getRuntime().gc();
+		dataBlock.loadViewerData(new OfflineDataLoadInfo(startTime, endTime), null);
+		int totalUnits = dataBlock.getUnitsCount();
+		ListIterator<PamDataUnit> li = dataBlock.getListIterator(0);
+		PamDataUnit dataUnit;
+		int usedDataUnits = 0;
+		int doneUnits = 0;
+		workMonitor.publishProgress(new DatagramProgress(DatagramProgress.STATUS_UNITCOUNT, totalUnits, doneUnits));
+		while (currentStart <= endTime) {
+			datagramPoint = new DatagramDataPoint(datagram, currentStart, currentStart+datagramMillis, nPoints);
+			usedDataUnits = 0;
+			long t = System.currentTimeMillis();
+			while (li.hasNext()) {
+				dataUnit = li.next();
+				if (dataUnit.getTimeMilliseconds() >= currentEnd) {
 					break;
 				}
+				datagramProvider.addDatagramData(dataUnit, tempData);
+				usedDataUnits++;
+				doneUnits++;
+				long t2 = System.currentTimeMillis();
+				if (t2-t > 500) {
+					t = t2;
+					workMonitor.publishProgress(new DatagramProgress(DatagramProgress.STATUS_UNITCOUNT, totalUnits, doneUnits));
+				}
+
+				if (workMonitor.isWorkCancelled()) {
+					return;
+				}
 			}
-
-			updateProgress(new DatagramProgress(DatagramProgress.STATUS_ENDINGBLOCK, pamDataBlock, nToUpdate));
-		}
-
-		/**
-		 * Process a single data map point
-		 * @param dataBlock
-		 * @param dmp
-		 */
-		private void processDataMapPoint(PamDataBlock dataBlock, OfflineDataMapPoint dmp) {
-			long startTime = dmp.getStartTime();
-			long endTime = dmp.getEndTime();
-			DatagramProvider datagramProvider = dataBlock.getDatagramProvider();
-			int nPoints = datagramProvider.getNumDataGramPoints();
-			float[] tempData = new float[nPoints]; // temp holder - gets converted to float later on
-			float[] gramData;
-
 			/**
-			 * Create a new datagram class which will be given to this individual dmp
+			 * end the current datagram
 			 */
-			Datagram datagram = new Datagram(datagramSettings.datagramSeconds);
-			long datagramMillis = datagramSettings.datagramSeconds*1000;
-			long currentStart = startTime;
-			long currentEnd = currentStart + datagramMillis;
-			DatagramDataPoint datagramPoint;
-			/*
-			 * first load all the data from a single file ...
-			 */
-			dataBlock.clearAll();
-			Runtime.getRuntime().gc();
-
-			dataBlock.loadViewerData(new OfflineDataLoadInfo(startTime, endTime), null);
-
-
-			int totalUnits = dataBlock.getUnitsCount();
-			ListIterator<PamDataUnit> li = dataBlock.getListIterator(0);
-			PamDataUnit dataUnit;
-			int usedDataUnits = 0;
-			int doneUnits = 0;
-			updateProgress(new DatagramProgress(DatagramProgress.STATUS_UNITCOUNT, totalUnits, doneUnits));
-			while (currentStart <= endTime) {
-				datagramPoint = new DatagramDataPoint(datagram, currentStart, currentStart+datagramMillis, nPoints);
-				usedDataUnits = 0;
-				long t = System.currentTimeMillis();
-				while (li.hasNext()) {
-					dataUnit = li.next();
-					if (dataUnit.getTimeMilliseconds() >= currentEnd) {
-						break;
-					}
-					datagramProvider.addDatagramData(dataUnit, tempData);
-					usedDataUnits++;
-					doneUnits++;
-					long t2 = System.currentTimeMillis();
-					if (t2-t > 500) {
-						t = t2;
-						updateProgress(new DatagramProgress(DatagramProgress.STATUS_UNITCOUNT, totalUnits, doneUnits));
-					}
-
-					if (cancelNow) {
-						return;
-					}
+			if (usedDataUnits > 0) {
+				gramData = datagramPoint.getData(); 
+				for (int i = 0; i < nPoints; i++) {
+					gramData[i] = (float) tempData[i];
+					tempData[i] = 0;
 				}
-				/**
-				 * end the current datagram
-				 */
-				if (usedDataUnits > 0) {
-					gramData = datagramPoint.getData(); 
-					for (int i = 0; i < nPoints; i++) {
-						gramData[i] = (float) tempData[i];
-						tempData[i] = 0;
-					}
-					datagramPoint.setData(gramData, usedDataUnits);
-				}
-				datagram.addDataPoint(datagramPoint);
-				currentStart = currentEnd;
-				currentEnd = currentStart+datagramMillis;
+				datagramPoint.setData(gramData, usedDataUnits);
 			}
-			if (DatagramPoint.class.isAssignableFrom(dmp.getClass())) {
-				((DatagramPoint) dmp).setDatagram(datagram);
-			}
-
-			offlineDataStore.rewriteIndexFile(dataBlock, dmp);
+			//System.out.println("Process Point: " + currentStart + " " + endTime); 
+			datagram.addDataPoint(datagramPoint);
+			currentStart = currentEnd;
+			currentEnd = currentStart+datagramMillis;
+		}
+		if (DatagramPoint.class.isAssignableFrom(dmp.getClass())) {
+			((DatagramPoint) dmp).setDatagram(datagram);
 		}
 
-		/**
-		 * Update progress. 
-		 * @param datagramProgress
-		 */
-		private void updateProgress(DatagramProgress datagramProgress) {
-			PamController.getInstance().notifyTaskProgress(datagramProgress);
-		}
-
-		@Override
-		protected void done() {
-			//notify datamap that a load has occured
-			updateProgress(new DatagramProgress(PamTaskUpdate.STATUS_DONE, 1, 1));
-			PamController.getInstance().notifyModelChanged(PamControllerInterface.DATA_LOAD_COMPLETE);
-		}
-
-		@Override
-		protected void cancelled() {
-			cancelNow = true;
-		}
+		offlineDataStore.rewriteIndexFile(dataBlock, dmp);
 
 	}
 
-	class DatagramCreator extends SwingWorker<Integer, DatagramProgress> implements CancelObserver {
+	class DatagramCreator extends SwingWorker<Integer, DatagramProgress> implements CancelObserver, DatagramWorkMonitor {
 
 		private ArrayList<PamDataBlock> updateList;
 
@@ -407,23 +358,20 @@ public class DatagramManager {
 			if (datagramProvider == null) {
 				return;
 			}
-			BinaryOfflineDataMap dm = (BinaryOfflineDataMap) pamDataBlock.getOfflineDataMap(offlineDataStore);
+			OfflineDataMap dm = pamDataBlock.getOfflineDataMap(offlineDataStore);
 			if (dm == null) {
 				return;
 			}
 
-			int nMapPoints = dm.getNumMapPoints();
-			BinaryOfflineDataMapPoint dmp;
-			Datagram datagram;
+			OfflineDataMapPoint dmp;
 			/**
 			 * Loop through a first time to see now many map points need updating. 
 			 */
-			Iterator<BinaryOfflineDataMapPoint> it = dm.getListIterator();
+			Iterator<OfflineDataMapPoint> it = dm.getListIterator();
 			int nToUpdate = 0;
 			while (it.hasNext()) {
 				dmp = it.next();
-				datagram = dmp.getDatagram();
-				if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
+				if (isDatagramValid(dmp, getDatagram(dmp)) == false) {
 					nToUpdate++;
 				}
 			}
@@ -435,10 +383,9 @@ public class DatagramManager {
 			int iPoint = 0;
 			while (it.hasNext()) {
 				dmp = it.next();
-				datagram = dmp.getDatagram();
-				if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
+				if (isDatagramValid(dmp, getDatagram(dmp)) == false) {
 					publish(new DatagramProgress(DatagramProgress.STATUS_STARTINGFILE, dmp, ++iPoint));
-					processDataMapPoint(pamDataBlock, dmp);
+					processDataMapPoint(pamDataBlock, dmp, this);
 					publish(new DatagramProgress(DatagramProgress.STATUS_ENDINGFILE, dmp, iPoint));
 				}
 				if (cancelNow) {
@@ -447,93 +394,6 @@ public class DatagramManager {
 			}
 
 			publish(new DatagramProgress(DatagramProgress.STATUS_ENDINGBLOCK, pamDataBlock, nToUpdate));
-		}
-
-		/**
-		 * Process a single data map point
-		 * @param dataBlock
-		 * @param dmp
-		 */
-		private void processDataMapPoint(PamDataBlock dataBlock, OfflineDataMapPoint dmp) {
-			
-			long startTime = dmp.getStartTime();
-			long endTime = dmp.getEndTime();
-			
-//			if (endTime>=5951575134760222265L) {
-//				System.out.println("Darn: "+ dmp.toString());
-//			};
-			
-			//sometimes can get corrupt end times.
-			
-			DatagramProvider datagramProvider = dataBlock.getDatagramProvider();
-			int nPoints = datagramProvider.getNumDataGramPoints();
-			float[] tempData = new float[nPoints]; // temp holder - gets converted to float later on
-			float[] gramData;
-
-			/**
-			 * Create a new datagram class which will be given to this individual dmp
-			 */
-			Datagram datagram = new Datagram(datagramSettings.datagramSeconds);
-			long datagramMillis = datagramSettings.datagramSeconds*1000;
-			long currentStart = startTime;
-			long currentEnd = currentStart + datagramMillis;
-			DatagramDataPoint datagramPoint;
-			/*
-			 * first load all the data from a single file ...
-			 */
-			dataBlock.clearAll();
-			Runtime.getRuntime().gc();
-			dataBlock.loadViewerData(new OfflineDataLoadInfo(startTime, endTime), null);
-			int totalUnits = dataBlock.getUnitsCount();
-			ListIterator<PamDataUnit> li = dataBlock.getListIterator(0);
-			PamDataUnit dataUnit;
-			int usedDataUnits = 0;
-			int doneUnits = 0;
-			publish(new DatagramProgress(DatagramProgress.STATUS_UNITCOUNT, totalUnits, doneUnits));
-			while (currentStart <= endTime) {
-				datagramPoint = new DatagramDataPoint(datagram, currentStart, currentStart+datagramMillis, nPoints);
-				usedDataUnits = 0;
-				long t = System.currentTimeMillis();
-				while (li.hasNext()) {
-					dataUnit = li.next();
-					if (dataUnit.getTimeMilliseconds() >= currentEnd) {
-						break;
-					}
-					datagramProvider.addDatagramData(dataUnit, tempData);
-					usedDataUnits++;
-					doneUnits++;
-					long t2 = System.currentTimeMillis();
-					if (t2-t > 500) {
-						t = t2;
-						publish(new DatagramProgress(DatagramProgress.STATUS_UNITCOUNT, totalUnits, doneUnits));
-					}
-
-					if (cancelNow) {
-						return;
-					}
-				}
-				/**
-				 * end the current datagram
-				 */
-				if (usedDataUnits > 0) {
-					gramData = datagramPoint.getData(); 
-					for (int i = 0; i < nPoints; i++) {
-						gramData[i] = (float) tempData[i];
-						tempData[i] = 0;
-					}
-					datagramPoint.setData(gramData, usedDataUnits);
-				}
-				//System.out.println("Process Point: " + currentStart + " " + endTime); 
-				datagram.addDataPoint(datagramPoint);
-				currentStart = currentEnd;
-				currentEnd = currentStart+datagramMillis;
-			}
-			if (DatagramPoint.class.isAssignableFrom(dmp.getClass())) {
-				((DatagramPoint) dmp).setDatagram(datagram);
-			}
-
-			offlineDataStore.rewriteIndexFile(dataBlock, dmp);
-
 		}
 
 		@Override
@@ -559,12 +419,28 @@ public class DatagramManager {
 
 			}
 			datagramCreator = null;
+			datagramsComplete();
+			/*
+			 * Nothing else tells the data map that there are new datagrams to draw, so
+			 * give it a nudge.
+			 */
+			PamController.getInstance().notifyModelChanged(PamControllerInterface.OFFLINE_DATA_LOADED);
 		}
 
 		@Override
 		public boolean cancelPressed() {
 			cancelNow = true;
 			return true;
+		}
+
+		@Override
+		public void publishProgress(DatagramProgress datagramProgress) {
+			publish(datagramProgress);
+		}
+
+		@Override
+		public boolean isWorkCancelled() {
+			return cancelNow;
 		}
 
 	}
@@ -579,6 +455,20 @@ public class DatagramManager {
 		else {
 			PamController.getInstance().notifyTaskProgress(datagramProgress);
 		}
+	}
+
+	/**
+	 * Called on the AWT thread once all datagram creation has finished (or been
+	 * cancelled). Subclasses can override to save whatever they've created.
+	 */
+	protected void datagramsComplete() {
+	}
+
+	/**
+	 * @return the data store these datagrams belong to.
+	 */
+	public OfflineDataStore getOfflineDataStore() {
+		return offlineDataStore;
 	}
 
 	/**
@@ -610,7 +500,7 @@ public class DatagramManager {
 		}
 		DatagramProvider dp = dataBlock.getDatagramProvider();
 		if (dp == null) return null;
-		Iterator<BinaryOfflineDataMapPoint> iterator = binaryDataMap.getListIterator();
+		Iterator<OfflineDataMapPoint> iterator = binaryDataMap.getListIterator();
 		OfflineDataMapPoint mapPoint;
 		DatagramPoint datagramPoint;
 		double[] minMaxVal = {Double.MAX_VALUE, Double.MIN_VALUE};
@@ -797,7 +687,7 @@ public class DatagramManager {
 
 		@Override
 		public String getUnitName() {
-			return offlineDataStore.getDataSourceName();
+			return settingsName;
 		}
 
 		@Override

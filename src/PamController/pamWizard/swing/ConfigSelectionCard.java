@@ -56,7 +56,7 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int ICON_SIZE = 32;
+	private static final int ICON_SIZE = 40;
 
 	private static final String ALL_GROUPS = "All species";
 

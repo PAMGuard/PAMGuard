@@ -25,7 +25,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import targetMotionModule.TargetMotionControl;
 import targetMotionModule.TargetMotionInformation;
@@ -45,6 +44,7 @@ import PamView.panel.PamPanel;
 import PamguardMVC.PamDataUnit;
 import PamView.PamLoadBar;
 import PamView.PamTabPanel;
+import PamView.component.PamFontIcon;
 
 public class TargetMotionMainPanel<T extends PamDataUnit> implements PamTabPanel, ColorManaged {
 	
@@ -80,7 +80,7 @@ public class TargetMotionMainPanel<T extends PamDataUnit> implements PamTabPanel
 	
 //	public ImageIcon settings = new ImageIcon(ClassLoader
 //			.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settings =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
+	public static PamFontIcon settings = PamFontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE);
 
 
 	public TargetMotionMainPanel(TargetMotionLocaliser<T> targetMotionLocaliser) {

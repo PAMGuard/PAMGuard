@@ -1,7 +1,6 @@
 package export.swing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -25,7 +24,6 @@ import javax.swing.border.TitledBorder;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.fileicons.FileIcons;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import PamController.PamController;
 import PamUtils.PamFileChooser;
@@ -33,6 +31,7 @@ import PamView.dialog.PamButton;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
+import PamView.component.PamFontIcon;
 import PamguardMVC.PamDataBlock;
 import export.ExportParams;
 import export.PamExporterManager;
@@ -203,9 +202,7 @@ public class ExportProcessDialog {
 				JToggleButton b = new JToggleButton();
 				b.setToolTipText("Export to " + exportManager.getExporter(i).getName() + " file ("  + exportManager.getExporter(i).getFileExtension() + ")");
 
-				FontIcon icon = FontIcon.of(getIconFromString(exportManager.getExporter(i).getIconString()));
-				icon.setIconSize(25);
-				icon.setIconColor(Color.DARK_GRAY);
+				PamFontIcon icon = PamFontIcon.of(getIconFromString(exportManager.getExporter(i).getIconString()), 25);
 
 				b.setIcon(icon);
 

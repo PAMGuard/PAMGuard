@@ -22,9 +22,12 @@ import javax.swing.ImageIcon;
  * artwork.
  * <p>
  * The images live in {@value ConfigSpeciesGroup#ICON_FOLDER} within the packaged
- * resources. They are deliberately plain silhouettes so that they can be replaced
- * with better artwork without any code change. If an image is missing the caller
- * should fall back to the group's Ikonli glyph
+ * resources: plain black silhouettes, trimmed to the animal and all stored at the
+ * same width. They are sized by <i>width</i> rather than fitted into a square, so
+ * that a long flat animal such as a whale is drawn as large as a compact one such
+ * as a bat rather than shrinking to a sliver in the middle of an empty box.
+ * Replacing them with better artwork needs no code change. If an image is missing
+ * the caller should fall back to the group's Ikonli glyph
  * ({@link ConfigSpeciesGroup#getGlyphName()}).
  * <p>
  * Both Swing and JavaFX are supported, since the wizard runs under either GUI.
@@ -73,28 +76,30 @@ public class SpeciesIconFactory {
 	 * greyed out state rather than needing two sets of artwork.
 	 *
 	 * @param group the species group.
-	 * @param size  the required width and height in pixels.
+	 * @param width the required width in pixels; the height follows the artwork.
 	 * @param tint  the colour to paint the silhouette.
 	 * @return the recoloured icon, or null if the image resource is missing.
 	 */
-	public ImageIcon getSwingIcon(ConfigSpeciesGroup group, int size, Color tint) {
+	public ImageIcon getSwingIcon(ConfigSpeciesGroup group, int width, Color tint) {
 		if (group == null) {
 			group = ConfigSpeciesGroup.OTHER;
 		}
-		String key = group.getIconResource() + "@" + size + "#" + tint.getRGB();
+		String key = group.getIconResource() + "@" + width + "#" + tint.getRGB();
 		if (swingIcons.containsKey(key)) {
 			return swingIcons.get(key);
 		}
-		ImageIcon plain = getSwingIcon(group, size);
+		ImageIcon plain = getSwingIcon(group, width);
 		ImageIcon tinted = null;
 		if (plain != null) {
-			BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+			int w = plain.getIconWidth();
+			int h = plain.getIconHeight();
+			BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = image.createGraphics();
-			g.drawImage(plain.getImage(), 0, 0, size, size, null);
+			g.drawImage(plain.getImage(), 0, 0, null);
 			// paint the colour over the silhouette, keeping the existing alpha.
 			g.setComposite(AlphaComposite.SrcAtop);
 			g.setColor(tint);
-			g.fillRect(0, 0, size, size);
+			g.fillRect(0, 0, w, h);
 			g.dispose();
 			tinted = new ImageIcon(image);
 		}
@@ -103,17 +108,17 @@ public class SpeciesIconFactory {
 	}
 
 	/**
-	 * Get a Swing icon for a species group, scaled to the given size.
+	 * Get a Swing icon for a species group, scaled to the given width.
 	 *
 	 * @param group the species group.
-	 * @param size  the required width and height in pixels.
+	 * @param width the required width in pixels; the height follows the artwork.
 	 * @return the icon, or null if the image resource is missing.
 	 */
-	public ImageIcon getSwingIcon(ConfigSpeciesGroup group, int size) {
+	public ImageIcon getSwingIcon(ConfigSpeciesGroup group, int width) {
 		if (group == null) {
 			group = ConfigSpeciesGroup.OTHER;
 		}
-		return scale(loadSwingFromResource(group.getIconResource()), size);
+		return scale(loadSwingFromResource(group.getIconResource()), width);
 	}
 
 	/**
@@ -216,20 +221,21 @@ public class SpeciesIconFactory {
 	}
 
 	/**
-	 * Scale an icon to a square of the given size, keeping the cached original
-	 * untouched.
+	 * Scale an icon to the given width, keeping its proportions and leaving the
+	 * cached original untouched.
 	 *
-	 * @param icon the icon to scale, may be null.
-	 * @param size the required width and height in pixels.
+	 * @param icon  the icon to scale, may be null.
+	 * @param width the required width in pixels.
 	 * @return the scaled icon, or null if the input was null.
 	 */
-	private ImageIcon scale(ImageIcon icon, int size) {
-		if (icon == null) {
+	private ImageIcon scale(ImageIcon icon, int width) {
+		if (icon == null || icon.getIconWidth() <= 0) {
 			return null;
 		}
-		if (icon.getIconWidth() == size && icon.getIconHeight() == size) {
+		if (icon.getIconWidth() == width) {
 			return icon;
 		}
-		return new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		int height = Math.max(1, Math.round(icon.getIconHeight() * width / (float) icon.getIconWidth()));
+		return new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
 	}
 }

@@ -57,7 +57,7 @@ import javafx.stage.FileChooser;
  */
 public class ConfigImportWizardFX {
 
-	private static final int ICON_SIZE = 32;
+	private static final int ICON_SIZE = 40;
 
 	private static final String ALL_GROUPS = "All species";
 

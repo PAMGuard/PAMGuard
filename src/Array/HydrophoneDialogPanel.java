@@ -1,7 +1,6 @@
 package Array;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -27,11 +26,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import PamController.PamController;
 import PamView.component.PamSettingsIconButton;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 
 /**
  * Panel for the ArrayDialog to show a selection of hydrophone arrays and
@@ -130,10 +130,10 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 		editButton.addActionListener(this);
 		deleteButton.addActionListener(this);
 		JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		rightButtons.add(upButton = new JButton(FontIcon.of(MaterialDesignC.CHEVRON_UP, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-		rightButtons.add(downButton = new JButton(FontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-		upButton.setDisabledIcon(FontIcon.of(MaterialDesignC.CHEVRON_UP, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
-		downButton.setDisabledIcon(FontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+		rightButtons.add(upButton = new JButton(PamFontIcon.of(MaterialDesignC.CHEVRON_UP, PamSettingsIconButton.NORMAL_SIZE)));
+		rightButtons.add(downButton = new JButton(PamFontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamSettingsIconButton.NORMAL_SIZE)));
+		upButton.setDisabledIcon(PamFontIcon.of(MaterialDesignC.CHEVRON_UP, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
+		downButton.setDisabledIcon(PamFontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 		upButton.addActionListener(this);
 		downButton.addActionListener(this);
 		s.add(BorderLayout.WEST, leftButtons);
