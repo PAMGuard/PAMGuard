@@ -3,18 +3,12 @@ package PamController.pamWizard;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import javax.swing.Timer;
-import javafx.application.Platform;
 
 import Acquisition.AcquisitionControl;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
-import PamController.PamGUIManager;
-import PamModel.PamModuleInfo;
 import PamguardMVC.PamDataBlock;
 import PamUtils.worker.filelist.FileListData;
 import PamUtils.worker.filelist.WavFileType;
@@ -26,12 +20,9 @@ import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarkObservers;
 import PamView.paneloverlay.overlaymark.OverlayMarkProviders;
 import PamView.paneloverlay.overlaymark.OverlayMarker;
-import dataPlotsFX.TDControlAWT;
 import dataPlotsFX.TDDisplayController;
 import dataPlotsFX.layout.TDDisplayFX;
 import dataPlotsFX.layout.TDGraphFX;
-import userDisplay.UserDisplayComponent;
-import userDisplay.UserDisplayControl;
 
 /**
  * Builds a "view a spectrogram of sound files" PAMGuard configuration: Sound
@@ -47,8 +38,6 @@ public class SpectrogramConfigBuilder {
 
 	public static final String ACQUISITION_CLASS = "Acquisition.AcquisitionControl";
 	public static final String FFT_CLASS = "fftManager.PamFFTControl";
-	public static final String TD_DISPLAY_CLASS = "dataPlotsFX.TDDisplayController";
-	public static final String USER_DISPLAY_CLASS = "userDisplay.UserDisplayControl";
 	public static final String SPECTROGRAM_ANNOTATION_CLASS = "annotationMark.spectrogram.SpectrogramAnnotationModule";
 
 	/** Visible time range of the spectrogram display, in milliseconds. */
@@ -72,13 +61,13 @@ public class SpectrogramConfigBuilder {
 	public void build(PamFileImport files, boolean viewer) {
 
 		// 1. Add acquisition + FFT, and the (GUI-dependent) time display.
-		acquisitionControl = (AcquisitionControl) addModule(ACQUISITION_CLASS, "Sound Acquisition");
-		fftControl = addModule(FFT_CLASS, "FFT Engine");
-		Supplier<TDDisplayFX> displaySupplier = addSpectrogramDisplay();
+		acquisitionControl = (AcquisitionControl) PamAutoConfigUtils.addModule(ACQUISITION_CLASS, "Sound Acquisition");
+		fftControl = PamAutoConfigUtils.addModule(FFT_CLASS, "FFT Engine");
+		Supplier<TDDisplayFX> displaySupplier = PamAutoConfigUtils.addTimeDisplay("Spectrogram");
 		if (viewer) {
 			// Spectrogram Annotation module provides manual annotation marks over the
 			// spectrogram.
-			annotationControl = addModule(SPECTROGRAM_ANNOTATION_CLASS, "Spectrogram Annotation");
+			annotationControl = PamAutoConfigUtils.addModule(SPECTROGRAM_ANNOTATION_CLASS, "Spectrogram Annotation");
 		}
 
 		// 2. Point acquisition at the dropped sound files (and enable the offline map).
@@ -100,7 +89,7 @@ public class SpectrogramConfigBuilder {
 		//    scroller load fires before there is any data, and the spectrogram stays
 		//    blank until PAMGuard is restarted.
 		final boolean isViewer = viewer;
-		whenReady(displaySupplier, isViewer, display -> {
+		PamAutoConfigUtils.whenReady(displaySupplier, isViewer ? this::isDataMapReady : null, display -> {
 			configureDisplay(display);
 			if (isViewer) {
 				// Force the scroll system to re-initialise for the newly-added modules
@@ -117,54 +106,6 @@ public class SpectrogramConfigBuilder {
 	}
 
 	/**
-	 * Add the FX time display in a GUI-appropriate way and return a supplier that
-	 * resolves to its {@link TDDisplayFX} (which may not exist yet, as it is created
-	 * asynchronously on the JavaFX thread).
-	 */
-	private Supplier<TDDisplayFX> addSpectrogramDisplay() {
-		if (PamGUIManager.isFX()) {
-			// FX GUI: the time display is its own controlled unit.
-			TDDisplayController controller = (TDDisplayController) addModule(TD_DISPLAY_CLASS, "Spectrogram");
-			return () -> (controller == null) ? null : controller.getMainDisplay();
-		}
-		// Swing GUI: add a User Display module then create an FX time display within it.
-		UserDisplayControl userDisplay = (UserDisplayControl) addModule(USER_DISPLAY_CLASS, "Spectrogram");
-		if (userDisplay == null) {
-			return () -> null;
-		}
-		UserDisplayComponent component = userDisplay.addUserDisplay(TDControlAWT.class);
-		if (component instanceof TDControlAWT) {
-			TDControlAWT tdControl = (TDControlAWT) component;
-			return tdControl::getMainDisplay;
-		}
-		return () -> null;
-	}
-
-	/**
-	 * Wait (by polling) until the asynchronously-created {@link TDDisplayFX} is
-	 * available and - in viewer mode - the sound-file datamap has been built, then run
-	 * the given action on the JavaFX thread.
-	 */
-	private void whenReady(Supplier<TDDisplayFX> supplier, boolean requireDataMap, Consumer<TDDisplayFX> action) {
-		final int[] tries = { 0 };
-		Timer timer = new Timer(100, null);
-		timer.addActionListener(e -> {
-			TDDisplayFX display = supplier.get();
-			boolean ready = display != null && (!requireDataMap || isDataMapReady());
-			if (ready) {
-				timer.stop();
-				runOnFx(() -> action.accept(display));
-			}
-			else if (++tries[0] > 600) { // ~60 seconds (datamap scan can be slow)
-				timer.stop();
-				System.err.println("SpectrogramConfigBuilder: timed out waiting for display / datamap to initialise");
-			}
-		});
-		timer.setRepeats(true);
-		timer.start();
-	}
-
-	/**
 	 * @return true once the sound-file datamap has been built (has a valid first time).
 	 */
 	private boolean isDataMapReady() {
@@ -174,30 +115,6 @@ public class SpectrogramConfigBuilder {
 		}
 		long firstTime = dmc.getFirstTime();
 		return firstTime > 0 && firstTime != Long.MAX_VALUE;
-	}
-
-	/**
-	 * Run a task on the JavaFX application thread.
-	 */
-	private void runOnFx(Runnable runnable) {
-		if (Platform.isFxApplicationThread()) {
-			runnable.run();
-		}
-		else {
-			Platform.runLater(runnable);
-		}
-	}
-
-	/**
-	 * Add a module by class name and return the created controlled unit.
-	 */
-	private PamControlledUnit addModule(String className, String moduleName) {
-		PamModuleInfo moduleInfo = PamModuleInfo.findModuleInfo(className);
-		if (moduleInfo == null) {
-			System.err.println("SpectrogramConfigBuilder: could not find module " + className);
-			return null;
-		}
-		return PamController.getInstance().addModule(moduleInfo, moduleName);
 	}
 
 	/**
@@ -231,7 +148,7 @@ public class SpectrogramConfigBuilder {
 
 		// annotation overlay (spectrogram annotation) on the same graph as the
 		// spectrogram, plus wiring so marks made on the display reach the annotation module.
-		PamDataBlock annotationBlock = getOutputDataBlock(annotationControl);
+		PamDataBlock annotationBlock = PamAutoConfigUtils.getOutputDataBlock(annotationControl);
 		if (annotationBlock != null && !display.getTDGraphs().isEmpty()) {
 			display.addDataBlock(annotationBlock, display.getTDGraphs().get(0));
 		}
@@ -332,18 +249,5 @@ public class SpectrogramConfigBuilder {
 		}
 		soundFiles.sortFileList();
 		return soundFiles.getListCopy().get(0).getStartMilliseconds();
-	}
-
-	/**
-	 * Get the first output data block of a controlled unit, or null.
-	 */
-	private PamDataBlock getOutputDataBlock(PamControlledUnit unit) {
-		if (unit == null || unit.getNumPamProcesses() == 0) {
-			return null;
-		}
-		if (unit.getPamProcess(0).getNumOutputDataBlocks() == 0) {
-			return null;
-		}
-		return unit.getPamProcess(0).getOutputDataBlock(0);
 	}
 }

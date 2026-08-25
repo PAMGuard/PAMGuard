@@ -26,18 +26,20 @@ import javafx.application.Platform;
 /**
  * Manages the automatic creation of PAMGuard configurations when files are
  * dragged onto a <b>blank</b> configuration. Dropped files are scanned by a set
- * of {@link PamFileTypeScanner}s (only sound files are currently scanned for) and
- * the user is offered a list of {@link PamAutoConfig} options appropriate to the
- * file types present and the run mode.
+ * of {@link PamFileTypeScanner}s (sound files, SoundTrap click detections and
+ * CPOD/FPOD detection files) and the user is offered a list of
+ * {@link PamAutoConfig} options appropriate to the file types present and the run
+ * mode.
  *
  * @author Jamie Macaulay
  */
 public class PamWizardManager {
 
 	/**
-	 * Scanners which recognise file types within the dropped files. The sound-file
-	 * scanner is the only one implemented; FPOD/CPOD/binary scanners can be added
-	 * here to enable configurations that view those data alongside the sound.
+	 * Scanners which recognise file types within the dropped files. Sound files,
+	 * SoundTrap click detections and CPOD/FPOD detection files are recognised; a
+	 * PAMGuard binary file scanner could be added here to enable configurations that
+	 * view those data too.
 	 */
 	private final List<PamFileTypeScanner> scanners = new ArrayList<>();
 
@@ -66,12 +68,15 @@ public class PamWizardManager {
 	private void createScanners() {
 		scanners.add(new SoundFileScanner());
 		scanners.add(new SudClickScanner());
-		/* Future: register FPOD / CPOD / binary file scanners here. */
+		scanners.add(new PODFileScanner(PamImportFileType.CPOD));
+		scanners.add(new PODFileScanner(PamImportFileType.FPOD));
+		/* Future: register a PAMGuard binary file scanner here. */
 	}
 
 	private void createAutoConfigs() {
 		autoConfigs.add(new SpectrogramViewerAutoConfig());
 		autoConfigs.add(new SpectrogramRealTimeAutoConfig());
+		autoConfigs.add(new PODViewerAutoConfig());
 		/* Future: register combined configurations here, e.g. a config that is valid
 		 * when both FPOD detection files and sound files are present and shows the
 		 * detections alongside the spectrogram. */

@@ -339,12 +339,12 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		str += String.format("Slope: %d<p>", getSlope());
 		str += String.format("SPL: %d", getSpl());
 		if (rawData != null && rawData.length == 40) {
-			str += String.format("<p>QClass %d, SpClass %d", CPODUtils.getBits(rawData[19], (short) 0x3), 
-					CPODUtils.getBits(rawData[19], (short) 0b11100));
-			str += String.format("<p>Train %d, %d click", rawData[20], rawData[23]);
+			//CP3 records: the last byte is the click train id, byte 36 holds the classification
+			//and byte 23 the number of clicks in the train (including gaps).
+			str += String.format("<p>Train %d, %d clicks", rawData[39], rawData[23]);
 			str += String.format("<p>Qn %d, RateGood %d, SpGood %d, SpClass %d",
-					CPODUtils.getBits(rawData[36], (short)3), CPODUtils.getBits(rawData[36], (short) 4),
-					CPODUtils.getBits(rawData[36], (short)8), CPODUtils.getBits(rawData[36], (short) 240));
+					CPODUtils.getBits(rawData[36], (short)0x3), CPODUtils.getBits(rawData[36], (short) 0x4),
+					CPODUtils.getBits(rawData[36], (short)0x8), CPODUtils.getBits(rawData[36], (short) 0x70));
 		}
 		if (rawData != null) {
 			int nRaw = rawData.length;

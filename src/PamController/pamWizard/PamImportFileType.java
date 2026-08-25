@@ -2,10 +2,10 @@ package PamController.pamWizard;
 
 /**
  * The types of data file that can be recognised when files are dragged into a
- * blank PAMGuard configuration. Only {@link #SOUND} is currently scanned for;
- * the others are placeholders so that auto-configurations which view detection
- * data (e.g. FPOD/CPOD echolocation clicks) alongside sound data can be added
- * later without changing the framework.
+ * blank PAMGuard configuration. {@link #SOUND}, {@link #SUD_CLICKS},
+ * {@link #CPOD} and {@link #FPOD} are scanned for; {@link #BINARY} is a
+ * placeholder so that auto-configurations which view PAMGuard binary data can be
+ * added later without changing the framework.
  *
  * @author Jamie Macaulay
  */

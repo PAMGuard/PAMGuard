@@ -10,7 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import PamController.pamWizard.PamImportFileType;
+import PamController.pamWizard.PamFileImport;
 import PamController.pamWizard.SoundFileSummary;
 import PamController.pamWizard.configurations.ConfigWizardData;
 import PamView.wizard.PamWizard;
@@ -92,12 +92,21 @@ public class ScanSummaryCard extends PamWizardCard<ConfigWizardData> {
 	public void setParams(ConfigWizardData cardParams) {
 		SoundFileSummary summary = cardParams.getSoundSummary();
 
+		PamFileImport fileImport = cardParams.getFileImport();
+		String otherTypes = (fileImport == null) ? "" : fileImport.getOtherTypesDescription();
+		typesLabel.setText(otherTypes.isEmpty() ? "-" : otherTypes);
+
 		if (summary == null || summary.getFileCount() == 0) {
 			fileCountLabel.setText("none");
 			sampleRateLabel.setText("-");
 			channelsLabel.setText("-");
-			typesLabel.setText("-");
-			warningLabel.setText("No sound files were found in what you imported.");
+			/*
+			 * Detection files (CPOD/FPOD) can be viewed on their own, so having no sound
+			 * files is only a problem if nothing else turned up either.
+			 */
+			warningLabel.setText(otherTypes.isEmpty()
+					? "No sound files were found in what you imported."
+					: "");
 			return;
 		}
 
@@ -127,15 +136,5 @@ public class ScanSummaryCard extends PamWizardCard<ConfigWizardData> {
 							+ "lowest sample rate and channel count found."
 					: "");
 		}
-
-		StringBuilder types = new StringBuilder();
-		if (summary.hasSudFiles()) {
-			types.append("SoundTrap sud files");
-		}
-		if (cardParams.getFileImport() != null
-				&& cardParams.getFileImport().hasType(PamImportFileType.SUD_CLICKS)) {
-			types.append(types.length() > 0 ? ", " : "").append("click detections");
-		}
-		typesLabel.setText(types.length() == 0 ? "-" : types.toString());
 	}
 }

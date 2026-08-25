@@ -1,5 +1,6 @@
 package PamController.pamWizard;
 
+import PamController.pamWizard.configurations.ConfigApplyContext;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 
 /**
@@ -58,4 +59,41 @@ public interface PamAutoConfig {
 	 * @return the sound medium settings.
 	 */
 	public SoundMedium getGlobalMediumSettings();
+
+	/**
+	 * Whether this configuration writes binary data, and so needs the user to say
+	 * where the binary store should go. Configurations which answer true (or
+	 * {@link #needsDatabase}) are shown the wizard's storage page, and are handed
+	 * the paths the user chose through {@link #setApplyContext}.
+	 * <p>
+	 * Most code built configurations store nothing of their own, so this defaults
+	 * to false.
+	 *
+	 * @return true if a binary store folder is needed.
+	 */
+	default boolean needsBinaryStore() {
+		return false;
+	}
+
+	/**
+	 * Whether this configuration needs a database file, and so needs the user to
+	 * say where it should go. Note that in viewer mode a database is already open
+	 * before any files are dropped, so a viewer configuration should normally leave
+	 * this false rather than repointing it.
+	 *
+	 * @return true if a database file is needed.
+	 */
+	default boolean needsDatabase() {
+		return false;
+	}
+
+	/**
+	 * Give the configuration the storage locations and other choices the user made
+	 * in the wizard, immediately before {@link #createConfiguration} is called.
+	 * Configurations which store nothing can ignore this.
+	 *
+	 * @param applyContext the choices made in the wizard, never null.
+	 */
+	default void setApplyContext(ConfigApplyContext applyContext) {
+	}
 }

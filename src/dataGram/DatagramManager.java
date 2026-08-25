@@ -169,6 +169,34 @@ public class DatagramManager {
 		return datagram.getIntervalSeconds() == datagramSettings.datagramSeconds;
 	}
 
+	/**
+	 * Fix the datagram bin size without asking the user, so long as they haven't
+	 * already chosen one themselves.
+	 * <p>
+	 * Some modules know what bin size suits their data and there is nothing useful
+	 * for the user to decide - the CPOD/FPOD importer is the obvious case, where the
+	 * settings dialog would otherwise appear part way through an import. Calling this
+	 * marks the settings as valid, so the dialog which
+	 * {@link #checkAllDatagrams()} would normally show the first time round is not
+	 * shown at all.
+	 * <p>
+	 * A bin size the user has already settled on - whether through that dialog or
+	 * through the binary store's datagram options - is never overwritten, since
+	 * changing it would silently throw away and recalculate every datagram they
+	 * have.
+	 *
+	 * @param datagramSeconds the bin size to use, in seconds.
+	 * @return true if the settings were changed.
+	 */
+	public boolean setDefaultDatagramSeconds(int datagramSeconds) {
+		if (datagramSeconds <= 0 || datagramSettings.validDatagramSettings) {
+			return false;
+		}
+		datagramSettings.datagramSeconds = datagramSeconds;
+		datagramSettings.validDatagramSettings = true;
+		return true;
+	}
+
 	public boolean showDatagramDialog(boolean firstCall) {
 		if(PamGUIManager.getGUIType()==PamGUIManager.NOGUI) {
 			return false;

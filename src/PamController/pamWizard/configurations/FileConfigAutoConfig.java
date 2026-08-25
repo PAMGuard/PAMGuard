@@ -80,8 +80,29 @@ public class FileConfigAutoConfig implements PamAutoConfig {
 	/**
 	 * @param applyContext the storage paths and other choices to apply.
 	 */
+	@Override
 	public void setApplyContext(ConfigApplyContext applyContext) {
 		this.applyContext = (applyContext == null) ? new ConfigApplyContext() : applyContext;
+	}
+
+	/**
+	 * Whether the psfx file contains a binary store which will need repointing at a
+	 * folder on this machine.
+	 */
+	@Override
+	public boolean needsBinaryStore() {
+		PamConfigInspection configInspection = getInspection();
+		return configInspection != null && configInspection.isValid() && configInspection.hasBinaryStore();
+	}
+
+	/**
+	 * Whether the psfx file contains a database which will need repointing at a file
+	 * on this machine.
+	 */
+	@Override
+	public boolean needsDatabase() {
+		PamConfigInspection configInspection = getInspection();
+		return configInspection != null && configInspection.isValid() && configInspection.hasDatabase();
 	}
 
 	@Override

@@ -24,6 +24,18 @@ import cpod.CPODUtils.CPODFileType;
  */
 public class CPODReader  {
 
+	/**
+	 * The highest record type byte which is a click. 251-253 are records to be skipped,
+	 * 254 is a minute mark and 255 is the end of the file.
+	 */
+	private static final int MAX_CLICK_RECORD_TYPE = 250;
+
+	/**
+	 * Multiplier used to combine the minute number and the click train id into a single
+	 * unique id. Train ids in a CP3 file run 0-127 and are only unique within a minute.
+	 */
+	public static final int TRAIN_UID_MULTIPLIER = 256;
+
 
 	/**
 	 * A new minute. Don;t think we need to do anything here.?
@@ -195,31 +207,43 @@ public class CPODReader  {
 				}
 				fileEnds = 0;
 
-				isClick = byteData[dataSize-1] != -2;
+				/*
+				 * The last byte of the record is the record type. 0-250 are clicks (and, in a
+				 * CP3 file, the byte doubles as the click train id), 251-253 are records which
+				 * must be skipped (253 marks trains the user has sent to the trash), 254 is a
+				 * minute mark and 255 is the end of the file.
+				 */
+				int recordType = shortData[dataSize-1];
+				isClick = recordType <= MAX_CLICK_RECORD_TYPE;
 				if (isClick) {
 
 					//note that 'from' is inclusive - the click at index 'from' is the first one we want.
 					if (from<0 || (nClicks>=from && (long) nClicks < (long) from+maxNum)) {
 
 						//System.out.println("Create a new CPOD click: ");
-						CPODClick cpodClick = processCPODClick(nMinutes, shortData, header);
+						CPODClick cpodClick = processCPODClick(nMinutes, shortData, header, cpFileType);
 
 
 						if (cpFileType.equals(CPODFileType.CP3)) {
 
-							short trainID = shortData[20];
+							/*
+							 * The click train id is the record type byte, i.e. the last byte of the
+							 * record. Values above 127 indicate a corrupt record - the original code
+							 * treats those as train 0.
+							 */
+							short trainID = (short) (recordType > 127 ? 0 : recordType);
 
-//							short species =  (short) (shortData[36]  & (112 >> 4));
+							//byte 36 holds Qn (bits 0,1), RateGood (bit 2), SpGood (bit 3) and the
+							//species class (bits 4-6).
+							short quality =  (short) (shortData[36]  & 0x3);
 
-							short quality =  (short) (shortData[36]  & 3);
-							
-							short species =  (short) (shortData[36]  >> 3);
-							
-//														short species =  (short) ((shortData[19]  >> 2)  & 7);
-//														short quality =  (short) (shortData[19]  & 3);
+							short species =  (short) ((shortData[36] & 0x70)  >> 4);
 
-							//generate a unique train ID within the file			
-							int trainUID = Integer.valueOf(String.format("%06d", nMinutes) + String.format("%d", trainID));
+							//generate a unique train ID within the file. Train ids are only unique
+							//within a minute, so combine the two. This must not be done by
+							//concatenating decimal strings - that is ambiguous (minute 1000 train 12
+							//and minute 10001 train 2 both give 100012).
+							int trainUID = nMinutes * TRAIN_UID_MULTIPLIER + trainID;
 
 							//find the click train from the hash map - if it is not there, create a new one. 
 							cpodClassification = clickTrains.get(trainUID);
@@ -228,7 +252,7 @@ public class CPODReader  {
 								cpodClassification = new CPODClassification();
 								cpodClassification.isEcho = false;
 								cpodClassification.clicktrainID = trainUID;
-								cpodClassification.species = CPODUtils.getCPODSpecies(species); 
+								cpodClassification.species = CPODUtils.getSpClassSpecies(species); 
 								cpodClassification.qualitylevel = quality;
 
 								clickTrains.put(trainUID, cpodClassification); 
@@ -341,24 +365,60 @@ public class CPODReader  {
 	 * @param header
 	 * @return
 	 */
-	private static CPODClick processCPODClick(int nMinutes, short[] shortData, CPODHeader header) {
+	private static CPODClick processCPODClick(int nMinutes, short[] shortData, CPODHeader header, CPODFileType cpFileType) {
 
 		long minuteMillis = header.fileStart + nMinutes * 60000L;
 
 		int t = shortData[0]<<16 | 
 				shortData[1]<<8 |
 				shortData[2]; // 5 microsec intervals !
+
+		/*
+		 * The times logged by the POD are the END times of the clicks. CP2 and CP3 files
+		 * hold times which have already been corrected back to the start of the click, but
+		 * CP1 files do not, so the correction has to be made here. Without this, clicks read
+		 * from a CP1 file are offset from the same clicks in the matching CP3 file by the
+		 * duration of the click, and CPODImporter cannot pair them up.
+		 */
+		if (cpFileType == CPODFileType.CP1) {
+			t = correctCP1ClickTime(t, shortData[3], shortData[5]);
+		}
+
 		long tMillis = minuteMillis + t/200;
 
-
-
-		// do a sample number within the file as 5us intervals
-		long fileSamples = (long) (((minuteMillis*60) +  (t*5/1000000.))*CPODClickDataBlock.CPOD_SR);
+		/*
+		 * Sample number within the file. Note that this must be worked out from the minute
+		 * number within the file and not from the absolute time in milliseconds - the latter
+		 * overflows a long once multiplied up by the sample rate, leaving every click with a
+		 * start sample of Long.MAX_VALUE.
+		 */
+		long fileSamples = (long) (((nMinutes*60.) +  (t*5/1000000.))*CPODClickDataBlock.CPOD_SR);
 
 		/*
 		 * 
 		 */
 		return CPODClick.makeCPODClick(tMillis, fileSamples, shortData);
+	}
+
+	/**
+	 * Correct a click time read from a CP1 file from the end of the click back to the start
+	 * of the click.
+	 * <p>
+	 * This is the Pascal
+	 * <code>FiveMusec := Max(1, FiveMusec - (Ncyc * Cyc8dur[ClkKHZ]) shr 3)</code>, where
+	 * Cyc8dur is the duration of eight cycles at that frequency in 5us units, i.e. 1600/kHz.
+	 *
+	 * @param t - the time within the minute in 5us units, as read from the file.
+	 * @param nCyc - the number of cycles in the click.
+	 * @param kHz - the click frequency in kHz.
+	 * @return the corrected time within the minute in 5us units.
+	 */
+	private static int correctCP1ClickTime(int t, short nCyc, short kHz) {
+		if (kHz <= 0) {
+			return t;
+		}
+		int cyc8dur = 1600/kHz;
+		return Math.max(1, t - ((nCyc * cyc8dur) >> 3));
 	}
 
 	/**

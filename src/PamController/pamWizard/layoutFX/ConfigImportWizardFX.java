@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import PamController.UsedModuleInfo;
+import PamController.pamWizard.PODViewerAutoConfig;
 import PamController.pamWizard.PamAutoConfig;
+import PamController.pamWizard.PamFileImport;
 import PamController.pamWizard.PamImportFileType;
 import PamController.pamWizard.SoundFileSummary;
 import PamController.pamWizard.configurations.ConfigApplyContext;
@@ -261,8 +263,21 @@ public class ConfigImportWizardFX {
 		SoundFileSummary summary = wizardData.getSoundSummary();
 		VBox box = new VBox(6);
 
+		PamFileImport fileImport = wizardData.getFileImport();
+		String otherTypes = (fileImport == null) ? "" : fileImport.getOtherTypesDescription();
+
 		if (summary == null || summary.getFileCount() == 0) {
-			box.getChildren().add(new Label("No sound files were found in what you imported."));
+			/*
+			 * Detection files (CPOD/FPOD) can be viewed on their own, so having no sound
+			 * files is only a problem if nothing else turned up either.
+			 */
+			if (otherTypes.isEmpty()) {
+				box.getChildren().add(new Label("No sound files were found in what you imported."));
+			}
+			else {
+				box.getChildren().add(field("Sound files", "none"));
+				box.getChildren().add(field("Also found", otherTypes));
+			}
 			return box;
 		}
 
@@ -283,15 +298,7 @@ public class ConfigImportWizardFX {
 			box.getChildren().add(field("Channels", "unknown"));
 		}
 
-		StringBuilder types = new StringBuilder();
-		if (summary.hasSudFiles()) {
-			types.append("SoundTrap sud files");
-		}
-		if (wizardData.getFileImport() != null
-				&& wizardData.getFileImport().hasType(PamImportFileType.SUD_CLICKS)) {
-			types.append(types.length() > 0 ? ", " : "").append("click detections");
-		}
-		box.getChildren().add(field("Also found", types.length() == 0 ? "-" : types.toString()));
+		box.getChildren().add(field("Also found", otherTypes.isEmpty() ? "-" : otherTypes));
 
 		String warning = null;
 		if (!summary.isValid()) {
@@ -588,7 +595,6 @@ public class ConfigImportWizardFX {
 
 	private javafx.scene.Node buildStoragePage() {
 		ConfigApplyContext context = wizardData.getApplyContext();
-		PamConfigInspection inspection = wizardData.getSelectedInspection();
 
 		File project = context.getProjectFolder();
 		if (project == null) {
@@ -627,8 +633,9 @@ public class ConfigImportWizardFX {
 			databaseField.setText(new File(folder, name).getAbsolutePath());
 		});
 
-		boolean hasBinary = inspection != null && inspection.hasBinaryStore();
-		boolean hasDatabase = inspection != null && inspection.hasDatabase();
+		PamAutoConfig selected = wizardData.getSelectedConfig();
+		boolean hasBinary = selected != null && selected.needsBinaryStore();
+		boolean hasDatabase = selected != null && selected.needsDatabase();
 		binaryRow.setVisible(hasBinary);
 		binaryRow.setManaged(hasBinary);
 		databaseRow.setVisible(hasDatabase);
@@ -652,7 +659,7 @@ public class ConfigImportWizardFX {
 
 	private boolean readStoragePage() {
 		ConfigApplyContext context = wizardData.getApplyContext();
-		PamConfigInspection inspection = wizardData.getSelectedInspection();
+		PamAutoConfig selected = wizardData.getSelectedConfig();
 
 		String projectText = projectField.getText().trim();
 		if (projectText.isEmpty()) {
@@ -661,7 +668,7 @@ public class ConfigImportWizardFX {
 		}
 		context.setProjectFolder(new File(projectText), wizardData.getSelectedConfig().getConfigName());
 
-		if (inspection != null && inspection.hasBinaryStore()) {
+		if (selected != null && selected.needsBinaryStore()) {
 			String binaryText = binaryField.getText().trim();
 			if (binaryText.isEmpty()) {
 				warn("No binary store",
@@ -674,7 +681,7 @@ public class ConfigImportWizardFX {
 			context.setBinaryFolder(null);
 		}
 
-		if (inspection != null && inspection.hasDatabase()) {
+		if (selected != null && selected.needsDatabase()) {
 			String databaseText = databaseField.getText().trim();
 			if (databaseText.isEmpty()) {
 				warn("No database", "This configuration uses a database, so it needs a database file.");
@@ -756,6 +763,12 @@ public class ConfigImportWizardFX {
 			text.append(".\n");
 		}
 
+		int podFiles = countPodFiles(selected, wizardData.getFileImport());
+		if (podFiles > 0) {
+			text.append(podFiles).append(podFiles == 1 ? " POD file" : " POD files")
+					.append(" will be converted into PAMGuard binary files.\n");
+		}
+
 		PamConfigInspection inspection = wizardData.getSelectedInspection();
 		if (wizardData.willDecimate() && inspection != null && summary != null) {
 			text.append("A decimator will reduce the sample rate from ")
@@ -766,11 +779,11 @@ public class ConfigImportWizardFX {
 		}
 
 		ConfigApplyContext context = wizardData.getApplyContext();
-		if (inspection != null && inspection.hasBinaryStore() && context.getBinaryFolder() != null) {
+		if (selected.needsBinaryStore() && context.getBinaryFolder() != null) {
 			text.append("Binary data will be written to ")
 					.append(context.getBinaryFolder().getAbsolutePath()).append("\n");
 		}
-		if (inspection != null && inspection.hasDatabase() && context.getDatabaseFile() != null) {
+		if (selected.needsDatabase() && context.getDatabaseFile() != null) {
 			text.append("The database will be ")
 					.append(context.getDatabaseFile().getAbsolutePath()).append("\n");
 		}
@@ -818,4 +831,24 @@ public class ConfigImportWizardFX {
 			this.enabled = enabled;
 		}
 	}
+
+	/**
+	 * The number of CPOD/FPOD detection files the chosen configuration will import.
+	 * These are converted into binary files rather than being read while processing,
+	 * so they are worth mentioning separately from the sound files - but only when
+	 * the configuration actually does something with them. POD files may well have
+	 * been dropped alongside sound files that the user has chosen a sound
+	 * configuration for.
+	 *
+	 * @param selected   the chosen configuration, may be null.
+	 * @param fileImport the imported files, may be null.
+	 * @return the number of POD files which will be imported.
+	 */
+	private static int countPodFiles(PamAutoConfig selected, PamFileImport fileImport) {
+		if (fileImport == null || !(selected instanceof PODViewerAutoConfig)) {
+			return 0;
+		}
+		return fileImport.getFileCount(PamImportFileType.CPOD) + fileImport.getFileCount(PamImportFileType.FPOD);
+	}
+
 }

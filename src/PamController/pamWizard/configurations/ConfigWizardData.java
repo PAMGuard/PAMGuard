@@ -141,13 +141,17 @@ public class ConfigWizardData {
 
 	/**
 	 * Whether the user needs to be asked where data should be stored. Only
-	 * configurations which contain a binary store or a database do.
+	 * configurations which write a binary store or a database of their own do -
+	 * each configuration says so for itself, since a code built configuration has no
+	 * psfx file to inspect.
 	 *
 	 * @return true if the storage page is needed.
 	 */
 	public boolean needsStoragePaths() {
-		PamConfigInspection inspection = getSelectedInspection();
-		return inspection != null && inspection.isValid() && inspection.needsStoragePaths();
+		if (selectedConfig == null) {
+			return false;
+		}
+		return selectedConfig.needsBinaryStore() || selectedConfig.needsDatabase();
 	}
 
 	/**
@@ -241,9 +245,7 @@ public class ConfigWizardData {
 		if (selectedConfig == null) {
 			return false;
 		}
-		if (selectedConfig instanceof FileConfigAutoConfig) {
-			((FileConfigAutoConfig) selectedConfig).setApplyContext(applyContext);
-		}
+		selectedConfig.setApplyContext(applyContext);
 		selectedConfig.createConfiguration(fileImport);
 		applyMedium();
 		return true;

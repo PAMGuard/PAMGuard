@@ -521,15 +521,36 @@ public class CPODImporter {
 			//now we get rid if duplicate clicks
 			if (cpodCP1Data != null && cpodCP3Data != null) {
 				CPODClickOmparator cpodComparator =  new CPODClickOmparator();
-				
-				//make sure to sort the list. 
+
+				//make sure both lists are sorted.
 				Collections.sort(cpodCP3Data, cpodComparator);
-				//here we need to replace the CP1 detection in the CP1 file with the CP3 detections in the CP3 file
+				Collections.sort(cpodCP1Data, cpodComparator);
+
+				/*
+				 * Here we need to replace the CP1 detection from the CP1 file with the matching
+				 * CP3 detection from the CP3 file, since only the CP3 detection carries the click
+				 * train classification.
+				 *
+				 * Both lists are in time order, so walk through them together rather than doing a
+				 * binary search for every click. Apart from being a lot faster, this guarantees
+				 * that each CP3 click is used at most once - a binary search returns an arbitrary
+				 * one of several equal elements, so several CP1 clicks could otherwise be replaced
+				 * by the same CPODClick object, which would then be added to the data block and to
+				 * the click train more than once.
+				 *
+				 * Note that cpodCP1Data is only a chunk of the CP1 file whereas cpodCP3Data is the
+				 * whole CP3 file, so there will be CP3 clicks before and after the chunk which
+				 * never match anything.
+				 */
+				int i3 = 0;
 				for (int j=0; j<cpodCP1Data.size(); j++) {
-					int index = Collections.binarySearch(cpodCP3Data, cpodCP1Data.get(j),cpodComparator);
-					//replace
-					if (index>=0) {
-						cpodCP1Data.set(j, cpodCP3Data.get(index));
+					CPODClick cp1Click = cpodCP1Data.get(j);
+					while (i3<cpodCP3Data.size() && cpodComparator.compare(cpodCP3Data.get(i3), cp1Click)<0) {
+						i3++;
+					}
+					if (i3<cpodCP3Data.size() && cpodComparator.compare(cpodCP3Data.get(i3), cp1Click)==0) {
+						cpodCP1Data.set(j, cpodCP3Data.get(i3));
+						i3++;
 						repcount++;
 					}
 				}
@@ -621,24 +642,20 @@ public class CPODImporter {
 		return timelims;
 	}
 
-	// Comparator to sort a list 
+	/**
+	 * Comparator to sort clicks into time order.
+	 * <p>
+	 * Times are only held to the nearest millisecond, so the sample number, which holds the
+	 * full 5us resolution of the file, is used to separate clicks within a millisecond.
+	 */
 	static class CPODClickOmparator implements Comparator<CPODClick> { 
 		@Override public int compare(CPODClick s1, CPODClick s2) 
 		{ 
-			if (s1.getTimeMilliseconds() > s2.getTimeMilliseconds()) { 
-				return 1; 
-			} 
-			else if (s1.getTimeMilliseconds() < s2.getTimeMilliseconds()) { 
-				return -1; 
-			} 
-			else if (s1.getTimeMilliseconds() == s2.getTimeMilliseconds()) { 
-				
-//				return 0;
-				if (s1.getStartSample()>(s2.getStartSample())) return 1;
-				else if (s1.getStartSample()<(s2.getStartSample())) return -1;
-				else return 0;
-			} 
-			return -1; 
+			int cmp = Long.compare(s1.getTimeMilliseconds(), s2.getTimeMilliseconds());
+			if (cmp != 0) {
+				return cmp;
+			}
+			return Long.compare(s1.getStartSample(), s2.getStartSample());
 		} 
 	}
 

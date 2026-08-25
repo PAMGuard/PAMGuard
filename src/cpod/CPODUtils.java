@@ -142,8 +142,37 @@ public class CPODUtils {
 	}
 
 	/**
-	 * Get the CPOD species from an int flag 
-	 * @param species - integer flag representing the species
+	 * Get the species from the SpClass field of a CP3 or FP3 file.
+	 * <p>
+	 * CP3 files hold this in bits 4-6 of byte 36 of the click record, FP3 files in bits 2-3
+	 * of byte 14 of the click train (249) record. Both use the same codes, which are the
+	 * ordinal values of the Pascal tSpClass enumeration (spNBHF, spDOL, spUnClassed, spSON).
+	 *
+	 * @param spClass - the SpClass value from the file, 0-3.
+	 * @return the ENUM species type.
+	 */
+	public static CPODSpeciesType getSpClassSpecies(short spClass) {
+		switch (spClass) {
+		case 0:
+			return CPODSpeciesType.NBHF;
+		case 1:
+			return CPODSpeciesType.DOLPHIN;
+		case 2:
+			return CPODSpeciesType.UNKNOWN;
+		case 3:
+			return CPODSpeciesType.SONAR;
+		}
+		return CPODSpeciesType.UNKNOWN;
+	}
+
+	/**
+	 * Get the species which corresponds to an index in the species selection menu of the
+	 * CPOD data selector, i.e. 0 = Unknown, 1 = NBHF, 2 = Dolphins, 3 = Sonar.
+	 * <p>
+	 * Note that this is NOT the coding used within CP3 and FP3 files - use
+	 * {@link #getSpClassSpecies(short)} for that.
+	 *
+	 * @param species - the menu index.
 	 * @return the ENUM species type. 
 	 */
 	public static CPODSpeciesType getCPODSpecies(short species) {
@@ -185,29 +214,4 @@ public class CPODUtils {
 		return (short) (data>>firstBit);
 	}
 	
-	/**
-	 * Get the FPOD species from an int flag 
-	 * @param species - integer flag representing the species
-	 * @return the ENUM species type. 
-	 */
-	public static CPODSpeciesType getFPODSpecies(short species) {
-		CPODSpeciesType type= CPODSpeciesType.UNKNOWN;
-		switch (species) {
-		case 0:
-			type = CPODSpeciesType.NBHF;
-			break;
-		case 1:
-			type = CPODSpeciesType.DOLPHIN;
-			break;
-		case 2:
-			type = CPODSpeciesType.UNKNOWN;
-			break;
-		case 4:
-			type = CPODSpeciesType.SONAR;
-			break;
-		}
-		return type;
-	}
-
-
 }

@@ -14,9 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import PamController.pamWizard.PamAutoConfig;
 import PamController.pamWizard.configurations.ConfigApplyContext;
 import PamController.pamWizard.configurations.ConfigWizardData;
-import PamController.pamWizard.configurations.PamConfigInspection;
 import PamView.dialog.PamDialog;
 import PamView.wizard.PamWizard;
 import PamView.wizard.PamWizardCard;
@@ -141,9 +141,9 @@ public class StoragePathsCard extends PamWizardCard<ConfigWizardData> {
 		showDerived(cardParams);
 
 		// hide the rows the chosen configuration has no use for.
-		PamConfigInspection inspection = cardParams.getSelectedInspection();
-		boolean hasBinary = inspection != null && inspection.hasBinaryStore();
-		boolean hasDatabase = inspection != null && inspection.hasDatabase();
+		PamAutoConfig selected = cardParams.getSelectedConfig();
+		boolean hasBinary = selected != null && selected.needsBinaryStore();
+		boolean hasDatabase = selected != null && selected.needsDatabase();
 		setRowVisible(binaryLabel, binaryField, binaryBrowse, hasBinary);
 		setRowVisible(databaseLabel, databaseField, databaseBrowse, hasDatabase);
 	}
@@ -151,7 +151,7 @@ public class StoragePathsCard extends PamWizardCard<ConfigWizardData> {
 	@Override
 	public boolean getParams(ConfigWizardData cardParams) {
 		ConfigApplyContext context = cardParams.getApplyContext();
-		PamConfigInspection inspection = cardParams.getSelectedInspection();
+		PamAutoConfig selected = cardParams.getSelectedConfig();
 
 		String projectText = projectField.getText().trim();
 		if (projectText.isEmpty()) {
@@ -160,7 +160,7 @@ public class StoragePathsCard extends PamWizardCard<ConfigWizardData> {
 		}
 		context.setProjectFolder(new File(projectText), cardParams.getSelectedConfig().getConfigName());
 
-		if (inspection != null && inspection.hasBinaryStore()) {
+		if (selected != null && selected.needsBinaryStore()) {
 			String binaryText = binaryField.getText().trim();
 			if (binaryText.isEmpty()) {
 				return PamDialog.showWarning(getPamWizard(), "No binary store",
@@ -172,7 +172,7 @@ public class StoragePathsCard extends PamWizardCard<ConfigWizardData> {
 			context.setBinaryFolder(null);
 		}
 
-		if (inspection != null && inspection.hasDatabase()) {
+		if (selected != null && selected.needsDatabase()) {
 			String databaseText = databaseField.getText().trim();
 			if (databaseText.isEmpty()) {
 				return PamDialog.showWarning(getPamWizard(), "No database",

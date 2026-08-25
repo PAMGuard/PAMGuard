@@ -9,6 +9,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import PamController.UsedModuleInfo;
+import PamController.pamWizard.PODViewerAutoConfig;
+import PamController.pamWizard.PamAutoConfig;
+import PamController.pamWizard.PamFileImport;
+import PamController.pamWizard.PamImportFileType;
 import PamController.pamWizard.SoundFileSummary;
 import PamController.pamWizard.configurations.ConfigApplyContext;
 import PamController.pamWizard.configurations.ConfigWizardData;
@@ -67,10 +71,11 @@ public class ConfigSummaryCard extends PamWizardCard<ConfigWizardData> {
 	public static String buildSummary(ConfigWizardData data) {
 		StringBuilder text = new StringBuilder();
 
-		if (data.getSelectedConfig() == null) {
+		PamAutoConfig selected = data.getSelectedConfig();
+		if (selected == null) {
 			return "No configuration selected.";
 		}
-		text.append(data.getSelectedConfig().getConfigName()).append("\n\n");
+		text.append(selected.getConfigName()).append("\n\n");
 
 		SoundFileSummary summary = data.getSoundSummary();
 		if (summary != null && summary.getFileCount() > 0) {
@@ -80,6 +85,12 @@ public class ConfigSummaryCard extends PamWizardCard<ConfigWizardData> {
 				text.append(" at ").append(summary.getFormatDescription());
 			}
 			text.append(".\n");
+		}
+
+		int podFiles = countPodFiles(selected, data.getFileImport());
+		if (podFiles > 0) {
+			text.append(podFiles).append(podFiles == 1 ? " POD file" : " POD files")
+					.append(" will be converted into PAMGuard binary files.\n");
 		}
 
 		PamConfigInspection inspection = data.getSelectedInspection();
@@ -93,11 +104,11 @@ public class ConfigSummaryCard extends PamWizardCard<ConfigWizardData> {
 		}
 
 		ConfigApplyContext context = data.getApplyContext();
-		if (inspection != null && inspection.hasBinaryStore() && context.getBinaryFolder() != null) {
+		if (selected.needsBinaryStore() && context.getBinaryFolder() != null) {
 			text.append("Binary data will be written to ")
 					.append(context.getBinaryFolder().getAbsolutePath()).append("\n");
 		}
-		if (inspection != null && inspection.hasDatabase() && context.getDatabaseFile() != null) {
+		if (selected.needsDatabase() && context.getDatabaseFile() != null) {
 			text.append("The database will be ")
 					.append(context.getDatabaseFile().getAbsolutePath()).append("\n");
 		}
@@ -118,4 +129,24 @@ public class ConfigSummaryCard extends PamWizardCard<ConfigWizardData> {
 
 		return text.toString();
 	}
+
+	/**
+	 * The number of CPOD/FPOD detection files the chosen configuration will import.
+	 * These are converted into binary files rather than being read while processing,
+	 * so they are worth mentioning separately from the sound files - but only when
+	 * the configuration actually does something with them. POD files may well have
+	 * been dropped alongside sound files that the user has chosen a sound
+	 * configuration for.
+	 *
+	 * @param selected   the chosen configuration, may be null.
+	 * @param fileImport the imported files, may be null.
+	 * @return the number of POD files which will be imported.
+	 */
+	private static int countPodFiles(PamAutoConfig selected, PamFileImport fileImport) {
+		if (fileImport == null || !(selected instanceof PODViewerAutoConfig)) {
+			return 0;
+		}
+		return fileImport.getFileCount(PamImportFileType.CPOD) + fileImport.getFileCount(PamImportFileType.FPOD);
+	}
+
 }

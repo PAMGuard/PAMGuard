@@ -75,6 +75,60 @@ public class PamFileImport {
 	}
 
 	/**
+	 * The number of files of a given type that were found.
+	 *
+	 * @param fileType the file type.
+	 * @return the file count, or zero if that type was not scanned for / not found.
+	 */
+	public int getFileCount(PamImportFileType fileType) {
+		PamFileTypeResult result = results.get(fileType);
+		return (result == null) ? 0 : result.getFileCount();
+	}
+
+	/**
+	 * A short description of everything found among the imported files apart from
+	 * the sound files themselves - sud files holding click detections, CPOD/FPOD
+	 * detection files, and so on. Shown on the first page of the import wizard so
+	 * that it is obvious what PAMGuard made of what was dropped on it.
+	 * <p>
+	 * Built here rather than in the wizards so that the Swing and JavaFX versions
+	 * always say the same thing.
+	 *
+	 * @return the description, or an empty string if nothing else was found.
+	 */
+	public String getOtherTypesDescription() {
+		StringBuilder types = new StringBuilder();
+
+		SoundFileSummary summary = getSoundSummary();
+		if (summary != null && summary.hasSudFiles()) {
+			append(types, "SoundTrap sud files");
+		}
+		if (hasType(PamImportFileType.SUD_CLICKS)) {
+			append(types, "click detections");
+		}
+		int cpodFiles = getFileCount(PamImportFileType.CPOD);
+		if (cpodFiles > 0) {
+			append(types, cpodFiles + " CPOD file" + (cpodFiles == 1 ? "" : "s"));
+		}
+		int fpodFiles = getFileCount(PamImportFileType.FPOD);
+		if (fpodFiles > 0) {
+			append(types, fpodFiles + " FPOD file" + (fpodFiles == 1 ? "" : "s"));
+		}
+
+		return types.toString();
+	}
+
+	/**
+	 * Add an item to a comma separated list.
+	 */
+	private static void append(StringBuilder list, String item) {
+		if (list.length() > 0) {
+			list.append(", ");
+		}
+		list.append(item);
+	}
+
+	/**
 	 * Convenience accessor for the scanned sound files.
 	 * @return the audio file list data, or null if no sound files were found.
 	 */
