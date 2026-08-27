@@ -159,6 +159,18 @@ public class EventListDialog extends PamDialog {
 		}
 
 		@Override
+		public boolean canLocaliseGroup() {
+			return clickControl.getTargetMotionLocaliser() != null;
+		}
+
+		@Override
+		public void localiseGroup(SuperDetection group) {
+			if (group instanceof DetectionGroup) {
+				clickControl.getTargetMotionLocaliser().showTMDialog((DetectionGroup) group);
+			}
+		}
+
+		@Override
 		public String getGroupInfo(SuperDetection group) {
 			if (group instanceof CPODClickTrainDataUnit) {
 				return ((CPODClickTrainDataUnit) group).getStringInfo();

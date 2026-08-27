@@ -2,7 +2,7 @@ package clickDetector.offlineFuncs;
 
 import java.util.Hashtable;
 import clickDetector.ClickDetection;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.AcousticDetectionGroup;
 import PamController.PamController;
 import PamView.PamColors;
 import PamguardMVC.PamDataUnit;
@@ -24,7 +24,7 @@ import PamguardMVC.PamDataUnit;
  * @author Doug Gillespie
  *
  */
-public class OfflineEventDataUnit extends GroupDetection<PamDataUnit> {
+public class OfflineEventDataUnit extends AcousticDetectionGroup<PamDataUnit> {
 
 	private String eventType;
 	
@@ -68,6 +68,7 @@ public class OfflineEventDataUnit extends GroupDetection<PamDataUnit> {
 	
 	public OfflineEventDataUnit(ClickDetection firstClick) {
 		super(firstClick.getTimeMilliseconds(),firstClick.getChannelBitmap(),firstClick.getStartSample(),firstClick.getSampleDuration());
+		makeLocalisation();
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 //		super("Online", 0, firstClick);
 //		this.eventType 
@@ -80,6 +81,7 @@ public class OfflineEventDataUnit extends GroupDetection<PamDataUnit> {
 
 	public OfflineEventDataUnit(long timeMilliseconds, int channelBitmap, long startSample, long duration) {
 		super(timeMilliseconds, channelBitmap, startSample, duration);
+		makeLocalisation();
 //		super("Online", 0, null);
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 		this.setTimeMilliseconds(timeMilliseconds);
@@ -98,6 +100,7 @@ public class OfflineEventDataUnit extends GroupDetection<PamDataUnit> {
 //		super(firstClick.getTimeMilliseconds(), firstClick.getChannelBitmap(), 
 //				firstClick.getStartSample(), firstClick.getDuration());
 		super(0,0,0,0);
+		makeLocalisation();
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 		this.eventType = eventType;
 		if (nominalEventId != null) {

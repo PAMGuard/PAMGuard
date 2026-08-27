@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.Vector;
 
 import Localiser.LocalisationAlgorithm;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamController.PamController;
 import PamView.symbol.StandardSymbolManager;
-import targetMotionOld.TargetMotionLocaliser;
+import targetMotion.TargetMotionLocaliser;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
@@ -232,7 +232,7 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		int unitsRemoved = 0;
 		if (pamDataUnits.isEmpty())
 			return 0;
-		GroupDetection clickTrain;
+		DetectionGroup clickTrain;
 		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		
@@ -330,7 +330,7 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		 */
 		ClickControl clickControl = clickDetector.getClickControl();
 		ClicksOffline clicksOffline = clickControl.getClicksOffline();
-		TargetMotionLocaliser<GroupDetection> tml = clickControl.getTargetMotionLocaliser();
+		TargetMotionLocaliser<DetectionGroup> tml = clickControl.getTargetMotionLocaliser();
 		return tml;
 //		return super.getLocalisationAlgorithm();
 	}

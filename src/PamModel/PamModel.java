@@ -930,7 +930,6 @@ final public class PamModel implements PamSettings {
 		//		mi.setToolTipText("Locates sounds using wide aperture arrays of hydrophones");
 		//		mi.setMaxNumber(1);
 
-		//		mi = PamModuleInfo.registerControlledUnit("targetMotionModule.TargetMotionControl", "Target Motion Localiser");
 		//		//mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		//		mi.setModulesMenuGroup(localiserGroup);
 		//		mi.setToolTipText("Locates sounds in 2D and 3D detected using towed hydrophone arrays");

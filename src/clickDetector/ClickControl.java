@@ -37,7 +37,7 @@ import Filters.FilterDialog;
 import Filters.FilterParams;
 import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -95,7 +95,7 @@ import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
 import fftManager.fftorganiser.FFTDataOrganiser;
 import rocca.RoccaControl;
 import soundPlayback.PlaybackControl;
-import targetMotionOld.TargetMotionLocaliser;
+import targetMotion.TargetMotionLocaliser;
 import tethys.localization.LocalizationCreator;
 
 /**
@@ -168,7 +168,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 	/**
 	 * The offline target motion localisation mmodule. 
 	 */
-	private TargetMotionLocaliser<GroupDetection> targetMotionLocaliser;
+	private TargetMotionLocaliser<DetectionGroup> targetMotionLocaliser;
 
 	private String dataBlockPrefix = "";
 
@@ -1194,7 +1194,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 	}
 
 
-	public TargetMotionLocaliser<GroupDetection> getTargetMotionLocaliser() {
+	public TargetMotionLocaliser<DetectionGroup> getTargetMotionLocaliser() {
 		return targetMotionLocaliser;
 	}
 

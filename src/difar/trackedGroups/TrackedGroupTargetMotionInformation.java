@@ -9,7 +9,7 @@ import pamMaths.PamVector;
 import GPS.GpsData;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
-import targetMotionModule.TargetMotionInformation;
+import difar.targetmotion.TargetMotionInformation;
 
 public class TrackedGroupTargetMotionInformation implements TargetMotionInformation {
 

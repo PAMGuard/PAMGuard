@@ -7,7 +7,7 @@ import Localiser.algorithms.genericLocaliser.MinimisationFunction;
 import Localiser.algorithms.locErrors.LocaliserError;
 import Localiser.algorithms.locErrors.SimpleError;
 import Localiser.detectionGroupLocaliser.DetectionGroupLocaliser;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import PamDetection.AbstractLocalisation;
 import PamUtils.LatLong;

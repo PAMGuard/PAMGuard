@@ -69,7 +69,7 @@ import Array.ArrayManager;
 import GPS.GpsData;
 import Layout.PamAxis;
 import Localiser.DisplayLocaliserMenu;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -2443,12 +2443,15 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				//If the static localiser is currently implemented and the click is part of the list then have option to localise
 				addLocaliserMenuItems(menu, clickedClick);
 
-				if (clickedClick.getSuperDetection(0) != null) {
-					SuperDetection sd = clickedClick.getSuperDetection(0);
-					if (sd.getSubDetectionsCount() > 1) {
-						//uurgh...what??
-						if (sd instanceof GroupDetection) {
-							menuItem = clickControl.getTargetMotionLocaliser().getEventMenuItem((GroupDetection) sd, "Click Train");
+				/*
+				 * Offer target motion localisation for every detection group the
+				 * click belongs to (manually annotated event, click train, ...).
+				 */
+				for (int iSuper = 0; iSuper < clickedClick.getSuperDetectionsCount(); iSuper++) {
+					SuperDetection sd = clickedClick.getSuperDetection(iSuper);
+					if (sd instanceof DetectionGroup && sd.getSubDetectionsCount() > 1) {
+						menuItem = clickControl.getTargetMotionLocaliser().getEventMenuItem((DetectionGroup) sd);
+						if (menuItem != null) {
 							menu.add(menuItem);
 						}
 					}

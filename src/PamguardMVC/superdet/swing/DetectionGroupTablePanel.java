@@ -64,6 +64,20 @@ public class DetectionGroupTablePanel {
 		 */
 		public default void convertGroup(SuperDetection group) {
 		}
+
+		/**
+		 * @return true if localiseGroup should be offered in the popup menu.
+		 */
+		public default boolean canLocaliseGroup() {
+			return false;
+		}
+
+		/**
+		 * Open target motion localisation for the given group.
+		 * @param group group to localise.
+		 */
+		public default void localiseGroup(SuperDetection group) {
+		}
 	}
 
 	private PamDataBlock dataBlock;
@@ -228,6 +242,17 @@ public class DetectionGroupTablePanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					commands.gotoGroup(group, beforeTime);
+				}
+			});
+			menu.add(menuItem);
+		}
+		if (commands.canLocaliseGroup()) {
+			menuItem = new JMenuItem(String.format("Localise %s %d ...", typeName, id));
+			menuItem.setToolTipText("Open the target motion localiser for this group");
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					commands.localiseGroup(group);
 				}
 			});
 			menu.add(menuItem);

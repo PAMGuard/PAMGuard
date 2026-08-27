@@ -36,7 +36,7 @@ import Localiser.algorithms.DelayGroup;
 import Localiser.algorithms.TimeDelayData;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamController.PamController;
 import PamController.status.BaseProcessCheck;
 import PamDetection.LocContents;
@@ -78,8 +78,8 @@ import fftFilter.FFTFilterParams;
 import fftManager.FastFFT;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
 import signal.Hilbert;
-import targetMotionOld.TargetMotionLocaliser;
-import targetMotionOld.TargetMotionSQLLogging;
+import targetMotion.TargetMotionLocaliser;
+import targetMotion.TargetMotionSQLLogging;
 
 /**
  * Main click detector process.
@@ -2068,7 +2068,7 @@ public class ClickDetector extends PamProcess {
 	// return targetMotionSQLLogging;
 	// }
 
-	public void setTargetMotionLocaliser(TargetMotionLocaliser<GroupDetection> targetMotionLocaliser) {
+	public void setTargetMotionLocaliser(TargetMotionLocaliser<DetectionGroup> targetMotionLocaliser) {
 		targetMotionSQLLogging.setTargetMotionLocaliser(targetMotionLocaliser);
 	}
 

@@ -1,8 +1,8 @@
 package whistlesAndMoans;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.AcousticDetectionGroup;
 
-public class WhistleToneGroupedDetection extends GroupDetection<ConnectedRegionDataUnit> {
+public class WhistleToneGroupedDetection extends AcousticDetectionGroup<ConnectedRegionDataUnit> {
 
 	public WhistleToneGroupedDetection(ConnectedRegionDataUnit firstDetection) {
 		super(firstDetection);
