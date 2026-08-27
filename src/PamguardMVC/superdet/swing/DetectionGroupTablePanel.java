@@ -159,6 +159,23 @@ public class DetectionGroupTablePanel {
 		return "";
 	}
 
+	/**
+	 * Get the singular lower case type name for the groups in this table, taken
+	 * from the data block name, e.g. "click train". Used in popup menu wording so
+	 * that click trains are called click trains rather than events.
+	 * @return type name for use in menus.
+	 */
+	public String getGroupTypeName() {
+		String name = dataBlock.getDataName();
+		if (name == null) {
+			return "detection group";
+		}
+		if (name.endsWith("s")) {
+			name = name.substring(0, name.length()-1);
+		}
+		return name.toLowerCase();
+	}
+
 	private class TableMouse extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -195,14 +212,15 @@ public class DetectionGroupTablePanel {
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem menuItem;
 		long id = group.getDatabaseIndex() > 0 ? group.getDatabaseIndex() : group.getUID();
+		String typeName = getGroupTypeName();
 		int[] beforeTimes = {0, 10, 60};
 		for (int i = 0; i < beforeTimes.length; i++) {
 			String title;
 			if (beforeTimes[i] == 0) {
-				title = String.format("Goto event %d ...", id);
+				title = String.format("Goto %s %d ...", typeName, id);
 			}
 			else {
-				title = String.format("Goto %ds before event %d ...", beforeTimes[i], id);
+				title = String.format("Goto %ds before %s %d ...", beforeTimes[i], typeName, id);
 			}
 			menuItem = new JMenuItem(title);
 			final int beforeTime = beforeTimes[i];

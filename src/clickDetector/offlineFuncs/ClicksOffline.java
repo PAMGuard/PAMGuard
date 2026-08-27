@@ -46,6 +46,10 @@ import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.superdet.DetectionGroup;
 import PamguardMVC.superdet.SuperDetection;
+import clickTrainDetector.CTDetectionGroupDataUnit;
+import clickTrainDetector.TempCTDataUnit;
+import cpod.CPODClickTrainDataUnit;
+import detectiongrouplocaliser.DetectionGroupDataUnit;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -258,10 +262,19 @@ public class ClicksOffline {
 		}
 		else if (otherGroups.size() > 1) {
 			int totalDets = 0;
+			String typeName = null;
 			for (SuperDetection group : otherGroups) {
 				totalDets += group.getLoadedSubDetectionsCount();
+				String aType = groupTypeName(group);
+				if (typeName == null) {
+					typeName = aType;
+				}
+				else if (typeName.equals(aType) == false) {
+					typeName = "group"; // mixed types.
+				}
 			}
-			menuItem = new JMenuItem(String.format("Merge %d detections into event ...", totalDets));
+			menuItem = new JMenuItem(String.format("Merge %d %ss into event (%d clicks) ...",
+					otherGroups.size(), typeName, totalDets));
 			menuItem.setToolTipText(String.format("Copy the detections of the %d marked groups into a new manually "
 					+ "annotated event. The original groups are not changed. Only detections currently loaded are copied.",
 					otherGroups.size()));
@@ -273,21 +286,64 @@ public class ClicksOffline {
 	}
 
 	/**
+	 * Specify which detection group data blocks the click detector's event list
+	 * shows as extra tabs. Allowed: saved click trains from the click train
+	 * detector module, CPOD click trains and manually created detection groups.
+	 * Excluded: this module's own events (and other click detectors' events,
+	 * which are managed by their own dialogs), transient working blocks with no
+	 * database storage (possible / unconfirmed click trains) and detection
+	 * groups unrelated to clicks (e.g. localised whistle contours).
+	 * @param block a data block.
+	 * @return true if the block should be listed in the event list dialog.
+	 */
+	public boolean canShowInEventList(PamDataBlock block) {
+		if (block == null) {
+			return false;
+		}
+		Class unitClass = block.getUnitClass();
+		if (unitClass == null || DetectionGroup.class.isAssignableFrom(unitClass) == false) {
+			return false;
+		}
+		if (OfflineEventDataUnit.class.isAssignableFrom(unitClass)) {
+			return false;
+		}
+		if (block.getLogging() == null) {
+			return false; // transient working block, never saved.
+		}
+		if (TempCTDataUnit.class.isAssignableFrom(unitClass)) {
+			return false;
+		}
+		return CTDetectionGroupDataUnit.class.isAssignableFrom(unitClass)
+				|| CPODClickTrainDataUnit.class.isAssignableFrom(unitClass)
+				|| unitClass == DetectionGroupDataUnit.class;
+	}
+
+	/**
+	 * Get the singular lower case type name for a detection group, taken from
+	 * its data block name, e.g. "click train".
+	 * @param group the group.
+	 * @return type name for use in menus.
+	 */
+	private String groupTypeName(SuperDetection group) {
+		PamDataBlock pdb = group.getParentDataBlock();
+		if (pdb == null) {
+			return "detection group";
+		}
+		String name = pdb.getDataName();
+		if (name.endsWith("s")) {
+			name = name.substring(0, name.length()-1);
+		}
+		return name.toLowerCase();
+	}
+
+	/**
 	 * Get a short display name for a detection group.
 	 * @param group the group.
-	 * @return name for menus, e.g. "Click Train 12".
+	 * @return name for menus, e.g. "click train 12".
 	 */
 	private String groupName(SuperDetection group) {
-		String name = "detection group";
-		PamDataBlock pdb = group.getParentDataBlock();
-		if (pdb != null) {
-			name = pdb.getDataName();
-			if (name.endsWith("s")) {
-				name = name.substring(0, name.length()-1);
-			}
-		}
 		long id = group.getDatabaseIndex() > 0 ? group.getDatabaseIndex() : group.getUID();
-		return String.format("%s %d", name, id);
+		return String.format("%s %d", groupTypeName(group), id);
 	}
 
 	/**

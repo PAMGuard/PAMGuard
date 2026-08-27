@@ -107,15 +107,12 @@ public class EventListDialog extends PamDialog {
 	private void createGroupTabs() {
 		ArrayList<PamDataBlock> blocks = PamController.getInstance().getDataBlocks(DetectionGroup.class, true);
 		ArrayList<PamDataBlock> wantedBlocks = new ArrayList<>();
-		if (blocks != null) {
+		ClicksOffline clicksOffline = clickControl.getClicksOffline();
+		if (blocks != null && clicksOffline != null) {
 			for (PamDataBlock block : blocks) {
-				if (block == offlineEventDataBlock) {
-					continue; // that's the first tab.
+				if (clicksOffline.canShowInEventList(block)) {
+					wantedBlocks.add(block);
 				}
-				if (block.getUnitClass() == OfflineEventDataUnit.class) {
-					continue; // another click detector's manual events - managed by its own dialog.
-				}
-				wantedBlocks.add(block);
 			}
 		}
 		if (wantedBlocks.equals(groupTabBlocks)) {
