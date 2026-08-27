@@ -4212,7 +4212,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 * @param event event to scroll to
 	 * @param beforeTime seconds before the event to scroll to. 
 	 */
-	public void gotoEvent(OfflineEventDataUnit event, int beforeTime) {
+	public void gotoEvent(PamguardMVC.PamDataUnit event, int beforeTime) {
 		long evStart = event.getTimeMilliseconds() - beforeTime*1000;
 		if (evStart < hScrollBar.getMinimumMillis() || evStart > hScrollBar.getMaximumMillis()) {
 			long range = hScrollBar.getMaximumMillis() - hScrollBar.getMinimumMillis();

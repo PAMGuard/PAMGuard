@@ -1082,7 +1082,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 	 * @param event event to scroll to
 	 * @param beforeTime 
 	 */
-	public void gotoEvent(OfflineEventDataUnit event, int beforeTime) {
+	public void gotoEvent(PamDataUnit event, int beforeTime) {
 		tabPanelControl.clickDisplayManager.gotoEvent(event, beforeTime);
 	}
 

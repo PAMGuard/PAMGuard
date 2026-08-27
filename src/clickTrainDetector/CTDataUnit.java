@@ -79,7 +79,7 @@ public class CTDataUnit extends CTDetectionGroupDataUnit implements RawDataHolde
 		
 		if (list==null) return -1; 
 
-		getIDIInfo().lastNumber=-1; //forces an update on the IDI manager next time it's called.
+		forceIDIUpdater(); //forces an update on the IDI manager next time it's called.
 		
 		//Do not calc here to save processing time calculating new IDI values every time and array is added. 
 		PamDataUnit dataUnit; 
