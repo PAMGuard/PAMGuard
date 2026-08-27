@@ -3631,7 +3631,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 						}
 						else {
 							bwSymbol = symbols[i].clone();
-							bwSymbol.setFillColor(PamColors.getInstance().getColor(PamColor.PLAIN));
+							// the key for "colour by train" shows species shapes in the neutral
+							// symbol colour, which is what the clicks themselves are drawn in.
+							bwSymbol.setFillColor(PamColors.getInstance().getDefaultSymbolColour());
 							bwSymbol.setLineColor(bwSymbol.getFillColor());
 							keyPanel.add(bwSymbol.makeKeyItem(speciesList[i]));
 						}

@@ -199,7 +199,15 @@ public class CPODUtils {
 	 * @return the species type. 
 	 */
 	public static CPODSpeciesType getSpecies(String species) {
-		return CPODSpeciesType.valueOf(species);
+		if (species == null) {
+			return CPODSpeciesType.UNKNOWN;
+		}
+		try {
+			return CPODSpeciesType.valueOf(species.trim());
+		}
+		catch (IllegalArgumentException e) {
+			return CPODSpeciesType.UNKNOWN;
+		}
 	}
 	
 	public static short getBits(short data, short bitMap) {

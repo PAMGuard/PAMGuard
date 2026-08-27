@@ -1,9 +1,11 @@
 package PamView.symbol;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
 import PamView.GeneralProjector;
+import PamView.PamColors;
 import PamView.PamSymbol;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataBlock;
@@ -42,31 +44,71 @@ abstract public class PamSymbolChooser {
 	public abstract SymbolData getSymbolChoice(GeneralProjector projector, PamDataUnit dataUnit);
 
 
+	/**
+	 * Adapt a symbol's colours to the colour scheme the user has selected.
+	 * <p>
+	 * This is the one place every display goes through to turn a
+	 * {@link SymbolData} into something drawable, so it's the one place which has
+	 * to know that black symbols are invisible on the dark schemes. The stored
+	 * {@link SymbolData} is never modified - the symbol options dialogs go on
+	 * showing (and saving) the colour the user actually chose - so switching back
+	 * to a light scheme puts the black symbols straight back.
+	 *
+	 * @param symbolData the symbol as chosen by the modifiers, may be null
+	 * @return symbol data to draw with, the same object if nothing needs changing.
+	 * @see PamColors#adaptSymbolColour(Color)
+	 */
+	public static SymbolData adaptToColourScheme(SymbolData symbolData) {
+		if (symbolData == null) {
+			return null;
+		}
+		PamColors pamColours = PamColors.getInstance();
+		Color fillColour = pamColours.adaptSymbolColour(symbolData.getFillColor());
+		Color lineColour = pamColours.adaptSymbolColour(symbolData.getLineColor());
+		if (fillColour == symbolData.getFillColor() && lineColour == symbolData.getLineColor()) {
+			return symbolData;
+		}
+		SymbolData adapted = symbolData.clone();
+		adapted.setFillColor(fillColour);
+		adapted.setLineColor(lineColour);
+		return adapted;
+	}
+
 	private SymbolData lastSymbolDataFX;
 	private PamSymbolFX lastSymbolFX;
-	
+	private int lastSchemeVersionFX = -1;
+
 	public PamSymbolFX getPamSymbolFX(GeneralProjector projector, PamDataUnit dataUnit) {
 		SymbolData symbolData = getSymbolChoice(projector, dataUnit);
-		if (symbolData == lastSymbolDataFX) {
+		/*
+		 * The cache is keyed on the symbol data the modifiers came up with, which
+		 * doesn't change when the colour scheme does, so the scheme has to be part of
+		 * the key as well or the display would keep drawing the old scheme's colours.
+		 */
+		int schemeVersion = PamColors.getInstance().getColourSchemeVersion();
+		if (symbolData == lastSymbolDataFX && schemeVersion == lastSchemeVersionFX && lastSymbolFX != null) {
 			return lastSymbolFX;
 		}
-		else {
-			lastSymbolFX = new PamSymbolFX(lastSymbolDataFX = symbolData);
-			return lastSymbolFX;
-		}
+		lastSymbolDataFX = symbolData;
+		lastSchemeVersionFX = schemeVersion;
+		lastSymbolFX = new PamSymbolFX(adaptToColourScheme(symbolData));
+		return lastSymbolFX;
 	}
 	
 	private SymbolData lastSymbolData;
 	private PamSymbol lastSymbol;
+	private int lastSchemeVersion = -1;
+
 	public PamSymbol getPamSymbol(GeneralProjector projector, PamDataUnit dataUnit) {
 		SymbolData symbolData = getSymbolChoice(projector, dataUnit);
-		if (symbolData == lastSymbolData) {
+		int schemeVersion = PamColors.getInstance().getColourSchemeVersion();
+		if (symbolData == lastSymbolData && schemeVersion == lastSchemeVersion && lastSymbol != null) {
 			return lastSymbol;
 		}
-		else {
-			lastSymbol = new PamSymbol(lastSymbolData = symbolData);
-			return lastSymbol;
-		}
+		lastSymbolData = symbolData;
+		lastSchemeVersion = schemeVersion;
+		lastSymbol = new PamSymbol(adaptToColourScheme(symbolData));
+		return lastSymbol;
 	}
 
 	/**

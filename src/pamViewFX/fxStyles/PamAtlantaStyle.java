@@ -2,10 +2,6 @@ package pamViewFX.fxStyles;
 
 import java.util.ArrayList;
 
-import PamView.ColourScheme;
-import PamView.PamColors;
-import atlantafx.base.theme.CupertinoDark;
-import atlantafx.base.theme.CupertinoLight;
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 
@@ -83,47 +79,39 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 		super.dialogCSS = primerdark;
 		super.slidingDialogCSS = primerPAMGuard;
 	}
-	
 
 	@Override
 	public ArrayList<String> getGUICSS() {
 		ArrayList<String> cssStyles = new ArrayList<String>();
-		System.out.println("Current colour scheme: " + PamColors.getInstance().getColourScheme().getName() + " " + guiCSSNightMode);
-		if (PamColors.getInstance().getColourScheme().getName() == ColourScheme.NIGHTSCHEME) {
-			System.out.println("Using NIGHT MODE GUI CSS");
-			cssStyles.add(getClass().getResource(primerdark).toExternalForm());
-		} else {
-			System.out.println("Using LIGHT MODE GUI CSS");
-			cssStyles.add(getClass().getResource(primerlight).toExternalForm());
+		/*
+		 * Both the Dark and the Night scheme need the dark Primer theme: the Night
+		 * scheme is a red on black variant of the dark one, not a separate light
+		 * theme, so testing for Night alone left the Dark scheme wearing the light
+		 * style sheet.
+		 */
+		addSheet(cssStyles, isDarkScheme() ? primerdark : primerlight);
+		addSheet(cssStyles, primerPAMGuard);
+		if (isDarkScheme()) {
+			addSheet(cssStyles, primerPAMGuardDark);
 		}
-		cssStyles.add(getClass().getResource(primerPAMGuard).toExternalForm());
 		return cssStyles;
 	}
 
-
 	@Override
 	public ArrayList<String> getDialogCSS() {
+		// the dialogs are always dark, whatever the colour scheme.
 		ArrayList<String> cssStyles = new ArrayList<String>();
-		if (PamColors.getInstance().getColourScheme().getName() == ColourScheme.NIGHTSCHEME
-				&& dialogCSSNightMode != null) {
-			cssStyles.add(getClass().getResource(primerdark).toExternalForm());
-		} else {
-			cssStyles.add(getClass().getResource(primerdark).toExternalForm());
-		}
-		cssStyles.add(getClass().getResource(primerPAMGuard).toExternalForm());
-		cssStyles.add(getClass().getResource(primerPAMGuardDark).toExternalForm());
+		addSheet(cssStyles, primerdark);
+		addSheet(cssStyles, primerPAMGuard);
+		addSheet(cssStyles, primerPAMGuardDark);
 		return cssStyles;
 	}
 
 	@Override
 	public ArrayList<String> getSlidingDialogCSS() {
+		// as are the sliding panes - see PamDefaultStyle.getSlidingDialogCSS().
 		ArrayList<String> cssStyles = new ArrayList<String>();
-		if (PamColors.getInstance().getColourScheme().getName() == ColourScheme.NIGHTSCHEME
-				&& slidingDialogCSSNightMode != null) {
-			cssStyles.add(getClass().getResource(primerPAMGuardDark).toExternalForm());
-		} else {
-			cssStyles.add(getClass().getResource(primerPAMGuardDark).toExternalForm());
-		}
+		addSheet(cssStyles, primerPAMGuardDark);
 		return cssStyles;
 	}
 

@@ -19,6 +19,7 @@ import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.WrapperControlledGUISwing;
 import binaryFileStorage.BinaryStore;
+import cpod.dataPlotFX.CPODClickTrainDDPlotProvider;
 import cpod.dataPlotFX.CPODDPlotProvider;
 import cpod.dataPlotFX.CPODPlotProviderFX;
 import cpod.fx.CPODGUIFX;
@@ -150,6 +151,10 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		// register the DD display
 		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp1DataBlock));
 		//		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp3DataBlock));
+
+		//register the click trains too, so that the super detection tab of the advanced pop up
+		//menu shows the average spectrum of the train a selected detection belongs to.
+		DDPlotRegister.getInstance().registerDataInfo(new CPODClickTrainDDPlotProvider(clickTrainDataBlock));
 
 
 		//		//swing time display data providers. 

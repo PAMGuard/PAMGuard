@@ -48,6 +48,21 @@ public class ColourScheme implements Serializable, Cloneable {
 
 	private int colourBlind;
 
+	/**
+	 * Colour to draw symbols which have been left at the default black.
+	 * <p>
+	 * Nearly every detection symbol in PAMGuard defaults to black (see
+	 * {@link PamView.symbol.SymbolData#SymbolData()}), which is invisible on the near
+	 * black plot windows of the Dark and Night schemes. Rather than rewrite every
+	 * module's default, each scheme says here what black should become; see
+	 * {@link #adaptSymbolColour(Color)}.
+	 * <p>
+	 * Colour schemes are serialised with the settings, so this will be null in a
+	 * scheme restored from a file written before it existed. Always read it through
+	 * {@link #getDefaultSymbolColour()}, which fills it in.
+	 */
+	private Color defaultSymbolColour;
+
 	public ColourScheme(String name, int colourBlind) {
 		super();
 		this.name = name;
@@ -381,6 +396,12 @@ public class ColourScheme implements Serializable, Cloneable {
 		scheme.put(PamColor.GPSTRACK, new Color(255, 255, 255));
 		scheme.whaleColors[0] = new Color(192, 0, 0);
 		scheme.whaleColors[1] = new Color(255, 255, 255);
+		/*
+		 * Detections which have been left at the default black are invisible on this
+		 * scheme's plot window, so draw them white - the same colour this scheme has
+		 * always used for the GPS track and for the first whale colour.
+		 */
+		scheme.defaultSymbolColour = Color.WHITE;
 		scheme.put(PamColor.TITLEBORDER, new Color(224, 74, 74));
 		scheme.put(PamColor.BUTTONFACE, new Color(38, 38, 38));
 		scheme.put(PamColor.EDITCTRL, new Color(38, 38, 38));
@@ -428,7 +449,52 @@ public class ColourScheme implements Serializable, Cloneable {
 		 * dark plot window, so lift it to the foreground grey.
 		 */
 		scheme.whaleColors[0] = new Color(187, 187, 187);
+		/*
+		 * ... and the same for the detection symbols which have been left at the
+		 * default black. White rather than the foreground grey: these are data, and
+		 * should stand out from the text and axes drawn around them.
+		 */
+		scheme.defaultSymbolColour = Color.WHITE;
 		return scheme;
+	}
+
+	/**
+	 * Get the colour that symbols left at the default black should be drawn in for
+	 * this scheme. Black for the light schemes (so nothing changes), a light colour
+	 * for the dark ones.
+	 *
+	 * @return the default symbol colour, never null.
+	 */
+	public Color getDefaultSymbolColour() {
+		if (defaultSymbolColour == null) {
+			// schemes restored from older settings won't have one - work it out from the name.
+			defaultSymbolColour = isDark() ? Color.WHITE : Color.BLACK;
+		}
+		return defaultSymbolColour;
+	}
+
+	/**
+	 * Adapt a symbol or line colour to this colour scheme.
+	 * <p>
+	 * Only pure black is changed, and only to {@link #getDefaultSymbolColour()}.
+	 * Black is what a symbol is when nobody has chosen a colour for it, so it can
+	 * safely be treated as "use the scheme's colour"; any other colour is either a
+	 * module's own choice or the user's, and is left exactly as it is. Any
+	 * transparency on the original colour is kept.
+	 *
+	 * @param colour the colour a symbol would be drawn in, may be null
+	 * @return the colour to draw it in, which is the same object if nothing needs
+	 *         changing.
+	 */
+	public Color adaptSymbolColour(Color colour) {
+		if (colour == null || colour.getRed() != 0 || colour.getGreen() != 0 || colour.getBlue() != 0) {
+			return colour;
+		}
+		Color schemeColour = getDefaultSymbolColour();
+		if (colour.getAlpha() == 255) {
+			return schemeColour;
+		}
+		return new Color(schemeColour.getRed(), schemeColour.getGreen(), schemeColour.getBlue(), colour.getAlpha());
 	}
 
 	/**

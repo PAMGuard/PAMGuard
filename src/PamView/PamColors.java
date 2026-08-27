@@ -496,6 +496,31 @@ public class PamColors implements PamSettings {
 		return colourScheme.getWhaleColour(col);
 	}
 
+	/**
+	 * Get the colour that symbols left at the default black should be drawn in for
+	 * the current colour scheme.
+	 *
+	 * @return the default symbol colour.
+	 * @see ColourScheme#getDefaultSymbolColour()
+	 */
+	public Color getDefaultSymbolColour() {
+		return colourScheme.getDefaultSymbolColour();
+	}
+
+	/**
+	 * Adapt a symbol or line colour to the current colour scheme, so that symbols
+	 * which have been left at the default black are visible on the dark schemes'
+	 * plot windows. Colours which have actually been chosen, by a module or by the
+	 * user, are returned unchanged.
+	 *
+	 * @param colour the colour a symbol would be drawn in, may be null
+	 * @return the colour to draw it in, the same object if nothing needs changing.
+	 * @see ColourScheme#adaptSymbolColour(Color)
+	 */
+	public Color adaptSymbolColour(Color colour) {
+		return colourScheme.adaptSymbolColour(colour);
+	}
+
 	public Color getChannelColor(int iChan) {
 		Color col = colourScheme.getChannelColour(iChan);
 		if (col == null) {

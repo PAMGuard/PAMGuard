@@ -838,7 +838,9 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 				}
 			}
 			if (symbolData != null) {
-				keyPanel.add(new SymbolKeyItem(new PamSymbol(symbolData), dataBlock.getDataName()));
+				// same colour scheme adaptation the detections themselves get.
+				keyPanel.add(new SymbolKeyItem(new PamSymbol(PamSymbolChooser.adaptToColourScheme(symbolData)),
+						dataBlock.getDataName()));
 			}
 			else {
 				keyPanel.add(dataBlock.createKeyItem(radarProjector, keyPanel.getKeyType()));

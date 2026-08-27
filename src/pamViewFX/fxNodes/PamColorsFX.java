@@ -23,34 +23,25 @@ package pamViewFX.fxNodes;
  */
 
 
-import java.io.Serializable;
 import java.util.Scanner;
-
-import javax.swing.SwingUtilities;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamControllerInterface;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
+import PamView.ColourScheme;
 import PamView.PamColors;
 
 
 /**
+ * JavaFX face of {@link PamColors}.
+ * <p>
+ * This holds no colours of its own. {@link PamColors} owns the colour schemes,
+ * is where the user selects one, and is what gets saved with the settings; this
+ * class simply hands the same colours back as JavaFX {@link Color}s so that the
+ * JavaFX displays don't all have to convert them.
+ *
  * @author Doug Gillespie
- * 
- * Some standard colours to use for various bits of a view.
- * <p>
- * Ultimately, it should be possible to set these dynamically during operation or
- * have night / day settings, etc.
- * <p>
- * Any bit of the display can register with a single instance of PamColors and
- * it will then receive notifications whenever any of the colours change.
- * 
  */
-public class PamColorsFX implements PamSettings {
+public class PamColorsFX {
 
 	public static enum PamColor {
 		PlOTWINDOW, BORDER, PLAIN, AXIS, GRID, MAP, WARNINGBORDER, BACKGROUND_ALPHA, HIGHLIGHT_ALPHA, HIGHLIGHT, 
@@ -59,74 +50,15 @@ public class PamColorsFX implements PamSettings {
 	
 
 	static private PamColorsFX singleInstance;
-	
-	/**
-	 * Kept only so that the (unused, never registered) PamSettings implementation
-	 * below still has something to hand back. The colours actually returned by this
-	 * class all come from {@link PamColors}, which is where the user selects the
-	 * colour scheme and where it is saved with the settings.
-	 */
-	private ColorSchemeFX colourScheme = null;//ColourScheme.createDefaultDayScheme();
 
-
-	private ColorSettingsFX colorSettings = new ColorSettingsFX();
-
-	
 	private PamColorsFX() {
-
-		colourScheme = colorSettings.getScheme(0);
-		
-		//PamSettingManager.getInstance().registerSettings(this, PamSettingManager.LIST_SYSTEMGLOBAL);
 	}
 
-
-	
 	static public PamColorsFX getInstance() {
 		if (singleInstance == null) {
 			singleInstance = new PamColorsFX();
 		}
 		return singleInstance;
-	}
-
-	public void notifyModelChanged(int changeType) {
-		if (PamController.getInstance().isInitializationComplete() == false) {
-			return;
-		}
-		switch (changeType) {
-		case PamControllerInterface.ADD_CONTROLLEDUNIT:
-		case PamControllerInterface.INITIALIZATION_COMPLETE:
-		case PamControllerInterface.CHANGED_DISPLAY_SETTINGS:
-			SwingUtilities.invokeLater(new SetColoursLater());
-		}
-	}
-	
-	class SetColoursLater implements Runnable {
-
-		@Override
-		public void run() {
-			setColors();
-		}
-		
-	}
-
-	public void setColors() {
-		notifyAllComponents();
-
-//		javax.swing.UIManager.put("ScrollBar.background", new javax.swing.plaf.ColorUIResource(255,0,0));
-//		javax.swing.UIManager.put("ScrollBar.highlight", new javax.swing.plaf.ColorUIResource(0,255,0));
-//		javax.swing.UIManager.put("Button.foreground", new javax.swing.plaf.ColorUIResource(0,0,255));
-	}
-	
-	private void notifyAllComponents() {
-//		PamController pc = PamController.getInstance();
-//		if (pc == null) {
-//			return;
-//		}
-//		int nG = pc.getGuiManagerFX().getNumFrames();
-//		for (int i = 0; i < nG; i++) {
-//			//FIXME - causes issues on startup
-//			//notifyContianer(pc.getGuiManagerFX().getFrame(i));
-//		}
 	}
 
 	/**
@@ -178,40 +110,39 @@ public class PamColorsFX implements PamSettings {
 		return awtColorToFx(PamColors.getInstance().getChannelColor(iChan));
 	}
 
+	/**
+	 * Get the colour that symbols and lines left at the default black should be
+	 * drawn in for the current colour scheme.
+	 *
+	 * @return the default symbol colour.
+	 * @see PamColors#getDefaultSymbolColour()
+	 */
+	public Color getDefaultSymbolColour() {
+		return awtColorToFx(PamColors.getInstance().getDefaultSymbolColour());
+	}
+
+	/**
+	 * Adapt a symbol or line colour to the current colour scheme, so that anything
+	 * left at the default black stays visible on the dark schemes.
+	 *
+	 * @param colour the colour something would be drawn in.
+	 * @return the colour to draw it in.
+	 * @see PamColors#adaptSymbolColour(java.awt.Color)
+	 */
+	public Color adaptSymbolColour(Color colour) {
+		if (colour == null || colour.getRed() != 0 || colour.getGreen() != 0 || colour.getBlue() != 0) {
+			return colour;
+		}
+		Color schemeColour = getDefaultSymbolColour();
+		return new Color(schemeColour.getRed(), schemeColour.getGreen(), schemeColour.getBlue(), colour.getOpacity());
+	}
+
 	static private Font boldFont;
 	public Font getBoldFont() {
 		if (boldFont == null) {
 			boldFont = new Font("system", 12);
 		}
 		return boldFont;
-	}
-	
-	public Serializable getSettingsReference() {
-		return colorSettings;
-	}
-
-	public long getSettingsVersion() {
-		return ColorSettingsFX.serialVersionUID;
-	}
-
-	public String getUnitName() {
-		return "Pam Color Manager";
-	}
-
-	public String getUnitType() {
-		return "Pam Color Manager";
-	}
-
-	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
-		ColorSettingsFX newSettings = (ColorSettingsFX) pamControlledUnitSettings.getSettings();
-		this.colorSettings = newSettings.clone();
-		colourScheme = colorSettings.selectScheme(colorSettings.getCurrentScheme());
-		setColors();	
-		return true;
-	}
-
-	public ColorSettingsFX getColorSettings() {
-		return colorSettings;
 	}
 	
 	/**
@@ -346,10 +277,13 @@ public class PamColorsFX implements PamSettings {
 	}
 
 	/**
-	 * @return the colourScheme
+	 * Get the colour scheme the user has selected. There is only one set of colour
+	 * schemes, owned by {@link PamColors}.
+	 *
+	 * @return the current colour scheme.
 	 */
-	public ColorSchemeFX getColourScheme() {
-		return colourScheme;
+	public ColourScheme getColourScheme() {
+		return PamColors.getInstance().getColourScheme();
 	}
 
 	public static Color awtColorToFx(java.awt.Color color) {

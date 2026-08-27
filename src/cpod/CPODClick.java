@@ -331,7 +331,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		}
 		long tm = getTimeMilliseconds();
 		str += PamCalendar.formatDate(tm) + " " + PamCalendar.formatTime(tm, 3) + "<p>";
-		str += String.format("UID: %dkHz<p>", this.getUID());
+		str += String.format("UID: %d<p>", this.getUID());
 		str += String.format("Start Freq: %dkHz<p>", getkHz());
 		str += String.format("N Cycles: %d<p>", getnCyc());
 		str += String.format("BandWidth: %dkHz<p>", getBw());
@@ -358,10 +358,10 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		}
 		CPODClickTrainDataUnit clicktrain = getCPODClickTrain();
 		if (clicktrain!=null) {
-			str += "<p>" + clicktrain.getStringInfo() + "<p>";
+			str += "<p>" + clicktrain.getStringInfo();
 		}
 		else {
-			str += "<p>" + String.format("No click train info <p>");
+			str += "<p>No click train info<p>";
 		}
 		
 //		str += "<\html>";
