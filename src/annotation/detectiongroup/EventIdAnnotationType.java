@@ -1,7 +1,6 @@
 package annotation.detectiongroup;
 
 import PamguardMVC.superdet.SuperDetection;
-import annotation.CentralAnnotationsList;
 import annotation.DataAnnotationType;
 import generalDatabase.SQLLoggingAddon;
 
@@ -23,7 +22,13 @@ public class EventIdAnnotationType extends DataAnnotationType<EventIdAnnotation>
 	public EventIdAnnotationType() {
 		super();
 		eventIdSqlAddon = new EventIdSqlAddon(this);
-		CentralAnnotationsList.addAnnotationType(this);
+		/*
+		 * Note: deliberately NOT registered with CentralAnnotationsList. Registration
+		 * would trigger construction of every other annotation type (including the
+		 * target motion localiser) whenever the first event id is set, which is too
+		 * early in the model creation sequence. The annotation is wired directly
+		 * into group logging so central registration is not needed.
+		 */
 	}
 
 	/**

@@ -120,10 +120,32 @@ public class OfflineEventDatabaseMigration {
 			return;
 		}
 
+		int nCopied = copyOldEventClicks(con.getConnection(), oldClicksTableName(), eventsTableName(),
+				childrenTableName(), clickControl.getClickDataBlock().getLongDataName());
+		dbControl.commitChanges();
+		System.out.printf("Click event database upgrade: copied %d event clicks into %s\n",
+				nCopied, childrenTableName());
+	}
+
+	/**
+	 * Copy the standard sub table columns of every old format event click row
+	 * into the new children table, filling in parent ids from the old EventId
+	 * column and parent UIDs from the events table where the newer columns are
+	 * missing or empty.
+	 * @param con database connection.
+	 * @param oldClicksTable name of the old _OfflineClicks table.
+	 * @param eventsTable name of the events table.
+	 * @param childrenTable name of the new children table.
+	 * @param defaultLongName long data name of the click data block, used where
+	 * the old rows don't have one.
+	 * @return number of rows copied.
+	 */
+	static int copyOldEventClicks(java.sql.Connection con, String oldClicksTable, String eventsTable,
+			String childrenTable, String defaultLongName) throws Exception {
 		// map of event database index to event UID for filling in missing parent UIDs.
 		HashMap<Integer, Long> eventUIDs = new HashMap<>();
-		Statement stmt = con.getConnection().createStatement();
-		ResultSet rs = stmt.executeQuery(String.format("SELECT Id, UID FROM %s", eventsTableName()));
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(String.format("SELECT Id, UID FROM %s", eventsTable));
 		while (rs.next()) {
 			int id = rs.getInt(1);
 			long uid = rs.getLong(2);
@@ -131,15 +153,13 @@ public class OfflineEventDatabaseMigration {
 		}
 		rs.close();
 
-		String longDataName = clickControl.getClickDataBlock().getLongDataName();
-
 		String insertSql = String.format("INSERT INTO %s (UID, UTC, UTCMilliseconds, PCLocalTime, PCTime, " +
 				"ChannelBitmap, SequenceBitmap, parentID, parentUID, LongDataName, BinaryFile) " +
-				"VALUES (?,?,?,?,?,?,?,?,?,?,?)", childrenTableName());
-		PreparedStatement insertStmt = con.getConnection().prepareStatement(insertSql);
+				"VALUES (?,?,?,?,?,?,?,?,?,?,?)", childrenTable);
+		PreparedStatement insertStmt = con.prepareStatement(insertSql);
 
 		String selectSql = String.format("SELECT UID, UTC, UTCMilliseconds, PCLocalTime, PCTime, " +
-				"ChannelBitmap, SequenceBitmap, parentID, parentUID, LongDataName, BinaryFile, EventId FROM %s", oldClicksTableName());
+				"ChannelBitmap, SequenceBitmap, parentID, parentUID, LongDataName, BinaryFile, EventId FROM %s", oldClicksTable);
 		rs = stmt.executeQuery(selectSql);
 		int nCopied = 0, nBatch = 0;
 		while (rs.next()) {
@@ -162,7 +182,7 @@ public class OfflineEventDatabaseMigration {
 			}
 			String rowLongName = rs.getString(10);
 			if (rowLongName == null) {
-				rowLongName = longDataName;
+				rowLongName = defaultLongName;
 			}
 			insertStmt.setObject(1, uid);
 			insertStmt.setObject(2, rs.getObject(2));
@@ -188,9 +208,7 @@ public class OfflineEventDatabaseMigration {
 		rs.close();
 		stmt.close();
 		insertStmt.close();
-		dbControl.commitChanges();
-		System.out.printf("Click event database upgrade: copied %d event clicks into %s\n",
-				nCopied, childrenTableName());
+		return nCopied;
 	}
 
 	/**
