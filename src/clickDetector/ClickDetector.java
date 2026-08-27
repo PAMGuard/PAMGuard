@@ -70,6 +70,7 @@ import clickDetector.offlineFuncs.ClickBearingTask;
 import clickDetector.offlineFuncs.ClickDelayTask;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventLogging;
+import clickDetector.offlineFuncs.OfflineEventSubLogging;
 import clickDetector.tdPlots.ClickDetSymbolManager;
 import clickDetector.tdPlots.ClickEventSymbolManager;
 import fftFilter.FFTFilter;
@@ -323,8 +324,14 @@ public class ClickDetector extends PamProcess {
 			offlineEventDataBlock.setLocalisationContents(LocContents.HAS_BEARING | LocContents.HAS_RANGE
 					| LocContents.HAS_LATLONG | LocContents.HAS_AMBIGUITY | LocContents.HAS_PERPENDICULARERRORS);
 //		}
-		// set up the subtable for the Event Logger, and force creation
-		offlineEventLogging.setSubLogging(getClickDataBlock().getOfflineClickLogging());
+		// event id annotation - carries the historic event numbering in the event table
+		// so that upgraded databases retain their event ids.
+		offlineEventLogging.addAddOn(annotation.detectiongroup.EventIdAnnotationType.getInstance().getSQLLoggingAddon());
+		// set up the subtable for the Event Logger, and force creation.
+		// Click events now use the same standard sub table system as the click train
+		// detector; the old system of logging event clicks to the _OfflineClicks table
+		// is only retained for reading / migrating old databases.
+		offlineEventLogging.setSubLogging(new OfflineEventSubLogging(clickControl, offlineEventDataBlock));
 
 		triggerBackgroundHandler = new TriggerBackgroundHandler(this);
 

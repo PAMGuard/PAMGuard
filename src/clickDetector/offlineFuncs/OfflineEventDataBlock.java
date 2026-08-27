@@ -161,6 +161,22 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 
 
 	/**
+	 * Migration of old format click event data (EventId column in the
+	 * _OfflineClicks table) into the standard sub table. Checked once, the
+	 * first time viewer data are loaded.
+	 */
+	private OfflineEventDatabaseMigration databaseMigration;
+
+	@Override
+	public boolean loadViewerData(PamguardMVC.dataOffline.OfflineDataLoadInfo offlineDataLoadInfo, pamScrollSystem.ViewLoadObserver loadObserver) {
+		if (databaseMigration == null) {
+			databaseMigration = new OfflineEventDatabaseMigration(clickDetector.getClickControl(), this);
+		}
+		databaseMigration.checkAndMigrate();
+		return super.loadViewerData(offlineDataLoadInfo, loadObserver);
+	}
+
+	/**
 	 * This is generally only called from loadViwerData and since
 	 * LoadviewerData only ever operates once, it should never get called !
 	 */
