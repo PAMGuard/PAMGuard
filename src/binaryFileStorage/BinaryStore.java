@@ -1813,7 +1813,7 @@ PamSettingsSource, DataOutputStore {
 					createdUnit.setDataUnitFileInformation(
 							new DataUnitFileInformation(this, mapPoint.getBinaryFile(this), binaryObjectData.getObjectNumber()));
 
-					unpackAnnotationData(bh.getHeaderFormat(), createdUnit, binaryObjectData, dataSink);
+					binarySource.unpackAnnotationData(bh.getHeaderFormat(), createdUnit, binaryObjectData, dataSink);
 
 					if (!dataSink.newDataUnit(binaryObjectData, dataBlock, createdUnit)) {
 						return false;
@@ -1828,64 +1828,65 @@ PamSettingsSource, DataOutputStore {
 		return true;
 	}
 
-	/**
-	 * Unpack annotation data. 
-	 * @param createdUnit
-	 * @param binaryObjectData
-	 * @param dataSink
-	 */
-	protected void unpackAnnotationData(int fileVersion, PamDataUnit createdUnit, BinaryObjectData binaryObjectData, BinaryDataSink dataSink) {
-
-		//System.out.println("Hello annotation  " + binaryObjectData.getAnnotationDataLength());
-		if (binaryObjectData.getAnnotationDataLength() == 0) {
-			return;
-		}
-		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getAnnotationData());
-		DataInputStream dis = new DataInputStream(bis);
-		try {
-			int nAnnotations = dis.readShort();
-			for (int i = 0; i < nAnnotations; i++) {
-				int nextLength = dis.readShort();
-				String nextIdCode = dis.readUTF();
-				short nextVersion = dis.readShort();
-
-				// 2020/05/13 changed next line from -6 to -8, to match BinaryDataSource.getPackedAnnotationData:
-				// line 294 dos.writeShort(abd.data.length + abd.shortIdCode.length() + 2 + 4 + 2);
-				// see comments just above line 294 for explanation of added numbers
-				byte[] nextData = new byte[nextLength - nextIdCode.length() - 8];
-				int bytesRead = dis.read(nextData);
-
-				DataAnnotationType<?> annotationType = getAnnotationType(nextIdCode, dataSink);
-				AnnotationBinaryData abd = new AnnotationBinaryData(fileVersion, nextVersion, annotationType, nextIdCode, nextData);
-				DataAnnotation an = annotationType.getBinaryHandler().setAnnotationBinaryData(createdUnit, abd);
-				if (an != null) {
-					createdUnit.addDataAnnotation(an);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}		
-	}
-
-	private DataAnnotationType<?> getAnnotationType(String idCode, BinaryDataSink dataSink) {
-		PamDataBlock parentDataBlock = null;
-		DataAnnotationType<?> annotationType = null;
-		if (dataSink instanceof PamDataBlock) {
-			parentDataBlock = (PamDataBlock) dataSink;
-			AnnotationHandler anHandler = parentDataBlock.getAnnotationHandler();
-			if (anHandler != null) {
-				annotationType = anHandler.findAnnotationTypeFromCode(idCode);
-			}
-		}
-		if (annotationType == null) {
-			annotationType = CentralAnnotationsList.getList().findTypeFromCode(idCode);
-		}
-		if (annotationType == null) {
-			annotationType = CentralAnnotationsList.getDummyAnnotationType();
-		}
-		return annotationType;
-	}
+//	/**
+//	 * Unpack annotation data. 
+//	 * @param createdUnit
+//	 * @param binaryObjectData
+//	 * @param dataSink
+//	 */
+//	protected void unpackAnnotationData(int fileVersion, PamDataUnit createdUnit, BinaryObjectData binaryObjectData, BinaryDataSink dataSink) {
+//
+//		//System.out.println("Hello annotation  " + binaryObjectData.getAnnotationDataLength());
+//		if (binaryObjectData.getAnnotationDataLength() == 0) {
+//			return;
+//		}
+//		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getAnnotationData());
+//		DataInputStream dis = new DataInputStream(bis);
+//		try {
+//			int nAnnotations = dis.readShort();
+//			for (int i = 0; i < nAnnotations; i++) {
+//				int nextLength = dis.readShort();
+//				String nextIdCode = dis.readUTF();
+//				short nextVersion = dis.readShort();
+//
+//				// 2020/05/13 changed next line from -6 to -8, to match BinaryDataSource.getPackedAnnotationData:
+//				// line 294 dos.writeShort(abd.data.length + abd.shortIdCode.length() + 2 + 4 + 2);
+//				// see comments just above line 294 for explanation of added numbers
+//				byte[] nextData = new byte[nextLength - nextIdCode.length() - 8];
+//				int bytesRead = dis.read(nextData);
+//
+//				DataAnnotationType<?> annotationType = getAnnotationType(nextIdCode, dataSink);
+//				AnnotationBinaryData abd = new AnnotationBinaryData(fileVersion, nextVersion, annotationType, nextIdCode, nextData);
+//				DataAnnotation an = annotationType.getBinaryHandler().setAnnotationBinaryData(createdUnit, abd);
+//				if (an != null) {
+//					an.addToDataUnit(createdUnit);
+////					createdUnit.addDataAnnotation(an);
+//				}
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return;
+//		}		
+//	}
+//
+//	private DataAnnotationType<?> getAnnotationType(String idCode, BinaryDataSink dataSink) {
+//		PamDataBlock parentDataBlock = null;
+//		DataAnnotationType<?> annotationType = null;
+//		if (dataSink instanceof PamDataBlock) {
+//			parentDataBlock = (PamDataBlock) dataSink;
+//			AnnotationHandler anHandler = parentDataBlock.getAnnotationHandler();
+//			if (anHandler != null) {
+//				annotationType = anHandler.findAnnotationTypeFromCode(idCode);
+//			}
+//		}
+//		if (annotationType == null) {
+//			annotationType = CentralAnnotationsList.getList().findTypeFromCode(idCode);
+//		}
+//		if (annotationType == null) {
+//			annotationType = CentralAnnotationsList.getDummyAnnotationType();
+//		}
+//		return annotationType;
+//	}
 
 	/**
 	 * Standard data sink used when file data is loaded into memory
@@ -2084,7 +2085,7 @@ PamSettingsSource, DataOutputStore {
 						continue;
 					}
 					aDataUnit.getBasicData().mergeBaseData(binaryObjectData.getDataUnitBaseData());
-					unpackAnnotationData(binaryHeader.getHeaderFormat(), aDataUnit, binaryObjectData, null);
+					binarySource.unpackAnnotationData(binaryHeader.getHeaderFormat(), aDataUnit, binaryObjectData, null);
 					binarySource.saveData(aDataUnit);
 					n++;
 					//					outputStream.storeData(binaryObjectData);
@@ -2281,7 +2282,7 @@ PamSettingsSource, DataOutputStore {
 					continue;
 				}
 				aDataUnit.getBasicData().mergeBaseData(binaryObjectData.getDataUnitBaseData());
-				unpackAnnotationData(binaryHeader.getHeaderFormat(), aDataUnit, binaryObjectData, null);
+				binarySource.unpackAnnotationData(binaryHeader.getHeaderFormat(), aDataUnit, binaryObjectData, null);
 				binarySource.saveData(aDataUnit);
 				n++;
 				//					outputStream.storeData(binaryObjectData);

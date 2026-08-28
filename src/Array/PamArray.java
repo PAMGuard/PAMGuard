@@ -1200,6 +1200,27 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 		}
 		return phones;
 	}
+	
+	/**
+	 * GEt a list of hydrophones assigned to a specific streamer. 
+	 * @param iStreamer
+	 * @return
+	 */
+	public int[] getStreamerHydrophones(int iStreamer) {
+		int n = getHydrophoneCount();
+		int[] h = new int[n];
+		int k = 0;
+		for (int i = 0; i < n; i++) {
+			Hydrophone hyd = getHydrophone(i);
+			if (hyd.getStreamerId() == iStreamer) {
+				h[k++] = i;
+			}
+		}
+		if (k < n) {
+			h = Arrays.copyOf(h, k);
+		}
+		return h;
+	}
 
 	/**
 	 * Get the streamer id for a particular hydrophone

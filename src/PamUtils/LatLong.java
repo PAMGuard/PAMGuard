@@ -603,19 +603,36 @@ public class LatLong implements Serializable, Cloneable, Transferable, PamCoordi
 		return (ll.latitude == latitude && ll.longitude == longitude);
 	}
 	
+	/**
+	 * Get the mean of an array of lat longs. 
+	 * Rewritten for V2.02.19+ to use correct geometric mean longitude that will correctly wrap 180EW. 
+	 * @param lls
+	 * @return
+	 */
 	public static LatLong getMean(LatLong[] lls){
 		double lat=0;
-		double lon=0;
+		double lonS=0;
+		double lonC=0;
 		double height=0;
 		int no=lls.length;
+		int nUse = 0;
+		double lon;
 		for (int i=0;i<no;i++){
+			if (lls[i] == null) {
+				continue;
+			}
+			nUse++;
 			lat+=lls[i].latitude;
-			lon+=lls[i].longitude;
+			lon = Math.toRadians(lls[i].longitude);
+			lonS += Math.sin(lon);
+			lonC += Math.cos(lon);
 			height+=lls[i].height;
 		}
+//		lonS /= no;
+//		lonC /= no; // no need to do this for inverse tangent!
+		lon = Math.toDegrees(Math.atan2(lonS, lonC));
 		
-		
-		return new LatLong(lat/no, lon/no, height/no);
+		return new LatLong(lat/nUse, lon, height/nUse);
 		
 	}
 	

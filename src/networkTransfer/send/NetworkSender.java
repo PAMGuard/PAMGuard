@@ -75,11 +75,13 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		checkCommandLineOptions();
 		
-		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
+//		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
+//		if(this.networkSendParams.getSendSelection(null, getQueueLength())) {
+		// not really got an option for this - do we always want to send the command data, or does this need to be optionsl ? 
 			commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
 			commandProcess.setCommandProcess(true);
 			addPamProcess(commandProcess);
-		}
+//		}
 		
 		sidePanel = new NetworkSendSidePanel(this);
 		initializeClient();
@@ -175,21 +177,23 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		/**
 		 * Do we need code here that will allow both ? 
+		 * This will need updated to allow both, since send fmt is now on a block by block basis, so these commands
+		 * have become irrelevent. 
 		 */
-		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
-		if(useJson!=null) {
-			isSetJson = Boolean.valueOf(useJson);
-		}
-		
-		
-		int sendFmt = 0;
-		if(isSetJson) {
-			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
-		}
-		else {
-			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-		}
-		networkSendParams.setSendingFormat(sendFmt);		
+//		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
+//		if(useJson!=null) {
+//			isSetJson = Boolean.valueOf(useJson);
+//		}
+//		
+//		
+//		int sendFmt = 0;
+//		if(isSetJson) {
+//			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
+//		}
+//		else {
+//			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
+//		}
+//		networkSendParams.setSendingFormat(sendFmt);		
 	}
 
 	public void initializeClient() {
@@ -349,34 +353,39 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	
 
 	private void sortDataSources() {
-		ArrayList<PamDataBlock> wanted = listWantedDataSources();
+		ArrayList<PamDataBlock> wanted = PamController.getInstance().getDataBlocks(); // get everything !
 		int nProcess = getNumPamProcesses();
+		// remove all the old processes. 
 		for (int i = nProcess - 1; i >= 1; i--) {
 			removePamProcess(getPamProcess(i));
 		}
+		int totalFormat = 0;
 		for (PamDataBlock aBlock:wanted) {
-			addPamProcess(new NetworkSendProcess(this, aBlock,networkSendParams.getSendingFormat()));
-
+			int fmt = networkSendParams.getSendSelection(aBlock);
+			if (fmt > 0) {
+				addPamProcess(new NetworkSendProcess(this, aBlock, fmt));
+			}
+			totalFormat |= fmt;
 		}
 		
 		// set the command process to use the same format as all of the new processes
 		if(this.commandProcess!=null) {
-			commandProcess.setOutputFormat(networkSendParams.getSendingFormat());
+			commandProcess.setOutputFormat(totalFormat);
 		}
 	}
 
-	public ArrayList<PamDataBlock> listWantedDataSources() {
-		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.getSendingFormat());
-		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
-		for (PamDataBlock aBlock:possibles) {
-			if (networkSendParams.findDataBlock(aBlock) != null) {
-				wants.add(aBlock);
-			}
-		}
-		return wants;
-	}
-	
-	
+//	public ArrayList<PamDataBlock> listWantedDataSources() {
+//		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.getSendingFormat());
+//		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
+//		for (PamDataBlock aBlock:possibles) {
+//			if (networkSendParams.findDataBlock(aBlock) != null) {
+//				wants.add(aBlock);
+//			}
+//		}
+//		return wants;
+//	}
+//	
+//	
 	public ArrayList<PamDataBlock> listPossibleDataSources(int outputFormat) {
 		ArrayList<PamDataBlock> possibles = new ArrayList<PamDataBlock>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();

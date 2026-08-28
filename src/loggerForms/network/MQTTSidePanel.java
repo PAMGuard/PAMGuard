@@ -52,7 +52,7 @@ public class MQTTSidePanel implements LoggerNetworkObserver {
 		mainPanel = new WarningPanel(new BorderLayout());
 		mainPanel.setBorder(new TitledBorder("Logger Network"));
 		contactsPanel = new WarningPanel(null);
-		contactsPanel.setLayout(new BoxLayout(contactsPanel, BoxLayout.X_AXIS));
+		contactsPanel.setLayout(new BoxLayout(contactsPanel, BoxLayout.Y_AXIS));
 		JPanel topPanel = new WarningPanel(new GridBagLayout());
 		JPanel topWestPanel = new WarningPanel(new BorderLayout());
 		topWestPanel.add(BorderLayout.WEST, topPanel);

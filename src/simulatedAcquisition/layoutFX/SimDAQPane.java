@@ -52,6 +52,8 @@ public class SimDAQPane extends DAQSettingsPane {
 	 * Background noise text field.
 	 */
 	private TextField noiseField;
+	
+	private TextField arrayWobble;
 
 	/**
 	 * Propagation model combo box.
