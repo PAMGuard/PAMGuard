@@ -58,6 +58,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.SwingUtilities;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -1916,6 +1917,20 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			// need to remove the old plots first
 			removeAll();
 
+			// The old hidingDialogPanel (if any) is about to be replaced below. If its popup
+			// (freq/colour/map controls) happened to be open at this exact moment - which is
+			// common in file-based analysis, where this method gets re-triggered by model
+			// change events at file boundaries - just overwriting the field orphans the popup:
+			// it's a real top level Window, so losing the Java reference does not close it,
+			// it just gets stuck visible on screen with nothing left able to hide it. Close it
+			// properly first, but remember whether it was open (and pinned) so we can restore
+			// that state on the new HidingDialogPanel once it's built and on screen.
+			boolean reopenHidingDialog = hidingDialogPanel != null && hidingDialogPanel.isDialogVisible();
+			boolean reopenPinned = reopenHidingDialog && hidingDialogPanel.isDialogPinned();
+			if (hidingDialogPanel != null) {
+				hidingDialogPanel.closeHidingDialog();
+			}
+
 			//need to use layered panes
 			CornerLayoutContraint c = new CornerLayoutContraint();
 			spectroAndSidePanel = new SpecLayeredPane();
@@ -1930,6 +1945,24 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			hidingDialogPanel.setAutoHideTime(1000);
 			spectroAndSidePanel.add(hidingDialogPanel.getShowButton(), clc, JLayeredPane.PALETTE_LAYER);
 			c.anchor = CornerLayoutContraint.FILL;	
+
+			if (reopenHidingDialog) {
+				// showHidingDialog(true) positions itself relative to the show button, which
+				// isn't showing on screen yet at this point in layout - defer to the next
+				// EDT cycle, by which time this layout pass has completed and the button
+				// is realized, so the popup lands in the right place.
+				final HidingDialogPanel reopeningPanel = hidingDialogPanel;
+				final boolean pinned = reopenPinned;
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						reopeningPanel.showHidingDialog(true);
+						if (pinned) {
+							reopeningPanel.getHidingDialog().setPinned(true);
+						}
+					}
+				});
+			}
 
 			if (viewerScroller != null) {
 				add(BorderLayout.SOUTH, viewerScroller.getComponent());
