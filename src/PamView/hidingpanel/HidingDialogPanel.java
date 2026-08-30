@@ -290,7 +290,10 @@ public class HidingDialogPanel {
 		JRootPane rootPane = SwingUtilities.getRootPane(showButton);
 		Component root = SwingUtilities.getRoot(showButton);
 		if (rootPane != registeredRootPane || root != registeredRoot){
-			hidingDialog = null;
+			// The old hidingDialog (if any) is about to become unreachable. It's a genuine
+			// top level Window, so simply dropping the reference leaves it stuck on screen
+			// forever with nothing left to hide it. Close it properly first.
+			closeHidingDialog();
 			if (registeredRootPane != null) {
 				registeredRootPane.removeComponentListener(parentListener);
 				registeredRootPane.removeHierarchyListener(parentListener);
@@ -358,6 +361,41 @@ public class HidingDialogPanel {
 
 	public HidingDialog getHidingDialog() {
 		return hidingDialog;
+	}
+
+	/**
+	 * @return true if the popup dialog currently exists and is visible. Callers that
+	 * need to rebuild/replace this HidingDialogPanel can check this before calling
+	 * {@link #closeHidingDialog()}, in order to restore the open/closed state afterwards.
+	 */
+	public boolean isDialogVisible() {
+		return hidingDialog != null && hidingDialog.isVisible();
+	}
+
+	/**
+	 * @return true if the popup dialog currently exists and is pinned open. Callers that
+	 * need to rebuild/replace this HidingDialogPanel can check this before calling
+	 * {@link #closeHidingDialog()}, in order to restore the pinned state afterwards.
+	 */
+	public boolean isDialogPinned() {
+		return hidingDialog != null && hidingDialog.isPinned();
+	}
+
+	/**
+	 * Properly close and release the floating popup dialog, if one currently exists.
+	 * Must be called before this HidingDialogPanel (or its hidingDialog reference) is
+	 * discarded/replaced - e.g. when the owning display rebuilds its layout - otherwise
+	 * an open popup is orphaned: it's an independent top level Window, so dropping the
+	 * Java reference to it does NOT close it, it just leaves it stuck visible on screen
+	 * with no remaining code path (timer, listeners, pin button) able to hide it.
+	 */
+	public void closeHidingDialog() {
+		hidingTimer.stop();
+		if (hidingDialog != null) {
+			hidingDialog.setVisible(false);
+			hidingDialog.dispose();
+			hidingDialog = null;
+		}
 	}
 
 	private Component findRootPane(Component c) {

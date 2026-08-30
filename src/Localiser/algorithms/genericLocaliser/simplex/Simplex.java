@@ -1,6 +1,7 @@
 package Localiser.algorithms.genericLocaliser.simplex;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MathException;
@@ -14,6 +15,7 @@ import org.apache.commons.math.optimization.direct.NelderMead;
 
 import pamMaths.PamVector;
 import Localiser.LocaliserPane;
+import Localiser.algorithms.genericLocaliser.Chi2Bearings;
 import Localiser.algorithms.genericLocaliser.MinimisationAlgorithm;
 import Localiser.algorithms.genericLocaliser.MinimisationFunction;
 import Localiser.algorithms.locErrors.LikilihoodError;
@@ -52,6 +54,8 @@ public class Simplex implements MinimisationAlgorithm {
 	 * The chi2 function needed by the  apache.commons library. 
 	 */
 	private Chi2 chi2; 
+	
+	private Random r = new Random();
 
 	
 	public Simplex(){
@@ -122,11 +126,18 @@ public class Simplex implements MinimisationAlgorithm {
 //		optimiser.set
 		//			optimiser.setConvergenceChecker(new StopEarly(1));
 		RealPointValuePair resultVal;
+		double bestChi2 = 1.0e12;
+		double[] bestPoint = null;
+		for (int i = 0; i < 1; i++) {
 		try {
 
 			
 			double[] start = chi2Minimisation.getStart(); 
 			double[] firstStep = chi2Minimisation.getFirstStep();
+			for (int j = 0; j < start.length; j++) {
+				start[j] *= r.nextGaussian();
+			}
+			
 			optimiser.setStartConfiguration(firstStep);
 			resultVal = optimiser.optimize(chi2, GoalType.MINIMIZE, start);
 			int iterations = optimiser.getIterations();
@@ -140,6 +151,26 @@ public class Simplex implements MinimisationAlgorithm {
 //			double p = chi2Dist.cumulativeProbability(result.getValue());
 
 			finalChi2=chi2Minimisation.value(point);
+			double r = 0;
+			for (int k = 0; k < point.length; k++) {
+				r += Math.pow(point[k], 2);
+			}
+			r = Math.sqrt(r);
+			if (r > 100000) {
+//				System.out.printf("Stooopid big r of %.0fm, with Chi2 %3.1f\n", r, finalChi2);
+				continue;
+			}
+//			if (finalChi2 > -1000) {
+//				Chi2Bearings c2b = (Chi2Bearings) chi2Minimisation;
+//				System.out.printf("Stupid chi2 %3.1f! detection angles %3.1f and %3.1f\n", finalChi2, Math.toDegrees(c2b.detectionAngles[0]), 
+//					 Math.toDegrees(c2b.detectionAngles[1]));
+//			}
+			if (finalChi2 > bestChi2 || finalChi2 < 0) {
+				continue;
+			}
+			bestChi2 = finalChi2;
+			bestPoint = point;
+				
 			/*
 			 * Now we must calculate errors. Need to look at the log likelihood surface;
 			 */
@@ -176,6 +207,11 @@ public class Simplex implements MinimisationAlgorithm {
 		} catch (@SuppressWarnings("hiding") MathException e) {
 			System.out.println("Simplex Math Exception: " + e.getMessage());
 		}
+		}
+		
+		if (bestPoint == null) {
+			return false;
+		}
 		
 		//now need to add to the final results which includes possible ambiguities. 
 		
@@ -185,9 +221,9 @@ public class Simplex implements MinimisationAlgorithm {
 		this.resultErrors=new LocaliserError[ambiguity];
 		this.finalChi2=new double[ambiguity];
 		
-		this.result[0]=result; 
+		this.result[0]=bestPoint; 
 		this.resultErrors[0]=error; 
-		this.finalChi2[0]=finalChi2; 
+		this.finalChi2[0]=bestChi2; 
 
 		
 		long time2=System.currentTimeMillis();

@@ -3,7 +3,9 @@ package networkTransfer.send;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -27,6 +29,10 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 	public int stationId1;
 	
 	public int stationId2;
+	
+	private static final String defaultTopic = "pamData";
+	private String binaryTopic = defaultTopic;
+	private String jsonTopic = "jsonData";
 		
 	/*
 	 * 29/7/26 DG changed these so the options are 1,2,3 instead of 0,1,2. 
@@ -48,38 +54,101 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 	 */
 	public int maxQueueSize = 10000;
 	
+	@Deprecated
 	private ArrayList<String> selectedDataBlocks;
 	
-	/**
-	 * Set send selection for an individual datablock. 
-	 * @param dataBlock datablock 
-	 * @param doSend true - will send, false don't send. 
-	 */
-	public void setDataBlock(PamDataBlock dataBlock, boolean doSend) {
-		if (selectedDataBlocks == null) {
-			selectedDataBlocks = new ArrayList<String>();
-		}
-		if (doSend) {
-			String foundName = findDataBlock(dataBlock);
-			if (foundName == null) {
-				selectedDataBlocks.add(dataBlock.getDataName());
-			}
-		}
-		else {
-			String found = findDataBlock(dataBlock);
-			if (found != null){
-				selectedDataBlocks.remove(found);
-			}
+	private HashMap<String, Integer> dataSendOptions = new HashMap<String, Integer>(); 
+	
+//	/**
+//	 * Set send selection for an individual datablock. 
+//	 * @param dataBlock datablock 
+//	 * @param doSend true - will send, false don't send. 
+//	 */
+//	private void setDataBlock(PamDataBlock dataBlock, boolean doSend) {
+//		if (selectedDataBlocks == null) {
+//			selectedDataBlocks = new ArrayList<String>();
+//		}
+//		if (doSend) {
+//			String foundName = findDataBlock(dataBlock);
+//			if (foundName == null) {
+//				selectedDataBlocks.add(dataBlock.getDataName());
+//			}
+//		}
+//		else {
+//			String found = findDataBlock(dataBlock);
+//			if (found != null){
+//				selectedDataBlocks.remove(found);
+//			}
+//		}
+//	}
+	
+	public void clearSendOptions() {
+		if (dataSendOptions != null) {
+			dataSendOptions.clear();
 		}
 	}
 	
+	/**
+	 * Get the send selection for a datablock. 
+	 * @param aBlock
+	 * @return
+	 */
+	public int getSendSelection(PamDataBlock aBlock) {
+		if (dataSendOptions == null && selectedDataBlocks != null) {
+			convertSendSelection();
+		}
+		Integer val = dataSendOptions.get(aBlock.getLongDataName());
+		if (val == null) {
+			return 0;
+		}
+		else {
+			return val;
+		}
+	}
+	
+	/**
+	 * Get if a format is selected for a datablock. 
+	 * @param aBlock datablock
+	 * @param sendFormat either NETWORKSEND_BYTEARRAY or NETWORKSEND_JSON
+	 * @return
+	 */
+	public boolean getSendSelection(PamDataBlock aBlock, int sendFormat) {
+		int sel = getSendSelection(aBlock);
+		return (sel & sendFormat) != 0;
+	}
+	
+	/**
+	 * Convert old options format. Should only be called once when updating 
+	 * to new PAMGuard version, to turn the array list into a hashmap and also
+	 * to switch to using longdatanames in place of data names. 
+	 */
+	private void convertSendSelection() {
+		dataSendOptions = new HashMap<String, Integer>();
+		ArrayList<PamDataBlock> allBlocks = PamController.getInstance().getDataBlocks();
+		int sendBinary = (getSendingFormat() & NETWORKSEND_BYTEARRAY);
+		int sendJson = (getSendingFormat() & NETWORKSEND_JSON);
+		for (PamDataBlock aBlock : allBlocks) {
+			if (findDataBlock(aBlock) == null) {
+				continue;
+			}
+			int sendFmt = 0;
+			if (aBlock.getBinaryDataSource() != null) {
+				sendFmt |= sendBinary;
+			}
+			if (aBlock.getJSONDataSource() != null) {
+				sendFmt |= sendJson;
+			}
+			dataSendOptions.put(aBlock.getLongDataName(), sendFmt);
+		}
+	}
+
 	/**
 	 * Find if a datablock is listed in the list of wanted datablocks. 
 	 * If it is, return a reference to the string in the array list. 
 	 * @param dataBlock datablock. 
 	 * @return reference to string name. 
 	 */
-	public String findDataBlock(PamDataBlock dataBlock) {
+	private String findDataBlock(PamDataBlock dataBlock) {
 		if (selectedDataBlocks == null) {
 			return null;
 		}
@@ -92,13 +161,23 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 		return null;
 	}
 	
-	
+	/**
+	 * Set send format bitmap for a datablock. 
+	 * @param aBlock
+	 * @param sendFormat
+	 */
+	public void setSendFormat(PamDataBlock aBlock, int sendFormat) {
+		dataSendOptions.put(aBlock.getLongDataName(), sendFormat);
+	}
 	
 	@Override
 	public NetworkSendParams clone() {
 		return (NetworkSendParams) super.clone();
 	}
 
+	/**
+	 * Clear sending list immediately prior to repopulating. 
+	 */
 	public void clearDataBlocks() {
 		if (selectedDataBlocks == null) {
 			return;
@@ -123,24 +202,58 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 		return ps;
 	}
 
-	public int getSendingFormat() {
+	private int getSendingFormat() {
 		if (sendingFormatNew == 0) {
 			sendingFormatNew = sendingFormat + 1;
 		}
 		return sendingFormatNew;
 	}
 
-	public void setSendingFormat(int sendingFormatNew) {
-		this.sendingFormatNew = sendingFormatNew;
+	/**
+	 * @return the binaryTopic
+	 */
+	public String getBinaryTopic() {
+		if (binaryTopic == null) {
+			binaryTopic = defaultTopic;
+		}
+		return binaryTopic;
 	}
 
 	/**
-	 * Check to see if the params have a specific send format set (NETWORKSEND_BYTEARRAY or NETWORKSEND_JSON)
-	 * @param format
-	 * @return
+	 * @param binaryTopic the binaryTopic to set
 	 */
-	public boolean hasSendFormat(int format) {
-		return (getSendingFormat() & format) != 0;
+	public void setBinaryTopic(String binaryTopic) {
+		this.binaryTopic = binaryTopic;
 	}
+
+	/**
+	 * @return the jsonTopic
+	 */
+	public String getJsonTopic() {
+		if (jsonTopic == null) {
+			jsonTopic = defaultTopic; // set to pamData for backwards compatibility
+		}
+		return jsonTopic;
+	}
+
+	/**
+	 * @param jsonTopic the jsonTopic to set
+	 */
+	public void setJsonTopic(String jsonTopic) {
+		this.jsonTopic = jsonTopic;
+	}
+
+//	public void setSendingFormat(int sendingFormatNew) {
+//		this.sendingFormatNew = sendingFormatNew;
+//	}
+
+//	/**
+//	 * Check to see if the params have a specific send format set (NETWORKSEND_BYTEARRAY or NETWORKSEND_JSON)
+//	 * @param format
+//	 * @return
+//	 */
+//	public boolean hasSendFormat(int format) {
+//		return (getSendingFormat() & format) != 0;
+//	}
 
 }

@@ -56,6 +56,11 @@ public class ClickLocParams implements Serializable, Cloneable, DetectionGroupOp
 	 */
 	public int maxLocPoints = 30;
 	
+	/*
+	 * MAx allowable shi2 for fit. 
+	 */
+	private Double maxChi2 = 1000.;
+	
 	/**
 	 * Click localiser params 
 	 */
@@ -136,6 +141,26 @@ public class ClickLocParams implements Serializable, Cloneable, DetectionGroupOp
 		}
 		return ps;
 	}
+
+	/**
+	 * Get maximum chi2 for a fit to be accepted
+	 * @return
+	 */
+	public double getMaxChi2() {
+		if (maxChi2 == null) {
+			maxChi2 = 1000.;
+		}
+		return maxChi2;
+	}
+
+	/**
+	 * Set max chi2 for a fit to be accepted. 
+	 * @param maxChi2
+	 */
+	public void setMaxChi2(double maxChi2) {
+		this.maxChi2 = maxChi2;
+	}
+
 
 
 

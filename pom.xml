@@ -679,12 +679,12 @@
     		<artifactId>javacv-platform</artifactId>
     		<version>1.5.13</version>
 		</dependency>-->
-		<!-- https://github.com/sarxos/webcam-capture seems to be a lot easier to use
+		<!-- https://github.com/sarxos/webcam-capture seems to be a lot easier to use-->
 		<dependency>
   			<groupId>com.github.sarxos</groupId>
   			<artifactId>webcam-capture</artifactId>
   			<version>0.3.12</version>
-		</dependency> -->
+		</dependency> 
 
 		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
 		<!--  IMPORTANT - IF MAVEN IS NOT DOWNLOADING THE JAVAFX FILES AND

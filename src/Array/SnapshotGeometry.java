@@ -1,9 +1,11 @@
 package Array;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import GPS.GpsData;
 import PamUtils.LatLong;
+import pamMaths.PamQuaternion;
 import pamMaths.PamVector;
 
 /**
@@ -13,7 +15,7 @@ import pamMaths.PamVector;
  * @author dg50
  *
  */
-public class SnapshotGeometry {
+public class SnapshotGeometry implements Cloneable {
 
 	private long timeMilliseconds;
 	
@@ -357,6 +359,62 @@ public class SnapshotGeometry {
 	 */
 	public PamVector[] getHydrophoneErrors() {
 		return hydrophoneErrors;
+	}
+
+	/**
+	 * Used by the simulator to wobble the array about for each sound to give a better
+	 * representation of errors. 
+	 * @param arrayWobble wobble in degrees
+	 * @return
+	 */
+	public SnapshotGeometry wobbleGeometry(double arrayWobble) {
+		if (arrayWobble <= 0) {
+			return this;
+		}
+		
+		SnapshotGeometry wobble = this.clone();
+		// to wobble it, we need to rotate the geometry vectors. Easiest thing is 
+		// to first convert these into a matrix. however, these need to be done on a streamer by streamer
+		// basis, so this isn't really the best place to do this !
+		double wobbleRadians = Math.toRadians(arrayWobble);
+		Random r = new Random();
+		int nStreamer = currentArray.getStreamerCount();
+//		PamQuaternion[] rotations = new PamQuaternion[nStreamer];
+		PamVector aVec;
+		for (int i = 0; i < nStreamer; i++) {
+			PamQuaternion rotations = new PamQuaternion(r.nextGaussian()*wobbleRadians, r.nextGaussian()*wobbleRadians, r.nextGaussian()*wobbleRadians);
+			int[] phones = currentArray.getStreamerHydrophones(i);
+			PamVector[] vecs = new PamVector[phones.length];
+			for (int j = 0; j < phones.length; j++) {
+				vecs[j] = geometry[phones[j]];
+			}
+			PamVector mean = PamVector.mean(vecs);
+			for (int j = 0; j < phones.length; j++) {
+				aVec = vecs[j];
+				aVec = aVec.sub(mean);
+				aVec = PamVector.rotateVector(aVec, rotations);
+				aVec = aVec.add(mean);
+				wobble.geometry[phones[j]] = aVec;
+			}
+			
+		}
+		// now need to find the hydrophones for each streamer. Find thier centre, rotate about the then add center back on
+		
+		
+		
+		return wobble;
+	}
+
+	@Override
+	protected SnapshotGeometry clone() {
+		try {
+			SnapshotGeometry aClone = (SnapshotGeometry) super.clone();
+			aClone.geometry = Arrays.copyOf(aClone.geometry, aClone.geometry.length);
+			return aClone;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
