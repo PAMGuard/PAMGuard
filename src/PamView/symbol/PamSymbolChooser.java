@@ -1,9 +1,6 @@
 package PamView.symbol;
 
-<<<<<<< HEAD
 import java.awt.Color;
-=======
->>>>>>> upstream/main
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.ListIterator;

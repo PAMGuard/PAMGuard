@@ -80,10 +80,6 @@ import fftManager.PamFFTControl;
 import gpl.GPLControlledUnit;
 import group3dlocaliser.Group3DLocaliserControl;
 import landMarks.LandmarkControl;
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main
 import levelMeter.LevelMeterControl;
 import likelihoodDetectionModule.LikelihoodDetectionUnit;
 import loc3d_Thode.TowedArray3DController;
@@ -459,7 +455,6 @@ final public class PamModel implements PamSettings {
 		mi.setHidden(!isViewer);
 		mi.setMaxNumber(1);
 
-<<<<<<< HEAD
 		mi = PamModuleInfo.registerControlledUnit("soundtrapSensor.SudSensorControl", "SoundTrap SWV Sensor Import");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Extracts magnetometer and accelerometer data from SoundTrap SUD (.swv) files and computes heading, pitch and roll");
@@ -467,8 +462,6 @@ final public class PamModel implements PamSettings {
 		mi.setHelpPoint("sensors/soundtrapSensor/docs/soundtrapSensor.html");
 
 
-=======
->>>>>>> upstream/main
 		mi = PamModuleInfo.registerControlledUnit(CPODControl2.class.getName(), "CPOD Detector Import");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Imports CPOD data");
@@ -716,21 +709,12 @@ final public class PamModel implements PamSettings {
 		//		mi.setHidden(isViewer == false);
 
 
-<<<<<<< HEAD
 		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("AI used to enhance whistle detection");
 		mi.setHidden(!SMRUEnable.isEnable());
 		mi.setModulesMenuGroup(detectorsGroup);	
 				mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
-=======
-//		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
-//		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
-//		mi.setToolTipText("AI used to enhance whistle detection");
-//		mi.setHidden(!SMRUEnable.isEnable());
-//		mi.setModulesMenuGroup(detectorsGroup);	
-		//		mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
->>>>>>> upstream/main
 
 		/*
 		 * ************* End Detectors Group *******************
@@ -803,10 +787,6 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Locates sounds detected by the click detector using surface echo's to obtain slant angles and generate a 3-D location");
 		mi.setHelpPoint("detectors/Pam3DHelp/docs/guiOverview.html");
 
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main
 		// TODO: Move all DIFAR modules into sub-menu under localisation>DIFAR>
 		mi = PamModuleInfo.registerControlledUnit(Azigram.AzigramControl.class.getName(), "DIFAR Azigram Engine");
 		mi.addDependency( new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
@@ -864,10 +844,6 @@ final public class PamModel implements PamSettings {
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html");
 
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main
 		// load any plugins in the plugin folder
 		listPlugins(mi);
 		loadModulePlugins();

@@ -4,13 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pamguard</groupId>
 	<artifactId>Pamguard</artifactId>
-<<<<<<< HEAD
 
 	<version>2.03.00</version>
 
-=======
-	<version>2.02.19</version>
->>>>>>> upstream/main
 	<name>Pamguard</name>
 	<description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -682,17 +678,7 @@
 		  	<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
 		  	<version>1.2.5</version>
 		</dependency>
-<<<<<<< HEAD
 
-		<dependency>
-		  	<groupId>org.eclipse.paho</groupId>
-		  	<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-		  	<version>1.2.5</version>
-		</dependency>
-
-
-=======
->>>>>>> upstream/main
 
 		<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
 		<dependency>
@@ -707,16 +693,13 @@
     		<artifactId>javacv-platform</artifactId>
     		<version>1.5.13</version>
 		</dependency>-->
-<<<<<<< HEAD
 
-=======
 		<!-- https://github.com/sarxos/webcam-capture seems to be a lot easier to use-->
 		<dependency>
   			<groupId>com.github.sarxos</groupId>
   			<artifactId>webcam-capture</artifactId>
   			<version>0.3.12</version>
 		</dependency> 
->>>>>>> upstream/main
 
 		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
 		<!--  IMPORTANT - IF MAVEN IS NOT DOWNLOADING THE JAVAFX FILES AND

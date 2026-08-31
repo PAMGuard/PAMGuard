@@ -27,12 +27,8 @@ public class ClickGroupDataBlock<t extends DetectionGroup> extends AcousticDataB
 		int unitsRemoved = 0;
 		if (pamDataUnits.isEmpty())
 			return 0;
-<<<<<<< HEAD
 		DetectionGroup clickTrain;
 
-=======
-		GroupDetection clickTrain;
->>>>>>> upstream/main
 		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		

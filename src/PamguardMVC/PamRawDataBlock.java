@@ -31,10 +31,7 @@ import java.util.ListIterator;
 
 import org.json.JSONObject;
 
-<<<<<<< HEAD
 import dataMap.OfflineDataMap;
-=======
->>>>>>> upstream/main
 import Acquisition.AcquisitionProcess;
 import Acquisition.DCFilter;
 import Acquisition.RawDataBinaryDataSource;

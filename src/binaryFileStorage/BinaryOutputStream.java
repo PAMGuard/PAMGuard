@@ -18,8 +18,6 @@ import PamUtils.PamFileFilter;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.uid.DataBlockUIDHandler;
-import dataGram.Datagram;
-import warnings.RepeatWarning;
 
 /**
  * Handles writing of an actual binary data file. 
@@ -254,30 +252,7 @@ public class BinaryOutputStream {
 
 		return fileList;
 	}
-<<<<<<< HEAD
 
-	/**
-	 * Generate lock file to flag transfer that this file is actively being written to for APS.
-	 * Linux does not handle file locks well, so explicitly building them in. 
-	 * @param outputFile
-	 */
-	private void makeLock(File outputFile) {
-		try {
-			File mainLockFile = new File(outputFile.toString()+".lck");
-			mainLockFile.createNewFile();
-			File pgdxLockFile = new File(binaryStore.swapFileType(outputFile, BinaryStore.indexFileType)+".lck");
-			pgdxLockFile.createNewFile();
-			if(wantNoiseOutputFile()) {
-				File noiseFile = binaryStore.swapFileType(outputFile, BinaryStore.noiseFileType);
-				File noiseLockFile = new File(noiseFile.toString()+".lck");
-				noiseLockFile.createNewFile();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-=======
->>>>>>> upstream/main
 
 	/**
 	 * See if we're going to want a separate noise output file
@@ -438,23 +413,6 @@ public class BinaryOutputStream {
 		return ok;
 	}
 	
-	/**
-	 * Delete lock file to flag transfer that this file is no longer being written to for APS.
-	 * Linux does not handle file locks well, so explicitly building them in. 
-	 * @param outputFile
-	 */
-	private void deleteLock(File outputFile) {
-		File mainLockFile = new File(outputFile.toString()+".lck");
-		mainLockFile.delete();
-		File pgdxLockFile = new File(binaryStore.swapFileType(outputFile, BinaryStore.indexFileType)+".lck");
-		pgdxLockFile.delete();
-		if(wantNoiseOutputFile()) {
-			File noiseFile = binaryStore.swapFileType(outputFile, BinaryStore.noiseFileType);
-			File noiseLockFile = new File(noiseFile.toString()+".lck");
-			noiseLockFile.delete();
-		}
-	}
-
 	private long getSamplesFromMilliseconds(long timeMillis) {
 		if (parentDataBlock == null) {
 			return 0;

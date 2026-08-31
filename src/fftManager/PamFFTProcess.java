@@ -24,10 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.stream.Collectors;
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/main
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
@@ -150,16 +146,8 @@ public class PamFFTProcess extends PamProcess {
 		// then find the new one and subscribe to that instead.
 		channelCounts = new int[PamConstants.MAX_CHANNELS];
 		// since it's used so much, make a local reference
-<<<<<<< HEAD
-
 		FFTParameters fftParameters = this.fftControl.getFFTParameters();
 
-
-=======
-		FFTParameters fftParameters = this.fftControl.getFFTParameters();
-
-		
->>>>>>> upstream/main
 		int[] chanList = PamUtils.getChannelArray(fftParameters.channelMap);
 		
 		tempStores = new TempOutputStore[PamConstants.MAX_CHANNELS];
@@ -525,10 +513,6 @@ public class PamFFTProcess extends PamProcess {
 		 */
 		setupFFT();
 
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main
 		int fftChannelMap = fftControl.getFFTParameters().channelMap;
 		int sourceChannelMap = this.parentDataBlock.getChannelMap();
 		int unavailableSelectedChannels = fftChannelMap & ~sourceChannelMap;

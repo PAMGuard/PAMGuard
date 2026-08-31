@@ -49,7 +49,6 @@ public class WavFileWriter extends WavFile {
 		wavHeader.writeHeader(windowsFile);
 	}
 	
-<<<<<<< HEAD
 
 	/**
 	 * Create lock file to flag transfer that this file is actively being written to for APS.
@@ -66,9 +65,7 @@ public class WavFileWriter extends WavFile {
 	}
 	
 
-=======
->>>>>>> upstream/main
-	
+
 	/**
 	 * Writes an array of double values to a WAV file.  This method only writes
 	 * single channel data.

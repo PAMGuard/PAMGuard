@@ -232,11 +232,8 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		int unitsRemoved = 0;
 		if (pamDataUnits.isEmpty())
 			return 0;
-<<<<<<< HEAD
 		DetectionGroup clickTrain;
-=======
-		GroupDetection clickTrain;
->>>>>>> upstream/main
+
 		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		
