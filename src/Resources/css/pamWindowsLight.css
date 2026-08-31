@@ -1,0 +1,1550 @@
+/*
+ * pamWindowsLight.css
+ *
+ * A JavaFX (Modena-based) stylesheet that reproduces the default Windows
+ * Swing look and feel (com.sun.java.swing.plaf.windows.WindowsLookAndFeel),
+ * used by PAMGuard on Windows, so that JavaFX panes embedded in the Swing
+ * GUI match the surrounding Swing components as closely as possible.
+ *
+ * The Windows L&F delegates rendering to the OS visual styles (uxtheme).
+ * On Windows 10 and 11 the classic Win32 common controls use the palette
+ * below (Win11 rounds its own new controls, but themed Win32/Swing controls
+ * keep the square Windows 10 look):
+ *
+ *   dialog background            #f0f0f0
+ *   text                         #000000
+ *   disabled text                #838383
+ *   button face / border         #e1e1e1 / #adadad
+ *   button hover                 #e5f1fb / #0078d7
+ *   button pressed               #cce4f7 / #005499
+ *   button disabled              #cccccc / #bfbfbf
+ *   edit & combo border          #ababab
+ *   check/radio outline & glyph  #333333 / #000000
+ *   accent / selection           #0078d7 (white text)
+ *   menu highlight               #91c9f7 (black text)
+ *   scrollbar thumb              #cdcdcd (hover #a6a6a6, pressed #606060)
+ *   progress bar                 #06b025 on #e6e6e6 (border #bcbcbc)
+ *   tab borders                  #d9d9d9 (hover #d8eaf9)
+ *   tooltip                      #ffffff, border #767676, text #575757
+ *
+ * Fonts are deliberately NOT set: the JavaFX platform default on Windows
+ * (Segoe UI 12px) matches the Swing default.
+ *
+ * This file parallels pamFlatLafLight.css (the macOS/Linux FlatLaf theme);
+ * keep the two section structures in sync when editing.
+ */
+
+/*
+ * The Windows palette is declared on '.root, .gui-css-root' rather than on '.root'
+ * alone. This sheet is attached two ways: to a Scene (dialogs, main GUI), where
+ * '.root' matches the scene root, AND node-by-node to individual content nodes of
+ * the time display (see TDDisplayFX.addGUICSS - it must not cascade into the graph
+ * hiding panes). A '.root' selector only matches a node carrying the 'root' style
+ * class (the scene root), so when the sheet is attached to an ordinary content node
+ * every '-win-*' lookup would fail to resolve and JavaFX floods the log with
+ * "Could not resolve '-win-foreground'" warnings and String->Paint cast errors.
+ * TDDisplayFX.addGUICSS adds the 'gui-css-root' style class to each decorated node,
+ * so the palette resolves there too. NB: do NOT use the universal '*' selector for
+ * this - that would define the palette on every node and shadow the dark-mode
+ * override (pamWindowsDark.css) which redefines the palette on '.root' and relies
+ * on descendants resolving it from the nearest ancestor. The actual paint
+ * properties (-fx-background-color / -fx-text-fill) stay under '.root' below so
+ * they are not forced onto every node.
+ */
+.root, .gui-css-root {
+    /* ---- Windows palette as looked-up colours ---- */
+    -win-background:            #f0f0f0;
+    -win-foreground:            #000000;
+    -win-disabled-foreground:   #838383;
+    -win-component-background:  #ffffff;
+    -win-button-face:           #e1e1e1;
+    -win-button-border:         #adadad;
+    -win-hover-face:            #e5f1fb;
+    -win-pressed-face:          #cce4f7;
+    -win-pressed-border:        #005499;
+    -win-disabled-face:         #cccccc;
+    -win-disabled-border:       #bfbfbf;
+    -win-input-border:          #ababab;
+    -win-accent:                #0078d7;
+    -win-menu-highlight:        #91c9f7;
+    -win-selection-inactive:    #dadada;
+    -win-separator:             #a0a0a0;
+    -win-tab-border:            #d9d9d9;
+    -win-link:                  #0066cc;
+    -win-arrow:                 #505050;
+    -win-progress:              #06b025;
+
+    /* ---- remap the Modena looked-up colours so un-styled controls
+            also pick up the Windows palette ---- */
+    -fx-base:                        -win-background;
+    -fx-background:                  -win-background;
+    -fx-color:                       -win-background;
+    -fx-control-inner-background:    -win-component-background;
+    -fx-control-inner-background-alt:-win-component-background;
+    -fx-accent:                      -win-accent;
+    -fx-default-button:              -win-button-face;
+    -fx-focus-color:                 -win-accent;
+    -fx-faint-focus-color:           #0078d722;
+    -fx-selection-bar:               -win-accent;
+    -fx-selection-bar-non-focused:   -win-selection-inactive;
+    -fx-outer-border:                -win-button-border;
+    -fx-inner-border:                -win-button-face;
+    -fx-body-color:                  -win-button-face;
+    -fx-text-box-border:             -win-input-border;
+    -fx-text-base-color:             -win-foreground;
+    -fx-text-background-color:       -win-foreground;
+    -fx-text-inner-color:            -win-foreground;
+    -fx-mark-color:                  -win-arrow;
+    -fx-mark-highlight-color:        transparent;
+    -fx-shadow-highlight-color:      transparent;
+
+    /* ---- PAMGuard plot furniture. These are theme-neutral names (-pam-*)
+            so the rules that use them work with either base sheet; the dark
+            and night override sheets redefine them. ---- */
+    -pam-axis-background:  -win-background;
+    -pam-axis-foreground:  -win-foreground;
+    -pam-axis-line:        -win-button-border;
+    -pam-plot-background:  #ffffff;          /* PamColor.PlOTWINDOW for the day scheme */
+    -pam-scroller-body:    rgba(70,70,70,0.45);
+    -pam-scroller-handle:  rgba(40,40,40,0.75);
+    -pam-scroller-grip:    rgba(235,235,235,0.9);
+
+    /* legacy PAMGuard names, kept for panes that reference them */
+    -fx-icon_col: #4d4d4d;
+    -icons-color: -fx-icon_col;
+    -fx-disabled-opacity: 0.6;
+}
+
+/* Paint the scene root only. These are actual painted properties (not lookups), so
+   they must stay scoped to '.root' - adding them to the palette selector above would
+   force a grey background and black text onto every node the sheet decorates. */
+.root {
+    -fx-background-color: -win-background;
+    -fx-text-fill: -win-foreground;
+}
+
+.text {
+    -fx-font-smoothing-type: gray;
+}
+
+.label {
+    -fx-text-fill: -win-foreground;
+}
+
+.label:disabled {
+    -fx-text-fill: -win-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+#label-title1 {
+    -fx-font-size: 16pt;
+    -fx-font-weight: bold;
+}
+
+#label-title2 {
+    -fx-font-size: 10pt;
+    -fx-font-weight: bold;
+}
+
+/* mnemonics */
+.button:show-mnemonics > .mnemonic-underline,
+.toggle-button:show-mnemonics > .mnemonic-underline,
+.radio-button:show-mnemonics > .mnemonic-underline,
+.check-box:show-mnemonics > .mnemonic-underline,
+.hyperlink:show-mnemonics > .mnemonic-underline,
+.split-menu-button:show-mnemonics > .mnemonic-underline,
+.menu-button:show-mnemonics > .mnemonic-underline {
+    -fx-stroke: -win-foreground;
+}
+
+.mnemonic-underline {
+    -fx-stroke: transparent;
+}
+
+
+/********************************************
+*                                           *
+*       Button / ToggleButton               *
+*                                           *
+* Windows: #e1e1e1 fill, 1px #adadad        *
+* border, square corners. Hover tints       *
+* light blue with an accent border.         *
+*********************************************/
+
+.button,
+.toggle-button,
+.menu-button,
+.split-menu-button {
+    -fx-background-color: -win-button-border, -win-button-face;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 4 14 4 14;
+    -fx-text-fill: -win-foreground;
+    -fx-alignment: center;
+    -fx-effect: null;
+}
+
+.button {
+    -fx-min-width: 72;
+}
+
+/* Opt-out of the 72px minimum for icon-only buttons (mirrors
+   pamFlatLafLight.css - icon-only buttons add this style class). */
+.icon-button {
+    -fx-min-width: 0;
+    -fx-padding: 4 6 4 6;
+}
+
+.button:hover,
+.toggle-button:hover,
+.menu-button:hover,
+.split-menu-button:hover {
+    -fx-background-color: -win-accent, -win-hover-face;
+}
+
+/* focused: accent outline. NB do not use -fx-border here - a JavaFX border
+   contributes to the node's insets and so resizes the button when it gains
+   focus (very visible on icon-only buttons that have no min-width). The
+   accent outer background layer below indicates focus without changing size. */
+.button:focused,
+.toggle-button:focused,
+.menu-button:focused,
+.split-menu-button:focused {
+    -fx-background-color: -win-accent, -win-button-face;
+}
+
+.button:focused:hover,
+.toggle-button:focused:hover {
+    -fx-background-color: -win-accent, -win-hover-face;
+}
+
+.button:armed,
+.toggle-button:armed,
+.menu-button:showing,
+.split-menu-button:showing {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+}
+
+/* default button: accent border, normal fill */
+.button:default {
+    -fx-background-color: -win-accent, -win-button-face;
+}
+
+.button:default:hover {
+    -fx-background-color: -win-accent, -win-hover-face;
+}
+
+/* Opaque, square icon button used in the acoustic scroller strip. Like the
+   normal .button it keeps the 1px border line (outer background layer + 1px
+   inset), but with an opaque panel-coloured face and no size/border change on
+   focus, so the scroll arrows sit flush against the scroll bar while staying
+   visually delineated. Windows buttons are already square. Sizing/padding is
+   left to .icon-button, which these buttons also carry. Declared after the
+   .button rules so it wins on equal specificity. */
+.opaque-button-square {
+    -fx-background-color: -win-button-border, -win-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-effect: null;
+}
+
+.opaque-button-square:hover {
+    -fx-background-color: -win-accent, -win-hover-face;
+}
+
+.opaque-button-square:focused {
+    -fx-background-color: -win-accent, -win-background;
+}
+
+.opaque-button-square:armed {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+}
+
+.button:default:armed {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+}
+
+.button:disabled,
+.toggle-button:disabled,
+.menu-button:disabled,
+.split-menu-button:disabled {
+    -fx-background-color: -win-disabled-border, -win-disabled-face;
+    -fx-text-fill: -win-disabled-foreground;
+    -fx-opacity: 1.0;
+    -fx-border-color: transparent;
+}
+
+.button:disabled > .text,
+.toggle-button:disabled > .text {
+    -fx-fill: -win-disabled-foreground;
+}
+
+/* arrow of menu / split-menu buttons */
+.menu-button > .arrow-button > .arrow,
+.split-menu-button > .arrow-button > .arrow {
+    -fx-background-color: -win-arrow;
+}
+
+
+/********************************************
+*                                           *
+*       Hyperlink                           *
+*                                           *
+*********************************************/
+
+.hyperlink {
+    -fx-text-fill: -win-link;
+    -fx-underline: false;
+    -fx-border-color: transparent;
+}
+
+.hyperlink:hover,
+.hyperlink:visited:hover {
+    -fx-underline: true;
+}
+
+.hyperlink:visited {
+    -fx-text-fill: -win-link;
+}
+
+.hyperlink:focused {
+    -fx-border-color: transparent;
+}
+
+
+/********************************************
+*                                           *
+*       CheckBox                            *
+*                                           *
+* Windows 10/11: 13px square white box      *
+* with a #333333 outline and a black        *
+* checkmark; the outline turns accent       *
+* blue on hover.                            *
+*********************************************/
+
+.check-box {
+    -fx-label-padding: 0 0 0 4;
+    -fx-text-fill: -win-foreground;
+}
+
+.check-box > .box {
+    -fx-background-color: #333333, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 2.5;
+    -fx-effect: null;
+}
+
+.check-box:hover > .box,
+.check-box:focused > .box {
+    -fx-background-color: -win-accent, -win-component-background;
+}
+
+.check-box:pressed > .box {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: transparent;
+    -fx-padding: 4.5;
+    -fx-shape: "M927.936 272.992l-68.288-68.288c-12.608-12.576-32.96-12.576-45.536 0l-409.44 409.44-194.752-194.752c-12.576-12.608-32.928-12.608-45.536 0l-68.288 68.288c-12.576 12.576-12.576 32.96 0 45.536l285.824 285.824c12.576 12.576 32.96 12.576 45.536 0l500.48-500.512c12.576-12.576 12.576-32.96 0-45.536z";
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -win-foreground;
+}
+
+.check-box:indeterminate > .box > .mark {
+    -fx-background-color: -win-foreground;
+    -fx-shape: "M0,0H10V2H0Z";
+    -fx-padding: 1 4.5 1 4.5;
+}
+
+.check-box:disabled {
+    -fx-text-fill: -win-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.check-box:disabled > .box {
+    -fx-background-color: -win-disabled-border, -win-background;
+}
+
+.check-box:disabled:selected > .box > .mark {
+    -fx-background-color: -win-disabled-foreground;
+}
+
+
+/********************************************
+*                                           *
+*       RadioButton                         *
+*                                           *
+* Same palette as the checkbox; black       *
+* centre dot.                               *
+*********************************************/
+
+.radio-button {
+    -fx-label-padding: 0 0 0 4;
+    -fx-text-fill: -win-foreground;
+}
+
+.radio-button > .radio {
+    -fx-background-color: #333333, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1em;
+    -fx-padding: 3;
+    -fx-effect: null;
+}
+
+.radio-button:hover > .radio,
+.radio-button:focused > .radio {
+    -fx-background-color: -win-accent, -win-component-background;
+}
+
+.radio-button:pressed > .radio {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+}
+
+.radio-button > .radio > .dot {
+    -fx-background-color: transparent;
+    -fx-background-radius: 1em;
+    -fx-background-insets: 0;
+    -fx-padding: 3.5;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -win-foreground;
+}
+
+.radio-button:disabled {
+    -fx-text-fill: -win-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.radio-button:disabled > .radio {
+    -fx-background-color: -win-disabled-border, -win-background;
+}
+
+.radio-button:disabled:selected > .radio > .dot {
+    -fx-background-color: -win-disabled-foreground;
+}
+
+
+/********************************************
+*                                           *
+*       Text input controls                 *
+*                                           *
+* Windows: white, 1px #ababab border,       *
+* square corners; accent border on focus.   *
+*********************************************/
+
+.text-input {
+    -fx-background-color: -win-input-border, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+    -fx-text-fill: -win-foreground;
+    -fx-prompt-text-fill: -win-disabled-foreground;
+    -fx-highlight-fill: -win-accent;
+    -fx-highlight-text-fill: white;
+    -fx-cursor: text;
+    -fx-effect: null;
+}
+
+.text-input:focused {
+    -fx-background-color: -win-accent, -win-component-background;
+    -fx-effect: null;
+}
+
+.text-input:disabled {
+    -fx-background-color: -win-disabled-border, -win-background;
+    -fx-text-fill: -win-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.text-area {
+    -fx-padding: 0;
+}
+
+.text-area .content {
+    -fx-background-color: -win-component-background;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+}
+
+.text-area:disabled .content {
+    -fx-background-color: -win-background;
+}
+
+
+/********************************************
+*                                           *
+*       ComboBox / ChoiceBox                *
+*                                           *
+* Windows: white, 1px #ababab border,       *
+* square corners; hover tints the whole     *
+* control light blue. Dark triangle arrow.  *
+*********************************************/
+
+.combo-box-base,
+.choice-box {
+    -fx-background-color: -win-input-border, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+    -fx-effect: null;
+}
+
+.combo-box-base:hover,
+.choice-box:hover {
+    -fx-background-color: #7eb4ea, -win-hover-face;
+}
+
+.combo-box-base:focused,
+.choice-box:focused,
+.combo-box-base:showing,
+.choice-box:showing {
+    -fx-background-color: -win-accent, -win-component-background;
+}
+
+.combo-box-base:disabled,
+.choice-box:disabled {
+    -fx-background-color: -win-disabled-border, -win-background;
+    -fx-opacity: 1.0;
+}
+
+.combo-box > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -win-foreground;
+    -fx-padding: 3 4 3 7;
+}
+
+.combo-box:disabled > .list-cell,
+.choice-box:disabled > .label {
+    -fx-text-fill: -win-disabled-foreground;
+}
+
+.choice-box > .label {
+    -fx-text-fill: -win-foreground;
+    -fx-padding: 1 4 1 7;
+}
+
+.combo-box-base > .arrow-button,
+.choice-box > .open-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 8 0 6;
+}
+
+.combo-box-base > .arrow-button > .arrow,
+.choice-box > .open-button > .arrow {
+    -fx-background-color: -win-arrow;
+    -fx-shape: "M 0 0 L 7 0 L 3.5 4 Z";
+    -fx-padding: 2 3.5 2 3.5;
+    -fx-background-insets: 0;
+}
+
+.combo-box-base:disabled > .arrow-button > .arrow,
+.choice-box:disabled > .open-button > .arrow {
+    -fx-background-color: -win-disabled-foreground;
+}
+
+/* editable combo: transparent inner editor */
+.combo-box:editable > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.combo-box:editable > .arrow-button {
+    -fx-background-color: -win-input-border, -win-button-face;
+    -fx-background-insets: 1 1 1 0, 1 1 1 1;
+    -fx-background-radius: 0;
+}
+
+/* popup list */
+.combo-box-popup > .list-view {
+    -fx-background-color: #cccccc, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 3 8 3 8;
+    -fx-background-color: -win-component-background;
+    -fx-text-fill: -win-foreground;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: -win-menu-highlight;
+    -fx-text-fill: -win-foreground;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background-color: -win-accent;
+    -fx-text-fill: white;
+}
+
+
+/********************************************
+*                                           *
+*       Spinner                             *
+*                                           *
+* Windows up-down control: white editor,    *
+* button-face arrow buttons with dark       *
+* triangles, square corners.                *
+*********************************************/
+
+.spinner {
+    -fx-background-color: -win-input-border, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-pref-width: 100px;
+    -fx-effect: null;
+}
+
+.spinner:focused {
+    -fx-background-color: -win-accent, -win-component-background;
+}
+
+.spinner:disabled {
+    -fx-background-color: -win-disabled-border, -win-background;
+    -fx-opacity: 1.0;
+}
+
+.spinner .text-field,
+.spinner .text-field:focused,
+.spinner .text-field:disabled {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+}
+
+/* default layout: stacked button column on the right */
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: -win-input-border, -win-button-face;
+    -fx-background-insets: 1 1 0 0, 1 1 0 1;
+    -fx-background-radius: 0;
+    -fx-padding: 2 7 2 7;
+}
+
+.spinner .decrement-arrow-button {
+    -fx-background-insets: 0 1 1 0, 0 1 1 1;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: -win-input-border, -win-hover-face;
+}
+
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed {
+    -fx-background-color: -win-input-border, -win-pressed-face;
+}
+
+.spinner .increment-arrow-button .increment-arrow {
+    -fx-background-color: -win-arrow;
+    -fx-shape: "M 0 4 L 3.5 0 L 7 4 Z";
+    -fx-padding: 2 3.5 2 3.5;
+}
+
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: -win-arrow;
+    -fx-shape: "M 0 0 L 7 0 L 3.5 4 Z";
+    -fx-padding: 2 3.5 2 3.5;
+}
+
+/* split-arrows-horizontal layout (widely used in PAMGuard): decrement
+   button on the left, increment on the right, triangles pointing out */
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+    -fx-background-color: -win-input-border, -win-button-face;
+    -fx-background-insets: 1 0 1 1, 1 1 1 1;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+}
+
+.spinner.split-arrows-horizontal .increment-arrow-button {
+    -fx-background-color: -win-input-border, -win-button-face;
+    -fx-background-insets: 1 1 1 0, 1 1 1 1;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button:hover,
+.spinner.split-arrows-horizontal .increment-arrow-button:hover {
+    -fx-background-color: -win-input-border, -win-hover-face;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button:pressed,
+.spinner.split-arrows-horizontal .increment-arrow-button:pressed {
+    -fx-background-color: -win-input-border, -win-pressed-face;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: -win-arrow;
+    -fx-shape: "M 4 0 L 0 3.5 L 4 7 Z";
+    -fx-padding: 3.5 2 3.5 2;
+}
+
+.spinner.split-arrows-horizontal .increment-arrow-button .increment-arrow {
+    -fx-background-color: -win-arrow;
+    -fx-shape: "M 0 0 L 4 3.5 L 0 7 Z";
+    -fx-padding: 3.5 2 3.5 2;
+}
+
+
+/********************************************
+*                                           *
+*       ToggleSwitch (ControlsFX)           *
+*                                           *
+* Used by PamToggleSwitch. Styled like the  *
+* Windows 10/11 switch: outlined pill with  *
+* dark thumb when off, accent-filled with   *
+* white thumb when on.                      *
+*********************************************/
+
+.toggle-switch > .thumb-area {
+    -fx-background-color: #333333, -win-background;
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 1em;
+    -fx-padding: 0.6em 1.1em 0.6em 1.1em;
+}
+
+.toggle-switch:selected > .thumb-area {
+    -fx-background-color: -win-accent;
+    -fx-background-insets: 0;
+}
+
+.toggle-switch > .thumb {
+    -fx-background-color: #333333;
+    -fx-background-insets: 3;
+    -fx-background-radius: 1em;
+    -fx-padding: 0.6em;
+    -fx-effect: null;
+}
+
+.toggle-switch:selected > .thumb {
+    -fx-background-color: white;
+}
+
+.toggle-switch:disabled > .thumb-area {
+    -fx-background-color: -win-disabled-border, -win-background;
+    -fx-background-insets: 0, 1.5;
+}
+
+.toggle-switch:disabled > .thumb {
+    -fx-background-color: -win-disabled-border;
+}
+
+.toggle-switch:disabled:selected > .thumb-area {
+    -fx-background-color: #9dc9e8;
+    -fx-background-insets: 0;
+}
+
+.toggle-switch .label {
+    -fx-text-fill: -win-foreground;
+}
+
+
+/********************************************
+*                                           *
+*       Slider                              *
+*                                           *
+* Windows trackbar: thin sunken grey        *
+* channel, accent-blue thumb.               *
+*********************************************/
+
+.slider .track {
+    -fx-background-color: #d6d6d6, #e7eaea;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-pref-height: 5;
+    -fx-pref-width: 5;
+}
+
+.slider .thumb {
+    -fx-background-color: -win-accent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-pref-height: 18;
+    -fx-pref-width: 9;
+    -fx-effect: null;
+}
+
+.slider:vertical .thumb {
+    -fx-pref-height: 9;
+    -fx-pref-width: 18;
+}
+
+.slider .thumb:hover {
+    -fx-background-color: #2b88d8;
+}
+
+.slider .thumb:pressed {
+    -fx-background-color: -win-pressed-border;
+}
+
+.slider:disabled .track {
+    -fx-background-color: -win-disabled-border, -win-background;
+}
+
+.slider:disabled .thumb {
+    -fx-background-color: -win-disabled-border;
+}
+
+.slider .axis {
+    -fx-tick-label-fill: -win-disabled-foreground;
+}
+
+
+/********************************************
+*                                           *
+*       ProgressBar / ProgressIndicator     *
+*                                           *
+* Windows: green bar on a light grey        *
+* bordered track.                           *
+*********************************************/
+
+.progress-bar > .track {
+    -fx-background-color: #bcbcbc, #e6e6e6;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -win-progress;
+    -fx-background-insets: 1;
+    -fx-background-radius: 0;
+    -fx-padding: 6;
+}
+
+.progress-bar {
+    -fx-pref-height: 14;
+    -fx-effect: null;
+}
+
+.progress-indicator {
+    -fx-progress-color: -win-progress;
+}
+
+
+/********************************************
+*                                           *
+*       ScrollBar / ScrollPane              *
+*                                           *
+* Windows: light grey track, flat square    *
+* #cdcdcd thumb, visible arrow buttons.     *
+*********************************************/
+
+.scroll-bar {
+    -fx-background-color: -win-background;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 14;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 14;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: #cdcdcd;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar > .thumb:hover {
+    -fx-background-color: #a6a6a6;
+}
+
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: #606060;
+}
+
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: -win-background;
+    -fx-background-radius: 0;
+    -fx-padding: 3;
+}
+
+.scroll-bar > .increment-button:hover,
+.scroll-bar > .decrement-button:hover {
+    -fx-background-color: #dadada;
+}
+
+.scroll-bar > .increment-button:pressed,
+.scroll-bar > .decrement-button:pressed {
+    -fx-background-color: #606060;
+}
+
+.scroll-bar > .increment-button > .increment-arrow,
+.scroll-bar > .decrement-button > .decrement-arrow {
+    -fx-background-color: -win-arrow;
+    -fx-padding: 2 3.5 2 3.5;
+}
+
+.scroll-bar:vertical > .increment-button > .increment-arrow {
+    -fx-shape: "M 0 0 L 7 0 L 3.5 4 Z";
+}
+
+.scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-shape: "M 0 4 L 3.5 0 L 7 4 Z";
+}
+
+.scroll-bar:horizontal > .increment-button > .increment-arrow,
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-padding: 3.5 2 3.5 2;
+}
+
+.scroll-bar:horizontal > .increment-button > .increment-arrow {
+    -fx-shape: "M 0 0 L 4 3.5 L 0 7 Z";
+}
+
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-shape: "M 4 0 L 0 3.5 L 4 7 Z";
+}
+
+.scroll-bar > .increment-button:pressed > .increment-arrow,
+.scroll-bar > .decrement-button:pressed > .decrement-arrow {
+    -fx-background-color: white;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: -win-background;
+}
+
+
+/********************************************
+*                                           *
+*       Separator / SplitPane               *
+*                                           *
+*********************************************/
+
+.separator > .line {
+    -fx-border-color: -win-separator;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-insets: 0;
+}
+
+.separator:vertical > .line {
+    -fx-border-width: 0 0 0 1;
+}
+
+.split-pane {
+    -fx-background-color: -win-background;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: -win-background;
+    -fx-padding: 0 2 0 2;
+}
+
+
+/********************************************
+*                                           *
+*       TabPane                             *
+*                                           *
+* Windows: boxy tabs. Unselected tabs sit   *
+* on the dialog background with #d9d9d9     *
+* borders; the selected tab is white and    *
+* merges into the bordered content area.    *
+*********************************************/
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 2 0 0 4;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -win-tab-border, -win-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: -win-tab-border, -win-background;
+    -fx-background-insets: 0 0 0 0, 1 1 0 1;
+    -fx-background-radius: 0;
+    -fx-padding: 3 10 3 10;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: -win-tab-border, #d8eaf9;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -win-tab-border, -win-component-background;
+    -fx-background-insets: 0 0 -1 0, 1 1 -1 1;
+    -fx-padding: 4 10 3 10;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-text-fill: -win-foreground;
+    -fx-alignment: center;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:disabled > .tab-container > .tab-label {
+    -fx-text-fill: -win-disabled-foreground;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .focus-indicator {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.tab-pane > .tab-content-area {
+    -fx-background-color: -win-tab-border, -win-background;
+    -fx-background-insets: 0, 0 1 1 1;
+    -fx-padding: 1;
+}
+
+.tab-pane.floating > .tab-content-area {
+    -fx-background-color: -win-tab-border, -win-background;
+    -fx-background-insets: 0, 1;
+}
+
+
+/********************************************
+*                                           *
+*       ListView / TreeView / TableView     *
+*                                           *
+* White data areas, accent selection,       *
+* grey unfocused selection.                 *
+*********************************************/
+
+.list-view,
+.tree-view,
+.table-view,
+.tree-table-view {
+    -fx-background-color: #828790, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 1;
+}
+
+.list-view:focused,
+.tree-view:focused,
+.table-view:focused,
+.tree-table-view:focused {
+    -fx-background-color: -win-accent, -win-component-background;
+}
+
+.list-cell,
+.tree-cell {
+    -fx-background-color: -win-component-background;
+    -fx-text-fill: -win-foreground;
+    -fx-padding: 2 6 2 6;
+}
+
+.table-row-cell,
+.tree-table-row-cell {
+    -fx-background-color: -win-component-background;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-cell,
+.tree-table-cell {
+    -fx-text-fill: -win-foreground;
+    -fx-padding: 3 4 3 4;
+}
+
+.list-cell:filled:hover,
+.tree-cell:filled:hover,
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
+    -fx-background-color: #e8f4fd;
+}
+
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.list-cell:filled:selected:hover,
+.tree-cell:filled:selected:hover,
+.table-row-cell:filled:selected:hover,
+.tree-table-row-cell:filled:selected:hover {
+    -fx-background-color: -win-selection-inactive;
+    -fx-text-fill: -win-foreground;
+}
+
+.list-view:focused .list-cell:filled:selected,
+.tree-view:focused .tree-cell:filled:selected,
+.table-view:focused .table-row-cell:filled:selected,
+.tree-table-view:focused .tree-table-row-cell:filled:selected {
+    -fx-background-color: -win-accent;
+    -fx-text-fill: white;
+}
+
+.list-view:focused .list-cell:filled:selected .text,
+.tree-view:focused .tree-cell:filled:selected .text,
+.table-view:focused .table-row-cell:filled:selected .text,
+.tree-table-view:focused .tree-table-row-cell:filled:selected .text {
+    -fx-fill: white;
+}
+
+.table-row-cell:filled:selected .table-cell,
+.tree-table-row-cell:filled:selected .tree-table-cell {
+    -fx-text-fill: inherit;
+}
+
+/* tree disclosure arrows: dark triangles, as in Windows Explorer */
+.tree-cell > .tree-disclosure-node > .arrow,
+.tree-table-row-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -win-arrow;
+    -fx-shape: "M 0 0 L 4 3.5 L 0 7 Z";
+    -fx-padding: 3.5 2 3.5 2;
+}
+
+.tree-cell:expanded > .tree-disclosure-node > .arrow,
+.tree-table-row-cell:expanded > .tree-disclosure-node > .arrow {
+    -fx-rotate: 90;
+}
+
+/* table headers: white with light grey separators */
+.table-view > .column-header-background,
+.tree-table-view > .column-header-background {
+    -fx-background-color: -win-component-background;
+    -fx-background-insets: 0;
+}
+
+.table-view .column-header,
+.tree-table-view .column-header,
+.table-view .filler,
+.tree-table-view .filler {
+    -fx-background-color: transparent, -win-component-background;
+    -fx-background-insets: 0, 0 1 1 0;
+    -fx-border-color: transparent #e5e5e5 #e5e5e5 transparent;
+    -fx-border-width: 0 1 1 0;
+    -fx-size: 25;
+}
+
+.table-view .column-header:hover,
+.tree-table-view .column-header:hover {
+    -fx-background-color: transparent, #d9ebf9;
+}
+
+.table-view .column-header .label,
+.tree-table-view .column-header .label {
+    -fx-text-fill: -win-foreground;
+    -fx-alignment: center-left;
+    -fx-padding: 2 4 2 4;
+}
+
+.table-view .arrow,
+.tree-table-view .column-header .arrow {
+    -fx-background-color: -win-arrow;
+}
+
+
+/********************************************
+*                                           *
+*       Menus                               *
+*                                           *
+* White menus with a grey border; light     *
+* blue highlight with black text, like      *
+* Win32 menus on Windows 10/11.             *
+*********************************************/
+
+.menu-bar {
+    -fx-background-color: -win-component-background;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.menu-bar > .container > .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 4 8 4 8;
+    -fx-min-width: 0;
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: -win-menu-highlight;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-text-fill: -win-foreground;
+}
+
+.context-menu {
+    -fx-background-color: #cccccc, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 2 1 2 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 4 8 4 8;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -win-foreground;
+    -fx-padding: 0 16 0 0;
+}
+
+.menu-item:focused,
+.menu-item:hovered {
+    -fx-background-color: -win-menu-highlight;
+}
+
+.menu-item:focused > .label,
+.menu-item:hovered > .label {
+    -fx-text-fill: -win-foreground;
+}
+
+.menu-item:disabled > .label {
+    -fx-text-fill: -win-disabled-foreground;
+}
+
+.menu-item > .accelerator-text {
+    -fx-text-fill: #6d6d6d;
+}
+
+.menu-item:focused > .accelerator-text {
+    -fx-text-fill: -win-foreground;
+}
+
+.menu-item > .right-container > .arrow {
+    -fx-background-color: -win-arrow;
+}
+
+.radio-menu-item:checked > .left-container > .radio,
+.check-menu-item:checked > .left-container > .check {
+    -fx-background-color: -win-foreground;
+}
+
+.context-menu .separator > .line {
+    -fx-border-color: #d7d7d7;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-insets: 0;
+}
+
+
+/********************************************
+*                                           *
+*       ToolBar                             *
+*                                           *
+* Flat, transparent buttons with a light    *
+* blue hover, like Windows toolbars.        *
+*********************************************/
+
+.tool-bar {
+    -fx-background-color: -win-background;
+    -fx-background-insets: 0;
+    -fx-padding: 2 4 2 4;
+    -fx-spacing: 2;
+}
+
+.tool-bar > .button,
+.tool-bar > .toggle-button,
+.tool-bar > .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 4 6 4 6;
+    -fx-min-width: 0;
+    -fx-effect: null;
+}
+
+.tool-bar > .button:hover,
+.tool-bar > .toggle-button:hover,
+.tool-bar > .menu-button:hover {
+    -fx-background-color: #7eb4ea, -win-hover-face;
+    -fx-background-insets: 0, 1;
+}
+
+.tool-bar > .button:armed,
+.tool-bar > .toggle-button:armed {
+    -fx-background-color: -win-pressed-border, -win-pressed-face;
+    -fx-background-insets: 0, 1;
+}
+
+.tool-bar > .toggle-button:selected {
+    -fx-background-color: #7eb4ea, -win-pressed-face;
+    -fx-background-insets: 0, 1;
+}
+
+
+/********************************************
+*                                           *
+*       Tooltip                             *
+*                                           *
+* Windows: white, #767676 border, dark      *
+* grey text, square corners.                *
+*********************************************/
+
+.tooltip {
+    -fx-background-color: #767676, -win-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-text-fill: #575757;
+    -fx-padding: 4 6 4 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0, 0, 2);
+    -fx-font-size: 1em;
+}
+
+
+/********************************************
+*                                           *
+*       TitledPane                          *
+*                                           *
+*********************************************/
+
+.titled-pane {
+    -fx-text-fill: -win-foreground;
+}
+
+.titled-pane > .title {
+    -fx-background-color: -win-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 5 8 5 8;
+    -fx-font-weight: bold;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: #d8eaf9;
+}
+
+.titled-pane > .title > .arrow-button > .arrow {
+    -fx-background-color: -win-arrow;
+}
+
+.titled-pane > .content {
+    -fx-background-color: -win-background;
+    -fx-border-color: -win-tab-border;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 8;
+}
+
+.titled-pane:focused > .title {
+    -fx-background-color: -win-background;
+    -fx-color: -win-background;
+}
+
+
+/********************************************
+*                                           *
+*       DialogPane                          *
+*                                           *
+*********************************************/
+
+.dialog-pane {
+    -fx-background-color: -win-background;
+    -fx-padding: 0;
+}
+
+.dialog-pane > .content {
+    -fx-padding: 12;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-padding: 8 12 12 12;
+}
+
+
+/********************************************
+*                                           *
+*       Titled Border (PAMGuard custom)     *
+*                                           *
+* Mirrors the Swing TitledBorder etched     *
+* style: a grey/white double line with the  *
+* title inset over the top edge.            *
+*********************************************/
+
+.bordered-titled-title {
+    -fx-background-color: -win-background;
+    -fx-translate-y: -10;
+    -fx-text-fill: -win-foreground;
+}
+
+.bordered-titled-border {
+    -fx-content-display: top;
+    -fx-border-insets: 12 4 4 4, 13 5 5 5;
+    -fx-background-color: -win-background;
+    -fx-border-color: #c8c8c8, #ffffff;
+    -fx-border-radius: 0;
+    -fx-border-width: 1, 1;
+}
+
+.bordered-titled-content {
+    -fx-padding: 10 10 10 10;
+}
+
+
+/********************************************
+*                                           *
+*      ikonli icons (PAMGuard custom)       *
+*                                           *
+*********************************************/
+
+.ikonli-font-icon {
+    -fx-text-fill: -fx-icon_col;
+    -fx-fill: -fx-icon_col;
+}
+
+#module-icon .ikonli-font-icon {
+    -fx-icon-color: black;
+}
+
+
+/********************************************
+*                                           *
+*      Navigation drawer / flip pane        *
+*      (PAMGuard custom)                    *
+*                                           *
+* Recoloured to the Windows accent so the   *
+* buttons match the rest of the theme.      *
+*********************************************/
+
+.flip-pane-back-button,
+.flip-pane-back-button:hover,
+.flip-pane-back-button:focused,
+.flip-pane-back-button:pressed {
+    -fx-background-radius: 0 5 5 0;
+    -fx-border-radius: 0 5 5 0;
+    -fx-background-color: -win-accent;
+}
+
+.navigation-drawer-button,
+.navigation-drawer-button:hover,
+.navigation-drawer-button:focused,
+.navigation-drawer-button:pressed {
+    -fx-alignment: center-left;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-min-width: 0;
+}
+
+.navigation-drawer-button:hover {
+    -fx-background-color: -win-hover-face;
+}
+
+.navigation-drawer-button-selected,
+.navigation-drawer-button-selected:hover,
+.navigation-drawer-button-selected:focused,
+.navigation-drawer-button-selected:pressed {
+    -fx-background-color: -win-accent;
+    -fx-border-color: -win-accent;
+    -fx-text-fill: white;
+}
+
+.navigation-drawer-button-selected .ikonli-font-icon {
+    -fx-icon-color: white;
+    -fx-fill: white;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * PAMGuard plot furniture                                                     *
+ *                                                                             *
+ * The axis panes, plot areas and scroll bar of the time display and of the    *
+ * data map. Unlike ordinary controls these are bare Panes and Canvases with   *
+ * no background of their own, so before these rules existed they showed       *
+ * whatever happened to be behind them and stayed light whatever the colour    *
+ * scheme.                                                                     *
+ *                                                                             *
+ * The colours come from the theme-neutral -pam-* lookups declared in the      *
+ * palette at the top of this sheet, so the same rules work in the Windows and *
+ * the FlatLaf base sheets and are re-pointed by the dark / night overrides.   *
+ *                                                                             *
+ ******************************************************************************/
+
+/* The pane an axis is drawn on - pamViewFX.fxNodes.pamAxis.PamAxisPane and
+   PamAxisPane2. Sits alongside the plot, so it takes the window background. */
+.pam-axis-pane {
+    -fx-background-color: -pam-axis-background;
+}
+
+/* The plot itself, and the acoustic scroller under the time display. Both show
+   data, so they take the plot window colour rather than the window background. */
+.pam-plot-pane,
+.pam-scroller-pane {
+    -fx-background-color: -pam-plot-background;
+}
+
+/* The draggable visible-range rectangle on the acoustic scroller. */
+.pam-scroller-body {
+    -fx-background-color: -pam-scroller-body;
+}
+
+.pam-scroller-handle {
+    -fx-background-color: -pam-scroller-handle;
+}
+
+.pam-scroller-grip {
+    -fx-stroke: -pam-scroller-grip;
+}
+
+/*
+ * The drag icon which appears on top of the visible-range rectangle when the
+ * rectangle is too narrow to grab. Takes the handle colour so that it reads as
+ * part of the scroller, but opaque so that it stands out against the text box
+ * it sits on top of.
+ */
+.pam-scroller-drag-icon {
+    -fx-background-color: -pam-scroller-handle;
+    -fx-background-radius: 3;
+}
+
+.pam-scroller-drag-glyph {
+    -fx-icon-color: -pam-scroller-grip;
+}
+
+/*
+ * JavaFX NumberAxis, used by PamAxisPane2. Modena derives all of these from
+ * -fx-background / -fx-text-background-color with derive(), which washes out
+ * against a dark background, so set them from the palette directly.
+ */
+.axis {
+    -fx-tick-label-fill: -pam-axis-foreground;
+}
+
+.axis > .axis-label,
+.axis .text {
+    -fx-fill: -pam-axis-foreground;
+    -fx-text-fill: -pam-axis-foreground;
+}
+
+.axis .axis-tick-mark,
+.axis .axis-minor-tick-mark {
+    -fx-stroke: -pam-axis-line;
+}
+
+/* keep Modena's one-sided axis lines, but in a palette colour */
+.axis:top {
+    -fx-border-color: transparent transparent -pam-axis-line transparent;
+}
+
+.axis:right {
+    -fx-border-color: transparent transparent transparent -pam-axis-line;
+}
+
+.axis:bottom {
+    -fx-border-color: -pam-axis-line transparent transparent transparent;
+}
+
+.axis:left {
+    -fx-border-color: transparent -pam-axis-line transparent transparent;
+}

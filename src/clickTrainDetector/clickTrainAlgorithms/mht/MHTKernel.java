@@ -116,16 +116,17 @@ public class MHTKernel<T> {
 	 */
 	public void clearKernel() {
 		//Debug.out.println("MHTKernel: Clear Kernel Garbage");
+		//everything is cleared under the lock so this cannot race a concurrent
+		//addDetection()/growProbMatrix()/pruneProbMatrix() on the data thread.
 		synchronized (trackSynchronisation) {
 			possibleTracks=null;
 			activeTracks=null;
+			referenceDataUnit=null;
+			confirmedTracks=null;
+			dataUnits = null; //garbage collector will delete all data units referenced in list and nowhere else.
+			mhtChi2Provider.clear();
+			kcount=0;
 		}
-		referenceDataUnit=null; 
-		activeTracks=null;
-		confirmedTracks=null;
-		dataUnits = null; //garbage collector will delete all data units referenced in list and nowhere else.
-		mhtChi2Provider.clear(); 
-		kcount=0; 
 	}
 
 	/**
@@ -281,43 +282,29 @@ public class MHTKernel<T> {
 		}
 
 		else {
-			//now the array has to grow. All possibilities must now be branched to include 
-			//and exclude the new data unit. 
-			BitSet currentBitSet;
-			MHTChi2<T> mhtChi2;
-			int index; 
+			//now the array has to grow. All possibilities must now be branched to include
+			//and exclude the new data unit.
+			//index is the total detection count-1;
+			int index=kcount-1;
 			synchronized(trackSynchronisation) {
-				try {
 				for (int i=0; i<possibleTracks.size(); i++) {
 
-					currentBitSet=possibleTracks.get(i).trackBitSet;
+					//the existing branch's bitset. Clone it for both new branches rather than
+					//mutating it in place: the original is still referenced by the current
+					//possibleTracks list (and by activeTracks / reader threads), so mutating it
+					//here is what caused the intermittent concurrency errors this method used to
+					//swallow.
+					BitSet baseBitSet=possibleTracks.get(i).trackBitSet;
 
-					//index is the total detection count-1; 
-					index=kcount-1; 
+					//branch that includes the new data unit.
+					BitSet withDetection=(BitSet) baseBitSet.clone();
+					withDetection.set(index, true);
+					newPossibilities.add(new TrackBitSet(withDetection, possibleTracks.get(i).chi2Track.cloneMHTChi2()));
 
-					//now add both a true and false for the data unit to be in this possibility. 
-					currentBitSet.set(index, true);
-					mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
-
-					newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
-
-					//add a coast to the possibility
-					currentBitSet=(BitSet) currentBitSet.clone(); 
-					currentBitSet.set(index, false);
-					//currentBitSet.set(currentBitSet.size(), true);
-					//add new chi2 value -  need to clone this time. 
-					/*
-					 * This line can throw an error due to poor sunchronisation if 
-					 * the list is emptied from a different thread. 
-					 */
-					mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
-
-					//added the cloned bitset to not mess up references 
-					newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
-				}
-				}
-				catch (Exception e) {
-					System.out.printf("*******  MHTKernel Exception %s in growProbMatrix: %s\n", e.getClass().getSimpleName(), e.getMessage());
+					//branch that coasts (excludes) the new data unit.
+					BitSet withCoast=(BitSet) baseBitSet.clone();
+					withCoast.set(index, false);
+					newPossibilities.add(new TrackBitSet(withCoast, possibleTracks.get(i).chi2Track.cloneMHTChi2()));
 				}
 			}
 		}
@@ -358,17 +345,15 @@ public class MHTKernel<T> {
 //				//Note- this is definitely in the correct order
 //				return Double.compare(left.chi2Track.getChi2(), right.chi2Track.getChi2());
 //			});		
-			try {
+			//Double.compare gives a total order (NaN sorts last consistently), and all
+			//mutation of the possibility list is now serialised on trackSynchronisation, so
+			//the sort can no longer see chi2 values change underneath it.
 			Collections.sort(newPossibleTracks, new Comparator<TrackBitSet>() {
 				@Override
 				public int compare(TrackBitSet left, TrackBitSet right) {
 					return Double.compare(left.chi2Track.getChi2(), right.chi2Track.getChi2());
 				}
 			});
-			}
-			catch (Exception e) {
-				System.out.printf("Handled  MHTKernel Exception %s in pruneProbMatrix: %s\n", e.getClass().getSimpleName(), e.getMessage());
-			}
 
 			//			for (int i=0; i<newPossibleTracks.size(); i++) {
 			//				System.out.print("Possibility chi2: " + i +  "  " + String.format("%.3f", newPossibleTracks.get(i).chi2Track.getChi2()));
@@ -661,9 +646,11 @@ public class MHTKernel<T> {
 	 * called once the last data unit has been added. 
 	 */
 	public void confirmRemainingTracks() {
-		if (possibleTracks != null && possibleTracks.size()>0) {
-			//kcount=kcount-1; 
-			this.pruneProbMatrix(true);
+		synchronized (trackSynchronisation) {
+			if (possibleTracks != null && possibleTracks.size()>0) {
+				//kcount=kcount-1;
+				this.pruneProbMatrix(true);
+			}
 		}
 	}
 

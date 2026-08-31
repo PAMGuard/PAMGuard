@@ -173,6 +173,7 @@ public abstract class ChoiceTable<T extends ChoiceTableItem> extends PamBorderPa
 		buttonPane.setPadding(new Insets(5,5,5,5));
 		
 		addButton = new PamButton(); 
+		addButton.getStyleClass().add("icon-button");
 //		addButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ADD, PamGuiManagerFX.iconSize));
 		addButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
 		addButton.setOnAction((action)->{
@@ -180,6 +181,7 @@ public abstract class ChoiceTable<T extends ChoiceTableItem> extends PamBorderPa
 		});
 
 		removeButton = new PamButton(); 
+		removeButton.getStyleClass().add("icon-button");
 //		removeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.DELETE,  PamGuiManagerFX.iconSize));
 		removeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-delete",  Color.WHITE, PamGuiManagerFX.iconSize));
 		removeButton.setOnAction((action)->{

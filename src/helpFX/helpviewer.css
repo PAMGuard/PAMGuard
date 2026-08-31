@@ -1,0 +1,45 @@
+/*
+ * Chrome (toolbar, navigation tree, window background) styling for the PAMGuard
+ * FX help viewer (HelpViewerFX). The root pane carries the "help-root" style
+ * class; in dark mode it additionally carries "dark".
+ *
+ * Setting -fx-base lets the JavaFX modena theme derive the tree, buttons,
+ * scrollbars and split pane to match. Dark colours follow GitHub's dark theme,
+ * matching the rendered help content (github-markdown.css).
+ */
+
+/* ── Light (default modena-ish) ──────────────────────────────────────────── */
+.help-root {
+    -fx-base: #ececec;
+    -fx-background: #ffffff;
+    -fx-background-color: #ffffff;
+}
+
+.help-toolbar {
+    -fx-background-color: derive(-fx-base, -4%);
+    -fx-border-color: derive(-fx-base, -22%);
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ── Dark (GitHub dark palette) ──────────────────────────────────────────── */
+.help-root.dark {
+    -fx-base: #21262d;
+    -fx-background: #0d1117;
+    -fx-background-color: #0d1117;
+    -fx-text-base-color: #e6edf3;
+    -fx-text-fill: #e6edf3;
+}
+
+.help-root.dark .help-toolbar {
+    -fx-background-color: #161b22;
+    -fx-border-color: #30363d;
+}
+
+.help-root.dark .label {
+    -fx-text-fill: #e6edf3;
+}
+
+/* Keep the split divider subtle in dark mode. */
+.help-root.dark .split-pane > .split-pane-divider {
+    -fx-background-color: #30363d;
+}

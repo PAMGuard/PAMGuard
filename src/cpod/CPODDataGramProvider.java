@@ -26,7 +26,7 @@ public class CPODDataGramProvider implements DatagramProvider {
 		CPODClick cpodClick = (CPODClick) dataUnit;
 		
 		int minKhz = cpodClick.getkHz()- cpodClick.getBw()/2;
-		int maxkHz = cpodClick.getkHz()- cpodClick.getBw()/2;
+		int maxkHz = cpodClick.getkHz()+ cpodClick.getBw()/2;
 		//each datagram line is a 1kHz bin
 		for (int i=0; i<dataGramLine.length; i++) {
 				if(i>=minKhz && i<=maxkHz) {

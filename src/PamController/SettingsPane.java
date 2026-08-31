@@ -67,6 +67,17 @@ public abstract class SettingsPane<T> {
 	public String getHelpPoint() {
 		return null;
 	}
+
+	/**
+	 * Get a {@link helpFX.HelpPoint} for the PAMGuardFX help system.
+	 * Override this in FX settings panes to enable the help button in FX dialogs.
+	 *
+	 * @return a {@link helpFX.HelpPoint} identifying the relevant help page, or
+	 *         {@code null} if no FX help is available for this pane
+	 */
+	public helpFX.HelpPoint getHelpPointFX() {
+		return null;
+	}
 	
 	/**
 	 * Set default settings in the settings pane. 

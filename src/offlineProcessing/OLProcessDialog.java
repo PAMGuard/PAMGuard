@@ -1,7 +1,6 @@
 package offlineProcessing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -27,7 +26,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
-import org.kordamp.ikonli.swing.FontIcon;
 
 import PamUtils.PamCalendar;
 import PamUtils.TxtFileUtils;
@@ -40,6 +38,7 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamAlignmentPanel;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
+import PamView.component.PamFontIcon;
 import PamguardMVC.PamDataBlock;
 import offlineProcessing.logging.OldTaskData;
 import offlineProcessing.logging.TaskLogging;
@@ -97,7 +96,7 @@ public class OLProcessDialog extends PamDialog {
 
 
 //	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settings = FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
+	public static PamFontIcon settings = PamFontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE);
 
 
 	TaskStatus currentStatus = TaskStatus.IDLE;

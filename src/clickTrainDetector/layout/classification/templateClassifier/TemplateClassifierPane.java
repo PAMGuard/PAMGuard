@@ -8,12 +8,16 @@ import clickTrainDetector.classification.templateClassifier.DefualtSpectrumTempl
 import clickTrainDetector.classification.templateClassifier.TemplateClassifierParams;
 import clickTrainDetector.layout.classification.idiClassifier.IDIPane;
 import clickTrainDetector.layout.classification.simplechi2classifier.SimpleCTClassifierPane;
+import clickTrainDetector.layout.classification.CTClassifierPane;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
+import matchedTemplateClassifer.MatchTemplate;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamSpinner;
@@ -51,25 +55,80 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 	private TemplateSpectrumPane spectrumTemplatePane;
 
 	/**
-	 * The spectrum threshold. 
+	 * The spectrum threshold.
 	 */
 	private ControlField<Double> spectrumthreshold;
+
+	/**
+	 * Pane which generates a spectrum template from annotated click events. Shown
+	 * on the back of the enclosing classifier pane's flip pane so the event table
+	 * can fill the whole classifier pane.
+	 */
+	private TemplateGeneratePane templateGeneratePane;
+
+	/**
+	 * Menu item, in the spectrum template drop-down menu, which flips to the
+	 * generate template pane.
+	 */
+	private MenuItem generateTemplateItem;
 
 
 	public TemplateClassifierPane(CTTemplateClassifier cTTemplateClassifier) {
 		super(null);
-		this.cTTemplateClassifier=cTTemplateClassifier; 
-		
+		this.cTTemplateClassifier=cTTemplateClassifier;
+
 		mainPane = new PamBorderPane();
-		
+
 //		ScrollPane scrollPane = new  ScrollPane(createTemplatePane());
 //		scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-		
-		mainPane.setCenter(createTemplatePane()); 
+
+		templateGeneratePane = new TemplateGeneratePane(this::onTemplateGenerated);
+
+		mainPane.setCenter(createTemplatePane());
+
+		generateTemplateItem.setOnAction(e -> {
+			CTClassifierPane classifierPane = findClassifierPane();
+			if (classifierPane == null) {
+				System.err.println("TemplateClassifierPane: could not find the enclosing classifier pane to flip.");
+				return;
+			}
+			templateGeneratePane.refresh();
+			classifierPane.flipToBack("Generate Spectrum Template", templateGeneratePane.getNode());
+		});
+
 		//TEMP
 		this.setParams(new TemplateClassifierParams());
-		
-		
+
+
+	}
+
+	/**
+	 * Find the enclosing classifier pane, which holds the flip pane used to show
+	 * the generate template pane over the whole classifier pane.
+	 * @return the enclosing classifier pane, or null if there is not one.
+	 */
+	private CTClassifierPane findClassifierPane() {
+		Parent parent = mainPane.getParent();
+		while (parent != null) {
+			if (parent instanceof CTClassifierPane) {
+				return (CTClassifierPane) parent;
+			}
+			parent = parent.getParent();
+		}
+		return null;
+	}
+
+	/**
+	 * Called when a template has been generated from click events: set it as the
+	 * classification template and flip back to the settings.
+	 * @param template - the generated template.
+	 */
+	private void onTemplateGenerated(MatchTemplate template) {
+		spectrumTemplatePane.setSpectrum(template);
+		CTClassifierPane classifierPane = findClassifierPane();
+		if (classifierPane != null) {
+			classifierPane.flipToFront();
+		}
 	}
 
 	private Node createTemplatePane() {
@@ -113,9 +172,14 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 //				idiPane); 
 		generalPane.setPadding(new Insets(5,5,5,5));
 
-		PamVBox spectrumPane = new PamVBox(); 
+		// sits at the bottom of the template drop-down menu, below the default
+		// templates. The action is wired in the constructor, once the flip pane exists.
+		generateTemplateItem = new MenuItem("Generate from click events…");
+		spectrumTemplatePane.addMenuItem(generateTemplateItem);
+
+		PamVBox spectrumPane = new PamVBox();
 		spectrumPane.setSpacing(5);
-		spectrumPane.getChildren().addAll(spectrumthreshold, spectrumTemplatePane); 
+		spectrumPane.getChildren().addAll(spectrumthreshold, spectrumTemplatePane);
 		spectrumPane.setPadding(new Insets(5,5,5,5));
 		
 		spectrumTemplatePane.prefWidthProperty().bind(spectrumPane.widthProperty());

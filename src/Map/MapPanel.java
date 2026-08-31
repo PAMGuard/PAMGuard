@@ -1528,7 +1528,9 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 						}
 					}
 					if (symbolData != null) {
-						keyPanel.add(new SymbolKeyItem(new PamSymbol(symbolData), aBlock.getDataName()));
+						// same colour scheme adaptation the detections themselves get.
+						keyPanel.add(new SymbolKeyItem(new PamSymbol(PamSymbolChooser.adaptToColourScheme(symbolData)),
+								aBlock.getDataName()));
 					} else {
 						keyPanel.add(detectorDataBlocks.get(m).createKeyItem(rectProj, PamKeyItem.KEY_SHORT));
 					}

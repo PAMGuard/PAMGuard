@@ -158,6 +158,7 @@ public class BearLocAlgorithmPane extends SettingsPane<BearingLocaliserParams> {
 
 //			settingsButtons[i] = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 			settingsButtons[i] = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+			settingsButtons[i].getStyleClass().add("icon-button");
 			algoPane.add(settingsButtons[i], 3, iRow);
 			
 			//make sure the combo box and button are the same size. 

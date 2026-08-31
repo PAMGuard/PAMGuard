@@ -116,7 +116,7 @@ public class ClickParameters implements Serializable, Cloneable, ManagedParamete
 	/**
 	 * Run classification in real time / online ops. 
 	 */
-	public boolean classifyOnline;
+	public boolean classifyOnline = true;
 
 	public boolean discardUnclassifiedClicks;
 	/*

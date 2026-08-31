@@ -28,7 +28,7 @@ public class TDAcousticScrollerParams implements Cloneable, Serializable, Manage
 	/**
 	 * The min and max allowed amplitude for the colour scale
 	 */
-	public double[] amplitudeMinMax= {60, 180};
+	public double[] amplitudeMinMax= {0, 180};
 	
 	/**
 	 * Disables the spectrogram preview if true. Used to prevent  long clunky load times, especially for high frequency data. 

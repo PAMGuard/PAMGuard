@@ -43,7 +43,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 
 	private static final int JUNK_TRACK_MAXIMUM = 10; 
 	
-	public static final String MHT_NAME = "MHT detector"; 
+	public static final String MHT_NAME = "MHT detector";
 	
 	
 	/**

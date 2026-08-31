@@ -95,6 +95,7 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 				
 //		dataSelButton = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
 		dataSelButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+		dataSelButton.getStyleClass().add("icon-button");
 
 		PamGridPane selPane = gridPane; //new PamGridPane();
 		selPane.add(new PamLabel("Data selection ", Pos.CENTER_LEFT), x=0, ++y);

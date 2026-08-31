@@ -1,6 +1,7 @@
 package PamView.paneloverlay.overlaymark;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -45,7 +46,23 @@ public interface OverlayMarkObserver {
 	 * @return A menu item (can be null)
 	 */
 	public JPopupMenu getPopupMenuItems(DetectionGroupSummary markSummaryData);
-	
+
+	/**
+	 * Get keyboard shortcuts which this observer offers for a set of marked data
+	 * units. These are the keyboard equivalents of the popup menu items, so that a
+	 * user who has just made a mark can act on it without going to the menu.<p>
+	 * Displays are not obliged to offer keyboard shortcuts at all, so anything
+	 * available here must also be available from getPopupMenuItems().
+	 *
+	 * @param markSummaryData everything we need to know about the mark, including
+	 * which data are within it.
+	 * @return list of key actions, or null if this observer has no keyboard shortcuts.
+	 */
+	default List<MarkKeyAction> getMarkKeyActions(DetectionGroupSummary markSummaryData) {
+		return null;
+	}
+
+
 	/**
 	 * Required parameters for the mark to get used. Can be null in which case 
 	 * the mark can accept anything, might be something like TIME & FREQUENCY, etc. 

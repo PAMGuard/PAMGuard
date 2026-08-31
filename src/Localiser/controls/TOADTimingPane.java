@@ -49,6 +49,7 @@ public class TOADTimingPane extends SettingsPane<DelayMeasurementParams> {
 		gridPane.add(filterData = new CheckBox("Filter data during measurement"), x, y, 4, 1);
 //		filterOptsButton = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
 		filterOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog",Color.WHITE, PamGuiManagerFX.iconSize));
+		filterOptsButton.getStyleClass().add("icon-button");
 		gridPane.add(filterOptsButton, 4, 0);
 		filterOptsButton.setTooltip(new Tooltip("Filter settings"));
 		gridPane.add(filterInfo = new Label("no filter"), x=0, ++y, 5, 1);

@@ -2,7 +2,7 @@ package clickDetector;
 
 import java.util.ListIterator;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
@@ -167,7 +167,7 @@ public class TrackedClickLocaliser extends PamProcess {
 	/*
 	 * return true if a localisation is calculated, false otherwise. 
 	 */
-	public boolean localiseGroup(GroupDetection detectionGroup) {
+	public boolean localiseGroup(DetectionGroup detectionGroup) {
 		if (detectionGroup.getSubDetectionsCount() < 2) {
 			return false;
 		}

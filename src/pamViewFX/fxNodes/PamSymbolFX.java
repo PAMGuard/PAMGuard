@@ -416,11 +416,13 @@ public class PamSymbolFX  extends PamSymbolBase implements Serializable, Cloneab
 	private transient java.awt.Color lastAWTFillColor = null;
 	private transient Color lastFXFillColor = null;
 	public Color getFillColor() {
-		if (getSymbolData().getFillColor() == lastAWTFillColor) {
+		java.awt.Color awtColor = getSymbolData().getFillColor();
+		if (awtColor == lastAWTFillColor && lastFXFillColor != null) {
 			return lastFXFillColor;
 		}
 		else {
-			return (lastFXFillColor = PamUtilsFX.awtToFXColor(getSymbolData().getFillColor()));
+			lastAWTFillColor = awtColor;
+			return (lastFXFillColor = PamUtilsFX.awtToFXColor(awtColor));
 		}
 	}
 
@@ -431,11 +433,13 @@ public class PamSymbolFX  extends PamSymbolBase implements Serializable, Cloneab
 	private transient java.awt.Color lastAWTLineColor = null;
 	private transient Color lastFXLineColor = null;
 	public Color getLineColor() {
-		if (getSymbolData().getLineColor() == lastAWTLineColor) {
+		java.awt.Color awtColor = getSymbolData().getLineColor();
+		if (awtColor == lastAWTLineColor && lastFXLineColor != null) {
 			return lastFXLineColor;
 		}
 		else {
-			return (lastFXLineColor = PamUtilsFX.awtToFXColor(getSymbolData().getLineColor()));
+			lastAWTLineColor = awtColor;
+			return (lastFXLineColor = PamUtilsFX.awtToFXColor(awtColor));
 		}
 	}
 

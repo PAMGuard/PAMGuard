@@ -14,11 +14,14 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
+import clickDetector.ClickDetection;
+import clipgenerator.ClipDataUnit;
 import noiseMonitor.NoiseBinaryDataSource;
 import noiseMonitor.NoiseDataBlock;
 import noiseMonitor.NoiseDataUnit;
 import noiseMonitor.NoiseJsonDataSource;
 import noiseMonitor.NoiseLogging;
+import whistlesAndMoans.ConnectedRegionDataUnit;
 
 public class NoiseBandProcess extends PamProcess {
 
@@ -413,4 +416,18 @@ public class NoiseBandProcess extends PamProcess {
 	public NoiseLogging getNoiseLogging() {
 		return noiseLogging;
 	}
+	
+	/**
+	 * A list of data block class types which are compatible as parent data blocks
+	 * for the PamProcess. This can return null, e.g. in the case of Acquisition
+	 * process.
+	 * 
+	 * @return a list of PamDataBlock sub class types which can be used as parent
+	 *         data blocks for the process.
+	 */
+	@Override
+	public ArrayList getCompatibleDataUnits(){
+		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
+	}
+
 }

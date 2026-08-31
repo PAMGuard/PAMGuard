@@ -65,6 +65,8 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 		mlDataUnitsExport.add(new MLCPODExport()); 
 		mlDataUnitsExport.add(new MLRawExport()); 
 		mlDataUnitsExport.add(new MLNoiseExport());
+		mlDataUnitsExport.add(new MLSudSensorExport());
+		mlDataUnitsExport.add(new MLMarkExport());
 	}
 
 	@Override

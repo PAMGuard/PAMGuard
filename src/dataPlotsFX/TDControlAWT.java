@@ -16,7 +16,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import pamViewFX.fxStyles.PamStylesManagerFX;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
 import PamController.PAMStartupEnabler;
@@ -89,15 +88,20 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 		 * Need to send a message to PamController to hold off enabling the start 
 		 * button and other controls until this thread has completed.
 		 */
-		PAMStartupEnabler.addDisableCount();
+		//FIXME - causing thread lock on startup. Need to investigate.
+		//PAMStartupEnabler.addDisableCount();
 		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				Group root=  new  Group();
 				Scene scene  =  new  Scene(root, Color.GRAY);
+				//NB: do NOT add the GUI (pamCSS) style sheet to the scene here. Scene stylesheets cascade
+				//into the entire descendant subtree and cannot be un-inherited, which would leak the GUI
+				//style into the graph hiding panes (they must be styled only by the sliding dialog CSS).
+				//Instead the GUI style is applied node-by-node to the display's content nodes - see
+				//TDDisplayFX.addGUICSS(...).
 				scene.getStylesheets().clear();
-				scene.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS());    
 
 				setTDDisplay(new TDDisplayFX(tdControlfx));
 				root.getChildren().add(getTDDisplay());
@@ -108,8 +112,8 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 				if (timeScroller != null && isViewer()) {
 					timeScroller.coupleScroller(userDisplayControl.getUnitName());
 				}
-
-				PAMStartupEnabler.dropDisableCount();
+				//FIXME - causing thread lock on startup. Need to investigate.
+				//PAMStartupEnabler.dropDisableCount();
 			}
 		});		
 

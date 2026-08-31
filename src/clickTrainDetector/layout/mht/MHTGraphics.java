@@ -54,7 +54,12 @@ public class MHTGraphics implements CTDetectorGraphics {
 
 	@Override
 	public boolean getParams() {
-		MHTParams mhtParams = mhtSettingsPane.getParams(mhtClickTrainAlgoirthm.getParams()); 
+		// getAlgorithmParams() is called for every registered algorithm, including ones
+		// whose settings pane was never shown (and so never created). Guard against that.
+		if (mhtSettingsPane == null) {
+			return true;
+		}
+		MHTParams mhtParams = mhtSettingsPane.getParams(mhtClickTrainAlgoirthm.getParams());
 		if (mhtParams==null) {
 			System.err.print("MHT Algorithm returned null params");
 			return false;

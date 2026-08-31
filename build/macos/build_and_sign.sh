@@ -89,6 +89,25 @@ sdk_is_too_old() {
     return 1
 }
 
+
+# 0b. COPY DEFAULT CONFIGURATIONS INTO THE BUNDLE
+# These are the psfx/json pairs the import wizard offers when files are dropped
+# into a blank configuration. PamController.getInstallFolder() resolves to
+# <app>/Contents on macOS, so they must sit directly under Contents.
+# This has to happen BEFORE the app bundle is signed in step 5, or the signature
+# will not match the bundle contents.
+echo "--- Copying default configurations ---"
+CONFIG_SRC="$BASE_DIR/configurations"
+if [ -d "$CONFIG_SRC" ]; then
+    rm -rf "$APP_PATH/Contents/configurations"
+    cp -R "$CONFIG_SRC" "$APP_PATH/Contents/configurations"
+    echo "✅ Copied $(ls -1 "$CONFIG_SRC"/*.json 2>/dev/null | wc -l | tr -d ' ') configuration(s) into the bundle"
+else
+    echo "⚠️  Warning: no configurations folder at $CONFIG_SRC - the import wizard will offer only a blank configuration"
+fi
+
+echo ""
+
 # Function to process and sign a native library
 process_native_lib() {
     local LIB="$1"

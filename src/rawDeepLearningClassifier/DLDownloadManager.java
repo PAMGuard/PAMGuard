@@ -87,6 +87,35 @@ public class DLDownloadManager {
 		return new File(getModelFolder(modelName)  + File.separator + fileName);
 	}
 
+	/**
+	 * Check whether the model referenced by the URI has already been downloaded and
+	 * decompressed to the local model folder, returning the path to the model file
+	 * if it is present. This lets callers avoid re-downloading a model which has
+	 * already been downloaded (and unzipped) on a previous occasion.
+	 *
+	 * @param modelURI - the URI (URL) of the model archive.
+	 * @param modelFileNames - candidate model file names to search for within the
+	 *        local model folder (e.g. the <code>.pt</code> file inside the archive).
+	 * @return the local model file if it already exists, otherwise null.
+	 */
+	public File getExistingModelFile(URI modelURI, String[] modelFileNames) {
+		if (modelURI == null || modelFileNames == null) {
+			return null;
+		}
+		//local files are already "there" - nothing to download.
+		if ("file".equalsIgnoreCase(modelURI.getScheme())) {
+			File file = new File(modelURI);
+			return file.exists() ? file : null;
+		}
+		String modelName = getModelName(modelURI);
+		String folder = getModelFolder(modelName);
+		if (folder == null) {
+			return null;
+		}
+		//search the (previously unzipped) model folder for the model file.
+		return findModelFile(new File(folder), modelFileNames);
+	}
+
 
 	/**
 	 * Get the path to a model. If the URI is a URL then the model is download to a local folder and the path to
@@ -98,6 +127,21 @@ public class DLDownloadManager {
 	public URI downloadModel(URI modelURI) {
 		String modelName = getModelName(modelURI);
 		return downloadModel( modelURI,  modelName);
+	}
+
+	/**
+	 * Get the path to a model, searching a downloaded archive for one of the supplied
+	 * model file names instead of the default ({@link #defaultModels}). Use this when
+	 * the model inside a zip is not a TensorFlow <code>saved_model.pb</code> (e.g. a
+	 * PyTorch <code>.pt</code> file).
+	 * @param modelURI - the URI to the model.
+	 * @param modelFileNames - the candidate model file names to search for within a
+	 *        decompressed archive.
+	 * @return the path to the model, or null if it could not be found / downloaded.
+	 */
+	public URI downloadModel(URI modelURI, String[] modelFileNames) {
+		String modelName = getModelName(modelURI);
+		return downloadModel( modelURI,  modelName, modelFileNames);
 	}
 
 	/**
@@ -127,6 +171,18 @@ public class DLDownloadManager {
 	 * @return the path to the model The model might be a zip file, py file, .kgu file. 
 	 */
 	public URI downloadModel(URI modelURI, String modelName) {
+		return downloadModel(modelURI, modelName, defaultModels);
+	}
+
+	/**
+	 * Get the path to a model. If the URI is a URL then the model is download to a local folder and the path to
+	 * the local folder is returned.
+	 * @param modelURI - the model to load.
+	 * @param modelName - the name of the model - this is used to create the local folder name if the model is downloaded.
+	 * @param modelFileNames - the candidate model file names to search for within a decompressed archive.
+	 * @return the path to the model The model might be a zip file, py file, .kgu file.
+	 */
+	public URI downloadModel(URI modelURI, String modelName, String[] modelFileNames) {
 
 		if ("file".equalsIgnoreCase(modelURI.getScheme())) {
 			// It's a file path
@@ -158,7 +214,7 @@ public class DLDownloadManager {
 
 						if (file.isDirectory()) {
 							//the file has been decompressed and need to search for model path within this...
-							file =  findModelFile(file, defaultModels);
+							file =  findModelFile(file, modelFileNames);
 							
 							System.out.println("DECOMPRESSED MODEL: " + file );
 

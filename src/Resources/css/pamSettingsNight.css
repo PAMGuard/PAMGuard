@@ -1,0 +1,104 @@
+/*
+ * pamSettingsNight.css
+ *
+ * Night-mode OVERRIDE for pamSettingsCSS.css (the sliding / hiding settings
+ * panes). This is not a standalone theme: add it as an additional stylesheet
+ * AFTER pamSettingsCSS.css.
+ *
+ * The sliding panes are already dark, so all this does is replace the white
+ * text/borders and the cyan highlight with the reds used by the rest of the
+ * Night colour scheme, and darken the pane backgrounds to match.
+ *
+ * Unlike the GUI sheets this one declares the palette on the universal '*'
+ * selector. The sliding style is only ever attached to hiding panes (ordinary
+ * Parent nodes, never a Scene root), so '.root' would not match, and unlike
+ * the GUI sheets there is no second override layered on top of this one whose
+ * palette could be shadowed.
+ *
+ * NB: never attach the sliding style to an ANCESTOR of a hiding pane which
+ * also has it. JavaFX de-duplicates stylesheets by URL and keeps only the
+ * first position in the cascade, so the hiding pane's own copy stops counting
+ * as the nearest one - and any GUI style attached in between (as
+ * OverlayGroupDisplay does in the advanced pop up menu) then wins instead,
+ * leaving the pane half styled by each sheet. The pop up's own control strip
+ * is a sibling of the detection display, not an ancestor of it, which is what
+ * keeps this working.
+ */
+
+/*
+ * The pane colours are deliberately LIGHTER than the rest of the night scheme
+ * (window background #1c1c1c, plot window #101010), in the same way that the
+ * day and dark schemes have a #464646 settings pane over their darker plots.
+ * That contrast is what makes a sliding pane read as a panel sitting on top of
+ * the display; an earlier version of this sheet made them darker than their
+ * surroundings and they vanished into the background.
+ */
+* {
+  -fx-pambackground: rgba(58,38,38,1);
+  -fx-darkbackground: rgba(58,38,38,1);        /* #3a2626 - pane face, cf. #464646 in the base sheet */
+  -fx-darkbackground2: rgba(76,50,50,1);       /* #4c3232 - lighter face for controls               */
+  -fx-darkbackground-trans: rgba(58,38,38,0.85);
+  -fx-highlight: rgba(140,31,31,.75);
+  -fx-highlight_border: rgba(179,40,40,1);
+  -fx-text: #e04a4a;
+  -fx-border_col: #c05050;
+  -fx-icon_col: #d04545;
+}
+
+.root {
+  -icons-color: -fx-icon_col;
+}
+
+
+/*
+ * The advanced pop up menu's control strip sits flush against the display
+ * rather than floating over it, so give it the general night window background
+ * (-flat-background from the GUI sheets, #1c1c1c) instead of the lighter panel
+ * face the sliding panes use. Its controls are outlined, so they still read
+ * against it.
+ */
+.pam-menu-pane {
+    -fx-background-color: #1c1c1c;
+}
+
+
+/*
+ * Give the controls a face that is a step lighter than the pane they sit on, so
+ * they stand out from it the way they do in the day and dark schemes. Otherwise
+ * a red outline on a near-black fill is all there is to see.
+ */
+.button,
+.toggle-button,
+.menu-button,
+.split-menu-button,
+.combo-box-base,
+.choice-box,
+.text-field,
+.text-area,
+.spinner,
+.spinner .text-field {
+    -fx-background-color: -fx-darkbackground2;
+}
+
+
+/* ---- the base sheet paints these literally white ---- */
+
+.button,
+.toggle-button,
+.split-menu-button .label,
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button,
+.spinner.split-arrows-horizontal .increment-arrow-button,
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+   -fx-text-fill: -fx-text;
+}
+
+.spinner .increment-arrow,
+.spinner .decrement-arrow {
+    -fx-background-color: -fx-text;
+}
+
+.tab,
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-border-color: -fx-border_col;
+}

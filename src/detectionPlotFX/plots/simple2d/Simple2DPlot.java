@@ -414,7 +414,10 @@ public class Simple2DPlot {
 	 */
 	private void clearDisplay() {
 		Canvas canvas = plotPane.getPlotCanvas();
-		PamColorsFX.getInstance().getColor(PamColor.PlOTWINDOW);
+		/*
+		 * Black whatever the colour scheme: this is the ground of a 2D colour surface,
+		 * not a line plot, and the colour maps used on it all start at black.
+		 */
 		canvas.getGraphicsContext2D().setFill(Color.BLACK);
 		canvas.getGraphicsContext2D().fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 //		canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());

@@ -33,6 +33,7 @@ public class CTAlgorithmInfoManager {
 		if (jsonString == null) {
 			return null;
 		}
+		
 		// now try to parse it back into numbers.... 
 		String algorithmType; 
 		try {

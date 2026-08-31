@@ -18,8 +18,6 @@ import PamUtils.PamFileFilter;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.uid.DataBlockUIDHandler;
-import dataGram.Datagram;
-import warnings.RepeatWarning;
 
 /**
  * Handles writing of an actual binary data file. 
@@ -255,6 +253,7 @@ public class BinaryOutputStream {
 		return fileList;
 	}
 
+
 	/**
 	 * See if we're going to want a separate noise output file
 	 * @return true if we'll want a separate noise output file
@@ -413,7 +412,7 @@ public class BinaryOutputStream {
 //		Debug.out.printf("Closed binary storage file %s\n", mainFileName);
 		return ok;
 	}
-
+	
 	private long getSamplesFromMilliseconds(long timeMillis) {
 		if (parentDataBlock == null) {
 			return 0;

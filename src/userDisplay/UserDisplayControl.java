@@ -398,6 +398,24 @@ public class UserDisplayControl extends PamControlledUnit implements
 	public static void addUserDisplayProvider(UserDisplayProvider userDisplayProvider) {
 		userDisplayProviders.add(userDisplayProvider);
 	}
+
+	/**
+	 * Add a user display of the given component type (e.g. the FX time display) and
+	 * return the created component. Used to build displays programmatically, for
+	 * example by the drag-and-drop auto-configuration wizard.
+	 *
+	 * @param componentClass the {@link UserDisplayComponent} class to add, as
+	 *                       reported by {@link UserDisplayProvider#getComponentClass()}.
+	 * @return the created display component, or null if no matching provider was found.
+	 */
+	public UserDisplayComponent addUserDisplay(Class<?> componentClass) {
+		for (UserDisplayProvider udp : userDisplayProviders) {
+			if (udp.getComponentClass() == componentClass) {
+				return tabPanelControl.addUserDisplay(udp, null);
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * Remove a reference to a list of user display provider

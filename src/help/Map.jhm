@@ -948,4 +948,6 @@
 
 <mapID target="visual_methods.videoRangeHelp.Resources.topic" url="visual_methods/videoRangeHelp/Resources/topic.gif"/>
 
+<mapID target="sensors.soundtrapSensor.docs.soundtrapSensor" url="sensors/soundtrapSensor/docs/soundtrapSensor.html"/>
+
 </map>

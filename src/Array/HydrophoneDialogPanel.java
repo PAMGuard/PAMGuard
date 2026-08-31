@@ -25,8 +25,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import PamController.PamController;
+import PamView.component.PamSettingsIconButton;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 
 /**
  * Panel for the ArrayDialog to show a selection of hydrophone arrays and
@@ -40,7 +45,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 
 	private JPanel hydrophonePanel;
 	
-	private JButton deleteButton, addButton, editButton;
+	private JButton deleteButton, addButton, editButton, upButton, downButton;
 	
 	private JTable hydrophoneTable;
 	
@@ -116,13 +121,23 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 		scrollPane.setPreferredSize(new Dimension(320, 90));
 		configPanel.add(BorderLayout.CENTER, scrollPane);
 		JPanel s = new JPanel();
-		s.setLayout(new FlowLayout(FlowLayout.LEFT));
-		s.add(addButton = new JButton("Add..."));
-		s.add(editButton = new JButton("Edit..."));
-		s.add(deleteButton = new JButton("Delete"));
+		s.setLayout(new BorderLayout());
+		JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		leftButtons.add(addButton = new JButton("Add..."));
+		leftButtons.add(editButton = new JButton("Edit..."));
+		leftButtons.add(deleteButton = new JButton("Delete"));
 		addButton.addActionListener(this);
 		editButton.addActionListener(this);
 		deleteButton.addActionListener(this);
+		JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		rightButtons.add(upButton = new JButton(PamFontIcon.of(MaterialDesignC.CHEVRON_UP, PamSettingsIconButton.NORMAL_SIZE)));
+		rightButtons.add(downButton = new JButton(PamFontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamSettingsIconButton.NORMAL_SIZE)));
+		upButton.setDisabledIcon(PamFontIcon.of(MaterialDesignC.CHEVRON_UP, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
+		downButton.setDisabledIcon(PamFontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
+		upButton.addActionListener(this);
+		downButton.addActionListener(this);
+		s.add(BorderLayout.WEST, leftButtons);
+		s.add(BorderLayout.EAST, rightButtons);
 		configPanel.add(BorderLayout.SOUTH, s);
 		
 		JSplitPane bottomPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -154,6 +169,9 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 		int selRow = hydrophoneTable.getSelectedRow();
 		editButton.setEnabled(selRow >= 0);
 		deleteButton.setEnabled(selRow >= 0);
+		// up and down are also disabled at the top and bottom of the list.
+		upButton.setEnabled(selRow > 0);
+		downButton.setEnabled(selRow >= 0 && selRow < hydrophoneTable.getRowCount()-1);
 		streamerPanel.enableButtons();
 	}
 	
@@ -189,10 +207,14 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 	 */
 	private void setRecieverLabels(){
 		
-		String reciever = PamController.getInstance().getGlobalMediumManager().getRecieverString(); 
-		
+		String reciever = PamController.getInstance().getGlobalMediumManager().getRecieverString();
+
 		configPanelLabel.setText(reciever + " Elements");
-		
+
+		String lcReciever = PamController.getInstance().getGlobalMediumManager().getRecieverString(false);
+		upButton.setToolTipText("Move the selected " + lcReciever + " up one channel, swapping it with the " + lcReciever + " above");
+		downButton.setToolTipText("Move the selected " + lcReciever + " down one channel, swapping it with the " + lcReciever + " below");
+
 		this.streamerPanel.setRecieverLabels();
 	}
 	
@@ -240,8 +262,24 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 		else if (e.getSource() == addButton) {
 			addElement();
 		}
+		else if (e.getSource() == upButton) {
+			moveElement(-1);
+		}
+		else if (e.getSource() == downButton) {
+			moveElement(1);
+		}
 		arrayDialog.newArraySelection();
+		/*
+		 * fireTableDataChanged sends an event with lastRow = Integer.MAX_VALUE, which makes
+		 * JTable throw away its selection, so hold onto the selected row and put it back
+		 * afterwards. Without this the moved element is deselected as soon as it moves and
+		 * the up / down buttons can't be pressed a second time.
+		 */
+		int selRow = hydrophoneTable.getSelectedRow();
 		hydrophoneTableData.fireTableDataChanged();
+		if (selRow >= 0 && selRow < hydrophoneTable.getRowCount()) {
+			hydrophoneTable.setRowSelectionInterval(selRow, selRow);
+		}
 		hydrophonePanel.repaint();
 //		EnableButtons();		// gets called from ArrayDialog anyway
 	}
@@ -259,6 +297,32 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 		updateData();
 	}
 	
+	/**
+	 * Move the selected element up or down the list, swapping it with its
+	 * neighbour so that the two elements exchange channel numbers.
+	 * @param direction -1 to move up the list, +1 to move down.
+	 */
+	public void moveElement(int direction) {
+		PamArray currentArray = getDialogSelectedArray();
+		if (currentArray == null) return;
+		int selRow = hydrophoneTable.getSelectedRow();
+		if (selRow < 0) return;
+		int newRow = selRow + direction;
+		if (!currentArray.swapHydrophones(selRow, newRow)) {
+			return;
+		}
+		updateData();
+		/*
+		 * Table selection is by row, not by element, so follow the element to its new row
+		 * and keep it selected so that repeated button presses walk the same element up or
+		 * down the array. Focus goes back to the table as well, otherwise the button keeps
+		 * it and the selected row is drawn in the muted 'inactive selection' colour.
+		 */
+		hydrophoneTable.setRowSelectionInterval(newRow, newRow);
+		hydrophoneTable.scrollRectToVisible(hydrophoneTable.getCellRect(newRow, 0, true));
+		hydrophoneTable.requestFocusInWindow();
+	}
+
 	public void editElement() {
 		arrayDialog.getParams();
 		PamArray currentArray = getDialogSelectedArray();

@@ -62,6 +62,7 @@ public class TabSelectionPane extends SettingsPane<PamGuiTabFX> {
 
 		//listener for adding tabs
 		addButton=new PamButton(); 
+		addButton.getStyleClass().add("icon-button");
 //		addButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PLUS, Color.WHITE, PamGuiManagerFX.iconSize)); 
 		addButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize)); 
 		addButton.setOnAction((action)->{

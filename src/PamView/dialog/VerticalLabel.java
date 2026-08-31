@@ -17,7 +17,22 @@ public class VerticalLabel extends PamLabel implements ColorManaged{
 		setUI(labelUI);
 		setDefaultColor(null);
 	}
-	
+
+	/**
+	 * Reinstall the vertical label UI. Called by Swing whenever the look and feel
+	 * changes (which PAMGuard does when a dark colour scheme is selected) - without
+	 * this the label would revert to the look and feel's own UI and start drawing
+	 * itself horizontally.
+	 */
+	@Override
+	public void updateUI() {
+		super.updateUI();
+		if (labelUI != null) {
+			setUI(labelUI);
+		}
+	}
+
+
 	public VerticalLabel() {
 		super();
 	}

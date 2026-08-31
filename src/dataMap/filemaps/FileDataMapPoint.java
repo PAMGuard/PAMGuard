@@ -4,6 +4,8 @@ import java.io.File;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import dataGram.Datagram;
+import dataGram.DatagramPoint;
 import dataMap.OfflineDataMapPoint;
 
 /**
@@ -12,13 +14,20 @@ import dataMap.OfflineDataMapPoint;
  * @author dg50
  *
  */
-public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedParameters {
+public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedParameters, DatagramPoint {
 	
 	private static final long serialVersionUID = 4955333805088379820L;
 	
 	private File soundFile;
 	
 	private FileSubSection fileSubSection;
+
+	/**
+	 * Waveform summary of this sound file, used by the data map. Created on demand by
+	 * SoundFileDatagramManager and saved along with the rest of the map, so it only has
+	 * to be calculated once. Null until it's been made.
+	 */
+	private Datagram datagram;
 
 	public FileDataMapPoint(File soundFile, long startTime, long endTime) {
 		super(startTime, endTime, (int) Math.max(((endTime-startTime)/1000),1), 0);
@@ -50,6 +59,16 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	 */
 	public void setSoundFile(File soundFile) {
 		this.soundFile = soundFile;
+	}
+
+	@Override
+	public Datagram getDatagram() {
+		return datagram;
+	}
+
+	@Override
+	public void setDatagram(Datagram datagram) {
+		this.datagram = datagram;
 	}
 
 	@Override

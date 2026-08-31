@@ -69,6 +69,7 @@ public class SettingsFilePane extends SettingsPane<SettingsFileData> {
 		fileBox=new ComboBox<String>();
 				
 		PamButton browseButton = new PamButton();
+		browseButton.getStyleClass().add("icon-button");
 		//browseButton.setGraphic(Glyph.create("FontAwesome|FILE").size(22).color(Color.WHITE.darker()));
 //		browseButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, Color.WHITE, PamGuiManagerFX.iconSize));
 		browseButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file", Color.WHITE, PamGuiManagerFX.iconSize));
@@ -80,6 +81,7 @@ public class SettingsFilePane extends SettingsPane<SettingsFileData> {
 		
 		
 		PamButton browseSaveButton = new PamButton();
+		browseSaveButton.getStyleClass().add("icon-button");
 //		browseSaveButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.PLUS, Color.WHITE, PamGuiManagerFX.iconSize));
 		browseSaveButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
 		//browseSaveButton.prefHeightProperty().bind(fileBox.heightProperty());

@@ -21,14 +21,23 @@ import PamguardMVC.DataUnit2D;
 import dataPlotsFX.projector.TimeProjectorFX;
 
 /**
- * Contains the spectrogram data for a single channel. 
- * Will only exist and be populated if that channel is 
- * included in the spectrogram display. 
+ * Contains the spectrogram data for a single channel.
+ * Will only exist and be populated if that channel is
+ * included in the spectrogram display.
  * @author Doug Gillespie and Jamie Macaulay
- * 
+ *
  * Was SpectrogramPlotDataFX
  *
+ * @deprecated This single-image renderer keeps only a small scrolling/wrapping
+ *             buffer of spectrogram data, which causes the earliest data to be
+ *             lost when the image is re-coloured (e.g. on an amplitude-limit
+ *             change). Use the tiled {@link Scrolling2DPlotDataFX2} instead, which
+ *             retains the whole displayed range as re-colourable tiles. This class
+ *             is retained as the base type for {@link Scrolling2DPlotDataFX2} and
+ *             the {@code Scrolling2DPlotDataFX[]} arrays, but should not be
+ *             instantiated directly for new code.
  */
+@Deprecated
 public class Scrolling2DPlotDataFX {
 
 	/**
@@ -1253,6 +1262,60 @@ public class Scrolling2DPlotDataFX {
 		this.lastPowerSpecTime = lastPowerSpecTime;
 	}
 
+	/**
+	 * Does this plot data maintain its own incremental store (e.g. a tiled
+	 * renderer) that does <b>not</b> need clearing and fully re-ordering every
+	 * time the display moves? The default single-image implementation returns
+	 * <code>false</code>: the owning {@link Scrolling2DPlotInfo} clears and
+	 * re-orders the whole visible range on every move. Incremental implementations
+	 * (e.g. {@link Scrolling2DPlotDataFX2}) return <code>true</code> so that only
+	 * the missing portions are ordered.
+	 *
+	 * @return true if this implementation manages an incremental store.
+	 */
+	public boolean isIncrementalStore() {
+		return false;
+	}
 
+	/**
+	 * For incremental (tiled) stores, the time span of one tile in milliseconds.
+	 * Used by the owning {@link Scrolling2DPlotInfo} to size load chunks. The
+	 * default single-image implementation returns 0.
+	 *
+	 * @return tile span in milliseconds, or 0 if not a tiled store.
+	 */
+	public long getTileMillis() {
+		return 0;
+	}
+
+	/**
+	 * For incremental stores, work out which time intervals within the given
+	 * preload window still need FFT data ordered (i.e. are not already rendered).
+	 * The default implementation simply returns the whole window as a single
+	 * interval. Incremental implementations override this to return only the
+	 * missing portions so that already-rendered sections are not re-ordered.
+	 *
+	 * @param preloadStart start of the window to consider, in milliseconds.
+	 * @param preloadEnd   end of the window to consider, in milliseconds.
+	 * @return list of [start, end] millisecond intervals that need loading. An
+	 *         empty list means nothing needs loading.
+	 */
+	public java.util.List<long[]> getRequiredLoadIntervals(long preloadStart, long preloadEnd) {
+		java.util.List<long[]> intervals = new java.util.ArrayList<>();
+		intervals.add(new long[] { preloadStart, preloadEnd });
+		return intervals;
+	}
+
+	/**
+	 * Mark a time range as fully loaded. Called by the owning
+	 * {@link Scrolling2DPlotInfo} when an offline data order completes so that an
+	 * incremental store knows the range no longer needs ordering (even where it
+	 * contained no data). The default implementation does nothing.
+	 *
+	 * @param startMillis start of the loaded range, in milliseconds.
+	 * @param endMillis   end of the loaded range, in milliseconds.
+	 */
+	public void markRangeLoaded(long startMillis, long endMillis) {
+	}
 
 }

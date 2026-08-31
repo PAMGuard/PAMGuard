@@ -31,6 +31,7 @@ import java.util.ListIterator;
 
 import org.json.JSONObject;
 
+import dataMap.OfflineDataMap;
 import Acquisition.AcquisitionProcess;
 import Acquisition.DCFilter;
 import Acquisition.RawDataBinaryDataSource;
@@ -718,6 +719,27 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	 */
 	public DCFilter getDcFilter() {
 		return dcFilter;
+	}
+
+	/**
+	 * Raw data blocks can have several offline data maps (e.g. if both the Acquisition
+	 * and the Decimator have offline file servers). Only the one with a datagram manager
+	 * can serve up a datagram, so pick that rather than relying on the default 'map with
+	 * the most data' rule.
+	 */
+	@Override
+	public OfflineDataMap getDatagrammedMap() {
+		if (getDatagramProvider() == null) {
+			return null;
+		}
+		int nMaps = getNumOfflineDataMaps();
+		for (int i = 0; i < nMaps; i++) {
+			OfflineDataMap aMap = getOfflineDataMap(i);
+			if (aMap.getOfflineDataSource() != null && aMap.getOfflineDataSource().getDatagramManager() != null) {
+				return aMap;
+			}
+		}
+		return super.getDatagrammedMap();
 	}
 
 	@Override

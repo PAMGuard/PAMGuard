@@ -314,6 +314,11 @@ public class WhistleMoanSettingsPaneFX extends SettingsPane<WhistleToneParameter
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("whistle_moan_detector.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return pamBorderPane;
 	}

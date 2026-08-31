@@ -57,10 +57,9 @@ import PamController.fileprocessing.ReprocessStoreChoice;
 import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
 import PamUtils.PamExceptionHandler;
-import PamUtils.PlatformInfo;
-import PamUtils.PlatformInfo.OSType;
 import PamUtils.Splash;
 import PamView.FullScreen;
+import PamView.PamLookAndFeel;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
@@ -111,16 +110,25 @@ public class Pamguard {
 		CommandLine.create(args);
 		
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
-		try {			
-			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-			else {
-				//do not use the mac version...it's awful
-				//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			    UIManager.setLookAndFeel(new FlatLightLaf() );	
 
-			}
+		/*
+		 * On macOS, decide whether the menu bar goes in the status bar at the top of the
+		 * screen or in the PAMGuard window (the default). Must happen before the look
+		 * and feel is installed, since that's when the choice is read. Does nothing on
+		 * Windows or Linux.
+		 */
+		PamLookAndFeel.applyMenuBarLocation();
+
+		try {			
+			/*
+			 * FlatLaf Light is the standard PAMGuard look on every platform, including
+			 * Windows: it's the only one of the light themes with a matching dark theme, so
+			 * anything else would leave the colour schemes changing the look and feel out
+			 * from under the user. Windows users who prefer the plain Windows look and feel
+			 * can turn it on from the Display menu - see PamView.PamLookAndFeel - and it is
+			 * restored below with the rest of the settings.
+			 */
+			UIManager.setLookAndFeel(new FlatLightLaf());
 			//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			//		        if ("Nimbus".equals(info.getName())) {
 			//		            UIManager.setLookAndFeel(info.getClassName());
@@ -138,7 +146,7 @@ public class Pamguard {
 			//			  System.out.println(keys.nextElement() + ": " + ui.get(nxt));
 			//			}
 			//			PamColors.getInstance().setColors();
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			System.out.println("Unable to load lookAndFeel: " + e.getMessage());
 //			e.printStackTrace();
 			try {
@@ -149,6 +157,15 @@ public class Pamguard {
 //				e1.printStackTrace();
 			}
 		}
+
+		/*
+		 * Remember whatever look and feel we've ended up with. Selecting a dark colour
+		 * scheme swaps in FlatLaf Dark so that text fields, check boxes, internal frame
+		 * title bars and the rest follow the scheme; selecting a light one puts this
+		 * back. Must happen before any settings (and hence any saved colour scheme or
+		 * look and feel choice) are restored.
+		 */
+		PamLookAndFeel.recordStartupLookAndFeel();
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";

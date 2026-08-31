@@ -166,6 +166,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 		originMethod = new ComboBox<HydrophoneOriginSystem>();		
 		originButton = new PamButton();
+		originButton.getStyleClass().add("icon-button");
 		originButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-crosshairs-gps"));
 		originButton.setOnAction((a)->{
 			popOver.show(originButton);

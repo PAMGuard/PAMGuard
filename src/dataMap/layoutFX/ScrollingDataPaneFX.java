@@ -246,6 +246,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		holder.setBottom(timeLabelPane);
 		
 		PamButton scrollLeft = new PamButton(); 
+		scrollLeft.getStyleClass().add("icon-button");
 		scrollLeft.setOnAction((a)->{
 			 /*
 			  * The distance is a percentage of the
@@ -259,6 +260,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		scrollLeft.prefHeightProperty().bind(timeScrollBar.heightProperty());
 
 		PamButton scrollRight = new PamButton(); 
+		scrollRight.getStyleClass().add("icon-button");
 		scrollRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconSize));
 		scrollRight.setOnAction((a)->{
 			moveScrollBar(timeScrollBar.getVisibleAmount()*SCROLL_BAR_INCREMENT);

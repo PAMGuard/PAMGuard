@@ -6,7 +6,7 @@ import PamguardMVC.PamDataUnit;
 import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.SQLTypes;
-import targetMotionOld.TargetMotionSQLLogging;
+import targetMotion.TargetMotionSQLLogging;
 
 public class TMAnnotationLogging extends TargetMotionSQLLogging {
 

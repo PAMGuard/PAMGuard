@@ -7,7 +7,7 @@ public class BOSymbolChooser extends SimpleSymbolChooserFX {
 
 	public BOSymbolChooser() {
 		super();
-		getPamSymbol(null, 0).setSymbol(PamSymbolType.SYMBOL_POINT);
+		getSymbolData().symbol = PamSymbolType.SYMBOL_POINT;
 	}
 
 

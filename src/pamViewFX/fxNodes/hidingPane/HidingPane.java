@@ -10,10 +10,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.Animation.Status;
+import javafx.scene.CacheHint;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -63,7 +65,7 @@ public class HidingPane extends StackPane {
 	/**
 	 * Show/Hide animation time in milliseconds. 
 	 */
-	private long duration=200;
+	private long duration=300;
 
 	/**
 	 * Time line which shows the pane
@@ -236,6 +238,7 @@ public class HidingPane extends StackPane {
 	 * @param side - the side the button should be styled for. 
 	 */
 	public void styleHideButton(PamButton button, Side side){
+		button.getStyleClass().add("icon-button");
 		switch (side){
 		case RIGHT:
 			//button.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/Resources/SidePanelShow2.png"))));
@@ -321,6 +324,62 @@ public class HidingPane extends StackPane {
 		if (showing.get()) paneTanslateProperty.set(overlay ? 0 : expandedSize+offset);
 		else paneTanslateProperty.set(overlay ? (expandedSize+offset)*sideIndex: 0);
 
+	}
+
+	/**
+	 * Dynamically change the expanded size of the hiding pane. This updates
+	 * the content pane preferred size, the max size constraint, the translate
+	 * property, button binding and animation so that the pane can change
+	 * width (or height for horizontal panes) while it is open or closed.
+	 * <p>
+	 * Unlike {@link #setAnimation()}, this method does <b>not</b> snap the
+	 * translate property to the hidden position first, which avoids a
+	 * momentary zero-size frame that can trigger a JavaFX rendering NPE
+	 * ({@code maskTex} is null).
+	 *
+	 * @param newSize the new expanded size in pixels (width for LEFT/RIGHT
+	 *                panes, height for TOP/BOTTOM panes).
+	 */
+	public void setExpandedSize(double newSize) {
+		this.expandedSize = newSize;
+
+		if (!isHorizontal()) {
+			hidePane.setPrefWidth(expandedSize);
+			setMaxWidth(expandedSize);
+		} else {
+			hidePane.setPrefHeight(expandedSize);
+			setMaxHeight(expandedSize);
+		}
+
+		// reconfigure translate property and button binding
+		setTranlsateProperty();
+		if (overlay) showButton.translateXProperty().bind(buttonTranslateProperty);
+
+		// rebuild the timelines for the new size WITHOUT snapping the
+		// translate property to the hidden position (which setAnimation does)
+		timeLineShow = createAnimation(paneTanslateProperty,
+				overlay ? 0 - offset : expandedSize + offset, duration);
+		timeLineHide = createAnimation(paneTanslateProperty,
+				overlay ? (expandedSize + offset) * sideIndex : 0 - offset, duration);
+
+		timeLineShow.setOnFinished(e -> showFinished());
+		timeLineHide.setOnFinished(e -> hideFinished());
+
+		// set the correct translation for the current state
+		if (showing.get()) {
+			paneTanslateProperty.set(overlay ? 0 : expandedSize + offset);
+		} else {
+			paneTanslateProperty.set(overlay ? (expandedSize + offset) * sideIndex : 0);
+		}
+	}
+
+	/**
+	 * Get the current expanded size of the hiding pane.
+	 *
+	 * @return the expanded size in pixels.
+	 */
+	public double getExpandedSize() {
+		return expandedSize;
 	}
 
 
@@ -538,7 +597,7 @@ public class HidingPane extends StackPane {
 		Timeline timeLine= new Timeline();
 		// Animation for scroll SHOW.
 		timeLine.setCycleCount(1); //defines the number of cycles for this animation
-		final KeyValue kvDwn = new KeyValue(paneTanslateProperty, newSize);
+		final KeyValue kvDwn = new KeyValue(paneTanslateProperty, newSize, Interpolator.EASE_BOTH);
 		//		final KeyValue kvDwn = new KeyValue(translateProperty, expandedSize);
 		final KeyFrame kfDwn = new KeyFrame(Duration.millis(duration), kvDwn);
 		timeLine.getKeyFrames().add(kfDwn);
@@ -584,6 +643,9 @@ public class HidingPane extends StackPane {
 		showButton.setVisible(true);
 		hidePane.setVisible(false);
 		hideButton.setVisible(false);
+		// disable bitmap cache now the animation is done
+		hidePane.setCache(false);
+		hidePane.setCacheHint(CacheHint.DEFAULT);
 		showButton.toFront();
 		//		//TODO-delete
 		//		System.out.println("ShowButton Size:"+showButton.getLayoutX() +" tranlateX: "+showButton.getTranslateX() + 
@@ -598,6 +660,9 @@ public class HidingPane extends StackPane {
 		showButton.setVisible(false);
 		hidePane.setVisible(true);
 		hideButton.setVisible(true);
+		// disable bitmap cache now the animation is done
+		hidePane.setCache(false);
+		hidePane.setCacheHint(CacheHint.DEFAULT);
 	}
 
 	/**
@@ -625,6 +690,10 @@ public class HidingPane extends StackPane {
 				return;
 			}
 
+			// cache the content as a bitmap during the slide animation
+			// to avoid expensive per-frame layout of complex content
+			hidePane.setCache(true);
+			hidePane.setCacheHint(CacheHint.SPEED);
 			timeLineShow.play();
 		}
 		else{
@@ -632,6 +701,8 @@ public class HidingPane extends StackPane {
 			if (!visibleImmediatly) hidePane.setVisible(false);
 //			System.out.println("HidingPane: Close Hide Pane");
 			//close the panel
+			hidePane.setCache(true);
+			hidePane.setCacheHint(CacheHint.SPEED);
 			timeLineHide.play();
 		}
 	}

@@ -455,6 +455,13 @@ final public class PamModel implements PamSettings {
 		mi.setHidden(!isViewer);
 		mi.setMaxNumber(1);
 
+		mi = PamModuleInfo.registerControlledUnit("soundtrapSensor.SudSensorControl", "SoundTrap SWV Sensor Import");
+		mi.setModulesMenuGroup(sensorsGroup);
+		mi.setToolTipText("Extracts magnetometer and accelerometer data from SoundTrap SUD (.swv) files and computes heading, pitch and roll");
+		mi.setMaxNumber(1);
+		mi.setHelpPoint("sensors/soundtrapSensor/docs/soundtrapSensor.html");
+
+
 		mi = PamModuleInfo.registerControlledUnit(CPODControl2.class.getName(), "CPOD Detector Import");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Imports CPOD data");
@@ -702,12 +709,12 @@ final public class PamModel implements PamSettings {
 		//		mi.setHidden(isViewer == false);
 
 
-//		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
-//		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
-//		mi.setToolTipText("AI used to enhance whistle detection");
-//		mi.setHidden(!SMRUEnable.isEnable());
-//		mi.setModulesMenuGroup(detectorsGroup);	
-		//		mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
+		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
+		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
+		mi.setToolTipText("AI used to enhance whistle detection");
+		mi.setHidden(!SMRUEnable.isEnable());
+		mi.setModulesMenuGroup(detectorsGroup);	
+				mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
 
 		/*
 		 * ************* End Detectors Group *******************

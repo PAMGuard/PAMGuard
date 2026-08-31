@@ -17,9 +17,7 @@ The module has three possible modes of importing data
 
 Users can use the file button to select a single file (e.g. an FP3 file) or the folder button to select a folder of CPOD/FPOD files. If the folder button is used and there are both CP1/FP1 (detections) and CP3/FP3 (click trains) files then PAMGuard will automatically load all files and assign detections to click trains. Once files have imported select **_Import_** and the data will be imported into PAMGuard - note this can take some time, especially if importing CP1/FP1 files.
 
-<p align="center">
-  <img width="750" height="400" src = "resources/cpod_settings_description.png">
-</p>
+![](resources/cpod_settings_description.png)
 
 _The CPOD module allow users to import CPOD/FPOD data by selecting either individual files or a folder of files_
 
@@ -28,12 +26,8 @@ A broad overview of CPOD data is shown in PAMGuard's data map which shows a data
 
 Individual CPOD detections can be viewed in the Time base display in PAMGuard. Add the CPOD module to a plot and then data can be viewed with time using a selection y-axis options such as Amplitude, Amplitude (stem), Frequency, bandwidth etc. 
 
-<p align="center">
-  <img width="750" height="380" src = "resources/cpod_time_display_stem.png">
-</p>
-<p align="center">
-  <img width="750" height="380" src = "resources/cpod_time_display_amplitude2.png">
-</p>
+![](resources/cpod_time_display_stem.png)
+![](resources/cpod_time_display_amplitude2.png)
 
 _FPOD data visualised in the time base display as a stem plots like FPOD.exe (top) and as a scatter plot of click amplitudes (bottom)_
 
@@ -49,9 +43,7 @@ _Screenshots of the data selector user interface used throughtout PAMGuard. Alth
 ## Exporting CPOD/FPOD data
 CPOD and FPOD data can be exported to .RData and .mat using PAMGuard's exporter. 
 
-<p align="center">
-  <img width="450" height="600" src = "resources/cpod_exporter_dialog_swing.png">
-</p>
+![](resources/cpod_exporter_dialog_swing.png)
 
 _PAMGuard's exporter can export CPOD/FPOD clicks to .mat or .RData files. These can be openend in MATLAB/Python and R respectively_
 

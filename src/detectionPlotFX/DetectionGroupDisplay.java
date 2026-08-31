@@ -161,6 +161,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		detectionDisplay= new DetectionPlotDisplay();
 
 		arrowLeft= new PamButton();
+		arrowLeft.getStyleClass().add("icon-button");
 //		arrowLeft.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.KEYBOARD_ARROW_LEFT, PamGuiManagerFX.iconSize));
 		arrowLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconSize));
 		arrowLeft.setOnAction((action)->{
@@ -170,6 +171,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		});
 
 		arrowRight= new PamButton();
+		arrowRight.getStyleClass().add("icon-button");
 //		arrowRight.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.KEYBOARD_ARROW_RIGHT, PamGuiManagerFX.iconSize));
 		arrowRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconSize));
 		arrowRight.setOnAction((action)->{
@@ -302,7 +304,20 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		//set styles
 //		detectionDisplay.getSettingsHolder().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 //		detectionDisplay.getSettingsHolder().setStyle("-fx-background-color: -fx-darkbackground");
-		hidingPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(hidingPane, PamStylesManagerFX.STYLE_SLIDING);
+
+		/*
+		 * Style the plot itself with the GUI style so that it follows the day / dark /
+		 * night colour schemes. Without this the display inherits the sliding dialog
+		 * style of whatever it is shown inside - the advanced pop up menu on the time
+		 * display, for one - which is a fixed mid grey whatever scheme is selected.
+		 *
+		 * The settings hiding pane keeps the sliding style: it is registered above (and,
+		 * in the extended layout, is a sibling of this holder rather than inside it), and
+		 * a style sheet on the node itself takes precedence over one inherited from an
+		 * ancestor.
+		 */
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(detectionDisplayHolder, PamStylesManagerFX.STYLE_GUI);
 
 		//set default size
 		detectionDisplayHolder.setPrefSize(500, 400);

@@ -10,7 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -18,6 +17,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
+import PamView.component.PamFontIcon;
 import PamView.panel.PamPanel;
 
 /**
@@ -77,14 +79,12 @@ public class HidingSidePanel {
 		
 		topBar = new PamPanel();
 		topBar.setLayout(new BorderLayout());
-		showButton = new JButton("", new ImageIcon(ClassLoader
-				.getSystemResource("Resources/SidePanelShow.png")));
+		showButton = new JButton("", PamFontIcon.of(MaterialDesignC.CHEVRON_RIGHT, PamFontIcon.ARROW_SIZE));
 		showButton.addActionListener(new ShowButton());
 		showButton.setToolTipText("Show side panels");
 //		showButton.setBorder(null);
 		showButton.setMargin(new Insets(0, 0, 0, 0));
-		hideButton = new JButton("", new ImageIcon(ClassLoader
-				.getSystemResource("Resources/SidePanelHide.png")));
+		hideButton = new JButton("", PamFontIcon.of(MaterialDesignC.CHEVRON_LEFT, PamFontIcon.ARROW_SIZE));
 		hideButton.addActionListener(new HideButton());
 		hideButton.setToolTipText("Hide side panels");
 //		hideButton.setBorder(null);

@@ -1,0 +1,309 @@
+/*
+ * pamFlatLafDark.css
+ *
+ * Dark-mode OVERRIDE for pamFlatLafLight.css. This is not a standalone
+ * theme: add it as an additional stylesheet AFTER pamFlatLafLight.css.
+ * It redefines the -flat-* looked-up colours and re-colours the handful
+ * of rules that use hard-coded light values.
+ *
+ * All colours are taken from (or computed from) the FlatLaf 3.5.1 dark
+ * theme (com.formdev.flatlaf.FlatDarkLaf / FlatDarkLaf.properties):
+ *
+ *   @background                    #3c3f41
+ *   @foreground                    #bbbbbb
+ *   @disabledForeground            shade(#bbb,25%)          -> #8c8c8c
+ *   @componentBackground           tint(@background,5%)     -> #46494b
+ *   @menuBackground                darken(@background,5%)   -> #313435
+ *   @accentBaseColor / selection   #4b6eaf
+ *   @selectionInactiveBackground                            -> #0d293e
+ *   Component.borderColor          tint(@background,19%)    -> #616465
+ *   Component.focusColor           shade(spin(accent,-8),20%) -> #3c628c
+ *   Component.focusedBorderColor   lighten(focusColor,5%)   -> #466f9e
+ *   @accentBase2Color (slider/underline)                    -> #4b87c8
+ *   CheckBox.icon.checkmarkColor   shade(#bbb,10%)          -> #a8a8a8
+ *   Button.default.background      darken(spin(accent,-8),13%) -> #365880
+ *   Separator.foreground           tint(@background,10%)    -> #505254
+ *   PopupMenu.borderColor          tint(@background,17%)    -> #5d6061
+ *   ToolTip.background             shade(@background,50%)   -> #1e2021
+ *   @icon                          shade(#bbb,7%)           -> #aeaeae
+ *   @buttonArrowColor              shade(#bbb,17%)          -> #9b9b9b
+ *
+ * The palette is declared on '.root, .gui-css-root', matching the base sheet:
+ * the GUI style is attached both to a Scene (where '.root' matches the scene
+ * root) and node-by-node to the time display's content nodes, which carry the
+ * 'gui-css-root' class instead (see TDDisplayFX.addGUICSS). Both sheets use the
+ * same selector, so this one - added after the base sheet - wins.
+ */
+
+.root, .gui-css-root {
+    -flat-background:            #3c3f41;
+    -flat-foreground:            #bbbbbb;
+    -flat-disabled-foreground:   #8c8c8c;
+    -flat-component-background:  #46494b;
+    -flat-border:                #616465;
+    -flat-disabled-border:       #616465;
+    -flat-focus:                 #3c628c;
+    -flat-focused-border:        #466f9e;
+    -flat-accent:                #4b6eaf;
+    -flat-accent2:               #4b87c8;
+    -flat-checkmark:             #a8a8a8;
+    -flat-underline:             #4b87c8;
+    -flat-link:                  #589df6;
+    -flat-selection-inactive:    #0d293e;
+    -flat-separator:             #505254;
+    -flat-icon:                  #aeaeae;
+    -flat-arrow:                 #9b9b9b;
+    -flat-hover:                 #515456;   /* Button.hoverBackground: lighten(bg,3%)   */
+    -flat-pressed:               #5b5e60;   /* Button.pressedBackground: lighten(bg,6%) */
+    -flat-selected:              #666a6c;   /* ToggleButton.selectedBackground          */
+    -flat-menu-hover:            #4b4e50;
+
+    -fx-faint-focus-color:       #4b7baf44;
+
+    /* ---- PAMGuard plot furniture. -pam-axis-* follow the -flat-* values
+            redefined above; only the plot window colour needs its own value
+            (it matches PamColor.PlOTWINDOW for the Dark scheme, which is what
+            the Swing side and the plot canvases use). ---- */
+    -pam-plot-background:  #2b2b2b;
+    -pam-scroller-body:    rgba(190,190,190,0.30);
+    -pam-scroller-handle:  rgba(215,215,215,0.65);
+    -pam-scroller-grip:    rgba(40,40,40,0.9);
+
+    /* FlatLaf dark icons are light grey */
+    -fx-icon_col: #afb1b3;
+}
+
+
+/* ---- Button: no focus tint in the dark theme; the default button is
+        accent-filled (FlatDarkLaf Button.default.background) ---- */
+
+.button:focused,
+.toggle-button:focused,
+.menu-button:focused,
+.split-menu-button:focused {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+}
+
+.button:default {
+    -fx-background-color: #55718f, #365880;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-text-fill: #d4d4d4;
+    -fx-font-weight: bold;
+}
+
+.button:default:hover {
+    -fx-background-color: #55718f, #3b6089;
+}
+
+.button:default:armed {
+    -fx-background-color: #55718f, #416890;
+}
+
+
+/* ---- CheckBox / RadioButton box colours ---- */
+
+.check-box > .box,
+.radio-button > .radio {
+    -fx-background-color: #696c6d, -flat-component-background;
+}
+
+.check-box:hover > .box,
+.check-box:focused > .box,
+.radio-button:hover > .radio,
+.radio-button:focused > .radio {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+}
+
+.check-box:pressed > .box,
+.radio-button:pressed > .radio {
+    -fx-background-color: -flat-focused-border, -flat-pressed;
+}
+
+.check-box:selected > .box,
+.check-box:indeterminate > .box,
+.radio-button:selected > .radio {
+    -fx-background-color: #87898a, -flat-component-background;
+}
+
+.check-box:disabled > .box,
+.radio-button:disabled > .radio {
+    -fx-background-color: #545658, -flat-background;
+}
+
+.check-box:disabled:selected > .box > .mark,
+.radio-button:disabled:selected > .radio > .dot {
+    -fx-background-color: #686868;
+}
+
+
+/* ---- Spinner / editable combo inner buttons ---- */
+
+.combo-box:editable > .arrow-button,
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button,
+.spinner.split-arrows-horizontal .increment-arrow-button,
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+    -fx-background-color: -flat-border, #414547;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover,
+.spinner.split-arrows-horizontal .increment-arrow-button:hover,
+.spinner.split-arrows-horizontal .decrement-arrow-button:hover {
+    -fx-background-color: -flat-border, #4e5254;
+}
+
+
+/* ---- ToggleSwitch ---- */
+
+.toggle-switch > .thumb-area {
+    -fx-background-color: #696c6d, #55595b;
+}
+
+.toggle-switch > .thumb {
+    -fx-background-color: #696c6d, #b4b8ba;
+}
+
+.toggle-switch:selected > .thumb {
+    -fx-background-color: -flat-accent, #ffffff;
+}
+
+.toggle-switch:disabled > .thumb-area {
+    -fx-background-color: #545658, -flat-background;
+}
+
+.toggle-switch:disabled:selected > .thumb-area {
+    -fx-background-color: #33517a;
+}
+
+
+/* ---- Slider / ProgressBar tracks ---- */
+
+.slider .track {
+    -fx-background-color: #626668;
+}
+
+.slider .thumb:hover {
+    -fx-background-color: #5c92cf;
+}
+
+.slider .thumb:pressed {
+    -fx-background-color: #3e78b7;
+}
+
+.slider:focused .thumb {
+    -fx-background-color: #4b7baf80, -flat-accent2;
+}
+
+.slider:disabled .track,
+.slider:disabled .thumb {
+    -fx-background-color: #525658;
+}
+
+.progress-bar > .track {
+    -fx-background-color: #525658;
+}
+
+
+/* ---- ScrollBar ---- */
+
+.scroll-bar,
+.scroll-pane > .corner {
+    -fx-background-color: #404344;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: #585c5e;
+}
+
+.scroll-bar > .thumb:hover {
+    -fx-background-color: #6e7274;
+}
+
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: #797d7f;
+}
+
+
+/* ---- Tabs / toolbar / titled pane hover ---- */
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover {
+    -fx-background-color: #313435;
+}
+
+.tool-bar > .button:hover,
+.tool-bar > .toggle-button:hover,
+.tool-bar > .menu-button:hover {
+    -fx-background-color: #505254;
+}
+
+.tool-bar > .button:armed,
+.tool-bar > .toggle-button:armed {
+    -fx-background-color: #55585a;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: #313435;
+}
+
+
+/* ---- List / table cells ---- */
+
+.list-cell:filled:hover,
+.tree-cell:filled:hover,
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
+    -fx-background-color: #515456;
+}
+
+.table-view .column-header,
+.tree-table-view .column-header,
+.table-view .filler,
+.tree-table-view .filler {
+    -fx-border-color: transparent #5f6264 #5f6264 transparent;
+}
+
+.table-view .column-header:hover,
+.tree-table-view .column-header:hover {
+    -fx-background-color: transparent, #505254;
+}
+
+
+/* ---- Menus (FlatDark @menuBackground = #313435) ---- */
+
+.menu-bar {
+    -fx-background-color: -flat-separator, #313435;
+}
+
+.context-menu {
+    -fx-background-color: #5d6061, #313435;
+}
+
+.menu-item > .accelerator-text {
+    -fx-text-fill: #959595;
+}
+
+.context-menu .separator > .line {
+    -fx-border-color: #505254;
+}
+
+.combo-box-popup > .list-view {
+    -fx-background-color: #5d6061, -flat-component-background;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-background-color: -flat-component-background;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: -flat-menu-hover;
+}
+
+
+/* ---- Tooltip (FlatDark ToolTip.background = shade(bg,50%)) ---- */
+
+.tooltip {
+    -fx-background-color: -flat-border, #1e2021;
+}

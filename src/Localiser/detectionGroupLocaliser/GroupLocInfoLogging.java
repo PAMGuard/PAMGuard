@@ -1,5 +1,7 @@
 package Localiser.detectionGroupLocaliser;
 
+import PamguardMVC.superdet.DetectionGroup;
+
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.PamDetectionLogging;
@@ -15,7 +17,7 @@ public abstract class GroupLocInfoLogging extends PamDetectionLogging {
 	@Override
 	protected boolean fillDataUnit(SQLTypes sqlTypes, PamDataUnit pamDetection) {
 		boolean basicFillOk =  super.fillDataUnit(sqlTypes, pamDetection);
-		GroupDetection groupDetection = (GroupDetection) pamDetection;
+		DetectionGroup groupDetection = (DetectionGroup) pamDetection;
 		
 		return basicFillOk;
 	}
