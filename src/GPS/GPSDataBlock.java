@@ -4,6 +4,7 @@ import java.util.ListIterator;
 
 import GPS.effort.GpsEffortProvider;
 import PamUtils.LatLong;
+import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -188,5 +189,6 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 		// TODO Auto-generated method stub
 		return super.loadViewerData(offlineDataLoadInfo, loadObserver);
 	}
+
 
 }

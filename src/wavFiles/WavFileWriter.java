@@ -49,6 +49,8 @@ public class WavFileWriter extends WavFile {
 		wavHeader.writeHeader(windowsFile);
 	}
 	
+<<<<<<< HEAD
+
 	/**
 	 * Create lock file to flag transfer that this file is actively being written to for APS.
 	 * Linux does not handle file locks well, so explicitly building them in. 
@@ -63,6 +65,9 @@ public class WavFileWriter extends WavFile {
 		}
 	}
 	
+
+=======
+>>>>>>> upstream/main
 	
 	/**
 	 * Writes an array of double values to a WAV file.  This method only writes

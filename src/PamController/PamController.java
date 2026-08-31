@@ -3267,6 +3267,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 		sum += String.format("<STATUS>%d<\\STATUS>", getPamStatus());
 		sum += String.format("<STATE>%d<\\STATE>", getRealStatus());
 
+<<<<<<< HEAD
+=======
+		//sum += String.format("\n<SYSTIME>%s<\\SYSTIME>", t);
+		//sum += String.format("\n<STATUS>%d<\\STATUS>", getPamStatus());
+	//	sum += String.format("\n<STATE>%d<\\STATE>", getRealStatus());
+>>>>>>> upstream/main
 		sum += "\n";
 		return sum;
 	}

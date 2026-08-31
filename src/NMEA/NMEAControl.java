@@ -24,6 +24,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -31,6 +32,9 @@ import javax.swing.JMenuItem;
 import org.json.JSONObject;
 
 import Acquisition.FolderInputSystem;
+import NMEA.serial.SerialNMEAProvider;
+import NMEA.simulated.SimulatedNMEAProvider;
+import NMEA.udp.UdpNMEAProvider;
 import nmeaEmulator.NMEAFrontEnd;
 import pamguard.CommandLine;
 import pamguard.GlobalArguments;
@@ -41,6 +45,8 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.command.SummaryCommand;
 import PamController.status.BaseProcessCheck;
+import PamModel.CommonPluginInterface;
+import PamModel.PamModel;
 import nmeaEmulator.NMEAFrontEnd;
 import pamguard.GlobalArguments;
 
@@ -78,6 +84,8 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	 * Command line to set com port from command start line. 
 	 */
 	public static final String NMEACOMCOMMAND = "-NMEAPORT";
+	
+	private ArrayList<NMEAProvider> nmeaProviders = new ArrayList<NMEAProvider>();
 
 	public NMEAControl(String unitName) {
 		
@@ -89,6 +97,16 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 
 		addPamProcess(acquireNmeaData);
 		setModuleStatusManager(acquireNmeaData);
+		
+		nmeaProviders.add(new SerialNMEAProvider(this));
+		nmeaProviders.add(new UdpNMEAProvider(this));
+		nmeaProviders.add(new SimulatedNMEAProvider(this));
+		// add plugins
+		ArrayList<CommonPluginInterface> plugins = PamModel.getPamModel().getPluginType(NMEAPlugin.class);
+		for (CommonPluginInterface p : plugins) {
+			NMEAPlugin nmeaPlugin = (NMEAPlugin) p;
+			nmeaProviders.add(nmeaPlugin.getNMEAProvider(this));
+		}
 		
 		PamSettingManager.getInstance().registerSettings(this);
 		
@@ -106,7 +124,6 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 			globArg = GlobalArguments.getParam(NMEACOMCOMMAND); // old way !
 		}
 		if (globArg != null) {
-
 			System.out.printf("Setting %s serial port to %s\n", getUnitName(), globArg);
 			if (globArg.equalsIgnoreCase("auto")) {
 				nmeaParameters.autoSerialPort = true;
@@ -127,9 +144,20 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	public JMenuItem createNMEAMenu(Frame parentFrame) {
 		JMenuItem menuItem;
 		JMenu subMenu = new JMenu(getUnitName());
+//		menuItem = new JMenuItem("NMEA Parameters ...");
+//		menuItem.addActionListener(new NMEASettings(parentFrame));
+//		subMenu.add(menuItem);
+		
 		menuItem = new JMenuItem("NMEA Parameters ...");
-		menuItem.addActionListener(new NMEASettings(parentFrame));
+		menuItem.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showDialog2(parentFrame);
+			}
+		});
 		subMenu.add(menuItem);
+		
 		menuItem = new JMenuItem("NMEA Strings ...");
 		menuItem.addActionListener(new NMEAStrings(parentFrame));
 		subMenu.add(menuItem);
@@ -147,35 +175,43 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 		return subMenu;
 	}
 
+
 	public NMEAParameters getNmeaParameters() {
 		return nmeaParameters;
 	}
 
-	class NMEASettings implements ActionListener {
-		Frame parentFrame;
-		
-		public NMEASettings(Frame parentFrame) {
-			super();
-			// TODO Auto-generated constructor stub
-			this.parentFrame = parentFrame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			showNMEADialog(parentFrame);
-		}		
-	}
+//	class NMEASettings implements ActionListener {
+//		Frame parentFrame;
+//		
+//		public NMEASettings(Frame parentFrame) {
+//			super();
+//			// TODO Auto-generated constructor stub
+//			this.parentFrame = parentFrame;
+//		}
+//
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//			showNMEADialog(parentFrame);
+//		}		
+//	}
 	
-	public void showNMEADialog(Frame parentFrame ) {
-		
-			NMEAParameters ans = NMEAParametersDialog
-					.showDialog(parentFrame, nmeaParameters);
-			if (ans != null) {
-				nmeaParameters = ans.clone(); // copy across new settings
-				acquireNmeaData.startNmeaSource(ans.sourceType); // restart the process with new settings
-				
-			}
+//	public void showNMEADialog(Frame parentFrame ) {
+//		
+//			NMEAParameters ans = NMEAParametersDialog
+//					.showDialog(parentFrame, nmeaParameters);
+//			if (ans != null) {
+//				nmeaParameters = ans.clone(); // copy across new settings
+//				acquireNmeaData.startNmeaSource(); // restart the process with new settings
+//				
+//			}
+//	}
+	protected void showDialog2(Frame parentFrame) {
+		boolean ans = NMEADialog2.showDialog(parentFrame, this);
+		if (ans) {
+			acquireNmeaData.startNmeaSource(); // restart the process with new settings
+		}
 	}
+
 	
 	class NMEAStrings implements ActionListener {
 		private Frame parentFrame;
@@ -271,7 +307,7 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public void setupControlledUnit() {
 		super.setupControlledUnit();
-		acquireNmeaData.startNmeaSource(this.nmeaParameters.sourceType);
+		acquireNmeaData.startNmeaSource();
 		
 	}
 
@@ -318,6 +354,37 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 		
 		return NMEAString;
 	}
+
+	public void setNmeaParameters(NMEAParameters newParams) {
+		this.nmeaParameters = newParams;
+	}
+
+	/**
+	 * @return the nmeaProviders
+	 */
+	public ArrayList<NMEAProvider> getNmeaProviders() {
+		return nmeaProviders;
+	}
+
+	/**
+	 * Get a provider based on it's class name
+	 * @param providerClass
+	 * @return
+	 */
+	public NMEAProvider getNMEAProvider(String providerClass) {
+		for (NMEAProvider provider : nmeaProviders) {
+			if (provider.getClass().getName().equals(providerClass)) {
+				return provider;
+			}
+		}
+		return null;
+	}
+//	public NMEAProvider getNMEAProvider(String type) {
+//		if (type == null) {
+//			return null;
+//		}
+//		
+//	}
 
 	
 }

@@ -149,6 +149,11 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 		for (int j=0; j<results.length; j++){
 			double perpDist = groupLocalisation.getGroupLocaResult(j).getPerpendicularDistance();
 			double height = groupLocalisation.getHeight(j);
+			Double chi2 =groupLocalisation.getGroupLocaResult(j).getChi2();
+			if (chi2 != null && chi2 > clickLocParams.getMaxChi2()) {
+//				System.out.println("Bad Chi2 value in results filter: " + chi2);
+				continue;
+			}
 			if (perpDist <= clickLocParams.maxRange &&
 					height >= clickLocParams.minHeight && height <= clickLocParams.maxHeight){
 				//even if one ambiguity is OK then the whole localisation passes the filter. 

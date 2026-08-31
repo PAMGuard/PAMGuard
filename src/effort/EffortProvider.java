@@ -161,7 +161,7 @@ public abstract class EffortProvider {
 		if (symbolChooser == null) {
 			return false;
 		}
-		SwingSymbolOptionsPanel panel = symbolChooser.getSwingOptionsPanel(null);
+		SwingSymbolOptionsPanel panel = symbolChooser.getSwingOptionsPanel(parent, null);
 		if (panel == null) {
 			return false;
 		}

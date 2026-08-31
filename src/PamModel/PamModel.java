@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -33,8 +32,17 @@ import java.util.jar.JarFile;
 
 import javax.swing.JFrame;
 
+import Acquisition.AcquisitionControl;
 import Array.ArraySidePanelControl;
+import ArrayAccelerometer.ArrayAccelControl;
+import Filters.FilterControl;
 import GPS.GpsDataUnit;
+import IMU.IMUControl;
+import IshmaelDetector.EnergySumControl;
+import IshmaelDetector.MatchFiltControl;
+import IshmaelDetector.SgramCorrControl;
+import IshmaelLocator.IshLocControl;
+import KernelSmoothing.KernelSmoothingControl;
 import NMEA.NMEADataUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -46,29 +54,61 @@ import PamDetection.RawDataUnit;
 import PamUtils.FileFinder;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
+import RightWhaleEdgeDetector.RWEControl;
+import SoundRecorder.RecorderControl;
+import amplifier.AmpControl;
 import analogarraysensor.ArraySensorControl;
+import angleMeasurement.AngleControl;
 import backupmanager.BackupManager;
 import beamformer.continuous.BeamFormerControl;
 import bearinglocaliser.BearingLocaliserControl;
 import binaryFileStorage.SecondaryBinaryStore;
 import cepstrum.CepstrumControl;
+import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
+import clickTrainDetector.ClickTrainControl;
+import clipgenerator.ClipControl;
+import cpod.CPODControl2;
 import dataMap.DataMapControl;
+import dbht.DbHtControl;
+import decimator.DecimatorControl;
 import detectiongrouplocaliser.DetectionGroupControl;
 import effortmonitor.EffortControl;
+import envelopeTracer.EnvelopeControl;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
+import gpl.GPLControlledUnit;
 import group3dlocaliser.Group3DLocaliserControl;
 import landMarks.LandmarkControl;
-import loggerForms.cameragrabber.CameraGrabber;
+<<<<<<< HEAD
+
+=======
+>>>>>>> upstream/main
+import levelMeter.LevelMeterControl;
+import likelihoodDetectionModule.LikelihoodDetectionUnit;
+import loc3d_Thode.TowedArray3DController;
+import localTime.LocalTime;
+import ltsa.LtsaControl;
+import matchedTemplateClassifer.MTClassifierControl;
 import mel.MelControl;
-import meygenturbine.MeygenTurbine;
+import noiseBandMonitor.NoiseBandControl;
+import noiseMonitor.NoiseControl;
+import noiseOneBand.OneBandControl;
+import patchPanel.PatchPanelControl;
 import printscreen.PrintScreenControl;
 import ravendata.RavenControl;
-import rockBlock.RockBlockControl;
+import rawDeepLearningClassifier.DLControl;
+import rocca.RoccaControl;
+import seismicVeto.VetoController;
+import soundPlayback.PlaybackControl;
+import soundtrap.STClickControl;
+import soundtrap.STToolsControl;
 import tethys.TethysControl;
-import turbineops.TurbineOperationControl;
+import userDisplay.UserDisplayControl;
+import whistleClassifier.WhistleClassifierControl;
+import whistleDetector.WhistleControl;
 import whistlesAndMoans.AbstractWhistleDataUnit;
+import whistlesAndMoans.WhistleMoanControl;
 
 /**
  * @author Doug Gillespie
@@ -121,6 +161,21 @@ final public class PamModel implements PamSettings {
 	 * Subclass of URLClassLoader, to handle loading of plugins 
 	 */
 	private final PluginClassloader classLoader;
+	
+	/**
+	 * Default names for all the groups so that they can more easily be replicated
+	 * within plugin modules. 
+	 */
+	public static final String _MapGroup = "Maps and Mapping"; 
+	public static final String _SoundGroup = "Sound Processing"; 
+	public static final String _DetectorGroup = "Detectors"; 
+	public static final String _ClassifierGroup = "Classifiers"; 
+	public static final String _LocaliserpGroup = "Localisers"; 
+	public static final String _DisplaysGroup = "Displays"; 
+	public static final String _UtilitiesGroup = "Utilities"; 
+	public static final String _VisualGroup = "Visual Methods"; 
+	public static final String _SensorsGroup = "Sensors"; 
+	public static final String _SoundMeasurementGroup = "Sound Measurements"; 
 
 	/**
 	 * @param pamController
@@ -129,7 +184,6 @@ final public class PamModel implements PamSettings {
 	public PamModel(PamController pamController) {
 		this.pamController = pamController;
 		pamModel = this;
-		//		createPamModel();
 		classLoader = new PluginClassloader(new URL[0], this.getClass().getClassLoader());
 	}
 
@@ -138,22 +192,6 @@ final public class PamModel implements PamSettings {
 	public static PamModel getPamModel() {
 		return pamModel;
 	}
-
-	//	public PamDataBlock<GpsDataUnit> getGpsDataBlock() {
-	//		/*
-	//		 * If it's a fixed array then don't get this data block, but
-	//		 * get one that's sitting in the ArrayManager and return that 
-	//		 * instead
-	//		 */
-	//		PamArray currentArray = ArrayManager.getArrayManager().getCurrentArray();
-	//		if (currentArray != null && currentArray.getHydrophoneLocator().isStatic()) {
-	//			return currentArray.getFixedPointReferenceBlock();
-	//		}
-	//		else {
-	//			// otherwise, just return the normal gps data block that was set from the NMEA module
-	//			return gpsDataBlock;
-	//		}
-	//	}
 
 	public void setGpsDataBlock(PamDataBlock gpsDataBlock) {
 		this.gpsDataBlock = gpsDataBlock;
@@ -173,25 +211,25 @@ final public class PamModel implements PamSettings {
 		 * Make a series of module menu groups and add most of the 
 		 * modules to one group or another
 		 */
-		ModulesMenuGroup mapsGroup = new ModulesMenuGroup("Maps and Mapping");
+		ModulesMenuGroup mapsGroup = new ModulesMenuGroup(_MapGroup);
 		modulesMenuGroups.add(mapsGroup);
-		ModulesMenuGroup processingGroup = new ModulesMenuGroup("Sound Processing");
+		ModulesMenuGroup processingGroup = new ModulesMenuGroup(_SoundGroup);
 		modulesMenuGroups.add(processingGroup);
-		ModulesMenuGroup detectorsGroup = new ModulesMenuGroup("Detectors");
+		ModulesMenuGroup detectorsGroup = new ModulesMenuGroup(_DetectorGroup);
 		modulesMenuGroups.add(detectorsGroup);
-		ModulesMenuGroup classifierGroup = new ModulesMenuGroup("Classifiers");
+		ModulesMenuGroup classifierGroup = new ModulesMenuGroup(_ClassifierGroup);
 		modulesMenuGroups.add(classifierGroup);
-		ModulesMenuGroup localiserGroup = new ModulesMenuGroup("Localisers");
+		ModulesMenuGroup localiserGroup = new ModulesMenuGroup(_LocaliserpGroup);
 		modulesMenuGroups.add(localiserGroup);
-		ModulesMenuGroup displaysGroup = new ModulesMenuGroup("Displays");
+		ModulesMenuGroup displaysGroup = new ModulesMenuGroup(_DisplaysGroup);
 		modulesMenuGroups.add(displaysGroup);
-		ModulesMenuGroup utilitiesGroup = new ModulesMenuGroup("Utilities");
+		ModulesMenuGroup utilitiesGroup = new ModulesMenuGroup(_UtilitiesGroup);
 		modulesMenuGroups.add(utilitiesGroup);
-		ModulesMenuGroup visualGroup = new ModulesMenuGroup("Visual Methods");
+		ModulesMenuGroup visualGroup = new ModulesMenuGroup(_VisualGroup);
 		modulesMenuGroups.add(visualGroup);
-		ModulesMenuGroup sensorsGroup = new ModulesMenuGroup("Sensors");
+		ModulesMenuGroup sensorsGroup = new ModulesMenuGroup(_SensorsGroup);
 		modulesMenuGroups.add(sensorsGroup);
-		ModulesMenuGroup measurementGroup = new ModulesMenuGroup("Sound Measurements");
+		ModulesMenuGroup measurementGroup = new ModulesMenuGroup(_SoundMeasurementGroup);
 		modulesMenuGroups.add(measurementGroup);
 
 		//		ModulesMenuGroup smruGroup = new ModulesMenuGroup("SMRU Stuff");		
@@ -204,25 +242,14 @@ final public class PamModel implements PamSettings {
 		/*
 		 * ************* Start Maps and Mapping Group *******************
 		 */
-		/*
-		 * Changed to allow any number, DG 13 March 2008
-		 * This cooincides with changes to AIS and GPS modules
-		 * which allow them to select an NMEA source. 
-		 * These changes mean you can have GPS data and AIS data comign in 
-		 * over separate serial ports.
-		 */
-		//		mi = PamModuleInfo.registerControlledUnit("Array.ArrayManager", "Array Manager");
-		//		mi.setModulesMenuGroup(mapsGroup);
-		//		mi.setMinNumber(1);
-		//		mi.setMaxNumber(1);
 
-		mi = PamModuleInfo.registerControlledUnit("NMEA.NMEAControl", "NMEA Data Collection");
+		mi = PamModuleInfo.registerControlledUnit(NMEA.NMEAControl.class.getName(), "NMEA Data Collection");
 		mi.setModulesMenuGroup(mapsGroup);
 		mi.setToolTipText("Collects NMEA data from a serial port");
 		mi.setMinNumber(0);
 		mi.setHelpPoint("mapping/NMEA/docs/configuringNMEADataSource.html");
 
-		mi = PamModuleInfo.registerControlledUnit("GPS.GPSControl", "GPS Processing");
+		mi = PamModuleInfo.registerControlledUnit(GPS.GPSControl.class.getName(), "GPS Processing");
 		mi.setModulesMenuGroup(mapsGroup);
 		mi.setToolTipText("Interprets NMEA data to extract GPS data");
 		mi.setMinNumber(0);
@@ -232,30 +259,14 @@ final public class PamModel implements PamSettings {
 			mi.setMaxNumber(1);		
 		}
 
-		mi = PamModuleInfo.registerControlledUnit("Map.MapController", "Map");	
+		mi = PamModuleInfo.registerControlledUnit(Map.MapController.class.getName(), "Map");	
 		mi.addDependency(new PamDependency(GpsDataUnit.class, "GPS.GPSControl"));
 		mi.setToolTipText("Displays a map of vessel position and detections");
 		mi.setModulesMenuGroup(mapsGroup);
 		mi.setMinNumber(0);
 		mi.setHelpPoint("mapping/NMEA/docs/ConfiguringGPS.html");
 
-		//		mi = PamModuleInfo.registerControlledUnit(GridbaseControl.class.getName(), GridbaseControl.unitType);	
-		//		mi.setToolTipText("Load a gridded map to display as an overlay");
-		//		mi.setModulesMenuGroup(mapsGroup);
-		//		mi.setMinNumber(0);
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-
-		/**
-		 * Very basic ideas for a 3D map - abandoned and modified the main Map 
-		 * to incorporate 3D rotations instead. 
-		 */
-		//		mi = PamModuleInfo.registerControlledUnit(Map3DControl.class.getName(), "3D Map Display");
-		//		mi.setToolTipText("Displays 3D plots of data centred around the hydrophone array");
-		//		mi.setModulesMenuGroup(mapsGroup);
-		//		mi.setMaxNumber(1);
-		//		mi.setMaxNumber(1);
-
-		mi = PamModuleInfo.registerControlledUnit("AIS.AISControl", "AIS Processing");
+		mi = PamModuleInfo.registerControlledUnit(AIS.AISControl.class.getName(), "AIS Processing");
 		mi.addDependency(new PamDependency(NMEADataUnit.class, "NMEA.NMEAControl"));
 		mi.setToolTipText("Interprets NMEA data to extract AIS data");
 		mi.setModulesMenuGroup(mapsGroup);
@@ -263,33 +274,15 @@ final public class PamModel implements PamSettings {
 		mi.setMinNumber(0);
 		mi.setMaxNumber(1);
 
-		mi = PamModuleInfo.registerControlledUnit("AirgunDisplay.AirgunControl", "Airgun Display");
+		mi = PamModuleInfo.registerControlledUnit(AirgunDisplay.AirgunControl.class.getName(), "Airgun Display");
 		mi.setModulesMenuGroup(mapsGroup);
 		mi.setToolTipText("Shows the position of airguns (or any other source) on the map");
 		mi.setMinNumber(0);
 		mi.setHelpPoint("mapping/AirgunDisplay/docs/AirgunOverview.html");
-		//		mi.setMaxNumber(1);
 
 		mi = PamModuleInfo.registerControlledUnit(LandmarkControl.class.getName(), "Fixed Landmarks");
 		mi.setModulesMenuGroup(mapsGroup);
 		mi.setToolTipText("Place object symbols on the PAMGuard map");
-
-		//		mi = PamModuleInfo.registerControlledUnit("mapgrouplocaliser.MapGroupLocaliserControl", "Map Group Localiser");
-		//		mi.setModulesMenuGroup(mapsGroup);
-		//		mi.setToolTipText("Group and localise detections on the PAMGuard map");
-		//		mi.addDependency(new PamDependency(MapComment.class, "Map.MapController"));
-
-		//		mi = PamModuleInfo.registerControlledUnit("WILDInterface.WILDControl", "WILD ArcGIS Interface");
-		//		mi.setModulesMenuGroup(mapsGroup);
-		//		mi.setToolTipText("Outputs data in an NMEA string via a serial port");
-		//		mi.setMaxNumber(1);
-
-		//		mi = PamModuleInfo.registerControlledUnit("Map3D.Map3DControl", "3D Map");	
-		//		//mi.addDependency(new PamDependency(GpsDataUnit.class, "GPS.GPSControl"));
-		//		mi.setModulesMenuGroup(mapsGroup);
-		//		mi.setMinNumber(0);
-		//		mi.setMaxNumber(1);
-
 
 		/*
 		 * ************* End Maps and Mapping Group *******************
@@ -299,7 +292,7 @@ final public class PamModel implements PamSettings {
 		 * ************* Start Utilities Group *******************
 		 */
 
-		mi = PamModuleInfo.registerControlledUnit("generalDatabase.DBControlUnit", "Database");
+		mi = PamModuleInfo.registerControlledUnit(generalDatabase.DBControlUnit.class.getName(), "Database");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setToolTipText("Stores PAMGuard data in a database");
 		mi.addGUICompatabilityFlag(PamGUIManager.FX);
@@ -309,16 +302,12 @@ final public class PamModel implements PamSettings {
 		}
 		mi.setMaxNumber(1);
 
-		mi = PamModuleInfo.registerControlledUnit("binaryFileStorage.BinaryStore", "Binary Storage");
+		mi = PamModuleInfo.registerControlledUnit(binaryFileStorage.BinaryStore.class.getName(), "Binary Storage");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setToolTipText("Stores PAMGuard data in files on the hard drive");
-		//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-		//			mi.setMinNumber(1);
-		//		}
 		mi.setHelpPoint("utilities/BinaryStore/docs/binarystore_overview.html");
 		mi.setMaxNumber(1);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX);
-		//		mi.setMaxNumber(SMRUEnable.isEnable() ? 2 : 1);
 
 
 		mi = PamModuleInfo.registerControlledUnit(SecondaryBinaryStore.class.getName(), SecondaryBinaryStore.unitType);
@@ -327,44 +316,19 @@ final public class PamModel implements PamSettings {
 		mi.setHidden(!isViewer || !SMRUEnable.isEnable());
 		mi.setHelpPoint("utilities/BinaryStore/docs/binarystore_overview.html");
 
-
-		//		if (isSMRU) {
-		mi = PamModuleInfo.registerControlledUnit("networkTransfer.send.NetworkSender", "Network Sender");
+		mi = PamModuleInfo.registerControlledUnit(networkTransfer.send.NetworkSender.class.getName(), "Network Sender");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setToolTipText("Sends PAMGuard data over a network to other computers");
 		mi.setHidden(!SMRUEnable.isEnable());
 
-
-		//		mi = PamModuleInfo.registerControlledUnit("serialPortLogger.SerialLogger", "Serial Port Logger");
-		//		mi.setModulesMenuGroup(utilitiesGroup);
-		//		mi.setToolTipText("Logs data from a serial port to a timestamped database");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-		//		mi.setMaxNumber(1);
-
-		//		if (pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER ||
-		//				pamController.getRunMode() == PamController.RUN_NORMAL) {
-		mi = PamModuleInfo.registerControlledUnit("networkTransfer.receive.NetworkReceiver", "Network Receiver");
+		mi = PamModuleInfo.registerControlledUnit(networkTransfer.receive.NetworkReceiver.class.getName(), "Network Receiver");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setToolTipText("Receives PAMGuard data sent over the network from the Network Sender module");
 		mi.setMaxNumber(1);
 		mi.setMinNumber(pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER ? 1 : 0);
 		mi.setHidden(!SMRUEnable.isEnable());
 		mi.setAllowedModes(PamPluginInterface.NOTINVIEWER);
-		//		}
 
-		//		mi = PamModuleInfo.registerControlledUnit("decimus.summarystring.DStrControl", "Decimus Summary Strings");
-		//		mi.setModulesMenuGroup(utilitiesGroup);
-		//		mi.setToolTipText("Displays information from Decimus summary strings");
-		//		mi.setHidden(SMRUEnable.isEnableDecimus() == false);
-
-		//		mi = PamModuleInfo.registerControlledUnit(DecimusMitigateControl.class.getName(), "Decimus Network Control");
-		//		mi.addDependency(new PamDependency(BuoyStatusDataUnit.class, NetworkReceiver.class.getName()));
-		//		mi.setModulesMenuGroup(utilitiesGroup);
-		//		mi.setToolTipText("Additional functionality for Decimus running in Mitigate mode. ");
-		//		mi.setHidden(SMRUEnable.isEnableDecimus() == false);
-		//		}
-
-		//		if (isViewer) {
 		mi = PamModuleInfo.registerControlledUnit(DataMapControl.class.getName(), "Data Map");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setToolTipText("Shows a summary of data density over time for large datasets");
@@ -376,14 +340,14 @@ final public class PamModel implements PamSettings {
 		mi.setAllowedModes(PamPluginInterface.VIEWERONLY);
 		//		}
 
-		mi = PamModuleInfo.registerControlledUnit("UserInput.UserInputController", "User input");	
+		mi = PamModuleInfo.registerControlledUnit(UserInput.UserInputController.class.getName(), "User input");	
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setToolTipText("Creates a form for the user to type comments into");
 		mi.setMinNumber(0);
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("utilities/userInputHelp/docs/userInput.html");
 
-		mi = PamModuleInfo.registerControlledUnit("listening.ListeningControl", "Aural Listening Form");
+		mi = PamModuleInfo.registerControlledUnit(listening.ListeningControl.class.getName(), "Aural Listening Form");
 		mi.setToolTipText("Creates a form for the user to manually log things they hear");
 		mi.setModulesMenuGroup(utilitiesGroup);		
 		mi.setHelpPoint("utilities/listening/docs/Listening_Overview.html");
@@ -393,13 +357,6 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Signal injection and real time performance tests");
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("utilities/SIDEModule/docs/SIDE_Overview.html");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-
-		//		if (isViewer) {
-		//			mi = PamModuleInfo.registerControlledUnit("xBatLogViewer.XBatLogControl", "XBat Log Viewer");
-		//			mi.setToolTipText("Displays converted xBat log files");
-		//			mi.setModulesMenuGroup(utilitiesGroup);
-		//			mi.setHidden(SMRUEnable.isEnable() == false);
 
 		//			mi = PamModuleInfo.registerControlledUnit("offlineProcessing.OfflineProcessingControlledUnit", "Offline Processing");
 		//			mi.setModulesMenuGroup(utilitiesGroup);
@@ -407,59 +364,28 @@ final public class PamModel implements PamSettings {
 		//			mi.setMaxNumber(1);
 		//			mi.setHidden(SMRUEnable.isEnable() == false);
 
-		mi = PamModuleInfo.registerControlledUnit(TurbineOperationControl.class.getName(), TurbineOperationControl.unitType);
-		mi.setModulesMenuGroup(utilitiesGroup);
-		mi.setHidden(!SMRUEnable.isEnable());
-		mi.setAllowedModes(PamPluginInterface.VIEWERONLY);
-		//		}
-
-		mi = PamModuleInfo.registerControlledUnit("alarm.AlarmControl", "Alarm");
+		mi = PamModuleInfo.registerControlledUnit(alarm.AlarmControl.class.getName(), "Alarm");
 		mi.setToolTipText("Alerts the operator when certain detections are made");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setHelpPoint("utilities/Alarms/docs/Alarms_Overview.html");
 
 		//		if (isViewer) {
-		mi = PamModuleInfo.registerControlledUnit("annotationMark.spectrogram.SpectrogramAnnotationModule", "Spectrogram Annotation");
+		mi = PamModuleInfo.registerControlledUnit(annotationMark.spectrogram.SpectrogramAnnotationModule.class.getName(), "Spectrogram Annotation");
 		mi.setToolTipText("Offline marking on the spectrogram display");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setHelpPoint("displays/displaymarks/docs/displaymarks.html");
 
-		mi = PamModuleInfo.registerControlledUnit("quickAnnotation.QuickAnnotationModule", "Quick Spectrogram Annotation");
+		mi = PamModuleInfo.registerControlledUnit(quickAnnotation.QuickAnnotationModule.class.getName(), "Quick Spectrogram Annotation");
 		mi.setToolTipText("Manual marking on the spectrogram display using user-defined 'quick' annotations");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setHidden(!SMRUEnable.isEnable());
 		mi.setHelpPoint("displays/displaymarks/docs/displaymarks.html");
-
-		// now releagate to a plugin module. 
-		//		mi = PamModuleInfo.registerControlledUnit(ALFAControl.class.getName(), "Master Controller");
-		//		mi.setToolTipText("Big brother - will keep an eye on you and look after you");
-		//		mi.setModulesMenuGroup(utilitiesGroup);
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 
 		mi = PamModuleInfo.registerControlledUnit(PrintScreenControl.class.getName(), "Print Screen");
 		mi.setToolTipText(PrintScreenControl.getToolTip());
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("overview/PamMasterHelp/docs/CopyingPrinting.html");
-
-		//		mi = PamModuleInfo.registerControlledUnit("resourceMonitor.ResourceMonitor", "Resource Monitor");
-		//		mi.setToolTipText("Monitor JAVA System resources");
-		//		mi.setModulesMenuGroup(utilitiesGroup);
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-		//		}
-
-		mi = PamModuleInfo.registerControlledUnit(RockBlockControl.class.getName(), "Short Burst Data Service Communication");
-		mi.setToolTipText("Communication with the Iridium SBD service via a RockBlock+ unit");
-		mi.setModulesMenuGroup(utilitiesGroup);
-		mi.setHidden(!SMRUEnable.isEnable());
-
-
-		mi = PamModuleInfo.registerControlledUnit(MeygenTurbine.class.getName(), MeygenTurbine.unitType);
-		mi.setToolTipText("Show turbine location on map");
-		mi.setModulesMenuGroup(utilitiesGroup);
-		mi.setHidden(!SMRUEnable.isEnable());
-		mi.setMaxNumber(1);
-
 
 		mi = PamModuleInfo.registerControlledUnit(EffortControl.class.getName(), EffortControl.unitType);
 		mi.setToolTipText("Record observer monitoring effort");
@@ -473,12 +399,6 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("utilities/backupmanager/docs/backupmanager.html");
-
-
-		//		mi = PamModuleInfo.registerControlledUnit(MetaDataContol.class.getName(), MetaDataContol.unitType);
-		//		mi.setToolTipText("Project Meta Data");
-		//		mi.setModulesMenuGroup(utilitiesGroup);
-		//		mi.setMaxNumber(1); 
 
 		mi = PamModuleInfo.registerControlledUnit(TethysControl.class.getName(), TethysControl.defaultName);
 		mi.setToolTipText("Interface to Tethys Database");
@@ -511,49 +431,47 @@ final public class PamModel implements PamSettings {
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("sensors/analogarray/docs/analogarray.html");
 
-		mi = PamModuleInfo.registerControlledUnit("depthReadout.DepthControl", "Hydrophone Depth Readout");
+		mi = PamModuleInfo.registerControlledUnit(depthReadout.DepthControl.class.getName(), "Hydrophone Depth Readout");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Reads and displays hydrophone depth information");
 		mi.setHelpPoint("utilities/depthreadout/docs/depth_overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("ArrayAccelerometer.ArrayAccelControl", "Array Accelerometer");
+		mi = PamModuleInfo.registerControlledUnit(ArrayAccelControl.class.getName(), "Array Accelerometer");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Reads and accelerometer to orientate a hydrophone array");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("sensors/arrayAccelerometer/docs/arrayAccelerometer.html");
 
-		mi = PamModuleInfo.registerControlledUnit("angleMeasurement.AngleControl", "Angle Measurement");
+		mi = PamModuleInfo.registerControlledUnit(AngleControl.class.getName(), "Angle Measurement");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Reads angles from a Fluxgate World shaft angle encoder. (Can be used to read angle of binocular stands)");
 
-		mi = PamModuleInfo.registerControlledUnit("IMU.IMUControl", "IMU Measurement");
+		mi = PamModuleInfo.registerControlledUnit(IMUControl.class.getName(), "IMU Measurement");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Reads IMU data (heading, pitch and roll) from file or instrument");
 		mi.setHidden(!SMRUEnable.isEnable());
 		//		mi.setHidden(SMRUEnable.isEnable() == false);
 
-		mi = PamModuleInfo.registerControlledUnit("d3.D3Control", "D3 Sensor Data");
-		mi.setModulesMenuGroup(sensorsGroup);
-		mi.setToolTipText("Display sensor data from D3 recorders / DTags, etc");
-		mi.setHidden(!SMRUEnable.isEnable());
 
-		mi = PamModuleInfo.registerControlledUnit("soundtrap.STToolsControl", "SoundTrap Detector Import");
+		mi = PamModuleInfo.registerControlledUnit(STToolsControl.class.getName(), "SoundTrap Detector Import");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Tools for import of SoundTrap detector data");
 		mi.setHidden(!isViewer);
 		mi.setMaxNumber(1);
 
+<<<<<<< HEAD
 		mi = PamModuleInfo.registerControlledUnit("soundtrapSensor.SudSensorControl", "SoundTrap SWV Sensor Import");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Extracts magnetometer and accelerometer data from SoundTrap SUD (.swv) files and computes heading, pitch and roll");
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("sensors/soundtrapSensor/docs/soundtrapSensor.html");
 
-		mi = PamModuleInfo.registerControlledUnit("cpod.CPODControl2", "CPOD Detector Import");
+
+=======
+>>>>>>> upstream/main
+		mi = PamModuleInfo.registerControlledUnit(CPODControl2.class.getName(), "CPOD Detector Import");
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Imports CPOD data");
-		//mi.setHidden(SMRUEnable.isEnable() == false);
 		mi.setHidden(!isViewer);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 		mi.setHelpPoint("sensors/cpod/docs/cpod.html");
@@ -562,23 +480,17 @@ final public class PamModel implements PamSettings {
 		 * ************* Start Displays  Group *******************
 		 */
 
-		mi = PamModuleInfo.registerControlledUnit("userDisplay.UserDisplayControl", "User Display");
+		mi = PamModuleInfo.registerControlledUnit(UserDisplayControl.class.getName(), "User Display");
 		mi.setToolTipText("Creates an empty display panel which the user can add spectrograms and other displays to");		
 		mi.setModulesMenuGroup(displaysGroup);
 		mi.setHelpPoint("displays/userDisplayHelp/docs/userDisplayPanel.html");
 
-		// moved this to be a plugin for now
-		//		mi = PamModuleInfo.registerControlledUnit(DVControl.class.getName(), DVControl.unitType);
-		//		mi.setToolTipText(DVControl.unitTip);
-		//		mi.setModulesMenuGroup(displaysGroup);
-		//		mi.setHidden(SMRUEnable.isDevEnable() == false);
-
-		mi = PamModuleInfo.registerControlledUnit("localTime.LocalTime", "Local Time");		
+		mi = PamModuleInfo.registerControlledUnit(LocalTime.class.getName(), "Local Time");		
 		mi.setToolTipText("Shows local time on the display");
 		mi.setModulesMenuGroup(displaysGroup);
 		mi.setHelpPoint("displays/LocalTime/Docs/LocalTime.html");
 
-		mi = PamModuleInfo.registerControlledUnit("levelMeter.LevelMeterControl", "Level Meter");	
+		mi = PamModuleInfo.registerControlledUnit(LevelMeterControl.class.getName(), "Level Meter");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Shows signal level meters");
 		mi.setModulesMenuGroup(displaysGroup);
@@ -589,7 +501,6 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Displays array depth and orientation data");
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("sensors/analogarray/docs/analogarray.html");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 
 		/*
 		 * ************* End Displays Group *******************
@@ -599,19 +510,13 @@ final public class PamModel implements PamSettings {
 		 * ************* Start Sound Processing  Group *******************
 		 */
 
-		mi = PamModuleInfo.registerControlledUnit("Acquisition.AcquisitionControl", "Sound Acquisition");	
+		mi = PamModuleInfo.registerControlledUnit(AcquisitionControl.class.getName(), "Sound Acquisition");	
 		mi.setToolTipText("Controls input of sound data from sound cards, NI cards, etc. ");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 		mi.setHelpPoint("sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html");
 
-		//		mi = PamModuleInfo.registerControlledUnit("soundtrap.STAcquisitionControl", "SoundTrap Sound Acquisition");
-		//		mi.setModulesMenuGroup(processingGroup);
-		//		mi.setToolTipText("Acquisition module for Soundtrap detector data");
-		//		mi.setHidden(isViewer == false);
-		//		mi.setMaxNumber(1);
-
-		mi = PamModuleInfo.registerControlledUnit("soundPlayback.PlaybackControl", "Sound Output");	
+		mi = PamModuleInfo.registerControlledUnit(PlaybackControl.class.getName(), "Sound Output");	
 		mi.setToolTipText("Controls output of sound data for listening to on headphones");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
@@ -621,7 +526,7 @@ final public class PamModel implements PamSettings {
 		}
 		mi.setHelpPoint("sound_processing/soundPlaybackHelp/docs/soundPlayback_soundPlayback.html");
 
-		mi = PamModuleInfo.registerControlledUnit("fftManager.PamFFTControl", "FFT (Spectrogram) Engine");
+		mi = PamModuleInfo.registerControlledUnit(PamFFTControl.class.getName(), "FFT (Spectrogram) Engine");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 		mi.setToolTipText("Computes spectrograms of audio data");
@@ -634,14 +539,14 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/mel/docs/mel_overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("Filters.FilterControl", "Filters (IIR and FIR)");
+		mi = PamModuleInfo.registerControlledUnit(FilterControl.class.getName(), "Filters (IIR and FIR)");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Filters audio data");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 		mi.setHelpPoint("sound_processing/FiltersHelp/Docs/Filters_filters.html");
 
-		mi = PamModuleInfo.registerControlledUnit("decimator.DecimatorControl", "Decimator");	
+		mi = PamModuleInfo.registerControlledUnit(DecimatorControl.class.getName(), "Decimator");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Decimates (reduces the frequency of) audio data");
 		mi.setModulesMenuGroup(processingGroup);
@@ -653,92 +558,83 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Calculates a continuous Cepstrum from FFT Data");
 		mi.setModulesMenuGroup(processingGroup);
 
-		mi = PamModuleInfo.registerControlledUnit("SoundRecorder.RecorderControl", "Sound recorder");	
+		mi = PamModuleInfo.registerControlledUnit(RecorderControl.class.getName(), "Sound recorder");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Records audio data to wav of AIF files");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/soundRecorderHelp/docs/RecorderOverview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("clipgenerator.ClipControl", "Clip generator");	
+		mi = PamModuleInfo.registerControlledUnit(ClipControl.class.getName(), "Clip generator");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Generates and stores short clips of sound data in response to detections");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/ClipGenerator/docs/ClipGenerator.html");
 
-		mi = PamModuleInfo.registerControlledUnit("amplifier.AmpControl", "Signal Amplifier");	
+		mi = PamModuleInfo.registerControlledUnit(AmpControl.class.getName(), "Signal Amplifier");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Amplifies (or attenuates) audio data");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/amplifier/docs/amplifier.html");
 
-		mi = PamModuleInfo.registerControlledUnit("patchPanel.PatchPanelControl", "Patch Panel");	
+		mi = PamModuleInfo.registerControlledUnit(PatchPanelControl.class.getName(), "Patch Panel");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Reorganises and mixes audio data between channels");
 		mi.setModulesMenuGroup(processingGroup);
 
-		mi = PamModuleInfo.registerControlledUnit("KernelSmoothing.KernelSmoothingControl", "Spectrogram smoothing kernel");	
+		mi = PamModuleInfo.registerControlledUnit(KernelSmoothingControl.class.getName(), "Spectrogram smoothing kernel");	
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setToolTipText("Smooths a spectrogram of audio data");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/SpectrogramSmoothing/docs/SpectrogramSmoothing.html");
 
-		//		mi = PamModuleInfo.registerControlledUnit("spectrogramNoiseReduction.SpectrogramNoiseControl", "Spectrogram noise reduction");	
-		//		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
-		//		mi.setModulesMenuGroup(processingGroup);
-
-		mi = PamModuleInfo.registerControlledUnit("seismicVeto.VetoController", "Seismic Veto");
+		mi = PamModuleInfo.registerControlledUnit(VetoController.class.getName(), "Seismic Veto");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));	
 		mi.setToolTipText("Cuts out loud sounds from audio data");	
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/seismicveto/docs/veto_overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("noiseMonitor.NoiseControl", "Noise Monitor");
+		mi = PamModuleInfo.registerControlledUnit(NoiseControl.class.getName(), "Noise Monitor");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("Measures noise in predefined frequency bands (e.g. third octave) using FFT data");
 		mi.setModulesMenuGroup(processingGroup);
 
-		mi = PamModuleInfo.registerControlledUnit("noiseBandMonitor.NoiseBandControl", "Noise Band Monitor");
+		mi = PamModuleInfo.registerControlledUnit(NoiseBandControl.class.getName(), "Noise Band Monitor");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.setToolTipText("Measure noise in octave, third octave, decade bands, etc. using filter banks");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/NoiseBands/Docs/NoiseBands.html");
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 
-		mi = PamModuleInfo.registerControlledUnit("dbht.DbHtControl", "dBHt Measurement");
+		mi = PamModuleInfo.registerControlledUnit(DbHtControl.class.getName(), "dBHt Measurement");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.setToolTipText("Measure noise relative to animal hearing threshold");		
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHidden(!SMRUEnable.isEnable());
 
-		mi = PamModuleInfo.registerControlledUnit("noiseOneBand.OneBandControl", "Filtered Noise Measurement");
+		mi = PamModuleInfo.registerControlledUnit(OneBandControl.class.getName(), "Filtered Noise Measurement");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.setToolTipText("Measure noise in a single arbitrary filter band (replaces dBHt module)");		
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/NoiseOneBand/Docs/NoiseOneBand.html");
 
-		mi = PamModuleInfo.registerControlledUnit("ltsa.LtsaControl", "Long Term Spectral Average");
+		mi = PamModuleInfo.registerControlledUnit(LtsaControl.class.getName(), "Long Term Spectral Average");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "fftManager.PamFFTControl"));	
 		mi.setToolTipText("Make Long Term Spectral Average Measurements");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/LTSA/Docs/LTSA.html");
 
-		mi = PamModuleInfo.registerControlledUnit("envelopeTracer.EnvelopeControl", "Envelope Tracing");
+		mi = PamModuleInfo.registerControlledUnit(EnvelopeControl.class.getName(), "Envelope Tracing");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Traces the envelope of audio data and outputs it as a new waveform");
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setHelpPoint("sound_processing/EnvelopeTrace/Docs/EnvelopeOverview.html");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 
 		mi = PamModuleInfo.registerControlledUnit(BeamFormerControl.class.getName(), BeamFormerControl.unitType);	
 		mi.setModulesMenuGroup(processingGroup);
 		mi.setToolTipText("Continuous Frequency Domain Beamforming");
 		mi.setHelpPoint("sound_processing/beamformer/docs/Beamformer_Overview.html");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 
-
-
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 		/*
 		 * ************* End Sound Processing Group *******************
 		 */
@@ -747,7 +643,7 @@ final public class PamModel implements PamSettings {
 		 * ************* Start Detectors Group *******************
 		 */
 
-		mi = PamModuleInfo.registerControlledUnit("clickDetector.ClickControl", "Click Detector");
+		mi = PamModuleInfo.registerControlledUnit(ClickControl.class.getName(), "Click Detector");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Searches for transient sounds, attempts to assign species, measure "
 				+ "bearings to source, group into click trains, etc.");
@@ -755,14 +651,14 @@ final public class PamModel implements PamSettings {
 		mi.addGUICompatabilityFlag(PamGUIManager.FX);
 		mi.setHelpPoint("detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html");
 
-		mi = PamModuleInfo.registerControlledUnit("clickTrainDetector.ClickTrainControl", "Click Train Detector");
+		mi = PamModuleInfo.registerControlledUnit(ClickTrainControl.class.getName(), "Click Train Detector");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "clickDetector.ClickControl"));	
 		mi.setToolTipText("Searches for click trains in detected clicks.");
 		mi.addGUICompatabilityFlag(PamGUIManager.FX);
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setHelpPoint("detectors/ClickTrainDetector/docs/ClickTrainDetector.html");
 
-		mi = PamModuleInfo.registerControlledUnit("whistlesAndMoans.WhistleMoanControl", 
+		mi = PamModuleInfo.registerControlledUnit(WhistleMoanControl.class.getName(), 
 				"Whistle and Moan Detector");	
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setToolTipText("Searches for tonal noises. Measures bearings and locations of source. Replaces older Whistle Detector");
@@ -770,37 +666,37 @@ final public class PamModel implements PamSettings {
 		mi.addGUICompatabilityFlag(PamGUIManager.FX);
 		mi.setHelpPoint("detectors/whistleMoanHelp/docs/whistleMoan_Overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("whistleDetector.WhistleControl", "Whistle Detector");	
+		mi = PamModuleInfo.registerControlledUnit(WhistleControl.class.getName(), "Whistle Detector");	
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setToolTipText("Searches for tonal noises. Measures bearings and locations of source");
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setHelpPoint("detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("IshmaelDetector.EnergySumControl", "Ishmael energy sum");
+		mi = PamModuleInfo.registerControlledUnit(EnergySumControl.class.getName(), "Ishmael energy sum");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setToolTipText("Detects sounds with energy in a specific frequency band");
 		mi.setHelpPoint("detectors/ishmael/docs/ishmael_energysum.html");
 
-		mi = PamModuleInfo.registerControlledUnit("IshmaelDetector.SgramCorrControl", "Ishmael spectrogram correlation");
+		mi = PamModuleInfo.registerControlledUnit(SgramCorrControl.class.getName(), "Ishmael spectrogram correlation");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
 		mi.setToolTipText("Detects sounds matching a user defined 'shape' on a spectrogram");
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setHelpPoint("detectors/ishmael/docs/ishmael_speccorrelation.html");
 
-		mi = PamModuleInfo.registerControlledUnit("IshmaelDetector.MatchFiltControl", "Ishmael matched filtering");	
+		mi = PamModuleInfo.registerControlledUnit(MatchFiltControl.class.getName(), "Ishmael matched filtering");	
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.setToolTipText("Detects sounds using a user defined matched filter");	
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setHelpPoint("detectors/ishmael/docs/ishmael_matchedfilter.html");
 
-		mi = PamModuleInfo.registerControlledUnit("likelihoodDetectionModule.LikelihoodDetectionUnit", "Likelihood Detector" );
+		mi = PamModuleInfo.registerControlledUnit(LikelihoodDetectionUnit.class.getName(), "Likelihood Detector" );
 		mi.addDependency( new PamDependency( RawDataUnit.class, "Acquisition.AcquisitionControl" ) );
 		mi.setToolTipText("An implementation of a likelihood ratio test");
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setHelpPoint("detectors/likelihoodDetectionModuleHelp/docs/LikelihoodDetector_Introduction.html");		
 
-		mi = PamModuleInfo.registerControlledUnit("RightWhaleEdgeDetector.RWEControl", "Right Whale Edge Detector");
+		mi = PamModuleInfo.registerControlledUnit(RWEControl.class.getName(), "Right Whale Edge Detector");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("Detects right whale upsweep calls");
 		mi.setModulesMenuGroup(detectorsGroup);	
@@ -808,37 +704,33 @@ final public class PamModel implements PamSettings {
 		//		mi.setHidden(SMRUEnable.isEnable() == false);
 
 		// remove GPL detector - too slow for real-time use
-		mi = PamModuleInfo.registerControlledUnit("gpl.GPLControlledUnit", "Generalised Power Law Detector");
+		mi = PamModuleInfo.registerControlledUnit(GPLControlledUnit.class.getName(), "Generalised Power Law Detector");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("Generalised Power Law Detector for tonal sounds");
 		mi.setModulesMenuGroup(detectorsGroup);	
 		mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
 
-		mi = PamModuleInfo.registerControlledUnit("soundtrap.STClickControl", "SoundTrap Click Detector");
+		mi = PamModuleInfo.registerControlledUnit(STClickControl.class.getName(), "SoundTrap Click Detector");
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.setToolTipText("Click Detector module for Soundtrap detector data only");
 		//		mi.setHidden(isViewer == false);
 
 
+<<<<<<< HEAD
 		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("AI used to enhance whistle detection");
 		mi.setHidden(!SMRUEnable.isEnable());
 		mi.setModulesMenuGroup(detectorsGroup);	
 				mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
-
-
-		//		mi = PamModuleInfo.registerControlledUnit("WorkshopDemo.WorkshopController", "Workshop Demo Detector");
-		//		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
-		//		mi.setToolTipText("Simple demo detector for programmers");
-		//		mi.setModulesMenuGroup(detectorsGroup);	
-
-
-		//		mi = PamModuleInfo.registerControlledUnit("EdgeDetector.EdgeControl", "Edge Detector");		
-		//		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));		
-		//		mi.setModulesMenuGroup(detectorsGroup);
-
-
+=======
+//		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
+//		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
+//		mi.setToolTipText("AI used to enhance whistle detection");
+//		mi.setHidden(!SMRUEnable.isEnable());
+//		mi.setModulesMenuGroup(detectorsGroup);	
+		//		mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
+>>>>>>> upstream/main
 
 		/*
 		 * ************* End Detectors Group *******************
@@ -849,20 +741,20 @@ final public class PamModel implements PamSettings {
 		 * 
 		 */
 
-		mi = PamModuleInfo.registerControlledUnit("whistleClassifier.WhistleClassifierControl", "Whistle Classifier");	
+		mi = PamModuleInfo.registerControlledUnit(WhistleClassifierControl.class.getName(), "Whistle Classifier");	
 		mi.addDependency(new PamDependency(AbstractWhistleDataUnit.class, "whistlesAndMoans.WhistleMoanControl"));	
 		mi.setToolTipText("Analyses multiple whistle contours to assign to species");
 		mi.setModulesMenuGroup(classifierGroup);
 		mi.setHelpPoint("classifiers/whistleClassifierHelp/docs/whistleClassifier_Overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("rocca.RoccaControl", "Rocca");
+		mi = PamModuleInfo.registerControlledUnit(RoccaControl.class.getName(), "Rocca");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));	
 		mi.setToolTipText("Classifies dolphin whistles selected from the spectrogram display");
 		mi.setToolTipText("Real-time acoustic species identification of delphinid whistles and clicks");
 		mi.setModulesMenuGroup(classifierGroup);
 		mi.setHelpPoint("classifiers/roccaHelp/docs/rocca_Overview.html");
 
-		mi = PamModuleInfo.registerControlledUnit("matchedTemplateClassifer.MTClassifierControl", "Matched Template Click Classifer");
+		mi = PamModuleInfo.registerControlledUnit(MTClassifierControl.class.getName(), "Matched Template Click Classifer");
 		mi.addDependency(new PamDependency(ClickDetection.class, "clickDetector.ClickControl"));	
 		mi.setToolTipText("Classifies clicks based on an ideal template to match and a template to reject. "
 				+ "An example of this is to classify beaked whale clicks in an environment with dolphin clicks");
@@ -870,7 +762,7 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(classifierGroup);
 		mi.setHelpPoint("classifiers/matchedtemplate/mathchedtemplate.html");		
 
-		mi = PamModuleInfo.registerControlledUnit("rawDeepLearningClassifier.DLControl", "Deep Learning Classifier");
+		mi = PamModuleInfo.registerControlledUnit(DLControl.class.getName(), "Deep Learning Classifier");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.setToolTipText("Classifies sections of raw acoustic data based on an imported deep learning classifier");
 		mi.setModulesMenuGroup(classifierGroup);
@@ -888,14 +780,12 @@ final public class PamModel implements PamSettings {
 		mi = PamModuleInfo.registerControlledUnit(BearingLocaliserControl.class.getName(), "Bearing Localiser");	
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("Estimate bearing to detections or spectrogram marks from small aperture arrays");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 		mi.setHelpPoint("localisation/bearingLocaliser/docs/BL_Overview.html");
 
 
 		mi = PamModuleInfo.registerControlledUnit(Group3DLocaliserControl.class.getName(), Group3DLocaliserControl.unitType);	
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("2D and 3D Localisation for large aperture arrays");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
 		mi.setHelpPoint("localisation/group3d/docs/3doverview.html");
 
 		mi = PamModuleInfo.registerControlledUnit(DetectionGroupControl.class.getName(), "Detection Grouper");	
@@ -903,53 +793,35 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Groups detections and other data using manual annotations on PAMGuard displays");
 		mi.setHelpPoint("localisation/detectiongroup/docs/dglocaliser.html");
 
-		//		mi = PamModuleInfo.registerControlledUnit(BeamFormLocaliserControl.class.getName(), BeamFormLocaliserControl.unitType);	
-		//		mi.setModulesMenuGroup(localiserGroup);
-		//		mi.setToolTipText("Localise detections or spectrogram marks with beamforming algorithms");
-		//		mi.setHidden(true); // now obsolete.
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-
-		//		mi = PamModuleInfo.registerControlledUnit(CBLocaliserControl.class.getName(), CBLocaliserControl.unitType);	
-		//		mi.setModulesMenuGroup(localiserGroup);
-		//		mi.setToolTipText("Localise by crossing bearings from multiple hydrophone groups");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-
-		mi = PamModuleInfo.registerControlledUnit("IshmaelLocator.IshLocControl", "Ishmael Locator");	
+		mi = PamModuleInfo.registerControlledUnit(IshLocControl.class.getName(), "Ishmael Locator");	
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("Locates sounds extracted either from areas marked out on a spectrogram display or using output from a detector");
 
-		mi = PamModuleInfo.registerControlledUnit("loc3d_Thode.TowedArray3DController", "Multipath 3D Localiser");
+		mi = PamModuleInfo.registerControlledUnit(TowedArray3DController.class.getName(), "Multipath 3D Localiser");
 		mi.addDependency(new PamDependency(ClickDetection.class, "clickDetector.ClickControl"));
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("Locates sounds detected by the click detector using surface echo's to obtain slant angles and generate a 3-D location");
 		mi.setHelpPoint("detectors/Pam3DHelp/docs/guiOverview.html");
 
-		//		mi = PamModuleInfo.registerControlledUnit("staticLocaliser.StaticLocaliserControl", "Large Aperture 3D Localiser");
-		//		//mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
-		//		mi.setModulesMenuGroup(localiserGroup);
-		//		mi.setToolTipText("Locates sounds using wide aperture arrays of hydrophones");
-		//		mi.setMaxNumber(1);
+<<<<<<< HEAD
 
-		//		//mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
-		//		mi.setModulesMenuGroup(localiserGroup);
-		//		mi.setToolTipText("Locates sounds in 2D and 3D detected using towed hydrophone arrays");
-		//		mi.setMaxNumber(1);
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
+=======
+>>>>>>> upstream/main
 		// TODO: Move all DIFAR modules into sub-menu under localisation>DIFAR>
-		mi = PamModuleInfo.registerControlledUnit("Azigram.AzigramControl", "DIFAR Azigram Engine");
+		mi = PamModuleInfo.registerControlledUnit(Azigram.AzigramControl.class.getName(), "DIFAR Azigram Engine");
 		mi.addDependency( new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("(BETA) Azigram engine for multiplexed DIFAR data (BETA)");
 		mi.setHelpPoint("localisation/difar/difarAzigram/docs/azigram.html");
 
-		mi = PamModuleInfo.registerControlledUnit("difar.beamforming.BeamformControl", "DIFAR Directional Audio");
+		mi = PamModuleInfo.registerControlledUnit(difar.beamforming.BeamformControl.class.getName(), "DIFAR Directional Audio");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.addDependency(new PamDependency(GpsDataUnit.class, "GPS.GPSControl"));
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("Audio from a DIFAR sonobuoy that has been beamformed at a user-specified single steering angle. This module can be used to reduce directional masking noise.");
 		mi.setHelpPoint("localisation/difar/difarAudio/docs/directionalAudio.html");
 
-		mi = PamModuleInfo.registerControlledUnit("difar.DifarControl", "DIFAR Localisation");
+		mi = PamModuleInfo.registerControlledUnit(difar.DifarControl.class.getName(), "DIFAR Localisation");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setModulesMenuGroup(localiserGroup);
 		mi.setToolTipText("DIFAR Sonobuoy localisation module - takes raw data source with multiplexed directional audio data");
@@ -965,12 +837,12 @@ final public class PamModel implements PamSettings {
 		 */
 		//the displays group is only used in the PAMGuard FX gui so far.  
 		if (PamGUIManager.isFX()) {
-			mi = PamModuleInfo.registerControlledUnit("dataPlotsFX.TDDisplayController", "Time Display" );
+			mi = PamModuleInfo.registerControlledUnit(dataPlotsFX.TDDisplayController.class.getName(), "Time Display" );
 			mi.setToolTipText("Display time series data");
 			mi.setModulesMenuGroup(displaysGroup);
 			mi.addGUICompatabilityFlag(PamGUIManager.FX);
 
-			mi = PamModuleInfo.registerControlledUnit("detectionPlotFX.DetectionDisplayControl2", "Detection Display" );
+			mi = PamModuleInfo.registerControlledUnit(detectionPlotFX.DetectionDisplayControl2.class.getName(), "Detection Display" );
 			mi.setToolTipText("Display detection data");
 			mi.setModulesMenuGroup(displaysGroup);
 			mi.addGUICompatabilityFlag(PamGUIManager.FX);
@@ -978,18 +850,6 @@ final public class PamModel implements PamSettings {
 		/**
 		 ************* End Display Group ********************
 		 */
-
-		/*
-		 * Visual group
-		 */
-
-		//		mi = PamModuleInfo.registerControlledUnit("beakedWhaleProtocol.BeakedControl", "Beaked Whale Protocol");
-		//		//	mi.addDependency(new PamDependency(GpsDataUnit.class, "GPS.GPSControl"));
-		//		mi.setModulesMenuGroup(visualGroup);
-		//		mi.setToolTipText("");
-		//		mi.setHidden(SMRUEnable.isEnable() == false);
-		//	mi.setMaxNumber(1);
-		//		}
 
 		mi = PamModuleInfo.registerControlledUnit("videoRangePanel.VRControl", "Video Range");
 		mi.setModulesMenuGroup(visualGroup);
@@ -1004,44 +864,10 @@ final public class PamModel implements PamSettings {
 		mi.setMaxNumber(1);
 		mi.setHelpPoint("visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html");
 
-		mi = PamModuleInfo.registerControlledUnit(CameraGrabber.class.getName(), CameraGrabber.unitType);
-		mi.setModulesMenuGroup(visualGroup);
-		mi.setToolTipText("Grab and store still frames from a webcam or other connected camera");
-		
-		//		}
+<<<<<<< HEAD
 
-		//		mi = PamModuleInfo.registerControlledUnit("autecPhones.AutecPhonesControl", "AUTEC Phones");
-		//		mi.setModulesMenuGroup(visualGroup);
-		//		mi.setMaxNumber(1);
-
-		/*
-		 * ************* End Visual Group ********************
-		 */
-		//		mi = PamModuleInfo.registerControlledUnit("smlGainControl.SMLGainControl", "SML Gain Control");
-		//		mi.setModulesMenuGroup(smlGroup);
-		//		mi.setToolTipText("Automatically controls the gain and filter settings of Seiche Measurements Ltd preamlifiers");
-		//		mi.setMaxNumber(1);
-		//		mi.setHidden(SEICHEEnable.isEnable() == false);
-
-		//		mi = PamModuleInfo.registerControlledUnit("smlPingerControl.SMLPingerControl", "SML Pinger Control");
-		//		mi.setModulesMenuGroup(smlGroup);
-		//		mi.setToolTipText("Automatically controls an Seiche Measurements Ltd Pinger");
-		//		mi.setMaxNumber(1);
-		//		mi.setHidden(SEICHEEnable.isEnable() == false);
-
-		// two modules from Brian Miller ...
-		//		mi = PamModuleInfo.registerControlledUnit("echoDetector.EchoController", "Echo Detector" );
-		//		mi.addDependency( new PamDependency( ClickDetection.class, "clickDetector.ClickControl" ) );
-		//		mi.setToolTipText("Detects echos from the click detector");
-		//		mi.setModulesMenuGroup(measurementGroup);
-		//				mi.setHidden(SMRUEnable.isEnable() == false);
-
-		//		mi = PamModuleInfo.registerControlledUnit("ipiDemo.IpiController", "Sperm whale IPI computation" );
-		//		mi.addDependency( new PamDependency( EchoDataUnit.class, "echoDetector.EchoController" ) );
-		//		mi.setToolTipText("Measures inter pulse interval from the click detector");
-		//		mi.setModulesMenuGroup(measurementGroup);
-		//				mi.setHidden(SMRUEnable.isEnable() == false);
-
+=======
+>>>>>>> upstream/main
 		// load any plugins in the plugin folder
 		listPlugins(mi);
 		loadModulePlugins();

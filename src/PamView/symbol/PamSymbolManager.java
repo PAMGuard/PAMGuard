@@ -1,5 +1,6 @@
 package PamView.symbol;
 
+import java.awt.Window;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -45,6 +46,11 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 	private ManagedSymbolData managedSymbolData = new ManagedSymbolData();
 	
 	private Hashtable<String, PamSymbolChooser> symbolChoosers;
+	
+	/**
+	 * Flag to say line only. dialog will not show other options. 
+	 */
+	private boolean lineOnly; 
 
 	public PamSymbolManager(PamDataBlock pamDataBlock2) {
 		super();
@@ -172,13 +178,25 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 
 	/**
 	 * Get the Swing pane with controls to change symbol colours, types and line colours. 
+	 * <br> Deprecated - use getSwingOptionsPanel(Window parent, String displayName, GeneralProjector projector)
 	 * @param displayName - the display name
 	 * @param projector - the projector associated with the display
 	 * @return panel with controls for changing symbol settings. 
 	 */
+	@Deprecated
 	public SwingSymbolOptionsPanel getSwingOptionsPanel(String displayName, GeneralProjector projector) {
+		return getSwingOptionsPanel(null, displayName, projector);
+	}
+	/**
+	 * Get the Swing pane with controls to change symbol colours, types and line colours. 
+	 * @param parent - parent AWT window / frame / dialog, etc. 
+	 * @param displayName - the display name
+	 * @param projector - the projector associated with the display
+	 * @return panel with controls for changing symbol settings. 
+	 */
+	public SwingSymbolOptionsPanel getSwingOptionsPanel(Window parent, String displayName, GeneralProjector projector) {
 		PamSymbolChooser symbolChooser = getSymbolChooser(displayName, projector);
-		return symbolChooser.getSwingOptionsPanel(projector);
+		return symbolChooser.getSwingOptionsPanel(parent, projector);
 	}
 	
 	/**
@@ -300,6 +318,20 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 				psc.addSymbolModifier(sm);
 			}
 		}
+	}
+
+	/**
+	 * @return the lineOnly
+	 */
+	public boolean isLineOnly() {
+		return lineOnly;
+	}
+
+	/**
+	 * @param lineOnly the lineOnly to set
+	 */
+	public void setLineOnly(boolean lineOnly) {
+		this.lineOnly = lineOnly;
 	}
 	
 }

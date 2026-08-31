@@ -72,6 +72,20 @@ public class NetworkQueuedObject {
 		this.dataLength = jsonString.length();
 		this.streamName = dataStream;
 	}
+
+
+	@Override
+	public String toString() {
+		String str = String.format("Net Obj. Id1 %d, ID2 %d, Fmt %d", buoyId1, buoyId2, format);
+		if (jsonString != null) {
+			str += String.format(", Json length %d", jsonString.length()); 
+		}
+		else {
+			str += String.format(", binary length %d bytes", dataLength);
+		}
+		
+		return str;
+	}
 	
 	
 }

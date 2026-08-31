@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import PamController.PamguardVersionInfo;
 import PamUtils.PamCalendar;
 import PamguardMVC.DataUnitBaseData;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryStore;
@@ -157,6 +158,10 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 		// finally, add in the new fields used in the convertBinToJSON Matlab script
 		objectData.filePath = "Network Sender";
 		
+		PamDataBlock parentDatablock = dataUnit.getParentDataBlock();
+		if (parentDatablock == null) {
+			return;
+		}
 		BinaryDataSource theBinarySource = dataUnit.getParentDataBlock().getBinaryDataSource();
 		if(theBinarySource!=null) {
 			objectData.moduleType = theBinarySource.getModuleType();

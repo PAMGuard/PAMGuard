@@ -16,7 +16,7 @@ public class LoggerMqttClient extends PamMqttClient {
 	}
 
 	@Override
-	public String getBaseTransmitTopic() {
+	public String getBaseTransmitTopic(String extension) {
 		String trueBase = this.networkParams.baseTopic+"/";
 		return trueBase;
 	}

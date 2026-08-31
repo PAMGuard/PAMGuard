@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.PamAlignmentPanel;
 import PamguardMVC.PamDataBlock;
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParamsPanel;
@@ -42,7 +43,7 @@ public class NetworkSendDialog extends PamDialog {
 		
 	private JTabbedPane tabbedPane;
 
-	private FormatPanel formatPanel;
+//	private FormatPanel formatPanel;
 		
 	private NetworkParamsPanel netParamsPanel;
 	
@@ -56,8 +57,8 @@ public class NetworkSendDialog extends PamDialog {
 		
 		tabbedPane.add("Connection", netParamsPanel.getNetParamsPanel());
 
-		formatPanel = new FormatPanel();
-		tabbedPane.add("Format", formatPanel);
+//		formatPanel = new FormatPanel();
+//		tabbedPane.add("Format", formatPanel);
 		
 		queuePanel = new QueuePanel();
 		tabbedPane.add("Queue", queuePanel);
@@ -71,9 +72,9 @@ public class NetworkSendDialog extends PamDialog {
 	}
 
 	public static NetworkSendParams showDialog(Window frame, NetworkSender networkSender, NetworkSendParams networkSendParams) {
-		if (singleInstance == null || singleInstance.getOwner() != frame) {
+//		if (singleInstance == null || singleInstance.getOwner() != frame) {
 			singleInstance = new NetworkSendDialog(frame, networkSender);
-		}
+//		}
 		singleInstance.networkSendParams = networkSendParams.clone();
 		singleInstance.setParams();
 		singleInstance.setVisible(true);
@@ -82,9 +83,9 @@ public class NetworkSendDialog extends PamDialog {
 
 	private void setParams() {
 
-		formatPanel.setParams();
+//		formatPanel.setParams();
 		queuePanel.setParams();
-		dataPanel.setParams(networkSendParams.sendingFormat);
+		dataPanel.setParams(NetworkSendParams.NETWORKSEND_BOTH);
 		netParamsPanel.setParams(networkSendParams);
 		tabbedPane.invalidate();
 		
@@ -97,7 +98,8 @@ public class NetworkSendDialog extends PamDialog {
 
 	@Override
 	public boolean getParams() {
-		boolean worked = (dataPanel.getParams() && queuePanel.getParams() && formatPanel.getParams() && netParamsPanel.getParams());
+//		boolean worked = (dataPanel.getParams() && queuePanel.getParams() && formatPanel.getParams() && netParamsPanel.getParams());
+		boolean worked = (dataPanel.getParams() && queuePanel.getParams()  && netParamsPanel.getParams());
 		return worked;
 	}
 
@@ -119,7 +121,8 @@ public class NetworkSendDialog extends PamDialog {
 	
 	private class DataPanel extends JPanel {
 
-		private JCheckBox[] checkBoxes;
+		private JCheckBox[] binaryBoxes;
+		private JCheckBox[] jsonBoxes;
 		private ArrayList<PamDataBlock> possibles;
 		private JPanel streamPanel;
 		private JTextField stationId1, stationId2;
@@ -146,12 +149,14 @@ public class NetworkSendDialog extends PamDialog {
 			idPanelO.add(BorderLayout.WEST, idPanel);
 			addComponent(idPanel, stationId2 = new JTextField(4), c);
 			
-			
+			JPanel southPanel = new JPanel(new BorderLayout());
+			southPanel.setBorder(new TitledBorder("Output Streams"));
 			
 			streamPanel = new JPanel();
-			streamPanel.setBorder(new TitledBorder("Output Streams"));
 			streamPanel.setLayout(new BoxLayout(streamPanel, BoxLayout.Y_AXIS));
-			add(BorderLayout.CENTER, streamPanel);
+			southPanel.add(BorderLayout.CENTER, new PamAlignmentPanel(streamPanel, BorderLayout.WEST));
+			
+			add(BorderLayout.CENTER, southPanel);
 		}
 
 		public void setParams(int outputFormat) {
@@ -159,18 +164,54 @@ public class NetworkSendDialog extends PamDialog {
 			stationId2.setText(String.format("%d", networkSendParams.stationId2));
 			
 			streamPanel.removeAll();
-			possibles = networkSender.listPossibleDataSources(outputFormat);
+			streamPanel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new PamGridBagContraints();
+			c.gridx = 1;
+			JLabel ll;
+			streamPanel.add(ll = new JLabel("Binary", JLabel.CENTER), c);
+			c.gridx++;
+			streamPanel.add(new JLabel("Json", JLabel.CENTER), c);
+			
+			possibles = networkSender.listPossibleDataSources(NetworkSendParams.NETWORKSEND_BOTH);
 			if (possibles == null) {
 				return;
 			}
-			checkBoxes = new JCheckBox[possibles.size()];
+			binaryBoxes = new JCheckBox[possibles.size()];
+			jsonBoxes = new JCheckBox[possibles.size()];
 			int i = 0;
 			for (PamDataBlock aBlock:possibles) {
-				checkBoxes[i] = new JCheckBox(aBlock.getDataName());
-				streamPanel.add(checkBoxes[i]);
-				if (networkSendParams.findDataBlock(aBlock) != null) {
-					checkBoxes[i].setSelected(true);
+//				checkBoxes[i] = new JCheckBox(aBlock.getDataName());
+//				streamPanel.add(checkBoxes[i]);
+//				if (networkSendParams.findDataBlock(aBlock) != null) {
+//					checkBoxes[i].setSelected(true);
+//				}
+				boolean isBinary = networkSendParams.getSendSelection(aBlock, NetworkSendParams.NETWORKSEND_BYTEARRAY);
+				boolean isJson = networkSendParams.getSendSelection(aBlock, NetworkSendParams.NETWORKSEND_JSON);
+				binaryBoxes[i] = new JCheckBox();
+				jsonBoxes[i] = new JCheckBox();
+				binaryBoxes[i].setSelected(isBinary & aBlock.getBinaryDataSource() != null);
+				jsonBoxes[i].setSelected(isJson & aBlock.getJSONDataSource() != null);
+				if (aBlock.getBinaryDataSource() != null) {
+					binaryBoxes[i].setToolTipText(String.format("Output %s data in binary format", aBlock.getDataName()));
 				}
+				else {
+					binaryBoxes[i].setEnabled(false);
+					binaryBoxes[i].setToolTipText(String.format("Binary output not available for %s", aBlock.getDataName()));
+				}
+				if (aBlock.getJSONDataSource() != null) {
+					jsonBoxes[i].setToolTipText(String.format("Output %s data in Json format", aBlock.getDataName()));
+				}
+				else {
+					jsonBoxes[i].setEnabled(false);
+					jsonBoxes[i].setToolTipText(String.format("Json output not available for %s", aBlock.getDataName()));
+				}
+				c.gridx = 0;
+				c.gridy++;
+				streamPanel.add(ll = new JLabel(aBlock.getDataName() + " ", JLabel.RIGHT), c);
+				c.gridx++;
+				streamPanel.add(binaryBoxes[i], c);
+				c.gridx++;
+				streamPanel.add(jsonBoxes[i], c);
 				i++;
 			}
 		}
@@ -185,13 +226,18 @@ public class NetworkSendDialog extends PamDialog {
 			}
 			
 			networkSendParams.clearDataBlocks();
-			if (checkBoxes == null) {
+			if (binaryBoxes == null || jsonBoxes == null) {
 				return true;
 			}
-			for (int i = 0; i < checkBoxes.length; i++) {
-				if (checkBoxes[i].isSelected()) {
-					networkSendParams.setDataBlock(possibles.get(i), true);
+			for (int i = 0; i < binaryBoxes.length; i++) {
+				int fmt = 0;
+				if (binaryBoxes[i].isSelected()) {
+					fmt |= NetworkSendParams.NETWORKSEND_BYTEARRAY;
 				}
+				if (jsonBoxes[i].isSelected()) {
+					fmt |= NetworkSendParams.NETWORKSEND_JSON;
+				}
+				networkSendParams.setSendFormat(possibles.get(i), fmt);
 			}
 			return true;
 		}
@@ -255,92 +301,85 @@ public class NetworkSendDialog extends PamDialog {
 	}
 		
 	
-	private class FormatPanel extends JPanel {
-		JCheckBox byteArray, jsonString;
-		ButtonGroup buttonGroup;
-		
-		public FormatPanel() {
-			setBorder(new TitledBorder("Output Format"));
-			setLayout(new BorderLayout());
-			JPanel inny = new JPanel();
-			add(BorderLayout.NORTH, inny);
-			inny.setLayout(new GridBagLayout());
-			GridBagConstraints c = new PamGridBagContraints();
-			ButtonListener buttonListen = new ButtonListener();
-			addComponent(inny, byteArray = new JCheckBox("Byte Array"), c);
-			byteArray.addActionListener(buttonListen);
-			c.gridy++;
-			addComponent(inny, new JLabel("Used when communicating with remote PAMGuard installations", JLabel.LEFT), c);
-			c.gridx = 0;
-			c.gridy++;
-			addComponent(inny, new JLabel(" "), c);
-			c.gridy++;
-			addComponent(inny, jsonString = new JCheckBox("JSON-formatted String"), c);
-			jsonString.addActionListener(buttonListen);
-			c.gridy++;
-			addComponent(inny, new JLabel("Used for a human-readable output", JLabel.LEFT), c);
-			
-			// add the buttons to the button group
-			//buttonGroup = new ButtonGroup();
-			//buttonGroup.add(byteArray);
-			//buttonGroup.add(jsonString);
-		}
-			
-
-		public void setParams() {
-			if (networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_BYTEARRAY) {
-				byteArray.setSelected(true);
-				jsonString.setSelected(false);
-
-			} 
-			
-			if (networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_JSON) {
-				byteArray.setSelected(false);
-				jsonString.setSelected(true);
-			}
-			
-			if(networkSendParams.sendingFormat == NetworkSendParams.NETWORKSEND_BOTH) {
-				byteArray.setSelected(true);
-				jsonString.setSelected(true);
-			}
-		}
-
-		public boolean getParams() {
-			if (byteArray.isSelected() && !jsonString.isSelected()) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-			} else if (jsonString.isSelected() && !byteArray.isSelected()) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_JSON;
-			}else if(jsonString.isSelected() && byteArray.isSelected()) {
-				networkSendParams.sendingFormat = NetworkSendParams.NETWORKSEND_BOTH;
-
-			}else {
-				return showWarning("Must select one or both of data format options :)");
-			}
-			return true;
-		}
-		
-		private class ButtonListener implements ActionListener {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JCheckBox theButton = (JCheckBox) e.getSource();
-				boolean jsonCheck = jsonString.isSelected();
-				boolean byteArrayCheck = byteArray.isSelected();
-
-				if(jsonCheck && !byteArrayCheck) {
-					dataPanel.setParams(NetworkSendParams.NETWORKSEND_JSON);
-				}else if(!jsonCheck && byteArrayCheck) {
-					dataPanel.setParams(NetworkSendParams.NETWORKSEND_BYTEARRAY);
-				}else if(jsonCheck && byteArrayCheck) {
-					dataPanel.setParams(NetworkSendParams.NETWORKSEND_BOTH);
-				}else {
-					dataPanel.setParams(-1);
-
-				}
-				revalidate();
-				repaint();
-			}
-			
-			
-		}
-	}
+//	private class FormatPanel extends JPanel {
+//		JCheckBox byteArray, jsonString;
+//		ButtonGroup buttonGroup;
+//		
+//		public FormatPanel() {
+//			setBorder(new TitledBorder("Output Format"));
+//			setLayout(new BorderLayout());
+//			JPanel inny = new JPanel();
+//			add(BorderLayout.NORTH, inny);
+//			inny.setLayout(new GridBagLayout());
+//			GridBagConstraints c = new PamGridBagContraints();
+//			ButtonListener buttonListen = new ButtonListener();
+//			addComponent(inny, byteArray = new JCheckBox("Byte Array"), c);
+//			byteArray.addActionListener(buttonListen);
+//			c.gridy++;
+//			addComponent(inny, new JLabel("Used when communicating with remote PAMGuard installations", JLabel.LEFT), c);
+//			c.gridx = 0;
+//			c.gridy++;
+//			addComponent(inny, new JLabel(" "), c);
+//			c.gridy++;
+//			addComponent(inny, jsonString = new JCheckBox("JSON-formatted String"), c);
+//			jsonString.addActionListener(buttonListen);
+//			c.gridy++;
+//			addComponent(inny, new JLabel("Used for a human-readable output", JLabel.LEFT), c);
+//			
+//			// add the buttons to the button group
+//			//buttonGroup = new ButtonGroup();
+//			//buttonGroup.add(byteArray);
+//			//buttonGroup.add(jsonString);
+//		}
+//			
+//
+//		public void setParams() {
+////			int sendFmt = networkSendParams.getSendingFormat();
+////			
+////			byteArray.setSelected((sendFmt & NetworkSendParams.NETWORKSEND_BYTEARRAY) != 0);
+////
+////			jsonString.setSelected((sendFmt & NetworkSendParams.NETWORKSEND_JSON) != 0);	
+//			
+//		}
+//
+//		public boolean getParams() {
+//			int format = 0;
+//			if (byteArray.isSelected()) {
+//				format |= NetworkSendParams.NETWORKSEND_BYTEARRAY;
+//			}
+//			if (jsonString.isSelected()) {
+//				format |= NetworkSendParams.NETWORKSEND_JSON;
+//			}
+////			networkSendParams.setSendingFormat(format);
+//	
+//			if (format == 0) {
+//				return showWarning("Must select one or both of data format options :)");
+//			}
+//			return true;
+//		}
+//		
+//		private class ButtonListener implements ActionListener {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				JCheckBox theButton = (JCheckBox) e.getSource();
+//				boolean jsonCheck = jsonString.isSelected();
+//				boolean byteArrayCheck = byteArray.isSelected();
+//
+//				if(jsonCheck && !byteArrayCheck) {
+//					dataPanel.setParams(NetworkSendParams.NETWORKSEND_JSON);
+//				}else if(!jsonCheck && byteArrayCheck) {
+//					dataPanel.setParams(NetworkSendParams.NETWORKSEND_BYTEARRAY);
+//				}else if(jsonCheck && byteArrayCheck) {
+//					dataPanel.setParams(NetworkSendParams.NETWORKSEND_BOTH);
+//				}else {
+//					dataPanel.setParams(-1);
+//
+//				}
+//				revalidate();
+//				repaint();
+//			}
+//			
+//			
+//		}
+//	}
 }

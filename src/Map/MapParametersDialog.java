@@ -29,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import Array.Hydrophone;
+import GPS.GPSControl;
 //import Array.streamerOrigin.StaticOriginMethod.StaticHydrophoneDialogComponent.MenuButton;
 import Map.gridbaselayer.GridDialogPanel;
 import PamUtils.LatLong;
@@ -36,7 +37,10 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SettingsButton;
 import PamView.panel.PamNorthPanel;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelectDialog;
 import effort.EffortProvider;
 import effort.swing.EffortSourcePanel;
 
@@ -328,10 +332,16 @@ public class MapParametersDialog extends PamDialog {
 				return;
 			}
 			EffortProvider effortProvider = effortBlock.getEffortProvider();
-			if (effortProvider == null) {
-				return;
+			if (!colourByEffort.isSelected()) {
+				effortProvider = null;
 			}
-			effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
+			if (effortProvider == null) {
+				// use the button to do the standard track symbol
+				showStandardGpsSymbolOption();
+			}
+			else {
+				effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
+			}
 		}
 	}
 
@@ -438,6 +448,115 @@ public class MapParametersDialog extends PamDialog {
 			c.gridx+=c.gridwidth;
 			c.gridx = 0;
 			c.gridy++;
+<<<<<<< HEAD
+		}
+	}
+
+	
+	
+	class StaticMapOptions extends JPanel {
+		
+		private JCheckBox lockMapBox = new JCheckBox("Lock Map",false);
+		
+		private JTextField latitude, longitude, initHeightKM;
+		
+		private boolean isSet;
+		
+		public StaticMapOptions() {
+			super();
+			setBorder(new TitledBorder("Static Map Options"));
+			setLayout(new GridBagLayout());
+			GridBagConstraints c = new PamGridBagContraints();
+			c.gridx = 0;
+			c.gridy ++;
+			c.gridwidth = 3;
+			addComponent(this,lockMapBox, c);
+			lockMapBox.addActionListener(new AnyAction());
+			addMapCenterFields(c);
+			PamDialog.addComponent(this, new JLabel("Locked Map Height (meters): ", JLabel.RIGHT), c);
+			c.gridx ++;
+			c.gridwidth = 2;
+			PamDialog.addComponent(this, initHeightKM = new JTextField(12), c);
+			isSet = false;
+		}
+		
+		public int getScale() {
+			return Integer.parseInt(this.initHeightKM.getText());
+		}
+
+		public LatLong getLatLon() {
+			double lat = Double.parseDouble(this.latitude.getText());
+			double lon = Double.parseDouble(this.longitude.getText());
+			return new LatLong(lat,lon);
+		}
+
+		public void alignWithToggle() {
+			this.setEditable(this.lockMapBox.isSelected());
+		}
+		
+		public void setEditable(boolean setEdible) {
+			this.latitude.setEditable(setEdible);
+			this.longitude.setEditable(setEdible);
+			this.initHeightKM.setEditable(setEdible);
+		}
+		
+		public boolean isStaticToggledOn() {
+			return this.lockMapBox.isSelected();
+		}
+		
+		public void unSetFields() {
+			isSet = false;
+			this.latitude.setText("");
+			this.longitude.setText("");
+			this.initHeightKM.setText("");
+		}
+		
+		public void initFields(MapParameters mapParams) {
+			this.lockMapBox.setSelected(mapParams.lockMap);
+			if(mapParams.lockMap) {
+				setFields(mapParams.lockedMapCenter,mapParams.lockedMapScale);
+			}else{
+				unSetFields();
+			}
+		}
+		
+		public void setFields(LatLong center, int heightM) {
+			isSet = true;
+			this.latitude.setText(Double.toString(center.getLatitude()));
+			this.longitude.setText(Double.toString(center.getLongitude()));
+			this.initHeightKM.setText(Integer.toString(heightM));
+		}
+		
+		public boolean isSet() {
+			return this.isSet;
+		}
+		
+		private void addMapCenterFields(GridBagConstraints c) {
+			c.gridx+=c.gridwidth;
+			c.gridheight = 2;
+			c.gridheight = 1;
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 1;
+			PamDialog.addComponent(this, new JLabel("Center Latitude (decimal degrees): ", JLabel.RIGHT), c);
+			c.gridx ++;
+			c.gridwidth = 2;
+			PamDialog.addComponent(this, latitude = new JTextField(12), c);
+			c.gridx+=c.gridwidth;
+			c.gridheight = 2;
+			c.gridheight = 1;
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 1;
+			PamDialog.addComponent(this, new JLabel("Center Longitude (decimal degrees): ", JLabel.RIGHT), c);
+			c.gridx ++;
+			c.gridwidth = 2;
+			PamDialog.addComponent(this, longitude = new JTextField(12), c);
+			c.gridx+=c.gridwidth;
+			c.gridx = 0;
+			c.gridy++;
+=======
+>>>>>>> upstream/main
 		}
 	}
 
@@ -525,6 +644,20 @@ public class MapParametersDialog extends PamDialog {
 		return ans*2;
 	}
 	
+	public void showStandardGpsSymbolOption() {
+		GPSControl gps = GPSControl.getGpsControl();
+		if (gps == null) {
+			return;
+		}
+		PamSymbolManager symbolManager = gps.getGpsDataBlock().getPamSymbolManager();
+		if (symbolManager == null) {
+			return;
+		}
+		PamSymbolChooser symbolChooser = symbolManager.getSymbolChooser(simpleMap.getSelectorName(), null);
+		DataSelectDialog dataSelectDialog = new DataSelectDialog(this, gps.getGpsDataBlock(), null, symbolChooser);
+		boolean ans = dataSelectDialog.showDialog();
+	}
+
 	class FilePanel extends JPanel {
 		private JTextField mapName;
 		JButton browseButton, clearButton, allButton, noneButton;

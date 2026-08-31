@@ -55,8 +55,9 @@ public class TCPSendClient extends NetworkClient{
 	
 	@Override
 	public boolean testClient() throws ClientConnectFailedException {
+		System.out.println("Running test on TCP Client");
 		int port = 0;
-		int timeout = 2000;
+		int timeout = 5;
 		String node = this.networkSendParams.ipAddress;
 		try {
 			port = this.networkSendParams.portNumber;
@@ -73,7 +74,7 @@ public class TCPSendClient extends NetworkClient{
 			s.setReuseAddress(true);
 			SocketAddress sa = new InetSocketAddress(node, port);
 			s.connect(sa, timeout * 1000);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			if ( e.getMessage().equals("Connection refused")) {
 				reason = "port " + port + " on " + node + " is closed.";
 			};
@@ -82,17 +83,21 @@ public class TCPSendClient extends NetworkClient{
 			}
 			if ( e instanceof SocketTimeoutException ) {
 				reason = "timeout while attempting to reach node " + node + " on port " + port;
+			}else {
+				reason = e.getMessage();
 			}
 		} finally {
 			if (s != null) {
-				if ( s.isConnected()) {
+				
+				if ( s.isConnected() && s.isBound()) {
 					reason = "Port " + port + " on " + node + " is reachable!";
 				} else {
-					reason = "Port " + port + " on " + node + " is not reachable; reason: " + reason;
+					reason = "Test Failed. \nReason: " + reason+"\n(Note this module is not set for MQTT right now)";
 				}
 				try {
 					s.close();
 				} catch (IOException e) {
+					
 				}
 			}
 		}

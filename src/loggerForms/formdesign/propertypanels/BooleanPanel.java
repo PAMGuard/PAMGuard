@@ -18,7 +18,7 @@ public class BooleanPanel extends PropertyPanel {
 
 	@Override
 	public void propertyEnable(boolean enabled) {
-		System.out.println("Propertey enabled " + enabled);
+//		System.out.println("Property enabled " + enabled);
 	}
 
 	@Override

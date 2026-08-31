@@ -783,7 +783,7 @@ abstract public class AbstractLocalisation {
 			LatLong latLong = getLatLong(i);
 			if (latLong != null) {
 				str += latLong.toString();
-				str += String.format(", depth %3.1m", -latLong.getHeight());
+				str += String.format(", depth %3.1fm", -latLong.getHeight());
 				continue;
 			}
 			else if (angles != null) {

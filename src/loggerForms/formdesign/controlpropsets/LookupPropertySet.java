@@ -26,6 +26,7 @@ public class LookupPropertySet extends BasePropertySet {
 		case Topic:
 			return new LUTTopicPanel(selTitle, propertyName);
 		case Length:
+			// all LUT lengths are automatically set to LookUpTables.CODE_LENGTH = 12
 			return null;//LookUpTables.CODE_LENGTH;
 		}
 		return super.getItemPropertyPanel(selTitle, propertyName);

@@ -180,6 +180,31 @@ public class HidingDialog extends PamDialog {
 
 	}
 
+	/**
+	 * @return true if the pin button is currently engaged (dialog will not auto-hide
+	 * when the mouse moves away).
+	 */
+	public boolean isPinned() {
+		return pinButton.isSelected();
+	}
+
+	/**
+	 * Set the pinned state directly (as opposed to the user clicking the pin button),
+	 * keeping the icon and tooltip in sync. Used to restore pin state onto a freshly
+	 * rebuilt HidingDialog. Does not itself show/hide the dialog.
+	 */
+	public void setPinned(boolean pinned) {
+		pinButton.setSelected(pinned);
+		if (pinned) {
+			pinButton.setIcon(pinHide);
+			pinButton.setToolTipText("Hide dialog");
+		}
+		else {
+			pinButton.setIcon(pinImage);
+			pinButton.setToolTipText("Pin hiding dialog");
+		}
+	}
+
 	@Override
 	public boolean getParams() {
 		// TODO Auto-generated method stub

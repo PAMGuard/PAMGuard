@@ -32,7 +32,7 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 	
 	private Timer reconnectTimer;
 	
-	private HashMap<String, Long> loggerContacts = new HashMap<>();
+	private HashMap<String, ContactData> loggerContacts = new HashMap<>();
 	
 	public LoggerMQTTManager() {
 		
@@ -108,11 +108,19 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 				}
 			});
 			
-			subsribeTopic("Hello/Logger/#", new LoggerNetworkReceiver() {
+			subsribeTopic("Logger/Hello/#", new LoggerNetworkReceiver() {
 				
 				@Override
 				public boolean newMessage(LoggerNetworkMessage message) {
 					helloMessage(message);
+					return true;
+				}
+			});
+			subsribeTopic("Logger/Battery/#", new LoggerNetworkReceiver() {
+			
+				@Override
+				public boolean newMessage(LoggerNetworkMessage message) {
+					batteryMessage(message);
 					return true;
 				}
 			});
@@ -129,15 +137,51 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		synchronized (loggerContacts) {
 			try {
 				String str = new String(message.getData());
-				loggerContacts.put(str, System.currentTimeMillis());
+				updateContact(str, System.currentTimeMillis(), null);
 			}
 			catch (Exception e) {
 				System.err.println(e.getMessage());
 			}
 		}
+		
+	}
+	
+	private void updateContact(String station, long time, String battery) {
+		ContactData current = loggerContacts.get(station);
+		if (current == null) {
+			loggerContacts.put(station, new ContactData(time, battery));
+		}
+		else {
+			current.setLastUpdateTime(time);
+			if (battery != null) {
+				current.setBattery(battery);
+			}
+		}
 		if (mqttSidePanel != null) {
 			mqttSidePanel.updateContacts();
 		}
+	}
+	
+	/**
+	 * Called from each scansapp every 30s. Will weed any that haven't called in one minute
+	 * on a separate time. 
+	 * @param message
+	 */
+	protected void batteryMessage(LoggerNetworkMessage message) {
+		// extract platform name as last bit of topic and get te battery % from the data
+		String platform = null;
+		String battery = null;
+			
+		try {
+			String[] topic = message.getTopic().split("/");
+			platform = topic[topic.length-1];
+			battery = new String(message.getData());
+//			System.out.printf("Battery on %s is %s%%\n", platform, battery);
+		}
+		catch (Exception e) {
+			return;
+		}
+		updateContact(platform, System.currentTimeMillis(), battery);
 	}
 
 	/**
@@ -147,11 +191,11 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		boolean removed = false;
 		long now = System.currentTimeMillis();
 		synchronized (loggerContacts) {
-			Set<Entry<String, Long>> entries = loggerContacts.entrySet();
-			Iterator<Entry<String, Long>> it = entries.iterator();
+			Set<Entry<String, ContactData>> entries = loggerContacts.entrySet();
+			Iterator<Entry<String, ContactData>> it = entries.iterator();
 			while (it.hasNext()) {
-				Entry<String, Long> e = it.next();
-				if (now - e.getValue() > 60000) {
+				Entry<String, ContactData> e = it.next();
+				if (now - e.getValue().getLastUpdateTime() > 60000) {
 					it.remove();
 					removed = true;
 				}
@@ -180,11 +224,12 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		}
 		MqttMessage message = new MqttMessage(payload);
 		try {
-			mqttClient.sendMqttMessage(topic, message);
+			mqttClient.sendMqttMessage(topic, message, "loggerData");
 		} catch (NetTransmitException e) {
 			System.out.println("Error sending MQTT Message: " + e.getMessage());
 			return false;
 		}
+//		System.out.println("Send network data : " + topic);
 		return true;
 	}
 
@@ -271,7 +316,7 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 	/**
 	 * @return the loggerContacts
 	 */
-	public HashMap<String, Long> getLoggerContacts() {
+	public HashMap<String, ContactData> getLoggerContacts() {
 		return loggerContacts;
 	}
 

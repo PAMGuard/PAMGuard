@@ -167,8 +167,9 @@ public class DetectionGroupLocaliser2<T extends SuperDetection> implements Local
 			if (perpDist == null) {
 				continue;
 			}
+
 			if (perpDist > Math.PI*2*PamConstants.EARTH_RADIUS_METERS ){
-//				System.err.println("DetectionGroupLocalisert2: The perpindicular distance is greater than the earth's radius. Runaway localisation. Return null");
+//				System.err.println("DetectionGroupLocalisert2: The perpendicular distance is greater than the earth's radius. Runaway localisation. Return null");
 				//probabaly a runaway localisation. 
 				continue;
 			}

@@ -1,11 +1,13 @@
 package annotation;
 
+import Localiser.algorithms.timeDelayLocalisers.bearingLoc.annotation.BearingLocAnnotationType;
 import annotation.calcs.snr.SNRAnnotationType;
 import annotation.calcs.spl.SPLAnnotationType;
 import annotation.calcs.wav.WavAnnotationType;
 import annotation.dummy.DummyAnnotationType;
 import annotation.localise.targetmotion.TMAnnotationType;
 import annotation.userforms.UserFormAnnotationType;
+import bearinglocaliser.annotation.BearingAnnotationType;
 
 /**
  * Singleton centralised annotations types list. 
@@ -33,6 +35,8 @@ public class CentralAnnotationsList {
 					singleInstance.addAnnotationType(new TMAnnotationType());
 					singleInstance.addAnnotationType(new UserFormAnnotationType(null));
 					singleInstance.addAnnotationType(new WavAnnotationType());
+					singleInstance.addAnnotationType(new BearingLocAnnotationType());
+					singleInstance.addAnnotationType(new BearingAnnotationType());
 				}
 			}
 		}

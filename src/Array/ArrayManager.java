@@ -1163,6 +1163,19 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 	}
 	
 	/**
+	 * GEt a list of hydrophones assigned to a specific streamer. 
+	 * @param iStreamer
+	 * @return
+	 */
+	public int[] getStreamerHydrophones(int iStreamer) {
+		PamArray currentArray = getCurrentArray();
+		if (currentArray == null) {
+			return null;
+		}
+		return currentArray.getStreamerHydrophones(iStreamer);
+	}
+	
+	/**
 	 * Create a snapshot geometry from the master reference position, which will either be the GPS data, or 
 	 * the centre point of the array. Worst case is that it ends up as 0,0,0
 	 * @param timeMillis

@@ -25,7 +25,7 @@ import fileOfflineData.OfflineFileProcess;
 import pamScrollSystem.ViewLoadObserver;
 
 /**
- * Module for loading CPOD data and converting into PAMGuard binary fiel format. 
+ * Module for loading CPOD data and converting into PAMGuard binary file format. 
  * @author Doug Gillespie
  * @author Jamie Macaulay
  *

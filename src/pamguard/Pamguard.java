@@ -75,6 +75,11 @@ import Array.ArrayManager;
 import NMEA.NMEAControl;
 import rawDeepLearningClassifier.DLControl;
 import networkTransfer.send.NetSendCommandParam;
+<<<<<<< HEAD
+
+=======
+>>>>>>> upstream/main
+import PamUtils.PlatformInfo.OSType;
 
 /**
  * Pamguard main class. 
