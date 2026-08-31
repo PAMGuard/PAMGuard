@@ -225,7 +225,7 @@
 									/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
 							</jdk>
 							<codesign>
-								<enable>true</enable>
+								<enable>false</enable>
 								<identity>Apple Distribution: Jamie Macaulay
 									(7365S9DZ34)</identity>
 							</codesign>

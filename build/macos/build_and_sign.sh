@@ -52,6 +52,43 @@ fi
 
 echo ""
 
+# Report the macOS SDK version a single slice was built against.
+# Prints e.g. "10.7", or nothing if the binary carries no version load command.
+get_slice_sdk() {
+    local LIB="$1"
+    local ARCH="$2"
+    otool -arch "$ARCH" -l "$LIB" 2>/dev/null | awk '
+        /LC_VERSION_MIN_MACOSX|LC_BUILD_VERSION/ { inCmd = 1; next }
+        inCmd && $1 == "sdk" { print $2; exit }
+        inCmd && /^Load command/ { inCmd = 0 }
+    '
+}
+
+# True if the given version string is older than 10.9 (Apple's notarization floor).
+# An empty/unparseable version returns false, so we never delete a binary we
+# could not actually read a version from.
+sdk_is_too_old() {
+    local V="$1"
+    [ -z "$V" ] && return 1
+
+    local MAJOR="${V%%.*}"
+    local REST="${V#*.}"
+    local MINOR="${REST%%.*}"
+    [ "$MINOR" = "$V" ] && MINOR=0
+
+    case "$MAJOR$MINOR" in
+        ''|*[!0-9]*) return 1 ;;
+    esac
+
+    if [ "$MAJOR" -lt 10 ]; then
+        return 0
+    fi
+    if [ "$MAJOR" -eq 10 ] && [ "$MINOR" -lt 9 ]; then
+        return 0
+    fi
+    return 1
+}
+
 # Function to process and sign a native library
 process_native_lib() {
     local LIB="$1"
@@ -87,6 +124,46 @@ process_native_lib() {
             rm -f "${LIB}.tmp"
         fi
     fi
+
+    # Drop any slice built against an SDK older than 10.9 - Apple rejects these
+    # at notarization. If no usable slice remains, the whole file has to go.
+    while [ -f "$LIB" ]; do
+        ARCHS=$(lipo -archs "$LIB" 2>/dev/null)
+        [ -z "$ARCHS" ] && break
+
+        OLD_ARCH=""
+        for ARCH in $ARCHS; do
+            if sdk_is_too_old "$(get_slice_sdk "$LIB" "$ARCH")"; then
+                OLD_ARCH="$ARCH"
+                break
+            fi
+        done
+        [ -z "$OLD_ARCH" ] && break
+
+        if [ "$(echo $ARCHS | wc -w | tr -d ' ')" -le 1 ]; then
+            # Never delete part of the bundled Java runtime - that would break the
+            # app silently. Flag it instead and let the build fail loudly.
+            case "$LIB" in
+                */Contents/runtime/*)
+                    echo "    ⚠️  WARNING: JRE binary built against old SDK ($OLD_ARCH, $(get_slice_sdk "$LIB" "$OLD_ARCH")): $LIB"
+                    echo "        Not deleting - notarization will reject this. Update the bundled JDK."
+                    break
+                    ;;
+            esac
+            echo "    ❌ Removing old-SDK binary ($OLD_ARCH): $(basename "$LIB")"
+            rm -f "$LIB"
+            return 0
+        fi
+
+        echo "    🔧 Stripping old-SDK $OLD_ARCH slice from: $(basename "$LIB")"
+        if lipo "$LIB" -remove "$OLD_ARCH" -output "${LIB}.tmp" 2>/dev/null; then
+            mv "${LIB}.tmp" "$LIB"
+            MODIFIED=true
+        else
+            rm -f "${LIB}.tmp"
+            break
+        fi
+    done
 
     # Sign the binary with runtime hardening and timestamp
     if [ -f "$LIB" ]; then
