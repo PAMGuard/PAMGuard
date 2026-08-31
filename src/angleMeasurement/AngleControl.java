@@ -10,6 +10,15 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
 import PamView.PamSidePanel;
 
+/**
+ * Measurement of angles from non-acoustic sources. This was written decades ago to get data
+ * from a fluxgate world shaft encoder. That company no longer exists, so it's quite unlikely 
+ * that anyone is, or ever will use that system. however, elements of this module are referenced
+ * in several other parts of PAMGuard and some plugins, so it can't be removed. 
+ * <p>The sensible thing to do will be to one day replace the AngleMeasurement with a list 
+ * of possible angle measurement providers, then make this itself a type of plugin so that it's
+ * easy to support multiple and bespoke angle measurement devices. 
+ */
 public class AngleControl extends PamControlledUnit {
 
 	AngleProcess angleProcess;
