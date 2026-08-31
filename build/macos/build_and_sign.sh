@@ -89,6 +89,7 @@ sdk_is_too_old() {
     return 1
 }
 
+
 # 0b. COPY DEFAULT CONFIGURATIONS INTO THE BUNDLE
 # These are the psfx/json pairs the import wizard offers when files are dropped
 # into a blank configuration. PamController.getInstallFolder() resolves to
