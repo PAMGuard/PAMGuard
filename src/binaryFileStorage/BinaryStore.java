@@ -77,6 +77,9 @@ import pamScrollSystem.ViewLoadObserver;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamguard.GlobalArguments;
 import warnings.RepeatWarning;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+
+import PamView.component.PamFontIcon;
 
 /**
  * The binary store will work very much like the database in that it 
@@ -495,6 +498,7 @@ PamSettingsSource, DataOutputStore {
 		m.setToolTipText("Configure binary storage location and file lengths");
 		m.addActionListener(new BinaryStorageOptions(parentFrame));
 		JMenu settingsMenu = new JMenu(getUnitName());
+		settingsMenu.setIcon(PamFontIcon.of(MaterialDesignF.FILE_CODE_OUTLINE, PamFontIcon.MENU_SIZE));
 		settingsMenu.add(m);
 
 		if (isViewer || SMRUEnable.isEnable()) {

@@ -100,6 +100,13 @@ public class PamFontIcon extends FontIcon {
 	 */
 	public static final int ARROW_SIZE = 14;
 
+	/**
+	 * Size for the icons on the main menu bar items. Matches FlatLaf's
+	 * MenuItem.minimumIconSize, so the icons sit in the space the look and feel
+	 * already reserves for a check mark and the menu text stays where it was.
+	 */
+	public static final int MENU_SIZE = 16;
+
 	private final IconColour iconColour;
 
 	private PamFontIcon(Ikon ikon, int iconSize, IconColour iconColour) {

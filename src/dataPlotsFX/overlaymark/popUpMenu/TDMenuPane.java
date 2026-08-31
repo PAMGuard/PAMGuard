@@ -508,7 +508,7 @@ public class TDMenuPane extends PamBorderPane {
 				 * The .icon-button class stops the style sheet left justifying them like the
 				 * menu entries above - see pamSettingsFlatLaf.css.
 				 */
-				styleButton(menuButton, MENU_WIDTH/3.);
+				styleButton(menuButton, MENU_WIDTH/3.2);
 				menuButton.getStyleClass().add("icon-button");
 				//				n++;
 			}

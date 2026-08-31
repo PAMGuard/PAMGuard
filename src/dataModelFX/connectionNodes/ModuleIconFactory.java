@@ -90,6 +90,7 @@ public class ModuleIconFactory {
 			break;
 		case NMEA:
 			iconNode = createNMEASymbol();
+			break;
 		case NOISE_BAND:
 			iconNode = getSVGIcon("/Resources/modules/noise_band_monitor.svg", Color.BLACK, 2);
 
@@ -222,6 +223,21 @@ public class ModuleIconFactory {
 		case "Acquisition.AcquisitionControl":
 			icon=ModuleIcon.SOUND_AQ; 
 			break; 
+		case "NMEA.NMEAControl":
+			icon=ModuleIcon.NMEA;
+			break;
+		case "GPS.GPSControl":
+			icon=ModuleIcon.GPS;
+			break;
+		case "Map.MapController":
+			icon=ModuleIcon.MAP;
+			break;
+		case "SoundRecorder.RecorderControl":
+			icon=ModuleIcon.RECORDER;
+			break;
+		case "noiseOneBand.OneBandControl":
+			icon=ModuleIcon.NOISE_FILT;
+			break;
 		case "ArrayManager":
 			icon=ModuleIcon.ARRAY; 
 			break; 
@@ -278,7 +294,6 @@ public class ModuleIconFactory {
 			icon = ModuleIcon.TETHYS;
 			break;
 		}
-		System.out.println("Get module icon: " + className + " icon " + icon);
 
 		return icon;
 	}

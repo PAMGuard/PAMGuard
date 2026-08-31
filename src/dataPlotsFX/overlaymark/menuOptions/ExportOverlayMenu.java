@@ -27,7 +27,7 @@ import javafx.util.Duration;
 public abstract class ExportOverlayMenu implements OverlayMenuItem {
 
 
-	public static int standardIconSize=30; 
+	public static int standardIconSize=25; 
 	
 	/**
 	 * Save the file to clipboard.  

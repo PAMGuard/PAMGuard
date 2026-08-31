@@ -73,7 +73,19 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignH;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 
 import Array.ArrayManager;
 //import Logging.LogDataObserver;
@@ -99,6 +111,7 @@ import PamView.panel.PamBorderPanel;
 import PamView.panel.PamTabbedPane;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 import PamguardMVC.datakeeper.DataKeeper;
 import annotation.tasks.AnnotationManager;
 import metadata.MetaDataContol;
@@ -579,6 +592,35 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	private JMenuItem hydrophoneArrayMenu;
 	private JCheckBoxMenuItem checkLogFiles;
 
+	/**
+	 * Give a menu item one of the Ikonli symbols.
+	 * <p>
+	 * The icons are all drawn from the MaterialDesign2 pack PAMGuard already uses
+	 * for its buttons and tabs, and are created as {@link PamFontIcon}s so that they
+	 * follow the menu text through a change of colour scheme rather than staying
+	 * black on a dark menu.
+	 * <p>
+	 * Note that check box menu items are deliberately left without icons: FlatLaf
+	 * paints a custom icon in place of the check mark, so an icon on a check box
+	 * item would hide the very thing the user needs to see.
+	 *
+	 * @param menuItem the menu item. May be null, in which case nothing happens.
+	 * @param ikon     the symbol, e.g. MaterialDesignC.CONTENT_SAVE
+	 * @return the same menu item, so this can wrap a menu item as it's created.
+	 */
+	private static <T extends JMenuItem> T withIcon(T menuItem, Ikon ikon) {
+		if (menuItem == null) {
+			return menuItem;
+		}
+		menuItem.setIcon(PamFontIcon.of(ikon, PamFontIcon.MENU_SIZE));
+		/*
+		 * Several of these items are controlled by MenuItemEnablers, and a FontIcon
+		 * isn't an ImageIcon, so Swing can't grey one out by itself.
+		 */
+		menuItem.setDisabledIcon(PamFontIcon.of(ikon, PamFontIcon.MENU_SIZE, IconColour.DISABLED));
+		return menuItem;
+	}
+
 	public JMenuBar makeGuiMenu() {
 
 		//		if (getFrameNumber() > 0) {
@@ -600,7 +642,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		fileMenu.getPopupMenu().setLightWeightPopupEnabled(false);
 
 		if (isViewer) {
-			menuItem = new JMenuItem("Save Data");
+			menuItem = withIcon(new JMenuItem("Save Data"), MaterialDesignC.CONTENT_SAVE_ALL);
 			menuItem.addActionListener(new MenuDataSave());
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
@@ -608,7 +650,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		/*
 		 * Settings load, import and export functions
 		 */
-		menuItem = new JMenuItem("Save Configuration");
+		menuItem = withIcon(new JMenuItem("Save Configuration"), MaterialDesignC.CONTENT_SAVE);
 		menuItem.addActionListener(new menuSave());
 		fileMenu.add(menuItem);
 		if (isViewer) {
@@ -618,22 +660,22 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			menuItem.setToolTipText("Save configuration to psf file");
 		}
 		if (isViewer) {
-			menuItem = new JMenuItem("Export Configuration  ...");
+			menuItem = withIcon(new JMenuItem("Export Configuration  ..."), MaterialDesignF.FILE_EXPORT);
 			menuItem.setToolTipText("Export configuration to a new psfx file");
 		}
 		else {
-			menuItem = new JMenuItem("Save Configuration As ...");
+			menuItem = withIcon(new JMenuItem("Save Configuration As ..."), MaterialDesignC.CONTENT_SAVE_EDIT);
 			menuItem.setToolTipText("Save configuration to a new psfx file");
 		}
 		menuItem.addActionListener(new menuSaveAs());
 		fileMenu.add(menuItem);
 		
-		menuItem = new JMenuItem("Export XML Configuration");
+		menuItem = withIcon(new JMenuItem("Export XML Configuration"), MaterialDesignC.CODE_TAGS);
 		menuItem.addActionListener(new MenuGeneralXMLExport(getGuiFrame()));
 		fileMenu.add(menuItem);
 
 		if (!isViewer) {
-			menuItem = new JMenuItem("Load Configuration ...");
+			menuItem = withIcon(new JMenuItem("Load Configuration ..."), MaterialDesignF.FOLDER_OPEN_OUTLINE);
 			menuItem.addActionListener(new menuLoadSettings());
 			fileMenu.add(menuItem);
 		}
@@ -645,14 +687,14 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			//				fileMenu.add(menuItem);
 			//			}
 
-			menuItem = new JMenuItem("Import Configuration ...");
+			menuItem = withIcon(new JMenuItem("Import Configuration ..."), MaterialDesignF.FILE_IMPORT);
 			menuItem.addActionListener(new menuImportSettings());
 			menuItem.setToolTipText("Import a configuration from a psf file");
 			fileMenu.add(menuItem);
 		}
 
 		//		if (SMRUEnable.isEnable()) {
-		menuItem = new JMenuItem("Import PAMGuard Modules");
+		menuItem = withIcon(new JMenuItem("Import PAMGuard Modules"), MaterialDesignP.PACKAGE_DOWN);
 		menuItem.setToolTipText("Import module settings from a different PAMGuard configuration (psfx files only");
 		menuItem.addActionListener(new ActionListener() {
 			@Override
@@ -670,53 +712,54 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		
 		fileMenu.addSeparator();
 
-		fileMenu.add(PamController.getInstance().getGlobalTimeManager().getSwingMenuItem(frame));
+		fileMenu.add(withIcon(PamController.getInstance().getGlobalTimeManager().getSwingMenuItem(frame),
+				MaterialDesignC.CLOCK_OUTLINE));
 		
 		fileMenu.addSeparator();
 
-		fileMenu.add(menuItem = PamModuleInfo.getModulesMenu(frame));
+		fileMenu.add(menuItem = withIcon(PamModuleInfo.getModulesMenu(frame), MaterialDesignP.PLUS_BOX_OUTLINE));
 		addModuleEnabler.addMenuItem(menuItem);
-		fileMenu.add(menuItem = PamModuleInfo.getRemoveMenu());
+		fileMenu.add(menuItem = withIcon(PamModuleInfo.getRemoveMenu(), MaterialDesignM.MINUS_BOX_OUTLINE));
 		removeModuleEnabler.addMenuItem(menuItem);
 
 
-		menuItem = new JMenuItem("Module Ordering ...");
+		menuItem = withIcon(new JMenuItem("Module Ordering ..."), MaterialDesignS.SORT_VARIANT);
 		menuItem.addActionListener(new menuModuleOrder());
 		menuItem.setToolTipText("Change the order of modules in the PAMGuard configuration");
 		orderModulesEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
 
-		menuItem = new JMenuItem("Show Object List ...");
+		menuItem = withIcon(new JMenuItem("Show Object List ..."), MaterialDesignF.FORMAT_LIST_BULLETED);
 		menuItem.addActionListener(new menuShowObjectList());
 		menuItem.setToolTipText("Show a list of data and detections currnetly held in memory for each module");
 		fileMenu.add(menuItem);
 
-		menuItem = new JMenuItem("Show Data Model ...");
+		menuItem = withIcon(new JMenuItem("Show Data Model ..."), MaterialDesignS.SITEMAP);
 		menuItem.addActionListener(new menuShowObjectDiagram());
 		menuItem.setToolTipText("Show a graphical representation of modules and their interconnections");
 		fileMenu.add(menuItem);
 
-		menuItem = new JMenuItem("Multi-Threading ...");
+		menuItem = withIcon(new JMenuItem("Multi-Threading ..."), MaterialDesignC.CHIP);
 		menuItem.addActionListener(new MenuMultiThreading());
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
 		
 		if (!isViewer) {
-			fileMenu.add(DataKeeper.getInstance().getSwingMenuItem(frame));
+			fileMenu.add(withIcon(DataKeeper.getInstance().getSwingMenuItem(frame), MaterialDesignM.MEMORY));
 		}
 
 		fileMenu.addSeparator();
 
 		boolean needSeperator = false;
 
-		menuItem = new JMenuItem("External Data Storage ...");
+		menuItem = withIcon(new JMenuItem("External Data Storage ..."), MaterialDesignH.HARDDISK);
 		menuItem.setToolTipText("Control data storage in the datbase and binary files");
 		menuItem.addActionListener(new StorageOptions(getGuiFrame()));
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
 		
 		if (isViewer) {
-		menuItem = new JMenuItem("Export Data ...");
+		menuItem = withIcon(new JMenuItem("Export Data ..."), MaterialDesignE.EXPORT);
 		menuItem.addActionListener(new ExportData(getGuiFrame()));
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
@@ -747,10 +790,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		else {
 			menuItem = new JMenuItem("Save Configuration and Exit");
 		}
+		withIcon(menuItem, MaterialDesignE.EXIT_TO_APP);
 		menuItem.addActionListener(new menuExit());
 		fileMenu.add(menuItem);
 
-		menuItem = new JMenuItem("Exit without Save");
+		menuItem = withIcon(new JMenuItem("Exit without Save"), MaterialDesignC.CLOSE_CIRCLE_OUTLINE);
 		menuItem.addActionListener(new menuExitNoSave());
 		fileMenu.add(menuItem);
 
@@ -844,18 +888,36 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			displayMenu = new JMenu("Display");
 		}
 
-		displayMenu.add(MarkRelationships.getInstance().getSwingMenuItem(getGuiFrame()));
+		displayMenu.add(withIcon(MarkRelationships.getInstance().getSwingMenuItem(getGuiFrame()),
+				MaterialDesignS.SELECT_DRAG));
 
-		displayMenu.add(PamColors.getInstance().getMenu(getGuiFrame()));
+		displayMenu.add(withIcon(PamColors.getInstance().getMenu(getGuiFrame()),
+				MaterialDesignP.PALETTE_OUTLINE));
 
-		displayMenu.add(CalendarControl.getInstance().getMenu(getGuiFrame()));
+		/*
+		 * The two platform look and feel options. Both are null on the platforms they
+		 * don't apply to, and neither gets an icon since they're check box items.
+		 */
+		JMenuItem lafItem = PamColors.getInstance().getLookAndFeelMenuItem();
+		if (lafItem != null) {
+			displayMenu.add(lafItem);
+		}
+
+		JMenuItem menuBarItem = PamLookAndFeel.getScreenMenuBarMenuItem(getGuiFrame());
+		if (menuBarItem != null) {
+			displayMenu.add(menuBarItem);
+		}
+
+		displayMenu.add(withIcon(CalendarControl.getInstance().getMenu(getGuiFrame()),
+				MaterialDesignE.EARTH));
 
 		//		JMenuItem symbolItem = PamOldSymbolManager.getInstance().getMenu(getGuiFrame());
 		//		if (symbolItem != null) {
 		//			displayMenu.add(symbolItem);
 		//		}
 
-		displayMenu.add(PamController.getInstance().getGuiFrameManager().getCollapseMenuItem());
+		displayMenu.add(withIcon(PamController.getInstance().getGuiFrameManager().getCollapseMenuItem(),
+				MaterialDesignA.ARROW_COLLAPSE_ALL));
 
 		displayMenu.addSeparator();
 
@@ -877,7 +939,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		//		new PamHelpContentViewerUI()
 		//menu.add(PamHelp.getInstance().getMenu());
 		//		PamHelp.getInstance();
-		menuItem = new JMenuItem("About PAMGuard");
+		menuItem = withIcon(new JMenuItem("About PAMGuard"), MaterialDesignI.INFORMATION_OUTLINE);
 		menuItem.addActionListener(new menuAbout());
 		menu.add(menuItem);
 
@@ -889,7 +951,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		List<CommonPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
 //		List<DaqSystemInterface> daqList = ((PamModel) PamController.getInstance().getModelInterface()).getDaqList();
 		if (!pluginList.isEmpty()) {
-			JMenu subPluginsMenu= new JMenu("About Plugins");
+			JMenu subPluginsMenu = withIcon(new JMenu("About Plugins"), MaterialDesignP.PUZZLE_OUTLINE);
 			//subPluginsMenu.addMouseListener(new menuArrayListener(menu));
 
 			if (!pluginList.isEmpty()) {
@@ -906,18 +968,18 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 
 		PamHelp.getInstance();
-		JMenuItem testHelpMenu = new JMenuItem("Help");
+		JMenuItem testHelpMenu = withIcon(new JMenuItem("Help"), MaterialDesignH.HELP_CIRCLE_OUTLINE);
 		testHelpMenu.addActionListener(new TestMenuHelpPG() );
 		separator = false;
 		menu.add(testHelpMenu);
 
 
 		PamHelp.getInstance();
-		JMenuItem tipMenu = new JMenuItem("Tip of the day ...");
+		JMenuItem tipMenu = withIcon(new JMenuItem("Tip of the day ..."), MaterialDesignL.LIGHTBULB_ON_OUTLINE);
 		tipMenu.addActionListener(new TipMenu() );
 		menu.add(tipMenu);
 
-		menuItem = new JMenuItem("Reset hidden warnings");
+		menuItem = withIcon(new JMenuItem("Reset hidden warnings"), MaterialDesignA.ALERT_CIRCLE_OUTLINE);
 		menuItem.setToolTipText("Warnings told \"Not to show again\" will be shown again");
 		menuItem.addActionListener(new ClearHiddenWarnings());
 		menu.add(menuItem);
@@ -935,9 +997,9 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		 * 9/18/10
 		 */
 		menu.addSeparator();
-		JMenu logFileMenu = new JMenu("Log File");
+		JMenu logFileMenu = withIcon(new JMenu("Log File"), MaterialDesignT.TEXT_BOX_OUTLINE);
 		String logFileName = pamguard.Pamguard.getLogFileName();
-		JMenuItem openLogFileFolder = new JMenuItem("Open Folder");
+		JMenuItem openLogFileFolder = withIcon(new JMenuItem("Open Folder"), MaterialDesignF.FOLDER_OPEN_OUTLINE);
 		openLogFileFolder.addActionListener(new OpenFolder());
 		logFileMenu.add(openLogFileFolder);
 		if (logFileName==null) {
@@ -945,6 +1007,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		} else {
 			toggleLogFile = new JMenuItem("Disable Log File");
 		}
+		withIcon(toggleLogFile, MaterialDesignF.FILE_DOCUMENT_OUTLINE);
 		toggleLogFile.addActionListener(new ToggleLogFile());
 		logFileMenu.add(toggleLogFile);
 		menu.add(logFileMenu);
@@ -957,20 +1020,20 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		
 
 		menu.addSeparator();
-		menuItem = new JMenuItem("Set Display Scaling Factor");
+		menuItem = withIcon(new JMenuItem("Set Display Scaling Factor"), MaterialDesignM.MAGNIFY_PLUS_OUTLINE);
 		menuItem.addActionListener(new ScalingFactorManager());
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("System performance tests ...");
+		menuItem = withIcon(new JMenuItem("System performance tests ..."), MaterialDesignS.SPEEDOMETER);
 		menuItem.addActionListener(new PerformanceTests());
 		startMenuEnabler.addMenuItem(menuItem);
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("PAMGuard Web site");
+		menuItem = withIcon(new JMenuItem("PAMGuard Web site"), MaterialDesignW.WEB);
 		menuItem.addActionListener(new MenuPamguardURL(PamguardVersionInfo.webAddress));
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("Contact and Support");
+		menuItem = withIcon(new JMenuItem("Contact and Support"), MaterialDesignE.EMAIL_OUTLINE);
 		menuItem.addActionListener(new MenuPamguardURL("www.pamguard.org/contact.html"));
 		menu.add(menuItem);
 

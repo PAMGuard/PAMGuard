@@ -1458,10 +1458,9 @@ public class ClickDetector extends PamProcess {
 		private boolean findBearingLocaliser() {
 			if (rawDataSource != null && rawDataSource.getChannelListManager() != null) {
 				int locChannels = SMRUEnable.getGoodChannels(groupChannels);
-//				groupHydrophones = rawDataSource.getChannelListManager().channelIndexesToPhones(locChannels);
-				int[] phoneList = rawDataSource.getChannelListManager().channelMapToPhonesList(locChannels);
+				groupHydrophones = rawDataSource.getChannelListManager().channelMapToPhonesList(locChannels);
 				double timingError = Correlations.defaultTimingError(getSampleRate());
-				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(phoneList, timingError);
+				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(groupHydrophones, timingError);
 				return true;
 			} else {
 				return false;

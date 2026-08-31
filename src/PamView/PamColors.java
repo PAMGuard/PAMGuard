@@ -71,6 +71,12 @@ public class PamColors implements PamSettings {
 	
 	private JCheckBoxMenuItem[] colourMenuItems;
 
+	/**
+	 * Menu item for the standard Windows look and feel option. Only created on
+	 * Windows - see {@link #getLookAndFeelMenuItem()}.
+	 */
+	private JCheckBoxMenuItem windowsLafMenuItem;
+
 //	private MenuItemEnabler nightMenuEnabler = new MenuItemEnabler(); 
 //	private MenuItemEnabler dayMenuEnabler = new MenuItemEnabler(); 
 //	private MenuItemEnabler printMenuEnabler = new MenuItemEnabler(); 
@@ -109,10 +115,6 @@ public class PamColors implements PamSettings {
 		JMenuItem menuItem;
 		
 		ColourScheme currentScheme = getColourScheme();
-		String currSchemeName = "";
-		if (currentScheme != null) {
-			currSchemeName = currentScheme.getName();
-		}
 
 		int n = colorSettings.getNumSchemes();
 		colourMenuItems = new JCheckBoxMenuItem[n];
@@ -121,8 +123,8 @@ public class PamColors implements PamSettings {
 			colourMenuItems[i] = new JCheckBoxMenuItem(name);
 			colourMenuItems[i].addActionListener(new SelectScheme(name));
 			colorMenu.add(colourMenuItems[i]);
-			colourMenuItems[i].setSelected(name.equalsIgnoreCase(currSchemeName));
 		}
+		updateSchemeMenuItems();
 		JMenu blindMenu = new JMenu("Colour Pallets");
 		colorMenu.add(blindMenu);
 		ButtonGroup bg = new ButtonGroup();
@@ -145,6 +147,87 @@ public class PamColors implements PamSettings {
 		return colorMenu;
 	}
 	
+	/**
+	 * Menu item for the standard Windows look and feel, for the Display menu.
+	 * <p>
+	 * FlatLaf is PAMGuard's standard look, but it isn't to everyone's taste, so on
+	 * Windows the plain Windows look and feel can be had instead. The Windows look
+	 * and feel has no dark mode, so while it is selected the dark colour schemes are
+	 * greyed out in the colour scheme menu.
+	 *
+	 * @return the menu item, or null on platforms where the option isn't offered.
+	 */
+	public JMenuItem getLookAndFeelMenuItem() {
+		if (!PamLookAndFeel.isWindowsLookAndFeelAvailable()) {
+			return null;
+		}
+		windowsLafMenuItem = new JCheckBoxMenuItem("Windows Look and Feel");
+		windowsLafMenuItem.setToolTipText("Use the standard Windows look and feel instead of the "
+				+ "PAMGuard (FlatLaf) one. The Windows look and feel has no dark mode, so the "
+				+ "Dark and Night colour schemes are unavailable while it's selected.");
+		windowsLafMenuItem.setSelected(PamLookAndFeel.isWindowsLookAndFeel());
+		windowsLafMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setWindowsLookAndFeel(windowsLafMenuItem.isSelected());
+			}
+		});
+		return windowsLafMenuItem;
+	}
+
+	/**
+	 * Switch between the standard Windows look and feel and FlatLaf, and restyle
+	 * everything that's open.
+	 * <p>
+	 * The Windows look and feel has no dark mode, so selecting it while a dark
+	 * colour scheme is in use drops back to the Day scheme.
+	 *
+	 * @param windows true for the Windows look and feel, false for FlatLaf.
+	 */
+	public void setWindowsLookAndFeel(boolean windows) {
+		colorSettings.setWindowsLookAndFeel(windows);
+		PamLookAndFeel.setWindowsLookAndFeel(windows);
+		/*
+		 * Nothing about the colour scheme has changed, but every component has just been
+		 * repainted by a different look and feel, so components which are detached from
+		 * the window at the moment need bringing up to date when they come back - see
+		 * PamLookAndFeel.refreshComponentTheme().
+		 */
+		colourSchemeVersion++;
+		if (windows && colourScheme != null && colourScheme.isDark()) {
+			// setColourScheme does the restyling, and ticks the menus afterwards.
+			setColourScheme(ColourScheme.DAYSCHEME);
+		}
+		else {
+			setColors();
+			SwingUtilities.invokeLater(this::colourSchemeChanged);
+		}
+	}
+
+	/**
+	 * Tick the currently selected colour scheme in the colour scheme menu, and grey
+	 * out the dark schemes if the Windows look and feel is in use.
+	 */
+	private void updateSchemeMenuItems() {
+		if (colourMenuItems == null) {
+			return;
+		}
+		String currSchemeName = colourScheme == null ? "" : colourScheme.getName();
+		boolean windowsLaf = PamLookAndFeel.isWindowsLookAndFeel();
+		for (int i = 0; i < colourMenuItems.length; i++) {
+			String name = colourMenuItems[i].getText();
+			boolean darkScheme = PamLookAndFeel.isDarkSchemeName(name);
+			colourMenuItems[i].setSelected(name.equalsIgnoreCase(currSchemeName));
+			colourMenuItems[i].setEnabled(!windowsLaf || !darkScheme);
+			// tool tips still show on a disabled menu item, so say why it's greyed out.
+			colourMenuItems[i].setToolTipText(windowsLaf && darkScheme
+					? "Not available with the Windows look and feel, which has no dark mode" : null);
+		}
+		if (windowsLafMenuItem != null) {
+			windowsLafMenuItem.setSelected(windowsLaf);
+		}
+	}
+
 	protected void setBlindPalet(int selected) {
 		colorSettings.setColourBlindPalet(selected);
 		colorSettings.rebuildSchemes(selected);
@@ -264,7 +347,7 @@ public class PamColors implements PamSettings {
 
 		@Override
 		public void run() {
-			if (refreshLookAndFeel && PamLookAndFeel.isDarkLookAndFeel()) {
+			if (refreshLookAndFeel && PamLookAndFeel.isChangedFromStartup()) {
 				PamLookAndFeel.refreshWindows();
 			}
 			setColors();
@@ -571,7 +654,12 @@ public class PamColors implements PamSettings {
 		 * e.g. the Dark scheme, so make sure the list is up to date before selecting.
 		 */
 		colorSettings.checkSchemes();
+		PamLookAndFeel.setWindowsLookAndFeel(colorSettings.isWindowsLookAndFeel());
 		colourScheme = colorSettings.selectScheme(colorSettings.getCurrentScheme());
+		if (PamLookAndFeel.isWindowsLookAndFeel() && colourScheme != null && colourScheme.isDark()) {
+			// the Windows look and feel has no dark mode, so a saved dark scheme can't be honoured.
+			colourScheme = colorSettings.selectScheme(ColourScheme.DAYSCHEME);
+		}
 
 		colourScheme.setWhaleColor(7,  new Color(255,128,192)); // dirty pink
 		colourScheme.setWhaleColor(6,  new Color(255,128,0)); // orange
@@ -752,11 +840,7 @@ public class PamColors implements PamSettings {
 	 * until the next time something happens to make it repaint.
 	 */
 	private void colourSchemeChanged() {
-		if (colourMenuItems != null) {
-			for (int i = 0; i < colourMenuItems.length; i++) {
-				colourMenuItems[i].setSelected(colourMenuItems[i].getText().equalsIgnoreCase(colourScheme.getName()));
-			}
-		}
+		updateSchemeMenuItems();
 		PamController pamController = PamController.getInstance();
 		if (pamController != null && pamController.isInitializationComplete()) {
 			pamController.notifyModelChanged(PamControllerInterface.CHANGED_DISPLAY_SETTINGS);

@@ -11,6 +11,7 @@ import detectionPlotFX.plots.SpectrumPlot;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
@@ -24,7 +25,6 @@ import matchedTemplateClassifer.TemplateImport;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamStackPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
@@ -63,6 +63,18 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 	 * File chooser for selecting a template
 	 */
 	private FileChooser fileChooser;  
+
+	/**
+	 * The load/select template button. Its drop-down menu lists the default
+	 * templates plus any extra items added with {@link #addMenuItem(MenuItem)}.
+	 */
+	private SplitMenuButton splitMenuButton;
+
+	/**
+	 * True once a separator has been added below the default templates, so that
+	 * extra menu items are only separated from the defaults once.
+	 */
+	private boolean extraMenuItems = false;
 
 	public TemplateSpectrumPane() {
 		this.setCenter(createTheDisplay());
@@ -103,7 +115,6 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 	private Pane createTemplatePane(TemplateDetectionPlot detectionPlot) {
 
 		SplitMenuButton splitMenuButtonReject = createLoadButton();
-		PamStackPane headerPane = new PamStackPane(); 
 		//detectionPlot.setEnableSettingsButton(false); //disable settings button as too much clutter
 
 		
@@ -149,7 +160,7 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 	 */
 	private SplitMenuButton createLoadButton(){
 
-		SplitMenuButton splitMenuButton = new SplitMenuButton(); 
+		splitMenuButton = new SplitMenuButton(); 
 		splitMenuButton.setOnAction((action)->{
 			loadNewTemplate(); 
 		});
@@ -172,6 +183,20 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		}
 
 		return splitMenuButton;
+	}
+
+	/**
+	 * Add an item to the bottom of the template drop-down menu, below the list of
+	 * default templates. Used for extra ways of setting a template, e.g. generating
+	 * one from click events.
+	 * @param menuItem - the menu item to add.
+	 */
+	public void addMenuItem(MenuItem menuItem) {
+		if (!extraMenuItems) {
+			extraMenuItems = true;
+			splitMenuButton.getItems().add(new SeparatorMenuItem());
+		}
+		splitMenuButton.getItems().add(menuItem);
 	}
 
 
@@ -372,8 +397,8 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		tooltipText+="A comma-delimited CSV file where the first row is the amplitude values of the spectrum (usually "
 				+ "normalised between 0 and 1) and the first value of the second row is the sample rate in samples per second.";
 		tooltipText+="<p><p>";
-		tooltipText+="Templates generated from click events (the <i>Generate template from click events</i> button) are "
-				+ "saved in these same formats and so can be re-imported here.";
+		tooltipText+="Templates generated from click events (the <i>Generate from click events…</i> item at the bottom "
+				+ "of the drop-down menu) are saved in these same formats and so can be re-imported here.";
 		return 	PamUtilsFX.htmlToNormal(tooltipText);
 	}
 

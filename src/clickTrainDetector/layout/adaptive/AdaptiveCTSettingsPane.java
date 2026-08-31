@@ -204,10 +204,11 @@ public class AdaptiveCTSettingsPane extends SettingsPane<AdaptiveCTParams> {
 	 */
 	private void addSliderRow(PamGridPane grid, int row, String labelText, String tip, Slider slider, String minLabel,
 			String maxLabel) {
-		// snap to clean 0.05 steps and give keyboard/scroll a sensible increment.
+		// any value between the limits is allowed; the increment only affects
+		// keyboard/scroll steps.
 		slider.setBlockIncrement(0.05);
 		slider.setMinorTickCount(1);
-		slider.setSnapToTicks(true);
+		slider.setSnapToTicks(false);
 		// grow to fill the slider column.
 		slider.setMaxWidth(Double.MAX_VALUE);
 

@@ -80,6 +80,18 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 		super.slidingDialogCSS = primerPAMGuard;
 	}
 
+	/**
+	 * The main GUI style sheets for the colour scheme currently in force.
+	 * <p>
+	 * Both of the dark schemes get the dark sheets. This used to test for the Night
+	 * scheme alone, which meant the Dark scheme - what the Dark Mode item in the
+	 * JavaFX Settings menu selects - fell through to the light sheet and appeared to
+	 * do nothing at all.
+	 * <p>
+	 * There is no red-on-black Primer sheet, so the Night scheme is drawn with the
+	 * same dark sheets as the Dark scheme rather than being left light. The Swing
+	 * GUI's style ({@link PamDefaultStyle}) does have a night override.
+	 */
 	@Override
 	public ArrayList<String> getGUICSS() {
 		ArrayList<String> cssStyles = new ArrayList<String>();
@@ -92,6 +104,7 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 		addSheet(cssStyles, isDarkScheme() ? primerdark : primerlight);
 		addSheet(cssStyles, primerPAMGuard);
 		if (isDarkScheme()) {
+			// recolours the PAMGuard specific parts of primerPAMGuard for a dark background
 			addSheet(cssStyles, primerPAMGuardDark);
 		}
 		return cssStyles;

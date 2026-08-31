@@ -9,6 +9,7 @@ import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.superdet.SubDetectionLoader;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
 import clickTrainDetector.clickTrainAlgorithms.ukf.AffinityTrainer;
 import clickTrainDetector.clickTrainAlgorithms.ukf.UKFClickTrainAlgorithm;
@@ -54,6 +55,12 @@ public class UKFAffinityTrainPane {
 	private final Label statusLabel;
 	private final PamButton trainButton;
 	private final PamButton selectAllButton;
+
+	/**
+	 * Fraction of the progress bar given over to loading click data out of the
+	 * binary store; the rest is the training itself.
+	 */
+	private static final double LOAD_FRACTION = 0.3;
 
 	public UKFAffinityTrainPane(UKFClickTrainAlgorithm algorithm, Consumer<File> onApplied) {
 		this.algorithm = algorithm;
@@ -159,30 +166,37 @@ public class UKFAffinityTrainPane {
 			return;
 		}
 
-		// gather each event's clicks and detect whether bearing is available.
-		List<List<PamDataUnit>> trainEvents = new ArrayList<>();
-		boolean bearingAvailable = false;
-		for (OfflineEventDataUnit event : selected) {
-			ArrayList<PamDataUnit> clicks = new ArrayList<>(event.getSubDetections());
-			trainEvents.add(clicks);
-			for (PamDataUnit click : clicks) {
-				if (click.getLocalisation() != null && click.getLocalisation().getAngles() != null
-						&& click.getLocalisation().getAngles().length > 0) {
-					bearingAvailable = true;
-					break;
-				}
-			}
-		}
-		final boolean bearing = bearingAvailable;
 		final UKFParams params = algorithm.getParams();
 
 		setBusy(true);
 		Task<AffinityTrainer.Result> task = new Task<AffinityTrainer.Result>() {
 			@Override
 			protected AffinityTrainer.Result call() throws Exception {
-				return AffinityTrainer.trainAndExport(trainEvents, params, bearing, AffinityTrainer.DEFAULT_HIDDEN,
-						AffinityTrainer.DEFAULT_EPOCHS, (frac, msg) -> {
-							updateProgress(frac, 1.0);
+				// the clicks of events outside the currently loaded time period are not in
+				// memory, so read whatever is missing back out of the binary store.
+				List<List<PamDataUnit>> trainEvents = SubDetectionLoader.loadSubDetections(selected, (frac, msg) -> {
+					updateProgress(frac * LOAD_FRACTION, 1.0);
+					updateMessage(msg);
+				});
+				// bearing is only used if the clicks actually carry one.
+				boolean bearingAvailable = false;
+				int nClicks = 0;
+				for (List<PamDataUnit> clicks : trainEvents) {
+					nClicks += clicks.size();
+					for (PamDataUnit click : clicks) {
+						if (click.getLocalisation() != null && click.getLocalisation().getAngles() != null
+								&& click.getLocalisation().getAngles().length > 0) {
+							bearingAvailable = true;
+							break;
+						}
+					}
+				}
+				if (nClicks == 0) {
+					throw new RuntimeException("the selected events contain no clicks");
+				}
+				return AffinityTrainer.trainAndExport(trainEvents, params, bearingAvailable,
+						AffinityTrainer.DEFAULT_HIDDEN, AffinityTrainer.DEFAULT_EPOCHS, (frac, msg) -> {
+							updateProgress(LOAD_FRACTION + frac * (1 - LOAD_FRACTION), 1.0);
 							updateMessage(msg);
 						}, null);
 			}

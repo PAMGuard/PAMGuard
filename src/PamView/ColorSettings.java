@@ -17,6 +17,18 @@ public class ColorSettings implements Serializable, Cloneable{
 		
 		private int colourBlindPalet = ACCESSIBLE_95; 
 
+		/**
+		 * Use the standard Windows look and feel rather than FlatLaf. Windows only, and
+		 * off by default - FlatLaf is the standard PAMGuard look. See
+		 * {@link PamLookAndFeel#setWindowsLookAndFeel(boolean)}.
+		 * <p>
+		 * Not present in settings written by older versions, where it deserialises as
+		 * false, which is what those versions did on macOS and Linux. Windows users
+		 * upgrading will see FlatLaf where they used to see the Windows look and feel,
+		 * and can turn this back on from the Display menu.
+		 */
+		private boolean windowsLookAndFeel = false;
+
 		public ColorSettings() {
 			super();
 			rebuildSchemes(colourBlindPalet);
@@ -123,6 +135,7 @@ public class ColorSettings implements Serializable, Cloneable{
 				ColorSettings newSettings = (ColorSettings) super.clone();
 				if (colourSchemes == null || colourSchemes.size() == 0) {
 					newSettings = new ColorSettings();
+					newSettings.setWindowsLookAndFeel(windowsLookAndFeel);
 				}
 				return newSettings;
 			} catch (CloneNotSupportedException e) {
@@ -149,6 +162,22 @@ public class ColorSettings implements Serializable, Cloneable{
 			this.colourBlindPalet = colourBlindPalet;
 		}
 		
+		/**
+		 * @return true if the standard Windows look and feel is to be used in place of
+		 *         FlatLaf.
+		 */
+		public boolean isWindowsLookAndFeel() {
+			return windowsLookAndFeel;
+		}
+
+		/**
+		 * @param windowsLookAndFeel true to use the standard Windows look and feel in
+		 *                           place of FlatLaf.
+		 */
+		public void setWindowsLookAndFeel(boolean windowsLookAndFeel) {
+			this.windowsLookAndFeel = windowsLookAndFeel;
+		}
+
 		public String getColourBlindName() {
 			return getColourBlindName(colourBlindPalet);
 		}

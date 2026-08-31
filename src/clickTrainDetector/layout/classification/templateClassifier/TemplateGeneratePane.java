@@ -3,6 +3,7 @@ package clickTrainDetector.layout.classification.templateClassifier;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import PamController.PamController;
@@ -10,6 +11,7 @@ import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.superdet.SubDetectionLoader;
 import clickDetector.ClickDetection;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -54,6 +56,12 @@ public class TemplateGeneratePane {
 	private final Label statusLabel;
 	private final PamButton generateButton;
 	private final PamButton selectAllButton;
+
+	/**
+	 * Fraction of the progress bar given over to loading click data out of the
+	 * binary store; the rest is the spectrum calculation.
+	 */
+	private static final double LOAD_FRACTION = 0.5;
 
 	/**
 	 * File chooser for saving the generated template - field so the last used
@@ -168,31 +176,35 @@ public class TemplateGeneratePane {
 			statusLabel.setText("Select at least one event to generate a template from.");
 			return;
 		}
-
-		// grab the clicks from the selected events on the FX thread.
-		List<ClickDetection> clicks = new ArrayList<>();
-		for (OfflineEventDataUnit event : selected) {
-			if (event.getSubDetections() == null) {
-				continue;
-			}
-			for (PamDataUnit unit : event.getSubDetections()) {
-				if (unit instanceof ClickDetection) {
-					clicks.add((ClickDetection) unit);
-				}
-			}
-		}
-		if (clicks.isEmpty()) {
-			statusLabel.setText("The selected events contain no clicks.");
-			return;
-		}
 		final int nEvents = selected.size();
+		// number of clicks actually used, set by the task and read once it succeeds.
+		AtomicInteger nClicks = new AtomicInteger();
 
 		setBusy(true);
 		Task<MatchTemplate> task = new Task<MatchTemplate>() {
 			@Override
 			protected MatchTemplate call() throws Exception {
+				// the clicks of events outside the currently loaded time period are not in
+				// memory, so read whatever is missing back out of the binary store.
+				List<List<PamDataUnit>> eventUnits = SubDetectionLoader.loadSubDetections(selected,
+						(frac, msg) -> {
+							updateProgress(frac * LOAD_FRACTION, 1.0);
+							updateMessage(msg);
+						});
+				List<ClickDetection> clicks = new ArrayList<>();
+				for (List<PamDataUnit> units : eventUnits) {
+					for (PamDataUnit unit : units) {
+						if (unit instanceof ClickDetection) {
+							clicks.add((ClickDetection) unit);
+						}
+					}
+				}
+				if (clicks.isEmpty()) {
+					throw new RuntimeException("the selected events contain no clicks");
+				}
+				nClicks.set(clicks.size());
 				return generateTemplate(clicks, (frac, msg) -> {
-					updateProgress(frac, 1.0);
+					updateProgress(LOAD_FRACTION + frac * (1 - LOAD_FRACTION), 1.0);
 					updateMessage(msg);
 				});
 			}
@@ -203,7 +215,7 @@ public class TemplateGeneratePane {
 		task.setOnSucceeded(e -> {
 			unbind();
 			setBusy(false);
-			saveAndApply(task.getValue(), nEvents, clicks.size());
+			saveAndApply(task.getValue(), nEvents, nClicks.get());
 		});
 		task.setOnFailed(e -> {
 			unbind();
@@ -245,7 +257,13 @@ public class TemplateGeneratePane {
 		}
 		int fftLength = PamUtils.getMinFftLength(minLength);
 
-		float sR = clicks.get(0).getParentDataBlock().getSampleRate();
+		float sR = 0;
+		for (ClickDetection click : clicks) {
+			if (click.getParentDataBlock() != null) {
+				sR = click.getParentDataBlock().getSampleRate();
+				break;
+			}
+		}
 
 		double[] average = null;
 		int n = 0;

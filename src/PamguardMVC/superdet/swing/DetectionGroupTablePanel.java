@@ -15,9 +15,11 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 
 import PamUtils.PamCalendar;
 import PamView.panel.PamPanel;
+import PamView.tables.SortableTableValue;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -92,6 +94,12 @@ public class DetectionGroupTablePanel {
 
 	private String[] colNames = {"Id", "UID", "Start Time", "End Time", "N Detections", "Info"};
 
+	/**
+	 * Sorter attached to the table so that columns can be sorted by clicking on
+	 * their headers.
+	 */
+	private TableRowSorter<GroupTableModel> rowSorter;
+
 	private ArrayList<SuperDetection> visibleData = new ArrayList<>();
 
 	public DetectionGroupTablePanel(PamDataBlock dataBlock, GroupTableCommands commands) {
@@ -104,6 +112,12 @@ public class DetectionGroupTablePanel {
 
 		tableModel = new GroupTableModel();
 		table = new JTable(tableModel);
+		rowSorter = new TableRowSorter<>(tableModel);
+		for (int i = 0; i < colNames.length; i++) {
+			rowSorter.setSortable(i, isColumnSortable(i));
+		}
+		table.setRowSorter(rowSorter);
+		table.getTableHeader().setToolTipText("Click a column header to sort the table");
 		table.setRowSelectionAllowed(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.addMouseListener(new TableMouse());
@@ -157,10 +171,34 @@ public class DetectionGroupTablePanel {
 	 */
 	public SuperDetection getSelectedGroup() {
 		int row = table.getSelectedRow();
-		if (row < 0 || row >= visibleData.size()) {
+		if (row < 0) {
 			return null;
 		}
-		return visibleData.get(row);
+		return getGroup(table.convertRowIndexToModel(row));
+	}
+
+	/**
+	 * Get the group in a given row of the table model. Note that this is the row
+	 * in the model, not the row on the screen, which may be different if the
+	 * table has been sorted.
+	 * @param modelRow row index in the table model.
+	 * @return group or null if the row index is out of range.
+	 */
+	public SuperDetection getGroup(int modelRow) {
+		if (modelRow < 0 || modelRow >= visibleData.size()) {
+			return null;
+		}
+		return visibleData.get(modelRow);
+	}
+
+	/**
+	 * Is a column worth sorting on ? Columns of free text such as the Info
+	 * column are not.
+	 * @param column column index.
+	 * @return true if the column can be sorted.
+	 */
+	public boolean isColumnSortable(int column) {
+		return column != 5;
 	}
 
 	/**
@@ -291,6 +329,22 @@ public class DetectionGroupTablePanel {
 		}
 
 		@Override
+		public Class<?> getColumnClass(int column) {
+			switch (column) {
+			case 0:
+				return Integer.class;
+			case 1:
+				return Long.class;
+			case 2:
+			case 3:
+				return SortableTableValue.class;
+			case 4:
+				return Integer.class;
+			}
+			return super.getColumnClass(column);
+		}
+
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			if (rowIndex >= visibleData.size()) {
 				return null;
@@ -302,9 +356,11 @@ public class DetectionGroupTablePanel {
 			case 1:
 				return group.getUID();
 			case 2:
-				return PamCalendar.formatDBDateTime(group.getTimeMilliseconds());
+				return new SortableTableValue(PamCalendar.formatDBDateTime(group.getTimeMilliseconds()),
+						group.getTimeMilliseconds());
 			case 3:
-				return PamCalendar.formatDBDateTime(group.getEndTimeInMilliseconds());
+				return new SortableTableValue(PamCalendar.formatDBDateTime(group.getEndTimeInMilliseconds()),
+						group.getEndTimeInMilliseconds());
 			case 4:
 				return group.getSubDetectionsCount();
 			case 5:

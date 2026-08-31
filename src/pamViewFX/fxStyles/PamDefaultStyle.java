@@ -25,10 +25,9 @@ package pamViewFX.fxStyles;
 import java.net.URL;
 import java.util.ArrayList;
 
-import PamUtils.PlatformInfo;
-import PamUtils.PlatformInfo.OSType;
 import PamView.ColourScheme;
 import PamView.PamColors;
+import PamView.PamLookAndFeel;
 
 /**
  * Class defining the default CSS Style sheets to use for JavaFX displays. This
@@ -50,8 +49,13 @@ public class PamDefaultStyle {
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard GUI (but
 	 * not dialogs) with a light colour scheme.
+	 * <p>
+	 * Null means "whichever light sheet matches the Swing look and feel currently in
+	 * use" - see {@link #defaultLightCSS()}. That can't be resolved once and cached
+	 * in this field because the user can switch look and feel at any time. Sub
+	 * classes which have their own light sheet set this field in their constructor.
 	 */
-	protected String guiCSS = defaultLightCSS();
+	protected String guiCSS = null;
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard GUI when
@@ -62,13 +66,14 @@ public class PamDefaultStyle {
 	 * {@link PamAtlantaStyle}); {@link #getGUICSS()} now builds the dark style from
 	 * {@link #darkBaseCSS} / {@link #darkOverrideCSS} / {@link #nightOverrideCSS}.
 	 */
-	protected String guiCSSNightMode = guiCSS;
+	protected String guiCSSNightMode = null;
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard standard
-	 * dialogs with a light colour scheme.
+	 * dialogs with a light colour scheme. Null means the default light sheet, as for
+	 * {@link #guiCSS}.
 	 */
-	protected String dialogCSS = defaultLightCSS();
+	protected String dialogCSS = null;
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard std
@@ -127,14 +132,18 @@ public class PamDefaultStyle {
 	protected String slidingNightOverrideCSS = "/Resources/css/pamSettingsFlatLafNight.css";
 
 	/**
-	 * Pick the default light style sheet to match the Swing look and feel set in
-	 * Pamguard.main(): the Windows system look and feel on Windows, FlatLaf Light
-	 * everywhere else (macOS / Linux).
+	 * Pick the light style sheet which matches the Swing look and feel currently
+	 * installed, so that JavaFX panes embedded in the Swing GUI match their
+	 * surroundings.
+	 * <p>
+	 * That is FlatLaf Light unless the user has asked for the standard Windows look
+	 * and feel from the Display menu - see
+	 * {@link PamLookAndFeel#setWindowsLookAndFeel(boolean)}.
 	 *
 	 * @return the resource path of the default light CSS style sheet
 	 */
-	private static String defaultLightCSS() {
-		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+	protected static String defaultLightCSS() {
+		if (PamLookAndFeel.isWindowsLookAndFeel()) {
 			return "/Resources/css/pamWindowsLight.css";
 		}
 		return "/Resources/css/pamFlatLafLight.css";
@@ -202,7 +211,8 @@ public class PamDefaultStyle {
 	 * FlatLaf base sheet plus the dark colour override, plus the night override on
 	 * top of that for the Night scheme.
 	 *
-	 * @param lightSheet the sheet to use for the light schemes
+	 * @param lightSheet the sheet to use for the light schemes, or null for the sheet
+	 *                   which matches the current look and feel
 	 * @return the style sheets to apply, in the order they must be applied.
 	 */
 	private ArrayList<String> mainStyleSheets(String lightSheet) {
@@ -211,7 +221,7 @@ public class PamDefaultStyle {
 			addDarkSheets(cssStyles);
 		}
 		else {
-			addSheet(cssStyles, lightSheet);
+			addSheet(cssStyles, lightSheet == null ? defaultLightCSS() : lightSheet);
 		}
 		return cssStyles;
 	}

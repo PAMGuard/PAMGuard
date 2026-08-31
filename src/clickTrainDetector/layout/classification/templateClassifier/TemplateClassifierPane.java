@@ -10,18 +10,16 @@ import clickTrainDetector.layout.classification.idiClassifier.IDIPane;
 import clickTrainDetector.layout.classification.simplechi2classifier.SimpleCTClassifierPane;
 import clickTrainDetector.layout.classification.CTClassifierPane;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import matchedTemplateClassifer.MatchTemplate;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
-import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.utilsFX.ControlField;
@@ -69,9 +67,10 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 	private TemplateGeneratePane templateGeneratePane;
 
 	/**
-	 * Button which flips to the generate template pane.
+	 * Menu item, in the spectrum template drop-down menu, which flips to the
+	 * generate template pane.
 	 */
-	private PamButton generateTemplateButton;
+	private MenuItem generateTemplateItem;
 
 
 	public TemplateClassifierPane(CTTemplateClassifier cTTemplateClassifier) {
@@ -87,7 +86,7 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 
 		mainPane.setCenter(createTemplatePane());
 
-		generateTemplateButton.setOnAction(e -> {
+		generateTemplateItem.setOnAction(e -> {
 			CTClassifierPane classifierPane = findClassifierPane();
 			if (classifierPane == null) {
 				System.err.println("TemplateClassifierPane: could not find the enclosing classifier pane to flip.");
@@ -173,20 +172,14 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 //				idiPane); 
 		generalPane.setPadding(new Insets(5,5,5,5));
 
-		// the action is wired in the constructor, once the flip pane exists.
-		generateTemplateButton = new PamButton("Generate template from click events…");
-		generateTemplateButton.setTooltip(new Tooltip(
-				"Generate an average spectrum template from manually-annotated click events,\n"
-				+ "then save it to file and use it as the classification template."));
-
-		PamHBox generateBox = new PamHBox();
-		generateBox.setSpacing(5);
-		generateBox.setAlignment(Pos.CENTER_RIGHT);
-		generateBox.getChildren().add(generateTemplateButton);
+		// sits at the bottom of the template drop-down menu, below the default
+		// templates. The action is wired in the constructor, once the flip pane exists.
+		generateTemplateItem = new MenuItem("Generate from click events…");
+		spectrumTemplatePane.addMenuItem(generateTemplateItem);
 
 		PamVBox spectrumPane = new PamVBox();
 		spectrumPane.setSpacing(5);
-		spectrumPane.getChildren().addAll(spectrumthreshold, spectrumTemplatePane, generateBox);
+		spectrumPane.getChildren().addAll(spectrumthreshold, spectrumTemplatePane);
 		spectrumPane.setPadding(new Insets(5,5,5,5));
 		
 		spectrumTemplatePane.prefWidthProperty().bind(spectrumPane.widthProperty());
