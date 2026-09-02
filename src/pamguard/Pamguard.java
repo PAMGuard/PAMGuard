@@ -747,8 +747,16 @@ public class Pamguard {
 		 */
 		private static synchronized void disableLogFile() {
 			logFile = null;
-			fileStream.close();
-			fileStream = null;
+			if (fileStream == null) {
+				return;
+			}
+			try {
+				fileStream.close();
+				fileStream = null;
+			}
+			catch (Exception e) {
+				
+			}
 		}
 
 		/**
