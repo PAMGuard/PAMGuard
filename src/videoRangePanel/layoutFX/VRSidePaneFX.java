@@ -99,6 +99,7 @@ public class VRSidePaneFX extends PamBorderPane {
 
 		//opens a single image or video. 
         final PamButton openButton = new PamButton();
+        openButton.getStyleClass().add("icon-button");
 //        openButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_IMAGE, PamGuiManagerFX.iconSize));
         openButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-image", PamGuiManagerFX.iconSize));
         openButton.setTooltip(new Tooltip("Open a single image or video file"));
@@ -115,6 +116,7 @@ public class VRSidePaneFX extends PamBorderPane {
         
         //button for opening a folder of images and/or videos. 
         final PamButton openMultipleButton = new PamButton();
+        openMultipleButton.getStyleClass().add("icon-button");
 //        openMultipleButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FOLDER, PamGuiManagerFX.iconSize));
         openMultipleButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize));
         openMultipleButton.setTooltip(new Tooltip("Open multiple images and video files "));
@@ -130,6 +132,7 @@ public class VRSidePaneFX extends PamBorderPane {
  
         //pastes and image or video from clip board. 
         final PamButton paste = new PamButton();
+        paste.getStyleClass().add("icon-button");
 //        paste.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CONTENT_PASTE, PamGuiManagerFX.iconSize));
         paste.setGraphic(PamGlyphDude.createPamIcon("mdi2c-content-paste", PamGuiManagerFX.iconSize));
         paste.setTooltip(new Tooltip("Open multiple images and video files "));
@@ -155,6 +158,7 @@ public class VRSidePaneFX extends PamBorderPane {
 
         
         final PamButton arrowRight = new PamButton();
+        arrowRight.getStyleClass().add("icon-button");
 //        arrowRight.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.SKIP_NEXT, PamGuiManagerFX.iconSize));
         arrowRight.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-next", PamGuiManagerFX.iconSize));
         arrowRight.setTooltip(new Tooltip("Move to next image/video"));
@@ -166,6 +170,7 @@ public class VRSidePaneFX extends PamBorderPane {
         });
         
         final PamButton  arrowLeft = new PamButton();
+        arrowLeft.getStyleClass().add("icon-button");
 //        arrowLeft.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.SKIP_PREVIOUS, PamGuiManagerFX.iconSize));
         arrowLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-previous", PamGuiManagerFX.iconSize));
         arrowLeft.setTooltip(new Tooltip("Move to previous image/video"));

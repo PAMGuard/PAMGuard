@@ -112,7 +112,7 @@ public class TDControlPaneFX extends Pane  {
 
 		//CSS styling- pane has the standard PAMGUARD settings pane styling. 		  
 //		this.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
-		this.getStyleClass().add("pane");
+//		this.getStyleClass().add("pane");
 
 		PamBorderPane mainPane=new PamBorderPane();
 
@@ -255,6 +255,7 @@ public class TDControlPaneFX extends Pane  {
 		
 		//zoom in and zoom out buttons
 		zoomInto=new PamButton();
+		zoomInto.getStyleClass().add("icon-button");
 //		zoomInto.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.ARROW_COMPRESS_ALL, Color.WHITE, PamGuiManagerFX.iconSize));
 		zoomInto.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-collapse-all", PamGuiManagerFX.iconSize));
 		zoomInto.setOnAction((action)->{
@@ -262,6 +263,7 @@ public class TDControlPaneFX extends Pane  {
 		}); 
 
 		zoomOut=new PamButton();
+		zoomOut.getStyleClass().add("icon-button");
 //		zoomOut.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.ARROW_EXPAND_ALL, Color.WHITE, PamGuiManagerFX.iconSize));
 		zoomOut.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-expand-all", PamGuiManagerFX.iconSize));
 		zoomOut.setOnAction((action)->{
@@ -269,6 +271,7 @@ public class TDControlPaneFX extends Pane  {
 		}); 
 		//create button to rotate the display
 		rotate=new PamButton();
+		rotate.getStyleClass().add("icon-button");
 //		rotate.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ROTATE_90_DEGREES_CCW, Color.WHITE, PamGuiManagerFX.iconSize));
 		rotate.setGraphic(PamGlyphDude.createPamIcon("mdi2f-format-rotate-90", PamGuiManagerFX.iconSize));
 		rotate.setOnAction(new RotateButton());

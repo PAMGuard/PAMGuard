@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.TabbedPaneUI;
 
 import PamController.PamControllerInterface;
 import PamView.ColorManaged;
@@ -224,29 +225,79 @@ public class PamTabbedPane extends JTabbedPane implements ColorManaged {
 		this.defaultColor = defaultColor;
 	}
 
+	/**
+	 * True while the UI delegate is being installed. See {@link #setUI(TabbedPaneUI)}.
+	 */
+	private transient boolean installingUI;
+
+	/**
+	 * True while {@link #setBackground(Color)} is propagating a colour, to stop the
+	 * parent / child propagation below from looping forever when one PamTabbedPane
+	 * is a direct child of another.
+	 */
+	private transient boolean settingBackground;
+
+	/**
+	 * Install the UI delegate.
+	 * <p>
+	 * The first thing BasicTabbedPaneUI.installDefaults() does is
+	 * LookAndFeel.installColorsAndFont(), which calls setBackground() on this
+	 * component - and only afterwards does it read TabbedPane.tabInsets from
+	 * UIManager. Our setBackground() override calls setBackgroundAt(), which asks the
+	 * UI for the tab bounds and so forces a layout; doing that half way through
+	 * installDefaults() throws a NullPointerException out of
+	 * BasicTabbedPaneUI.calculateTabHeight() because tabInsets is still null.
+	 * <p>
+	 * That never used to happen because the look and feel was fixed once at start
+	 * up. It does now: selecting a dark colour scheme swaps the look and feel and
+	 * reinstalls the UI on every live component. So suppress the per-tab colouring
+	 * while the UI is being installed and re-apply it immediately afterwards.
+	 */
+	@Override
+	public void setUI(TabbedPaneUI ui) {
+		installingUI = true;
+		try {
+			super.setUI(ui);
+		}
+		finally {
+			installingUI = false;
+		}
+		// the UI is fully installed now, so the colours can safely be re-applied.
+		setBackground(getBackground());
+	}
+
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
-//		setOpaque(false);
-		int nC = this.getComponentCount();
-		for (int i = 0; i < nC; i++) {
-			Component comp = this.getComponent(i);
-			comp.setBackground(bg);
+		if (installingUI || settingBackground) {
+			return;
 		}
-		Container p = this.getParent();
-		if (p != null) {
-			p.setBackground(bg);
-		}
-		
-		Color fg = PamColors.getInstance().getColor(PamColor.AXIS);
-		this.setForeground(fg);
-		for (int i = 0; i < getTabCount(); i++) {
-			Component tc = super.getTabComponentAt(i);
-			if (tc != null) {
-				tc.setBackground(bg);
-				tc.setForeground(fg);
+		settingBackground = true;
+		try {
+//			setOpaque(false);
+			int nC = this.getComponentCount();
+			for (int i = 0; i < nC; i++) {
+				Component comp = this.getComponent(i);
+				comp.setBackground(bg);
 			}
-			super.setBackgroundAt(i, bg);
+			Container p = this.getParent();
+			if (p != null) {
+				p.setBackground(bg);
+			}
+
+			Color fg = PamColors.getInstance().getColor(PamColor.AXIS);
+			this.setForeground(fg);
+			for (int i = 0; i < getTabCount(); i++) {
+				Component tc = super.getTabComponentAt(i);
+				if (tc != null) {
+					tc.setBackground(bg);
+					tc.setForeground(fg);
+				}
+				super.setBackgroundAt(i, bg);
+			}
+		}
+		finally {
+			settingBackground = false;
 		}
 	}
 

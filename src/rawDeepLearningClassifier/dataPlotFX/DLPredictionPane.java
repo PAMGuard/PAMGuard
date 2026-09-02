@@ -130,14 +130,14 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 //		+ this.colourPanes.size() + " LINE INFOS: " + this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos);
 			if (i<this.colourPanes.size()) {
 				if (!classNames[i].className.equals(this.colourPanes.get(i).getName())) {
-					colourPanes.add(new PredictionColourPane(classNames[i].className, true, Color.BLACK));
+					colourPanes.add(new PredictionColourPane(classNames[i].className, true, DLClassColours.getClassColour(i)));
 				}
 				else {
 					colourPanes.add(this.colourPanes.get(i));
 				}
 			}
 			else {
-				colourPanes.add(new PredictionColourPane(classNames[i].className, true, Color.BLACK));
+				colourPanes.add(new PredictionColourPane(classNames[i].className, true, DLClassColours.getClassColour(i)));
 			}
 			
 			//now check if we can recycle colours

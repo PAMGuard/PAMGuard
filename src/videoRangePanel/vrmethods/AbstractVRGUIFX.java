@@ -130,6 +130,7 @@ public abstract class AbstractVRGUIFX implements VROverlayFX {
 		});
 
 		PamButton settingsButton = new PamButton(); 
+		settingsButton.getStyleClass().add("icon-button");
 //		settingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		settingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		settingsButton.setStyle("-fx-border-color: -fx_border_col;"); 
@@ -193,6 +194,7 @@ public abstract class AbstractVRGUIFX implements VROverlayFX {
 
 
 		PamButton settingsButton = new PamButton(); 
+		settingsButton.getStyleClass().add("icon-button");
 //		settingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		settingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		settingsButton.setStyle("-fx-border-color: -fx_border_col;"); 

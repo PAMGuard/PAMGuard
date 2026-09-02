@@ -118,17 +118,60 @@ public class StandardMHTChi2 implements MHTChi2<PamDataUnit>, Cloneable {
 	 * @return a list of chi2 varibales. 
 	 */
 	public static ArrayList<MHTChi2Var<PamDataUnit>> createChi2Vars() {
-		ArrayList<MHTChi2Var<PamDataUnit>> mhtChi2Vars = new ArrayList<MHTChi2Var<PamDataUnit>>(); 
+		ArrayList<MHTChi2Var<PamDataUnit>> mhtChi2Vars = new ArrayList<MHTChi2Var<PamDataUnit>>();
 		/******Add new chi2 vars here*******/
-		mhtChi2Vars.add(new IDIChi2()); 
-		mhtChi2Vars.add(new AmplitudeChi2()); 
-		mhtChi2Vars.add(new BearingChi2Delta()); 
-		mhtChi2Vars.add(new CorrelationChi2()); 
-		mhtChi2Vars.add(new TimeDelayChi2Delta()); 
-		mhtChi2Vars.add(new LengthChi2()); 
-		mhtChi2Vars.add(new PeakFrequencyChi2()); 
+		mhtChi2Vars.add(new IDIChi2());
+		mhtChi2Vars.add(new AmplitudeChi2());
+		mhtChi2Vars.add(new BearingChi2Delta());
+		mhtChi2Vars.add(new CorrelationChi2());
+		mhtChi2Vars.add(new TimeDelayChi2Delta());
+		mhtChi2Vars.add(new LengthChi2());
+		mhtChi2Vars.add(new PeakFrequencyChi2());
 		/**********************************/
-		return mhtChi2Vars; 
+		return mhtChi2Vars;
+	}
+
+	/**
+	 * Calculate a chi^2 quality metric for a complete, time-ordered list of track
+	 * detections using the standard chi^2 variables.
+	 * <p>
+	 * This is the same per-feature chi^2 calculation the MHT and adaptive algorithms
+	 * use to score track consistency (see {@link IDIChi2}, {@link AmplitudeChi2} and
+	 * {@link BearingChi2Delta}), exposed as a static utility so other click train
+	 * algorithms which build their tracks by a different mechanism (e.g. the UKF
+	 * detector, which does not use the {@link MHTKernel}) can assign a comparable
+	 * quality metric to their click trains.
+	 * <p>
+	 * The returned value is the sum of the per-click-averaged chi^2 of each enabled
+	 * feature; the penalty/bonus factors that the kernel adds for track competition
+	 * (coasts, new-track, long-track) are intentionally not included, so the value
+	 * reflects only how consistent the train is.
+	 *
+	 * @param dataUnits    - the complete, time-ordered list of detections in the track.
+	 * @param useAmplitude - true to include the amplitude consistency in the chi^2.
+	 * @param useBearing   - true to include the bearing consistency in the chi^2 (the
+	 *                     detections must carry bearing localisation information).
+	 * @return the chi^2 consistency metric (lower is more consistent), or
+	 *         {@link Double#NaN} if the track is too short to score.
+	 */
+	public static double calcTrackChi2(ArrayList<PamDataUnit> dataUnits, boolean useAmplitude, boolean useBearing) {
+		if (dataUnits == null || dataUnits.size() < 3) {
+			return Double.NaN;
+		}
+
+		// the IDIManager handles all time/ICI calculations for the chi2 variables.
+		IDIManager idiManager = new IDIManager();
+		idiManager.setDataUnitList(dataUnits, false);
+
+		double chi2 = 0;
+		chi2 += new IDIChi2().calcChi2(dataUnits, idiManager);
+		if (useAmplitude) {
+			chi2 += new AmplitudeChi2().calcChi2(dataUnits, idiManager);
+		}
+		if (useBearing) {
+			chi2 += new BearingChi2Delta().calcChi2(dataUnits, idiManager);
+		}
+		return chi2;
 	}
 
 	@Override

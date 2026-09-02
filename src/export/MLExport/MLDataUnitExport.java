@@ -34,6 +34,8 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 	 */
 	public Struct detectionToStruct(Struct mlStruct, T dataUnit, int index){
 		
+		//System.out.println("Exporting data unit "+dataUnit.getUID()+" to MATLAB structure" + dataUnit);
+		
 		Mat5.newScalar(dataUnit.getTimeMilliseconds());
 		
 		//all the default stuff every data unit has. 
@@ -59,7 +61,13 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 		
 
 		//the duration of the detection in samples.
-		Matrix sampleDuration = Mat5.newScalar(dataUnit.getSampleDuration()); 
+		Matrix sampleDuration;
+		if (dataUnit.getSampleDuration()!=null) {
+			 sampleDuration = Mat5.newScalar(dataUnit.getSampleDuration()); 
+		}
+		else {
+			 sampleDuration = Mat5.newScalar(0);
+		}
 		
 		Matrix freqLimits = DLMatFile.array2Matrix(dataUnit.getBasicData().getFrequency());
 

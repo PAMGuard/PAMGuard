@@ -202,6 +202,11 @@ public class PlayBackPane extends SettingsPane<PlaybackParameters>  implements P
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("sound_output.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return mainPane;
 	}

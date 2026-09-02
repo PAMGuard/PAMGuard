@@ -161,26 +161,29 @@ public class AverageWaveform {
 	 * @param sampleRate2 - the sample rate in samples per second. 
 	 * @param defaultFFTLen - the defaultFFT length. 
 	 */
-	public void addWaveform(double minFreq, double maxFreq, double amplitude, float sampleRate2, int defaultFFTLen) {
+	public synchronized void addWaveform(double minFreq, double maxFreq, double amplitude, float sampleRate2, int defaultFFTLen) {
 		this.fftLength = defaultFFTLen; 
+		this.sampleRate = sampleRate2; 
 		
 		//System.out.println("Add to averagewaveform: minFreq " + minFreq + " maxFreq: " + maxFreq + " amplitude: " + amplitude + " sR: " + sampleRate2); 
 
 		if (avrgSpectra==null) {
-			//the FFT length is the length of the first waveform 
+			//there is no waveform, so the length of the histogram is simply the FFT length. 
 			avrgSpectra = new double[this.fftLength];
-			return; 
+		}
+		
+		if (maxFreq<=minFreq) {
+			//nothing sensible to add - would give an infinite or negative amplitude per bin. 
+			return;
 		}
 		
 		double amplitudebin = amplitude/(maxFreq-minFreq); 
 
-		double minFreqBin;
-		double maxFreqBin;
+		double binFreq;
 		for (int i= 0; i <avrgSpectra.length; i++) {
-			minFreqBin = (i/(double) avrgSpectra.length)*(sampleRate2/2); 
-			maxFreqBin = (i/(double) avrgSpectra.length)*(sampleRate2/2); 
+			binFreq = (i/(double) avrgSpectra.length)*(sampleRate2/2); 
 
-			if (minFreqBin > minFreq && maxFreqBin<=maxFreq) {
+			if (binFreq > minFreq && binFreq<=maxFreq) {
 				avrgSpectra[i]+=amplitudebin;
 			}
 		}

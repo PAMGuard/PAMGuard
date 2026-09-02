@@ -6,8 +6,8 @@ import generalDatabase.PamConnection;
 import difar.DifarControl;
 import difar.DifarDataUnit;
 import pamScrollSystem.PamScroller;
-import targetMotionModule.TargetMotionResult;
-import targetMotionModule.algorithms.Simplex2D;
+import difar.targetmotion.TargetMotionResult;
+import difar.targetmotion.Simplex2D;
 import Array.ArrayManager;
 import Array.StreamerDataUnit;
 import PamController.PamController;
@@ -113,7 +113,7 @@ public class TrackedGroupProcess extends PamProcess{
 		ArrayList<PamDataUnit> detectionList = trackedGroupData.findDataUnits(trackedGroupDataUnit.getGroupName());
 		if (detectionList.size() < 2) return null;
 
-		Simplex2D simplex2D = new Simplex2D(null);
+		Simplex2D simplex2D = new Simplex2D();
 		TrackedGroupTargetMotionInformation tmi = new TrackedGroupTargetMotionInformation(this, detectionList);
 		simplex2D.setStartPoint(tmi.getMeanPosition());
 		long now = System.currentTimeMillis();

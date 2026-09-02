@@ -1,6 +1,7 @@
 package pamViewFX.fxNodes.pamScrollers.acousticScroller;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -91,9 +92,25 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	private RawSoundDataInfo rawSoundDataInfo;
 
 	/**
-	 * The default height of the scroll bar. 
+	 * The default height of the scroll bar.
 	 */
 	private static final double scrollBarHeight=40.;
+
+	/**
+	 * The fraction of the displayed data range which is also loaded either side of it.
+	 * <p>
+	 * The scroller draws a preview of the currently loaded data range, so on the face
+	 * of it there is no point loading anything outside it. But when that range moves -
+	 * the user pages forwards or backwards, or jumps to a detection - a preview which
+	 * holds exactly the old range has nothing for the new one and has to be rebuilt
+	 * from disk, which the user sees as the scroll bar blanking and slowly refilling.
+	 * Loading a margin either side (and only ordering what is actually missing, see
+	 * {@link AcousticScrollerGraphics#getRequiredLoadIntervals(long, long)}) means a
+	 * move smaller than the margin needs no loading at all, and a larger one only loads
+	 * the part that is genuinely new. Same idea as the pre-load either side of the
+	 * visible range in the tiled spectrogram (see {@code Scrolling2DPlotDataFX2}).
+	 */
+	private static final double LOAD_MARGIN_FRACTION = 0.25;
 
 
 	/**
@@ -208,12 +225,14 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 		//buttons for moving the scroll bar. 
 		arrowBottomLeft=new PamButton(); 
+		arrowBottomLeft.getStyleClass().add("icon-button");
 		arrowBottomLeft.getStyleClass().add("opaque-button-square"); 
 		arrowBottomLeft.setOnAction((action)->{
 			scrollBarPane.moveScrollRectangle(-this.scrollArrowIncrement);
 		});
 
 		arrowTopRight=new PamButton(); 
+		arrowTopRight.getStyleClass().add("icon-button");
 		arrowTopRight.getStyleClass().add("opaque-button-square"); 
 		arrowTopRight.setOnAction((action)->{
 			scrollBarPane.moveScrollRectangle(this.scrollArrowIncrement);
@@ -236,9 +255,9 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 		@Override
 		public void scrollRangeChanged(AbstractPamScroller pamScroller) {
-			//here the range has chnaged i.e. new data has been loaded. Need to redraw the datagrams. 
+			//here the range has chnaged i.e. new data has been loaded. Need to redraw the datagrams.
 			//			System.out.println("AcousticScrollerFX: Begin loading data");
-			cancelDataLoadTasks(); 
+			cancelDataLoadTasks();
 			if (isViewer) loadScrollerData();
 		}
 	}
@@ -271,8 +290,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	 * @param - newTasks - true to create new tasks. False to use old tasks (that might have kept a record of previous loading)
 	 */
 	public synchronized void loadScrollerData(boolean newTasks){
-
-		if (loadTasks==null) return; 
+		if (loadTasks==null) return;
 		/***
 		 * Why do we use threads here?
 		 * Basically we do this because in most data blocks we process a lot of  data, which has already been loaded, from the data block
@@ -297,14 +315,14 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		for (int i=0; i<acousticScrollerGraphics.size(); i++){
 
 			if (newTasks) {
-				loadTasks.add(new LoadTask(acousticScrollerGraphics.get(i))); 
+				loadTasks.add(new LoadTask(acousticScrollerGraphics.get(i)));
 			}
 			else {
-				loadTasks.add(new LoadTask(acousticScrollerGraphics.get(i), oldloadTasks.get(i).getCurrentCount()));  
+				loadTasks.add(new LoadTask(acousticScrollerGraphics.get(i), oldloadTasks.get(i).getCurrentCount()));
 			}
 
 			//this executes the threads SEQUENTIALLY
-			executorService.submit(loadTasks.get(i)); 
+			executorService.submit(loadTasks.get(i));
 		}
 
 	}
@@ -319,11 +337,41 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		private AcousticScrollerGraphics acousticScrollerGraphics;
 
 		/**
-		 * Indicates that offline data is still beinhg loaded. 
+		 * Indicates that offline data is still beinhg loaded.
 		 */
-		private boolean dataLoading = false;
+		private volatile boolean dataLoading = false;
 
-		private int currentCount =0; 
+		/**
+		 * Sticky interrupted flag for the current pass. The offline loader can fire several
+		 * callbacks for one order (e.g. an INTERRUPTED followed by a spurious NO_DATA when a
+		 * cancelled order is re-queued under PRIORITY_CANCEL_RESTART). If ANY callback during
+		 * the pass was REQUEST_INTERRUPTED the pass was cut short and must be resumed - so we
+		 * latch it here rather than trusting only the last status.
+		 */
+		private volatile boolean passInterrupted = false;
+
+		/**
+		 * True once an offline load has run to its natural end (all available data
+		 * delivered). Distinct from being cancelled or given up while still incomplete -
+		 * only a natural completion should let the graphics mark its range fully loaded.
+		 */
+		private volatile boolean naturalCompletion = false;
+
+		/**
+		 * Wall-clock time (millis) of the last sign of life from the current order - either
+		 * when it was placed or when it last delivered a data unit. Used to detect a stalled
+		 * order (e.g. queued behind the display's load on the same block and never serviced)
+		 * so the wait loop can give up instead of spinning forever.
+		 */
+		private volatile long lastLoadActivity = 0;
+
+		/**
+		 * If an order neither delivers data nor finishes within this many millis it is
+		 * considered stalled and abandoned (the preview retries on the next change).
+		 */
+		private static final long STALL_TIMEOUT_MILLIS = 15000;
+
+		private int currentCount =0;
 
 		public LoadTask(AcousticScrollerGraphics acousticScrollerGraphics) {
 			this.acousticScrollerGraphics=acousticScrollerGraphics; 
@@ -340,20 +388,30 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		protected Double call() throws Exception {
 
 			try {
-			//allow for multiple calls here. Thread goes to sleep and if interrupted just cancels. 
-			//Thread.sleep(100);		
+			//allow for multiple calls here. Thread goes to sleep and if interrupted just cancels.
+			//Thread.sleep(100);
 
 			if (AcousticScrollerFX.this.getRangeMillis()==0) {
 				return 0.;
 			}
 
 			if (this.isCancelled()){
-				return 0.; 
+				return 0.;
+			}
+
+			//skip graphics that are already up to date (e.g. the spectrogram preview when
+			//the loaded range has not moved) so they are not needlessly rebuilt as the
+			//user drags the scroll bar.
+			if (!acousticScrollerGraphics.needsReload()) {
+				Platform.runLater(()->{
+					repaint(0);
+				});
+				return 0.;
 			}
 
 			//System.out.println("AcousticScrollerFX: Starting to load: " + acousticScrollerGraphics.getName());
 			if (acousticScrollerGraphics.orderOfflineData()){
-				//load data from files - PAMGuard handles threading here. 
+				//load data from files - PAMGuard handles threading here.
 				redrawOrderredDataGram(acousticScrollerGraphics);
 			}
 			else {
@@ -363,7 +421,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				return -1.; 
+				return -1.;
 			}
 		}
 
@@ -376,6 +434,12 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 		@Override protected void succeeded() {
 			super.succeeded();
+			//let the graphics record that its load completed (so a fixed preview is not
+			//rebuilt again until the loaded range actually changes). Pass the final load
+			//state so the graphics can tell a natural completion from an interruption - an
+			//interrupted or empty/NO_DATA pass must not be recorded as complete, or the
+			//preview would either never build or get stuck half-loaded.
+			acousticScrollerGraphics.loadCompleted(naturalCompletion);
 			Platform.runLater(()->{
 				repaint(0);
 			});
@@ -449,52 +513,179 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 
 		/**
-		 * Create the datagram for a datablock which requires orderrring of offline data. 
-		 * @param task
-		 * @param acousticScrollerGraphics
+		 * Create the datagram for a datablock which requires ordering of offline data.
+		 * <p>
+		 * Only the parts of the range the graphics does not already hold are ordered, and
+		 * the range runs a margin either side of the displayed one (see
+		 * {@link AcousticScrollerFX#getLoadStartMillis()}). So when the loaded data range
+		 * moves, whatever the preview already built is kept and drawn - it is stored
+		 * against absolute time - and only genuinely new data are loaded; a move smaller
+		 * than the margin loads nothing at all.
+		 * @param acousticScrollerGraphics - the graphics to load data for.
 		 */
 		private void redrawOrderredDataGram(AcousticScrollerGraphics acousticScrollerGraphics){
 
-			//			try {
-			//				Thread.sleep(100);
-			//			} catch (InterruptedException e) {
-			//				// TODO Auto-generated catch blockf
-			//				e.printStackTrace();
-			//			}
+			long loadStart = getLoadStartMillis();
+			long loadEnd = getLoadEndMillis();
+			long chunkMillis = acousticScrollerGraphics.getLoadChunkMillis();
 
-			acousticScrollerGraphics.clearStore(); 
+			/*
+			 * Ask the graphics what it is still missing. Graphics which do not track what
+			 * they hold return null, in which case fall back to the original behaviour:
+			 * prepareOfflineLoad arms a deferred clear for a fresh range and returns where
+			 * to (re)start from - the range start for a fresh range, or the furthest
+			 * already-built point when continuing a previously interrupted load.
+			 */
+			List<long[]> required = acousticScrollerGraphics.getRequiredLoadIntervals(loadStart, loadEnd);
+			if (required == null) {
+				long cursor = acousticScrollerGraphics.prepareOfflineLoad(loadStart, loadEnd);
+				required = new ArrayList<long[]>();
+				required.add(new long[] {cursor, loadEnd});
+			}
 
-			long dataStart = getMinimumMillis();
-			long dataEnd = getMaximumMillis();
+			/*
+			 * Load as a sequence of chunks rather than one big order. Each offline order
+			 * clears the source data blocks first (see OfflineDataLoading.clearAllFFTBlocks),
+			 * so a single whole-range order would hold every FFT unit in the range in memory
+			 * at once - gigabytes for a long, high-sample-rate file. Chunking keeps the
+			 * resident FFT memory to roughly one chunk's worth (see
+			 * AcousticScrollerGraphics.getLoadChunkMillis), while the graphics retains its
+			 * own compact preview across chunks. A chunkMillis of 0 keeps the original
+			 * single-order behaviour.
+			 */
+			ArrayList<long[]> chunks = chunkIntervals(required, chunkMillis);
 
-			OfflineDataLoadInfo offlineDataInfo = new OfflineDataLoadInfo(new LoadOfflineDataObserver(acousticScrollerGraphics), new DataFinished(),  
-					dataStart, dataEnd, 0, OfflineDataLoading.OFFLINE_DATA_WAIT, false);
-			offlineDataInfo.setPriority(OfflineDataLoadInfo.PRIORITY_CANCEL_RESTART); 
+			naturalCompletion = false;
+			int noProgress = 0;
+			int iChunk = 0;
 
-			//loads on it's own thread. 
-			acousticScrollerGraphics.getDataBlock().orderOfflineData(offlineDataInfo);
+			while (iChunk < chunks.size() && !isCancelled()) {
 
-			dataLoading=true; 
+				long[] chunk = chunks.get(iChunk);
 
-			//wait for the data to load. 
-			while(dataLoading && !isCancelled()){
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch blockf
-					e.printStackTrace();
+				//Idle-gate: if another consumer (e.g. the main spectrogram display) is loading
+				//this block, wait for it to finish rather than placing a competing order that
+				//would just stall behind it. Polling here IS the retry-when-free mechanism.
+				while (acousticScrollerGraphics.isOfflineLoadBlocked() && !isCancelled()) {
+					try { Thread.sleep(500); } catch (InterruptedException e) { }
+				}
+				if (isCancelled()) {
+					break;
+				}
+
+				OfflineDataLoadInfo offlineDataInfo = new OfflineDataLoadInfo(new LoadOfflineDataObserver(acousticScrollerGraphics), new DataFinished(),
+						chunk[0], chunk[1], 0, OfflineDataLoading.OFFLINE_DATA_WAIT, false);
+				offlineDataInfo.setPriority(OfflineDataLoadInfo.PRIORITY_CANCEL_RESTART);
+
+				//NOTE: set the flag BEFORE placing the order, otherwise the DataFinished observer
+				//(which fires on the load thread) can set dataLoading=false before we set it true here.
+				dataLoading=true;
+				passInterrupted=false;
+				lastLoadActivity=System.currentTimeMillis();
+
+				//loads on it's own thread.
+				acousticScrollerGraphics.getDataBlock().orderOfflineData(offlineDataInfo);
+
+				//wait for this chunk to load.
+				boolean stalled = false;
+				while(dataLoading && !isCancelled()){
+					try {
+						Thread.sleep(500);
+						if (System.currentTimeMillis() - lastLoadActivity > STALL_TIMEOUT_MILLIS) {
+							//The order is neither delivering data nor finishing - almost always
+							//because it is queued behind the display's load on the same block.
+							//Abandon it rather than spin forever; the preview retries on the next change.
+							stalled = true;
+							break;
+						}
+					} catch (InterruptedException e) {
+					}
+				}
+
+				if (isCancelled()) {
+					break;
+				}
+
+				if (stalled) {
+					//cancel the abandoned order so it does not linger on the block, then give up.
+					acousticScrollerGraphics.getDataBlock().cancelDataOrder();
+					break;
+				}
+
+				//Use the sticky flag: if ANY callback during this chunk was INTERRUPTED the
+				//chunk was cut short, even if a later spurious NO_DATA callback followed.
+				if (passInterrupted) {
+					//Interrupted by the competing display load (not by the user). Retry the same
+					//chunk - whatever it did manage to build is kept (the store is keyed on
+					//absolute time), so a retry is not wasted work. Guard against spinning when
+					//the order is repeatedly bumped before delivering anything; the load is
+					//retried on the next scroll change anyway.
+					if (++noProgress > 10) {
+						break;
+					}
+					try { Thread.sleep(300); } catch (InterruptedException e) { }
+					continue;
+				}
+
+				//Chunk loaded to its natural end (including NO_DATA): record it as held so it
+				//is not ordered again, and move on to the next.
+				acousticScrollerGraphics.markRangeLoaded(chunk[0], chunk[1]);
+				iChunk++;
+				noProgress = 0;
+			}
+
+			//Only a run that got through every chunk without being cancelled is a genuine
+			//natural completion (so the graphics may mark its range fully loaded).
+			if (!isCancelled() && iChunk >= chunks.size()) {
+				naturalCompletion = true;
+			}
+		}
+
+		/**
+		 * Split the intervals which need loading into orders no longer than chunkMillis,
+		 * putting the chunks which overlap the displayed data range first so that what
+		 * the user can actually see is built before the off-screen margins.
+		 * @param intervals - the intervals needing to be loaded.
+		 * @param chunkMillis - the maximum span of one order, or 0 for no chunking.
+		 * @return the chunks to order, in the order they should be ordered.
+		 */
+		private ArrayList<long[]> chunkIntervals(List<long[]> intervals, long chunkMillis) {
+
+			long dispStart = getMinimumMillis();
+			long dispEnd = getMaximumMillis();
+
+			ArrayList<long[]> displayed = new ArrayList<long[]>();
+			ArrayList<long[]> margins = new ArrayList<long[]>();
+
+			for (long[] interval : intervals) {
+				long len = interval[1]-interval[0];
+				if (len <= 0) {
+					continue;
+				}
+				long span = (chunkMillis <= 0) ? len : chunkMillis;
+				for (long start = interval[0]; start < interval[1]; start += span) {
+					long end = Math.min(start+span, interval[1]);
+					if (end > dispStart && start < dispEnd) {
+						displayed.add(new long[] {start, end});
+					}
+					else {
+						margins.add(new long[] {start, end});
+					}
 				}
 			}
 
-			//Finished loading data!!!!!
-
+			displayed.addAll(margins);
+			return displayed;
 		}
 
 
 		private class DataFinished  implements LoadObserver {
 			@Override
 			public void setLoadStatus(int loadState) {
-				dataLoading=false; 
+				if ((loadState & OfflineDataLoading.REQUEST_INTERRUPTED) != 0) {
+					passInterrupted=true;
+				}
+				dataLoading=false;
 			}
 		}
 		
@@ -508,8 +699,6 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		 */
 		private class LoadOfflineDataObserver extends PamObserverAdapter {
 
-			int count=0;
-
 			/**
 			 * Acoustic scroller graphics for this loaded. 
 			 */
@@ -521,18 +710,12 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 			@Override
 			public void addData(PamObservable o, PamDataUnit dataUnit) {
-				//System.out.println("AcousticScrollerFX: New data: " +  dataUnit);
-				if (count%10000==0){
-					//					System.out.println("AcousticScrollerFX: New raw data type unit: count " + count + " " +  dataUnit);
-					count=0; 
-				}
-
+				//mark progress so the wait loop's stall detector knows the order is alive.
+				lastLoadActivity = System.currentTimeMillis();
 				acousticScrollerGraphics.addNewData(dataUnit);
 				Platform.runLater(()->{
 					repaint(100);
 				});
-				count++; 
-
 			}
 
 			@Override
@@ -557,7 +740,41 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 
 	/**
-	 * Pause the datagram loading. 
+	 * The start of the range the scroller graphics should load, in millis. This is the
+	 * start of the currently loaded (displayed) data range less a margin, clamped to
+	 * the start of the available data - see {@link #LOAD_MARGIN_FRACTION}.
+	 * @return the start of the range to load in millis.
+	 */
+	public long getLoadStartMillis() {
+		long start = getMinimumMillis() - (long) (getRangeMillis()*LOAD_MARGIN_FRACTION);
+		//checkMinimumTime pulls the time up to the start of the available data. It returns
+		//0 if there is no data map at all, in which case leave the unclamped value alone.
+		long clamped = AbstractScrollManager.getScrollManager().checkMinimumTime(start);
+		if (clamped > 0) {
+			start = Math.min(clamped, getMinimumMillis());
+		}
+		return start;
+	}
+
+	/**
+	 * The end of the range the scroller graphics should load, in millis. This is the end
+	 * of the currently loaded (displayed) data range plus a margin, clamped to the end
+	 * of the available data - see {@link #LOAD_MARGIN_FRACTION}.
+	 * @return the end of the range to load in millis.
+	 */
+	public long getLoadEndMillis() {
+		long end = getMaximumMillis() + (long) (getRangeMillis()*LOAD_MARGIN_FRACTION);
+		//checkMaximumTime pulls the time back to the end of the available data. It returns
+		//0 if there is no data map at all, in which case leave the unclamped value alone.
+		long clamped = AbstractScrollManager.getScrollManager().checkMaximumTime(end);
+		if (clamped > 0) {
+			end = Math.max(clamped, getMaximumMillis());
+		}
+		return end;
+	}
+
+	/**
+	 * Pause the datagram loading.
 	 * <p>
 	 * This is used to pause the data gram loading for example if a data block is
 	 * being accessed somewhere else. If pauseDataload(true) is called afterwards
@@ -565,7 +782,6 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	 * @param - true to pause
 	 */
 	public void pauseDataload(boolean pause) {
-		//System.out.println("Pause the data load: " + pause); 
 		if (pause) {
 			//stop all tasks
 			if (loadTasks!=null) {
@@ -574,10 +790,10 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 				}
 			}
 
-			if (executorService!=null) executorService.shutdownNow(); 
+			if (executorService!=null) executorService.shutdownNow();
 		}
 		else {
-			loadScrollerData(false); 
+			loadScrollerData(false);
 		}
 	}
 
@@ -949,10 +1165,24 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	 * Called whenever the scroll bar value changes. 
 	 */
 	private void scrollMoved() {
-		//System.out.println("Scroll Bar moved: "); 
-		pauseDataload(true); 
-		AbstractScrollManager.getScrollManager().moveInnerScroller(this, getValueMillis());	
+		//System.out.println("Scroll Bar moved: ");
+		pauseDataload(true);
+		AbstractScrollManager.getScrollManager().moveInnerScroller(this, getValueMillis());
 		notifyValueChange();
+
+		/*
+		 * An interactive drag sets isChanging=true while moving and false on release;
+		 * the isChangingProperty listener resumes the (paused) data load on that
+		 * release, which is what restarts the spectrogram preview after a drag.
+		 * Programmatic moves - the arrow buttons and clicking in the scroll trough -
+		 * change the scroll value WITHOUT that isChanging true->false transition, so
+		 * the load paused just above would never be resumed and the preview would not
+		 * reprocess. Resume it here for those moves. (needsReload() still guards against
+		 * a needless rebuild when the loaded range has not actually changed.)
+		 */
+		if (!isScrollerChanging()) {
+			pauseDataload(false);
+		}
 	}
 
 

@@ -6,9 +6,7 @@ The PAMGuard exporter allows users to export PAMGuard data, such as detections, 
 ## Exporting
 The PAMGuard exporter can be accessed from *File->Export*. This brings up the Export dialog. The export dialog allows users to select which data to export, where to export it and the file format to export as. Each data block also has a settings icon which opens the data block's unique data selector. So for example, users can export only specific types of clicks or whistles between certain frequencies. 
 
-<p align="center">
-  <img width="920" height="475" src = "resources/PAMGuard_exporter_dialog_annotated.png">
-</p>
+![](resources/PAMGuard_exporter_dialog_annotated.png)
 
 <center><em>  Diagram of the exporter dialog. The dialog allows users to select which part of the dataset to export, how to export it and which type of data to export </em></center>
 
@@ -78,9 +76,7 @@ load("/my/path/to/file.RData")
 ### Wav files
 Any detection which contains raw sound data, for example a click, clip or deep learning detection, can be exported as a wav file. When wav files are selected three options are presented for saving files. 
 
-<p align="center">
-  <img width="300" height="450" src = "resources/PAMGuard_exporter_dialog_wav.png">
-</p>
+![](resources/PAMGuard_exporter_dialog_wav.png)
 
 <center><em> When wav files are selected additional options are presented on how to save the file </em></center>
 

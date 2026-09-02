@@ -23,7 +23,6 @@ import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import soundPlayback.PlaybackControl;
 import clickDetector.BTDisplayParameters;
@@ -39,6 +38,7 @@ import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamLabel;
 import PamView.dialog.PamRadioButton;
 import PamView.panel.PamPanel;
+import PamView.component.PamFontIcon;
 import PamguardMVC.dataSelector.DataSelectParams;
 
 public class OfflineToolbar {
@@ -85,7 +85,7 @@ public class OfflineToolbar {
 			
 //			private static final FontIcon settings =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
 
-			playClicks = new JButton(FontIcon.of(MaterialDesignP.PLAY_CIRCLE_OUTLINE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY));
+			playClicks = new JButton(PamFontIcon.of(MaterialDesignP.PLAY_CIRCLE_OUTLINE, PamSettingsIconButton.NORMAL_SIZE));
 			playClicks.addActionListener(new PlayClicks());
 			playClicks.setToolTipText("Play clicks (pack empty space with 0's)");
 			PlaybackControl.registerPlayButton(playClicks);

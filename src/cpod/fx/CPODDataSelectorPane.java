@@ -12,7 +12,6 @@ import cpod.CPODClassification.CPODSpeciesType;
 import cpod.CPODUtils;
 import cpod.dataSelector.CPODDataSelector;
 import cpod.dataSelector.StandardCPODFilterParams;
-import export.MLExport.MLCPODExport;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -126,8 +125,23 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 	}
 	
 	protected static int getSpeciesIndex(CPODSpeciesType speciesType) {
+		/*
+		 * Index 0 of the menu is "All", so everything else is offset by one. Note that this
+		 * must be the exact inverse of getSpecies(int) - it cannot use the species codes from
+		 * MLCPODExport, which uses 4 rather than 3 for sonar and so selects nothing at all.
+		 */
 		if (speciesType==null) return 0;
-		else return MLCPODExport.getCPODSpecies(speciesType)+1;
+		switch (speciesType) {
+		case UNKNOWN:
+			return 1;
+		case NBHF:
+			return 2;
+		case DOLPHIN:
+			return 3;
+		case SONAR:
+			return 4;
+		}
+		return 0;
 	}
 
 	

@@ -2,7 +2,12 @@ package pamViewFX;
 
 import java.util.ArrayList;
 
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -117,8 +122,109 @@ public class PamGuiTabFX extends PamTabFX {
 		if (newContent!=null) addInternalPane(newContent);
 		
 		super.setContent(contentHolder);
-		
+
 		setPanesEditable(editable);
+
+		//allow the user to right-click the tab header to rename it.
+		setupRenameContextMenu();
+	}
+
+	/**
+	 * Add a context menu to the tab header which allows the user to rename the
+	 * tab by right-clicking on it.
+	 */
+	private void setupRenameContextMenu() {
+		Label label = getLabel();
+		if (label == null) return;
+
+		ContextMenu contextMenu = new ContextMenu();
+		MenuItem renameItem = new MenuItem("Rename tab...");
+		renameItem.setOnAction(e -> startRename());
+		contextMenu.getItems().add(renameItem);
+
+		label.setOnContextMenuRequested(e -> {
+			contextMenu.show(label, e.getScreenX(), e.getScreenY());
+			e.consume();
+		});
+
+		//also allow a double-click to start renaming.
+		label.setOnMouseClicked(e -> {
+			if (e.getClickCount() == 2) {
+				startRename();
+				e.consume();
+			}
+		});
+	}
+
+	/**
+	 * Begin an inline rename of the tab. The tab header label is temporarily
+	 * replaced with a text field. The new name is committed when the user
+	 * presses Enter or the field loses focus, and cancelled with Escape.
+	 */
+	public void startRename() {
+		Label label = getLabel();
+		if (label == null) return;
+
+		TextField textField = new TextField(getName());
+		textField.setPrefWidth(Math.max(80, label.getWidth() + 20));
+
+		//guard so the name is only committed once (Enter then focus-loss would otherwise fire twice).
+		final boolean[] committed = {false};
+
+		Runnable finish = () -> {
+			if (committed[0]) return;
+			committed[0] = true;
+			String newName = textField.getText() == null ? "" : textField.getText().trim();
+			//restore the label as the tab graphic.
+			setGraphic(label);
+			if (!newName.isEmpty() && !newName.equals(getName())) {
+				renameTab(newName);
+			}
+		};
+
+		textField.setOnAction(e -> finish.run());
+		textField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+			if (!isFocused) finish.run();
+		});
+		textField.setOnKeyPressed(e -> {
+			if (e.getCode() == KeyCode.ESCAPE) {
+				//cancel: restore the label without renaming.
+				committed[0] = true;
+				setGraphic(label);
+				e.consume();
+			}
+		});
+
+		setGraphic(textField);
+		textField.selectAll();
+		textField.requestFocus();
+	}
+
+	/**
+	 * Rename the tab. Updates the visible header text, the stored {@link TabInfo}
+	 * and the tab name referenced by any user displays held in this tab so that
+	 * the display-to-tab association is preserved when settings are saved and
+	 * restored.
+	 * @param newName - the new tab name.
+	 */
+	public void renameTab(String newName) {
+		if (newName == null || newName.trim().isEmpty()) return;
+		newName = newName.trim();
+
+		//update the visible label and drag text.
+		setLabelText(newName);
+
+		//update the stored tab info used for persistence.
+		tabInfo.tabName = newName;
+
+		//update the tab name referenced by any displays within this tab so the
+		//display-to-tab link survives a save/restore (see PamGuiManagerFX.getDisplayTab).
+		for (PamGuiInternalPane internalPane : internalPanes) {
+			UserDisplayNodeFX node = internalPane.getUserDisplayNode();
+			if (node != null && node.getDisplayParams() != null) {
+				node.getDisplayParams().tabName = newName;
+			}
+		}
 	}
 	
 	/**
@@ -218,6 +324,10 @@ public class PamGuiTabFX extends PamTabFX {
 		
 		
 		PamGuiInternalPane newInternalPane=new PamGuiInternalPane(userDisplayNodeFX, holder);
+		
+		//bind the drag pad to the height of the shared toolbar so that it is always below the toolbar.
+		newInternalPane.dragPadNorthProperty().bind(pamGui.getSharedToolbar().heightProperty());
+		
 		if (!userDisplayNodeFX.isResizeableDisplay()) newInternalPane.showResizeControls(false);
 		holder.getChildren().add(newInternalPane);
 		internalPanes.add(newInternalPane);
@@ -239,12 +349,26 @@ public class PamGuiTabFX extends PamTabFX {
 			holderHeight=pamGui.getPamGuiManagerFX().getDataModelFX().getHeight();
 		}
 		//HACK end
-		
+
+		// Compute the drag pad insets from the first pane (all panes share the same bindings).
+		double padNorth = internalPanes.isEmpty() ? 0 : internalPanes.get(0).getDragPadNorth();
+		double padSouth = internalPanes.isEmpty() ? 0 : internalPanes.get(0).getDragPadSouth();
+		double padWest  = internalPanes.isEmpty() ? 0 : internalPanes.get(0).getDragPadWest();
+		double padEast  = internalPanes.isEmpty() ? 0 : internalPanes.get(0).getDragPadEast();
+
+		// Effective area available for laying out panes, after accounting for drag pads.
+		double availWidth  = holderWidth  - padWest - padEast;
+		double availHeight = holderHeight - padNorth - padSouth;
+
+		// Origin offset so that panes start inside the padded area.
+		double originX = padWest;
+		double originY = padNorth;
+
 		//TILE means equally sized windows 
 		if (sortType==SORT_TILE){
 			for (int i=0; i<internalPanes.size(); i++){
-				internalPanes.get(i).setPaneSize(holderWidth/internalPanes.size(), holderHeight);
-				internalPanes.get(i).setPaneLayout((i*holderWidth)/internalPanes.size(), 0);
+				internalPanes.get(i).setPaneSize(availWidth/internalPanes.size(), availHeight);
+				internalPanes.get(i).setPaneLayout(originX + (i*availWidth)/internalPanes.size(), originY);
 			}
 			return;
 		}
@@ -281,15 +405,15 @@ public class PamGuiTabFX extends PamTabFX {
 			double pad =0.;
 			
 			if (largeWindows > 0) {
-				x = 0;
-				y = 0;
+				x = originX;
+				y = originY;
 				if (smallWindows == 0) {
-					h = (horz) ? holderHeight : holderHeight/largeWindows;
-					w = (horz) ? (holderWidth / largeWindows) : holderWidth*r;
+					h = (horz) ? availHeight : availHeight/largeWindows;
+					w = (horz) ? (availWidth / largeWindows) : availWidth*r;
 				}
 				else {
-					h = (horz) ? holderHeight * r :  holderHeight/largeWindows;
-					w = (horz) ? (holderWidth / largeWindows) : holderWidth ;
+					h = (horz) ? availHeight * r :  availHeight/largeWindows;
+					w = (horz) ? (availWidth / largeWindows) : availWidth;
 				}
 				for (int i = 0; i < dw.size(); i++) {
 					if (dw.get(i).getUserDisplayNode().isMinorDisplay()) continue;
@@ -306,16 +430,16 @@ public class PamGuiTabFX extends PamTabFX {
 			
 			//small windows
 			if (smallWindows > 0) {
-				x = (horz) ? 0 : holderWidth - holderWidth* r1;
-				y = (horz) ? h : 0;
+				x = (horz) ? originX : originX + availWidth - availWidth * r1;
+				y = (horz) ? originY + h : originY;
 									
 				if (largeWindows > 0) {
-					h = (horz) ? holderHeight - h : holderHeight/smallWindows;
-					w = (horz) ? (holderWidth / smallWindows) :  holderWidth* r1;
+					h = (horz) ? availHeight - h : availHeight/smallWindows;
+					w = (horz) ? (availWidth / smallWindows) :  availWidth * r1;
 				}
 				else {
-					w = (horz) ? (holderWidth / smallWindows) :  holderWidth;
-					h = (horz) ? holderHeight : holderHeight/smallWindows;
+					w = (horz) ? (availWidth / smallWindows) :  availWidth;
+					h = (horz) ? availHeight : availHeight/smallWindows;
 				}
 				
 				for (int i = 0; i < dw.size(); i++) {

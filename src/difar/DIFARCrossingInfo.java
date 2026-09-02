@@ -2,7 +2,7 @@ package difar;
 
 import PamUtils.LatLong;
 import pamMaths.PamVector;
-import targetMotionModule.TargetMotionResult;
+import difar.targetmotion.TargetMotionResult;
 
 /**
  * 

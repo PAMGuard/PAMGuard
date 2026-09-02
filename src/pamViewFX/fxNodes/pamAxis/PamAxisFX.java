@@ -46,6 +46,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import Layout.PamAxisPanel;
+import pamViewFX.fxNodes.PamColorsFX;
 import com.sun.javafx.geom.Dimension2D;
 //import com.sun.javafx.tk.FontMetrics; replaced with internal FontMetrics class
 
@@ -122,9 +123,13 @@ public class PamAxisFX {
 	private DoubleProperty y2 =  new AxisDoubleProperty(2);  
 		
 	/**
-	 * The stroke color, i.e. colour of text and labels. 
+	 * The stroke color, i.e. colour of text and labels.
+	 * <p>
+	 * Null means follow the current colour scheme (PamColor.AXIS) - see
+	 * {@link #getStrokeColor()}. It is only non null if something has explicitly
+	 * called {@link #setStrokeColor(Color)}.
 	 */
-	private Color axisStrokeColor=Color.BLACK; 
+	private Color axisStrokeColor = null;
 
 	
 	/**
@@ -355,7 +360,7 @@ public class PamAxisFX {
 	 */
 	public void drawAxis(GraphicsContext g) {
 
-		 g.setFill(axisStrokeColor);
+		 g.setFill(getStrokeColor());
 
 //		fontMetrics = Toolkit.getToolkit().getFontLoader().getFontMetrics(g.getFont());
 		fontMetrics = new FontMetrics(g.getFont());
@@ -689,8 +694,9 @@ public class PamAxisFX {
 		// need to first work out which way the lines are going and how long they are:
 		// basically they go in the same direction as the tickmarks - given in tickAngle
 
-		g.setFill(Color.GRAY);
-		
+		// grid lines follow the colour scheme so they stay visible on a dark plot.
+		g.setFill(PamColorsFX.getInstance().getColor(PamColorsFX.PamColor.GRID));
+
 		int xExtent = (int) (Math.cos(tickAngle) * plotSize.width);
 		int yExtent = (int) (Math.sin(tickAngle) * plotSize.height);
 		ArrayList<Point2D> axisPoint2Ds = getAxisPoint2Ds(true);
@@ -702,6 +708,7 @@ public class PamAxisFX {
 		
 		float[] dashes = {2, 2};
 		Paint s = g.getStroke();
+		g.setStroke(PamColorsFX.getInstance().getColor(PamColorsFX.PamColor.GRID));
 		if (minorGrid == 0) {
 //			// if there is a monir grid, draw the main one solid.
 //			// if no minor grid, thendo the main one dashed.
@@ -1409,16 +1416,31 @@ public class PamAxisFX {
 	}
 
 	/**
-	 * Set the stroke colour. 
-	 * @param strokeColor
+	 * Set the stroke colour, i.e. the colour of the axis line, ticks and labels.
+	 * <p>
+	 * Pass null to go back to following the current colour scheme.
+	 *
+	 * @param strokeColor the colour to draw the axis in, or null to follow the
+	 *                    colour scheme.
 	 */
 	public void setStrokeColor(Color strokeColor) {
-		this.axisStrokeColor=strokeColor; 
-		
+		this.axisStrokeColor=strokeColor;
+
 	}
 
+	/**
+	 * Get the stroke colour, i.e. the colour of the axis line, ticks and labels.
+	 * <p>
+	 * Unless a colour has been set explicitly this is PamColor.AXIS from the current
+	 * colour scheme, so that axes drawn on a canvas follow the day / dark / night
+	 * schemes in the same way as the JavaFX controls do through the style sheets.
+	 *
+	 * @return the colour to draw the axis in.
+	 */
 	public Color getStrokeColor() {
-		// TODO Auto-generated method stub
+		if (axisStrokeColor == null) {
+			return PamColorsFX.getInstance().getColor(PamColorsFX.PamColor.AXIS);
+		}
 		return axisStrokeColor;
 	}
 	

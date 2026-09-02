@@ -141,6 +141,7 @@ public class AdvMHTVarPane extends DynamicSettingsPane<SimpleChi2VarParams> {
 		//default button to set min error
 //		PamButton defaultMinError = new PamButton("",PamGlyphDude.createPamGlyph(MaterialIcon.REFRESH, PamGuiManagerFX.iconSize-2));
 		PamButton defaultMinError = new PamButton("",PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-2));
+		defaultMinError.getStyleClass().add("icon-button");
 		defaultMinError.prefHeightProperty().bind(minErrorSpinner.heightProperty());
 		defaultMinError.setTooltip(new Tooltip("Set default minimum value for input varience"));
 		gridPane.add(defaultMinError, 3, gridY); 

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.PamDetectionOverlayGraphics;
@@ -22,7 +22,7 @@ public class TrackedClickGraphics extends PamDetectionOverlayGraphics {
 
 	@Override
 	public Rectangle drawDataUnit(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
-		GroupDetection gd = (GroupDetection) pamDataUnit;
+		DetectionGroup gd = (DetectionGroup) pamDataUnit;
 //		System.out.println("TrackedClickGraphics: "+gd.getSubDetectionsCount());
 //		System.out.println("TrackedClickGraphics: "+gd.getLocalisation().getLocError(0));
 		Color col = PamColors.getInstance().getWhaleColor(gd.getEventId());

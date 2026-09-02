@@ -1,8 +1,10 @@
 package pamViewFX.fxNodes.internalNode;
 
-import org.controlsfx.glyphfont.Glyph;
-
+import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamButton;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -51,7 +53,27 @@ public class PamInternalPane extends Group {
 	 * Size in pixels of the anchors. 		
 	 */
 	double anchorSize=20;
-	
+
+	/**
+	 * Minimum distance in pixels the internal pane must remain from the north (top) edge of the holder pane.
+	 */
+	private DoubleProperty dragPadNorth = new SimpleDoubleProperty(0);
+
+	/**
+	 * Minimum distance in pixels the internal pane must remain from the south (bottom) edge of the holder pane.
+	 */
+	private DoubleProperty dragPadSouth = new SimpleDoubleProperty(0);
+
+	/**
+	 * Minimum distance in pixels the internal pane must remain from the west (left) edge of the holder pane.
+	 */
+	private DoubleProperty dragPadWest = new SimpleDoubleProperty(0);
+
+	/**
+	 * Minimum distance in pixels the internal pane must remain from the east (right) edge of the holder pane.
+	 */
+	private DoubleProperty dragPadEast = new SimpleDoubleProperty(0);
+
 	/*Need to store relative positions for window resizing*/
 	
 	//fraction of x layout
@@ -67,7 +89,7 @@ public class PamInternalPane extends Group {
 	double heightFraction=1;
 
 	/**
-	 * True of resize nodes are added or false otherwise. 
+	 * True if resize nodes are added or false otherwise. 
 	 */
 	private boolean editable=false;
 
@@ -79,7 +101,8 @@ public class PamInternalPane extends Group {
 	
 	/**
 	 * Create a new internal pane. 
-	 * @param mainPane- the pane to display and allow resizing. 
+	 * @param mainPane - the pane to display and allow resizing. 
+	 * @param holderPane - the parent pane that contains this internal pane.
 	 */
 	public PamInternalPane(Region mainPane, Region holderPane){
 		super();
@@ -116,39 +139,47 @@ public class PamInternalPane extends Group {
 	private void scaleInternalPane(){
 		if (holderPane==null) return;
 		
-		if (Double.isNaN(layoutXFraction) || Double.isNaN(layoutYFraction) || 
-				Double.isNaN(widthFraction)  || Double.isNaN(heightFraction)){
+		if (isInvalidFraction(layoutXFraction) || isInvalidFraction(layoutYFraction) || 
+				isInvalidFraction(widthFraction)  || isInvalidFraction(heightFraction)){
 			this.getPaneScaleFractions();
 		}
 		
+		// If still invalid after recalc, bail out
+		if (isInvalidFraction(layoutXFraction) || isInvalidFraction(layoutYFraction) || 
+				isInvalidFraction(widthFraction)  || isInvalidFraction(heightFraction)){
+			return;
+		}
+
 		double newX=layoutXFraction*holderPane.getWidth();
 		double newY=layoutYFraction*holderPane.getHeight();
 		double newWidth=widthFraction*holderPane.getWidth(); 
 		double newHeight=heightFraction*holderPane.getHeight(); 
 		
-		newX=Math.max(0,Math.min(newX,holderPane.getWidth()-anchorSize)); 
-		newY=Math.max(0,Math.min(newY,holderPane.getHeight()-anchorSize)); 
-		newWidth=Math.max(minDim, newWidth);
-		newHeight=Math.max(minDim, newHeight);
+		// Clamp position to stay within drag pad boundaries
+		newX=Math.max(dragPadWest.get(), Math.min(newX, holderPane.getWidth()  - dragPadEast.get()  - anchorSize)); 
+		newY=Math.max(dragPadNorth.get(), Math.min(newY, holderPane.getHeight() - dragPadSouth.get() - anchorSize)); 
+		// Clamp size so the pane doesn't overflow the padded area
+		newWidth  = Math.max(minDim, Math.min(newWidth,  holderPane.getWidth()  - newX - dragPadEast.get()));
+		newHeight = Math.max(minDim, Math.min(newHeight, holderPane.getHeight() - newY - dragPadSouth.get()));
 
-//		System.out.println("Has properties: "+mainPane.getPrefWidth() + " newX "+newX+ 
-//				" newY "+newY+ " newWidth "+ newWidth + " newHeight "+newHeight);
-		
-		//BUG: sometimes NaN values appear which 'destroys' the displays. 
-		if (!Double.isNaN(layoutXFraction) && !Double.isNaN(layoutYFraction) && 
-				!Double.isNaN(widthFraction)  && !Double.isNaN(heightFraction)){
-			mainPane.setLayoutX(newX);
-			mainPane.setLayoutY(newY);
-			mainPane.setPrefWidth(newWidth);
-			mainPane.setPrefHeight(newHeight);
-		}
-	} 
+		mainPane.setLayoutX(newX);
+		mainPane.setLayoutY(newY);
+		mainPane.setPrefWidth(newWidth);
+		mainPane.setPrefHeight(newHeight);
+	}
+
+	/**
+	 * Returns true if the value is NaN, infinite, or otherwise unusable as a fraction.
+	 */
+	private boolean isInvalidFraction(double v) {
+		return Double.isNaN(v) || Double.isInfinite(v);
+	}
 	
 	/**
 	 * Calculate window fraction which allow for scaled resizing
 	 */
 	private void getPaneScaleFractions(){
-		//hmmmm....need to fix NaN values. 
+		if (holderPane.getWidth() <= 0 || holderPane.getHeight() <= 0) return;
 		layoutXFraction=mainPane.getLayoutX()/holderPane.getWidth();
 		layoutYFraction=mainPane.getLayoutY()/holderPane.getHeight();
 		widthFraction=mainPane.getPrefWidth()/holderPane.getWidth();
@@ -202,7 +233,7 @@ public class PamInternalPane extends Group {
 		Anchor centreDrag= new Anchor(Color.DODGERBLUE, Pos.CENTER);
 		centreDrag.centerXProperty().bind(mainPane.layoutXProperty().add(mainPane.widthProperty().divide(2)));
 		centreDrag.centerYProperty().bind(mainPane.layoutYProperty().add(mainPane.heightProperty().divide(2)));
-		Node arrows=Glyph.create("FontAwesome|ARROWS").size(22).color(Color.WHITE); 
+		Node arrows = PamGlyphDude.createPamIcon("mdi2a-arrow-all", PamGuiManagerFX.iconSize);
 		arrows.layoutXProperty().bind(mainPane.layoutXProperty().add(mainPane.widthProperty().divide(2).subtract(11)));
 		arrows.layoutYProperty().bind(mainPane.layoutYProperty().add(mainPane.heightProperty().divide(2).subtract(13)));
 
@@ -245,14 +276,16 @@ public class PamInternalPane extends Group {
 	
 		/*Create buttons*/
 		PamButton expand=new PamButton();
-		expand.setGraphic(Glyph.create("FontAwesome|EXPAND").size(22).color(Color.WHITE));
+		expand.getStyleClass().add("icon-button");
+		expand.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-expand-all", PamGuiManagerFX.iconSize));
 		expand.layoutXProperty().bind(mainPane.layoutXProperty().add(mainPane.widthProperty().subtract(anchorSize*2).subtract(expand.widthProperty())));
 		expand.layoutYProperty().bind(mainPane.layoutYProperty().add(10));
 		expand.setOnAction((action)->{
-			mainPane.setLayoutX(0);
-			mainPane.setLayoutY(0);
-			mainPane.setPrefWidth(holderPane.getWidth());
-			mainPane.setPrefHeight(holderPane.getHeight());
+			//set to maximum size respecting the drag padding
+			mainPane.setLayoutX(dragPadEast.doubleValue());
+			mainPane.setLayoutY(dragPadNorth.doubleValue());
+			mainPane.setPrefWidth(holderPane.getWidth()-dragPadEast.doubleValue()-dragPadWest.doubleValue());
+			mainPane.setPrefHeight(holderPane.getHeight()-dragPadNorth.doubleValue()-dragPadSouth.doubleValue());
 			getPaneScaleFractions();
 		});
 		expand.getStyleClass().add("button-internal");
@@ -369,8 +402,8 @@ public class PamInternalPane extends Group {
 			break;
 		case CENTER:
 			//just drags entire node around. 
-			mainPane.layoutXProperty().setValue(Math.max(0,Math.min(newX,holderPane.getWidth()-anchorSize))-mainPane.getWidth()/2);
-			mainPane.layoutYProperty().setValue(Math.max(0,Math.min(newY,holderPane.getHeight()-anchorSize))-mainPane.getHeight()/2);
+			mainPane.layoutXProperty().setValue(Math.max(dragPadWest.get(), Math.min(newX - mainPane.getWidth()/2, holderPane.getWidth() - mainPane.getWidth() - dragPadEast.get())));
+			mainPane.layoutYProperty().setValue(Math.max(dragPadNorth.get(), Math.min(newY - mainPane.getHeight()/2, holderPane.getHeight() - mainPane.getHeight() - dragPadSouth.get())));
 			break;
 		case CENTER_LEFT:
 			//only X
@@ -417,27 +450,113 @@ public class PamInternalPane extends Group {
 	}
 	
 	private void dragRightX(double newX){
-		double width = getAllowedLayoutX(newX)-mainPane.getLayoutX();
+		double clampedX = Math.min(newX, holderPane.getWidth() - dragPadEast.get());
+		double width = clampedX - mainPane.getLayoutX();
 		mainPane.setPrefWidth(Math.max(minDim, width));
 	}
 	
 	private void dragTopY(double newY){
 		double oldYBottom=mainPane.getLayoutY()+mainPane.getPrefHeight(); 
-		mainPane.layoutYProperty().setValue(newY);
-		double height=oldYBottom-newY;
+		mainPane.layoutYProperty().setValue(getAllowedLayoutY(newY));
+		double height=oldYBottom-getAllowedLayoutY(newY);
 		mainPane.setPrefHeight(Math.max(minDim, height));
 	}
 	
 	private void dragBottomY(double newY){
-		double height = newY-mainPane.getLayoutY();
+		double clampedY = Math.min(newY, holderPane.getHeight() - dragPadSouth.get());
+		double height = clampedY - mainPane.getLayoutY();
 		mainPane.setPrefHeight(Math.max(minDim, height));
 	}
 	
 	private double getAllowedLayoutX(double newX){
-		if (newX<(-mainPane.getWidth()/2)) return -mainPane.getWidth()/2;
-		if (newX>holderPane.getWidth()+mainPane.getWidth()/2) return holderPane.getWidth()+mainPane.getWidth()/2;
-		return newX;
+		double minX = dragPadWest.get();
+		double maxX = holderPane.getWidth() - dragPadEast.get() - minDim;
+		return Math.max(minX, Math.min(newX, maxX));
 	}
+
+	private double getAllowedLayoutY(double newY){
+		double minY = dragPadNorth.get();
+		double maxY = holderPane.getHeight() - dragPadSouth.get() - minDim;
+		return Math.max(minY, Math.min(newY, maxY));
+	}
+
+	// ---- Drag pad property accessors ----
+
+	/**
+	 * Get the north drag pad property. The internal pane will not be dragged or resized
+	 * closer than this many pixels to the top edge of the holder pane.
+	 * @return the dragPadNorth DoubleProperty
+	 */
+	public DoubleProperty dragPadNorthProperty() { return dragPadNorth; }
+
+	/**
+	 * Get the north drag pad value.
+	 * @return minimum distance in pixels from the top edge of the holder pane.
+	 */
+	public double getDragPadNorth() { return dragPadNorth.get(); }
+
+	/**
+	 * Set the north drag pad value.
+	 * @param pad - minimum distance in pixels from the top edge of the holder pane.
+	 */
+	public void setDragPadNorth(double pad) { dragPadNorth.set(pad); }
+
+	/**
+	 * Get the south drag pad property. The internal pane will not be dragged or resized
+	 * closer than this many pixels to the bottom edge of the holder pane.
+	 * @return the dragPadSouth DoubleProperty
+	 */
+	public DoubleProperty dragPadSouthProperty() { return dragPadSouth; }
+
+	/**
+	 * Get the south drag pad value.
+	 * @return minimum distance in pixels from the bottom edge of the holder pane.
+	 */
+	public double getDragPadSouth() { return dragPadSouth.get(); }
+
+	/**
+	 * Set the south drag pad value.
+	 * @param pad - minimum distance in pixels from the bottom edge of the holder pane.
+	 */
+	public void setDragPadSouth(double pad) { dragPadSouth.set(pad); }
+
+	/**
+	 * Get the west drag pad property. The internal pane will not be dragged or resized
+	 * closer than this many pixels to the left edge of the holder pane.
+	 * @return the dragPadWest DoubleProperty
+	 */
+	public DoubleProperty dragPadWestProperty() { return dragPadWest; }
+
+	/**
+	 * Get the west drag pad value.
+	 * @return minimum distance in pixels from the left edge of the holder pane.
+	 */
+	public double getDragPadWest() { return dragPadWest.get(); }
+
+	/**
+	 * Set the west drag pad value.
+	 * @param pad - minimum distance in pixels from the left edge of the holder pane.
+	 */
+	public void setDragPadWest(double pad) { dragPadWest.set(pad); }
+
+	/**
+	 * Get the east drag pad property. The internal pane will not be dragged or resized
+	 * closer than this many pixels to the right edge of the holder pane.
+	 * @return the dragPadEast DoubleProperty
+	 */
+	public DoubleProperty dragPadEastProperty() { return dragPadEast; }
+
+	/**
+	 * Get the east drag pad value.
+	 * @return minimum distance in pixels from the right edge of the holder pane.
+	 */
+	public double getDragPadEast() { return dragPadEast.get(); }
+
+	/**
+	 * Set the east drag pad value.
+	 * @param pad - minimum distance in pixels from the right edge of the holder pane.
+	 */
+	public void setDragPadEast(double pad) { dragPadEast.set(pad); }
 	
 	public void setPaneSize(double x, double y){
 		mainPane.setPrefWidth(Math.max(minDim, x));

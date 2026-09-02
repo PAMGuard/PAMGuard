@@ -26,6 +26,12 @@ import PamUtils.PamCalendar;
 public class FPODReader {
 
 	/**
+	 * Multiplier used to combine the minute number and the click train id into a single
+	 * unique id. Train ids in an FP3 file restart at 1 every minute and run 1-255.
+	 */
+	public static final int TRAIN_UID_MULTIPLIER = 256;
+
+	/**
 	 * Look up array to convert byte values to linear sound level
 	 */
 	private static int[] LinearPkValsArr;
@@ -73,26 +79,17 @@ public class FPODReader {
 
 	public static FPODHeader readHeader(File cpFile) {
 
-		BufferedInputStream bis = null;
-		int bytesRead;
-		FileInputStream fileInputStream = null;
-		int totalBytes = 0;
-		try {
-			bis = new BufferedInputStream(fileInputStream = new FileInputStream(cpFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-
 		FPODHeader header = new FPODHeader();
-		try {
+
+		//try with resources so that the file is always closed, including when the header
+		//is too short to read.
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(cpFile))) {
 			if (readHeader(bis, header) != FPOD_HEADER) {
 				return null;
 			}
-			bis.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 
 		return header;
@@ -238,17 +235,17 @@ public class FPODReader {
 								localIPIatMax = fpodClick.IPIpreMax;
 							}
 
-							if (bufPosN[7] > 0) {
+							if (toUnsigned(bufPosN[7]) > 0) {
 								// IPI of Pk+1
 								fpodClick.IPIplus1 = toUnsigned(bufPosN[7]) + 1;
-								if (bufPosN[8] > 0) {
+								if (toUnsigned(bufPosN[8]) > 0) {
 									// IPI of Pk+1
 									fpodClick.IPIplus2 = toUnsigned(bufPosN[8]) + 1;
 								}
 							}
 
 							// now on to amplitudes
-							if (bufPosN[9] > 0) {
+							if (toUnsigned(bufPosN[9]) > 0) {
 								// Amplitude of P-1
 								fpodClick.RawPkminus1 = toUnsigned(bufPosN[9]);
 
@@ -277,7 +274,10 @@ public class FPODReader {
 								fpodClick.EndIPI = fpodClick.IPIpreMax;
 							} else {
 								//fpodClick.HasWave = (bufPosN[15] & 1) == 1;
-								fpodClick.EndIPI = bufPosN[15] & 254 + 1; // + 1 on all IPIs because counts from the POD start at
+								// + 1 on all IPIs because counts from the POD start at zero. Note the
+								// brackets - in Java + binds more tightly than &, so without them this
+								// is simply the raw byte value.
+								fpodClick.EndIPI = (toUnsigned(bufPosN[15]) & 254) + 1;
 							}
 
 							//the duration is in 5us units. 
@@ -285,19 +285,25 @@ public class FPODReader {
 
 							///rm...can't exactly explain this but it's translated from FPOD Pascal code - calculates bandwidth
 							int ampDfSum = Math.abs(fpodClick.Pkminus1Extnd - fpodClick.MaxPkRaw);
-							int ampSum = Math.round((fpodClick.Pkminus1Extnd + fpodClick.MaxPkRaw) / 2);
+							int ampSum = (fpodClick.Pkminus1Extnd >> 1) + (fpodClick.MaxPkRaw >> 1);
 							int ipIdfSum = Math.abs(fpodClick.IPIpreMax - fpodClick.IPIatMax);
-							int ipISum = fpodClick.IPIatMax;
+							int ipISum = fpodClick.IPIpreMax;
 
 							if (fpodClick.Pkplus1Extnd > 0) {
 								ampDfSum += Math.abs(fpodClick.Pkplus1Extnd - fpodClick.MaxPkRaw);
-								ampSum += Math.round((fpodClick.Pkplus1Extnd + fpodClick.MaxPkRaw) / 2);
-								ipIdfSum += Math.abs(fpodClick.IPIatMax - fpodClick.Pkplus1Extnd);
-								ipISum += fpodClick.Pkplus1Extnd;
+								ampSum += (fpodClick.Pkplus1Extnd >> 1) + (fpodClick.MaxPkRaw >> 1);
+								ipIdfSum += Math.abs(fpodClick.IPIatMax - fpodClick.IPIplus1);
+								ipISum += fpodClick.IPIplus1;
 							}
 
-							//set the nadwidth
-							fpodClick.BW = Math.max(0, Math.min(11, Math.round(ipIdfSum << 4 / ipISum)) + Math.min(20, Math.round((ampDfSum + (ampDfSum >> 1)) << 3 / ampSum) - 1));
+							/*
+							 * Set the bandwidth. Note the brackets around the shifts - in Java / binds
+							 * more tightly than <<, so 'ipIdfSum << 4 / ipISum' is a shift by
+							 * (4/ipISum), which is nearly always a shift by zero.
+							 */
+							int ipiTerm = ipISum > 0 ? (int) Math.round((ipIdfSum << 4) / (double) ipISum) : 0;
+							int ampTerm = ampSum > 0 ? (int) Math.round(((ampDfSum + (ampDfSum >> 1)) << 3) / (double) ampSum) : 0;
+							fpodClick.BW = Math.max(0, Math.min(11, ipiTerm) + Math.min(20, ampTerm - 1));
 
 
 							//							if (fpodClick.HasWave) {
@@ -362,11 +368,17 @@ public class FPODReader {
 
 							}
 
-							/**
-							 * Set the classification (if FP3 file)
+							/*
+							 * Set the classification (if FP3 file). In an FP3 file each click is
+							 * preceded by its own 249 record, so the classification read from that
+							 * record belongs to this click and to this click alone. Clear it once it
+							 * has been used - otherwise any click which is not preceded by a 249
+							 * record (for example after a 251, 252 or 253 record) would silently
+							 * inherit the previous click's train.
 							 */
-							if (clickTrains!=null) {
+							if (cpodClassification!=null) {
 								fpodClick.setClassification(cpodClassification);
+								cpodClassification = null;
 								
 								//TEST
 //								long timeMillis2 = PamCalendar.msFromDate(2023, 8, 31, 2, 52, 46, 200); //NBHF
@@ -379,7 +391,10 @@ public class FPODReader {
 
 							fpodClick.setMinute(nMinutes);
 
-							if (from<0 || (nClicks>from && nClicks<(from+maxNum))) {
+							//note that 'from' is inclusive - the click at index 'from' is the first one we want.
+							//this must match CPODReader.importCPODFile, since CPODImporter chunks both
+							//through the same loop.
+							if (from<0 || (nClicks>=from && (long) nClicks < (long) from+maxNum)) {
 								//add the click to the FPODdata.
 								fpodData.add(fpodClick);
 							}
@@ -429,30 +444,27 @@ public class FPODReader {
 				}
 
 				else if(toUnsigned(bufPosN[0])==249) {
-					//click train data - this is not included - for now
-					//click train data precedes the next click
+					//click train data - this record precedes the click it belongs to
 
-					//the train ID is unique to the minute, 
+					//the train ID is unique to the minute - the count restarts at 1 every minute
 					short trainID = toUnsigned(bufPosN[15]);
 
-					//0 is NBHF
-					//1 is dolphin
-					//2 spUnclassiifed?
-					//4 sonar?
-					short species = (short) ((bufPosN[14] >>> 2) & 3);
+					//0 is NBHF, 1 is dolphin, 2 is unclassed, 3 is sonar
+					short species = (short) ((toUnsigned(bufPosN[14]) >> 2) & 3);
 					lastSpecies = species;
 
 					//quality level for the click train
-					short qualitylevel = (short) ((bufPosN[14]) & 3);
+					short qualitylevel = (short) (toUnsigned(bufPosN[14]) & 3);
 
-					boolean echo = false;
-					if ((bufPosN[14] & 32) == 32) {
-						echo = true;
-					}
+					boolean echo = (toUnsigned(bufPosN[14]) & 32) == 32;
 
-
-					//generate a unique train ID within the file			
-					int trainUID = Integer.valueOf(String.format("%06d", nMinutes) + String.format("%d", trainID));
+					/*
+					 * Generate a unique train ID within the file. Train ids are only unique
+					 * within a minute, so combine the two. This must not be done by concatenating
+					 * decimal strings - that is ambiguous (minute 1000 train 12 and minute 10001
+					 * train 2 both give 100012).
+					 */
+					int trainUID = nMinutes * TRAIN_UID_MULTIPLIER + trainID;
 
 					//find the click train from the hash map - if it is not there, create a new one. 
 					cpodClassification = clickTrains.get(trainUID);
@@ -461,7 +473,7 @@ public class FPODReader {
 						cpodClassification = new CPODClassification();
 						cpodClassification.isEcho = echo;
 						cpodClassification.clicktrainID = trainUID;
-						cpodClassification.species = CPODUtils.getFPODSpecies(species); //add onme to make same format as CPOD...? 
+						cpodClassification.species = CPODUtils.getSpClassSpecies(species);
 						cpodClassification.qualitylevel = qualitylevel;
 
 						clickTrains.put(trainUID, cpodClassification); 
@@ -587,7 +599,9 @@ public class FPODReader {
 		}
 
 		for (int count = 16; count < 256; count++) {
-			IPItoKHZ[count] = Math.round(4000 / count);
+			//note the cast - without it this is an integer division and the value is
+			//truncated rather than rounded.
+			IPItoKHZ[count] = Math.round(4000f / count);
 		}
 
 		IPItoKHZ[64] = 63; // Smoothes an uncomfortable step here

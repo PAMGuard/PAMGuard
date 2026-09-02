@@ -26,6 +26,19 @@ public class MaskedFFTParamters implements Serializable {
 
 	public int dataSourceIndex;
 
+    /**
+     * The type of FFT mask to use. Currently only {@link FFTMaskType#DEEP_WHISTLE}
+     * is implemented but more will be added in the future.
+     */
+    public FFTMaskType maskType = FFTMaskType.DEEP_WHISTLE;
+
+    /**
+     * The local path to the model used by the selected mask. This is set once a
+     * model has been downloaded (or located locally) and is used by the mask to
+     * load the model. May be null if no model has been downloaded yet.
+     */
+    public String modelPath = null;
+
     public MaskedFFTParamters() {
     }
 

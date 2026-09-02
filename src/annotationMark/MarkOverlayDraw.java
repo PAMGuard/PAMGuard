@@ -23,7 +23,12 @@ public class MarkOverlayDraw extends PamDetectionOverlayGraphics {
 //	private SpectrogramAnnotationType spectrogramAnnotationType;
 
 	private MarkModule annotationModule;
-	public static final SymbolData defaultSymbolData = new SymbolData(PamSymbolType.SYMBOL_SQUARE, 8, 8, false, Color.BLACK, Color.BLACK);
+	/**
+	 * Default symbol for annotation marks: cyan outline with a translucent cyan fill
+	 * so that the spectrogram remains visible underneath the annotation box.
+	 */
+	public static final SymbolData defaultSymbolData = new SymbolData(PamSymbolType.SYMBOL_SQUARE, 8, 8, true,
+			new Color(0, 255, 255, 60), Color.CYAN);
 
 	public MarkOverlayDraw(MarkDataBlock markDataBlock, MarkModule annotationModule) {
 		super(markDataBlock, new PamSymbol(defaultSymbolData));

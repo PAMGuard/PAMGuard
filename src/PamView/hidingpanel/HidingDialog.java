@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -18,10 +17,11 @@ import javax.swing.JPanel;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamButtonAlpha;
 import PamView.dialog.PamDialog;
@@ -43,9 +43,13 @@ public class HidingDialog extends PamDialog {
 //	private ImageIcon pinHide = new ImageIcon(ClassLoader
 //			.getSystemResource("Resources/deletewhite.png"));
 	
-	private static final FontIcon settings =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
-	private static final FontIcon pinImage =  FontIcon.of(MaterialDesignP.PIN, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
-	private static final FontIcon pinHide =  FontIcon.of(MaterialDesignP.PIN_OFF, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
+	/*
+	 * These sit on the translucent dark panel which overlays the display, so they
+	 * stay light whatever the scheme - see IconColour.ALPHA_PANEL.
+	 */
+	private static final PamFontIcon settings = PamFontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, IconColour.ALPHA_PANEL);
+	private static final PamFontIcon pinImage = PamFontIcon.of(MaterialDesignP.PIN, PamSettingsIconButton.SMALL_SIZE, IconColour.ALPHA_PANEL);
+	private static final PamFontIcon pinHide = PamFontIcon.of(MaterialDesignP.PIN_OFF, PamSettingsIconButton.SMALL_SIZE, IconColour.ALPHA_PANEL);
 
 
 	public HidingDialog(Window parentFrame, HidingDialogPanel hidingDialogPanel, String title, boolean hasDefault) {

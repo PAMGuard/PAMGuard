@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
+import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -17,12 +18,15 @@ import PamController.SettingsPane;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.WrapperControlledGUISwing;
+import binaryFileStorage.BinaryStore;
+import cpod.dataPlotFX.CPODClickTrainDDPlotProvider;
 import cpod.dataPlotFX.CPODDPlotProvider;
 import cpod.dataPlotFX.CPODPlotProviderFX;
 import cpod.fx.CPODGUIFX;
 import cpod.fx.CPODSettingsPane;
 import cpod.logging.CPODClickTrainLogging;
 import cpod.logging.CPODSubDetLogging;
+import dataGram.DatagramManager;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import fileOfflineData.OfflineFileParams;
@@ -148,6 +152,10 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp1DataBlock));
 		//		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp3DataBlock));
 
+		//register the click trains too, so that the super detection tab of the advanced pop up
+		//menu shows the average spectrum of the train a selected detection belongs to.
+		DDPlotRegister.getInstance().registerDataInfo(new CPODClickTrainDDPlotProvider(clickTrainDataBlock));
+
 
 		//		//swing time display data providers. 
 		//		CPODPlotProvider cpodPlotProvider = new CPODPlotProvider(this, cp1DataBlock);
@@ -163,6 +171,56 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		//		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
 
 
+	}
+
+
+	/**
+	 * The datagram bin size, in seconds, used for POD data.
+	 * <p>
+	 * A POD deployment lasts weeks but the detections are sparse and come in short
+	 * trains, so the default ten minute bins smear everything into a single band. One
+	 * minute bins show the structure without holding an unreasonable datagram in
+	 * memory.
+	 */
+	public static final int DATAGRAM_SECONDS = 60;
+
+	/**
+	 * Fix the datagram bin size for POD data, so that the datagram settings dialog is
+	 * not put in front of the user - it would otherwise appear the first time
+	 * datagrams are built, which for POD data is part way through an import, where it
+	 * interrupts without stopping anything.
+	 * <p>
+	 * Done on every model change rather than in the constructor because the binary
+	 * store may be added after this module, and because settings are restored from
+	 * the psfx after the module is created. A bin size the user has already chosen is
+	 * left alone (see
+	 * {@link DatagramManager#setDefaultDatagramSeconds(int)}).
+	 */
+	private void setDatagramInterval() {
+		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
+		if (binaryStore == null) {
+			return;
+		}
+		DatagramManager datagramManager = binaryStore.getDatagramManager();
+		if (datagramManager == null) {
+			return;
+		}
+		if (datagramManager.setDefaultDatagramSeconds(DATAGRAM_SECONDS)) {
+			System.out.println("CPOD: datagram bin size set to " + DATAGRAM_SECONDS + " seconds");
+		}
+	}
+
+	@Override
+	public void notifyModelChanged(int changeType) {
+		super.notifyModelChanged(changeType);
+		switch (changeType) {
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
+		case PamControllerInterface.CHANGED_PROCESS_SETTINGS:
+			setDatagramInterval();
+			break;
+		}
 	}
 
 

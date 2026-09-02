@@ -154,6 +154,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 //		PamButton advButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.SETTINGS, PamGuiManagerFX.iconSize)); 
 		PamButton advButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize)); 
+		advButton.getStyleClass().add("icon-button");
 		advButton.setMinWidth(30);
 		advButton.setOnAction((action)->{
 			//pop up window with adv settings.

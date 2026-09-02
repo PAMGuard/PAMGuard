@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -25,7 +26,6 @@ import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.OfflineTaskManager;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
-import performanceTests.PamguardInfo;
 import binaryFileStorage.BinaryOfflineDataMap;
 import binaryFileStorage.BinaryStore;
 import clickDetector.ClickBTDisplay;
@@ -35,15 +35,21 @@ import clickDetector.ClickDataBlock;
 import clickDetector.ClickDetection;
 import clickDetector.offlineFuncs.eventtasks.EventCheckTask;
 import clickDetector.offlineFuncs.eventtasks.EventTaskGroup;
-import dataPlotsFX.JamieDev;
 import PamController.PamController;
 import PamModel.SMRUEnable;
 import PamView.CtrlKeyManager;
+import PamView.dialog.PamDialog;
 import PamView.PamColors;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.superdet.DetectionGroup;
+import PamguardMVC.superdet.SuperDetection;
+import clickTrainDetector.CTDetectionGroupDataUnit;
+import clickTrainDetector.TempCTDataUnit;
+import cpod.CPODClickTrainDataUnit;
+import detectiongrouplocaliser.DetectionGroupDataUnit;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -233,7 +239,229 @@ public class ClicksOffline {
 			}
 
 		}
+
+		/*
+		 * Copy-and-convert options for other types of detection group (click trains
+		 * etc.) found amongst the marked / clicked data. These never remove anything
+		 * from the source groups.
+		 */
+		List<PamDataUnit> groupSearchList = markedClicks;
+		if (singleDataUnit != null) {
+			groupSearchList = new ArrayList<>();
+			groupSearchList.add(singleDataUnit);
+		}
+		List<SuperDetection> otherGroups = findConvertibleGroups(groupSearchList);
+		if (otherGroups.size() == 1) {
+			SuperDetection group = otherGroups.get(0);
+			menuItem = new JMenuItem(String.format("Convert %s to event ...", groupName(group)));
+			menuItem.setToolTipText("Copy the detections of this group into a new manually annotated event. "
+					+ "The original group is not changed. Only detections currently loaded are copied.");
+			menuItem.addActionListener(new ConvertGroups(overlayMark, otherGroups));
+			menu.add(menuItem);
+			nMenuItems++;
+		}
+		else if (otherGroups.size() > 1) {
+			int totalDets = 0;
+			String typeName = null;
+			for (SuperDetection group : otherGroups) {
+				totalDets += group.getLoadedSubDetectionsCount();
+				String aType = groupTypeName(group);
+				if (typeName == null) {
+					typeName = aType;
+				}
+				else if (typeName.equals(aType) == false) {
+					typeName = "group"; // mixed types.
+				}
+			}
+			menuItem = new JMenuItem(String.format("Merge %d %ss into event (%d clicks) ...",
+					otherGroups.size(), typeName, totalDets));
+			menuItem.setToolTipText(String.format("Copy the detections of the %d marked groups into a new manually "
+					+ "annotated event. The original groups are not changed. Only detections currently loaded are copied.",
+					otherGroups.size()));
+			menuItem.addActionListener(new ConvertGroups(overlayMark, otherGroups));
+			menu.add(menuItem);
+			nMenuItems++;
+		}
 		return nMenuItems;
+	}
+
+	/**
+	 * Specify which detection group data blocks the click detector's event list
+	 * shows as extra tabs. Allowed: saved click trains from the click train
+	 * detector module, CPOD click trains and manually created detection groups.
+	 * Excluded: this module's own events (and other click detectors' events,
+	 * which are managed by their own dialogs), transient working blocks with no
+	 * database storage (possible / unconfirmed click trains) and detection
+	 * groups unrelated to clicks (e.g. localised whistle contours).
+	 * @param block a data block.
+	 * @return true if the block should be listed in the event list dialog.
+	 */
+	public boolean canShowInEventList(PamDataBlock block) {
+		if (block == null) {
+			return false;
+		}
+		Class unitClass = block.getUnitClass();
+		if (unitClass == null || DetectionGroup.class.isAssignableFrom(unitClass) == false) {
+			return false;
+		}
+		if (OfflineEventDataUnit.class.isAssignableFrom(unitClass)) {
+			return false;
+		}
+		if (block.getLogging() == null) {
+			return false; // transient working block, never saved.
+		}
+		if (TempCTDataUnit.class.isAssignableFrom(unitClass)) {
+			return false;
+		}
+		return CTDetectionGroupDataUnit.class.isAssignableFrom(unitClass)
+				|| CPODClickTrainDataUnit.class.isAssignableFrom(unitClass)
+				|| unitClass == DetectionGroupDataUnit.class;
+	}
+
+	/**
+	 * Get the singular lower case type name for a detection group, taken from
+	 * its data block name, e.g. "click train".
+	 * @param group the group.
+	 * @return type name for use in menus.
+	 */
+	private String groupTypeName(SuperDetection group) {
+		PamDataBlock pdb = group.getParentDataBlock();
+		if (pdb == null) {
+			return "detection group";
+		}
+		String name = pdb.getDataName();
+		if (name.endsWith("s")) {
+			name = name.substring(0, name.length()-1);
+		}
+		return name.toLowerCase();
+	}
+
+	/**
+	 * Get a short display name for a detection group.
+	 * @param group the group.
+	 * @return name for menus, e.g. "click train 12".
+	 */
+	private String groupName(SuperDetection group) {
+		long id = group.getDatabaseIndex() > 0 ? group.getDatabaseIndex() : group.getUID();
+		return String.format("%s %d", groupTypeName(group), id);
+	}
+
+	/**
+	 * Find detection groups (click trains, CPOD trains, detection groups, etc.,
+	 * but never manually annotated click events) amongst a list of marked data
+	 * units. Marked units which are themselves groups are included directly;
+	 * otherwise their super detections are searched.
+	 * @param markedData list of marked data units, can be null.
+	 * @return distinct list of groups, never null.
+	 */
+	public List<SuperDetection> findConvertibleGroups(List<PamDataUnit> markedData) {
+		LinkedHashSet<SuperDetection> groups = new LinkedHashSet<>();
+		if (markedData == null) {
+			return new ArrayList<>(groups);
+		}
+		for (PamDataUnit dataUnit : markedData) {
+			if (dataUnit == null) {
+				continue;
+			}
+			if (isConvertibleGroup(dataUnit)) {
+				groups.add((SuperDetection) dataUnit);
+				continue;
+			}
+			int nSuper = dataUnit.getSuperDetectionsCount();
+			for (int i = 0; i < nSuper; i++) {
+				PamDataUnit superDet = dataUnit.getSuperDetection(i);
+				if (isConvertibleGroup(superDet)) {
+					groups.add((SuperDetection) superDet);
+				}
+			}
+		}
+		return new ArrayList<>(groups);
+	}
+
+	/**
+	 * @return true if the data unit is a detection group which can be converted
+	 * into a manually annotated event, i.e. any DetectionGroup which is not
+	 * already a click event.
+	 */
+	private boolean isConvertibleGroup(PamDataUnit dataUnit) {
+		if (dataUnit == null) {
+			return false;
+		}
+		if (dataUnit instanceof OfflineEventDataUnit) {
+			return false;
+		}
+		return dataUnit instanceof DetectionGroup;
+	}
+
+	private class ConvertGroups implements ActionListener {
+		private OverlayMark overlayMark;
+		private List<SuperDetection> groups;
+
+		public ConvertGroups(OverlayMark overlayMark, List<SuperDetection> groups) {
+			this.overlayMark = overlayMark;
+			this.groups = groups;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			convertGroupsToEvent(overlayMark, groups);
+		}
+	}
+
+	/**
+	 * Copy and convert one or more detection groups (click trains, CPOD trains,
+	 * detection groups, ...) into a new manually annotated click event. The
+	 * detections of each group are added to the new event as sub detections; the
+	 * original groups are not modified or deleted. Note that only sub detections
+	 * currently loaded in memory can be copied.
+	 * @param overlayMark mark the request came from, may be null.
+	 * @param groups groups to copy into the new event.
+	 */
+	public void convertGroupsToEvent(OverlayMark overlayMark, List<SuperDetection> groups) {
+		if (groups == null || groups.isEmpty()) {
+			return;
+		}
+		Window win = clickControl.getGuiFrame();
+		LinkedHashSet<PamDataUnit> dets = new LinkedHashSet<>();
+		StringBuilder provenance = new StringBuilder("Converted from ");
+		int nGroup = 0;
+		for (SuperDetection group : groups) {
+			ArrayList<PamguardMVC.PamDataUnit<?, ?>> subDets = group.getSubDetections();
+			if (subDets != null) {
+				dets.addAll(subDets);
+			}
+			if (nGroup++ > 0) {
+				provenance.append(", ");
+			}
+			provenance.append(groupName(group));
+		}
+		if (dets.isEmpty()) {
+			PamDialog.showWarning(win, "Convert to event",
+					"None of the detections in the selected groups are currently loaded, so there is nothing to copy.");
+			return;
+		}
+		OfflineEventDataUnit newUnit = new OfflineEventDataUnit(null, getNextEventColourIndex(), null);
+		String comment = provenance.toString();
+		if (comment.length() > OfflineEventLogging.COMMENT_LENGTH) {
+			comment = comment.substring(0, OfflineEventLogging.COMMENT_LENGTH);
+		}
+		newUnit.setComment(comment);
+		newUnit = OfflineEventDialog.showDialog(win, clickControl, newUnit);
+		if (newUnit == null) {
+			return;
+		}
+		newUnit.addSubDetections(new ArrayList<PamDataUnit>(dets));
+		OfflineEventDataBlock offlineEventDataBlock = clickControl.getClickDetector().getOfflineEventDataBlock();
+		offlineEventDataBlock.addPamData(newUnit);
+		clickControl.setLatestOfflineEvent(newUnit);
+		notifyEventChanges(newUnit);
+		if (overlayMark != null) {
+			overlayMark.repaintOwner();
+		}
+		ClickBTDisplay btDisplay = clickControl.getDisplayManager().findFirstBTDisplay();
+		if (btDisplay != null) {
+			btDisplay.repaintTotal();
+		}
 	}
 
 	/**
@@ -319,28 +547,83 @@ public class ClicksOffline {
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (event == null) {
-				return;
-			}
 			if (singleClick != null) {
-				event.addSubDetection(singleClick);
-				if (overlayMark!=null) overlayMark.repaintOwner();
-
+				quickAddClicks(event, overlayMark, singleClick);
 			}
-			else if (markedClicks != null) {
-				event.addSubDetections(markedClicks);
-				if (overlayMark!=null) overlayMark.repaintOwner();
-
+			else {
+				quickAddClicks(event, overlayMark, markedClicks);
 			}
-
-			clickControl.getClickDetector().getOfflineEventDataBlock().
-			updatePamData(event, System.currentTimeMillis());
-			notifyEventChanges(event);
-			clickControl.setLatestOfflineEvent(event);
-			//must repaint or click does not change colour
-			clickControl.getDisplayManager().findFirstBTDisplay().repaintTotal();
 		}
 
+	}
+
+	/**
+	 * Add a single data unit to an existing event.
+	 * @param event event to add to, does nothing if null.
+	 * @param overlayMark mark the unit came from, may be null.
+	 * @param singleUnit unit to add.
+	 */
+	public void quickAddClicks(OfflineEventDataUnit event, OverlayMark overlayMark, PamDataUnit singleUnit) {
+		if (event == null || singleUnit == null) {
+			return;
+		}
+		event.addSubDetection(singleUnit);
+		eventChanged(event, overlayMark);
+	}
+
+	/**
+	 * Add a list of data units to an existing event. This is what the "Add n clicks
+	 * to event x" menu item and the Ctrl+A shortcut both do.
+	 * @param event event to add to, does nothing if null.
+	 * @param overlayMark mark the units came from, may be null.
+	 * @param dataList units to add.
+	 */
+	public void quickAddClicks(OfflineEventDataUnit event, OverlayMark overlayMark, List<PamDataUnit> dataList) {
+		if (event == null || dataList == null || dataList.isEmpty()) {
+			return;
+		}
+		event.addSubDetections(dataList);
+		eventChanged(event, overlayMark);
+	}
+
+	/**
+	 * Tell everything that an event has been added to, and repaint the displays.
+	 * @param event event which changed.
+	 * @param overlayMark mark to repaint, may be null.
+	 */
+	private void eventChanged(OfflineEventDataUnit event, OverlayMark overlayMark) {
+		if (overlayMark != null) {
+			overlayMark.repaintOwner();
+		}
+		clickControl.getClickDetector().getOfflineEventDataBlock().
+		updatePamData(event, System.currentTimeMillis());
+		notifyEventChanges(event);
+		clickControl.setLatestOfflineEvent(event);
+		//must repaint or click does not change colour
+		//NB there may not be a BT display at all if the marking was done on an FX display.
+		ClickBTDisplay btDisplay = clickControl.getDisplayManager().findFirstBTDisplay();
+		if (btDisplay != null) {
+			btDisplay.repaintTotal();
+		}
+	}
+
+	/**
+	 * Work out which event a set of marked data units would be quickly added to by
+	 * the "Add n clicks to event x" menu item and the Ctrl+A shortcut. This is
+	 * either the single event the marked units already belong to, or the last event
+	 * anything was added to.
+	 * @param markedClicks marked data units, may be null.
+	 * @return event to add to, or null if there isn't an obvious one.
+	 */
+	public OfflineEventDataUnit getQuickAddEvent(List<PamDataUnit> markedClicks) {
+		OfflineEventDataUnit[] markedEvents = findMarkedEvents(markedClicks);
+		if (markedEvents == null) {
+			return clickControl.getLatestOfflineEvent();
+		}
+		if (markedEvents.length == 1) {
+			return markedEvents[0];
+		}
+		return null;
 	}
 	//	private class LabelClick implements ActionListener {
 	//		private OverlayMark overlayMark;

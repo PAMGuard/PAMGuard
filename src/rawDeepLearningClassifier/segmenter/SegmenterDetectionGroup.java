@@ -1,6 +1,6 @@
 package rawDeepLearningClassifier.segmenter;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.AcousticDetectionGroup;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -8,7 +8,7 @@ import PamguardMVC.PamDataUnit;
  * @author Jamie Macaulay
  *
  */
-public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
+public class SegmenterDetectionGroup extends AcousticDetectionGroup<PamDataUnit> {
 
 	
 	/**
@@ -34,6 +34,7 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 	 */
 	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, double duration) {
 		super(timeMilliseconds, channelBitmap, startSample, (long) duration);
+		makeLocalisation();
 		this.setDurationInMilliseconds(duration);
 		this.segMillis = timeMilliseconds;
 		this.segDuration = duration;

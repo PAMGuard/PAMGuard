@@ -136,7 +136,7 @@ public class TDDisplayController extends UserDisplayControlFX {
 //		System.out.println("---------------------------------" ); 
 	}
 	
-	@Override 
+	@Override
 	public ArrayList<UserDisplayNodeFX> getDisplays(){
 		if (displays==null){
 			tdControlFX=new TDControlFX(this, getUnitName());
@@ -144,6 +144,19 @@ public class TDDisplayController extends UserDisplayControlFX {
 			displays.add(tdControlFX);
 		}
 		return displays;
+	}
+
+	/**
+	 * Get the main time-display panel ({@link dataPlotsFX.layout.TDDisplayFX}). Used
+	 * to programmatically add data (e.g. a spectrogram) and set the time scroller,
+	 * for example by the drag-and-drop auto-configuration wizard.
+	 *
+	 * @return the main TD display, or null if it has not been created yet.
+	 */
+	public dataPlotsFX.layout.TDDisplayFX getMainDisplay() {
+		// ensure the display node exists.
+		getDisplays();
+		return (tdControlFX == null) ? null : tdControlFX.getTDDisplay();
 	}
 
 

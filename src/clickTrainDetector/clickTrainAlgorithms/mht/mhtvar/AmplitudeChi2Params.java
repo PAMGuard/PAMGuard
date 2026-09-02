@@ -37,7 +37,7 @@ public class AmplitudeChi2Params extends SimpleChi2VarParams  implements Managed
 	public boolean ampJumpEnable = true;
 	
 	/**
-	 * The maximum allowed bearing bearing jump in a click train in RADIANS
+	 * The maximum allowed bearing bearing jump in a click train in dB
 	 */
 	public double maxAmpJump = 10; //dB
 

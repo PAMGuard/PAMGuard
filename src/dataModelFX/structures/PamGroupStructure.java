@@ -56,6 +56,7 @@ public class PamGroupStructure extends ConnectionGroupStructure implements PAMCo
 		
 		//add a remove button
 		deleteButton = new PamButton(); 
+		deleteButton.getStyleClass().add("icon-button");
 //		deleteButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.REMOVE, Color.GRAY, PamGuiManagerFX.iconSize));
 		deleteButton.setGraphic(PamGlyphDude.createPamIcon("mdi2w-window-close", Color.GRAY, PamGuiManagerFX.iconSize));
 

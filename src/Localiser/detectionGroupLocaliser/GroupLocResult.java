@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import javax.vecmath.Point3f;
 
 import pamMaths.PamVector;
-import targetMotionOld.TargetMotionModel;
+import targetMotion.TargetMotionModel;
 
 /**
  *

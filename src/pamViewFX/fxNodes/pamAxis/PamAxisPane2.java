@@ -20,6 +20,7 @@ import javafx.util.StringConverter;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 
 /**
  * Axis which utilises the javafx number axis instead of the graphics inside pamaxis. 
@@ -77,11 +78,21 @@ public class PamAxisPane2 extends StackPane {
 	private PamBorderPane mainPane = new PamBorderPane(); 
 	
 
+	/**
+	 * Style class which gives the axis pane the window background colour of the
+	 * current colour scheme. Without it the pane has no background at all and shows
+	 * whatever happens to be behind, which stayed light in the dark colour schemes.
+	 */
+	public static final String AXIS_PANE_STYLE_CLASS = PamStylesManagerFX.AXIS_PANE_STYLE_CLASS;
+
 	public PamAxisPane2(PamAxisFX pamAxisFX, Side side){
 		this.pamAxisFX=pamAxisFX;
 
-		this.side=side; 		
-		
+		this.side=side;
+
+		this.getStyleClass().add(AXIS_PANE_STYLE_CLASS);
+
+
 		//08/07/2017. Needed to initialise axis to prevent weird binding changes
 		//when new layout is called. 
 		for (int i=0; i<axis.length; i++) {

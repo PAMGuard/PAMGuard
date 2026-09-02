@@ -156,6 +156,7 @@ public class VRImageView extends PamBorderPane implements VRImage {
 		imageControlPane.setAlignment(Pos.CENTER);
 		
 		nextMedia= new PamButton(); 
+		nextMedia.getStyleClass().add("icon-button");
 		nextMedia.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-next",VRMediaView.controlIconSize));
 		nextMedia.getStyleClass().add("square-button-trans");
 		nextMedia.setOnAction((action)->{
@@ -163,6 +164,7 @@ public class VRImageView extends PamBorderPane implements VRImage {
 		});
 		
 		prevMedia= new PamButton(); 
+		prevMedia.getStyleClass().add("icon-button");
 //		prevMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_PREVIOUS		,VRMediaView.controlIconSize));
 		prevMedia.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-previous",VRMediaView.controlIconSize));
 		prevMedia.getStyleClass().add("square-button-trans");

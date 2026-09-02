@@ -36,7 +36,7 @@ import Localiser.algorithms.DelayGroup;
 import Localiser.algorithms.TimeDelayData;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamController.PamController;
 import PamController.status.BaseProcessCheck;
 import PamDetection.LocContents;
@@ -70,6 +70,7 @@ import clickDetector.offlineFuncs.ClickBearingTask;
 import clickDetector.offlineFuncs.ClickDelayTask;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventLogging;
+import clickDetector.offlineFuncs.OfflineEventSubLogging;
 import clickDetector.tdPlots.ClickDetSymbolManager;
 import clickDetector.tdPlots.ClickEventSymbolManager;
 import fftFilter.FFTFilter;
@@ -77,8 +78,8 @@ import fftFilter.FFTFilterParams;
 import fftManager.FastFFT;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
 import signal.Hilbert;
-import targetMotionOld.TargetMotionLocaliser;
-import targetMotionOld.TargetMotionSQLLogging;
+import targetMotion.TargetMotionLocaliser;
+import targetMotion.TargetMotionSQLLogging;
 
 /**
  * Main click detector process.
@@ -323,8 +324,14 @@ public class ClickDetector extends PamProcess {
 			offlineEventDataBlock.setLocalisationContents(LocContents.HAS_BEARING | LocContents.HAS_RANGE
 					| LocContents.HAS_LATLONG | LocContents.HAS_AMBIGUITY | LocContents.HAS_PERPENDICULARERRORS);
 //		}
-		// set up the subtable for the Event Logger, and force creation
-		offlineEventLogging.setSubLogging(getClickDataBlock().getOfflineClickLogging());
+		// event id annotation - carries the historic event numbering in the event table
+		// so that upgraded databases retain their event ids.
+		offlineEventLogging.addAddOn(annotation.detectiongroup.EventIdAnnotationType.getInstance().getSQLLoggingAddon());
+		// set up the subtable for the Event Logger, and force creation.
+		// Click events now use the same standard sub table system as the click train
+		// detector; the old system of logging event clicks to the _OfflineClicks table
+		// is only retained for reading / migrating old databases.
+		offlineEventLogging.setSubLogging(new OfflineEventSubLogging(clickControl, offlineEventDataBlock));
 
 		triggerBackgroundHandler = new TriggerBackgroundHandler(this);
 
@@ -1451,10 +1458,9 @@ public class ClickDetector extends PamProcess {
 		private boolean findBearingLocaliser() {
 			if (rawDataSource != null && rawDataSource.getChannelListManager() != null) {
 				int locChannels = SMRUEnable.getGoodChannels(groupChannels);
-//				groupHydrophones = rawDataSource.getChannelListManager().channelIndexesToPhones(locChannels);
-				int[] phoneList = rawDataSource.getChannelListManager().channelMapToPhonesList(locChannels);
+				groupHydrophones = rawDataSource.getChannelListManager().channelMapToPhonesList(locChannels);
 				double timingError = Correlations.defaultTimingError(getSampleRate());
-				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(phoneList, timingError);
+				bearingLocaliser = BearingLocaliserSelector.createBearingLocaliser(groupHydrophones, timingError);
 				return true;
 			} else {
 				return false;
@@ -2061,7 +2067,7 @@ public class ClickDetector extends PamProcess {
 	// return targetMotionSQLLogging;
 	// }
 
-	public void setTargetMotionLocaliser(TargetMotionLocaliser<GroupDetection> targetMotionLocaliser) {
+	public void setTargetMotionLocaliser(TargetMotionLocaliser<DetectionGroup> targetMotionLocaliser) {
 		targetMotionSQLLogging.setTargetMotionLocaliser(targetMotionLocaliser);
 	}
 

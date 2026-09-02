@@ -13,9 +13,7 @@ The classifier is based on a matched filter i.e. a candidate click detection is 
 
 The matched click classifier settings are accessed via **Settings-> Matched click classifier**_. The settings are split into the three sections, general settings, click waveform and click templates. 
 
-<p align="center">
-  <img width="950" height="550" src = "resources/matched_click_dialog_summary.png">
-</p>
+![](resources/matched_click_dialog_summary.png)
 
 _The settings pane of the matched click classifier_
 
@@ -65,9 +63,7 @@ The matched click classifier changes the species type flag of a click if at leas
 
 Matched clicks can be viewed in the bearing time display. If a click passes the threshold of one match/reject pair then the click symbol (defined in general settings) is shown in the bearing time display if _Colour by Matched Template Classifier_ is selected in the right click menu. The correlation values are shown by hovering the mouse over a click to bring up the info tool tip. 
 
-<p align="center">
-  <img width="950" height="550" src = "resources/matched_click_bt_display.png">
-</p>
+![](resources/matched_click_bt_display.png)
 
 _Screenshot of clicks classified from the matched click classifier showing matched clicks (coloured pink)_
 
@@ -75,18 +71,14 @@ _Screenshot of clicks classified from the matched click classifier showing match
 
 The time base display FX can show clicks classified by the matched clicks classifier. _Colour by Matched Template Classifier_ must be selecting in the right settings window. 
 
-<p align="center">
-  <img width="950" height="520" src = "resources/matched_click_tdisplay_example.png">
-</p>
+![](resources/matched_click_tdisplay_example.png)
 
 _Screenshot of Time Base display FX showing clicks classified by the match click classifier (coloured pink). The correlation values can be found in the meta data section of the detection pop up menu (highlighted)_
 
 Note that the time base display allows users to export clicks to be used as templates. Using the advanced pop up menu right click on a click detection and select the MATLAB icon. A .mat file of the selected click or clicks will be saved to your root user folder in a folder called _PAMGuard Manual Export_.  This .mat file can be opened by the matched click classifier - the first channel of the first click in the list will be imported as a template. 
 
 
-<p align="center">
-  <img width="510" height="300" src = "resources/exporting_mat_clicks.png">
-</p>
+![](resources/exporting_mat_clicks.png)
 
 
 ### Extracting correlation values using MATLAB/R 

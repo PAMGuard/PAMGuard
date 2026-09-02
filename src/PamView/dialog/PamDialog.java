@@ -41,6 +41,7 @@ import PamModel.SMRUEnable;
 import PamView.CancelObserver;
 import PamView.ClipboardCopier;
 import PamView.PamColors;
+import PamView.PamLookAndFeel;
 import PamView.ScreenSize;
 import PamView.help.PamHelp;
 import PamView.PamIcon;
@@ -305,6 +306,15 @@ abstract public class PamDialog extends JDialog {
 		 */
 		if (visible) {
 			synchronized (this) {
+				/*
+				 * Dialogs are generally built once and kept, and plenty of them cache and swap
+				 * whole panels (the data source panels in the acquisition dialog, for
+				 * instance), so parts of the dialog may have been detached from every open
+				 * window when the colour scheme last changed and so missed the look and feel
+				 * update. Put that right before it's seen. Does nothing if the dialog is
+				 * already up to date.
+				 */
+				PamLookAndFeel.refreshComponentTheme(this.getContentPane());
 				PamColors.getInstance().notifyContianer(this.getContentPane());
 			}
 			if (getOwner() == null && isMoveToMouse()) {

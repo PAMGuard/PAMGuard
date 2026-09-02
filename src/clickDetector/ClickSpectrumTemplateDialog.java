@@ -97,19 +97,20 @@ public class ClickSpectrumTemplateDialog  extends PamDialog {
 	
 	public void loadTemplate(){
 		String template=(String) templateList.getSelectedItem();
-		ClickTemplate clkTemplate=ClickTemplate.getCSVResults(template);
+		ClickTemplate clkTemplate=ClickTemplate.loadTemplateFile(template);
 		if (clkTemplate!=null){
 		clickSpectrumTemplateParams.clickTemplateArray.add(clkTemplate);
 		clickSpectrumTemplateParams.clickTempVisible.add(true);
 		}
 	}
-	
 
-	
+
+
 	public String openFileBrowser(){
-		
+
 		PamFileFilter fileFilter = new PamFileFilter("Click Template", ".csv");
 		fileFilter.addFileType(".txt");
+		fileFilter.addFileType(".mat");
 		JFileChooser fileChooser = new PamFileChooser();
 		fileChooser.setFileFilter(fileFilter);
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

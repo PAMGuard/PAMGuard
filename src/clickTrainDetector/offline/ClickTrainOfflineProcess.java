@@ -88,7 +88,6 @@ public class ClickTrainOfflineProcess {
 					clickTrainOfflineGroup, "Click Train Detection");
 			//batchLocaliseDialog.setModalityType(Dialog.ModalityType.MODELESS);
 		}
-		
 		clickTrainDialog.setVisible(true);
 	}
 	

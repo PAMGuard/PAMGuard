@@ -221,6 +221,7 @@ public class FFTPaneFX extends SettingsPane<FFTParameters>{
 		pamGridPane.add(fftSpinnerHop, 1, 1);
 
 		PamButton defaultHop=new PamButton();
+		defaultHop.getStyleClass().add("icon-button");
 //		defaultHop.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.REFRESH, PamGuiManagerFX.iconSize-3));
 		defaultHop.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
 		defaultHop.setOnAction((action)->{
@@ -357,6 +358,11 @@ public class FFTPaneFX extends SettingsPane<FFTParameters>{
 	@Override
 	public String getName() {
 		return "FFT Settings Pane";
+	}
+
+	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("fft_engine.md");
 	}
 
 	@Override

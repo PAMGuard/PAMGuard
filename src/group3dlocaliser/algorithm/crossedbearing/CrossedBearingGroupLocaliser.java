@@ -188,6 +188,7 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D implement
 				hBox.setPadding(new Insets(5,5,5,5));
 				
 				PamButton algoOptsButton = new PamButton("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+				algoOptsButton.getStyleClass().add("icon-button");
 				algoOptsButton.setOnAction((action)->{
 					moreAlgorithmOptions() ;
 				});

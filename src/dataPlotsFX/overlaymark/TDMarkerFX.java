@@ -8,11 +8,14 @@ import javax.swing.JPopupMenu;
 
 import PamController.PamController;
 import PamUtils.Coordinate3d;
+import PamUtils.PamCoordinate;
 import PamView.HoverData;
 import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamView.paneloverlay.overlaymark.MarkRelationshipsData;
 import PamView.paneloverlay.overlaymark.OverlayMark;
+import PamView.paneloverlay.overlaymark.OverlayMark.OverlayMarkType;
+import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
 import dataPlotsFX.data.TDDataInfoFX;
@@ -88,16 +91,105 @@ public class TDMarkerFX extends StandardOverlayMarker  {
 
 		//System.out.println("Select data unit: " + this.isNowMarking());
 
+		if (isIndividualSelect(e)) {
+			// Ctrl click adds / removes a single data unit from the individual selection.
+			return toggleIndividualSelection(e);
+		}
+
+		if (isIndividualSelection() && e.getButton() != MouseButton.PRIMARY) {
+			/*
+			 * Leave an individual selection alone for a right click, so that the popup menu
+			 * acts on the whole selection rather than on the one unit under the mouse.
+			 */
+			return super.mousePressed(e);
+		}
+
 		if (!this.isNowMarking() /*&& e.getButton()==MouseButton.PRIMARY*/){
 
-			bool = this.selectDataUnit(e); 
+			bool = this.selectDataUnit(e);
 			if (bool){
 				this.destroyCurrentMark(e);
 				getTdGraphFX().repaintMarks();
-				//return true; 
+				//return true;
 			}
 		}
-		return super.mousePressed(e); 
+		return super.mousePressed(e);
+	}
+
+	/**
+	 * Is there an individual (Ctrl click) selection of data units in place ?
+	 * @return true if the current mark is an individual selection.
+	 */
+	private boolean isIndividualSelection() {
+		OverlayMark mark = getCurrentMark();
+		return mark != null && mark.getMarkType() == OverlayMarkType.DATAUNITS;
+	}
+
+	/**
+	 * Add the data unit under the mouse to the individual selection, or remove it if
+	 * it's already there. The selection is held in a DATAUNITS OverlayMark which is
+	 * set as the current mark, so from that point on it behaves exactly like a
+	 * completed box or polygon: the same popup menus, the same mark observers and
+	 * the same highlighting on the display.
+	 * @param e mouse event
+	 * @return true if a data unit was found under the mouse.
+	 */
+	private boolean toggleIndividualSelection(MouseEvent e) {
+
+		FoundDataUnitFX foundDataUnit = findClosestUnit(new Point((int) e.getX(), (int) e.getY()));
+		if (foundDataUnit == null || foundDataUnit.dataUnit == null
+				|| foundDataUnit.distance >= TDMarkerFX.maxMarkDistance) {
+			return false;
+		}
+
+		OverlayMark mark = getCurrentMark();
+		if (mark == null || mark.getMarkType() != OverlayMarkType.DATAUNITS) {
+			// starting a new individual selection replaces whatever mark was there before.
+			mark = new OverlayMark(this, getMarkSource(), findExtraInfo(e.getSource()), getMarkChannels(),
+					getProjector().getParameterTypes(), getProjector().getParameterUnits());
+			setCurrentMark(mark);
+		}
+		setNowMarking(false);
+		mark.toggleDataUnit(foundDataUnit.dataUnit, getDataUnitCoordinate(foundDataUnit, e));
+
+		ArrayList<PamDataUnit> markedUnits = mark.getMarkedDataUnits();
+		if (markedUnits == null || markedUnits.isEmpty()) {
+			// the last unit has been deselected, so there's no mark left at all.
+			destroyCurrentMark(e);
+			currentDetectionGroup = null;
+		}
+		else {
+			currentDetectionGroup = new DetectionGroupSummary(e, this, mark, new ArrayList<PamDataUnit>(markedUnits));
+			/*
+			 * The focused unit is drawn with the stronger highlight symbol, so point it at
+			 * the unit which was just clicked on. If that unit was deselected it's no longer
+			 * in the list, in which case fall back to the last one still selected.
+			 */
+			int focusIndex = markedUnits.indexOf(foundDataUnit.dataUnit);
+			currentDetectionGroup.setFocusedIndex(focusIndex < 0 ? markedUnits.size() - 1 : focusIndex);
+			updateObservers(OverlayMarkObserver.MARK_END, e, mark);
+		}
+		notifyNewDetectionGroup(currentDetectionGroup);
+		getTdGraphFX().repaintMarks();
+
+		return true;
+	}
+
+	/**
+	 * Get the position of a found data unit in display coordinates, so that the mark
+	 * knows where its selected units are and can work out its own limits and centre.
+	 * @param foundDataUnit the data unit found under the mouse.
+	 * @param e mouse event, used as a fallback if the unit has no plottable value.
+	 * @return coordinate of the data unit, or of the mouse if that can't be worked out.
+	 */
+	private PamCoordinate getDataUnitCoordinate(FoundDataUnitFX foundDataUnit, MouseEvent e) {
+		if (foundDataUnit.dataInfo != null) {
+			Point unitPoint = getDataUnitPoint(foundDataUnit.dataInfo, foundDataUnit.dataUnit);
+			if (unitPoint != null) {
+				return getProjector().getDataPosition(new Coordinate3d(unitPoint.x, unitPoint.y));
+			}
+		}
+		return getCoordinate(e);
 	}
 
 

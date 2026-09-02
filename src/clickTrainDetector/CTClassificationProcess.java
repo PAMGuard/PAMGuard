@@ -55,6 +55,9 @@ public class CTClassificationProcess extends PamInstantProcess {
 		if (pamControlledUnit.saveTrains) {
 			clssfdClickTrainDataBlock.SetLogging(clickTrainDetLogging = new ClickTrainDetLogging(pamControlledUnit, clssfdClickTrainDataBlock));
 			clickTrainDetLogging.setSubLogging(new ClickTrainDetSubLogging(clickTrainDetLogging, clssfdClickTrainDataBlock));
+			// target motion results for click trains localised from the click
+			// detector's target motion dialog are saved in the click train table.
+			clickTrainDetLogging.addAddOn(new targetMotion.TargetMotionSQLLogging(2));
 			//It's important to have this here to ensure super detections from click trains load in viewer mode
 			AbstractScrollManager.getScrollManager().addToSpecialDatablock(clssfdClickTrainDataBlock);
 		}

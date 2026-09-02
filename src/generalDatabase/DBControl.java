@@ -44,6 +44,9 @@ import offlineProcessing.OfflineTaskGroup;
 import pamguard.GlobalArguments;
 import warnings.PamWarning;
 import warnings.WarningSystem;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignD;
+
+import PamView.component.PamFontIcon;
 
 /**
  * Database system for accessing data in just about any type of odbc database.
@@ -450,6 +453,7 @@ PamSettingsSource {
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
 		JMenu menu = new JMenu("Database");
+		menu.setIcon(PamFontIcon.of(MaterialDesignD.DATABASE_OUTLINE, PamFontIcon.MENU_SIZE));
 		JMenuItem fileMenu = new JMenuItem("Database Selection ...");
 		fileMenu.addActionListener(new DatabaseFileMenuAction(this, parentFrame));
 		menu.add(fileMenu);

@@ -1,6 +1,8 @@
 package dataPlotsFX.scrollingPlot2D;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import PamController.PamController;
 import javafx.animation.KeyFrame;
@@ -15,6 +17,7 @@ import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.DataBlock2D;
 import PamguardMVC.DataUnit2D;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -29,6 +32,7 @@ import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import dataPlotsFX.projector.TDProjectorFX;
 import dataPlotsFX.spectrogramPlotFX.Spectrogram2DPlotData;
+import dataPlotsFX.spectrogramPlotFX.Spectrogram2DPlotData2;
 import dataPlotsFX.spectrogramPlotFX.SpectrogramParamsFX;
 
 /**
@@ -238,11 +242,11 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 			if (chan >= 0 && scrolling2DPlotData[chan] != null) {
 				long time0 = System.currentTimeMillis();
 
-				scrolling2DPlotData[chan].drawSpectrogram(g, tdProjector.getWindowRect(), 
+				scrolling2DPlotData[chan].drawSpectrogram(g, tdProjector.getWindowRect(),
 						tdProjector.getOrientation(), tdProjector.getTimeAxis(), scrollStart, tdProjector.isWrap());
-				
+
 				long time1 = System.currentTimeMillis();
-				//System.out.println("chan: "+plotNumber + " draw: " + (time1-time0) + " " + scrollStart); 
+				//System.out.println("chan: "+plotNumber + " draw: " + (time1-time0) + " " + scrollStart);
 
 			}
 		}
@@ -564,9 +568,8 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	 * @throws InterruptedException  - throws the interrupted expression. We want the thread to be interrupted and cancelled here. Allows fast scrolling
 	 */
 	private synchronized boolean orderOfflineData(Task<Boolean> task) throws InterruptedException {
-		
-		
-		//do not try and order an data before everything has set up. 
+
+		//do not try and order an data before everything has set up.
 		if (!PamController.getInstance().isInitializationComplete()) return false;
 
 		if (dataBlock2D == null) {
@@ -576,13 +579,21 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 			return false;
 		}
 
-		//allow for fast scrolling. Thread goes to sleep and if interrupted just cancels. 
-		if (task!=null) Thread.sleep(100);		
+		//allow for fast scrolling. Thread goes to sleep and if interrupted just cancels.
+		if (task!=null) Thread.sleep(100);
 		if (task!=null && task.isCancelled()){
-			return false; 
+			return false;
 		}
+
+		// Incremental (tiled) renderers manage their own store and only need the
+		// missing portions ordered, plus pre-loading either side of the visible
+		// range. The single-image renderer falls through to the original logic.
+		if (isIncrementalStoreActive()) {
+			return orderOfflineDataIncremental(task);
+		}
+
 		/**
-		 * First cancel the last order and reset pointers in the output images. 
+		 * First cancel the last order and reset pointers in the output images.
 		 */
 		dataBlock2D.cancelDataOrder(true);
 		//don't know why, but some weird order quue stuff going on sometimes and this seems to 
@@ -617,7 +628,226 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 
 		dataBlock2D.orderOfflineData(this.fftObserver, new DataLoadObserver(), dataStart, dataEnd, 0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT);
 
-		return true; 
+		return true;
+	}
+
+	/**
+	 * @return true if at least one active channel uses an incremental (tiled)
+	 *         store and so wants incremental ordering.
+	 */
+	private boolean isIncrementalStoreActive() {
+		if (scrolling2DPlotData == null) {
+			return false;
+		}
+		for (int i = 0; i < scrolling2DPlotData.length; i++) {
+			if (scrolling2DPlotData[i] != null) {
+				return scrolling2DPlotData[i].isIncrementalStore();
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Maximum span of a single offline order for the tiled renderer, in
+	 * milliseconds. Each offline order clears the FFT data blocks before loading
+	 * (see {@code OfflineDataLoading.clearAllFFTBlocks()}), so the FFT block only
+	 * ever holds the most recent order's units. By loading the missing region as a
+	 * sequence of small chunks (rather than one big order) the resident FFT-unit
+	 * memory is kept to roughly one chunk's worth, while the rendered tiles retain
+	 * everything needed for display. Capped again below to a couple of tiles.
+	 */
+	private static final long MAX_CHUNK_MILLIS = 4000;
+
+	/** Queue of tile-aligned [start,end] intervals still to be ordered, in priority order. */
+	private final java.util.ArrayDeque<long[]> loadQueue = new java.util.ArrayDeque<>();
+
+	/** Lock guarding {@link #loadQueue}. */
+	private final Object loadQueueLock = new Object();
+
+	/**
+	 * Incremented each time a fresh incremental load is started so that completion
+	 * callbacks from a superseded load do not keep ordering stale chunks.
+	 */
+	private volatile int loadGeneration = 0;
+
+	/**
+	 * Incremental ordering for tiled renderers. Only the missing portions of the
+	 * display are ordered, as a sequence of small chunks: the visible range is
+	 * loaded first, then the margins up to half the visible range either side are
+	 * pre-loaded so that small scrolls within that window show no loading. Chunking
+	 * keeps the resident FFT-unit memory low (each offline order wipes the FFT
+	 * blocks first, so the block only ever holds the current chunk).
+	 *
+	 * @param task the loading task (used to allow cancellation), may be null.
+	 * @return true if ordering was (or did not need to be) started.
+	 */
+	private boolean orderOfflineDataIncremental(Task<Boolean> task) {
+		// Make sure each channel's tiling is up to date with the current visible range
+		// and resolution before working out what is missing. If the time range (and
+		// hence time compression / tile size) has changed, checkConfig() clears the
+		// now-stale tiles so the new range is re-ordered and regenerated at the correct
+		// resolution. Without this, reducing the visible range leaves nothing 'missing'
+		// (the smaller range is already covered by the old, coarser tiles) so no order
+		// fires and the display stays stuck at the old resolution.
+		for (int i = 0; i < scrolling2DPlotData.length; i++) {
+			if (scrolling2DPlotData[i] != null) {
+				scrolling2DPlotData[i].checkConfig();
+			}
+		}
+
+		long visStart = getVisibleStart();
+		long visEnd = getVisibleEnd();
+		long visible = Math.max(visEnd - visStart, 1);
+		long smoosh = getSmooshMillis();
+		long preloadStart = visStart - visible / 2;
+		long preloadEnd = visEnd + visible / 2;
+
+		// Representative channel - all active channels load together via the same
+		// orders, so their tile load-state stays in sync.
+		Scrolling2DPlotDataFX rep = firstActivePlotData();
+		if (rep == null) {
+			return false;
+		}
+
+		// All separately-missing runs across the whole pre-load window.
+		List<long[]> missingRuns = rep.getRequiredLoadIntervals(preloadStart, preloadEnd);
+
+		// Split each run into chunks; visible-overlapping chunks load first.
+		long chunkMax = chunkMaxMillis();
+		List<long[]> visibleChunks = new ArrayList<>();
+		List<long[]> marginChunks = new ArrayList<>();
+		for (long[] run : missingRuns) {
+			for (long s = run[0]; s < run[1]; s += chunkMax) {
+				long e = Math.min(s + chunkMax, run[1]);
+				if (e > visStart - smoosh && s < visEnd) {
+					visibleChunks.add(new long[] { s, e });
+				}
+				else {
+					marginChunks.add(new long[] { s, e });
+				}
+			}
+		}
+
+		synchronized (loadQueueLock) {
+			loadQueue.clear();
+			loadQueue.addAll(visibleChunks);
+			loadQueue.addAll(marginChunks);
+		}
+
+		int gen = ++loadGeneration;
+		if (loadQueue.isEmpty()) {
+			// Nothing to load (the no-flicker case) - just make sure we repaint.
+			Platform.runLater(() -> getTDGraph().repaint(0));
+			return true;
+		}
+		orderNextChunk(gen);
+		return true;
+	}
+
+	/**
+	 * The maximum span of a single order, in millis. A whole number of tiles (at
+	 * least one) no larger than {@link #MAX_CHUNK_MILLIS}, so that chunks stay
+	 * tile-aligned (avoiding marking partially-loaded tiles) while keeping resident
+	 * FFT memory small.
+	 */
+	private long chunkMaxMillis() {
+		Scrolling2DPlotDataFX rep = firstActivePlotData();
+		long tile = (rep == null) ? 0 : rep.getTileMillis();
+		if (tile <= 0) {
+			return MAX_CHUNK_MILLIS;
+		}
+		long nTiles = Math.max(1, MAX_CHUNK_MILLIS / tile);
+		return nTiles * tile;
+	}
+
+	/**
+	 * @return the first active (non-null) channel plot data, or null if none.
+	 */
+	private Scrolling2DPlotDataFX firstActivePlotData() {
+		if (scrolling2DPlotData == null) {
+			return null;
+		}
+		for (int i = 0; i < scrolling2DPlotData.length; i++) {
+			if (scrolling2DPlotData[i] != null) {
+				return scrolling2DPlotData[i];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Order the next queued chunk (if any), provided the load generation is still
+	 * current. Each chunk is a single tile-aligned offline order.
+	 *
+	 * @param gen the load generation this chain belongs to.
+	 */
+	private void orderNextChunk(int gen) {
+		if (gen != loadGeneration) {
+			return; // superseded by a newer load
+		}
+		long[] next;
+		synchronized (loadQueueLock) {
+			next = loadQueue.poll();
+		}
+		if (next == null) {
+			Platform.runLater(() -> getTDGraph().repaint(0));
+			return;
+		}
+		isOrderring = true;
+		dataBlock2D.cancelDataOrder(true);
+		lastReqStart = next[0];
+		lastReqEnd = next[1];
+		// allowRepeats = true: the tiled renderer does its own de-duplication via tile
+		// load-state (getRequiredLoadIntervals), so we must not let the data block's own
+		// 'same request' de-dup suppress a reload - e.g. after a resolution change that
+		// cleared and needs to refill the same time range.
+		dataBlock2D.orderOfflineData(this.fftObserver, new TiledLoadObserver(next[0], next[1], gen), next[0], next[1],
+				0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT, true);
+	}
+
+	/**
+	 * Load observer for one chunk of the incremental (tiled) ordering. On
+	 * completion it marks the ordered range as loaded on every channel, repaints
+	 * and orders the next queued chunk.
+	 */
+	private class TiledLoadObserver implements PamguardMVC.LoadObserver {
+
+		private final long start;
+		private final long end;
+		private final int gen;
+
+		TiledLoadObserver(long start, long end, int gen) {
+			this.start = start;
+			this.end = end;
+			this.gen = gen;
+		}
+
+		@Override
+		public void setLoadStatus(int loadState) {
+			// The status is a bitmask and can be OR'd (e.g. REQUEST_DATA_LOADED |
+			// REQUEST_SAME_REQUEST), so it must be tested with '&', not '=='.
+
+			// If this order was interrupted, a newer order has superseded it; let that
+			// chain continue the work and do not advance/mark from here.
+			if ((loadState & PamDataBlock.REQUEST_INTERRUPTED) != 0) {
+				return;
+			}
+
+			isOrderring = false;
+
+			// mark the whole ordered range as loaded (covers empty/silent tiles too).
+			for (int i = 0; i < scrolling2DPlotData.length; i++) {
+				if (scrolling2DPlotData[i] != null) {
+					scrolling2DPlotData[i].markRangeLoaded(start, end);
+				}
+			}
+
+			Platform.runLater(() -> getTDGraph().repaint(0));
+
+			// Order the next chunk on the FX thread (matching how scroll-driven
+			// orders are launched) rather than from the load-completion thread.
+			Platform.runLater(() -> orderNextChunk(gen));
+		}
 	}
 	
 	
@@ -655,7 +885,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	@Override
 	public void timeScrollValueChanged(double valueMillis) {
 		/*
-		 *  Called in viewer mode - need to request FFT data in order to 
+		 *  Called in viewer mode - need to request FFT data in order to
 		 *  rebuild the  spectrogram image
 		 */
 		if (isViewer()) {
@@ -670,8 +900,6 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	@Override
 	public void timeScrollRangeChanged(double minimumMillis, double maximumMillis) {
 		super.timeScrollRangeChanged(minimumMillis, maximumMillis);
-		//		System.out.println(String.format("Spec time range change from %s to %s", PamCalendar.formatDateTime(minimumMillis),
-		//				PamCalendar.formatTime(maximumMillis)));
 		if (isViewer()) {
 			orderOfflineData();
 		}
@@ -778,7 +1006,9 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 	 * @return plot information. 
 	 */
 	public Scrolling2DPlotDataFX makeScrolling2DPlotData(int iChannel) {
-		return new Spectrogram2DPlotData(this, iChannel);
+		// Tiled renderer (incremental load + preload). To revert to the original
+		// single-image renderer, return new Spectrogram2DPlotData(this, iChannel).
+		return new Spectrogram2DPlotData2(this, iChannel);
 	}
 
 	/**

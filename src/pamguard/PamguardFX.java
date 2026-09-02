@@ -197,10 +197,11 @@ public class PamguardFX extends Application {
 		}
 		//going to need the run mode inside a Runnable later 
 		final int chosenRunMode = runMode;
-		if(runMode != PamController.RUN_REMOTE) {
-			//			ScreenSize.startScreenSizeProcess();
-			ScreenSize.getScreenBounds();
-		}
+		// NOTE: ScreenSize.getScreenBounds() is intentionally NOT called here.
+		// It uses GraphicsEnvironment (AWT) which would initialise AWT before
+		// Application.launch(), causing AWT to take ownership of NSApplication
+		// on macOS and silently breaking JavaFX's setUseSystemMenuBar(true).
+		// It is called instead inside start() after JavaFX has launched.
 
 		/*
 		 * 
@@ -276,7 +277,12 @@ public class PamguardFX extends Application {
 		//that kicked off from with the EDT CJB 2009-06-16 
 
 		PamGUIManager.setType(PamGUIManager.FX);
-		
+
+		// Must be set before launch() on macOS so that JavaFX registers the
+		// system menu bar with NSApplication before any AWT initialisation occurs.
+		//System.setProperty("apple.awt.application.name", "PAMGuard");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+
 		launch(args);
 
 	}

@@ -1,5 +1,7 @@
 package Localiser.detectionGroupLocaliser;
 
+import PamguardMVC.superdet.DetectionGroup;
+
 import GPS.GpsData;
 import PamDetection.AbstractLocalisation;
 import PamUtils.LatLong;
@@ -49,7 +51,7 @@ public class DetectionGroupLocaliser {
 	 * @param side -1 or 1 for left and right
 	 * @return true of localisation calculated successfully
 	 */
-	public boolean localiseDetectionGroup(GroupDetection groupDetection, int side) {
+	public boolean localiseDetectionGroup(DetectionGroup groupDetection, int side) {
 
 		return localiseDetectionGroup(groupDetection, side, 0);
 
@@ -64,7 +66,7 @@ public class DetectionGroupLocaliser {
 	 * @param groupSize
 	 * @return true of localisation calculated successfully
 	 */
-	public boolean localiseDetectionGroup(GroupDetection groupDetection, int side, double groupSize) {
+	public boolean localiseDetectionGroup(DetectionGroup groupDetection, int side, double groupSize) {
 		// 29/11/2016 MO: converted PamDetection references to PamDataUnit, since we've moved
 		// the generics to there now
 		

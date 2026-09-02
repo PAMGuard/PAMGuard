@@ -60,17 +60,20 @@ public class TableButtonPane extends Pane {
 		mainPane.setPadding(new Insets(15, 12, 15, 12));
 		
 		addButton=new Button();
+		addButton.getStyleClass().add("icon-button");
 //		addButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PLUS, Color.WHITE, PamGuiManagerFX.iconSize));
 		addButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
 		HBox.setHgrow(addButton, Priority.ALWAYS);
 
 		
 		settingsButton=new Button(); 
+		settingsButton.getStyleClass().add("icon-button");
 //		settingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, Color.WHITE, PamGuiManagerFX.iconSize));
 		settingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, PamGuiManagerFX.iconSize));
 		HBox.setHgrow(settingsButton, Priority.ALWAYS);
 
 		deleteButton=new Button(); 
+		deleteButton.getStyleClass().add("icon-button");
 		//deleteButton.setGraphic(Glyph.create("FontAwesome|DELETE").size(22).color(Color.WHITE));
 //		deleteButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.DELETE, Color.WHITE, PamGuiManagerFX.iconSize));
 		deleteButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-delete", Color.WHITE, PamGuiManagerFX.iconSize));

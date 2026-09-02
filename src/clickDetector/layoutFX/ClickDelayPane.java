@@ -161,6 +161,7 @@ public class ClickDelayPane extends SettingsPane<ClickParameters> {
 			
 //			typeChange[i] = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
 			typeChange[i] = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog",Color.WHITE, PamGuiManagerFX.iconSize));
+			typeChange[i].getStyleClass().add("icon-button");
 			typeChange[i].setOnAction((action)->{
 				settingsButtonPress(typeIndex);
 			});

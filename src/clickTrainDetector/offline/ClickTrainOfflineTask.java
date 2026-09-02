@@ -10,6 +10,7 @@ import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.ClickTrainDataBlock;
 import dataMap.OfflineDataMapPoint;
+import generalDatabase.DBControlUnit;
 import offlineProcessing.OfflineTask;
 import offlineProcessing.TaskGroupParams;
 
@@ -75,7 +76,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 
 		//clear all the current click trains loaded in memory. 
 		clearCurrentTrains();
-		
+				
 		clickTrainControl.getClickTrainProcess().prepareProcess();
 		clickTrainControl.setNotifyProcesses(true);
 		clickTrainControl.update(ClickTrainControl.PROCESSING_START);
@@ -122,16 +123,39 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	 * Called at the end of the thread which executes this task. 
 	 */
 	@Override
-	public void completeTask() { 
+	public void completeTask() {
+		//PROCESSING_END finalises any remaining (still-active) click trains and passes
+		//them through to the classified data block.
 		clickTrainControl.update(ClickTrainControl.PROCESSING_END);
 		clickTrainControl.setNotifyProcesses(false);
-		
+
+		//These trains are finalised after the task group has already called
+		//saveViewerData()/commitDatabase() at the end of processing, so they would not
+		//otherwise be written to the database. Save the affected data blocks again here
+		//to ensure the trailing trains are persisted.
+		saveAffectedData();
+
 		//update the data map - needed for proper linking?
 		if (super.getOfflineTaskGroup().getTaskGroupParams().dataChoice!=TaskGroupParams.PROCESS_LOADED) {
 			//FIXME - a bit of a hack here. Calling updateDataMap means the the datamap reverts to loading the first
 			//section of data. This is really annoying when analysing loaded data becase you have to find your way back.
 			//For now just disabled for loaded data.
 			PamController.getInstance().updateDataMap();
+		}
+	}
+
+	/**
+	 * Save the affected data blocks to the database and commit. Used to persist click
+	 * trains that are only finalised at {@link ClickTrainControl#PROCESSING_END}, which
+	 * happens after the task group's own save/commit has run.
+	 */
+	private void saveAffectedData() {
+		for (int i = 0; i < getNumAffectedDataBlocks(); i++) {
+			getAffectedDataBlock(i).saveViewerData();
+		}
+		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+		if (dbControl != null) {
+			dbControl.commitChanges();
 		}
 	}
 
@@ -166,7 +190,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	public void deleteOldData(TaskGroupParams taskGroupParams) {
 		//only delete data if the click train task is selected- otherwise
 		//there may be other tasks that do not want to delete click train
-		///e.g. the click train classifier task. 
+		///e.g. the click train classifier task.
 		if (super.isDoRun() && super.canRun()) super.deleteOldData(taskGroupParams);
 	}
 

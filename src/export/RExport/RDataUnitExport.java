@@ -40,8 +40,20 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 			rData.add("sequenceMap", dataUnit.getSequenceBitmap());
 		}
 		rData.add("UID", dataUnit.getUID());
-		rData.add("startSample", dataUnit.getStartSample());
-		rData.add("sampleDuration", dataUnit.getSampleDuration());
+		//data units which are not tied to a stretch of raw data have no start sample -
+		//a manual annotation drawn on the spectrogram, for one - and add() won't take a null.
+		if (dataUnit.getStartSample()!=null) {
+			rData.add("startSample", dataUnit.getStartSample());
+		}
+		else {
+			rData.add("startSample", 0);
+		}
+		if (dataUnit.getSampleDuration()!=null) {
+			rData.add("sampleDuration", dataUnit.getSampleDuration());
+		}
+		else {
+			rData.add("sampleDuration", 1);
+		}
 //		rData.add("freqLimits", new DoubleArrayVector(dataUnit.getBasicData().getFrequency()));
 		rData.add("minFreq", dataUnit.getBasicData().getFrequency()[0]);
 		rData.add("maxFreq", dataUnit.getBasicData().getFrequency()[1]);

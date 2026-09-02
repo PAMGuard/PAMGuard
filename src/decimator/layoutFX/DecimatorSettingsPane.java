@@ -186,6 +186,7 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 
 
 		decimatorPane.add(defaultFilterButton = new PamButton(),  gridx, gridy);
+		defaultFilterButton.getStyleClass().add("icon-button");
 		defaultFilterButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog-refresh",PamGuiManagerFX.iconSize));
 		defaultFilterButton.setTooltip(new Tooltip("Set the default anti-aliasing filter"));
 		defaultFilterButton.setOnAction((action)->{
@@ -445,6 +446,11 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 	@Override
 	public String getName() {
 		return "Decimator Settings";
+	}
+
+	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("decimator.md");
 	}
 
 	@Override

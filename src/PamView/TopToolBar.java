@@ -24,6 +24,8 @@ import PamController.PamController;
 import PamController.RawInputControlledUnit;
 import PamUtils.PamCalendar;
 import PamView.PamColors.PamColor;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamButton;
 import PamView.dialog.PamLabel;
@@ -56,21 +58,21 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 
 		pamController = PamController.getInstance();
 		if (pamController.getRunMode() == PamController.RUN_PAMVIEW) {
-			add(startButton = new PamButton(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-			startButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			add(startButton = new PamButton(PamFontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE)));
+			startButton.setDisabledIcon(PamFontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 			startButton.setToolTipText("Start sound playback");
-			add(stopButton = new PamButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			add(stopButton = new PamButton(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE)));
+			stopButton.setDisabledIcon(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 
 			stopButton.setToolTipText("Stop sound playback");
 		}
 		else {
 			add(startButton = new PamButton(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.RED)));
-			startButton.setDisabledIcon(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			startButton.setDisabledIcon(PamFontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 			startButton.setToolTipText("Start processing");
 			startButton.addMouseListener(new StartButtonMouse());
-			add(stopButton = new PamButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
-			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+			add(stopButton = new PamButton(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE)));
+			stopButton.setDisabledIcon(PamFontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, IconColour.DISABLED));
 			stopButton.setToolTipText("Stop processing");
 		}
 		startButton.addActionListener(new StartButton());
@@ -212,10 +214,17 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 			currentPCUComponent = null;
 		}
 		if (newComponent != null) {
+			/*
+			 * Module tool bar components are only in the window while their own tab is
+			 * showing, so one which was detached when the colour scheme changed needs
+			 * bringing up to date before it goes back in.
+			 */
+			PamLookAndFeel.refreshComponentTheme(newComponent);
 			moduleBit.add(newComponent);
 			currentPCUComponent = newComponent;
 		}
 	}
+
 	/**
 	 * Enable all start buttons in all top menu bars. 
 	 * In normal mode, this is generally controlled

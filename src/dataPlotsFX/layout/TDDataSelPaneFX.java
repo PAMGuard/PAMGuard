@@ -186,6 +186,7 @@ public class TDDataSelPaneFX extends PamVBox {
 
 
 		PamButton button = new PamButton(); 
+		button.getStyleClass().add("icon-button");
 
 //		button.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.COGS, Color.WHITE, PamGuiManagerFX.iconSize));
 		button.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cogs", Color.WHITE, PamGuiManagerFX.iconSize));

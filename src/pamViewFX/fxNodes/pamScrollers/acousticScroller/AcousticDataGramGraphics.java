@@ -3,11 +3,14 @@ package pamViewFX.fxNodes.pamScrollers.acousticScroller;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamView.PamColors;
 import dataGram.DatagramDataPoint;
 import dataGram.DatagramProvider;
+import dataGram.DatagramScaleInformation;
 import dataPlotsFX.scrollingPlot2D.Plot2DColours;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -48,9 +51,18 @@ public class AcousticDataGramGraphics implements AcousticScrollerGraphics {
 	private AcousticScrollerFX acousticScroller; ; 
 
 
-	private Color nanColor=Color.TRANSPARENT; 
+	private Color nanColor=Color.TRANSPARENT;
+
+
+
+	/**
+	 * The current plot type. Defaults to 3D heatmap.
+	 */
+	private int plotType = DatagramScaleInformation.PLOT_3D;
 
 	public AcousticDataGramGraphics(AcousticScrollerFX acousticScroller, PamDataBlock<PamDataUnit> dataBlock){
+		
+		System.out.println("Create AcousticDataGramGraphics:  " + dataBlock.getDataName());
 		this.acousticScroller=acousticScroller; 
 		this.dataBlock=dataBlock;
 		this.standardSpecColours= new StandardPlot2DColours(); 
@@ -60,6 +72,11 @@ public class AcousticDataGramGraphics implements AcousticScrollerGraphics {
 
 		dataGramProvider=dataBlock.getDatagramProvider();
 		dataGramStore= new DataGramStore(acousticScroller.getRangeMillis()); 
+		
+		if (dataGramProvider.getScaleInformation()!=null) {
+			plotType = dataGramProvider.getScaleInformation().getDisplayType();
+		}
+		
 	}
 
 
@@ -92,9 +109,135 @@ public class AcousticDataGramGraphics implements AcousticScrollerGraphics {
 	Canvas canvas;
 	Rectangle windowRect;
 	long scrollEnd; 
+	
 	@Override
 	public synchronized void repaint() {
+		if (plotType == DatagramScaleInformation.PLOT_2D) {
+			repaint2D();
+		} else {
+			repaint3D();
+		}
+	}
 
+	/**
+	 * Repaint the datagram as a 2D line plot. One coloured line is drawn per
+	 * datagram amplitude bin, similar to the {@code datagramPaint2D} method in
+	 * {@code DataStreamPanel}.
+	 */
+	public synchronized void repaint2D() {
+		if (dataGramStore == null || dataGramStore.datagramStore == null) return;
+
+		canvas = acousticScroller.getScrollBarPane().getDrawCanvas();
+		windowRect = new Rectangle(0, 0, canvas.getWidth(), canvas.getHeight());
+		double w = windowRect.getWidth();
+		double h = windowRect.getHeight();
+
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, w, h);
+
+		int storeSize = dataGramStore.storeSize;
+		int nPoints = dataGramStore.nPoints;
+		if (nPoints <= 0) return;
+
+		long minMillis = acousticScroller.getMinimumMillis();
+		long maxMillis = acousticScroller.getMaximumMillis();
+		double totalRange = maxMillis - minMillis;
+		if (totalRange <= 0) return;
+
+		// Collect datagram points in chronological order, skipping nulls and
+		// entries that fall entirely outside the current display window.
+		// The store is a circular buffer: entries from [currentIndex+1 ..
+		// currentIndex] (wrapping) run from oldest to newest.  Once the buffer
+		// is full, the oldest entries will have timestamps before minMillis;
+		// including them would produce an off-screen path segment that draws
+		// a spurious horizontal line back across the display when the path is
+		// stroked.
+		DatagramDataPoint[] ordered = new DatagramDataPoint[storeSize];
+		int count = 0;
+		for (int i = 0; i < storeSize; i++) {
+			int idx = (dataGramStore.currentIndex + 1 + i) % storeSize;
+			DatagramDataPoint dp = dataGramStore.datagramStore[idx];
+			if (dp == null) continue;
+			// Discard entries that lie entirely before or after the display window.
+			if (dp.getEndTime() < minMillis) continue;
+			if (dp.getStartTime() > maxMillis) break;
+			ordered[count++] = dp;
+		}
+		if (count < 2) return;
+
+		// Compute overall min/max amplitude across all visible bins.
+		double minVal = Double.MAX_VALUE;
+		double maxVal = -Double.MAX_VALUE;
+		for (int i = 0; i < count; i++) {
+			float[] data = ordered[i].getData();
+			if (data == null) continue;
+			for (int iy = 0; iy < nPoints; iy++) {
+				if (data[iy] >= 0) {
+					if (data[iy] < minVal) minVal = data[iy];
+					if (data[iy] > maxVal) maxVal = data[iy];
+				}
+			}
+		}
+		if (minVal == Double.MAX_VALUE || maxVal <= minVal) return;
+
+		double yScale = h / (maxVal - minVal);
+
+		// Draw one line per amplitude/frequency bin.
+		for (int iy = 0; iy < nPoints; iy++) {
+			java.awt.Color awtCol = PamColors.getInstance().getWhaleColor(iy + 1);
+			Color fxCol = Color.rgb(awtCol.getRed(), awtCol.getGreen(), awtCol.getBlue(), awtCol.getAlpha() / 255.0);
+			gc.setStroke(fxCol);
+			gc.setLineWidth(1.0);
+
+			gc.beginPath();
+			boolean pathOpen = false;
+			for (int ix = 0; ix < count; ix++) {
+				long tMid = (ordered[ix].getStartTime() + ordered[ix].getEndTime()) / 2;
+				float[] data = ordered[ix].getData();
+
+				// Skip bins with no data: negative values are the explicit -1 sentinel;
+				// all-zero bins arise when a DatagramDataPoint was created but no data
+				// units fell inside its interval (e.g. a gap between sound files).
+				if (data == null || data[iy] < 0) {
+					pathOpen = false;
+					continue;
+				}
+				boolean allZero = true;
+				for (int k = 0; k < nPoints; k++) {
+					if (data[k] != 0) { allZero = false; break; }
+				}
+				if (allZero) {
+					pathOpen = false;
+					continue;
+				}
+
+				double x = w * (tMid - minMillis) / totalRange;
+				double y = h - yScale * (data[iy] - minVal);
+
+				// If this point is outside the visible window, treat it as a
+				// path break to avoid drawing segments that sweep off-screen
+				// and back, which manifests as a spurious horizontal line.
+				if (x < 0 || x > w) {
+					pathOpen = false;
+					continue;
+				}
+
+				if (!pathOpen) {
+					gc.moveTo(x, y);
+					pathOpen = true;
+				} else {
+					gc.lineTo(x, y);
+				}
+			}
+			gc.stroke();
+		}
+	}
+
+	/**
+	 * Repaint the datagram as a 3D colour map (heatmap). This is the original
+	 * behaviour.
+	 */
+	public synchronized void repaint3D() {
 		if (dataGramStore==null || dataGramStore.datagramStore[0]==null) return; 
 		//paint the data gram. So need to paint the 
 		//		//get the canvas. 
@@ -499,6 +642,22 @@ public class AcousticDataGramGraphics implements AcousticScrollerGraphics {
 	@Override
 	public Plot2DColours getColors() {
 		return this.standardSpecColours;
+	}
+
+	/**
+	 * Get the current plot type.
+	 * @return {@link #PLOT_3D} or {@link #PLOT_2D}
+	 */
+	public int getPlotType() {
+		return plotType;
+	}
+
+	/**
+	 * Set the plot type.
+	 * @param plotType {@link #PLOT_3D} for colour map, {@link #PLOT_2D} for line plot
+	 */
+	public void setPlotType(int plotType) {
+		this.plotType = plotType;
 	}
 
 }

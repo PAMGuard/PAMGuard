@@ -13,9 +13,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
+
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
@@ -23,6 +25,7 @@ import PamController.PamSettings;
 import PamView.ColorManaged;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
+import PamView.component.PamFontIcon;
 import PamView.panel.PamPanel;
 
 /**
@@ -63,14 +66,18 @@ public class HidingPanel extends PamPanel implements PamSettings {
 	private String displayName;
 	private String settingsName;
 	
-	private static ImageIcon arrowDown=new ImageIcon(ClassLoader
-			.getSystemResource("Resources/SidePanelShowH.png"));
-	private static ImageIcon arrowUp=new ImageIcon(ClassLoader
-			.getSystemResource("Resources/SidePanelHideH.png"));
-	private static ImageIcon arrowRight=new ImageIcon(ClassLoader
-			.getSystemResource("Resources/SidePanelHide.png"));
-	private static ImageIcon arrowLeft=new ImageIcon(ClassLoader
-			.getSystemResource("Resources/SidePanelShow.png"));
+	/*
+	 * The chevrons point the way the panel moves: a HORIZONTAL panel has its strip
+	 * along the top and folds upwards, so it shows with a down chevron and hides
+	 * with an up one, and a VERTICAL panel has its strip down the left hand side
+	 * and folds to the left, so it shows with a right chevron and hides with a left
+	 * one. reverseShowButton() is the mirror image of both.
+	 */
+	private static Icon chevronDown = PamFontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamFontIcon.ARROW_SIZE);
+	private static Icon chevronUp = PamFontIcon.of(MaterialDesignC.CHEVRON_UP, PamFontIcon.ARROW_SIZE);
+	private static Icon chevronLeft = PamFontIcon.of(MaterialDesignC.CHEVRON_LEFT, PamFontIcon.ARROW_SIZE);
+	private static Icon chevronRight = PamFontIcon.of(MaterialDesignC.CHEVRON_RIGHT, PamFontIcon.ARROW_SIZE);
+
 	/**
 	 * Create a panel which can hide. 
 	 * @param componentFrame the component where the hiding panel will sit. 
@@ -104,11 +111,11 @@ public class HidingPanel extends PamPanel implements PamSettings {
 		addMainComponent(mainComponent);
 		
 		if (direction == VERTICAL) {
-			showButton = new JButton("", arrowDown);
+			showButton = new JButton("", chevronRight);
 			showButton.addActionListener(new ShowButton());
 			showButton.setToolTipText(getShowTip());
 			showButton.setMargin(new Insets(0, 0, 0, 0));
-			hideButton = new JButton("", arrowUp);
+			hideButton = new JButton("", chevronLeft);
 			hideButton.addActionListener(new HideButton());
 			hideButton.setToolTipText(getHideTip());
 			hideButton.setMargin(new Insets(0, 0, 0, 0));
@@ -121,11 +128,11 @@ public class HidingPanel extends PamPanel implements PamSettings {
 			}
 		}
 		else {
-			showButton = new JButton("", arrowRight);
+			showButton = new JButton("", chevronDown);
 			showButton.addActionListener(new ShowButton());
 			showButton.setToolTipText(getShowTip());
 			showButton.setMargin(new Insets(0, 0, 0, 0));
-			hideButton = new JButton("", arrowLeft);
+			hideButton = new JButton("", chevronUp);
 			hideButton.addActionListener(new HideButton());
 			hideButton.setToolTipText(getHideTip());
 			hideButton.setMargin(new Insets(0, 0, 0, 0));
@@ -193,15 +200,15 @@ public class HidingPanel extends PamPanel implements PamSettings {
 	 */
 	public void reverseShowButton(){
 		if (direction == HORIZONTAL) {
-			hideButton.setIcon(arrowDown);
-			showButton.setIcon(arrowUp);
+			hideButton.setIcon(chevronDown);
+			showButton.setIcon(chevronUp);
 			edgePanel.remove(hideButton); edgePanel.remove(showButton);
 			edgePanel.add(BorderLayout.SOUTH, showButton); edgePanel.add(BorderLayout.NORTH, hideButton);
 			
 		}
 		else{
-			hideButton.setIcon( arrowRight);
-			showButton.setIcon(arrowLeft);
+			hideButton.setIcon(chevronRight);
+			showButton.setIcon(chevronLeft);
 			edgePanel.remove(hideButton); edgePanel.remove(showButton);
 			edgePanel.add(BorderLayout.EAST, showButton); edgePanel.add(BorderLayout.WEST, hideButton);
 		}

@@ -52,8 +52,17 @@ public class Plot2DControPane extends SpectrogramControlPane {
 		PlotParams2D spectrogramParams = plotInfo2D.getPlot2DParameters();
 		setAmplitudeProperties(spectrogramParams.getAmplitudeLimits(), spectrogramParams.getMaxAmplitudeLimits());
 
-		//set up listeners to repait graph and change colours when slider moves. 
+		//set up listeners to repait graph and change colours when slider moves.
 		addAmplitudeListeners(spectrogramParams.getAmplitudeLimits());
+
+		//persist and recolour when the user changes the absolute (min/max) limits
+		//via the colour slider's right-click menu.
+		getColourSlider().setOnLimitsChanged(() -> {
+			double[] maxRange = plotInfo2D.getPlot2DParameters().getMaxAmplitudeLimits();
+			maxRange[0] = getColourSlider().getMin();
+			maxRange[1] = getColourSlider().getMax();
+			plotInfo2D.reColourPlots(true);
+		});
 
 
 		getColorBox().valueProperty().addListener((ov,  t,  t1) -> {                

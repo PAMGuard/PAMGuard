@@ -14,9 +14,7 @@ The structure of the module is as follows.
 3) The deep learning model: passes the transformed data to the model and waits for a result.
 4) Data packaging: packages the results into a data unit which is passed onto PAMGuard's displays and downstream processes.
 
-<p align="center">
-  <img width="900" height="380" src = "resources/deep_learning_module_process.png">
-</p>
+![](resources/deep_learning_module_process.png)
 
 _A diagram of how the deep learning module works in PAMGuard. An input waveform is segmented into chunks. A series of transforms are applied to each chunk creating the input for the deep learning model. The transformed chunks are sent to the model. The results from the model are saved and can be viewed in real time (e.g. mitigation) or in post processing (e.g. data from SoundTraps)._
 
@@ -41,13 +39,11 @@ The module is now a core module in PAMGaurd and will be released with version 2.
 ### Adding to PAMGuard's data model
 The module is straightforward to use. Go to _File ->Add Modules -> Classifiers -> Raw Deep Learning Classifier_. This will add the module to the PAMGuard data model. Once the module has been added to the data model go to  _Settings -> Deep Learning Segmenter_ to open the module settings. Select the channels, window length, hop size and deep learning model and you are ready to start analysing data. 
 
-<p align="center">
-  <img width="512" height="512" src = "resources/advanced_settings_animalspot_1.png">
-</p>
+![](resources/advanced_settings_animalspot_1.png)
 
 _An example the user interface for loading a model. The module allows a users to select a model framework and then load a model file. The model will generate a list of transforms that convert the raw sound data to a suitable input. Users have the option to edit transforms associated with a loaded model if necessary._
 
-<center><img src="resources/OrcaSpot_help1.png" width="1024"></center>
+<center>![](resources/OrcaSpot_help1.png)</center>
 
 _An example of OrcaSpot (a now retired framework) working on some simulated data and explanations of the various GUI components. Here the output from the algorithm is being sent to a beam former which provides a bearing to the detected Orca call._
 

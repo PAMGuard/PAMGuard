@@ -113,6 +113,7 @@ public class StandardFileDatePane extends FileDatePane<StandardFileDateSettings>
 				"information on date and time codes, as well as examples of common formats.";
 
 		PamButton helpButton = new PamButton(); 
+		helpButton.getStyleClass().add("icon-button");
 //		helpButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.HELP_CIRCLE_OUTLINE, 15));
 		helpButton.setGraphic(PamGlyphDude.createPamIcon("mdi2h-help-circle-outline", 15));
 		final String message = text; 
