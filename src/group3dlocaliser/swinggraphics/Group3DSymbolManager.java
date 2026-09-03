@@ -12,6 +12,7 @@ public class Group3DSymbolManager extends StandardSymbolManager {
 	public Group3DSymbolManager(Group3DLocaliserControl group3DControl, PamDataBlock pamDataBlock, SymbolData defaultSymbol) {
 		super(pamDataBlock, defaultSymbol);
 		this.group3DControl = group3DControl;
+		this.addSymbolOption(HAS_LINE_AND_LENGTH);
 	}
 
 
