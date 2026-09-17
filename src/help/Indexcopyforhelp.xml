@@ -673,7 +673,6 @@
 
   </tocitem>
   <tocitem text="DIFAR ">
-   <tocitem text="Azigram (DIFAR Azigram Engine) " target="localisation.difar.difarAzigram.docs.azigram" image="topic"/>
 
    <tocitem text="DIFAR Directional Audio " target="localisation.difar.difarAudio.docs.directionalAudio" image="topic"/>
 
