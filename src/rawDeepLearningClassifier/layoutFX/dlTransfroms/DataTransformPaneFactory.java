@@ -146,8 +146,12 @@ public class DataTransformPaneFactory {
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 1, Integer.MAX_VALUE,   1);	
 			break;
 		case REDUCETONALNOISE_MEDIAN:
-			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.REDUCETONALNOISE_MEDIAN.toString()); 
+			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.REDUCETONALNOISE_MEDIAN.toString());
 			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
+		case MEDIAN_EQUALIZER:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Window "},  new String[]{"s"});
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, Double.MAX_VALUE,   1.0);
 			break;
 		case SPECNORMALISESTD:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Mean ", "Std "}); 

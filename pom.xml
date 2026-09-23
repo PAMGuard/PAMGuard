@@ -18,7 +18,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<javafx.version>21</javafx.version>
+		<javafx.version>25</javafx.version>
 		<maven.compiler.release>11</maven.compiler.release>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
@@ -654,7 +654,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit
 			dependencies which breaks our own testing -->
 			<!--<exclusions>
@@ -670,7 +670,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jdl4pam</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		
 		<dependency>

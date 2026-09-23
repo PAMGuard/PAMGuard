@@ -2,6 +2,8 @@ package rawDeepLearningClassifier.layoutFX;
 
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import PamView.dialog.warn.WarnOnce;
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
@@ -18,6 +20,28 @@ public class DLWarningDialog {
 	}
 
 	/**
+	 * Show a warning on top of the window that holds the settings pane. When the pane is
+	 * hosted in a Swing dialog there is no FX owner, so an FX alert opens unowned (often
+	 * behind the modal Swing dialog) and blocks the FX thread in a nested loop. In that case
+	 * show a Swing warning owned by the Swing dialog instead.
+	 */
+	private void showOwnedWarning(String title, String message, AlertType alertType, String helpPoint) {
+		java.awt.Window awtOwner = rawDLSettingsPane.getAWTWindow();
+		if (awtOwner != null) {
+			SwingUtilities.invokeLater(()->{
+				WarnOnce.showWarning(awtOwner, title, message.replace("\n", "<br>"), WarnOnce.WARNING_MESSAGE, helpPoint, null, null, null);
+				warningShow = false;
+			});
+		}
+		else {
+			Platform.runLater(()->{
+				WarnOnce.showWarningFX(rawDLSettingsPane.getFXWindow(), title, message, alertType, helpPoint, null, null, null, true);
+				warningShow = false;
+			});
+		}
+	}
+
+	/**
 	 * Show a warning dialog for the status
 	 * @param the status to show
 	 */
@@ -29,12 +53,8 @@ public class DLWarningDialog {
 			if (warningShow) return;
 			warningShow=true;
 			
-			Platform.runLater(()->{
-				String helpURL = "http://www.pamguard.org/deeplearning/deep_learning_troubleshoot.html";
-				WarnOnce.showWarningFX(rawDLSettingsPane.getFXWindow(),  dlWarning.getName(),  dlWarning.getDescription() , AlertType.ERROR, helpURL, null,null, null, true);
-				warningShow = false;
-				//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
-			});
+			String helpURL = "http://www.pamguard.org/deeplearning/deep_learning_troubleshoot.html";
+			showOwnedWarning(dlWarning.getName(), dlWarning.getDescription(), AlertType.ERROR, helpURL);
 
 			
 //			try {
@@ -63,12 +83,8 @@ public class DLWarningDialog {
 	 * @param the warning to show.
 	 */
 	public void showWarning(String dlWarning) {
-		this.warningShow = true; 
-		Platform.runLater(()->{
-			WarnOnce.showWarningFX(rawDLSettingsPane.getFXWindow(),  "Deep Learning Warning", dlWarning , AlertType.ERROR, true);
-			warningShow = false;
-			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
-		});
+		this.warningShow = true;
+		showOwnedWarning("Deep Learning Warning", dlWarning, AlertType.ERROR, null);
 //		try {
 //			SwingUtilities.invokeAndWait(()->{
 //		WarnOnce.showWarning("Deep Learning Warning", dlWarning, WarnOnce.WARNING_MESSAGE, 
@@ -119,11 +135,7 @@ public class DLWarningDialog {
 		final boolean errorF = error;
 
 
-		Platform.runLater(()->{
-			WarnOnce.showWarningFX(rawDLSettingsPane.getFXWindow(),  "Deep Learning Settings Warning",  warningsF , errorF ? AlertType.ERROR : AlertType.WARNING, true);
-			warningShow = false;
-			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
-		});
+		showOwnedWarning("Deep Learning Settings Warning", warningsF, errorF ? AlertType.ERROR : AlertType.WARNING, null);
 
 		//user presses OK - these warnings are just a message - they do not prevent running the module.
 	}

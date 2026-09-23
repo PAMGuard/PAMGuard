@@ -158,7 +158,8 @@ public class DLModelSelectPane extends PamBorderPane {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 
-			File file = fileChooser.showOpenDialog(null); 
+			//give the chooser an owner so it opens on top of the settings dialog.
+			File file = fileChooser.showOpenDialog(pamButton.getScene() == null ? null : pamButton.getScene().getWindow());
 
 			if (file==null) {
 				return; 
