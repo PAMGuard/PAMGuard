@@ -63,9 +63,13 @@ import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
 import difar.offline.DifarDataCopyTask;
 import difar.offline.UpdateCrossingTask;
+import difar.offline.ViewerClipWriter;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
 import difar.trackedGroups.TrackedGroupProcess;
+import generalDatabase.DBControlUnit;
+import generalDatabase.PamConnection;
+import generalDatabase.SQLLogging;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 import offlineProcessing.OLProcessDialog;
@@ -247,9 +251,11 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			}
 			break;
 		case DIFARMessage.SaveDatagramUnit:
-			if (!isViewer) {
+			if (!isViewer || isQueued(message.difarDataUnit)) {
+				prepareViewerSave(message.difarDataUnit);
 				message.difarDataUnit.saveCrossing(true);
 				difarProcess.finalProcessing(message.difarDataUnit);
+				completeViewerSave(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_SAVED, 0L, 100));
@@ -260,10 +266,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			
 		case DIFARMessage.SaveDatagramUnitWithoutRange:
 		
-			if (!isViewer) {
+			if (!isViewer || isQueued(message.difarDataUnit)) {
+				prepareViewerSave(message.difarDataUnit);
 				//remove Range/Localisation Information
 				message.difarDataUnit.saveCrossing(false);
 				difarProcess.finalProcessing(message.difarDataUnit);
+				completeViewerSave(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_SAVED, 0L, 100));
@@ -609,6 +617,47 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 
 	/**
+	 * In the viewer, open a file for the clip before it joins the saved data,
+	 * so the file exists before the clip is given its UID, as in normal mode.
+	 * The clip's queue UID is cleared, so the saved data give it a new one;
+	 * queue UIDs start again every viewer session, so they are not unique.
+	 * @param unit the clip about to be saved.
+	 */
+	private void prepareViewerSave(DifarDataUnit unit) {
+		if (!isViewer) {
+			return;
+		}
+		ViewerClipWriter writer = difarProcess.getProcessedDifarData().getViewerClipWriter();
+		if (writer != null) {
+			writer.prepare(unit);
+		}
+		unit.setUID(0);
+	}
+
+	/**
+	 * In the viewer, write a clip just saved to its binary file and to the
+	 * database. Normal mode does both as the clip joins the saved data. Only
+	 * this clip is logged, not the whole block, since clips loaded from binary
+	 * files may carry no database index and would be logged a second time.
+	 * @param unit the clip just saved.
+	 */
+	private void completeViewerSave(DifarDataUnit unit) {
+		if (!isViewer) {
+			return;
+		}
+		DifarDataBlock saved = difarProcess.getProcessedDifarData();
+		ViewerClipWriter writer = saved.getViewerClipWriter();
+		if (writer == null || !writer.write(unit)) {
+			System.out.println("DIFAR: clip saved in memory but not written to a binary file");
+		}
+		SQLLogging logging = saved.getLogging();
+		PamConnection connection = DBControlUnit.findConnection();
+		if (logging != null && connection != null) {
+			logging.logData(connection, unit);
+		}
+	}
+
+	/**
 	 * @param unit a DIFAR clip.
 	 * @return true if the clip is waiting on the queue, so has not been saved.
 	 */
@@ -847,14 +896,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 
 	public boolean isSaveEnabled() {
 		DifarDataUnit currentDataUnit = getCurrentDemuxedUnit();
-		return (!isViewer && 
-				isQueued(getCurrentDemuxedUnit()) &&
+		return (isQueued(getCurrentDemuxedUnit()) &&
 				getCurrentDemuxedUnit().getSelectedAngle() != null);
 	}
 	
 	public boolean isSaveWithoutCrossEnabled() {
-		return (!isViewer && 
-				isQueued(getCurrentDemuxedUnit()) &&
+		return (isQueued(getCurrentDemuxedUnit()) &&
 				getCurrentDemuxedUnit().getSelectedAngle() !=null && 
 				getCurrentDemuxedUnit().getTempCrossing() != null);
 	}	

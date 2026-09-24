@@ -117,6 +117,15 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 	@Override
 	public int difarNotification(DIFARMessage difarMessage) {
 		switch(difarMessage.message) {
+		case DIFARMessage.NewDifarUnit:
+		case DIFARMessage.SaveDatagramUnit:
+		case DIFARMessage.SaveDatagramUnitWithoutRange:
+			// the clip strip only lays itself out again for new clips in normal
+			// mode, so in the viewer a new or newly saved clip is there but not
+			// shown until something else redraws the strip. Later, so the clip
+			// has joined the strip before it is laid out.
+			clipDisplayPanel.updatePanelLater();
+			break;
 		case DIFARMessage.DeleteFromQueue:
 		case DIFARMessage.ProcessFromQueue:
 			// a clip leaves the queue strip once it is taken to be worked or

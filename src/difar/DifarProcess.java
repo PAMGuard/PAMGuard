@@ -703,7 +703,7 @@ public class DifarProcess extends PamProcess {
 				difarDataUnit.setSelectedAngle(difarGridToDegrees(difarDataUnit, maxAngleInd));
 			}
 			else {
-				if (!difarControl.isViewer()) {
+				if (pickBearing(difarDataUnit)) {
 					difarDataUnit.setSelectedAngle(difarGridToDegrees(difarDataUnit, maxAngleInd));
 				}
 				difarDataUnit.setMaximumAngle(difarGridToDegrees(difarDataUnit, maxAngleInd));
@@ -718,7 +718,7 @@ public class DifarProcess extends PamProcess {
 				}
 			}
 			if (maxFreqInd >= 0) {
-				if (!difarControl.isViewer()) {
+				if (pickBearing(difarDataUnit)) {
 					difarDataUnit.setSelectedFrequency(difarGridToFrequency(difarDataUnit, maxFreqInd));
 				}
 				difarDataUnit.setMaximumFrequency(difarGridToFrequency(difarDataUnit, maxFreqInd));
@@ -788,13 +788,13 @@ public class DifarProcess extends PamProcess {
 		difarDataUnit.setMaximumAngleSummary(summaryLine);
 		
 		if (maxAngleInd >= 0) {
-			if (!difarControl.isViewer()) {
+			if (pickBearing(difarDataUnit)) {
 				difarDataUnit.setSelectedAngle(difarGridToDegrees(difarDataUnit, maxAngleInd));
 			}
 			difarDataUnit.setMaximumAngle(difarGridToDegrees(difarDataUnit, maxAngleInd));
 		}
 		if (maxFreqInd >= 0) {
-			if (!difarControl.isViewer()) {
+			if (pickBearing(difarDataUnit)) {
 				difarDataUnit.setSelectedFrequency(difarGridToFrequency(difarDataUnit, maxFreqInd));
 			}
 			difarDataUnit.setMaximumFrequency(difarGridToFrequency(difarDataUnit, maxFreqInd));
@@ -1176,6 +1176,15 @@ public class DifarProcess extends PamProcess {
 		queuedDifarData.addPamData(du);
 
 		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit, du));
+	}
+
+	/**
+	 * Whether demuxing should pick the strongest bearing, and its frequency,
+	 * for a clip. It does for new clips in any mode; a saved clip looked at
+	 * again in the viewer keeps the bearing and frequency it was saved with.
+	 */
+	private boolean pickBearing(DifarDataUnit difarDataUnit) {
+		return !difarControl.isViewer() || difarControl.isQueued(difarDataUnit);
 	}
 
 	/**

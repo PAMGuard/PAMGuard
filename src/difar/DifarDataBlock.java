@@ -1,5 +1,7 @@
 package difar;
 
+import difar.offline.ViewerClipWriter;
+
 import java.util.ListIterator;
 
 import PamDetection.LocContents;
@@ -15,6 +17,9 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 	private DifarControl difarControl;
 	private DifarDataSelectCreator dataSelectCreator;
 	private boolean isDifarQueue;
+
+	/** Writes clips saved in the viewer; saved clips only, made when first needed. */
+	private ViewerClipWriter viewerClipWriter;
 
 	public DifarDataBlock(String dataName, DifarControl difarControl, boolean isDifarQueue,
 			DifarProcess parentProcess, int channelMap) {
@@ -127,6 +132,47 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 		return unitsJustRemoved;
 	}
 
+
+	/**
+	 * @return the writer for clips saved in the viewer, or null for the queue.
+	 */
+	public synchronized ViewerClipWriter getViewerClipWriter() {
+		if (isDifarQueue) {
+			return null;
+		}
+		if (viewerClipWriter == null) {
+			viewerClipWriter = new ViewerClipWriter(this);
+		}
+		return viewerClipWriter;
+	}
+
+	/**
+	 * The viewer calls this before loading any new stretch of data, on File,
+	 * Save, and on exit. Any file of clips saved in the viewer is finished
+	 * first, so it is complete before anything reads it.
+	 */
+	@Override
+	public boolean saveViewerData() {
+		if (viewerClipWriter != null) {
+			viewerClipWriter.close();
+		}
+		return super.saveViewerData();
+	}
+
+	/**
+	 * In the viewer, a clip is kept once even if it is found in two files.
+	 * Nothing should write a clip twice, but if something ever does, this
+	 * turns a silent duplicate into a message.
+	 */
+	@Override
+	public void addPamData(DifarDataUnit pamDataUnit, Long uid) {
+		if (difarControl.isViewer() && uid != null && uid > 0
+				&& findUnitByUIDandUTC(uid, pamDataUnit.getTimeMilliseconds()) != null) {
+			System.out.printf("DIFAR: skipped a second copy of clip UID %d\n", uid);
+			return;
+		}
+		super.addPamData(pamDataUnit, uid);
+	}
 
 	@Override
 	public void addPamData(DifarDataUnit pamDataUnit) {
