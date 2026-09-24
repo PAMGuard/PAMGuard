@@ -105,6 +105,8 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	private DIFARUnitControlPanel difarUnitControlPanel;
 	
 	private DIFARQueuePanel difarQueue; // display of queues clips to process. 
+
+	private DIFARQueuePanel savedClips; // display of clips already saved
 	
 	private DifarSidePanel difarSidePanel; // Side panel for easy access to frequenctly used DIFAR controls
 	
@@ -142,7 +144,10 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		displayUnits.add(difarUnitControlPanel = new DIFARUnitControlPanel(this));
 		displayUnits.add(difarGram = new DIFARGram(this));
 		displayUnits.add(internalActionsPanel=new DifarActionsVesselPanel(this));
-		displayUnits.add(difarQueue = new DIFARQueuePanel(this, "Queued Data"));
+		displayUnits.add(difarQueue = new DIFARQueuePanel(this, "Queued Data",
+				difarProcess.getQueuedDifarData(), false));
+		displayUnits.add(savedClips = new DIFARQueuePanel(this, "Saved Data",
+				difarProcess.getProcessedDifarData(), true));
 		displayUnits.add(demuxProgressDisplay = new DemuxProgressDisplay(this));
 		
 
@@ -207,15 +212,11 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		// use the message here. 
 		switch (message.message) {
 		case DIFARMessage.NewDifarUnit:
-			if (!isViewer) {
-				processNextIfAnyAndCanAndShould();
-			}
+			processNextIfAnyAndCanAndShould();
 			break;
 		
 		case DIFARMessage.DeleteFromQueue:
-			if (!isViewer) {
-				difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
-			}
+			difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
 			break;
 		case DIFARMessage.ReturnToQueue:
 			if (!isViewer) {
@@ -233,7 +234,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			currentDemuxedUnit = message.difarDataUnit;
 			break;
 		case DIFARMessage.DeleteDatagramUnit:
-			if (!isViewer) {
+			// a new clip is deleted as in normal mode; a saved one being looked
+			// at again is just put away
+			if (!isViewer || isQueued(message.difarDataUnit)) {
 				currentDemuxedUnit = null;
 				difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
@@ -599,6 +602,21 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 
 	/**
+	 * @return the strip of clips already saved.
+	 */
+	public DIFARQueuePanel getSavedClips() {
+		return savedClips;
+	}
+
+	/**
+	 * @param unit a DIFAR clip.
+	 * @return true if the clip is waiting on the queue, so has not been saved.
+	 */
+	public boolean isQueued(DifarDataUnit unit) {
+		return unit != null && difarProcess.getQueuedDifarData().getDataCopy().contains(unit);
+	}
+
+	/**
 	 * @return the demuxProgressDisplay
 	 */
 	public DemuxProgressDisplay getDemuxProgressDisplay() {
@@ -617,9 +635,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	 * @return true if it's OK to demux the next sound. 
 	 */
 	public boolean canDemux() {
-		return (isViewer() || (currentDemuxedUnit == null
-				&& !difarProcess.isProcessing()
-				));
+		if (difarProcess.isProcessing()) {
+			return false;
+		}
+		// a saved clip being looked at again can be replaced; a new clip
+		// being worked cannot, until it is saved or deleted
+		return currentDemuxedUnit == null || !isQueued(currentDemuxedUnit);
 	}
 	
 	/**
@@ -827,19 +848,19 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	public boolean isSaveEnabled() {
 		DifarDataUnit currentDataUnit = getCurrentDemuxedUnit();
 		return (!isViewer && 
-				getCurrentDemuxedUnit() != null && 
+				isQueued(getCurrentDemuxedUnit()) &&
 				getCurrentDemuxedUnit().getSelectedAngle() != null);
 	}
 	
 	public boolean isSaveWithoutCrossEnabled() {
 		return (!isViewer && 
-				getCurrentDemuxedUnit() != null &&
+				isQueued(getCurrentDemuxedUnit()) &&
 				getCurrentDemuxedUnit().getSelectedAngle() !=null && 
 				getCurrentDemuxedUnit().getTempCrossing() != null);
 	}	
 	
 	public boolean isDeleteEnabled() {
-		return (!isViewer && getCurrentDemuxedUnit() != null);
+		return (getCurrentDemuxedUnit() != null && (!isViewer || isQueued(getCurrentDemuxedUnit())));
 	}
 	
 

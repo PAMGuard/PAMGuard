@@ -26,7 +26,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import PamController.PamController;
 import PamUtils.PamUtils;
 import PamView.PamColors;
 import PamView.panel.PamPanel;
@@ -53,10 +52,25 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	private ClipDisplayPanel clipDisplayPanel;
 
-	public DIFARQueuePanel(DifarControl difarControl, String queueName) {
+	private final ClipDisplayDataBlock clipDataBlock;
+
+	private final boolean saved;
+
+	/**
+	 * A strip of DIFAR clips.
+	 * @param difarControl the DIFAR module.
+	 * @param queueName name of the strip.
+	 * @param clipDataBlock the clips to show.
+	 * @param saved true if the clips are saved ones, which can be looked at
+	 * again but not saved a second time; false for clips waiting to be worked.
+	 */
+	public DIFARQueuePanel(DifarControl difarControl, String queueName,
+			ClipDisplayDataBlock clipDataBlock, boolean saved) {
 		super();
 		this.difarControl = difarControl;
 		this.queueName = queueName;
+		this.clipDataBlock = clipDataBlock;
+		this.saved = saved;
 
 		mainPanel = new JPanel(new BorderLayout());
 
@@ -87,7 +101,7 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 	@Override
 	public ClipDisplayDecorations getClipDecorations(
 			ClipDisplayUnit clipDisplayUnit) {
-		return new DifarClipDecorations(difarControl, clipDisplayUnit);
+		return new DifarClipDecorations(difarControl, clipDisplayUnit, saved);
 	}
 
 	@Override
@@ -102,17 +116,12 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	@Override
 	public int difarNotification(DIFARMessage difarMessage) {
-		boolean isViewer = difarControl.isViewer();
 		switch(difarMessage.message) {
 		case DIFARMessage.DeleteFromQueue:
-			if (!isViewer) {
-				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
-				clipDisplayPanel.updatePanel();
-
-			}
-			break;
 		case DIFARMessage.ProcessFromQueue:
-			if (!isViewer) {
+			// a clip leaves the queue strip once it is taken to be worked or
+			// deleted. Saved clips stay where they are.
+			if (!saved) {
 				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
 				clipDisplayPanel.updatePanel();
 			}
@@ -136,16 +145,14 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	@Override
 	public ClipDisplayDataBlock getClipDataBlock() {
-		/*
-		 * for viewer mode there will never be anything in the queue, so display 
-		 * the processed data instead. 
-		 */
-		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-			return difarControl.getDifarProcess().getProcessedDifarData();
-		}
-		else {
-			return difarControl.getDifarProcess().getQueuedDifarData();
-		}
+		return clipDataBlock;
+	}
+
+	/**
+	 * @return true if this strip shows saved clips.
+	 */
+	public boolean isSaved() {
+		return saved;
 	}	
 	
 	/**
@@ -157,7 +164,9 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	@Override
 	public String getDisplayName() {
-		return difarControl.getUnitName();
+		// the queue keeps the module's name, so its existing display settings
+		// are kept; the saved strip needs a name of its own for its settings.
+		return saved ? difarControl.getUnitName() + " saved clips" : difarControl.getUnitName();
 	}
 
 	public void	clearQueuePanel() {

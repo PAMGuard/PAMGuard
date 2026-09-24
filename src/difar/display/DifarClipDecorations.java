@@ -63,9 +63,21 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	private MenuItemEnabler vesselEnabler = new MenuItemEnabler();
 	private ArrayList<MenuItemEnabler> speciesEnablers;
 	
-	public DifarClipDecorations(DifarControl difarControl, ClipDisplayUnit clipDisplayUnit) {
+	/**
+	 * True for a clip already saved, which can be looked at again but not
+	 * worked and saved a second time.
+	 */
+	private final boolean saved;
+
+	/**
+	 * @param difarControl the DIFAR module.
+	 * @param clipDisplayUnit the clip being decorated.
+	 * @param saved true for a saved clip, false for one waiting to be worked.
+	 */
+	public DifarClipDecorations(DifarControl difarControl, ClipDisplayUnit clipDisplayUnit, boolean saved) {
 		super(clipDisplayUnit);
 		this.difarControl = difarControl;
+		this.saved = saved;
 		
 		difarDataUnit = (DifarDataUnit) clipDisplayUnit.getClipDataUnit();
 		speciesEnablers = new ArrayList<MenuItemEnabler>();//(difarControl.getDifarParameters().getSpeciesList(difarControl).getSelectedList().size());
@@ -107,7 +119,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 		}
 
 		MouseAdapter mouseAdapter;
-		if (difarControl.isViewer()) {
+		if (saved) {
 			mouseAdapter = new ViewerMouseFuncs(difarDataUnit);
 		}
 		else {
@@ -577,7 +589,9 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+			// a clip being worked is not replaced by one being looked at again
+			if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1
+					&& difarControl.canDemux()) {
 				difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.ProcessFromQueue, difarDataUnit));
 			}
 		}
@@ -587,7 +601,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 
 	@Override
 	public JPopupMenu addDisplayMenuItems(JPopupMenu basicMenu) {
-		if (difarControl.isViewer()) {
+		if (saved) {
 			return basicMenu;
 		}
 		displayMenus = new DisplayMenus();
