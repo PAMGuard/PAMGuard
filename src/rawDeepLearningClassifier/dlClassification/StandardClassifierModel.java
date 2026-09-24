@@ -433,6 +433,18 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		getDLWorker().closeModel();
 	}
 
+	@Override
+	public boolean flushModel(long maxWaitMillis) {
+		//only real time (non viewer) mode queues data on the worker thread. 
+		if (workerThread==null) return true; 
+		boolean ok = workerThread.waitForIdle(maxWaitMillis); 
+		if (!ok && !workerThread.isIdle()) {
+			System.err.println(getName() + ": timed out waiting for the deep learning queue to empty. " 
+					+ workerThread.getQueue().size() + " batches were not classified.");
+		}
+		return ok; 
+	}
+
 
 	//	/**
 	//	 * Send a new result form the thread queue to the process. 

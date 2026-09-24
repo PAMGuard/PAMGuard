@@ -186,8 +186,18 @@ public class DataTransformPaneFactory {
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   100.); //hmmmm would be nice to have the sample rate here...
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
 			break;
+		case SPECFREQZERO:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Min. Freq. ", "Max. Freq. "},  new String[]{"Hz", "Hz"}, 2);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   10.);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   10.);
+			break;
+		case SPEC_IMADJUST:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Low tol. ", "High tol. "},  new String[]{"", ""}, 2);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 1.0,   0.01);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 1.0,   0.01);
+			break;
 		case SPECRESIZE:
-			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Time bins", "Freq. bins"},  new String[]{"", ""}); 
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Time bins", "Freq. bins"},  new String[]{"", ""});
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0,Integer.MAX_VALUE,   1);
 			break;

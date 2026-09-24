@@ -31,8 +31,8 @@ public class DataMapParameters implements Cloneable, Serializable, ManagedParame
 	 * datagram colours became selectable, so always go through 
 	 * {@link #getDatagramColourMap(String)} and {@link #setDatagramColourMap(String, ColourArrayType)}.
 	 */
-	public HashMap<String, ColourArrayType> datagramColourMaps = new HashMap<>();
-	
+	private HashMap<String, ColourArrayType> datagramColourMaps = new HashMap<>();
+
 	/**
 	 * Get the stored colour map for a datagram. 
 	 * @param dataName long data name of the data block
@@ -67,10 +67,24 @@ public class DataMapParameters implements Cloneable, Serializable, ManagedParame
 		return hScaleChoices[hScaleChoice];
 	}
 
+	/**
+	 * Get the colour maps for 3D datagrams. Can be null after deserialising
+	 * settings saved before this field existed, so create it if needed.
+	 * @return map of colour map types keyed on data block long data name
+	 */
+	public HashMap<String, ColourArrayType> getDatagramColourMaps() {
+		if (datagramColourMaps == null) {
+			datagramColourMaps = new HashMap<>();
+		}
+		return datagramColourMaps;
+	}
+
 	@Override
 	protected DataMapParameters clone() {
 		try {
-			return (DataMapParameters) super.clone();
+			DataMapParameters newParams = (DataMapParameters) super.clone();
+			newParams.datagramColourMaps = new HashMap<>(getDatagramColourMaps());
+			return newParams;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;

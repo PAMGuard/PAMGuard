@@ -158,7 +158,7 @@ public class KooguDLClassifierTest {
 			kooguWorker.closeModel();
 
 		    //at least 90% of results must match for the dataset
-			assertTrue(percTrue>0.9);
+			assertTrue(percTrue>90, String.format("Only %.1f%% of results matched the Koogu predictions", percTrue));
 
 
 		} catch (IOException | UnsupportedAudioFileException e) {

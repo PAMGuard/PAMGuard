@@ -18,6 +18,11 @@ import rawDeepLearningClassifier.segmenter.GroupedRawData;
 public abstract class DLTaskThread extends Thread {
 
 	private AtomicBoolean run = new AtomicBoolean(true);
+
+	/**
+	 * True while a batch taken from the queue is being classified. 
+	 */
+	private AtomicBoolean busy = new AtomicBoolean(false);
 	
 	/**
 	 * The dl model worker. 
@@ -50,13 +55,17 @@ public abstract class DLTaskThread extends Thread {
 			try {
 				if (queue.size()>0) {
 //					System.out.println("DL TASK THREAD: " + "The queue size is " + queue.size()); 
+					//set busy before removing from the queue so isIdle() never sees an empty queue and an idle thread mid-task. 
+					busy.set(true);
 					ArrayList<? extends PamDataUnit> groupedRawData = queue.remove(0);
 
-					ArrayList<StandardPrediction> modelResult = dlModelWorker.runModel(groupedRawData, 
-							groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); //TODO channel?
+					DLModelWorker worker = dlModelWorker; 
+					if (worker!=null) {
+						ArrayList<StandardPrediction> modelResult = worker.runModel(groupedRawData, 
+								groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); //TODO channel?
 
-					
-					newDLResult(modelResult, groupedRawData);
+						newDLResult(modelResult, groupedRawData);
+					}
 //					for (int i =0; i<modelResult.size(); i++) {
 ////						modelResult.get(i).setClassNameID(getClassNameIDs()); 
 ////						modelResult.get(i).setBinaryClassification(isBinaryResult(modelResult.get(i))); 
@@ -73,7 +82,39 @@ public abstract class DLTaskThread extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			finally {
+				busy.set(false);
+			}
 		}
+	}
+
+	/**
+	 * Check whether the thread has finished all queued work. 
+	 * @return true if the queue is empty and no batch is being classified. 
+	 */
+	public boolean isIdle() {
+		return !busy.get() && queue.isEmpty(); 
+	}
+
+	/**
+	 * Wait for all queued data to be classified and the results passed on. 
+	 * @param maxWaitMillis - the maximum time to wait in milliseconds. 
+	 * @return true if the queue emptied, false if timed out or the thread is not running. 
+	 */
+	public boolean waitForIdle(long maxWaitMillis) {
+		long endTime = System.currentTimeMillis() + maxWaitMillis; 
+		while (!isIdle()) {
+			if (!isAlive() || !run.get() || System.currentTimeMillis()>endTime) {
+				return false; 
+			}
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return false; 
+			}
+		}
+		return true; 
 	}
 	
 	/**

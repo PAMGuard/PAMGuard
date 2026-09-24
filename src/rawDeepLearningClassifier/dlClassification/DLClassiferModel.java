@@ -60,6 +60,18 @@ public interface DLClassiferModel {
 	public void closeModel();
 
 	/**
+	 * Wait until any data queued for classification on a separate thread has been
+	 * classified and the results passed back to the classify process. Models which
+	 * run synchronously do not need to override this.
+	 * 
+	 * @param maxWaitMillis - the maximum time to wait in milliseconds.
+	 * @return true if all queued data were classified, false if timed out.
+	 */
+	public default boolean flushModel(long maxWaitMillis) {
+		return true;
+	}
+
+	/**
 	 * Get the name of the model.
 	 * 
 	 * @return the name of the model.

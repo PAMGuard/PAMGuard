@@ -1,4 +1,4 @@
-package rawDeepLearningClassifier.dlClassification.deepAcoustics;
+package rawDeepLearningClassifier.dlClassification.yolo;
 
 import java.io.File;
 
@@ -21,15 +21,15 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
 
 
 /**
- * Settings pane for the Deep Acoustics classifier.
- * This pane allows users to set parameters specific to the Deep Acoustics model, such as confidence thresholds.
+ * Settings pane for YOLO classifiers e.g. Deep Acoustics.
+ * This pane allows users to set parameters specific to YOLO models, such as confidence thresholds.
  * 
  * @author Jamie Macaulay
  *
  */
-public class DeepAcousticsPane extends StandardModelPane {
+public class YoloPane extends StandardModelPane {
 
-	private DeepAcousticsClassifier deepAcousticClassifier;
+	private YoloClassifier yoloClassifier;
 
 	private PamSpinner<Double> confidenceSpinner;
 
@@ -39,9 +39,9 @@ public class DeepAcousticsPane extends StandardModelPane {
 
 	private PamToggleSwitch mergBoxesSwitch;
 
-	public DeepAcousticsPane(DeepAcousticsClassifier deepAcousticClassifier) {
-		super(deepAcousticClassifier);
-		this.deepAcousticClassifier = deepAcousticClassifier; 
+	public YoloPane(YoloClassifier yoloClassifier) {
+		super(yoloClassifier);
+		this.yoloClassifier = yoloClassifier; 
 
 
 
@@ -194,7 +194,7 @@ public class DeepAcousticsPane extends StandardModelPane {
 		this.setCurrentSelectedFile(file);
 
 		if (this.getParamsClone()==null) {
-			this.setParamsClone(new DeepAcousticParams()); 
+			this.setParamsClone(yoloClassifier.makeParams()); 
 		}
 
 		StandardModelParams params  = getParamsClone(); 
@@ -205,10 +205,10 @@ public class DeepAcousticsPane extends StandardModelPane {
 		 * Note that the model prep will determine whether new transforms need to be loaded from the 
 		 * model or to use the existing transforms in the settings. 
 		 */
-		DLStatus status = deepAcousticClassifier.getDLWorker().prepModel(params, deepAcousticClassifier.getDLControl());
+		DLStatus status = yoloClassifier.getDLWorker().prepModel(params, yoloClassifier.getDLControl());
 
 		//get the model transforms calculated from the model by the worker and apply them to our temporary params clone. 
-		getParamsClone().dlTransfroms = this.deepAcousticClassifier.getDLWorker().getModelTransforms(); 
+		getParamsClone().dlTransfroms = this.yoloClassifier.getDLWorker().getModelTransforms(); 
 
 		//		if (getParamsClone().defaultSegmentLen!=null) {
 		//			usedefaultSeg.setSelected(true);
@@ -224,14 +224,15 @@ public class DeepAcousticsPane extends StandardModelPane {
 
 	@Override
 	public StandardModelParams getParams(StandardModelParams currParams) {
-		DeepAcousticParams deepParams  = (DeepAcousticParams)  super.getParams(currParams);
+		StandardModelParams params  = super.getParams(currParams);
+		YoloDetectionParams yoloParams  = (YoloDetectionParams) params;
 
-		deepParams.minConfidence = confidenceSpinner.getValue();
+		yoloParams.setMinConfidence(confidenceSpinner.getValue());
 		
-		deepParams.minMergeOverlap =  mergePercentageSpinner.getValue().floatValue()/100.0f; 
-		deepParams.mergeOverlap = mergBoxesSwitch.isSelected();
+		yoloParams.setMinMergeOverlap(mergePercentageSpinner.getValue().floatValue()/100.0f); 
+		yoloParams.setMergeOverlap(mergBoxesSwitch.isSelected());
 
-		return deepParams;
+		return params;
 	}
 
 	
@@ -239,13 +240,13 @@ public class DeepAcousticsPane extends StandardModelPane {
 	public void setParams(StandardModelParams currParams) {
 		super.setParams(currParams);
 
-		DeepAcousticParams deepParams = (DeepAcousticParams) currParams;
-		confidenceSpinner.getValueFactory().setValue(deepParams.minConfidence);
+		YoloDetectionParams yoloParams = (YoloDetectionParams) currParams;
+		confidenceSpinner.getValueFactory().setValue(yoloParams.getMinConfidence());
 		
-		mergePercentageSpinner.getValueFactory().setValue((double) deepParams.minMergeOverlap*100.0);
-		mergePercentageSpinner.setDisable(!deepParams.mergeOverlap); 
+		mergePercentageSpinner.getValueFactory().setValue((double) yoloParams.getMinMergeOverlap()*100.0);
+		mergePercentageSpinner.setDisable(!yoloParams.isMergeOverlap()); 
 
-		mergBoxesSwitch.setSelected(deepParams.mergeOverlap);
+		mergBoxesSwitch.setSelected(yoloParams.isMergeOverlap());
 		
 		enableControls(currParams); 	
 	}
@@ -253,11 +254,11 @@ public class DeepAcousticsPane extends StandardModelPane {
 	
 	private void enableControls(StandardModelParams currParams) {
 		if (currParams!=null && currParams.modelPath!=null) {
-			this.deepAcousticClassifier.getDLControl().getSettingsPane().getMaxRemergeSpinner().setDisable(true);
+			this.yoloClassifier.getDLControl().getSettingsPane().getMaxRemergeSpinner().setDisable(true);
 
 		}
 		else {
-			this.deepAcousticClassifier.getDLControl().getSettingsPane().getMaxRemergeSpinner().setDisable(false);
+			this.yoloClassifier.getDLControl().getSettingsPane().getMaxRemergeSpinner().setDisable(false);
 
 		}
 		
