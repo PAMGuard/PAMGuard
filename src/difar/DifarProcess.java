@@ -1118,13 +1118,26 @@ public class DifarProcess extends PamProcess {
 			PamDataUnit pamDetection, double displaySampleRate, String triggerSpeciesName, String triggerDataBlockName) {
 		int millisToPreceed=(int) (difarControl.getDifarParameters().secondsToPreceed*1000);
 		long clipStartTime = signalStartMillis - millisToPreceed;
-		long startSample = absMillisecondsToSamples(clipStartTime);
-		startSample = Math.max(startSample, 0);
+		long startSample;
 		int nSamples = (int) relMillisecondsToSamples(durationMillis+millisToPreceed);
 		int clipSamples = (int) relMillisecondsToSamples(durationMillis);
 		double[][] rawData = new double[1][];
 		try {
-			double[][] rawDataAll = rawDataSource.getSamples(startSample, nSamples, channelMap);
+			double[][] rawDataAll;
+			if (difarControl.isViewer()) {
+				/*
+				 * In the viewer, samples are counted from the start of the loaded
+				 * data, not from the start of a session, so the clip is found by
+				 * time, as the WAV and SPL annotations do.
+				 */
+				startSample = viewerSampleNumber(clipStartTime);
+				rawDataAll = rawDataSource.getSamplesForMillis(clipStartTime,
+						durationMillis + millisToPreceed, channelMap);
+			}
+			else {
+				startSample = Math.max(absMillisecondsToSamples(clipStartTime), 0);
+				rawDataAll = rawDataSource.getSamples(startSample, nSamples, channelMap);
+			}
 			if (rawDataAll != null) {
 				rawData[0] = rawDataAll[0]; // is fine since getSamples was fed a channel map. 
 			}
@@ -1163,6 +1176,21 @@ public class DifarProcess extends PamProcess {
 		queuedDifarData.addPamData(du);
 
 		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit, du));
+	}
+
+	/**
+	 * The sample number of a time in the raw data loaded in the viewer, counted
+	 * the same way as the loaded data, from its first unit.
+	 * @param timeMillis a time within the loaded data.
+	 * @return the sample number, or 0 if no raw data is loaded.
+	 */
+	private long viewerSampleNumber(long timeMillis) {
+		RawDataUnit firstUnit = rawDataSource.getFirstUnit();
+		if (firstUnit == null) {
+			return 0;
+		}
+		return firstUnit.getStartSample()
+				+ (long) ((timeMillis - firstUnit.getTimeMilliseconds()) * rawDataSource.getSampleRate() / 1000.);
 	}
 
 	public DifarDataBlock getQueuedDifarData() {
