@@ -49,6 +49,9 @@ import difar.demux.AmmcDemux;
 import difar.demux.DifarDemux;
 import difar.demux.DifarResult;
 import difar.demux.NativeDemux;
+import difar.crossings.DifarCrossingDataBlock;
+import difar.crossings.DifarCrossingLogging;
+import difar.crossings.DifarCrossingSubLogging;
 import difar.display.DIFARUnitControlPanel;
 import difar.display.DifarOverlayGraphics;
 import generalDatabase.lookupTables.LookupItem;
@@ -75,6 +78,9 @@ public class DifarProcess extends PamProcess {
 	private DifarDemux difarDemux = ammcDemux;
 	
 	private DifarDataBlock processedDifarData;
+
+	/** Crossings of saved clips, stored in the database only. */
+	private DifarCrossingDataBlock crossingDataBlock;
 	
 	private CalibrationDataBlock calibrationDataBlock;
 
@@ -111,6 +117,15 @@ public class DifarProcess extends PamProcess {
 		processedDifarData.setClearAtStart(false);
 		addOutputDataBlock(queuedDifarData);
 		addOutputDataBlock(processedDifarData);
+		crossingDataBlock = new DifarCrossingDataBlock("DIFAR Crossings", this);
+		String crossingTable = difarControl.getUnitName() + " Crossings";
+		DifarCrossingLogging crossingLogging = new DifarCrossingLogging(crossingTable, crossingDataBlock);
+		crossingLogging.setSubLogging(new DifarCrossingSubLogging(crossingTable + " Children", difarControl, crossingDataBlock));
+		crossingDataBlock.SetLogging(crossingLogging);
+		crossingDataBlock.setShouldLog(true);
+		crossingDataBlock.setClearAtStart(false);
+		crossingDataBlock.setNaturalLifetime(24 * 3600);
+		addOutputDataBlock(crossingDataBlock);
 		calibrationDataBlock = new CalibrationDataBlock(this);
 		calibrationDataBlock.SetLogging(new CalibrationLogging(this, calibrationDataBlock));
 		calibrationDataBlock.setShouldLog(true);
@@ -1208,6 +1223,13 @@ public class DifarProcess extends PamProcess {
 
 	public DifarDataBlock getProcessedDifarData() {
 		return processedDifarData;
+	}
+
+	/**
+	 * @return the crossings of saved clips.
+	 */
+	public DifarCrossingDataBlock getCrossingDataBlock() {
+		return crossingDataBlock;
 	}
 
 	/* (non-Javadoc)
