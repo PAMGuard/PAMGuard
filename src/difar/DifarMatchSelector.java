@@ -258,11 +258,12 @@ public class DifarMatchSelector {
 	}
 
 	/**
-	 * Localise one group of detections.
+	 * Localise one group of detections. Also used to recalculate a crossing
+	 * that has lost clips.
 	 * @param group the detections, the seed first.
 	 * @return the localised group, or null if the fit failed.
 	 */
-	private Match localise(List<PamDataUnit> group) {
+	public Match localise(List<PamDataUnit> group) {
 		ArrayList<PamDataUnit> units = new ArrayList<>(group);
 		DIFARTargetMotionInformation info = new DIFARTargetMotionInformation(difarProcess, units);
 		info.setTimingErrorSeconds(timingErrorSeconds);

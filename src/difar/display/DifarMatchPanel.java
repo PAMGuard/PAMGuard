@@ -25,6 +25,7 @@ import difar.DIFARMessage;
 import difar.DifarControl;
 import difar.DifarDataUnit;
 import difar.DifarMatchSelector;
+import difar.crossings.DifarCrossing;
 
 /**
  * Shows which detections on other buoys could have been the same call as the
@@ -96,7 +97,7 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		if (match == null) {
 			return;
 		}
-		difarControl.getDifarProcess().applyMatch(currentUnit, match);
+		difarControl.getDifarProcess().applyMatch(currentUnit, match, DifarCrossing.MatchChoice.OPERATOR);
 		tableModel.setUsed(match);
 		updateClipStrip();
 	}

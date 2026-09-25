@@ -86,6 +86,13 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public int maxCandidatesPerBuoy = 10;
 
 	/**
+	 * When a crossing loses clips, to a new crossing or because a clip is
+	 * deleted, delete it even if two or more clips remain. By default it is
+	 * recalculated from the clips it keeps.
+	 */
+	public boolean alwaysDeleteTrimmedCrossings = false;
+
+	/**
 	 * Standard deviation of a DIFAR bearing, in degrees. This sets how much
 	 * weight bearings carry in a localisation, against the arrival time
 	 * differences.

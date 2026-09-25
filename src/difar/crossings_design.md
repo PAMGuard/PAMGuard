@@ -143,9 +143,9 @@ Everything stays inside `src/difar`. No core class changes.
 
 1. Pure classes and tests for the claiming rule and legacy replay.
 2. `DifarCrossing`, its block and its logging.
-3. Clip payload version 3, and the legacy record for older versions.
-4. Normal mode: pending crossing, save, replacement. Then the simulated two-buoy regression check.
-5. Viewer: load, reattach, in-memory conversion, displays.
+3. Normal mode writes crossing units alongside the old crossing on each clip: claiming, recalculation, match choice. Then the simulated two-buoy regression check.
+4. Clip payload version 3, and the legacy record for older versions. Buoy edits recalculate crossing units.
+5. Viewer: load, reattach, in-memory conversion. Displays move to crossing units, and the old crossing on each clip is deleted.
 6. The offline conversion task, tried on a copy of the pilot.
 7. Viewer compaction for clips, then delete with its setting.
 

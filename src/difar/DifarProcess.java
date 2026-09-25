@@ -49,6 +49,8 @@ import difar.demux.AmmcDemux;
 import difar.demux.DifarDemux;
 import difar.demux.DifarResult;
 import difar.demux.NativeDemux;
+import difar.crossings.CrossingRecorder;
+import difar.crossings.DifarCrossing;
 import difar.crossings.DifarCrossingDataBlock;
 import difar.crossings.DifarCrossingLogging;
 import difar.crossings.DifarCrossingSubLogging;
@@ -81,6 +83,9 @@ public class DifarProcess extends PamProcess {
 
 	/** Crossings of saved clips, stored in the database only. */
 	private DifarCrossingDataBlock crossingDataBlock;
+
+	/** Makes crossing units as clips are saved. */
+	private CrossingRecorder crossingRecorder;
 	
 	private CalibrationDataBlock calibrationDataBlock;
 
@@ -126,6 +131,7 @@ public class DifarProcess extends PamProcess {
 		crossingDataBlock.setClearAtStart(false);
 		crossingDataBlock.setNaturalLifetime(24 * 3600);
 		addOutputDataBlock(crossingDataBlock);
+		crossingRecorder = new CrossingRecorder(this, difarControl);
 		calibrationDataBlock = new CalibrationDataBlock(this);
 		calibrationDataBlock.SetLogging(new CalibrationLogging(this, calibrationDataBlock));
 		calibrationDataBlock.setShouldLog(true);
@@ -1232,6 +1238,13 @@ public class DifarProcess extends PamProcess {
 		return crossingDataBlock;
 	}
 
+	/**
+	 * @return what makes crossing units as clips are saved.
+	 */
+	public CrossingRecorder getCrossingRecorder() {
+		return crossingRecorder;
+	}
+
 	/* (non-Javadoc)
 	 * @see PamguardMVC.PamProcess#notifyModelChanged(int)
 	 */
@@ -1254,6 +1267,14 @@ public class DifarProcess extends PamProcess {
 	 */
 	public void finalProcessing(DifarDataUnit difarDataUnit) {
 		queuedDifarData.remove(difarDataUnit);
+		/*
+		 * The clip moves from the queue to the saved clips, so the saved clips
+		 * become its parent. Adding a unit only sets its parent when it has none,
+		 * so without this a saved clip would name the queue as its block forever:
+		 * crossings would record the wrong block for their clips, and could not
+		 * be linked back to them in the viewer.
+		 */
+		difarDataUnit.setParentDataBlock(processedDifarData);
 		/*
 		 *  the unit may already have been plotted in which case we need to clear it's origin so that
 		 *  it gets a new one based on the new angle settings. This is done after it's removed from 
@@ -1397,7 +1418,7 @@ public class DifarProcess extends PamProcess {
 		matchLog.put(difarDataUnit, candidates);
 		DifarMatchSelector.Match match = DifarMatchSelector.chooseMatch(candidates);
 
-		return applyMatch(difarDataUnit, match);
+		return applyMatch(difarDataUnit, match, DifarCrossing.MatchChoice.AUTO);
 	}
 
 	/**
@@ -1408,9 +1429,11 @@ public class DifarProcess extends PamProcess {
 	 * match leaves the detection with no crossing.
 	 * @param difarDataUnit the detection being matched.
 	 * @param match the match to use, or null for none.
+	 * @param choice how the match was chosen: automatically or by the operator.
 	 * @return the crossing, or null if there is none.
 	 */
-	public DIFARCrossingInfo applyMatch(DifarDataUnit difarDataUnit, DifarMatchSelector.Match match) {
+	public DIFARCrossingInfo applyMatch(DifarDataUnit difarDataUnit, DifarMatchSelector.Match match,
+			DifarCrossing.MatchChoice choice) {
 		DIFARCrossingInfo crossInfo = null;
 		if (match != null) {
 			LatLong ll = match.getResult().getLatLong();
@@ -1426,6 +1449,7 @@ public class DifarProcess extends PamProcess {
 			}
 		}
 		difarDataUnit.setTempCrossing(crossInfo);
+		crossingRecorder.noteChoice(difarDataUnit, crossInfo == null ? null : choice);
 		if (match != null) {
 			for (PamDataUnit unit : match.getUnits()) {
 				((DifarDataUnit) unit).setTempCrossing(crossInfo);

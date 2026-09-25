@@ -19,8 +19,6 @@ import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDataUnit;
 import fftManager.Complex;
 import fftManager.FastFFT;
-import generalDatabase.DBControlUnit;
-import generalDatabase.SQLLogging;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 
@@ -1077,20 +1075,6 @@ public class DifarDataUnit extends ClipDataUnit {
 		return specData;
 	}
 
-	@Override
-	public void updateDataUnit(long updateTime) {
-		// TODO Auto-generated method stub
-		super.updateDataUnit(updateTime);
-		/*
-		 * This is getting called on the queuedDifarData, bug that's occurring since I added something
-		 * to stop it reassigning datablock parent id's when units shift between data blocks. Bugger !
-		 */
-		SQLLogging logging = this.getParentDataBlock().getLogging();
-		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
-		if (logging != null && dbControl != null) {
-			logging.logData(dbControl.getConnection(), this);
-		}
-	}
 }
 
 
