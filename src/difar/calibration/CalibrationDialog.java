@@ -76,7 +76,7 @@ public class CalibrationDialog extends PamDialog implements CancelObserver {
 		calCorrectionDisplay.getHistoPlotPanel().addMouseListener(corrMouse);
 		calCorrectionDisplay.getSouthAxis().setInterval(90);
 		
-		String tip = "Drag selected bearing or right click to select mean / modal values";
+		String tip = "Drag selected bearing or right click to select mean, modal or mean near mode values";
 		calCorrectionDisplay.getHistoPlotPanel().setToolTipText(tip);
 		
 		calCorrectionHistogram.addObserver(new CalHistObserver());
@@ -157,6 +157,9 @@ public class CalibrationDialog extends PamDialog implements CancelObserver {
 			else if (difarControl.getDifarParameters().calibrationChoice == DifarParameters.CALIBRATION_USE_MODE) {
 				str = "Modal ";
 			}
+			else if (difarControl.getDifarParameters().calibrationChoice == DifarParameters.CALIBRATION_USE_MEAN_NEAR_MODE) {
+				str = "Mean near mode ";
+			}
 			else {
 				str = "";
 			}
@@ -227,8 +230,11 @@ public class CalibrationDialog extends PamDialog implements CancelObserver {
 		if (difarControl.getDifarParameters().calibrationChoice == DifarParameters.CALIBRATION_USE_MEAN) {
 			return calCorrectionHistogram.getMean();
 		}
-		else {
+		else if (difarControl.getDifarParameters().calibrationChoice == DifarParameters.CALIBRATION_USE_MODE) {
 			return calCorrectionHistogram.getMode();
+		}
+		else {
+			return calCorrectionHistogram.getMeanNearMode();
 		}
 	}
 
@@ -244,6 +250,11 @@ public class CalibrationDialog extends PamDialog implements CancelObserver {
 		popMenu.add(menuItem);
 		menuItem.setSelected(difarControl.getDifarParameters().calibrationChoice == DifarParameters.CALIBRATION_USE_MODE && draggedMouseValue == null);
 		menuItem.addActionListener(new SelectMode());
+		
+		menuItem = new JCheckBoxMenuItem("Select Mean Near Mode");
+		popMenu.add(menuItem);
+		menuItem.setSelected(difarControl.getDifarParameters().calibrationChoice == DifarParameters.CALIBRATION_USE_MEAN_NEAR_MODE && draggedMouseValue == null);
+		menuItem.addActionListener(new SelectMeanNearMode());
 		
 		popMenu.show(me.getComponent(), me.getX(), me.getY());
 	}
@@ -265,6 +276,15 @@ public class CalibrationDialog extends PamDialog implements CancelObserver {
 			calCorrectionDisplay.repaint();
 		}
 	}
+	private class SelectMeanNearMode implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			draggedMouseValue = null;
+			difarControl.getDifarParameters().calibrationChoice = DifarParameters.CALIBRATION_USE_MEAN_NEAR_MODE;
+			calCorrectionDisplay.repaint();
+		}
+	}
+
 	private void updateControls() {
 		progressText.setText(calibrationProcess.getStatusString());
 	}

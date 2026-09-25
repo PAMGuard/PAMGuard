@@ -118,7 +118,9 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 */
 	public static final int CALIBRATION_USE_MODE = 1;
 	public static final int CALIBRATION_USE_MEAN = 2;
-	public int calibrationChoice = CALIBRATION_USE_MODE;
+	/** The mean of the clips near the mode: ignores stray clips, and is not tied to bin centres. */
+	public static final int CALIBRATION_USE_MEAN_NEAR_MODE = 3;
+	public int calibrationChoice = CALIBRATION_USE_MEAN_NEAR_MODE;
 	
 	/**
 	 * Stores paramaters to correct the frequency response for DIFAR buoys
