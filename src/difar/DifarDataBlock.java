@@ -1,6 +1,6 @@
 package difar;
 
-import difar.offline.ViewerClipWriter;
+import difar.offline.ViewerClipStore;
 
 import java.util.ListIterator;
 
@@ -18,8 +18,8 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 	private DifarDataSelectCreator dataSelectCreator;
 	private boolean isDifarQueue;
 
-	/** Writes clips saved in the viewer; saved clips only, made when first needed. */
-	private ViewerClipWriter viewerClipWriter;
+	/** Keeps clips saved and deleted in the viewer; saved clips only, made when first needed. */
+	private ViewerClipStore viewerClipStore;
 
 	public DifarDataBlock(String dataName, DifarControl difarControl, boolean isDifarQueue,
 			DifarProcess parentProcess, int channelMap) {
@@ -134,29 +134,31 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 
 
 	/**
-	 * @return the writer for clips saved in the viewer, or null for the queue.
+	 * @return the store for clips saved in the viewer, or null for the queue.
 	 */
-	public synchronized ViewerClipWriter getViewerClipWriter() {
+	public synchronized ViewerClipStore getViewerClipStore() {
 		if (isDifarQueue) {
 			return null;
 		}
-		if (viewerClipWriter == null) {
-			viewerClipWriter = new ViewerClipWriter(this);
+		if (viewerClipStore == null) {
+			viewerClipStore = new ViewerClipStore(this, difarControl);
 		}
-		return viewerClipWriter;
+		return viewerClipStore;
 	}
 
 	/**
 	 * The viewer calls this before loading any new stretch of data, on File,
-	 * Save, and on exit. Any file of clips saved in the viewer is finished
-	 * first, so it is complete before anything reads it.
+	 * Save, and on exit. Clips saved or deleted in the viewer are written
+	 * first. Then the core save rewrites, in place, any other file holding a
+	 * clip that has changed.
 	 */
 	@Override
 	public boolean saveViewerData() {
-		if (viewerClipWriter != null) {
-			viewerClipWriter.close();
+		boolean ok = true;
+		if (viewerClipStore != null) {
+			ok = viewerClipStore.compact();
 		}
-		return super.saveViewerData();
+		return super.saveViewerData() && ok;
 	}
 
 	/**

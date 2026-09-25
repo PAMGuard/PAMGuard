@@ -63,13 +63,10 @@ import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
 import difar.offline.DifarDataCopyTask;
 import difar.offline.UpdateCrossingTask;
-import difar.offline.ViewerClipWriter;
+import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
 import difar.trackedGroups.TrackedGroupProcess;
-import generalDatabase.DBControlUnit;
-import generalDatabase.PamConnection;
-import generalDatabase.SQLLogging;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 import offlineProcessing.OLProcessDialog;
@@ -617,8 +614,8 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 
 	/**
-	 * In the viewer, open a file for the clip before it joins the saved data,
-	 * so the file exists before the clip is given its UID, as in normal mode.
+	 * In the viewer, make sure the saved clips' UIDs follow every DIFAR UID
+	 * already in use, before this clip joins the saved data and is given one.
 	 * The clip's queue UID is cleared, so the saved data give it a new one;
 	 * queue UIDs start again every viewer session, so they are not unique.
 	 * @param unit the clip about to be saved.
@@ -627,33 +624,25 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		if (!isViewer) {
 			return;
 		}
-		ViewerClipWriter writer = difarProcess.getProcessedDifarData().getViewerClipWriter();
-		if (writer != null) {
-			writer.prepare(unit);
+		ViewerClipStore store = difarProcess.getProcessedDifarData().getViewerClipStore();
+		if (store != null) {
+			store.prepare();
 		}
 		unit.setUID(0);
 	}
 
 	/**
-	 * In the viewer, write a clip just saved to its binary file and to the
-	 * database. Normal mode does both as the clip joins the saved data. Only
-	 * this clip is logged, not the whole block, since clips loaded from binary
-	 * files may carry no database index and would be logged a second time.
-	 * @param unit the clip just saved.
+	 * In the viewer, record a clip just saved. It is written to its binary
+	 * file and the database when the viewer next saves its data.
+	 * @param unit the clip just saved, now with its UID.
 	 */
 	private void completeViewerSave(DifarDataUnit unit) {
 		if (!isViewer) {
 			return;
 		}
-		DifarDataBlock saved = difarProcess.getProcessedDifarData();
-		ViewerClipWriter writer = saved.getViewerClipWriter();
-		if (writer == null || !writer.write(unit)) {
-			System.out.println("DIFAR: clip saved in memory but not written to a binary file");
-		}
-		SQLLogging logging = saved.getLogging();
-		PamConnection connection = DBControlUnit.findConnection();
-		if (logging != null && connection != null) {
-			logging.logData(connection, unit);
+		ViewerClipStore store = difarProcess.getProcessedDifarData().getViewerClipStore();
+		if (store != null) {
+			store.clipSaved(unit);
 		}
 	}
 
