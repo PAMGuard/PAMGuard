@@ -1896,7 +1896,8 @@ public class DifarProcess extends PamProcess {
 	synchronized public CalibrationHistogram getCalCorrectionHistogram(int channel) {
 		if (calCorrectionHistograms[channel] == null) {
 			calCorrectionHistograms[channel] = new CalibrationHistogram(difarControl, channel, 180);
-			calCorrectionHistograms[channel].setName("Bearing correction");
+			// each clip's correction is added to the heading the buoy already has
+			calCorrectionHistograms[channel].setName("Change to buoy heading");
 		}
 		return calCorrectionHistograms[channel];
 	}
