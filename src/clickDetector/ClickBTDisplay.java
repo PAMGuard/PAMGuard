@@ -209,7 +209,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	private PamLabel amplitudeSelectorLabel;
 
-	private boolean isViewer, isNetReceiver;
+	private boolean isViewer;//, isNetReceiver;
 
 	private ClickPlaybackMonitor clickPlaybackMonitor = new ClickPlaybackMonitor();
 
@@ -246,7 +246,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		ctrlKeyManager = new CtrlKeyManager();
 
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
-		isNetReceiver = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
+//		isNetReceiver = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 
 		btAxis = new BTAxis();
 
@@ -361,7 +361,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		if (obs == clickControl.getClickDataBlock()) {
 			newClick((ClickDetection) newData);
-			if (isNetReceiver) {
+			if (PamController.isNetRx()) {
 				newScrollTimingData(newData.getTimeMilliseconds());
 			}
 		}
@@ -3072,7 +3072,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			//			int hRange = timeRanges[rangeScrollBar.getValue()];
 			hScrollBar = new PamScroller("Click Time Display " + displayNumber, 
-					AbstractPamScrollerAWT.HORIZONTAL, 100, 5*60*1000, isViewer | isNetReceiver);
+					AbstractPamScrollerAWT.HORIZONTAL, 100, 5*60*1000, isViewer | PamController.isNetRx());
 			rangeSpinner = new RangeSpinner();
 			rangeSpinner.addRangeSpinnerListener(new TimeRangeListener());
 			hScrollBar.addControl(rangeSpinner.getComponent());
@@ -3092,7 +3092,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				this.add(BorderLayout.EAST, vScrollBar);
 				vScrollBar.addAdjustmentListener(new VScrollListener());
 			}
-			else if (isNetReceiver) {
+			else if (PamController.isNetRx()) {
 				hScrollManager = new NetRXScrollManager();
 				hScrollBar.addObserver(new HScrollObserver());
 			}
@@ -3138,7 +3138,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 			createKey();
 
-			if (isViewer || isNetReceiver) {
+			if (isViewer || PamController.isNetRx()) {
 				setToolTipText("Click detector bearing time display");
 			}
 			//			RepaintManager.currentManager(this).
@@ -3431,7 +3431,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		int tipCalls = 0;
 		@Override
 		public String getToolTipText(MouseEvent event) {
-			if (!isViewer && !isNetReceiver) {
+			if (!isViewer && !PamController.isNetRx()) {
 				return super.getToolTipText(event);
 			}
 			ClickDetection click = findClick(event.getX(), event.getY(), 10);

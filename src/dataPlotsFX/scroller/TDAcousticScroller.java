@@ -131,7 +131,7 @@ public class TDAcousticScroller extends AcousticScrollerFX implements PamSetting
 
 		//hard wire adding the raw data block. 
 		//Find the raw data block. 
-		if (!isViewer && !isNetRx){
+		if (!isViewer && !PamController.isNetRx()){
 			rawDataBlock= PamController.getInstance().getRawDataBlock(0);
 			this.rawScrollBarGraphics=new RawScrollBarGraphics(this, rawDataBlock); 
 			this.addAcousticScrollGraphics(rawScrollBarGraphics); 
@@ -405,7 +405,7 @@ public class TDAcousticScroller extends AcousticScrollerFX implements PamSetting
 		//		System.out.println("Check datablock graphics after adding " + dataBlock.getDataName());
 		checkDataBlockGraphics();
 		//load scroller data
-		if (isViewer || isNetRx) loadScrollerData();
+		if (isViewer || PamController.isNetRx()) loadScrollerData();
 	}
 
 	/**
@@ -566,7 +566,7 @@ public class TDAcousticScroller extends AcousticScrollerFX implements PamSetting
 		public AcousticObserver(TDAcousticScroller tdAcousticScroller, PamDataBlock observedData, int chan) {
 			this.observedData = observedData;
 			this.chan=chan; 
-			if(isNetRx && tdDisplay.getTDControl() instanceof TDControlAWT) {
+			if(PamController.isNetRx() && tdDisplay.getTDControl() instanceof TDControlAWT) {
 				TDControlAWT controlAwt = (TDControlAWT) tdDisplay.getTDControl();
 				controlAwt.addNetObservable(observedData);
 			}

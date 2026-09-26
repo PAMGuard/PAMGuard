@@ -621,7 +621,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 
 		@Override
 		public int getColumnCount() {
-			if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+			if (PamController.isNetRx()) {
 				return streamerColumns.length;
 			}
 			else {

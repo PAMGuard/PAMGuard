@@ -406,7 +406,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		if (PamController.getInstance() == null)
 			isNetworkReceive = false;
 		else
-			isNetworkReceive = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
+			isNetworkReceive = PamController.isNetRx();
 
 		if (!isOffline) {
 			removeTimer.start();

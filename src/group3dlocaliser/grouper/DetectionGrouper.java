@@ -87,9 +87,7 @@ public class DetectionGrouper {
 	private DataSelector dataSelector;
 
 	private boolean isViewer;
-	
-	private boolean isNetRx;
-		
+			
 	private Timer netRxTimer;
 
 	private NetRxTimerTask netRxTimerTask;
@@ -98,8 +96,7 @@ public class DetectionGrouper {
 		this.detectionGroupMonitor = detectionGroupMonitor;
 		developingGroups = new LinkedList<>();
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
-		isNetRx = PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER;
-		if(isNetRx) {
+		if(PamController.isNetRx()) {
 			netRxTimer = new Timer();
 			netRxTimerTask = new NetRxTimerTask();
 		}
@@ -114,7 +111,7 @@ public class DetectionGrouper {
 //		if (pamDataUnit.getUID() == 291039474) {
 //			System.out.println("Found it");
 //		}
-		if (sampleNo == null || isNetRx) {
+		if (sampleNo == null || PamController.isNetRx()) {
 			/*
 			 *  make up a sample number based on the millis or the mother group thing can't work. 
 			 *  The mother group thing needs to be in samples no tmillis since millis are
@@ -160,7 +157,7 @@ public class DetectionGrouper {
 		
 		motherGroup.addDataUnit(iChanGroup, pamDataUnit);
 	      
-        if(PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+        if(PamController.isNetRx()) {
             netRxTimerTask.cancel();
             netRxTimer.purge();
             long buffer = (long) maxInterGroupSample;
@@ -185,7 +182,7 @@ public class DetectionGrouper {
 //		int lastGroup = motherGroup.getLastChannelGroup();
 		long buffer = (long) this.maxInterGroupSample;
 	      
-        if(PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+        if(PamController.isNetRx()) {
             netRxTimerTask.cancel();
             netRxTimer.purge();
 			sampleNumber = (long) ((timeMilliseconds-PamCalendar.getSessionStartTime()) * sampleRate / 1000.);

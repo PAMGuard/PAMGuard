@@ -79,11 +79,6 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	 * True if in viewer mode. 
 	 */
 	public boolean isViewer=false; 
-	
-	/**
-	 * True if in network receiver mode. 
-	 */
-	public boolean isNetRx=false; 
 
 	/**
 	 * The acoustic plot.
@@ -161,7 +156,6 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		super(name, orientation, stepSizeMillis, defaultLoadTime, hasMenu);
 
 		isViewer=PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
-		isNetRx = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 
 		//System.out.println("Acoustic ScrollerFX :  Data length:  " + this.getScrollerData().getLength());
 

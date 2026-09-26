@@ -64,7 +64,7 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 	 * Create the vital components for the display. 
 	 */
 	private void create(){
-		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+		if(PamController.isNetRx()) {
 			dataObserver = new NetRxDataObserver();
 		}else {
 			dataObserver = new DataObserver();
@@ -224,7 +224,7 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 	}
 	
 	public void addNetObservable(PamObservable o) {
-		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+		if(PamController.isNetRx()) {
 			o.addObserver(dataObserver);
 		}
 	}

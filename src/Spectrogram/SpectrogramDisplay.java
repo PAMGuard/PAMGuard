@@ -228,7 +228,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 	protected ClipboardCopier panelClipBoardCopier;
 
-	private boolean viewerMode, netRXMode;
+	private boolean viewerMode;//, netRXMode;
 
 	private UserDisplayControl userDisplayControl;
 
@@ -298,8 +298,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		spectrogramDisplay = this;
 
 		viewerMode = (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW);
-		netRXMode = (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER);
-		if (viewerMode || netRXMode) {
+		if (viewerMode || PamController.isNetRx()) {
 			viewerScroller = new PamScroller(getFullTitle(), AbstractPamScrollerAWT.HORIZONTAL,
 					1, 10000, true);
 			viewerScroller.addObserver(new ViewScrollObserver());
@@ -926,7 +925,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 	public void masterClockUpdate(long milliSeconds, long sampleNumber) {
 		this.masterClockMilliseconds = milliSeconds;
 		this.masterClockSamples = sampleNumber;
-		if (netRXMode) {
+		if (PamController.isNetRx()) {
 			setupNetRXScroller();
 		}
 		//		spectrogramAxis.repaint(10);
@@ -994,7 +993,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 //		}
 
 		long history = (long) getXDuration();
-		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+		if (PamController.isNetRx()) {
 			if (viewerScroller != null) {
 				history = viewerScroller.getRangeMillis();
 			}

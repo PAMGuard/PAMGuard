@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -23,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
+import PamController.PamController;
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParams;
 import networkTransfer.receive.NetworkReceiveParams;
@@ -32,7 +34,7 @@ import networkTransfer.send.NetworkQueuedObject;
 import networkTransfer.send.NetworkSendParams;
 import pamguard.Pamguard;
 
-public class PamMqttClient extends NetworkClient  implements MqttCallback{
+public class PamMqttClient extends NetworkClient  implements MqttCallbackExtended{
 
 	private String stationId;
 	private String serverURI;
@@ -54,7 +56,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	public PamMqttClient(NetworkParams networkParams){
 		super(networkParams);
 		System.out.println("Initializing a new mqtt client.");
-		isAlsoNetRx = PamController.PamController.getInstance().getRunMode()==PamController.PamController.RUN_NETWORKRECEIVER;
+		isAlsoNetRx = PamController.isNetRx();
 		if(networkParams instanceof NetworkSendParams) {
 			isNetRx = false;
 			this.networkSendParams = (NetworkSendParams) networkParams;
@@ -447,8 +449,8 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		mqttOptions.setCleanSession(false);
 		mqttOptions.setConnectionTimeout(0);
 		mqttOptions.setMaxInflight(65535);
-		mqttOptions.setMaxReconnectDelay(30000);
-		//mqttOptions.setKeepAliveInterval(0);
+		mqttOptions.setMaxReconnectDelay(1000);
+		mqttOptions.setKeepAliveInterval(0);
 		//mqttOptions.
 		if(this.networkParams.userId!=null&&this.networkParams.password!=null&&!this.networkParams.userId.isEmpty()&&!this.networkParams.password.isEmpty()) {
 			mqttOptions.setUserName(this.networkParams.userId);
@@ -459,6 +461,12 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		if(this.networkParams.useSSL) {
 			mqttOptions.setSocketFactory(this.getSSLSocketFactory());
 		}
+	}
+
+	@Override
+	public void connectComplete(boolean reconnect, String serverURI) {
+		System.out.println("MQTT Client successfully connected to "+serverURI);
+		
 	}
 
 }
