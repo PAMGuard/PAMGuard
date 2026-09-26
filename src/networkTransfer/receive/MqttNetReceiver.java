@@ -19,6 +19,8 @@ import networkTransfer.mqttClient.PamMqttClient;
 import networkTransfer.receive.status.BuoyStatusDataBlock;
 import networkTransfer.receive.status.BuoyStatusDataUnit;
 import networkTransfer.send.ClientConnectFailedException;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInterface,NetworkDataUser{
 
@@ -29,6 +31,7 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 	private BaseListener baseListener;
 	private StatusListener statusListener;
 	
+	PamWarning sendWarning = new PamWarning("Mqtt Net Receiver Error: ","Warn!",0);
 	
 	public MqttNetReceiver(NetworkReceiveParams netRxParams, NetworkReceiver netReceiver) {
 		super(netRxParams);
@@ -58,11 +61,14 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 	@Override
 	public void runReceiver() {
 		if(!this.isConnected()) {
+			this.setWarning("Attempting to connect to MQTT Broker.", 2);
+			this.setWarning("Attempting to connect to MQTT Broker.", 2);
 			this.configureClient(this.netParams);
 			try {
 				this.connect();
 			} catch (ClientConnectFailedException e) {
 				e.printStackTrace();
+				this.setWarning(e.getMessage(), 2);
 			}
 		}
 		
@@ -264,6 +270,38 @@ public class MqttNetReceiver extends PamMqttClient implements NetworkReceiverInt
 		String pbId = "pb"+idInteger;
 		return baseListener.buoyReceivers.get(pbId);
 
+	}
+	
+	//Net receiver warning messages
+	
+	public void setWarning(String message) {
+		setWarning(message,2);
+	}
+	
+	boolean initialWarningSet = false;
+	
+	public synchronized void setWarning(String message, int level) {
+		if(message==null) {
+			WarningSystem.getWarningSystem().removeWarning(sendWarning);
+			initialWarningSet = false;
+		}else {
+			sendWarning.setWarningMessage(message);
+			sendWarning.setWarnignLevel(level);
+			if(!initialWarningSet) {
+				initialWarningSet = true;
+				WarningSystem.getWarningSystem().addWarning(sendWarning);
+			}else {
+				WarningSystem.getWarningSystem().updateWarning(sendWarning);
+			}
+		}
+	}
+	
+	public synchronized void removeWarning() {
+		if(!WarningSystem.getWarningSystem().removeWarning(sendWarning)) {
+			WarningSystem.getWarningSystem().forceRemoveWarning(sendWarning);
+		}
+		initialWarningSet = false;
+		
 	}
 	
 }
