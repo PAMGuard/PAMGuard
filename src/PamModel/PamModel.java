@@ -370,7 +370,7 @@ final public class PamModel implements PamSettings {
 		mi.setMaxNumber(1);
 		mi.setMinNumber(pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER ? 1 : 0);
 		mi.setHidden(!SMRUEnable.isEnable());
-		mi.setAllowedModes(PamPluginInterface.NOTINVIEWER);
+//		mi.setAllowedModes(PamPluginInterface.NOTINVIEWER);
 		//		}
 
 		//		mi = PamModuleInfo.registerControlledUnit("decimus.summarystring.DStrControl", "Decimus Summary Strings");
