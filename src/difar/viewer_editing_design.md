@@ -67,8 +67,11 @@ This needs bulk rematch, below, which is built first.
 
 ## Bulk rematch
 
-The "DIFAR Data Export" task rematched every clip over a period until step 4, which changed it to
-relocate existing crossings only. It is restored, now making crossing units.
+The DIFAR offline tasks rematched every clip over a period until step 4, which changed that task to
+relocate existing crossings only. "Rematch clips" restores it, making crossing units, and replaces the
+relocating task: a buoy change can make old pairings wrong, so after a buoy edit matches are chosen
+again, not just moved. It runs from the DIFAR offline tasks dialog, and automatically after a buoy
+edit in the Viewer, over the buoy's period.
 
 The offline task group loads one file of clips at a time. A clip near the start or end of a file
 cannot see partners in the next file, as with the old rematch. Loading a margin of clips either side
@@ -76,9 +79,14 @@ would fix that, and is worth doing if files are short. Within a file, clips are 
 automatically, and its crossing is recorded by the same `CrossingRecorder` rules as saving a clip.
 That is how an operator works through the queue.
 
-The result depends on the order. A clip takes its best match, and a later clip can claim a partner
-from an earlier crossing. The code and its documentation say so. Ways to reduce the dependence, for
-later:
+Crossings chosen by the operator are kept by default, and worked out again from their clips, since
+their buoys may have changed. A setting replaces them too. Clips' database rows get their buoy's
+current values.
+
+The result depends on the order. A clip takes its best match among the clips still free, and a clip
+matched earlier in the run is not free, so the first match stands. Of two clips of the same call on
+one buoy, the earlier, or the better scored, is matched, and a buoy edit can change which. The code
+and its documentation say so. Ways to reduce the dependence, for later:
 
 - Match all loaded clips together, choosing the set of crossings that fits best overall.
 - Weigh bearing residuals and time-delay residuals together when two matches compete.
@@ -114,13 +122,14 @@ A crossing of three, trimmed to two and recalculated, needs the three-buoy audio
 
 ## Order of work
 
-1. Bulk rematch into crossing units.
+1. Bulk rematch into crossing units. Done.
 2. Deleting a saved clip.
 3. The dataset upgrade, which uses 1.
 4. The auto-compaction setting.
 
 ## Also for the feature list
 
+- Time delays from cross-correlating the clips' audio, rather than from clip start times.
 - The auto-compaction setting, above.
 - The spectrogram marks clips that belong to a crossing, now that each clip can answer
   `getCrossing()`.

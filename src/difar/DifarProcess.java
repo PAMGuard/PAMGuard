@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Predicate;
 
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
@@ -1380,6 +1381,17 @@ public class DifarProcess extends PamProcess {
 	 * @return information about the range (will already have been put into affected units)
 	 */
 	public DIFARCrossingInfo getDifarRangeInfo(DifarDataUnit difarDataUnit) {
+		return getDifarRangeInfo(difarDataUnit, null);
+	}
+
+	/**
+	 * Find the best match for a clip, as {@link #getDifarRangeInfo(DifarDataUnit)}
+	 * does, considering only the clips on other buoys that are free to match.
+	 * @param difarDataUnit the clip to match.
+	 * @param freeToMatch which clips may be partners, or null for all.
+	 * @return the proposed crossing, set as the clip's temporary crossing, or null.
+	 */
+	public DIFARCrossingInfo getDifarRangeInfo(DifarDataUnit difarDataUnit, Predicate<DifarDataUnit> freeToMatch) {
 		/**
 		 * First find a list of other channels that may match by iterating backwards through
 		 * the datablocks. 
@@ -1408,7 +1420,7 @@ public class DifarProcess extends PamProcess {
 			if (aChan == thisChan) {
 				continue;
 			}
-			candidatesByBuoy.add(getMatchingUnits(difarDataUnit, aChan, params.maxCandidatesPerBuoy));
+			candidatesByBuoy.add(getMatchingUnits(difarDataUnit, aChan, params.maxCandidatesPerBuoy, freeToMatch));
 		}
 
 		DifarMatchSelector selector = new DifarMatchSelector(this,
@@ -1503,9 +1515,11 @@ public class DifarProcess extends PamProcess {
 	 * @param aChan other channel number we're looking for.
 	 * @param maxUnits most units to return, best overlap first. A cap is only
 	 * likely to matter for an automatic detector on a noisy chorus.
+	 * @param freeToMatch which clips may be partners, or null for all.
 	 * @return qualifying units, best overlap first. Never null.
 	 */
-	private ArrayList<PamDataUnit> getMatchingUnits(DifarDataUnit difarDataUnit, int aChan, int maxUnits) {
+	private ArrayList<PamDataUnit> getMatchingUnits(DifarDataUnit difarDataUnit, int aChan, int maxUnits,
+			Predicate<DifarDataUnit> freeToMatch) {
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		double speedOfSound = array.getSpeedOfSound();
 		/*
@@ -1527,6 +1541,9 @@ public class DifarProcess extends PamProcess {
 			while (it.hasPrevious()) {
 				otherUnit = it.previous();
 				if (otherUnit.getChannelBitmap() != 1<<aChan) {
+					continue;
+				}
+				if (freeToMatch != null && !freeToMatch.test(otherUnit)) {
 					continue;
 				}
 				if (!isSameSpecies(difarDataUnit, otherUnit)) {

@@ -63,7 +63,7 @@ import difar.display.DifarMatchProvider;
 import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
 import difar.offline.DifarDataCopyTask;
-import difar.offline.UpdateCrossingTask;
+import difar.offline.RematchTask;
 import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
@@ -449,7 +449,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		if (isViewer){
 			JMenu menu = new JMenu(getUnitName());
 			menu.add(menuItem);
-			JMenuItem offlineDataItem = new JMenuItem("Copy DIFAR Binaries to Database");
+			JMenuItem offlineDataItem = new JMenuItem("DIFAR offline tasks...");
 			offlineDataItem.addActionListener(new OfflineTaskAction());
 			menu.add(offlineDataItem);
 			return menu;
@@ -465,9 +465,10 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 	
 	/**
-	 * Bring the database up to date for a period, after a buoy has changed:
-	 * the buoy columns of each affected clip's row, and the location of each
-	 * crossing those clips belong to.
+	 * Carry a buoy change through the data, over the whole time the buoy
+	 * record is in force: matches in that period are chosen again, crossings
+	 * chosen by the operator keep their clips and are worked out again, and
+	 * affected clips' database rows get the buoy's new values.
 	 * <p>
 	 * The period is the whole time the buoy record is in force, not the loaded
 	 * period, so detections outside the viewer's window are covered too. No
@@ -475,12 +476,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	 * already agreed to it.
 	 * @param startTime start of the period.
 	 * @param endTime end of the period.
-	 * @param affected which clips the change affects.
+	 * @param affected the clips whose buoy changed.
 	 */
 	public void runCrossingTasks(long startTime, long endTime, Predicate<DifarDataUnit> affected) {
 		OfflineTaskGroup taskGroup = new OfflineTaskGroup(this, getUnitName());
 		taskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
-		UpdateCrossingTask task = new UpdateCrossingTask(this, affected);
+		RematchTask task = new RematchTask(this, affected);
 		taskGroup.addTask(task);
 		/*
 		 * A task group takes each task's on or off state from the offline tasks
@@ -504,7 +505,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		if (offlineTaskGroup == null) {
 			offlineTaskGroup = new OfflineTaskGroup(this, getUnitName());
 			offlineTaskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
-			offlineTaskGroup.addTask(new UpdateCrossingTask(this, null));
+			offlineTaskGroup.addTask(new RematchTask(this, null));
 			offlineTaskGroup.addTask(new DifarDataCopyTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
 //			offlineTaskGroup.addTask(task);
 		}

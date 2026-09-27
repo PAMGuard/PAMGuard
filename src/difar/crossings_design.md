@@ -137,7 +137,7 @@ Everything stays inside `src/difar`. No core class changes.
 | `DifarParameters` | New setting: recalculate or delete crossings when a clip is deleted. |
 | `DifarSqlLogging` | Writes NULL to the old crossing columns. Adds buoy name and deployment UID columns. Updates a clip row's buoy columns by UID. |
 | `SonobuoyManager` | Recalculates crossings and the derived columns of clip rows. Never rewrites clip binary objects. |
-| `UpdateCrossingTask` | After a buoy edit in the viewer, updates clip rows and recalculates crossings over the buoy's period. Never marks a clip changed. |
+| `RematchTask` | Replaces `UpdateCrossingTask`. Matches clips again over a period, keeping operator crossings and working them out again, and updates clip rows. Runs from the DIFAR offline tasks and after a buoy edit in the viewer. Never marks a clip changed. |
 | `ClearCrossingTask` | Deleted, as it is unused. |
 | `DIFARCrossingInfo` | Deleted once every caller has moved. |
 
@@ -161,4 +161,4 @@ Everything stays inside `src/difar`. No core class changes.
 4. **Old clip columns.** New rows write NULL. Old datasets are converted, not read by old-format tools.
 5. **Tracked groups.** Left alone for now. They are likely to be dropped or replaced by a general tracking tool later.
 6. **One copy of buoy-derived values.** Buoy position, heading, true bearing, buoy name and deployment UID live in the clip row only. The crossing subtable holds links, and a query joins them.
-7. **Buoy edits relocate, never rematch.** A crossing keeps its clips and its match choice when a buoy changes.
+7. **Buoy edits rematch.** A buoy error can make old pairings wrong, so matches over the buoy's period are chosen again. Crossings chosen by the operator keep their clips and are worked out again.

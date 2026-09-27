@@ -181,7 +181,9 @@ public class SonobuoyEditEffectsTest {
 		String message = effects.getMessage(true);
 		assertTrue(message.contains("Buoy 159 on channel 1"));
 		assertTrue(message.contains("2 bearings will be updated"));
-		assertTrue(message.contains("1 triangulations will be worked out again"));
+		assertTrue(message.contains("1 crossings have clips on this buoy"));
+		assertTrue(message.contains("will be chosen again"));
+		assertTrue(effects.getMessage(false).contains("1 triangulations will be worked out again"));
 	}
 
 	/** While PAMGuard runs, the message says what cannot be reached. */

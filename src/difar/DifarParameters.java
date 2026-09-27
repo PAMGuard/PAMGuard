@@ -93,6 +93,14 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public boolean alwaysDeleteTrimmedCrossings = false;
 
 	/**
+	 * When rematching a period by hand, whether crossings chosen by the operator
+	 * are replaced too. False keeps them, with their clips out of the rematch.
+	 * Named this way round so that settings saved before it existed read as
+	 * false, which keeps operator choices.
+	 */
+	public boolean rematchReplacesOperatorChoices = false;
+
+	/**
 	 * Standard deviation of a DIFAR bearing, in degrees. This sets how much
 	 * weight bearings carry in a localisation, against the arrival time
 	 * differences.
