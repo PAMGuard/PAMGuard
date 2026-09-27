@@ -81,6 +81,12 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	private int matched, unmatched, clipRows;
 
 	/**
+	 * True from prepareTask to completeTask. Core completes every task in a
+	 * group, even those not ticked, which it never prepared.
+	 */
+	private boolean running;
+
+	/**
 	 * @param difarControl the DIFAR module.
 	 * @param buoyChanged the clips whose buoy has changed, whose database rows
 	 * need its new values; null to refresh every clip's row.
@@ -122,6 +128,7 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 
 	@Override
 	public void prepareTask() {
+		running = true;
 		keepOperatorChoices = !difarControl.getDifarParameters().rematchReplacesOperatorChoices;
 		made.clear();
 		pending.clear();
@@ -224,6 +231,10 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 
 	@Override
 	public void completeTask() {
+		if (!running) {
+			return;
+		}
+		running = false;
 		System.out.printf("DIFAR: rematch made crossings for %d clips, left %d clips unmatched, removed %d old crossings, "
 				+ "and kept %d chosen by the operator, %d of them worked out again. %d clip rows updated\n",
 				matched, unmatched, removed.size(), kept.size(), relocated.size(), clipRows);

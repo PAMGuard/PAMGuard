@@ -64,10 +64,10 @@ import difar.display.DifarMatchContainer;
 import difar.display.DifarMatchProvider;
 import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
-import difar.offline.DifarDataCopyTask;
 import difar.crossings.CrossingLocaliser;
 import difar.crossings.DifarCrossing;
 import difar.offline.RematchTask;
+import difar.offline.UpgradeTask;
 import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
@@ -255,7 +255,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			}
 			break;
 		case DIFARMessage.SaveDatagramUnit:
-			if (!isViewer || isQueued(message.difarDataUnit)) {
+			if ((!isViewer || isQueued(message.difarDataUnit)) && canSaveInViewer()) {
 				prepareViewerSave(message.difarDataUnit);
 				difarProcess.finalProcessing(message.difarDataUnit);
 				difarProcess.getCrossingRecorder().record(message.difarDataUnit);
@@ -271,7 +271,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			
 		case DIFARMessage.SaveDatagramUnitWithoutRange:
 		
-			if (!isViewer || isQueued(message.difarDataUnit)) {
+			if ((!isViewer || isQueued(message.difarDataUnit)) && canSaveInViewer()) {
 				prepareViewerSave(message.difarDataUnit);
 				//remove Range/Localisation Information
 				message.difarDataUnit.clearTempCrossing();
@@ -511,11 +511,11 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			offlineTaskGroup = new OfflineTaskGroup(this, getUnitName());
 			offlineTaskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
 			offlineTaskGroup.addTask(new RematchTask(this, null));
-			offlineTaskGroup.addTask(new DifarDataCopyTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
+			offlineTaskGroup.addTask(new UpgradeTask(this));
 //			offlineTaskGroup.addTask(task);
 		}
 		OLProcessDialog olProcessDialog;
-		olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "DIFAR Data Export");
+		olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "DIFAR offline tasks");
 		olProcessDialog.setVisible(true);
 	}
 	
@@ -946,15 +946,48 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		deleteSavedClip(unit);
 	}
 
+	/** Why an older dataset cannot be edited, and what to do about it. */
+	private static final String OLD_FILES_ADVICE = "The data were written by an older version of PAMGuard, "
+			+ "and older DIFAR files are read only. To edit them, run \"Upgrade old DIFAR files\" from "
+			+ "DIFAR offline tasks, over all data. It backs up the files first.";
+
+	/**
+	 * In the viewer, whether the saved clips loaded now include any from files
+	 * before the current version. A dataset is written by one version, so this
+	 * stands for the dataset.
+	 * @return true if an older file's clips are loaded.
+	 */
+	private boolean hasOldClips() {
+		for (DifarDataUnit clip : difarProcess.getProcessedDifarData().getDataCopy()) {
+			if (clip.getBinaryVersion() < DifarClipPayload.CURRENT_VERSION) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * In the viewer, refuse to save a clip into an older dataset, which would
+	 * rewrite a file at the current version and lose the crossings in it.
+	 * @return true if the save may go ahead.
+	 */
+	private boolean canSaveInViewer() {
+		if (!isViewer || !hasOldClips()) {
+			return true;
+		}
+		JOptionPane.showMessageDialog(getGuiFrame(), "<html>Cannot save this clip.<p><p>" + OLD_FILES_ADVICE,
+				"Save DIFAR clip", JOptionPane.WARNING_MESSAGE);
+		return false;
+	}
+
 	private void deleteSavedClip(DifarDataUnit unit) {
 		int channel = PamUtils.getSingleChannel(unit.getChannelBitmap());
 		String clip = String.format("the clip on channel %d at %s, UID %d", channel,
 				PamCalendar.formatDateTime(unit.getTimeMilliseconds()), unit.getUID());
 		if (unit.getBinaryVersion() < DifarClipPayload.CURRENT_VERSION) {
 			JOptionPane.showMessageDialog(getGuiFrame(),
-					String.format("<html>Cannot delete %s.<p><p>It is in a file written by an older version "
-							+ "of PAMGuard, and older files are read only until the dataset is upgraded.",
-							clip), "Delete DIFAR clip", JOptionPane.WARNING_MESSAGE);
+					String.format("<html>Cannot delete %s.<p><p>%s", clip, OLD_FILES_ADVICE),
+					"Delete DIFAR clip", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		DifarCrossing crossing = unit.getCrossing();

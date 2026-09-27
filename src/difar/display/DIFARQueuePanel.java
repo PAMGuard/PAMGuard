@@ -115,25 +115,32 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 		return mainPanel;
 	}
 
+	/**
+	 * In the viewer a data block tells its observers nothing when a clip is
+	 * added or removed, so the saved strip never hears of a newly saved clip.
+	 * Rebuild it from the saved clips instead, as a new load does, once the
+	 * clip has joined them. Not done for the queue: a clip being worked stays
+	 * in the queue's block, and a queued clip gets its display settings after
+	 * it is marked, so a rebuild shows stale or duplicate clips there. The
+	 * queue needs the notices normal mode sends; see outstanding.md.
+	 */
+	private void rebuildSavedLater() {
+		SwingUtilities.invokeLater(() -> clipDisplayPanel.newViewerTimes(
+				getClipDataBlock().getCurrentViewDataStart(), getClipDataBlock().getCurrentViewDataEnd()));
+	}
+
 	@Override
 	public int difarNotification(DIFARMessage difarMessage) {
 		switch(difarMessage.message) {
 		case DIFARMessage.NewDifarUnit:
 		case DIFARMessage.SaveDatagramUnit:
 		case DIFARMessage.SaveDatagramUnitWithoutRange:
-			// the clip strip only lays itself out again for new clips in normal
-			// mode, so in the viewer a new or newly saved clip is there but not
-			// shown until something else redraws the strip. Later, so the clip
-			// has joined the strip before it is laid out.
 			if (saved && difarControl.isViewer()) {
-				// In the viewer a data block tells its observers nothing when a
-				// clip is added, so the saved strip never hears of a newly saved
-				// clip. Rebuild it from the saved clips, as a new load does, once
-				// the clip has joined them.
-				SwingUtilities.invokeLater(() -> clipDisplayPanel.newViewerTimes(
-						getClipDataBlock().getCurrentViewDataStart(), getClipDataBlock().getCurrentViewDataEnd()));
+				rebuildSavedLater();
 			}
 			else {
+				// the clip strip only lays itself out again for new clips in normal
+				// mode. Later, so the clip has joined the strip before it is laid out.
 				clipDisplayPanel.updatePanelLater();
 			}
 			break;

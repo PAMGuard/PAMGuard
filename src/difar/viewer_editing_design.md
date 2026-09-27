@@ -52,21 +52,23 @@ now, deleting saved clips is Viewer only. Normal mode keeps deleting from the qu
 
 ## Old files: read only, upgraded as a dataset
 
-Files at versions 0 to 2 are read only. The first edit to an old dataset in the Viewer, a saved or
-deleted clip, offers to upgrade the whole dataset, and edits are refused until it is upgraded. The
-upgrade:
+Files at versions 0 to 2 are read only. In the Viewer, saving or deleting a clip while older clips
+are loaded is refused, with a message pointing to the upgrade. Without the refusal, saving a clip
+would rewrite its file at version 3 and silently lose the crossings stored in it.
 
-1. Backs up every DIFAR binary file, as compaction already does.
-2. Rewrites them at version 3, with no crossing tail.
-3. Rematches: in time order, each clip gets the best viable match, chosen automatically, and the
-   crossing is recorded by the same `CrossingRecorder` rules as saving a clip.
+The upgrade is "Upgrade old DIFAR files to version 3", in the DIFAR offline tasks. It replaces the
+old copy to database task, which rewrote every clip file at version 3 as a side effect, with no
+backup and no rematch. The upgrade:
+
+1. Backs up every DIFAR binary file, as the clip store's backup does, and does nothing more if the
+   backup fails. The database is not backed up.
+2. Rematches every clip, by running `RematchTask`'s steps, making crossing units.
+3. Marks each clip from an older file as changed, so PAMGuard rewrites its file at version 3.
+
+It is run over all data, so matching can find partners anywhere in the dataset.
 
 The old crossings were made by buggy code, so they stay in the backup only, as a record of what was
 thought at the time. The new crossings are the best current estimate.
-
-The whole dataset is upgraded at once because matching looks for partner clips close in time, which
-may sit in the next file. Upgrading one file at a time would miss those, and leave a dataset in mixed
-versions.
 
 This needs bulk rematch, below, which is built first.
 
@@ -129,7 +131,7 @@ A crossing of three, trimmed to two and recalculated, needs the three-buoy audio
 
 1. Bulk rematch into crossing units. Done.
 2. Deleting a saved clip. Done.
-3. The dataset upgrade, which uses 1.
+3. The dataset upgrade, which uses 1. Built, test owed.
 4. The auto-compaction setting.
 
 ## Also for the feature list

@@ -18,9 +18,7 @@ and after every buoy edit in the Viewer.
 
 Next, in order, as set out in `viewer_editing_design.md`:
 
-1. Upgrading an old dataset to version 3, with a backup and a rematch. Until then, clips in files
-   before version 3 cannot be deleted.
-2. An auto-compaction setting, writing after every edit. Deletions already write at once.
+1. An auto-compaction setting, writing after every edit. Deletions already write at once.
 
 Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
 putting clips back on the queue; the spectrogram marking clips that belong to a crossing; time
@@ -31,10 +29,11 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
 
 ## Tests owed
 
+- The dataset upgrade, "Upgrade old DIFAR files to version 3", passed on the pilot: refusal on loaded data, then all data
+  backed up, 6 clips rewritten, crossings made, and pgmatlab reading both files as version 3.
 - Deleting a saved clip passed in the Viewer on the simulated data: an unmatched clip, a clip in a
   crossing of two (the crossing deleted), and a clip saved and deleted in one session. Each left the
-  panel, map and spectrogram at once, and the files and database. Refusal for pre-version-3 files is
-  untested.
+  panel, map and spectrogram at once, and the files and database.
 - "Rematch clips" passed in the Viewer on the simulated data, run from the DIFAR offline tasks and
   after a buoy edit. Keeping operator crossings is untested: it needs an operator match, as in rung 7.
 - Step 5 passed in the Viewer on the simulated data: crossings load and draw, a buoy edit moves them,
@@ -126,6 +125,12 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   highest from the block's latest, not from the file's contents.
 - `BinaryOutputStream.createIndexFile` needs a footer that only `writeFooter` sets.
 - `ClipDisplayPanel` skips `updatePanel()` for new data in Viewer.
+- In the Viewer, clips marked for the queue do not appear in the queue strip; they come up in the
+  DIFARgram one at a time. Rebuilding the strip from the queue's block was tried and removed: a clip
+  being worked stays in that block, so it reappeared in the strip, and a clip is given its display
+  settings after it is marked, so the strip showed full bandwidth. Fix: send the queue strip the
+  add and update notices normal mode sends, for clips made in the Viewer, without reaching
+  observers that write rows, which the clip store already does.
 - In the Viewer, `PamDataBlock.shouldNotify()` is false, so adding or removing a unit tells no normal
   observer, and core has no notice for a removed unit at all. DIFAR tells its saved clips panel
   directly, and reloads the view after a deletion so the map and spectrogram redraw.
@@ -135,6 +140,10 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   block. Fixed on `fix-superdet-viewer-load` (one commit on upstream `ddbb6374`, pull request
   PAMGuard/PAMGuard#348) and cherry-picked into `difar-crossings`. DIFAR crossings do not load in the
   Viewer without it.
+- After an upgrade, the first save of new clips asks again whether to back up the files, though the
+  upgrade has just backed them up. The upgrade could tell the clip store.
+- `OfflineTaskGroup.completeTasks` completes every task, ticked or not, though `prepareTasks` only
+  prepares ticked ones. DIFAR's tasks report and reload only if prepared in this run.
 - An offline task group takes each task's on or off state from the dialog's saved selection, off by
   default, even when the group is run from code. `runCrossingTasks` switches its task on. The buoy-edit
   group also shares its settings name with the DIFAR offline tasks group, and registers settings
