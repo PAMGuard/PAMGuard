@@ -1,6 +1,7 @@
 package networkTransfer.receive;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import PamController.PSFXReadWriter;
@@ -17,7 +18,11 @@ import networkTransfer.send.NetworkSender;
  */
 public class NetReceiveConfigBuilder {
 
-	public static void generateAndSaveNetRxPsfx(String existingConfigFilePath, String newConfigPath, String ipAddress, String userId,String password, int portNumber, String baseTopic) {
+	public static void generateAndSaveNetRxPsfx(String existingConfigFilePath, String newConfigPath, String ipAddress, String userId,String password, int portNumber, String baseTopic) throws Exception {
+		
+		if(!Paths.get(existingConfigFilePath).toFile().exists()) {
+			throw new Exception("Configuration "+existingConfigFilePath+" does not exist. Cannot generate a base station file for this config.");
+		}
 		
 		NetworkReceiveParams netRxParams = generateNetRxParams(ipAddress,userId,password,portNumber,baseTopic);
 		
@@ -26,6 +31,36 @@ public class NetReceiveConfigBuilder {
 		PamSettingsGroup newPSG = removeTxAndEnsureCorrectNetRx(existingPSG, netRxParams);
 		
 		PSFXReadWriter.getInstance().writePSFX(newConfigPath,newPSG);
+	}
+	
+	public static boolean configContainsNetworkSender(String existingConfigFilePath) throws Exception {
+		if(!Paths.get(existingConfigFilePath).toFile().exists()) {
+			throw new Exception("Configuration "+existingConfigFilePath+" does not exist. Cannot determine if this config has a network sender configured.");
+		}
+		
+		PamSettingsGroup existingPSG = loadPSG(existingConfigFilePath);
+		ArrayList<UsedModuleInfo> usedModuleInfo = existingPSG.getUsedModuleInfo();
+		for(UsedModuleInfo usedModule:usedModuleInfo) {
+			if(usedModule.getUnitType().equals(NetworkSender.UNIT_TYPE)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public static String[] listConfigModules(String existingConfigFilePath) throws Exception {
+		if(!Paths.get(existingConfigFilePath).toFile().exists()) {
+			throw new Exception("Configuration "+existingConfigFilePath+" does not exist. Cannot list active modules.");
+		}
+		
+		PamSettingsGroup existingPSG = loadPSG(existingConfigFilePath);
+		ArrayList<UsedModuleInfo> usedModuleInfo = existingPSG.getUsedModuleInfo();
+		String[] moduleList = new String[usedModuleInfo.size()];
+		for(int i=0;i<usedModuleInfo.size();i++) {
+			moduleList[i] = usedModuleInfo.get(i).getUnitType()+" - "+usedModuleInfo.get(i).getUnitName();
+		}
+		return moduleList;
 	}
 	
 	private static PamSettingsGroup loadPSG(String existingConfigFilePath) {
