@@ -4,6 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import javax.swing.SwingUtilities;
+
 import PamguardMVC.superdet.SuperDetection;
 import dataMap.OfflineDataMapPoint;
 import difar.DifarControl;
@@ -17,6 +19,7 @@ import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
 import offlineProcessing.OfflineTask;
+import pamScrollSystem.AbstractScrollManager;
 
 /**
  * Brings the database up to date after a buoy changes, over a stretch of
@@ -137,6 +140,15 @@ public class UpdateCrossingTask extends OfflineTask<DifarDataUnit> {
 		if (!notLoaded.isEmpty()) {
 			System.out.printf("DIFAR: %d crossings were not recalculated, since their clips were never all loaded together: UIDs %s\n",
 					notLoaded.size(), notLoaded);
+		}
+		/*
+		 * The task group reloads the clips at the end, but not the crossings,
+		 * which stay linked to the clips used during the task. Reload the whole
+		 * view so the displays show the updated crossings, linked to the clips
+		 * on screen.
+		 */
+		if (clipRows > 0 || !done.isEmpty()) {
+			SwingUtilities.invokeLater(() -> AbstractScrollManager.getScrollManager().reLoad());
 		}
 	}
 }

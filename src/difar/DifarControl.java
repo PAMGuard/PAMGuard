@@ -252,9 +252,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		case DIFARMessage.SaveDatagramUnit:
 			if (!isViewer || isQueued(message.difarDataUnit)) {
 				prepareViewerSave(message.difarDataUnit);
-				message.difarDataUnit.saveCrossing(true);
 				difarProcess.finalProcessing(message.difarDataUnit);
 				difarProcess.getCrossingRecorder().record(message.difarDataUnit);
+				message.difarDataUnit.clearTempCrossing();
 				completeViewerSave(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
@@ -269,7 +269,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			if (!isViewer || isQueued(message.difarDataUnit)) {
 				prepareViewerSave(message.difarDataUnit);
 				//remove Range/Localisation Information
-				message.difarDataUnit.saveCrossing(false);
+				message.difarDataUnit.clearTempCrossing();
 				difarProcess.finalProcessing(message.difarDataUnit);
 				difarProcess.getCrossingRecorder().forget(message.difarDataUnit);
 				completeViewerSave(message.difarDataUnit);

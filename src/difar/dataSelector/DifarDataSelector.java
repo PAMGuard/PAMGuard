@@ -100,7 +100,7 @@ public class DifarDataSelector extends DataSelector {
 			return false;
 		}
 		
-		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getDifarCrossing()==null){
+		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getCrossing()==null){
 			return false;
 		}
 		

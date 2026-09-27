@@ -3,11 +3,8 @@ package difar.crossings;
 import java.util.ArrayList;
 import java.util.List;
 
-import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
-import difar.DIFARCrossingInfo;
 import difar.DifarControl;
-import difar.DifarDataUnit;
 import difar.DifarMatchSelector;
 import difar.DifarParameters;
 import difar.DifarProcess;
@@ -96,38 +93,15 @@ public class CrossingLocaliser {
 			System.out.printf("DIFAR: crossing UID %d no longer crosses after the buoy change, so its location is cleared\n",
 					crossing.getUID());
 			crossing.setResult(null, Double.NaN, Double.NaN);
-			showOnClips(crossing);
 			return Outcome.NOT_CROSSED;
 		}
 		store(crossing, match);
-		showOnClips(crossing);
 		if (!match.isAccepted()) {
 			System.out.printf("DIFAR: crossing UID %d recalculated after the buoy change, but %s\n",
 					crossing.getUID(), match.getRejectReason());
 			return Outcome.RELOCATED_OUTSIDE_LIMITS;
 		}
 		return Outcome.RELOCATED;
-	}
-
-	/**
-	 * Until displays read crossing units (step 5), they draw the crossing
-	 * held on each clip. Give those the new location so the map stays true.
-	 */
-	private static void showOnClips(DifarCrossing crossing) {
-		Double[] errors = {crossing.getXError(), crossing.getYError(), 0d};
-		LatLong location = crossing.getLocation();
-		List<PamDataUnit<?, ?>> clips = crossing.getSubDetections();
-		if (clips == null) {
-			return;
-		}
-		for (PamDataUnit<?, ?> unit : clips) {
-			DifarDataUnit clip = (DifarDataUnit) unit;
-			DIFARCrossingInfo old = clip.getDifarCrossing();
-			if (old == null) {
-				continue;
-			}
-			clip.setDifarCrossing(location == null ? null : new DIFARCrossingInfo(old.getMatchedUnits(), location, errors));
-		}
 	}
 
 	private static double error(Double[] errors, int i) {

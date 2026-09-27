@@ -71,12 +71,12 @@ public class CrossingRecorder {
 	}
 
 	/**
-	 * Record the crossing of a clip just saved, if it has one.
+	 * Record the crossing proposed for a clip just saved, if it has one.
 	 * @param clip the clip, already in the saved clips, with its UID.
 	 */
 	public synchronized void record(DifarDataUnit clip) {
 		DifarCrossing.MatchChoice choice = choices.remove(clip);
-		DIFARCrossingInfo info = clip.getDifarCrossing();
+		DIFARCrossingInfo info = clip.getTempCrossing();
 		if (info == null || info.getCrossLocation() == null) {
 			return;
 		}

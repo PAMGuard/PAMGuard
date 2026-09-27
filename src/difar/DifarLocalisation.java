@@ -4,6 +4,7 @@ import Array.ArrayManager;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
+import difar.crossings.DifarCrossing;
 import pamMaths.PamVector;
 
 /**
@@ -58,7 +59,7 @@ public class DifarLocalisation extends AbstractLocalisation {
 	@Override
 	public LocContents getLocContents() {
 		int cont = LocContents.HAS_BEARING;
-		if (difarDataUnit.getDifarCrossing() != null) {
+		if (savedLocation() != null) {
 			cont |= LocContents.HAS_LATLONG;
 		}
 		return new LocContents(cont);
@@ -117,8 +118,7 @@ public class DifarLocalisation extends AbstractLocalisation {
 	 */
 	@Override
 	public LatLong getLatLong(int iSide) {
-		if (difarDataUnit.getDifarCrossing() == null) return null;
-		return difarDataUnit.getDifarCrossing().getCrossLocation();
+		return savedLocation();
 	}
 
 	/* (non-Javadoc)
@@ -126,7 +126,16 @@ public class DifarLocalisation extends AbstractLocalisation {
 	 */
 	@Override
 	public int getNumLatLong() {
-		return (difarDataUnit.getDifarCrossing() == null ? 0 : 1);
+		return (savedLocation() == null ? 0 : 1);
+	}
+
+	/**
+	 * @return the location of the saved crossing this clip belongs to, or
+	 * null if it has none or its crossing has no location.
+	 */
+	private LatLong savedLocation() {
+		DifarCrossing crossing = difarDataUnit.getCrossing();
+		return crossing == null ? null : crossing.getLocation();
 	}
 
 }

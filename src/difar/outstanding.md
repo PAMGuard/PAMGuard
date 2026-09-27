@@ -10,19 +10,17 @@ memory. The design for crossings is in `crossings_design.md`.
 The aim is reanalysis in the Viewer: new clips from raw audio, with time to correct mistakes. Old
 datasets stay as they are, readable by old PAMGuard versions and pgmatlab.
 
-Steps 1 to 4 are done: pure rules, crossing units and tables, Normal mode recording crossings as
-clips are saved, and clip payload version 3 with buoy edits recalculating crossings. Still to do, in
-order:
+Steps 1 to 5 are done: pure rules, crossing units and tables, Normal mode recording crossings as
+clips are saved, clip payload version 3 with buoy edits recalculating crossings, and displays drawing
+crossing units. A clip holds only the match proposed while it is worked on; once saved, its crossing
+is the crossing unit. Still to do, in order:
 
-1. Viewer displays draw crossing units. Until then, a crossing shows only while the clips that made
-   it are in memory, and vanishes after a reload, including the one at the end of a buoy edit.
-   Delete `DIFARCrossingInfo` and the temporary crossing on each clip.
-2. Deleting a clip, in both modes, with the trim rule and a checkbox for
+1. Deleting a clip, in both modes, with the trim rule and a checkbox for
    `alwaysDeleteTrimmedCrossings`. Editing a clip is then delete and re-mark. Needs a short design
    note first, since binary files are append-only.
-3. Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
+2. Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
    bulk rematch into crossing units, or putting clips back on the queue.
-4. Shelved: converting old datasets' crossings, and Viewer compaction.
+3. Shelved: converting old datasets' crossings, and Viewer compaction.
 
 The "DIFAR Data Export" offline task used to rematch every clip over a period. It now only updates
 clip rows and relocates existing crossings, the same as after a buoy edit, until bulk rematch is
@@ -30,6 +28,8 @@ rebuilt on crossing units.
 
 ## Tests owed
 
+- Step 5 passed in the Viewer on the simulated data: crossings load and draw, a buoy edit moves them,
+  and a new clip claims its partner and deletes the crossing it left with one clip.
 - Normal mode buoy edits are untested since step 4. Change a heading after a whale in one session:
   the crossing should keep its clips and move, and clip rows' `TrueBearing` should change.
 - The pilot's 2013 files opening in the Viewer after step 4. Not needed for new reanalysis.
@@ -93,7 +93,8 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
 
 - R and MATLAB wrappers around `crossing_clips.sql`.
 - pgmatlab: branch `difar-v3-no-tail` in `C:\analysis\pgmatlab` reads version 3 clips, tested on
-  the pilot's version 2 files and a real version 3 file. Open the pull request from the fork.
+  the pilot's version 2 files and a real version 3 file. Pushed to the fork. Open its pull request
+  alongside the next DIFAR pull request to PAMGuard.
 
 - Detections from reanalysed WAV files should reference the file and the sample within it. Check what
   the WAV annotation already records.
@@ -117,6 +118,11 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
 - `BinaryOutputStream.createIndexFile` needs a footer that only `writeFooter` sets.
 - `ClipDisplayPanel` skips `updatePanel()` for new data in Viewer.
 - `BINOVERLAPWARNING` is one named warning for every module.
+- The Viewer never loaded super-detection blocks alongside the blocks they group: a loop in
+  `ViewerScrollerManager` queued the sub-detection block again instead of each super-detection
+  block. Fixed on `fix-superdet-viewer-load` (one commit on upstream `ddbb6374`, pushed, pull request
+  not yet opened) and cherry-picked into `difar-crossings`. DIFAR crossings do not load in the
+  Viewer without it.
 - An offline task group takes each task's on or off state from the dialog's saved selection, off by
   default, even when the group is run from code. `runCrossingTasks` switches its task on. The buoy-edit
   group also shares its settings name with the DIFAR offline tasks group, and registers settings

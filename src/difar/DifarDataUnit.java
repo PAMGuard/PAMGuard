@@ -17,6 +17,7 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDataUnit;
+import difar.crossings.DifarCrossing;
 import difar.crossings.LegacyCrossing;
 import fftManager.Complex;
 import fftManager.FastFFT;
@@ -110,8 +111,7 @@ public class DifarDataUnit extends ClipDataUnit {
 	 */
 	private long clipStartMillis;
 
-	private DIFARCrossingInfo difarCrossing;
-	
+	/** The match proposed while the clip is worked on, before it is saved. */
 	private DIFARCrossingInfo tempCrossing;
 
 	/**
@@ -852,12 +852,11 @@ public class DifarDataUnit extends ClipDataUnit {
 			str += String.format("<br>Buoy head %3.1f%s, calibrated at %s", buoyHead, LatLong.deg, 
 					PamCalendar.formatDateTime(origin.getTimeInMillis()));
 		}
-		DIFARCrossingInfo xInfo = difarCrossing;
-		if (xInfo == null) xInfo = tempCrossing;
-		if (xInfo != null) {
-			int range = (int) origin.distanceToMetres(xInfo.getCrossLocation());
-			str += "<br>" + String.format("Range %dm,  Location %s %s", range, 
-					xInfo.getCrossLocation().formatLatitude(),xInfo.getCrossLocation().formatLongitude());
+		LatLong cross = getCrossLocation();
+		if (cross != null) {
+			int range = (int) origin.distanceToMetres(cross);
+			str += "<br>" + String.format("Range %dm,  Location %s %s", range,
+					cross.formatLatitude(), cross.formatLongitude());
 		}
 		str += "</html>";
 		return str;
@@ -928,54 +927,45 @@ public class DifarDataUnit extends ClipDataUnit {
 	}
 
 
-//	/**
-//	 * Set the crossing point when multiple matching DIFAR bearings are crossed. 
-//	 * @param crossInfo result from DIFAR localisation. 
-//	 */
-//	public void setDifarCrossing(DIFARCrossingInfo crossInfo) {
-//		this.difarCrossing = crossInfo;
-//	}
 	/**
-	 * Move the crossing info from it's temp position to 
-	 * a saved position. Called just at the point when the difar 
-	 * unit is saved and moved from the queue to the output data block. 
-	 * @param save - save it, or discard it (also from other units associated with 
-	 * this crossing
+	 * @return the crossing this clip belongs to, or null if none. Crossings
+	 * are PAMGuard super-detections, stored in the database and linked to
+	 * their clips when loaded, in both Normal mode and the viewer.
 	 */
-	public void saveCrossing(boolean save) {
+	public DifarCrossing getCrossing() {
+		return (DifarCrossing) getSuperDetection(DifarCrossing.class);
+	}
+
+	/**
+	 * Where this clip's bearing is crossed, for displays: its crossing's
+	 * location if it belongs to one, else the location of the match proposed
+	 * while it is being worked on.
+	 * @return the location, or null if there is none.
+	 */
+	public LatLong getCrossLocation() {
+		DifarCrossing crossing = getCrossing();
+		if (crossing != null) {
+			return crossing.getLocation();
+		}
+		return tempCrossing == null ? null : tempCrossing.getCrossLocation();
+	}
+
+	/**
+	 * Drop the match proposed for this clip, from it and the other clips in
+	 * the proposal. Called once the clip is saved, with or without the match.
+	 */
+	public void clearTempCrossing() {
 		if (tempCrossing == null) {
 			return;
 		}
-		if (save) {
-			difarCrossing = tempCrossing;
-			DifarDataUnit[] detList = tempCrossing.getMatchedUnits();
-			if (this == detList[0]) {
-				for (int i = 1; i < detList.length; i++) {
-					if (detList[i] != null)
-					detList[i].saveCrossing(save);
-				}
+		DIFARCrossingInfo proposal = tempCrossing;
+		for (DifarDataUnit clip : proposal.getMatchedUnits()) {
+			if (clip != null && clip.tempCrossing == proposal) {
+				clip.tempCrossing = null;
 			}
 		}
 		tempCrossing = null;
 	}
-	
-	/**
-	 * 
-	 * @return the crossing point when multiple matching DIFAR bearings are crossed. 
-	 */
-	public DIFARCrossingInfo getDifarCrossing() {
-		return difarCrossing;
-	}
-
-	
-
-	/**
-	 * @param difarCrossing the difarCrossing to set
-	 */
-	public void setDifarCrossing(DIFARCrossingInfo difarCrossing) {
-		this.difarCrossing = difarCrossing;
-	}
-
 
 	/**
 	 * @return the crossing stored with this clip in a file up to module
