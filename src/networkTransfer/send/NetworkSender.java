@@ -18,6 +18,7 @@ import PamController.PamSettings;
 import PamModel.SMRUEnable;
 import PamView.PamSidePanel;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParams;
 import networkTransfer.emulator.NetworkEmulator;
@@ -65,7 +66,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	private boolean initialisationComplete = false;
 	private NetworkSendSidePanel sidePanel;
 	private NetworkSendProcess commandProcess;
-	private boolean activatedByCommand = false;
 	//PamWarning sendWarning;
 	public NetworkClient client;
 	
@@ -95,6 +95,8 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		}
 		
 	}
+	
+	private boolean activatedByCommand = false;
 	
 	/**
 	 * Do this here, not in restore settings, otherwise it's not called the first time the module is added. 
@@ -383,7 +385,31 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 	}
 
-	
+	/**
+	 * Called when the network sender has no sending blocks configured and the sender was activated by command line.<br><br>
+	 * Intent here is that on the CAB, someone could take a non-network-sending config and select "send data" on the cab, 
+	 * and this module would create itself, and configure so that it sends all non-raw data blocks. Then they could download, edit manually, etc.<br><br>
+	 * ST 9/27/26 -- This isn't the safest or smartest way to implement this, but I was tasked with simplifying the net send/receive configuration on CAB. 
+	 * Could see this leading to unwanted overwhelm of data transmission if there are non-raw but high-rate blocks. 
+	 * @param wanted all the blocks in the model
+	 * @return totalFormat (it will be binary) 
+	 */
+	private int defaultPopulateBinarySenders(ArrayList<PamDataBlock> wanted) {
+		int totalFormat = 0;
+		for (PamDataBlock aBlock:wanted) {
+			boolean blockHasBinarySource = aBlock.getBinaryDataSource()!=null;
+			boolean blockIsRaw = (aBlock instanceof PamRawDataBlock);
+			if(blockHasBinarySource && !blockIsRaw) {
+				System.out.println("Adding output data "+aBlock.getLongDataName()+" to the network sender.");
+				int fmt = networkSendParams.getSendSelection(aBlock);
+				if (fmt > 0) {
+					addPamProcess(new NetworkSendProcess(this, aBlock, fmt));
+				}
+				totalFormat |= fmt;
+			}
+		}
+		return totalFormat;
+	}
 
 	private void sortDataSources() {
 		ArrayList<PamDataBlock> wanted = PamController.getInstance().getDataBlocks(); // get everything !
@@ -399,6 +425,15 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 				addPamProcess(new NetworkSendProcess(this, aBlock, fmt));
 			}
 			totalFormat |= fmt;
+		}
+		
+		/*
+		 * ST added 9/27/26: added functionality to the CAB to automatically add a network sender to a configuration if user wants to send data
+		 * Because sending format is configured block-block, and that makes a lot of sense, still want to give the CAB an easy way to 'get off the ground' 
+		 * without too much hastle. If they don't end up wanting this, that makes sense, but giving them the button for now. 
+		 */
+		if(getNumPamProcesses()==0 && this.activatedByCommand) {
+			totalFormat = defaultPopulateBinarySenders(wanted);
 		}
 		
 		// set the command process to use the same format as all of the new processes
