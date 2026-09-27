@@ -65,11 +65,14 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	private boolean initialisationComplete = false;
 	private NetworkSendSidePanel sidePanel;
 	private NetworkSendProcess commandProcess;
+	private boolean activatedByCommand = false;
 	//PamWarning sendWarning;
 	public NetworkClient client;
 	
+	public static final String UNIT_TYPE = "Network Sender";
+	
 	public NetworkSender(String unitName) {
-		super("Network Sender", unitName);
+		super(UNIT_TYPE, unitName);
 
 		PamSettingManager.getInstance().registerSettings(this);
 		
@@ -84,7 +87,13 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 //		}
 		
 		sidePanel = new NetworkSendSidePanel(this);
-		initializeClient();
+		
+		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
+		//If net sending is enabled then let this run, but otherwise just skip past it.. 
+		if(this.networkSendParams.isModuleActivated()) {
+			initializeClient();
+		}
+		
 	}
 	
 	/**
@@ -105,7 +114,26 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		String password = GlobalArguments.getParam(NetSendCommandParam.PASSWORD.arg);
 		String useJson = GlobalArguments.getParam(NetSendCommandParam.SENDJSON.arg);
 		String persistenceDir = GlobalArguments.getParam(NetSendCommandParam.PERSISTANCE_DIRECTORY.arg);
+		String senderActive = GlobalArguments.getParam(NetSendCommandParam.ACTIVE.arg);
 
+		/*
+		 * If a runtime arg is passed for activating/deactivating the network sender, then pass to the parameters.
+		 * Assume by default that if this module is present then it should be set to active.
+		 * ST Aug 13 2026
+		 */
+		if(senderActive!=null) {
+			boolean isActive = Boolean.valueOf(senderActive);
+			networkSendParams.setModuleActivated(isActive);
+			if(isActive) {
+				this.activatedByCommand = true;
+				System.out.println("Pamguard is running with network sending ENABLED");
+			}else {
+				System.out.println("Pamguard is running with network sending DISABLED");
+			}
+		}else {
+			networkSendParams.setModuleActivated(true);
+		}
+		
 		if(user!=null) {
 			networkSendParams.userId = user;
 		}
@@ -168,6 +196,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		 * If persistence directory is set, and the filepath is consistent with the current OS, and it is not a pamguard home-like directory, then move on
 		 */
 		networkSendParams.verifyCorrectPersistanceDirectory();
+		System.out.println("Decided to set persistance directory to "+networkSendParams.persistenceDirectory);
 		//Make it easy on users who may not know the details of MQTT -- if station ID is NOT set, then just set it to 'BaseStation' (the CAB/APS will set its ID to the pb###)
 		//If stationID is set, then move on
 		networkSendParams.checkStationID();
@@ -208,7 +237,11 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	}
 	
 	public void closeClient() {
-		this.client.close();
+		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client.
+		//Client may have never been initialized
+		if(client!=null) {
+			this.client.close();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -442,14 +475,22 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	@Override
 	public void pamToStart() {
 		super.pamToStart();
-		this.client.configureClient(this.networkSendParams);
-		runClient();
-		
+		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
+		//If net sending is enabled then let this run, but otherwise just skip past it.. 
+		if(this.networkSendParams.isModuleActivated() && this.client!=null) {
+			this.client.configureClient(this.networkSendParams);
+			runClient();
+		}
 	}
 	
 	public long lastTransmitErrorPrint = 0;
 
 	public void transmitData(NetworkQueuedObject qo) {
+		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
+		//Dont do anything if the sender is disabled
+		if(this.networkSendParams.isModuleActivated() != true) {
+			return;
+		}
 		if(client==null) {
 			System.out.println("Client is null. Likely due to restarting client");
 			return;
@@ -468,13 +509,25 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	}
 
 	public String getStatus() {
+		if(this.networkSendParams.isModuleActivated() != true) {
+			return "Net Send Manually Disabled";
+		}
 		if(client==null) {
 			return "Disconnected";
 		}
+		
 		return client.getStatus();
 	}
 
 	public void runClient() {
+		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
+		//Dont do anything if the sender is disabled
+		if(this.networkSendParams.isModuleActivated() != true) {
+			return;
+		}
+		if(client==null) {
+			this.initializeClient();
+		}
 		if(client.isConnected()) {
 			return;
 		}
@@ -504,6 +557,23 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		return client.getQueueSize();
 	}
 
+	
+	@Override
+	public String getModuleSummary(boolean clear, String format) {
+		if(format.equals("json")) {
+			String jsonString = String.format("{\"active\":%b,", this.networkSendParams.isModuleActivated());
+			if(this.networkSendParams.isModuleActivated()) {
+				jsonString += String.format("\"connected\":%b,\"serverHost\":\"%s\",\"serverPort\":%d", 
+						this.client.isConnected(),
+						this.networkSendParams.ipAddress,
+						this.networkSendParams.portNumber);
+			}
+			jsonString += "}";
+			return jsonString;
+		}
+		
+		return super.getModuleSummary(clear, format);
+	}
 	
 	
 }

@@ -54,6 +54,14 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 	 */
 	public int maxQueueSize = 10000;
 	
+	/**
+	 * Activate/deactivate Network Sender
+	 * This allows for a single configuration to be used for realtime and non realtime data. 
+	 * Makes configuration and usage easier for those more focused on the acoustics.
+	 * @author tabbutt Aug 13 2026
+	 */
+	private boolean moduleActivated = true;
+	
 	@Deprecated
 	private ArrayList<String> selectedDataBlocks;
 	
@@ -255,5 +263,30 @@ public class NetworkSendParams extends NetworkParams implements Serializable, Cl
 //	public boolean hasSendFormat(int format) {
 //		return (getSendingFormat() & format) != 0;
 //	}
+	
+	
+	/**
+	 * Check whether the network send module is set to active
+	 * This allows for a single configuration to be used for realtime and non realtime data. 
+	 * Makes configuration and usage easier for those more focused on the acoustics.
+	 * 
+	 * @return true if network sender should connect client and send. false if network sender should remain dormant for this deployment.
+	 * @author tabbutt Aug 13 2026
+	 */
+	public boolean isModuleActivated() {
+		return moduleActivated;
+	}
+
+	/**
+	 * Set whether the network send module is set to active
+	 * This allows for a single configuration to be used for realtime and non realtime data. 
+	 * Makes configuration and usage easier for those more focused on the acoustics.
+	 * 
+	 * @param moduleIsActivated: true if network sender should connect client and send. false if network sender should remain dormant for this deployment.
+	 * @author tabbutt Aug 13 2026
+	 */
+	public void setModuleActivated(boolean moduleIsActivated) {
+		this.moduleActivated = moduleIsActivated;
+	}
 
 }
