@@ -17,6 +17,7 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDataUnit;
+import difar.crossings.LegacyCrossing;
 import fftManager.Complex;
 import fftManager.FastFFT;
 import generalDatabase.lookupTables.LookupItem;
@@ -112,6 +113,12 @@ public class DifarDataUnit extends ClipDataUnit {
 	private DIFARCrossingInfo difarCrossing;
 	
 	private DIFARCrossingInfo tempCrossing;
+
+	/**
+	 * The crossing stored with this clip in files up to module version 2.
+	 * Inert: step 5's conversion turns these into crossing units.
+	 */
+	private LegacyCrossing legacyCrossing;
 	
 	private String trackedGroup;
 
@@ -969,6 +976,21 @@ public class DifarDataUnit extends ClipDataUnit {
 		this.difarCrossing = difarCrossing;
 	}
 
+
+	/**
+	 * @return the crossing stored with this clip in a file up to module
+	 * version 2, or null if it had none or was written later.
+	 */
+	public LegacyCrossing getLegacyCrossing() {
+		return legacyCrossing;
+	}
+
+	/**
+	 * @param legacyCrossing the crossing read from an old file, or null.
+	 */
+	public void setLegacyCrossing(LegacyCrossing legacyCrossing) {
+		this.legacyCrossing = legacyCrossing;
+	}
 
 	/**
 	 * @return the tempCrossing
