@@ -6,11 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,11 +22,24 @@ import javax.swing.event.ListSelectionListener;
 import PamController.PamController;
 import PamView.dialog.PamDialog;
 import clickDetector.ClickControl;
+import cpod.CPODClickTrainDataUnit;
+import clickTrainDetector.CTDataUnit;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
+import PamguardMVC.superdet.DetectionGroup;
+import PamguardMVC.superdet.SuperDetection;
+import PamguardMVC.superdet.swing.DetectionGroupTablePanel;
 
+/**
+ * Dialog listing the click detector's events plus, in additional tabs, any
+ * other types of detection group in the configuration (click trains from the
+ * click train detector module, the in-built click train detector, CPOD click
+ * trains, detection groups, ...). All tabs offer "go to event"; the click
+ * events tab retains the full editing functionality (edit / delete) and other
+ * group types can be copied and converted into manually annotated events.
+ */
 public class EventListDialog extends PamDialog {
 	
 	private OfflineEventListPanel offlineEventListPanel;
@@ -36,6 +53,15 @@ public class EventListDialog extends PamDialog {
 	private OfflineEventDataBlock offlineEventDataBlock;
 
 	private JPanel mainPanel;
+
+	private JTabbedPane tabbedPane;
+
+	/**
+	 * Data blocks currently shown in the extra (non click event) tabs.
+	 */
+	private ArrayList<PamDataBlock> groupTabBlocks = new ArrayList<>();
+
+	private ArrayList<DetectionGroupTablePanel> groupTablePanels = new ArrayList<>();
 	
 	protected EventListDialog(Window parentFrame, ClickControl clickControl) {
 		super(parentFrame, clickControl.getUnitName() + " Event List", false);
@@ -45,19 +71,23 @@ public class EventListDialog extends PamDialog {
 		offlineEventDataBlock.addObserver(new EventObserver());
 		
 		mainPanel = new JPanel(new BorderLayout());
+		tabbedPane = new JTabbedPane();
+
 		JPanel eventListPanel = new JPanel(new BorderLayout());
 		offlineEventListPanel = new OfflineEventListPanel(clickControl);
 		eventListPanel.add(BorderLayout.CENTER, offlineEventListPanel.getPanel());
-		eventListPanel.add(BorderLayout.NORTH, new JLabel("Event list"));
-		mainPanel.add(BorderLayout.CENTER, eventListPanel);
-		
 		JPanel southPanel = new JPanel(new BorderLayout());
 		southPanel.setBorder(new TitledBorder("Selection"));
 		southPanel.add(BorderLayout.WEST, offlineEventListPanel.getSelectionPanel());
-		mainPanel.add(BorderLayout.SOUTH, southPanel);
+		eventListPanel.add(BorderLayout.SOUTH, southPanel);
+		tabbedPane.addTab("Click events", eventListPanel);
+
+		mainPanel.add(BorderLayout.CENTER, tabbedPane);
 				
 		offlineEventListPanel.addMouseListener(new TableMouse());
 		offlineEventListPanel.addListSelectionListener(new ListSelection());
+
+		createGroupTabs();
 		
 		setResizable(true);
 		
@@ -68,6 +98,97 @@ public class EventListDialog extends PamDialog {
 	public JPanel getMainPanel(){
 		return mainPanel;
 		
+	}
+
+	/**
+	 * Find all the data blocks of detection groups (other than this click
+	 * detector's own events) and make a tab for each.
+	 */
+	private void createGroupTabs() {
+		ArrayList<PamDataBlock> blocks = PamController.getInstance().getDataBlocks(DetectionGroup.class, true);
+		ArrayList<PamDataBlock> wantedBlocks = new ArrayList<>();
+		ClicksOffline clicksOffline = clickControl.getClicksOffline();
+		if (blocks != null && clicksOffline != null) {
+			for (PamDataBlock block : blocks) {
+				if (clicksOffline.canShowInEventList(block)) {
+					wantedBlocks.add(block);
+				}
+			}
+		}
+		if (wantedBlocks.equals(groupTabBlocks)) {
+			return; // no change.
+		}
+		// remove old tabs (all but the first).
+		while (tabbedPane.getTabCount() > 1) {
+			tabbedPane.removeTabAt(1);
+		}
+		groupTabBlocks = wantedBlocks;
+		groupTablePanels.clear();
+		for (PamDataBlock block : wantedBlocks) {
+			DetectionGroupTablePanel tablePanel = new GroupTablePanel(block);
+			groupTablePanels.add(tablePanel);
+			tabbedPane.addTab(block.getDataName(), tablePanel.getPanel());
+			tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, block.getLongDataName());
+		}
+	}
+
+	/**
+	 * Table panel for the extra tabs with goto and convert-to-event commands.
+	 */
+	private class GroupTablePanel extends DetectionGroupTablePanel implements DetectionGroupTablePanel.GroupTableCommands {
+
+		public GroupTablePanel(PamDataBlock dataBlock) {
+			super(dataBlock, null);
+		}
+
+		@Override
+		public void gotoGroup(SuperDetection group, int secsBefore) {
+			clickControl.gotoEvent(group, secsBefore);
+		}
+
+		@Override
+		public boolean canConvertGroup() {
+			return true;
+		}
+
+		@Override
+		public void convertGroup(SuperDetection group) {
+			ArrayList<SuperDetection> groups = new ArrayList<>();
+			groups.add(group);
+			clickControl.getClicksOffline().convertGroupsToEvent(null, groups);
+		}
+
+		@Override
+		public boolean canLocaliseGroup() {
+			return clickControl.getTargetMotionLocaliser() != null;
+		}
+
+		@Override
+		public void localiseGroup(SuperDetection group) {
+			if (group instanceof DetectionGroup) {
+				clickControl.getTargetMotionLocaliser().showTMDialog((DetectionGroup) group);
+			}
+		}
+
+		@Override
+		public String getGroupInfo(SuperDetection group) {
+			if (group instanceof CPODClickTrainDataUnit) {
+				return ((CPODClickTrainDataUnit) group).getStringInfo();
+			}
+			if (group instanceof CTDataUnit) {
+				CTDataUnit ct = (CTDataUnit) group;
+				String info = "";
+				if (ct.getCTChi2() != null) {
+					info = String.format("X² %3.1f", ct.getCTChi2());
+				}
+				int clsfd = ct.getClassificationIndex();
+				if (clsfd >= 0 && clsfd < ct.getCtClassifications().size()) {
+					info += " " + ct.getCtClassifications().get(clsfd).getSummaryString();
+				}
+				return info;
+			}
+			return "";
+		}
 	}
 	
 	
@@ -82,37 +203,31 @@ public class EventListDialog extends PamDialog {
 	}
 	
 	private void setParams() {
+		createGroupTabs();
 		offlineEventListPanel.tableDataChanged();
+		for (DetectionGroupTablePanel tablePanel : groupTablePanels) {
+			tablePanel.updateTableData();
+		}
 		offlineEventListPanel.setSelectedEvent(clickControl.getLatestOfflineEvent());
 		enableControls();
 	}
 
 	private void enableControls() {
 		
-//		OfflineEventDataUnit selEvent = offlineEventListPanel.getSelectedEvent();
-//		getOkButton().setEnabled(selEvent != null);
 	}
 	
 	@Override
 	public void cancelButtonPressed() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public boolean getParams() {
-		// called when the OK button is pressed. 
-//		OfflineEventDataUnit selEvent = offlineEventListPanel.getSelectedEvent();
-//		if (selEvent != null) {
-//			addClicksToEvent(selEvent, false);
-//			return true;
-//		}
 		return true;
 	}
 
 	@Override
 	public void restoreDefaultSettings() {
-		// TODO Auto-generated method stub
 
 	}
 	
@@ -281,6 +396,9 @@ public class EventListDialog extends PamDialog {
 	private void modelChanged(int changeType) {
 		if (changeType == PamController.OFFLINE_DATA_LOADED) {
 			offlineEventListPanel.tableDataChanged();
+			for (DetectionGroupTablePanel tablePanel : groupTablePanels) {
+				tablePanel.updateTableData();
+			}
 		}
 		
 	}

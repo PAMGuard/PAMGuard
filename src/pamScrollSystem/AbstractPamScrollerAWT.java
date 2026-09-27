@@ -1,7 +1,6 @@
 package pamScrollSystem;
 
 import java.awt.Adjustable;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -16,7 +15,6 @@ import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -24,9 +22,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
+
 import PamView.PamMenuParts;
 import PamView.PamSymbol;
-import PamView.PamSymbolType;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
+import PamView.component.PamSettingsIconButton;
 
 abstract public class AbstractPamScrollerAWT extends AbstractPamScroller implements Serializable {
 
@@ -48,8 +54,21 @@ abstract public class AbstractPamScrollerAWT extends AbstractPamScroller impleme
 	
 	private Icon playIcon, stopIcon;
 
-	Color iconLine = Color.BLUE;
-	Color iconFill = Color.BLUE;
+	/**
+	 * Size of the glyphs in the scroller buttons. These used to be 12 pixel
+	 * {@link PamSymbol} triangles in a fixed blue and dark grey, which stayed dark
+	 * however the colour scheme was set. They are now Ikonli icons drawn through
+	 * {@link PamFontIcon}: the paging buttons keep their blue through
+	 * {@link IconColour#ACCENT}, which follows the scheme, and the rest take the
+	 * colour of the button they sit on.
+	 */
+	private static final int ICON_SIZE = PamSettingsIconButton.NORMAL_SIZE;
+
+	/**
+	 * Icon size the buttons themselves are sized from, which is deliberately
+	 * smaller than {@link #ICON_SIZE} - see {@link #buttonSize()}.
+	 */
+	private static final int BUTTON_ICON_SIZE = 16;
 
 	private int orientation;
 	
@@ -83,31 +102,23 @@ abstract public class AbstractPamScrollerAWT extends AbstractPamScroller impleme
 		//		pageForward = new JButton("", new ImageIcon(ClassLoader
 		//				.getSystemResource("Resources/doubleForwardArrow.png")));
 		if (hasMenu) {
-			PamSymbol ps;
-			pageForward = new JButton("", ps = new PamSymbol(PamSymbolType.SYMBOL_DOUBLETRIANGLER, 12, 12, true, 
-					iconFill, iconLine));
-			ps.setIconHorizontalAlignment(PamSymbol.ICON_HORIZONTAL_CENTRE);
+			pageForward = new JButton("", PamFontIcon.of(MaterialDesignF.FAST_FORWARD, ICON_SIZE, IconColour.ACCENT));
 			//		pageForward = new JButton(new Character('\u21F0').toString());
 			pageForward.addActionListener(new PageForwardAction());
 			pageForward.setToolTipText("Move loaded data forward");
 
-			pageBack = new JButton("", ps = new PamSymbol(PamSymbolType.SYMBOL_DOUBLETRIANGLEL, 12, 12, true, 
-					iconFill, iconLine));
-			ps.setIconHorizontalAlignment(PamSymbol.ICON_HORIZONTAL_CENTRE);
+			pageBack = new JButton("", PamFontIcon.of(MaterialDesignR.REWIND, ICON_SIZE, IconColour.ACCENT));
 			//		pageBack = new JButton(new Character('\u21e6').toString());
 			pageBack.addActionListener(new PageBackAction());
 			pageBack.setToolTipText("Move loaded data back");
 
-			Dimension d = pageBack.getMaximumSize();
-			d.width = d.height;
+			Dimension d = buttonSize();
 			//		pageBack.setMinimumSize(d);
 			pageForward.setPreferredSize(d);
 			pageBack.setPreferredSize(d);
 
 			//			Character c = '\u21b7';
-			showMenu = new JButton("", ps = new PamSymbol(PamSymbolType.SYMBOL_TRIANGLED, 12, 12, true, 
-					Color.DARK_GRAY, Color.DARK_GRAY));
-			ps.setIconHorizontalAlignment(PamSymbol.ICON_HORIZONTAL_CENTRE);
+			showMenu = new JButton("", PamFontIcon.of(MaterialDesignM.MENU_DOWN, ICON_SIZE));
 			showMenu.setToolTipText("<html>Scroll and data loading options: "+
 			"Left click for scroll time, Right for other options</html>");
 			showMenu.addActionListener(new ShowMenuButtonPress());
@@ -115,8 +126,8 @@ abstract public class AbstractPamScrollerAWT extends AbstractPamScroller impleme
 			showMenu.setPreferredSize(d);
 			
 			if (hasPlayback) {
-				playIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/playStart.png"));
-				stopIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/playbackStop.png"));
+				playIcon = PamFontIcon.of(MaterialDesignP.PLAY, ICON_SIZE);
+				stopIcon = PamFontIcon.of(MaterialDesignS.STOP, ICON_SIZE);
 				playbackButton = new JButton("",playIcon);
 				playbackButton.setToolTipText("Play scroller (right click for play speed)");
 				playbackButton.addActionListener(new PlayButton());
@@ -142,6 +153,25 @@ abstract public class AbstractPamScrollerAWT extends AbstractPamScroller impleme
 		
 	}
 	
+	/**
+	 * The square that every button in the scroller strip is set to.
+	 * <p>
+	 * MaterialDesign glyphs carry a good deal of padding inside their em square, so
+	 * an icon big enough to have the same visual weight as the 12 pixel symbols
+	 * these buttons used to hold would, if the buttons were sized from it, make the
+	 * whole strip taller than the displays have always been laid out around. Size
+	 * the buttons from a smaller icon instead and let the glyph sit slightly proud
+	 * of the button's content box - it still has room to draw, since the ink is only
+	 * about half the em square.
+	 *
+	 * @return the square to give each of the scroller buttons.
+	 */
+	private static Dimension buttonSize() {
+		Dimension d = new JButton("", PamFontIcon.of(MaterialDesignR.REWIND, BUTTON_ICON_SIZE)).getMaximumSize();
+		d.width = d.height;
+		return d;
+	}
+
 	/**
 	 * Add a component to the scrollers mouse wheel listener. 
 	 * All mouse wheel actions over that component will then be sent 

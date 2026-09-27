@@ -52,8 +52,8 @@ import difar.demux.NativeDemux;
 import difar.display.DIFARUnitControlPanel;
 import difar.display.DifarOverlayGraphics;
 import generalDatabase.lookupTables.LookupItem;
-import targetMotionModule.TargetMotionResult;
-import targetMotionModule.algorithms.Simplex2D;
+import difar.targetmotion.TargetMotionResult;
+import difar.targetmotion.Simplex2D;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 
@@ -1323,7 +1323,7 @@ public class DifarProcess extends PamProcess {
 		
 
 		if (simplex2D == null) {
-			simplex2D = new Simplex2D(null);
+			simplex2D = new Simplex2D();
 		}
 		DIFARTargetMotionInformation tmi = new DIFARTargetMotionInformation(this, detectionList);
 		simplex2D.setStartPoint(tmi.getMeanPosition());

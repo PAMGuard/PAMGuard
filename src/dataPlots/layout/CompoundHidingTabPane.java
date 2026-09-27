@@ -7,17 +7,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamButtonAlpha;
 import PamView.dialog.PamDialog;
 import PamView.hidingpanel.TabbedHidingPane;
 import PamView.panel.PamPanel;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 
 /**
  * 
@@ -32,7 +32,11 @@ public class CompoundHidingTabPane extends TabbedHidingPane{
 //	public static final ImageIcon settingsImage=new ImageIcon(ClassLoader
 //			.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
 	
-	public static final FontIcon settingsImage =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
+	/*
+	 * Sits on the translucent tab strip which overlays the display, so it stays
+	 * light whatever the colour scheme.
+	 */
+	public static final PamFontIcon settingsImage = PamFontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, IconColour.ALPHA_PANEL);
 
 
 	

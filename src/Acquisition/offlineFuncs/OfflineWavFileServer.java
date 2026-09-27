@@ -30,12 +30,15 @@ import PamUtils.worker.filelist.WavFileType;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import clickDetector.WindowsFile;
+import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.filemaps.FileDataMapPoint;
 import dataMap.filemaps.FileMapProgress;
 import dataMap.filemaps.FileSubSection;
 import dataMap.filemaps.OfflineFileParameters;
 import dataMap.filemaps.OfflineFileServer;
+import dataMap.filemaps.SoundFileDatagramManager;
+import dataMap.filemaps.WaveformDatagramProvider;
 import pamScrollSystem.ViewLoadObserver;
 import pamguard.CommandLine;
 import wavFiles.ByteConverter;
@@ -74,6 +77,30 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 
 	public FileDate getFileDate() {
 		return fileDate;
+	}
+
+	/**
+	 * Sound files can show a waveform summary on the data map instead of the usual flat
+	 * effort bar. This is only set up for the Acquisition module's file server: the
+	 * decimator and the DIFAR beamformer also create OfflineWavFileServers, and since
+	 * every one of them saves its map into the same serialisedSoundFileMap.data in the
+	 * sound folder they'd end up reading back each other's datagrams.
+	 */
+	@Override
+	protected DatagramManager createDatagramManager() {
+		if (getOfflineRawDataStore() instanceof AcquisitionControl == false) {
+			return null;
+		}
+		AcquisitionControl daqControl = (AcquisitionControl) getOfflineRawDataStore();
+		if (daqControl.isViewer() == false) {
+			return null;
+		}
+		PamDataBlock rawDataBlock = getRawDataBlock();
+		if (rawDataBlock == null) {
+			return null;
+		}
+		rawDataBlock.setDatagramProvider(new WaveformDatagramProvider());
+		return new SoundFileDatagramManager(this, "Sound Files " + daqControl.getUnitName());
 	}
 
 	@Override

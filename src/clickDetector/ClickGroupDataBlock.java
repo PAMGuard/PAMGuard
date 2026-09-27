@@ -1,6 +1,6 @@
 package clickDetector;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.PamProcess;
 
@@ -16,7 +16,7 @@ import PamguardMVC.PamProcess;
  * @author Doug Gillespie
  *
  */
-public class ClickGroupDataBlock<t extends GroupDetection> extends AcousticDataBlock<t> {
+public class ClickGroupDataBlock<t extends DetectionGroup> extends AcousticDataBlock<t> {
 
 	public ClickGroupDataBlock(Class pduClass, String dataName, PamProcess parentProcess, int channelMap) {
 		super(pduClass, dataName, parentProcess, channelMap);
@@ -27,7 +27,8 @@ public class ClickGroupDataBlock<t extends GroupDetection> extends AcousticDataB
 		int unitsRemoved = 0;
 		if (pamDataUnits.isEmpty())
 			return 0;
-		GroupDetection clickTrain;
+		DetectionGroup clickTrain;
+
 		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		

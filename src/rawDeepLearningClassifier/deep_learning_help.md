@@ -10,9 +10,7 @@ PAMGuard's deep learning module allows users to deploy a large variety of deep l
 
 The deep learning module accepts raw data from different types of data sources, e.g. from the Sound Acquisition module, clicks and clips. It segments data into equal sized chunks with a specified overlap. Each chunk is passed through a set of transforms which convert the data into a format which is accepted by the specified deep learning model. These transforms are either manually set up by the user or, if a specific type of framework has been used to train a deep learning model, then can be automatically set up by PAMGuard. Currently there are three implemented frameworks
 
-<p align="center">
-  <img width="900" height="360" src = "resources/deep_learning_module_process.png">
-</p>
+![](resources/deep_learning_module_process.png)
 
 _A diagram of how the deep learning module works in PAMGuard. An input waveform is segmented into chunks. A series of transforms are applied to each chunk creating the input for the deep learning model. The transformed chunks are sent to the model. The results from the model are saved and can be viewed in real time (e.g. mitigation) or in post processing (e.g. data from SoundTraps)._
 
@@ -44,9 +42,7 @@ The module can be added from the _File>  Add modules > Classifier > Raw deep lea
 
 The module settings are opened by selecting the  _Settings > Raw deep learning classifier_ menu. The main settings pane is shown below and is split into three sections, _Raw Sound Data_, _Segmentation_ and _Deep Learning Model_
 
-<p align="center">
-  <img width="700" height="630" src = "resources/deep_leanring_module_help.png">
-</p>
+![](resources/deep_leanring_module_help.png)
 
 _The main settings pane for the deep learning module with descriptions_
 
@@ -78,17 +74,13 @@ Once the model has loaded there some unique options depending on the currently s
 
 A generic model must be set up via the _Advanced_ menu button. 
 
-<p align="center">
-  <img width="700" height="700" src = "resources/advanced_settings_generic_1.png">
-</p>
+![](resources/advanced_settings_generic_1.png)
 
 _Before a sound segment can be classified it must be converted into a format suitable for the deep learning model. This is achieved by a list of *transforms* which convert a raw sound data into an appropriate format. Usually this involves converting to a spectrogram image and then performing a series of noise reductions and interpolation step. For the generic model users either have to manually add transforms and input the correct settings for each, or load a transforms *.pgtr setting file_
 
 The _Model Transforms_ tab in the advanced menu pane allows a user to set up a set of transforms. The _Add transfrom_ + button adds a transforms and these can be dragged in order using the drag handles on the left of each transform. Each transform has it's own settings pane which can be expanded to show transform specific settings. The bottom of the advanced settings pane shows a preview of the data that will be input into the deep learning model, including the shape of the input data e.g. a 100x50 image. 
 
-<p align="center">
-  <img width="700" height="700" src = "resources/advanced_settings_generic_2.png">
-</p>
+![](resources/advanced_settings_generic_2.png)
 
 _The Model Settings tab allows the model inputs and outputs to be defined_
 
@@ -100,9 +92,7 @@ The import and export buttons on the bottom of the advanced settings pane can be
 
 If using a deep learning model from a supported framework then all transforms are automatically set up. The transforms can be viewed and altered via the Advanced menu button but in the majority of cases these settings should not be used. For some models, it is advisable to select "Use default segment length" to change the _Window length_ to the default for the selected model. 
 
-<p align="center">
-  <img width="700" height="700" src = "resources/advanced_settings_animalspot_1.png">
-</p>
+![](resources/advanced_settings_animalspot_1.png)
 
 _An AnimalSpot, Ketos or other supported deep learning model will automatically create a list of transforms with the appropriate settings. These is no need to use the advanced pane but it is there in case users wish to change transform settings for some reason_
 
@@ -110,9 +100,7 @@ _An AnimalSpot, Ketos or other supported deep learning model will automatically 
 
 Example models are selectable from the menu button in the Deep Learning Pane. Default models are deep learning classifiers which are open source, known to be effective and have have been published in open access academic litrature; they are downloaded directly from a GitHub repository and then all associated settings are automtically applied. The default model selection pane also contains hyperlinks to the papers descirbing each model which will take users directly to the relvent website. 
 
-<p align="center">
-  <img width="550" height="700" src = "resources/default_settings_humpback_1.png">
-</p>
+![](resources/default_settings_humpback_1.png)
 
 _Example models can be downloaded. Example models are models which are published, open and have been known to work well amongst the bioacoustics community. More will be added to PAMGaurd over time. If you you would like your model to become a defualt model then drop PAMGuard support an email._
 
@@ -136,9 +124,7 @@ Detections form continuous raw data are shown in the datagram in the same way as
 
 The Time base display FX is best way to view detailed data outputs from the deep learning algorithm. The time base display can display almost all data types in PAMGuard on a large variety of different data axis. For example, click detections can be displayed on an amplitude, bearing, ICI, waveform and/or frequency axis. Deep learning detections (i.e. data units which have been saved from raw data using the deep learning detector) can be displayed on the time base display in the same way as many other detections and in addition, there is a symbol manager options which allows the deep learning detections or other detections which have been classified by the deep learning module to be coloured by prediction class. This means that a manual analyst can quickly navigate to detections with high prediction values for a certain class. Hovering over or right clicking on a data unit in the time display and selecting the information button, will show the data unit’s metadata, including the prediction values for all output classes from the deep learning model. 
 
-<p align="center">
-  <img src = "resources/bat_time_base_display.png">
-</p>
+![](resources/bat_time_base_display.png)
 
 _An example click detection module output coloured by deep learning annotations. Click detections are annotated with the results from the deep learning module. The symbol manager in the time base display can be used to colour the clicks by the prediction for a selected class_
 
@@ -148,9 +134,7 @@ Other displays also show outputs from the deep learning module. Hovering over da
 
 The deep learning classifier has a symbol manager that is used throughtout different PAMGuard displays. The symbol manager can either display deep learning detections by the prediction values of a particular class or colour the output class with the highest prediciton class. Colouring by a prediction value requires the user to select which output class they wish to display - all detections are then coloured by the output prediction values for that particular class via a selectable colour map. If colour by class is selected then each detection is coloured by the class with the maximum prediction value. The colours for each class are selectable. 
 
-<p align="center">
-  <img width="429" height="150" src = "resources/deep_learning_symbol_manager.png">
-</p>
+![](resources/deep_learning_symbol_manager.png)
 
 _The options for the deep learning symbol manager_
 
@@ -158,9 +142,7 @@ _The options for the deep learning symbol manager_
 
 The deep learning classifier has a data selector which is utilsied thorughout PAMGuard (for example for exporting detections, generating clips, showing on displays). The data selector allows users to filter detections based on a minimum prediciton values for different output classes. Classifiers with multiple classes can have different minimum predicitons values assigned to each class. The user interface allows user to use a slider to dynimically change the minimum prediciton value. The lock button clamps the minimum prediction values of all enabled output classes together.
 
-<p align="center">
-  <img width="190" height="170" src = "resources/deep_learning_data_selector.png">
-</p>
+![](resources/deep_learning_data_selector.png)
 
 _The options for the deep learning data selector_
 
@@ -227,9 +209,7 @@ for i=1:length(dldetections)
     end
 ```
 
-<p align="center">
-  <img width="800" height="700" src = "resources/right_whale_detection_MATLAB.png">
-</p>
+![](resources/right_whale_detection_MATLAB.png)
 
 _Right whale detections from a deep learning model imported and then plotted in MATLAB_
 

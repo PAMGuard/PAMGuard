@@ -50,7 +50,7 @@ import warnings.PamWarning;
 public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
-	public static double MAX_WIDTH = 270; 
+	public static double MAX_WIDTH = 330; 
 
 	/**
 	 * The source for the FFT data source.  
@@ -150,7 +150,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		//bit messy but have to set different sizes for FX and Swing due to differences in how they handle sizing.
 		if (!PamGUIManager.isFX()){
-			mainPane.setMinHeight(430);
+			mainPane.setMinHeight(460);
 			mainPane.setMaxWidth(MAX_WIDTH);
 			mainPane.setPrefWidth(MAX_WIDTH);
 		}
@@ -250,6 +250,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		//button to set default hop size
 		Button defaultButton = new Button();
+		defaultButton.getStyleClass().add("icon-button");
 		//		defaultButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.REFRESH, PamGuiManagerFX.iconSize-3));
 		defaultButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
 		defaultButton.setTooltip(new Tooltip("Set default hop size"));
@@ -320,6 +321,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			enableControls(); 
 		});
 		dataSelectorButton = new PamButton();
+		dataSelectorButton.getStyleClass().add("icon-button");
 		//		dataSelectorButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		dataSelectorButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		dataSelectorButton.setOnAction((action)->{
@@ -707,6 +709,11 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	@Override
 	public String getName() {
 		return "Raw Deep Learning Parameters";
+	}
+
+	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("deep_learning_classifier.md");
 	}
 
 

@@ -49,8 +49,9 @@ public class CPODClickTrainLogging extends SuperDetLogging {
 	public void setTableData(SQLTypes sqlTypes, PamDataUnit pamDataUnit) {
 		CPODClickTrainDataUnit ctDataUnit = (CPODClickTrainDataUnit) pamDataUnit;
 		if (ctDataUnit.getSubDetectionsCount()>0) {
+			cpodFileID.setValue(ctDataUnit.getClickTrainID());
 			species.setValue(ctDataUnit.getSpecies().toString());
-			quality.setValue(ctDataUnit.getConfidence());
+			quality.setValue((int) ctDataUnit.getConfidence());
 			isEcho.setValue(ctDataUnit.isEcho());
 
 		}
@@ -67,9 +68,9 @@ public class CPODClickTrainLogging extends SuperDetLogging {
 		
 		CPODSpeciesType speciesType = CPODUtils.getSpecies(speciesStr);
 		
-		classification.clicktrainID = cpodFileID.getIntegerValue();
 		classification.species = speciesType;
 		classification.clicktrainID = cpodFileID.getIntegerValue();
+		classification.qualitylevel = (short) quality.getIntegerValue();
 		classification.isEcho = isEcho.getBooleanValue();
 
 		CPODClickTrainDataUnit dataUnit = new CPODClickTrainDataUnit(timeMilliseconds, null, classification);

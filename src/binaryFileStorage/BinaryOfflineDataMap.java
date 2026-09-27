@@ -42,7 +42,7 @@ public class BinaryOfflineDataMap extends OfflineDataMap<BinaryOfflineDataMapPoi
 	 * @param dataEnd end time in milliseconds
 	 * @return Array list of map points
 	 */
-	protected ArrayList<BinaryOfflineDataMapPoint> getFileList(long dataStart, long dataEnd) {
+	public ArrayList<BinaryOfflineDataMapPoint> getFileList(long dataStart, long dataEnd) {
 		ArrayList<BinaryOfflineDataMapPoint> fileList = new ArrayList<BinaryOfflineDataMapPoint>();
 		Iterator<BinaryOfflineDataMapPoint> list = getListIterator();
 		BinaryOfflineDataMapPoint aMapPoint;

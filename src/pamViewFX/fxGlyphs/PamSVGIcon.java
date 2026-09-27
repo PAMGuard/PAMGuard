@@ -95,26 +95,22 @@ public class PamSVGIcon {
 			try {
 				SVGPath shape = new SVGPath();
 				shape.setFillRule(FillRule.NON_ZERO);
-				NamedNodeMap map = svgPaths.item(i).getAttributes();
+				org.w3c.dom.Node node = svgPaths.item(i);
+				NamedNodeMap map = node.getAttributes();
 
-//				System.out.println("Attributes: "  + map.getLength()); 
-//				for (int ii=0; ii<map.getLength(); ii++) {
-//					System.out.println(map.item(ii).getNodeName() +  "  " + map.item(ii).getFirstChild().getNodeValue());
-//				}
+				// Get path data - either directly from 'd' attribute or by converting shape elements
+				String pathData = getPathData(node);
+				if (pathData == null || pathData.isEmpty()) {
+					continue;
+				}
 
-				shape.setContent(map.getNamedItem("d").getTextContent());
+				shape.setContent(pathData);
 
-				//get the fx style form the svg data. 
-				String style = convertShapeStyle(map); 
+				//get the fx style from the svg data. 
+				String style = convertShapeStyle(node); 
 
 				shape.setStyle(style);
 
-				//				if(map.getNamedItem("style") != null) {
-				//					shape.setStyle(convertStyle(map.getNamedItem("style").getTextContent()));
-				//				} else {
-				//					shape.setStyle("-fx-fill: red;" + "-fx-stroke-width: " + lineWidth + ";-fx-stroke: "+col);
-				////					shape.setStyle("-fx-fill: "+col+"-fx-stroke: "+col);
-				//				}
 				shapes.add(shape);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -131,48 +127,219 @@ public class PamSVGIcon {
 		return new PamSVGIcon(shapesPaths, textStyle, margin, path);
 	}
 
-	
-	/*
-	 * Convert SVG properties to an fx css style. 
+	/**
+	 * Get the path data string for an SVG node. For path elements, this is
+	 * simply the 'd' attribute. For other shape elements (line, rect, circle,
+	 * ellipse, polygon, polyline), the geometry is converted to an equivalent
+	 * path data string.
+	 *
+	 * @param node the SVG DOM node
+	 * @return the path data string, or null if conversion is not possible
 	 */
-	private String convertShapeStyle(NamedNodeMap map) {
+	private String getPathData(org.w3c.dom.Node node) {
+		NamedNodeMap map = node.getAttributes();
+		String nodeName = node.getNodeName();
 
-		//Example of attributes map in SVG. 
-		//		fill  none
-		//		opacity  1
-		//		stroke  #000000
-		//		stroke-linecap  round
-		//		stroke-linejoin  round
-		//		stroke-width  2.0144
+		switch (nodeName) {
+		case "path":
+			if (map.getNamedItem("d") != null) {
+				return map.getNamedItem("d").getTextContent();
+			}
+			return null;
 
-		//"-fx-fill: red;" + "-fx-stroke-width: " + lineWidth + ";-fx-stroke: "+col
+		case "line": {
+			double x1 = getDoubleAttr(map, "x1", 0);
+			double y1 = getDoubleAttr(map, "y1", 0);
+			double x2 = getDoubleAttr(map, "x2", 0);
+			double y2 = getDoubleAttr(map, "y2", 0);
+			return "M" + x1 + "," + y1 + " L" + x2 + "," + y2;
+		}
 
-		String style = "";
-
-		for (int ii=0; ii<map.getLength(); ii++) {
-			String col;
-			//System.out.println(map.item(ii).getNodeName() +  "  " + map.item(ii).getFirstChild().getNodeValue());
-			switch (map.item(ii).getNodeName()) {
-			
-			case "fill":
-				col = map.item(ii).getFirstChild().getNodeValue();
-				style += "-fx-fill: " + col+";";
-				break;
-			case "stroke":
-				col = map.item(ii).getFirstChild().getNodeValue();
-				style += ("-fx-stroke: " + col+";");
-				break;
-			case "stroke-linecap":
-				style += "-fx-stroke-line-cap: "+map.item(ii).getFirstChild().getNodeValue()+";";
-				break;
-			case "stroke-width":
-				style += ("-fx-stroke-width: " +  map.item(ii).getFirstChild().getNodeValue()+";");
-				break;
-
+		case "rect": {
+			double x = getDoubleAttr(map, "x", 0);
+			double y = getDoubleAttr(map, "y", 0);
+			double w = getDoubleAttr(map, "width", 0);
+			double h = getDoubleAttr(map, "height", 0);
+			double rx = getDoubleAttr(map, "rx", 0);
+			double ry = getDoubleAttr(map, "ry", 0);
+			if (map.getNamedItem("rx") != null && map.getNamedItem("ry") == null) ry = rx;
+			if (map.getNamedItem("ry") != null && map.getNamedItem("rx") == null) rx = ry;
+			if (rx == 0 && ry == 0) {
+				return "M" + x + "," + y
+						+ " L" + (x + w) + "," + y
+						+ " L" + (x + w) + "," + (y + h)
+						+ " L" + x + "," + (y + h) + " Z";
+			} else {
+				rx = Math.min(rx, w / 2);
+				ry = Math.min(ry, h / 2);
+				return "M" + (x + rx) + "," + y
+						+ " L" + (x + w - rx) + "," + y
+						+ " A" + rx + "," + ry + " 0 0 1 " + (x + w) + "," + (y + ry)
+						+ " L" + (x + w) + "," + (y + h - ry)
+						+ " A" + rx + "," + ry + " 0 0 1 " + (x + w - rx) + "," + (y + h)
+						+ " L" + (x + rx) + "," + (y + h)
+						+ " A" + rx + "," + ry + " 0 0 1 " + x + "," + (y + h - ry)
+						+ " L" + x + "," + (y + ry)
+						+ " A" + rx + "," + ry + " 0 0 1 " + (x + rx) + "," + y + " Z";
 			}
 		}
 
-		return style;
+		case "circle": {
+			double cx = getDoubleAttr(map, "cx", 0);
+			double cy = getDoubleAttr(map, "cy", 0);
+			double r = getDoubleAttr(map, "r", 0);
+			return "M" + (cx - r) + "," + cy
+					+ " A" + r + "," + r + " 0 1 0 " + (cx + r) + "," + cy
+					+ " A" + r + "," + r + " 0 1 0 " + (cx - r) + "," + cy + " Z";
+		}
+
+		case "ellipse": {
+			double cx = getDoubleAttr(map, "cx", 0);
+			double cy = getDoubleAttr(map, "cy", 0);
+			double rx = getDoubleAttr(map, "rx", 0);
+			double ry = getDoubleAttr(map, "ry", 0);
+			return "M" + (cx - rx) + "," + cy
+					+ " A" + rx + "," + ry + " 0 1 0 " + (cx + rx) + "," + cy
+					+ " A" + rx + "," + ry + " 0 1 0 " + (cx - rx) + "," + cy + " Z";
+		}
+
+		case "polygon":
+		case "polyline": {
+			if (map.getNamedItem("points") == null) return null;
+			String points = map.getNamedItem("points").getTextContent().trim();
+			String[] coords = points.split("[\\s,]+");
+			if (coords.length < 2) return null;
+			StringBuilder sb = new StringBuilder();
+			sb.append("M").append(coords[0]).append(",").append(coords[1]);
+			for (int j = 2; j + 1 < coords.length; j += 2) {
+				sb.append(" L").append(coords[j]).append(",").append(coords[j + 1]);
+			}
+			if ("polygon".equals(nodeName)) {
+				sb.append(" Z");
+			}
+			return sb.toString();
+		}
+
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * Get a double attribute value from an SVG element's attribute map.
+	 * @param map the attribute map
+	 * @param name the attribute name
+	 * @param defaultVal the default value if the attribute is not present
+	 * @return the double value
+	 */
+	private double getDoubleAttr(NamedNodeMap map, String name, double defaultVal) {
+		if (map.getNamedItem(name) == null) return defaultVal;
+		try {
+			return Double.parseDouble(map.getNamedItem(name).getTextContent());
+		} catch (NumberFormatException e) {
+			return defaultVal;
+		}
+	}
+
+	/*
+	 * Convert SVG properties to an fx css style. Resolves attribute values 
+	 * by checking the element's own attributes first, then any inline CSS 
+	 * style attribute, then inherited attributes from parent elements.
+	 */
+	private String convertShapeStyle(org.w3c.dom.Node node) {
+
+		// The SVG presentation attributes we care about
+		String[] svgAttrs = {"fill", "stroke", "stroke-width", "stroke-linecap"};
+
+		// Collect effective values: element attributes override inline style,
+		// which overrides inherited parent attributes
+		java.util.Map<String, String> resolved = new java.util.LinkedHashMap<>();
+
+		for (String attr : svgAttrs) {
+			String value = resolveAttribute(node, attr);
+			if (value != null) {
+				resolved.put(attr, value);
+			}
+		}
+
+		// Build the JavaFX CSS style string
+		StringBuilder style = new StringBuilder();
+		for (java.util.Map.Entry<String, String> entry : resolved.entrySet()) {
+			switch (entry.getKey()) {
+			case "fill":
+				style.append("-fx-fill: ").append(entry.getValue()).append(";");
+				break;
+			case "stroke":
+				style.append("-fx-stroke: ").append(entry.getValue()).append(";");
+				break;
+			case "stroke-linecap":
+				style.append("-fx-stroke-line-cap: ").append(entry.getValue()).append(";");
+				break;
+			case "stroke-width":
+				style.append("-fx-stroke-width: ").append(entry.getValue()).append(";");
+				break;
+			}
+		}
+
+		return style.toString();
+	}
+
+	/**
+	 * Resolve an SVG presentation attribute value for a node. Checks (in order):
+	 * 1. Direct XML attribute on the element
+	 * 2. Inline CSS style attribute on the element
+	 * 3. Inherited from ancestor elements (walking up the DOM tree)
+	 *
+	 * @param node the SVG DOM node
+	 * @param attrName the SVG attribute name (e.g. "fill", "stroke")
+	 * @return the resolved value, or null if not found anywhere
+	 */
+	private String resolveAttribute(org.w3c.dom.Node node, String attrName) {
+		org.w3c.dom.Node current = node;
+		while (current != null && current.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+			NamedNodeMap attrs = current.getAttributes();
+			if (attrs != null) {
+				// Check direct XML attribute (only on the element itself, not parents, 
+				// unless not found on the element)
+				org.w3c.dom.Node attrNode = attrs.getNamedItem(attrName);
+				if (attrNode != null) {
+					return attrNode.getTextContent();
+				}
+				// Check inline style attribute
+				org.w3c.dom.Node styleNode = attrs.getNamedItem("style");
+				if (styleNode != null) {
+					String val = getStyleProperty(styleNode.getTextContent(), attrName);
+					if (val != null) {
+						return val;
+					}
+				}
+			}
+			// Walk up to the parent to check for inherited attributes
+			current = current.getParentNode();
+		}
+		return null;
+	}
+
+	/**
+	 * Extract a property value from an inline CSS style string.
+	 * @param styleStr the CSS style string, e.g. "fill:none;stroke-width:2.5"
+	 * @param property the property name to look for
+	 * @return the value, or null if not found
+	 */
+	private String getStyleProperty(String styleStr, String property) {
+		if (styleStr == null || styleStr.isEmpty()) return null;
+		String[] parts = styleStr.split(";");
+		for (String part : parts) {
+			part = part.trim();
+			if (part.isEmpty()) continue;
+			int colonIdx = part.indexOf(':');
+			if (colonIdx < 0) continue;
+			String name = part.substring(0, colonIdx).trim();
+			if (name.equals(property)) {
+				return part.substring(colonIdx + 1).trim();
+			}
+		}
+		return null;
 	}
 
 	//	/**
@@ -247,7 +414,7 @@ public class PamSVGIcon {
 		xpf = XPathFactory.newInstance();
 		xpath = xpf.newXPath();
 		try {
-			expression = xpath.compile("//path");
+			expression = xpath.compile("//path|//line|//rect|//circle|//ellipse|//polygon|//polyline");
 		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

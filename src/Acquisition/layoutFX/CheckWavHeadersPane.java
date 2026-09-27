@@ -118,6 +118,7 @@ public class CheckWavHeadersPane extends PamBorderPane {
 		pamHBox.setSpacing(5);
 		
 		runButton = new PamButton();
+		runButton.getStyleClass().add("icon-button");
 		runButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play"));
 		runButton.setOnAction((action)->{
 			checkFiles();

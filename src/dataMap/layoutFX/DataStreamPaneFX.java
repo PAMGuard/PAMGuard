@@ -4,8 +4,6 @@ import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import binaryFileStorage.BinaryOfflineDataMap;
-import binaryFileStorage.BinaryStore;
 import dataGram.DatagramImageData;
 import dataGram.DatagramManager;
 import dataGram.DatagramProvider;
@@ -14,6 +12,7 @@ import dataMap.DataMapControl;
 import dataMap.DataMapDrawing;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
+import dataMap.filemaps.SoundFileDatagramManager;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -23,10 +22,18 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.PixelBuffer;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -35,9 +42,11 @@ import javafx.util.Duration;
 import PamController.OfflineDataStore;
 import PamController.PamController;
 import PamUtils.PamCalendar;
+import PamView.PamColors;
 import PamguardMVC.PamDataBlock;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
@@ -92,6 +101,17 @@ public class DataStreamPaneFX extends PamBorderPane {
 	private double[] minMaxVal;
 
 	private boolean showDatagram = true;
+
+	/**
+	 * Minimum separation in pixels between drawn file boundary lines.
+	 */
+	private static final double MIN_FILE_BOUND_SEPARATION = 3;
+
+	/**
+	 * Colour of the file boundary lines. Semi transparent so that it reads over both the
+	 * rainbow of a 3D datagram and the plain background of a 2D one.
+	 */
+	private static final Color FILE_BOUNDS_COLOUR = Color.rgb(0, 0, 0, 0.47);
 
 	private boolean showDataCounts = false;
 	
@@ -184,6 +204,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		pane.setCenter(topPane);
 		
 		showButton = new PamButton();
+		showButton.getStyleClass().add("icon-button");
 		showButton.setStyle("-fx-padding: 0 10 0 10; -fx-border-radius: 0 0 0 0; -fx-background-radius: 0 0 0 0;");
 		showButton.setOnAction((action)->{
 			this.setCollapsed(!this.isCollapsed()); 
@@ -341,7 +362,15 @@ public class DataStreamPaneFX extends PamBorderPane {
 				paintDrawCanvas(drawCanvas.getGraphicsContext2D());
 			});
 			
+			canvasHolder.setOnContextMenuRequested(e->{
+				showGraphMenu(e);
+			});
+
 			canvasHolder.setOnMousePressed( e->{
+				if (e.getButton() != MouseButton.PRIMARY || e.isPopupTrigger()) {
+					// leave it to the context menu handler.
+					return;
+				}
 				//TEMP
 				//System.out.println("DataStreamPaneFX.DataGraphFX Loading Viewer Data: " + getTimeFromX(e.getX()));
 				dataMapControl.centreDataAt(dataBlock, getTimeFromX(e.getX()));
@@ -438,7 +467,9 @@ public class DataStreamPaneFX extends PamBorderPane {
 			axisPane.getStyleClass().add("pane");
 			axisPane.setOrientation(Orientation.VERTICAL);
 			axisPane.setPrefWidth(DataStreamPaneFX.PREF_AXIS_WIDTH);
-			axisPane.setStrokeColor(Color.BLACK);
+			//null rather than black, so the axis follows the colour scheme and stays
+			//visible in the dark and night schemes.
+			axisPane.setStrokeColor(null);
 			
 			this.setLeft(axisPane);
 			this.setCenter(canvasHolder);
@@ -542,11 +573,14 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private void paintPlotCanvas(GraphicsContext gc){
 			setupAxis();
 			gc.clearRect(0, 0, plotCanvas.getWidth(), plotCanvas.getHeight());
-			if (isHasDatagram() && showDatagram) {
+			if (isHasDatagram() && showDatagram && isDatagramAvailable()) {
 				datagramPaint(gc);
 			}
 			else {
 				standardPaint(gc);
+				if (isShowFileBounds()) {
+					drawFileBounds(gc, dataBlock.getDatagrammedMap());
+				}
 			}
 		}
 		
@@ -577,6 +611,57 @@ public class DataStreamPaneFX extends PamBorderPane {
 			else {
 				datagramPaint2D(g);
 			}
+			if (isShowFileBounds()) {
+				drawFileBounds(g, dataBlock.getDatagrammedMap());
+			}
+		}
+
+		/**
+		 * Draw a vertical line at the start and end of every data map point, which for
+		 * sound files means a line at every file boundary so that it's easy to see how
+		 * long the files are.
+		 * <p>
+		 * Lines are dropped when the map points get closer together than a few pixels,
+		 * otherwise a zoomed out view of a few thousand short files is just a solid block
+		 * of lines.
+		 * 
+		 * @param g graphics context
+		 * @param offlineDataMap map to take the boundaries from. May be null.
+		 */
+		private void drawFileBounds(GraphicsContext g, OfflineDataMap offlineDataMap) {
+			if (offlineDataMap == null) {
+				return;
+			}
+			double h = getHeight();
+			g.setStroke(FILE_BOUNDS_COLOUR);
+			g.setLineWidth(1);
+			synchronized (offlineDataMap) {
+				long startMillis = scrollingDataPanel.getScreenStartMillis();
+				long endMillis = scrollingDataPanel.getScreenEndMillis();
+				Iterator<OfflineDataMapPoint> iterator = offlineDataMap.getListIterator();
+				double lastDrawnX = -MIN_FILE_BOUND_SEPARATION;
+				while (iterator.hasNext()) {
+					OfflineDataMapPoint mapPoint = iterator.next();
+					long pointStart = mapPoint.getStartTime();
+					long pointEnd = mapPoint.getEndTime();
+					if (pointEnd < startMillis) {
+						continue;
+					}
+					if (pointStart > endMillis) {
+						break;
+					}
+					double x1 = (int) ((pointStart - startMillis) * pixelsPerMilli);
+					double x2 = (int) ((pointEnd - startMillis) * pixelsPerMilli);
+					if (x1 - lastDrawnX >= MIN_FILE_BOUND_SEPARATION) {
+						g.strokeLine(x1, 0, x1, h);
+						lastDrawnX = x1;
+					}
+					if (x2 - lastDrawnX >= MIN_FILE_BOUND_SEPARATION) {
+						g.strokeLine(x2, 0, x2, h);
+						lastDrawnX = x2;
+					}
+				}
+			}
 		}
 		
 		
@@ -585,16 +670,12 @@ public class DataStreamPaneFX extends PamBorderPane {
 			long endMillis = scrollingDataPanel.getScreenEndMillis();
 			endMillis = startMillis + (long) (scrollingDataPanel.getScreenSeconds() * 1000.);
 			double millisPerPixel = 1./pixelsPerMilli;
-			// find a first datagram point and hope that all the rest are the same. 
-			BinaryStore binaryStore = (BinaryStore) PamController.getInstance().findOfflineDataStore(BinaryStore.class);
-			if (binaryStore == null) {
-				return;
-			}
-			BinaryOfflineDataMap binaryDataMap = (BinaryOfflineDataMap) dataBlock.getOfflineDataMap(binaryStore);
-			if (binaryDataMap == null) {
-				return;
-			}
-			DatagramManager datagramManager = binaryStore.getDatagramManager();
+			/*
+			 * This used to look the datagram manager up from the binary store, which meant
+			 * 2D datagrams only worked for data stored in binary files. Sound file
+			 * waveform datagrams come from the OfflineFileServer instead.
+			 */
+			DatagramManager datagramManager = findDatagramManager();
 			if (datagramManager == null) {
 				return;
 			}
@@ -618,16 +699,42 @@ public class DataStreamPaneFX extends PamBorderPane {
 			lastPlotted2DminVal = minMaxValue[0];
 			lastPlotted2DmaxVal = minMaxValue[1];
 			
+			/*
+			 * Work out which time bins are gaps. A bin is a gap if any value is < 0 (the
+			 * -1 "no DatagramDataPoint" marker written by getImageData) or if every value
+			 * is exactly 0 (a DatagramDataPoint that was created but never filled, e.g.
+			 * the interval between two sound files). Without this, every gap draws a spike
+			 * down to zero.
+			 */
+			boolean[] skipBin = new boolean[nTimePoints];
+			for (int ix = 0; ix < nTimePoints; ix++) {
+				boolean anyNegative = false;
+				boolean allZero = true;
+				for (int iy = 0; iy < nAmpPoints; iy++) {
+					if (imageData[ix][iy] < 0) {
+						anyNegative = true;
+						break;
+					}
+					if (imageData[ix][iy] != 0) {
+						allZero = false;
+					}
+				}
+				skipBin[ix] = anyNegative || allZero;
+			}
+
 			double xScale = (double)(x2-x1)/(double)nTimePoints;
 			double yScale = getHeight()/(minMaxValue[1]-minMaxValue[0]);
 			double lastX = -9999., lastY=0, x, y;
 			double h = getHeight();
 			for (int iy = 0; iy < nAmpPoints; iy++) {
-				g.setStroke(Color.BLUE);
-				//g.setStroke(PamColors.getInstance().getWhaleColor(iy+1));
+				g.setStroke(get2DLineColour(iy, nAmpPoints));
 
 				lastX = -9999;
 				for (int ix = 0; ix < nTimePoints; ix++) {
+					if (skipBin[ix]) {
+						lastX = -9999;
+						continue;
+					}
 					x = (int) (xScale * ix) + x1;
 					y = h - (int) (yScale * (imageData[ix][iy]-minMaxValue[0]));
 					if (lastX != -9999.) {
@@ -638,6 +745,20 @@ public class DataStreamPaneFX extends PamBorderPane {
 				}
 			}
 			
+		}
+
+		/**
+		 * Colour for one of the lines in a 2D datagram. All the lines used to be blue,
+		 * which is no use at all when there is more than one of them.
+		 * @param iLine line index
+		 * @param nLines total number of lines
+		 * @return the colour to draw this line in
+		 */
+		private Color get2DLineColour(int iLine, int nLines) {
+			if (nLines <= 1) {
+				return Color.BLUE;
+			}
+			return PamUtilsFX.awtToFXColor(PamColors.getInstance().getWhaleColor(iLine+1));
 		}
 		
 		private synchronized void datagramPaint3D(GraphicsContext g) {
@@ -1192,6 +1313,114 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 
 	/**
+	 * @return true if file boundary lines should be drawn on this stream.
+	 */
+	private boolean isShowFileBounds() {
+		if (isSoundFileStream() == false) {
+			return false;
+		}
+		DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
+		return params == null || params.showFileBoundaries;
+	}
+
+	/**
+	 * @return true if there is actually a datagram to draw. Sound file datagrams are only
+	 * created when the user asks for them, so until then the stream has to fall back on
+	 * the standard effort drawing rather than showing an empty graph.
+	 */
+	private boolean isDatagramAvailable() {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm == null) {
+			return true;
+		}
+		return dgm.hasAnyDatagram(dataBlock);
+	}
+
+	/**
+	 * @return true if this stream is raw sound files, i.e. its datagram comes from a
+	 * SoundFileDatagramManager rather than the binary store.
+	 */
+	private boolean isSoundFileStream() {
+		return getSoundFileDatagramManager() != null;
+	}
+
+	/**
+	 * @return the sound file datagram manager for this stream, or null if this stream
+	 * isn't sound files.
+	 */
+	private SoundFileDatagramManager getSoundFileDatagramManager() {
+		OfflineDataMap dataMap = dataBlock.getDatagrammedMap();
+		if (dataMap == null || dataMap.getOfflineDataSource() == null) {
+			return null;
+		}
+		DatagramManager dgm = dataMap.getOfflineDataSource().getDatagramManager();
+		if (dgm instanceof SoundFileDatagramManager) {
+			return (SoundFileDatagramManager) dgm;
+		}
+		return null;
+	}
+
+	/**
+	 * Right click menu for a data stream. Currently only sound file streams have
+	 * anything worth putting in it.
+	 * @param e the event which asked for the menu
+	 */
+	private void showGraphMenu(ContextMenuEvent e) {
+		if (isSoundFileStream() == false) {
+			return;
+		}
+		ContextMenu menu = new ContextMenu();
+
+		CheckMenuItem boundsItem = new CheckMenuItem("Show file boundaries");
+		boundsItem.setSelected(isShowFileBounds());
+		boundsItem.setOnAction(a->{
+			DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
+			if (params != null) {
+				params.showFileBoundaries = boundsItem.isSelected();
+			}
+			repaint(0);
+		});
+		menu.getItems().add(boundsItem);
+
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm.hasAnyDatagram(dataBlock) == false) {
+			MenuItem createItem = new MenuItem("Create waveform summary...");
+			createItem.setOnAction(a->checkSoundFileDatagram());
+			menu.getItems().add(createItem);
+		}
+
+		menu.show(dataGraph, e.getScreenX(), e.getScreenY());
+	}
+
+	/**
+	 * Sound file datagrams aren't made automatically since reading every sound file can
+	 * take a long time (particularly for sud files, which have to be decompressed). Ask
+	 * the user, then set it going in the background.
+	 */
+	private void checkSoundFileDatagram() {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm == null || dgm.hasAnyDatagram(dataBlock)) {
+			return;
+		}
+		OfflineDataMap dataMap = dataBlock.getDatagrammedMap();
+		int nFiles = dataMap == null ? 0 : dataMap.getNumMapPoints();
+		if (nFiles == 0) {
+			return;
+		}
+		String msg = String.format("To show a waveform summary of the sound data, PAMGuard needs to read all "
+				+ "%d sound files.\n\nThis may take some time, but only has to be done once since the result "
+				+ "is saved alongside the sound files.\n\nRead the sound files now ?", nFiles);
+		Alert alert = new Alert(AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO);
+		alert.setTitle("Sound file datagram");
+		alert.setHeaderText(null);
+		alert.getDialogPane().setMinWidth(450);
+		if (alert.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+			return;
+		}
+		dgm.createDatagrams(dataBlock);
+	}
+
+	/**
 	 * Find the scale information for the datagram - return null
 	 * if there either isn't a datagram or if it's not currently showing
 	 * @return
@@ -1205,6 +1434,14 @@ public class DataStreamPaneFX extends PamBorderPane {
 			return null;
 		}
 		if (showDatagram == false) {
+			return null;
+		}
+		/*
+		 * A sound file stream has a datagram provider from the moment the viewer opens,
+		 * but no actual datagram until the user asks for one. Until then the graph draws
+		 * effort and counts, so the axis must go with it.
+		 */
+		if (isDatagramAvailable() == false) {
 			return null;
 		}
 		return dp.getScaleInformation();

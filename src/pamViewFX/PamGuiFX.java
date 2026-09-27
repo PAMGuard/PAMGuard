@@ -227,21 +227,26 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 				
 		/**create settings pane. This allows access to primary PAMGUARD settings.**/
 		settingsPane=new PamSettingsMenuPane();
-		settingsPane.setPrefWidth(250);
+		settingsPane.setPrefWidth(270);
 		
 		leftPaneWrapper = new PamVBox();
-		leftPaneWrapper.setPrefWidth(250);
+		leftPaneWrapper.setPrefWidth(270);
 		settingsContentPane = settingsPane;
 		leftPaneWrapper.getChildren().add(settingsContentPane);
 		
 		hidingPaneLeft=new HidingPane(Side.LEFT, leftPaneWrapper, this, false);
 		hidingPaneLeft.showHidePane(false);
-		
+		hidingPaneLeft.setStyle("-fx-background-color: -fx-darkbackground");
+
 		mainLayout = layout;
 		
 		hidingPaneLeft.showingProperty().addListener((obs, wasShowing, isShowing) -> {
-			if (!isShowing) {
-				restoreLeftPane();
+			if (!isShowing && showingCustomLeftContent) {
+				// The showing property changes at the START of the hide
+				// animation.  Schedule the content restore to run when the
+				// hide animation finishes so the user never briefly sees the
+				// settings menu sliding closed.
+				scheduleLeftPaneRestore();
 			}
 		});
 		
@@ -402,7 +407,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 */
 	public DataModelPaneFX addDataModelTab() {
 		
-		PamGuiTabFX newTab = new PamGuiTabFX(new TabInfo("Data Model"), this);
+		PamGuiTabFX newTab = new PamGuiTabFX(new TabInfo(TabInfo.DATA_MODEL_TAB_NAME), this);
 		
         newTab.setClosable(false); //can't close a data model
         newTab.setDetachable(false);
@@ -617,7 +622,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.setRight(rightHBox);
 			
 			this.setPrefHeight(prefHeight);
-			this.getStyleClass().add("pane-opaque");
+			//this.getStyleClass().add("pane-opaque");
 
 
 			//this.setPadding(new Insets(0,0,0,0));
@@ -841,6 +846,18 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	}
 
 	/**
+	 * The wider width used for the reprocess / export panes inside the
+	 * left hiding pane.
+	 */
+	private static final double WIDE_PANE_WIDTH = 450;
+
+	/**
+	 * The default (narrow) width of the left hiding pane used for the
+	 * standard settings menu.
+	 */
+	private static final double DEFAULT_PANE_WIDTH = 250;
+
+	/**
 	 * Swap the left hiding pane content with the given node, open the pane,
 	 * and disable the main tab area so the user must interact with the left
 	 * pane before returning to PAMGuard.
@@ -848,9 +865,15 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 * @param content the content node to display.
 	 */
 	private void showLeftPaneContent(Node content) {
-		leftPaneWrapper.getChildren().clear();
-		leftPaneWrapper.getChildren().add(content);
-		leftPaneWrapper.setPrefWidth(450);
+		// set the expanded size first so the HidingPane constraints and
+		// animation targets are correct before anything is shown
+		hidingPaneLeft.setExpandedSize(WIDE_PANE_WIDTH);
+		leftPaneWrapper.setPrefWidth(WIDE_PANE_WIDTH);
+		// apply the standard dark background used by settings panes
+		leftPaneWrapper.setStyle("-fx-background-color: -fx-darkbackground");
+		leftPaneWrapper.getChildren().setAll(content);
+		showingCustomLeftContent = true;
+		restoringLeftPane = false;
 		hidingPaneLeft.showHidePane(true);
 		mainTabPane.setDisable(true);
 		if (sharedToolbar != null) {
@@ -859,18 +882,101 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	}
 
 	/**
-	 * Restore the left hiding pane to its original settings content and
-	 * re-enable the main GUI.
+	 * True when the left pane is showing reprocess / export content
+	 * rather than the normal settings menu.
 	 */
-	private void restoreLeftPane() {
-		leftPaneWrapper.getChildren().clear();
-		leftPaneWrapper.getChildren().add(settingsContentPane);
-		leftPaneWrapper.setPrefWidth(250);
-		hidingPaneLeft.showHidePane(false);
+	private boolean showingCustomLeftContent = false;
+
+	/**
+	 * Flag to prevent the showingProperty listener from calling
+	 * {@link #restoreLeftPane()} while it is already executing.
+	 */
+	private boolean restoringLeftPane = false;
+
+	/**
+	 * Called by the showingProperty listener (which fires at the START of the
+	 * hide animation) to schedule the content restore for when the hide
+	 * animation has fully finished.  This avoids the settings menu briefly
+	 * flashing before the pane disappears.
+	 */
+	private void scheduleLeftPaneRestore() {
+		if (restoringLeftPane) {
+			return;
+		}
+		restoringLeftPane = true;
+
+		// re-enable the main GUI immediately
 		mainTabPane.setDisable(false);
 		if (sharedToolbar != null) {
 			sharedToolbar.setDisable(false);
 		}
+
+		javafx.animation.Timeline hideTimeLine = hidingPaneLeft.getTimeLineHide();
+		// The hide animation is about to start (or just started).
+		// Hook into its onFinished to swap content once the pane is invisible.
+		hideTimeLine.setOnFinished(e -> {
+			hidingPaneLeft.hideFinished();
+			doContentRestore();
+		});
+	}
+
+	/**
+	 * Restore the left hiding pane to its original settings content and
+	 * re-enable the main GUI.  Can be called directly (e.g. from the
+	 * onClose callback of the reprocess / export panes) or indirectly
+	 * via {@link #scheduleLeftPaneRestore()}.
+	 */
+	private void restoreLeftPane() {
+		if (restoringLeftPane) {
+			return;
+		}
+		restoringLeftPane = true;
+
+		mainTabPane.setDisable(false);
+		if (sharedToolbar != null) {
+			sharedToolbar.setDisable(false);
+		}
+
+		if (hidingPaneLeft.isShowing()) {
+			// pane is still open — start the hide animation, restore when done
+			javafx.animation.Timeline hideTimeLine = hidingPaneLeft.getTimeLineHide();
+			hideTimeLine.setOnFinished(e -> {
+				hidingPaneLeft.hideFinished();
+				doContentRestore();
+			});
+			hidingPaneLeft.showHidePane(false);
+		} else {
+			// pane is already closed / closing
+			javafx.animation.Timeline hideTimeLine = hidingPaneLeft.getTimeLineHide();
+			if (hideTimeLine.getStatus() == javafx.animation.Animation.Status.RUNNING) {
+				hideTimeLine.setOnFinished(e -> {
+					hidingPaneLeft.hideFinished();
+					doContentRestore();
+				});
+			} else {
+				// fully hidden already — safe to swap immediately
+				doContentRestore();
+			}
+		}
+	}
+
+	/**
+	 * Swap the left pane content back to the settings menu and restore the
+	 * default narrow width.  Must only be called when the hiding pane is
+	 * fully invisible so the user never sees the settings menu briefly
+	 * flash.
+	 */
+	private void doContentRestore() {
+		showingCustomLeftContent = false;
+		leftPaneWrapper.getChildren().setAll(settingsContentPane);
+		leftPaneWrapper.setPrefWidth(DEFAULT_PANE_WIDTH);
+		leftPaneWrapper.setStyle("");
+		// use runLater so the layout pass with the old size completes
+		// before we reconfigure the animation targets
+		Platform.runLater(() -> {
+			hidingPaneLeft.setExpandedSize(DEFAULT_PANE_WIDTH);
+			restoringLeftPane = false;
+		});
 	}
 
 	/**

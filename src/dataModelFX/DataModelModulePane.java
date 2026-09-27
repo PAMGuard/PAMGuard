@@ -72,7 +72,7 @@ public class DataModelModulePane  extends PamBorderPane {
 	private PamScrollPane createPane(){
 		moduleSelectPane=new PamScrollPane(); 
 				
-		moduleSelectPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(moduleSelectPane, PamStylesManagerFX.STYLE_SLIDING);
 	
 		moduleSelectPane.setPrefWidth(250);
 		moduleSelectPane.getStyleClass().add("scroll-pane-dark");		

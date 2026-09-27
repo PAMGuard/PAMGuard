@@ -160,6 +160,7 @@ public class SimpleMHTVarPane extends MHTVarSettingsPane<SimpleChi2VarParams>{
 				+ 	"The error value can also be set in the advanced settings pane"));
 
 		advSettingsButton = new PamButton(); 
+		advSettingsButton.getStyleClass().add("icon-button");
 //		advSettingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		advSettingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		advSettingsButton.setOnAction((action)->{

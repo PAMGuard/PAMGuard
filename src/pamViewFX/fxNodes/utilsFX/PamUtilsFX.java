@@ -577,19 +577,65 @@ public class PamUtilsFX {
 
 
 	/**
-	 * Convert an html string to normal text. JavaFX labels do not support html
+	 * Convert an html string to normal text. JavaFX labels and text areas do not support
+	 * html, so this strips out the tags but keeps the layout implied by basic html tags -
+	 * line breaks (&lt;br&gt;, &lt;p&gt;, &lt;div&gt;), headings, list bullets (&lt;li&gt;),
+	 * horizontal rules (&lt;hr&gt;) and table cells - and decodes common html entities.
 	 * @param htmlString - an html formatted string
-	 * @return a string with basic formatting corresponding to html. 
+	 * @return a plain string with basic formatting corresponding to the html.
 	 */
 	public static String htmlToNormal(String htmlString) {
-			if (htmlString == null) return null;
-			String str = htmlString.replaceAll("<p>", "\n");
-			str = str.replaceAll("</p>", "");
+		if (htmlString == null) return null;
 
-			str = str.replaceAll("<br>", "\n");
-			str = str.replaceAll("<html>", "");
-			str = str.replaceAll("</html>", "");
-			return str;
+		String str = htmlString;
+
+		//normalise any existing line endings.
+		str = str.replace("\r\n", "\n").replace("\r", "\n");
+
+		//remove document level tags.
+		str = str.replaceAll("(?i)</?(html|body|head)[^>]*>", "");
+
+		//horizontal rules and headings sit on their own lines.
+		str = str.replaceAll("(?i)<hr\\s*/?>", "\n----------\n");
+		str = str.replaceAll("(?i)</?h[1-6][^>]*>", "\n");
+
+		//block level tags become line breaks.
+		str = str.replaceAll("(?i)<br\\s*/?>", "\n");
+		str = str.replaceAll("(?i)</p\\s*>", "\n");
+		str = str.replaceAll("(?i)<p[^>]*>", "\n");
+		str = str.replaceAll("(?i)</div\\s*>", "\n");
+		str = str.replaceAll("(?i)<div[^>]*>", "\n");
+		str = str.replaceAll("(?i)</?(ul|ol)[^>]*>", "\n");
+
+		//list items become bullet points.
+		str = str.replaceAll("(?i)<li[^>]*>", "\n • ");
+		str = str.replaceAll("(?i)</li\\s*>", "");
+
+		//table rows become line breaks and cells are separated by tabs.
+		str = str.replaceAll("(?i)</td>\\s*<td[^>]*>", "\t");
+		str = str.replaceAll("(?i)</tr\\s*>", "\n");
+		str = str.replaceAll("(?i)</?(table|tr|thead|tbody)[^>]*>", "");
+		str = str.replaceAll("(?i)<t[dh][^>]*>", "");
+		str = str.replaceAll("(?i)</t[dh]\\s*>", "");
+
+		//strip any remaining tags (e.g. <b>, <i>, <font ...>, <span ...>).
+		str = str.replaceAll("<[^>]*>", "");
+
+		//decode the most common html entities. &amp; is decoded last so we don't double decode.
+		str = str.replace("&nbsp;", " ");
+		str = str.replace("&lt;", "<");
+		str = str.replace("&gt;", ">");
+		str = str.replace("&quot;", "\"");
+		str = str.replace("&#39;", "'");
+		str = str.replace("&apos;", "'");
+		str = str.replace("&amp;", "&");
+
+		//tidy up whitespace: drop trailing spaces on lines and collapse runs of blank lines.
+		str = str.replaceAll("[ \\t]+\n", "\n");
+		str = str.replaceAll("\n{3,}", "\n\n");
+		str = str.trim();
+
+		return str;
 	}
 	
 	

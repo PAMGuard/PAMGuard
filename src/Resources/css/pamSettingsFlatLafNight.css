@@ -1,0 +1,77 @@
+/*
+ * pamSettingsFlatLafNight.css
+ *
+ * Night-mode OVERRIDE for pamSettingsFlatLaf.css (the sliding / hiding settings
+ * panes). This is not a standalone theme: add it as the last sheet of the
+ * sliding style, AFTER pamSettingsFlatLaf.css.
+ *
+ * All it does is repoint the palette to the red on near black of the Night
+ * colour scheme, so that a settings pane doesn't ruin the observers' night
+ * vision when PAMGuard is run in real time on a vessel at night. Everything
+ * else - the pane faces, the hiding tabs, the close buttons, the charts in
+ * pamSettingsFlatLaf.css, and every control rule in the GUI sheets - is written
+ * in terms of these lookups, so nothing else needs redeclaring here. Only
+ * -fx-darkbackground-trans has to be repeated, because JavaFX CSS has no way of
+ * putting an alpha channel on a looked-up colour.
+ *
+ * The values are the Night palette of pamFlatLafNight.css - keep the two in
+ * step. They cannot be inherited from it: that sheet declares its palette on
+ * '.root, .gui-css-root', which does not match a sliding pane. See the header of
+ * pamSettingsFlatLaf.css for why the palette is on '*' here.
+ *
+ * The pane face (#1c1c1c) is deliberately lighter than the plot window it slides
+ * out over (#101010), in the same way that it is lighter than the #2b2b2b plots
+ * of the Dark scheme. That contrast is what makes a sliding pane read as a panel
+ * sitting on top of the display; an earlier version of the old night sheet made
+ * the panes darker than their surroundings and they vanished into the display.
+ */
+
+* {
+    /* ---- Night palette (cf. pamFlatLafNight.css) ---- */
+    -flat-background:            #1c1c1c;
+    -flat-foreground:            #e04a4a;
+    -flat-disabled-foreground:   #7c3535;
+    -flat-component-background:  #262626;
+    -flat-border:                #474747;
+    -flat-disabled-border:       #383838;
+    -flat-focus:                 #6e1717;
+    -flat-focused-border:        #a33a3a;
+    -flat-accent:                #8c1f1f;
+    -flat-accent2:               #b32828;
+    -flat-checkmark:             #ca4343;
+    -flat-underline:             #b32828;
+    -flat-link:                  #ef6a6a;
+    -flat-selection-inactive:    #3a1010;
+    -flat-separator:             #383838;
+    -flat-icon:                  #d04545;
+    -flat-arrow:                 #ba3d3d;
+    -flat-hover:                 #2e2e2e;
+    -flat-pressed:               #363636;
+    -flat-selected:              #3f3f3f;
+    -flat-menu-hover:            #2a1414;
+
+    -fx-faint-focus-color:       #8c1f1f44;
+
+    /* ---- plot furniture ---- */
+    -pam-plot-background:  #101010;
+    -pam-scroller-body:    rgba(200,80,80,0.28);
+    -pam-scroller-handle:  rgba(224,74,74,0.65);
+    -pam-scroller-grip:    rgba(20,20,20,0.9);
+
+    /* ---- the one legacy name which is a literal rather than an alias ---- */
+    -fx-darkbackground-trans: rgba(28,28,28,0.92);
+
+    /* red icons */
+    -fx-icon_col: #d04545;
+}
+
+
+/* The delete button of the data model, red on grey in the Dark scheme, needs a
+   red that still reads as a warning against the red text of this one. */
+.delete-button:hover {
+    -fx-background-color: #d05555, #6e1717;
+}
+
+.delete-button:armed {
+    -fx-background-color: #d05555, #8c1f1f;
+}

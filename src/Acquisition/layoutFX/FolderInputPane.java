@@ -193,6 +193,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		PamHBox fileSelectBox=new PamHBox();
 		fileSelectBox.setSpacing(5);
 		fileSelectBox.getChildren().addAll(fileNames = new PamComboBox<String>(), browseFileButton=new PamButton(), browseFolderButton=new PamButton() );
+		browseFileButton.getStyleClass().add("icon-button");
+		browseFolderButton.getStyleClass().add("icon-button");
 
 		fileNames.setMaxWidth(Double.MAX_VALUE);
 		HBox.setHgrow(fileNames, Priority.ALWAYS);	

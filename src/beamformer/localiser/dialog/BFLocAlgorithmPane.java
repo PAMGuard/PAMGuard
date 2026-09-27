@@ -155,6 +155,7 @@ public class BFLocAlgorithmPane extends SettingsPane<BFLocaliserParams> {
 
 //			settingsButtons[i] = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
 			settingsButtons[i] = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog",Color.WHITE, PamGuiManagerFX.iconSize));
+			settingsButtons[i].getStyleClass().add("icon-button");
 			algoPane.add(settingsButtons[i], 3, iRow);
 			GridPane.setHalignment(settingsButtons[i], HPos.CENTER);
 			settingsButtons[i].setOnAction(new AlgorithmSettings(i));

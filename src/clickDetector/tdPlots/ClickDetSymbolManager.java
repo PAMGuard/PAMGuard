@@ -62,8 +62,9 @@ public class ClickDetSymbolManager extends StandardSymbolManager {
 	public void addSymbolModifiers(PamSymbolChooser psc) {
 		super.addSymbolModifiers(psc);
 		
-		//add symbol modifier that allows the clicks to be coloured by species ID. 
-		psc.addSymbolModifier(new ClickClassSymbolModifier(clickControl, psc), 1);
+		//add symbol modifier that allows the clicks to be coloured by species ID. Most users
+		//want this, so default it to on (user selections, once restored, still take precedence).
+		psc.addSymbolModifier(new ClickClassSymbolModifier(clickControl, psc), 1, true);
 		
 		//add the peak frequency modifier that allows clicks to be coloured by peak frequency. 
 		psc.addSymbolModifier(new PeakFreqModifier(psc));

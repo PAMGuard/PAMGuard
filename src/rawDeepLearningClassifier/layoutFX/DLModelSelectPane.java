@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
 
-import ai.djl.Device;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -133,6 +132,7 @@ public class DLModelSelectPane extends PamBorderPane {
 		pathLabel = new Label("No classifier file selected"); 
 		//		PamButton pamButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, PamGuiManagerFX.iconSize)); 
 		PamButton pamButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize));
+		pamButton.getStyleClass().add("icon-button");
 		pathLabel.setMinWidth(100);
 
 		
@@ -173,6 +173,7 @@ public class DLModelSelectPane extends PamBorderPane {
 		urlBox.setSpacing(5);
 		
 		PamButton download = new PamButton();
+		download.getStyleClass().add("icon-button");
 		download.setTooltip(new Tooltip("Download the model from set URL"));
 		download.setGraphic(PamGlyphDude.createPamIcon("mdi2d-download", PamGuiManagerFX.iconSize));
 		download.setDisable(true);
@@ -219,6 +220,7 @@ public class DLModelSelectPane extends PamBorderPane {
 		urlPopOver.setContentNode(urlHolder);
 		
 		PamButton urlButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2l-link-variant", PamGuiManagerFX.iconSize)); 
+		urlButton.getStyleClass().add("icon-button");
 		urlButton.setTooltip(new Tooltip("Load a model from a URL"));
 		urlButton.setOnAction((action)->{
 			urlPopOver.show(urlButton);
@@ -226,6 +228,7 @@ public class DLModelSelectPane extends PamBorderPane {
 
 
 		PamButton defaults = new PamButton(); 
+		defaults.getStyleClass().add("icon-button");
 		defaults.setTooltip(new Tooltip("Default models"));
 		defaults.setGraphic(PamGlyphDude.createPamIcon("mdi2d-dots-vertical", PamGuiManagerFX.iconSize)); 
 		defaults.setTooltip(new Tooltip("Load a default model"));
@@ -456,25 +459,89 @@ public class DLModelSelectPane extends PamBorderPane {
 			pathLabel.setTooltip(new Tooltip(status.getDescription()));
 		}
 		else {
-			pathLabel .setText(new File(this.currentSelectedFile).getName()); 
-			//show a warning icon if needed. 
-			String tooltip = "";
-			try {
-				tooltip += (this.currentSelectedFile.getPath() 
-						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu());
-				tooltip+="\n";
-			}
-			catch (Exception e) {
-				//sometimes get an error here for some reason
-				//does not make a difference other than tooltip. 
-				System.err.println("StandardModelPane: Error getting the default device!");
-			}
-			if (status.isWarning()) {
-				tooltip+="Warning: " + status.getDescription(); 
-			}
-			pathLabel.setTooltip(new Tooltip(tooltip));
+			pathLabel .setText(new File(this.currentSelectedFile).getName());
+			//show a warning icon if needed, and a rich tooltip explaining which
+			//processor (CPU, graphics card, Apple Silicon) the model will run on.
+			pathLabel.setTooltip(createProcessorTooltip(status));
 		}
 
+	}
+
+	/**
+	 * Create a rich tooltip for the model path label. The tooltip clearly shows
+	 * the user which processor the deep learning model will run on (e.g. a CPU, a
+	 * graphics card or an Apple Silicon chip) along with the deep learning engine,
+	 * the model path and any warnings.
+	 *
+	 * @param status the current model load status.
+	 * @return a tooltip describing the model and its processor.
+	 */
+	private Tooltip createProcessorTooltip(DLStatus status) {
+
+		DLProcessorInfo procInfo = DLProcessorInfo.getCurrentProcessorInfo();
+
+		PamVBox content = new PamVBox();
+		content.setSpacing(4);
+		content.setPadding(new Insets(8));
+		content.setMaxWidth(360);
+		//self contained dark panel so the tooltip looks the same in light and dark themes.
+		content.setStyle("-fx-background-color: #2b2b2b; -fx-background-radius: 6;");
+
+		//header: processor icon + friendly processor name.
+		Node icon = PamGlyphDude.createPamIcon(procInfo.getIconString(), procInfo.getAccentColor(), 24);
+		Label procLabel = new Label("Runs on: " + procInfo.getFriendlyName());
+		procLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
+		procLabel.setTextFill(Color.WHITE);
+		PamHBox header = new PamHBox();
+		header.setSpacing(8);
+		header.setAlignment(Pos.CENTER_LEFT);
+		header.getChildren().addAll(icon, procLabel);
+		content.getChildren().add(header);
+
+		//longer description of what the processor is doing.
+		if (procInfo.getDetail() != null && !procInfo.getDetail().isEmpty()) {
+			content.getChildren().add(tooltipDetailLabel(procInfo.getDetail(), Color.web("#E0E0E0")));
+		}
+
+		//deep learning engine, version and raw device.
+		String engineText = "Engine: " + procInfo.getEngineDescription();
+		if (procInfo.getDeviceString() != null && !procInfo.getDeviceString().isEmpty()) {
+			engineText += "   Device: " + procInfo.getDeviceString();
+		}
+		content.getChildren().add(tooltipDetailLabel(engineText, Color.web("#9E9E9E")));
+
+		//the model file path.
+		content.getChildren().add(tooltipDetailLabel("Model: " + this.currentSelectedFile.getPath(),
+				Color.web("#9E9E9E")));
+
+		//any warning from the load status.
+		if (status != null && status.isWarning()) {
+			content.getChildren().add(tooltipDetailLabel("Warning: " + status.getDescription(),
+					Color.web("#FFB74D")));
+		}
+
+		Tooltip tooltip = new Tooltip();
+		//let the content pane draw the background so styling is consistent across themes.
+		tooltip.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+		tooltip.setGraphic(content);
+		tooltip.setMaxWidth(380);
+		tooltip.setWrapText(true);
+		return tooltip;
+	}
+
+	/**
+	 * Create a small wrapped label for a line of tooltip detail text.
+	 *
+	 * @param text  the text to show.
+	 * @param color the text colour.
+	 * @return a wrapped label.
+	 */
+	private Label tooltipDetailLabel(String text, Color color) {
+		Label label = new Label(text);
+		label.setWrapText(true);
+		label.setTextFill(color);
+		label.setMaxWidth(344);
+		return label;
 	}
 
 	/**

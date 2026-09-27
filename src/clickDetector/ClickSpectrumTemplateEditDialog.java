@@ -496,9 +496,10 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 	}
 	
 	public String openFileBrowser(){
-		
+
 		PamFileFilter fileFilter = new PamFileFilter("Click Template", ".csv");
 		fileFilter.addFileType(".txt");
+		fileFilter.addFileType(".mat");
 		JFileChooser fileChooser = new PamFileChooser();
 		fileChooser.setFileFilter(fileFilter);
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -512,7 +513,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 	}
 	
 	public void loadTemplate(){
-		ClickTemplate clkTemplate=ClickTemplate.getCSVResults(clickSpectrumTemplateParams.templateFile.getAbsolutePath());
+		ClickTemplate clkTemplate=ClickTemplate.loadTemplateFile(clickSpectrumTemplateParams.templateFile.getAbsolutePath());
 		if (clkTemplate!=null){
 		clickSpectrumTemplateParams.clickTemplateArray.add(clkTemplate);
 		clickSpectrumTemplateParams.clickTempVisible.add(true);

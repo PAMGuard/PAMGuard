@@ -70,6 +70,7 @@ public abstract class AbstractPamScrollerFX extends AbstractPamScroller implemen
 	private void createNavigationButtons(){
 				
 		settingsButton=new PamButton();
+		settingsButton.getStyleClass().add("icon-button");
 		//canvas=PamSymbolFX.createCanvas(PamSymbol.SYMBOL_TRIANGLED, Color.DARKSLATEGREY, Color.DARKSLATEGREY, 18, 18);//
 //		settingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.MENU, PamGuiManagerFX.iconSize));
 		settingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", PamGuiManagerFX.iconSize));
@@ -80,6 +81,7 @@ public abstract class AbstractPamScrollerFX extends AbstractPamScroller implemen
 		});
 	
 		pageForwardButton=new PamButton();
+		pageForwardButton.getStyleClass().add("icon-button");
 		//Canvas canvas=PamSymbolFX.createCanvas(PamSymbol.SYMBOL_DOUBLETRIANGLER, Color.BLUE, Color.BLUE, 18, 18);
 //		pageForwardButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.FAST_FORWARD, PamGuiManagerFX.iconSize));
 		pageForwardButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-fast-forward", PamGuiManagerFX.iconSize));
@@ -88,6 +90,7 @@ public abstract class AbstractPamScrollerFX extends AbstractPamScroller implemen
 		});
 		
 		pageBackwardButton=new PamButton();
+		pageBackwardButton.getStyleClass().add("icon-button");
 		//canvas=PamSymbolFX.createCanvas(PamSymbol.SYMBOL_DOUBLETRIANGLEL, Color.BLUE, Color.BLUE, 18, 18);//
 //		pageBackwardButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.FAST_REWIND, PamGuiManagerFX.iconSize));
 		pageBackwardButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-rewind", PamGuiManagerFX.iconSize));

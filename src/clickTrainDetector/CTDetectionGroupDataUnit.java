@@ -24,17 +24,6 @@ public abstract class CTDetectionGroupDataUnit extends DetectionGroupDataUnit im
 	 */
 	ArrayList<PamDataUnit> summaryDataUnits; 
 
-
-	/**
-	 * The minimum bearing angle of all data units in RADIANS
-	 */
-	private double minAngle = 0;
-
-	/**
-	 * The maximum bearing angle of all bearing units in RADIANS
-	 */
-	private double maxAngle = 0;
-
 	public CTDetectionGroupDataUnit(long timeMilliseconds, List<PamDataUnit> list) {
 		super(timeMilliseconds, list);
 	}
@@ -80,11 +69,6 @@ public abstract class CTDetectionGroupDataUnit extends DetectionGroupDataUnit im
 		
 	}
 	
-
-	//	public ClickTrainControl getClickTrainControl() {
-	//		this.getParentDataBlock().getClickTrainControl(); 
-	//	}
-
 
 	/**
 	 * Update the data unit list. The summary data units are used to represent a
@@ -133,50 +117,6 @@ public abstract class CTDetectionGroupDataUnit extends DetectionGroupDataUnit im
 		}
 	}
 
-	
-	/**
-	 * Calculate the minimum and maximum angle of the whole click train. 
-	 */
-	public void calcMinMaxAng() {
-		ArrayList<PamDataUnit<?,?>> subDet = this.getSubDetections();
-
-		if (subDet==null || subDet.get(0).getLocalisation()==null) {
-			return; 
-		}
-
-		ListIterator<PamDataUnit<?, ?>> iterator = subDet.listIterator();
-
-		int n=0; 
-		//CTLocalisation.minimum and maximum angles
-		double maxAngle = -Double.MAX_VALUE;
-		double minAngle = Double.MAX_VALUE;
-
-		if (subDet.get(0).getLocalisation()!=null) {
-			double lastAngle = subDet.get(0).getLocalisation().getAngles()[0];
-
-
-			PamDataUnit dataUnit; 
-			double angle; 
-			while (iterator.hasNext()) {
-				dataUnit=iterator.next();
-				angle=dataUnit.getLocalisation().getAngles()[0]; 
-
-				lastAngle= angle; 
-
-				//check that the datablock has localisation contents. 
-				if (subDet.get(0).getParentDataBlock().getLocalisationContents().hasLocContent(LocContents.HAS_BEARING)){
-					if (lastAngle>maxAngle) maxAngle=lastAngle;
-					if (lastAngle<minAngle) minAngle=lastAngle;
-
-					n++;
-				}
-			}
-
-			this.minAngle=minAngle;
-			this.maxAngle=maxAngle;
-		}
-	}
-
 	/**
 	 * Clear data units from the summary list
 	 */
@@ -191,14 +131,5 @@ public abstract class CTDetectionGroupDataUnit extends DetectionGroupDataUnit im
 	public ArrayList<PamDataUnit> getSummaryUnits() {
 		return summaryDataUnits;
 	}
-
-	/**
-	 * Get the angle range in RADIANS. 
-	 * @return the angle range. 
-	 */
-	public double getAngleRange() {
-		return maxAngle-minAngle;
-	}
-
 
 }

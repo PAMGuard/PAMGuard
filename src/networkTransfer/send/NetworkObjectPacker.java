@@ -78,12 +78,22 @@ public class NetworkObjectPacker {
 		BinaryObjectData packedObject = null;
 		synchronized (BinaryDataSource.packSynchObject) {
 			packedObject = binarySource.getPackedData(dataUnit);
+			// now get any annotation data that goes with this binary object. 
+			binarySource.getPackedAnnotationData(dataUnit, packedObject);
+			dataUnit.getBasicData().setHasBinaryAnnotations(packedObject.getAnnotationDataLength() != 0);
 		}
 		byte[] data = packedObject.getData();
 		int duDataLength = data.length + 12;
 		DataUnitBaseData baseData = dataUnit.getBasicData();
 		int baseDataLength = baseData.getBaseDataBinaryLength();
 		duDataLength += baseDataLength;
+		
+		byte[] annotationData = packedObject.getAnnotationData();
+		int annotationDataLength = packedObject.getAnnotationDataLength();
+//		if (annotationDataLength > 0) {
+//			duDataLength += annotationDataLength + 2;
+//		}
+		
 		
 		
 //		ByteOutputStream bos = new ByteOutputStream(duDataLength);
@@ -96,13 +106,21 @@ public class NetworkObjectPacker {
 			baseData.writeBaseData(dos, BinaryStore.getCurrentFileFormat());
 			dos.writeInt(data.length);
 			dos.write(data);
+			if (annotationDataLength > 0) {
+				dos.writeShort(annotationDataLength);
+				dos.write(annotationData);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 //		data = packData(buoyId1, buoyId2, dataType1, dataType2, bos.getBytes(), duDataLength);
-		data = packData(buoyId1, buoyId2, dataType1, dataType2, bos.toByteArray(), duDataLength);
+		int totalPackLength = duDataLength;
+		if (annotationDataLength > 0) {
+			totalPackLength += 2 + annotationDataLength;
+		}
+		data = packData(buoyId1, buoyId2, dataType1, dataType2, bos.toByteArray(), totalPackLength);
 		try {
 			dos.close();
 		} catch (IOException e) {

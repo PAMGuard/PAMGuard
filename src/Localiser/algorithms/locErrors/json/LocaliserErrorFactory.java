@@ -21,6 +21,7 @@ public class LocaliserErrorFactory {
 		errorTypes = new ArrayList<>();
 		errorTypes.add( new EllipseJsonConverter());
 		errorTypes.add( new SimpleErrorJsonConverter());
+		errorTypes.add(new BearingErrorJsonConverter());
 	}
 	
 	/**

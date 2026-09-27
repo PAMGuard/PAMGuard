@@ -48,6 +48,7 @@ public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 
 	private JTextField maxTime;
 
+	private JTextField maxChi2;
 
 	private JTextField minDepth;
 
@@ -148,7 +149,7 @@ public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 		constraints.gridy++;
 		constraints.gridx = 0;
 		constraints.gridwidth = 1;
-		PamDialog.addComponent(warningPanel, new JLabel("Max number of clicks ", JLabel.RIGHT), constraints);
+		PamDialog.addComponent(warningPanel, new JLabel("Max number of sounds ", JLabel.RIGHT), constraints);
 		constraints.gridx++;
 		PamDialog.addComponent(warningPanel, maxPoints=new JTextField(6), constraints);
 		constraints.gridy++;
@@ -157,9 +158,20 @@ public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 		PamDialog.addComponent(warningPanel, new JLabel("Max processing time ", JLabel.RIGHT), constraints);
 		constraints.gridx++;
 		PamDialog.addComponent(warningPanel, maxTime=new JTextField(6), constraints);
+		constraints.gridx++;
+		PamDialog.addComponent(warningPanel, new JLabel(" ms"), constraints);
+		constraints.gridy++;
+		constraints.gridx = 0;
+		PamDialog.addComponent(warningPanel, new JLabel("Max Chi2 ", JLabel.RIGHT), constraints);
+		constraints.gridx++;
+		PamDialog.addComponent(warningPanel, maxChi2=new JTextField(6), constraints);
+		constraints.gridy++;
+		constraints.gridx = 0;
+		
 		limitPoints.setToolTipText("<html><p width=\"200\">Real time localisation can be slow if large numbers of clicks are included in " + 
 		" a target motion analysis. Limiting the number of clicks can reduce processing time. If the maximum number of clicks" + 
 				" is exceeded, then clicks will be selected evenly from the entire track.");
+		maxChi2.setToolTipText("Maximum chi2 for fit. Localisations with a Chi2 above this will be rejected");
 		limitPoints.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -169,8 +181,6 @@ public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 		maxTime.setToolTipText("<html><p width=\"200\">Real time loclaisation can be processor intensive. If a loclaisation takes over the maximum allowed number of milliseconds, a warning will appear in PAMGuard's main window. "
 				+ "If this occurs, reduce the number of algorithms or switch to a less processor intensive algorithm e.g. least squares</p></html>");
 
-		constraints.gridx++;
-		PamDialog.addComponent(warningPanel, new JLabel(" ms"), constraints);
 		
 		//create holder
 		p = new JPanel();
@@ -233,6 +243,7 @@ public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 		minDepth.setText(String.format("%3.1f", -clickLocParams2.maxHeight));
 		maxDepth.setText(String.format("%3.1f", -clickLocParams2.minHeight));
 		maxTime.setText(String.format("%d", clickLocParams2.maxTime));
+		maxChi2.setText(String.format("%.0f", clickLocParams2.getMaxChi2()));
 		maxPoints.setText(String.format("%d", clickLocParams2.maxLocPoints));
 		limitPoints.setSelected(clickLocParams2.limitLocPoints);
 		
@@ -282,6 +293,13 @@ public class ClickLocDialogPanel implements LocalizationOptionsPanel {
 		}
 		catch (NumberFormatException e) {
 			return PamDialog.showWarning(null, groupLocaliser.getName(), "Invalid maximum time value");
+		}
+		try {
+			double mc = Double.valueOf(maxChi2.getText());
+			clickLocParams.setMaxChi2(mc);
+		}
+		catch (NumberFormatException e) {
+			return PamDialog.showWarning(null, groupLocaliser.getName(), "Invalid maximum Chi2 value");
 		}
 		
 		clickLocParams.limitLocPoints = limitPoints.isSelected();

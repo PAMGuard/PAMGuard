@@ -9,7 +9,6 @@ import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
-import PamView.PamColors;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamConstants;
@@ -26,7 +25,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import pamViewFX.fxNodes.PamColorsFX;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLDataUnit;
@@ -110,10 +108,9 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 				}
 				for (int i=0; i<classNames.length; i++) {
 					if (dlPredParams.lineInfos[i]==null) {
-//						dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
-						java.awt.Color wCol = PamColors.getInstance().getWhaleColor(i);
-						Color fxCol = PamColorsFX.awtColorToFx(wCol);
-						dlPredParams.lineInfos[i] = new LineInfo(true, fxCol);
+						//use the shared class colours so that the prediction lines and the
+						//detection symbols coloured by class start with the same colours.
+						dlPredParams.lineInfos[i] = new LineInfo(true, DLClassColours.getClassColour(i));
 					}
 				}
 			}

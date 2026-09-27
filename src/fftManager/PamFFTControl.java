@@ -175,6 +175,21 @@ public class PamFFTControl extends PamNotFFTControl implements PamSettings {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			setupControlledUnit();
 			break;
+		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
+			/*
+			 * The offline data store (e.g. the set of wav files) has changed, which can
+			 * bring a new sample rate and channel count. PamProcess.setSampleRate only
+			 * stores the new rate; it does NOT re-run setupFFT(), so without this the FFT
+			 * process keeps its previous setup - wrong FFT array sizes / sample-rate-derived
+			 * state and a stale effective channel map. In viewer mode that leaves regenerated
+			 * raw audio unconsumed (a memory leak) and produces no spectrogram until the FFT
+			 * dialog is opened. Re-running setupControlledUnit() here re-prepares the FFT for
+			 * the new data automatically, exactly as the dialog does.
+			 */
+			if (fftProcess != null) {
+				setupControlledUnit();
+			}
+			break;
 		}
 		//if FX gui then send notification through
 		if (fftGUIFX!=null) fftGUIFX.notifyGUIChange(changeType);

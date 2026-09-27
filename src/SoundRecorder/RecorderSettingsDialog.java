@@ -420,8 +420,8 @@ public class RecorderSettingsDialog extends PamDialog {
 			String infLabel;
 			addComponent(this, new JLabel(infLabel = "(file names automatically contain the date in the format YYYYMMDD_HHMMSS_mmm)"), c);
 			fileInitials.setToolTipText("Characters forming the start of each file name");
-			fileType.setToolTipText("<html>Recording format.  If X3 is listed, ONLY use it for creating a Decimus XML parameters file.<br>" +
-			"X3 recording is not implemented in the standard PAMGuard application.</html>");
+			fileType.setToolTipText("<html>Recording format.  SUD writes X3-compressed SoundTrap files (always 16-bit) that PAMGuard can read back.<br>" +
+			"If X3 is listed, ONLY use it for creating a Decimus XML parameters file - X3 recording is not implemented in the standard PAMGuard application.</html>");
 			bitDepth.setToolTipText("File bit depth (N.B. there is no point in generating 24 bit files from 16 bit sound card input)");
 			
 		}
@@ -432,6 +432,9 @@ public class RecorderSettingsDialog extends PamDialog {
 				fileType.addItem(types[i]);
 			}
 			
+			// SUD (X3-compressed SoundTrap files) is always available.
+			fileType.addItem(RecorderControl.SUD);
+			
 			// if the decimus flag is set, add the X3 file type
 			if (SMRUEnable.isEnableDecimus()) {
 				fileType.addItem(RecorderControl.X3);
@@ -441,6 +444,7 @@ public class RecorderSettingsDialog extends PamDialog {
 			fileInitials.setText(recorderSettings.fileInitials);
 			bitDepth.setSelectedItem(recorderSettings.bitDepth);
 		}
+		
 		boolean getParams() {
 			recorderSettings.setFileType((AudioFileFormat.Type) fileType.getSelectedItem());
 			if (recorderSettings.getFileType() == null) return false;
@@ -448,12 +452,14 @@ public class RecorderSettingsDialog extends PamDialog {
 				recorderSettings.fileInitials = fileInitials.getText();
 			}
 			catch (NullPointerException Ex) {
+				Ex.printStackTrace();
 				return showWarning("Error in file initials");
 			}
 			try {
 				recorderSettings.bitDepth = (int) bitDepth.getSelectedItem();
 			}
 			catch (Exception e) {
+				e.printStackTrace();
 				return showWarning("Error in Bit Depth selction");
 			}
 			return true;

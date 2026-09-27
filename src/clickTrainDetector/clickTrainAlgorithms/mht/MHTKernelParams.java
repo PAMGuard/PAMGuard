@@ -42,7 +42,7 @@ public class MHTKernelParams implements Cloneable,  Serializable, ManagedParamet
 	public int maxCoast = 3; //should be 5 
 	
 	@Override
-	protected MHTKernelParams clone() {
+	public MHTKernelParams clone() {
 		try {
 			return (MHTKernelParams) super.clone();
 		} catch (CloneNotSupportedException e) {

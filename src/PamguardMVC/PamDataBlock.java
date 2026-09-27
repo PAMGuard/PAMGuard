@@ -286,6 +286,21 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	private Vector<Tunit> recycledUnits;
 
+	/**
+	 * Maximum number of units to retain in {@link #pamDataUnits}. When set to a
+	 * positive value the oldest units are removed as new ones are added, so the
+	 * block never holds more than this many. The default (-1) means unlimited,
+	 * preserving the original behaviour.
+	 * <p>
+	 * This is used, for example, by the FFT process in viewer mode: FFT data is
+	 * regenerated on the fly and delivered to consumers (e.g. the spectrogram) via
+	 * the offline observer notifications as it is produced (see
+	 * {@link #notifyOfflineObservers}), so the block itself does not need to retain
+	 * the whole regenerated range. Without a cap the block grows without bound and
+	 * can run PAMGuard out of memory.
+	 */
+	private int maxKeepUnits = -1;
+
 	private DatagramProvider datagramProvider = null;
 
 	/**
@@ -1403,6 +1418,15 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 			if (offlineDataLoading.isCurrentOfflineLoadKeep()) {
 				pamDataUnits.add(pamDataUnit);
+				// bound the retained units if a cap is set (e.g. FFT regeneration in
+				// viewer mode). Consumers have already been given this unit via the
+				// instant/offline observer notifications above, so trimming the oldest
+				// units here does not starve them.
+				if (maxKeepUnits > 0) {
+					while (pamDataUnits.size() > maxKeepUnits) {
+						removedDataUnit(pamDataUnits.remove(0));
+					}
+				}
 			}
 			if (shouldBinary && getBinaryDataSource() != null && !isOffline && !pamDataUnit.isEmbryonic()) {
 				getBinaryDataSource().saveData(pamDataUnit);
@@ -3216,6 +3240,24 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public int getRecyclingStoreLength() {
 		return recyclingStoreLength;
+	}
+
+	/**
+	 * Set the maximum number of units to retain in the block. When positive, the
+	 * oldest units are removed as new ones are added so the block never holds more
+	 * than this many. Set to -1 (the default) for unlimited.
+	 *
+	 * @param maxKeepUnits the maximum number of retained units, or -1 for unlimited.
+	 */
+	public void setMaxKeepUnits(int maxKeepUnits) {
+		this.maxKeepUnits = maxKeepUnits;
+	}
+
+	/**
+	 * @return the maximum number of retained units, or -1 if unlimited.
+	 */
+	public int getMaxKeepUnits() {
+		return maxKeepUnits;
 	}
 
 	/**

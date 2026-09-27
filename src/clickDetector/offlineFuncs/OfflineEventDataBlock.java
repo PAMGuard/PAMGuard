@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.Vector;
 
 import Localiser.LocalisationAlgorithm;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import PamController.PamController;
 import PamView.symbol.StandardSymbolManager;
-import targetMotionOld.TargetMotionLocaliser;
+import targetMotion.TargetMotionLocaliser;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
@@ -161,6 +161,22 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 
 
 	/**
+	 * Migration of old format click event data (EventId column in the
+	 * _OfflineClicks table) into the standard sub table. Checked once, the
+	 * first time viewer data are loaded.
+	 */
+	private OfflineEventDatabaseMigration databaseMigration;
+
+	@Override
+	public boolean loadViewerData(PamguardMVC.dataOffline.OfflineDataLoadInfo offlineDataLoadInfo, pamScrollSystem.ViewLoadObserver loadObserver) {
+		if (databaseMigration == null) {
+			databaseMigration = new OfflineEventDatabaseMigration(clickDetector.getClickControl(), this);
+		}
+		databaseMigration.checkAndMigrate();
+		return super.loadViewerData(offlineDataLoadInfo, loadObserver);
+	}
+
+	/**
 	 * This is generally only called from loadViwerData and since
 	 * LoadviewerData only ever operates once, it should never get called !
 	 */
@@ -216,7 +232,8 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		int unitsRemoved = 0;
 		if (pamDataUnits.isEmpty())
 			return 0;
-		GroupDetection clickTrain;
+		DetectionGroup clickTrain;
+
 		long firstWantedTime = currentTimeMS - this.getNaturalLifetime() * 1000;
 		firstWantedTime = Math.min(firstWantedTime, currentTimeMS - getRequiredHistory());
 		
@@ -314,7 +331,7 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		 */
 		ClickControl clickControl = clickDetector.getClickControl();
 		ClicksOffline clicksOffline = clickControl.getClicksOffline();
-		TargetMotionLocaliser<GroupDetection> tml = clickControl.getTargetMotionLocaliser();
+		TargetMotionLocaliser<DetectionGroup> tml = clickControl.getTargetMotionLocaliser();
 		return tml;
 //		return super.getLocalisationAlgorithm();
 	}

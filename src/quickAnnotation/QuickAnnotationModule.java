@@ -67,6 +67,16 @@ public class QuickAnnotationModule extends SpectrogramAnnotationModule implement
 		return wavAnnotationType;
 	}
 
+	/**
+	 * The quick annotation module has its own "Popup annotation dialog" control in
+	 * its settings dialog and side panel ("Edit new"), so the option is not offered
+	 * again in the annotation types dialog.
+	 */
+	@Override
+	public boolean hasShowDialogOption() {
+		return false;
+	}
+
 
 	@Override
 	public Serializable getSettingsReference() {

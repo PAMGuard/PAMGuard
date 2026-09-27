@@ -489,7 +489,7 @@ public class ClickDisplayManager implements PamSettings {
 	 * @param event
 	 * @param beforeTime 
 	 */
-	public void gotoEvent(OfflineEventDataUnit event, int beforeTime) {
+	public void gotoEvent(PamguardMVC.PamDataUnit event, int beforeTime) {
 		for (int i = 0; i < windowList.size(); i++) {
 			if (windowList.get(i).getClass() == ClickBTDisplay.class) {
 				((ClickBTDisplay)windowList.get(i)).gotoEvent(event, beforeTime);

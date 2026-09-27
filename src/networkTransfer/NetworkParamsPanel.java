@@ -76,6 +76,7 @@ public class NetworkParamsPanel extends PamPanel{
 		GridBagConstraints c = new PamGridBagContraints();
 		addComponent(ipPanel, new JLabel("Host address ", SwingConstants.RIGHT), c);
 		c.gridx++;
+//		c.fill = GridBagConstraints.NONE;
 		addComponent(ipPanel, ipAddress = new JTextField(20), c);
 		c.gridx = 0;
 		c.gridy++;
@@ -122,13 +123,15 @@ public class NetworkParamsPanel extends PamPanel{
 		c.gridy++;
 		addComponent(ipPanel, new JLabel("Persistance Directory ", SwingConstants.RIGHT), c);
 		c.gridx++;
-		addComponent(ipPanel, persistenceDir = new JTextField(60), c);
+		c.gridwidth = 2;
+		addComponent(ipPanel, persistenceDir = new JTextField(40), c);
 		
 		c.gridx = 0;
 		c.gridy++;
+		c.gridwidth = 1;
 		
 		
-		
+		c.gridx = 1;
 		addComponent(ipPanel, testConnection = new JButton("Test connection"), c);
 		
 		tlsConfigurePanel = new TlsConfigurePanel(this.networkParams);

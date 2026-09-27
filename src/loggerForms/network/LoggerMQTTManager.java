@@ -224,11 +224,12 @@ public class LoggerMQTTManager extends LoggerNetworkManager {
 		}
 		MqttMessage message = new MqttMessage(payload);
 		try {
-			mqttClient.sendMqttMessage(topic, message);
+			mqttClient.sendMqttMessage(topic, message, "loggerData");
 		} catch (NetTransmitException e) {
 			System.out.println("Error sending MQTT Message: " + e.getMessage());
 			return false;
 		}
+//		System.out.println("Send network data : " + topic);
 		return true;
 	}
 

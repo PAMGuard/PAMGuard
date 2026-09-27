@@ -79,12 +79,12 @@ public class CTTemplateClassifier implements CTClassifier {
 		//chi2ThresholdClassifier.setParams(templateClassifierParams.chi2ThresholdParams);
 
 		if (clickTrain.getAverageSpectra()==null) {
-			System.err.println("TemplateClassifier:There is no average waveform for template classification: " + clickTrain.averageWaveform);
+			System.err.println("TemplateClassifier:There is no average waveform for template classification: " + clickTrain.averageWaveform());
 			return new TemplateClassification(0, CTClassifier.PRECLASSIFIERFLAG);
 		}
 		
 		//grab average waveform and calculate correlation value
-		double corrValue = calcSpectrumCorrelation(clickTrain.averageWaveform); 
+		double corrValue = calcSpectrumCorrelation(clickTrain.averageWaveform()); 
 				
 		//need to work out correlation threshold whatever
 		

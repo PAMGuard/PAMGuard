@@ -1,12 +1,9 @@
 package PamView.component;
 
-import java.awt.Color;
-
 import javax.swing.JButton;
 import org.kordamp.ikonli.Ikon;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.swing.FontIcon;
 
 public class PamSettingsIconButton extends JButton {
 	
@@ -24,7 +21,7 @@ public class PamSettingsIconButton extends JButton {
 
 	
 //	private static final ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	private static final FontIcon settingsIcon =  FontIcon.of(SETTINGS_IKON, NORMAL_SIZE, Color.DARK_GRAY);
+	private static final PamFontIcon settingsIcon = PamFontIcon.of(SETTINGS_IKON, NORMAL_SIZE);
 
 	/**
 	 * Create a simple square button using the given icon. 

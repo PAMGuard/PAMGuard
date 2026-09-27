@@ -32,7 +32,7 @@ import wavFiles.ByteConverter;
  * Class to handle BCL and DWV data from a SUD file during sud file processing.
  * SUD files are the compressed data files from soundtraps. The latest PAMGuard
  * version contains a audioinputstream for SUD files, making it possible to
- * process them withoug having to first inflate them to wav files. During
+ * process them without having to first inflate them to wav files. During
  * 'normal mode' processing, this class will subscribe to packets from the SUD
  * files, unpack what would normally be BCL and DWV data and generate
  * appropriate binary output files.

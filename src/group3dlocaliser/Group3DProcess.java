@@ -224,7 +224,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			// localiserAlgorithm3D.process(detectionGroupedSet.getGroup(i));
 			abstractLocalisation = localiserAlgorithm3D.runModel(group3dDataUnits[i], null, false);
 			if (abstractLocalisation == null) {
-				System.out.println("Group 3D process null localisation from " + localiserAlgorithm3D.getName());
+//				System.out.println("Group 3D process null localisation from " + localiserAlgorithm3D.getName());
 				continue;
 			}
 			// log all outputs ..

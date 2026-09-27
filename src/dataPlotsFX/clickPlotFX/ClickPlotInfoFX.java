@@ -216,6 +216,21 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 	}
 
 	@Override
+	public boolean canCullOffScreenUnits() {
+		/*
+		 * Only the plots which draw a single symbol per click, and whose value does not depend on the
+		 * previous click, can skip clicks which are off the screen. That excludes the ICI plot, since
+		 * the ICI is measured from the previous click, and the stem, raw and frequency plots, which
+		 * draw shapes that can extend some way beyond the time of the click itself.
+		 */
+		int scaleIndex = getScaleInfoIndex();
+		ArrayList<TDScaleInfo> scaleInfos = getScaleInfos();
+		return scaleIndex == scaleInfos.indexOf(bearingScaleInfo)
+				|| scaleIndex == scaleInfos.indexOf(slantScaleInfo)
+				|| scaleIndex == scaleInfos.indexOf(ampScaleInfo);
+	}
+
+	@Override
 	public boolean shouldDraw(int plotNumber, PamDataUnit dataUnit) {
 		boolean shouldDraw=super.shouldDraw(plotNumber, dataUnit.getSequenceBitmap());
 		if (!shouldDraw) return shouldDraw; //false so can't draw anyway

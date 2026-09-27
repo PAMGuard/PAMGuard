@@ -17,7 +17,6 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.superdet.SuperDetDataBlock;
@@ -560,9 +559,22 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 
 
 	/**
-	 * Called once at the start, and possibly after 
-	 * any changes to the database or binary store. 
-	 * Initialises scroll bars and calls for a data load. 
+	 * Force the scrollers to re-initialise and reload. Scroller initialisation
+	 * normally only happens once (guarded by {@code intialiseLoadDone}); this allows
+	 * it to run again, e.g. after modules have been added programmatically to a
+	 * previously-blank viewer configuration (the drag-and-drop spectrogram wizard).
+	 * Without this the newly-added displays/data blocks are not initialised with the
+	 * data and stay blank until PAMGuard is restarted.
+	 */
+	public void reinitialiseScrollers() {
+		intialiseLoadDone = false;
+		notifyModelChanged(PamControllerInterface.INITIALIZE_LOADDATA);
+	}
+
+	/**
+	 * Called once at the start, and possibly after
+	 * any changes to the database or binary store.
+	 * Initialises scroll bars and calls for a data load.
 	 */
 	private void initialiseScrollers() {
 		DataMapControl dmc = findDataMapControl();

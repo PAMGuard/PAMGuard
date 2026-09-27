@@ -263,6 +263,10 @@
    <tocitem text="CPOD Module " target="sensors.cpod.docs.cpod" image="topic"/>
 
   </tocitem>
+  <tocitem text="SoundTrap SWV Sensor Import ">
+   <tocitem text="Overview " target="sensors.soundtrapSensor.docs.soundtrapSensor" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Displays ">
   <tocitem text="Data Selection ">

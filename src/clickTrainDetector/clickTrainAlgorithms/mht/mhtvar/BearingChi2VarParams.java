@@ -79,4 +79,57 @@ public class BearingChi2VarParams  extends SimpleChi2VarParams implements Manage
 		return ps;
 	}
 
+	/**
+	 * The signed, wrapped difference between two bearings. Unlike a plain
+	 * subtraction this handles the 0/2&pi; wrap-around, returning a value in
+	 * (-&pi;, &pi;] which preserves the <i>direction</i> of the bearing change
+	 * (positive or negative) - which is what makes {@link BearingJumpDrctn} work.
+	 *
+	 * @param a1 - the first (e.g. newer) bearing in RADIANS.
+	 * @param a2 - the second (e.g. older) bearing in RADIANS.
+	 * @return the signed difference {@code a1 - a2} wrapped to (-&pi;, &pi;].
+	 */
+	public static double signedBearingDiff(double a1, double a2) {
+		return Math.atan2(Math.sin(a1 - a2), Math.cos(a1 - a2));
+	}
+
+	/**
+	 * Test whether a bearing jump exceeds the allowed maximum in the given
+	 * direction. This is the single definition of the max-bearing-jump rule shared
+	 * by every click train algorithm (MHT, adaptive and UKF) so the meaning of
+	 * {@link BearingJumpDrctn} is identical everywhere.
+	 * <ul>
+	 * <li>{@code BOTH} - a jump in either direction (its magnitude) is tested.</li>
+	 * <li>{@code POSITIVE} - only positive jumps are tested (a large negative jump
+	 * is ignored).</li>
+	 * <li>{@code NEGATIVE} - only negative jumps are tested.</li>
+	 * </ul>
+	 *
+	 * @param signedDeltaRad - the signed bearing change in RADIANS (see
+	 *                       {@link #signedBearingDiff(double, double)}).
+	 * @param maxJumpRad     - the maximum allowed jump in RADIANS.
+	 * @param drctn          - the jump direction to police; a {@code null} value is
+	 *                       treated as {@link BearingJumpDrctn#POSITIVE}.
+	 * @return true if the jump should be penalised.
+	 */
+	public static boolean exceedsMaxJump(double signedDeltaRad, double maxJumpRad, BearingJumpDrctn drctn) {
+		double delta;
+		if (drctn == null) {
+			drctn = BearingJumpDrctn.POSITIVE;
+		}
+		switch (drctn) {
+		case BOTH:
+			delta = Math.abs(signedDeltaRad);
+			break;
+		case NEGATIVE:
+			delta = -signedDeltaRad;
+			break;
+		case POSITIVE:
+		default:
+			delta = signedDeltaRad;
+			break;
+		}
+		return delta > maxJumpRad;
+	}
+
 }

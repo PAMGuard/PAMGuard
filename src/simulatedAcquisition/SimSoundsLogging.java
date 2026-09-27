@@ -17,7 +17,7 @@ import simulatedAcquisition.sounds.SimSound;
 public class SimSoundsLogging extends SQLLogging {
 
 	private SimSoundDataBlock simSoundDataBlock;
-	private PamTableItem lat, lon, height, head, slant, sound;
+	private PamTableItem lat, lon, height, head, slant, sound, name;
 	private PamTableItem x, y, z;
 	protected SimSoundsLogging(SimSoundDataBlock simSoundDataBlock) {
 		super(simSoundDataBlock);
@@ -31,6 +31,7 @@ public class SimSoundsLogging extends SQLLogging {
 		tableDef.addTableItem(z = new PamTableItem("z", Types.DOUBLE));
 		tableDef.addTableItem(head = new PamTableItem("Heading", Types.DOUBLE));
 		tableDef.addTableItem(slant = new PamTableItem("Slant", Types.DOUBLE));
+		tableDef.addTableItem(name = new PamTableItem("Name", Types.CHAR, 20));
 		tableDef.addTableItem(sound = new PamTableItem("Sound", Types.CHAR, 20));
 		
 		setTableDefinition(tableDef);
@@ -63,7 +64,12 @@ public class SimSoundsLogging extends SQLLogging {
 			slant.setValue(null);
 		}
 		sound.setValue(simSound.getSimSignal().getName());
-		
+		String simName = null;
+		SimObject simObject = simSound.getSimObjectDataUnit().getSimObject();
+		if (simObject != null) {
+			simName = simObject.name;
+		}
+		name.setValue(simName);
 
 		GpsData arrayLatLong = null;
 		try {

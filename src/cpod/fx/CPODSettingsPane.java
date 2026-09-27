@@ -133,6 +133,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 		//		PamButton browsFileButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_MULTIPLE, PamGuiManagerFX.iconSize)); 
 		PamButton browsFileButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file-multiple", PamGuiManagerFX.iconSize)); 
+		browsFileButton.getStyleClass().add("icon-button");
 		browsFileButton.setMinWidth(30);
 		browsFileButton.setTooltip(new Tooltip("Browse to select individual or mutliple CP1 or CP3 files or FP1 or FP3 files"));
 		browsFileButton.setOnAction((action)->{
@@ -145,6 +146,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 		//		PamButton browsFolderButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FOLDER, PamGuiManagerFX.iconSize)); 
 		PamButton browsFolderButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize)); 
+		browsFolderButton.getStyleClass().add("icon-button");
 		browsFolderButton.setMinWidth(30);
 		browsFolderButton.setTooltip(new Tooltip("Browse to a folder contaning CP1 and CP3 or FP1 and FP3 files"));
 		browsFolderButton.setOnAction((action)->{
@@ -499,7 +501,12 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 	@Override
 	public String getName() {
-		return "CPOD Paramters";
+		return "CPOD Parameters";
+	}
+
+	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("cpod_importer.md");
 	}
 
 

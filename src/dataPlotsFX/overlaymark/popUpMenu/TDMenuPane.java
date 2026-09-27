@@ -128,7 +128,14 @@ public class TDMenuPane extends PamBorderPane {
 	private OverlayGroupDisplay groupDetectionDisplay;
 
 	/**
-	 * Main holder for the menu pane. 
+	 * Style class for the pop up menu's control strip. Unlike the sliding panes,
+	 * which float over the display on a lighter panel face, this strip sits flush
+	 * against it and so takes the general window background of the colour scheme.
+	 */
+	public static final String MENU_PANE_STYLE_CLASS = "pam-menu-pane";
+
+	/**
+	 * Main holder for the menu pane.
 	 */
 	private PamBorderPane holder;
 
@@ -196,6 +203,8 @@ public class TDMenuPane extends PamBorderPane {
 			groupDetectionDisplay.layoutPane();
 
 			HidingPane hidingPaneLeft=new HidingPane(Side.LEFT, menuPane, this, false);
+			//its show / hide buttons sit outside menuPane, so they need the sliding style too.
+			PamStylesManagerFX.getPamStylesManagerFX().styleNode(hidingPaneLeft, PamStylesManagerFX.STYLE_SLIDING);
 			hidingPaneLeft.showHidePane(true, false);
 
 			PamButton showButtonLeft=hidingPaneLeft.getShowButton();
@@ -233,27 +242,28 @@ public class TDMenuPane extends PamBorderPane {
 	/**
 	 * Set the summary text for the data unit in the menu. 
 	 */
-	private void setSummaryText() {		
+	private void setSummaryText() {
 		if (currentDataUnit==null || detectionSummary==null) {
 			this.infoTextLabel.setText("No data units selected");
-			return; 
+			return;
 		}
 
-		String text; 
+		String text;
 		if (detectionSummary.getDataList().size()>=1){
 //			text= currentDataUnit.getSummaryString();
-						
+
 			text=currentDataUnit.getParentDataBlock().
 					getHoverText(tdGraphFX.getGraphProjector(), currentDataUnit, 0);
-			
-			
+
+
 			if (text==null) return; //do not clear as usually this is because a super unit has been set
 		}
 		else {
-			//selected an area with no data units. 
-			text= new String("No data units selected"); 
+			//selected an area with no data units.
+			text= new String("No data units selected");
 		}
 
+		//the hover/summary text is often HTML - htmlToNormal converts basic tags to formatted plain text.
 		this.infoTextLabel.setText(PamUtilsFX.htmlToNormal(text));
 	}
 
@@ -271,13 +281,15 @@ public class TDMenuPane extends PamBorderPane {
 	 */
 	private Pane createMenuPane(){
 
-		PamVBox menuPane = new PamVBox(); 
-		menuPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
-		menuPane.setStyle("-fx-background-color: -fx-darkbackground");
+		PamVBox menuPane = new PamVBox();
+		//background comes from the style class rather than an inline style: an inline
+		//style beats every style sheet, so the night override could never change it.
+		menuPane.getStyleClass().add(MENU_PANE_STYLE_CLASS);
 
 		//create info and toggle detection buttons that always sit at the top of the display
 
 		PamButton infoButton = new PamButton();
+		infoButton.getStyleClass().add("icon-button");
 		infoButton.getStyleClass().add("square-button-trans");
 		infoButton.setTooltip(new Tooltip("Show detection info"));
 //		infoButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.INFO, PamGuiManagerFX.iconSize));
@@ -319,11 +331,13 @@ public class TDMenuPane extends PamBorderPane {
 
 		//create info pane
 		PamButton reverseInfo = new PamButton();
+		reverseInfo.getStyleClass().add("icon-button");
 		reverseInfo.getStyleClass().add("square-button-trans");
 		reverseInfo.setTooltip(new Tooltip("Show menu"));
 //		reverseInfo.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.MENU, PamGuiManagerFX.iconSize));
 		reverseInfo.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", PamGuiManagerFX.iconSize));
 		infoPane= new PamBorderPane();
+		infoPane.getStyleClass().add(MENU_PANE_STYLE_CLASS);
 		infoPane.setTop(reverseInfo);
 		infoPane.setCenter(infoTextLabel=new TextArea());
 		infoTextLabel.setEditable(false);
@@ -342,9 +356,26 @@ public class TDMenuPane extends PamBorderPane {
 		flipPane.getBack().getChildren().add(infoPane); 
 		flipPane.setPrefWidth(MENU_WIDTH);
 
-		PamBorderPane holder = new PamBorderPane(flipPane); 
+		PamBorderPane holder = new PamBorderPane(flipPane);
 		holder.setPrefWidth(MENU_WIDTH);
+		holder.getStyleClass().add(MENU_PANE_STYLE_CLASS);
 
+		/*
+		 * Style the outer holder, so the flip pane and the info side get the sliding
+		 * style too - only the menu side used to, so flipping over showed an unstyled
+		 * pane.
+		 *
+		 * Register with the style manager rather than adding the style sheets directly:
+		 * the pop up menu is built once, when the time display's plot pane is created,
+		 * and reused for the rest of the session, so a plain addAll would leave it with
+		 * the style sheets of whatever colour scheme was selected at start up.
+		 *
+		 * NB style this holder, not TDMenuPane. This is a sibling of the detection
+		 * display; putting the sliding style on a common ancestor of both would demote
+		 * the detection display's own hiding panes in the cascade (see the note at the
+		 * top of pamSettingsFlatLaf.css).
+		 */
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(holder, PamStylesManagerFX.STYLE_SLIDING);
 
 		return holder;
 	}
@@ -469,13 +500,20 @@ public class TDMenuPane extends PamBorderPane {
 				final OverlayMenuItem overlayItme=menuNodes.get(i); 
 				//				System.out.println("Overlay Items: " +overlayItme.getNodeToolTip().getText());
 				menuButton=overlayItme.menuAction(detectionSummary, detectionSummary.getDataList().indexOf(currentDataUnit), overlayMarker.getCurrentMark() );
-				if (menuButton==null) continue; 
+				if (menuButton==null) continue;
 				tilePane.getChildren().add(menuButton);
-				styleButton(menuButton, 30);
-				//				n++; 
+				/*
+				 * These are icon only buttons, so they share the width of the menu evenly
+				 * rather than taking the 30 pixels of their icon and bunching up on the left.
+				 * The .icon-button class stops the style sheet left justifying them like the
+				 * menu entries above - see pamSettingsFlatLaf.css.
+				 */
+				styleButton(menuButton, MENU_WIDTH/3.2);
+				menuButton.getStyleClass().add("icon-button");
+				//				n++;
 			}
 		}
-		return tilePane; 
+		return tilePane;
 	}
 
 

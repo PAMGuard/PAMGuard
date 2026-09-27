@@ -1,0 +1,202 @@
+/*
+ * pamWindowsDark.css
+ *
+ * Dark-mode OVERRIDE for pamWindowsLight.css. This is not a standalone
+ * theme: add it as an additional stylesheet AFTER pamWindowsLight.css.
+ * It redefines the -win-* looked-up colours and re-colours the handful
+ * of rules that use hard-coded light values.
+ *
+ * The Windows Swing look and feel has no real dark mode, so this follows
+ * the Windows 10/11 dark app palette: #202020 background, #333333 control
+ * faces, white text and glyphs, the same #0078d7 accent, and the grey
+ * (#414141) menu highlight used by dark-mode Win32 menus.
+ *
+ * NOTE: not currently used by PamDefaultStyle. When a dark colour scheme is
+ * selected PamLookAndFeel installs FlatLaf Dark as the Swing look and feel on
+ * every platform (the Windows system look and feel has no dark mode), so the
+ * JavaFX side follows FlatLaf too and uses pamFlatLafDark.css. This sheet is
+ * kept for a future style which pairs a dark JavaFX theme with the Windows
+ * look and feel.
+ *
+ * The palette is declared on '.root, .gui-css-root' to match the base sheet -
+ * see the note at the top of pamWindowsLight.css.
+ */
+
+.root, .gui-css-root {
+    -win-background:            #202020;
+    -win-foreground:            #ffffff;
+    -win-disabled-foreground:   #6d6d6d;
+    -win-component-background:  #262626;
+    -win-button-face:           #333333;
+    -win-button-border:         #5c5c5c;
+    -win-hover-face:            #364554;
+    -win-pressed-face:          #2c4257;
+    -win-pressed-border:        #4884b4;
+    -win-disabled-face:         #2a2a2a;
+    -win-disabled-border:       #3d3d3d;
+    -win-input-border:          #666666;
+    -win-accent:                #0078d7;
+    -win-menu-highlight:        #414141;
+    -win-selection-inactive:    #4d4d4d;
+    -win-separator:             #5c5c5c;
+    -win-tab-border:            #444444;
+    -win-link:                  #75b6f3;
+    -win-arrow:                 #cccccc;
+    -win-progress:              #06b025;
+
+    /* ---- PAMGuard plot furniture ---- */
+    -pam-plot-background:  #101010;
+    -pam-scroller-body:    rgba(190,190,190,0.30);
+    -pam-scroller-handle:  rgba(215,215,215,0.65);
+    -pam-scroller-grip:    rgba(40,40,40,0.9);
+
+    /* light grey icons for the dark background */
+    -fx-icon_col: #c8c8c8;
+}
+
+
+/* ---- CheckBox / RadioButton / ToggleSwitch outlines: light on dark ---- */
+
+.check-box > .box,
+.radio-button > .radio {
+    -fx-background-color: #cccccc, -win-component-background;
+}
+
+.toggle-switch > .thumb-area {
+    -fx-background-color: #cccccc, -win-background;
+}
+
+.toggle-switch > .thumb {
+    -fx-background-color: #cccccc;
+}
+
+.toggle-switch:disabled:selected > .thumb-area {
+    -fx-background-color: #2f5877;
+}
+
+
+/* ---- Combo / toolbar hover borders: darker blue ---- */
+
+.combo-box-base:hover,
+.choice-box:hover {
+    -fx-background-color: #4a7ba6, -win-hover-face;
+}
+
+.tool-bar > .button:hover,
+.tool-bar > .toggle-button:hover,
+.tool-bar > .menu-button:hover {
+    -fx-background-color: #4a7ba6, -win-hover-face;
+}
+
+.tool-bar > .toggle-button:selected {
+    -fx-background-color: #4a7ba6, -win-pressed-face;
+}
+
+
+/* ---- Slider / ProgressBar tracks ---- */
+
+.slider .track {
+    -fx-background-color: #55595c, #3d4448;
+}
+
+.progress-bar > .track {
+    -fx-background-color: #4d4d4d, #2b2b2b;
+}
+
+
+/* ---- ScrollBar ---- */
+
+.scroll-bar > .thumb {
+    -fx-background-color: #4d4d4d;
+}
+
+.scroll-bar > .thumb:hover {
+    -fx-background-color: #686868;
+}
+
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: #9e9e9e;
+}
+
+.scroll-bar > .increment-button:hover,
+.scroll-bar > .decrement-button:hover {
+    -fx-background-color: #373737;
+}
+
+.scroll-bar > .increment-button:pressed,
+.scroll-bar > .decrement-button:pressed {
+    -fx-background-color: #9e9e9e;
+}
+
+
+/* ---- Tabs / titled pane hover ---- */
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: -win-tab-border, #2d3e4d;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: #2d3e4d;
+}
+
+
+/* ---- List / table ---- */
+
+.list-view,
+.tree-view,
+.table-view,
+.tree-table-view {
+    -fx-background-color: #5a5f66, -win-component-background;
+}
+
+.list-cell:filled:hover,
+.tree-cell:filled:hover,
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
+    -fx-background-color: #263845;
+}
+
+.table-view .column-header,
+.tree-table-view .column-header,
+.table-view .filler,
+.tree-table-view .filler {
+    -fx-border-color: transparent #3d3d3d #3d3d3d transparent;
+}
+
+.table-view .column-header:hover,
+.tree-table-view .column-header:hover {
+    -fx-background-color: transparent, #2d4a63;
+}
+
+
+/* ---- Menus ---- */
+
+.context-menu {
+    -fx-background-color: #494949, -win-component-background;
+}
+
+.menu-item > .accelerator-text {
+    -fx-text-fill: #9e9e9e;
+}
+
+.context-menu .separator > .line {
+    -fx-border-color: #404040;
+}
+
+.combo-box-popup > .list-view {
+    -fx-background-color: #494949, -win-component-background;
+}
+
+
+/* ---- Tooltip ---- */
+
+.tooltip {
+    -fx-text-fill: #e0e0e0;
+}
+
+
+/* ---- Titled Border (etched, dark) ---- */
+
+.bordered-titled-border {
+    -fx-border-color: #4a4a4a, #141414;
+}

@@ -37,9 +37,10 @@ public class KooguDLClassifierTest {
 	@Test
 	public void kooguClassifierTest() {
 		
+		//11/03/2026 - new Koogu model used which seems to be compatible with the latest version of TensorFlow. 
 
 		//relative paths to the resource folders.
-		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/blue_whale_24.kgu";
+		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/Koogu_Blue_Whale_BmD_2022_12_20.kgu";
 		String relWavPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/20190527_190000.wav";
 		String relMatPath  =	"./src/test/resources/rawDeepLearningClassifier/Koogu/blue_whale_24/rawScores_20190527_190000.mat";
 		

@@ -212,6 +212,11 @@ public class TDGraphSettingsPane extends DynamicSettingsPane<TDGraphParametersFX
 
 	@Override
 	public TDGraphParametersFX getParams(TDGraphParametersFX currParams) {
+		//a colour picked here is the user's own, so stop it following the colour
+		//scheme - until the next time the scheme is changed, which wins again.
+		if (!backColPicker.getValue().equals(currParams.plotFill)) {
+			currParams.plotFillFollowsScheme = false;
+		}
 		currParams.plotFill=backColPicker.getValue();
 		currParams.popUpMenuType=this.popUpBox.getSelectionModel().getSelectedIndex(); 		
 		return currParams;

@@ -718,7 +718,10 @@ public class OfflineTaskGroup implements PamSettings {
 				continue;
 			}
 			if (aTask.isDoRun()) {
+				System.out.println("CLICK TRAIN DETECTOR: SHOULD DELETE? " + taskGroupParams.deleteOld);
+
 				if (taskGroupParams.deleteOld) {
+					System.out.println("CLICK TRAIN DETECTOR: DELETING TASK " + aTask.getLongName());
 					aTask.deleteOldData(taskGroupParams);
 				}
 				//added this here so that tasks with different

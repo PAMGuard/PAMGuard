@@ -42,9 +42,12 @@ public class ClickBearingTask extends OfflineTask<ClickDetection> {
 		for (int i = 0; i < n; i++) {
 			gd = clickControl.getClickDetector().getChannelGroupDetector(i);
 
+			if (gd == null) {
+				continue;
+			}
 			int[] phones = gd.getGroupHydrophones();
 			bl = gd.getBearingLocaliser();
-			if (bl != null) {
+			if (bl != null && phones != null) {
 				bl.prepare(phones,0, Correlations.defaultTimingError(clickControl.getClickDetector().getSampleRate()));
 			}
 		}

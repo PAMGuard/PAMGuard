@@ -7,6 +7,7 @@ import clickTrainDetector.classification.CTClassifierParams;
 import clickTrainDetector.classification.CTClassifierType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -17,6 +18,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.flipPane.PamFlipPane;
 
 /**
  * The basic classifier pane. 
@@ -62,17 +64,49 @@ public class CTClassifierPane extends PamBorderPane {
 	private PamSpinner<Integer> speciesIDSpinner;
 	
 	/**
-	 * The default species to set 
+	 * The default species to set
 	 */
-	private int defaultSpeciesID = 1; 
+	private int defaultSpeciesID = 1;
 
 	/**
-	 * Constructor for the classifier pane. 
+	 * Flip pane - front is the whole classifier pane, the back can hold an
+	 * advanced pane for the current classifier (e.g. the pane for generating a
+	 * spectrum template from click events). The whole classifier pane is wrapped
+	 * so the advanced pane can be as large as possible.
+	 */
+	private PamFlipPane flipPane;
+
+	/**
+	 * Constructor for the classifier pane.
 	 * @param i - the default species ID
 	 */
 	public CTClassifierPane(ClickTrainControl clickTrainControl) {
-		this.clickTrainControl=clickTrainControl; 
-		this.setCenter(createClassifierPane()); 
+		this.clickTrainControl=clickTrainControl;
+
+		flipPane = new PamFlipPane();
+		flipPane.setFrontContent(createClassifierPane());
+
+		this.setCenter(flipPane);
+	}
+
+	/**
+	 * Show an advanced settings pane on the back of the flip pane. The back pane
+	 * fills the whole classifier pane. Use {@link #flipToFront()} to return to
+	 * the classifier settings (the back button also returns).
+	 * @param title - the title shown at the top of the advanced pane.
+	 * @param content - the content of the advanced pane.
+	 */
+	public void flipToBack(String title, Node content) {
+		flipPane.getAdvLabel().setText(title);
+		flipPane.setAdvPaneContent(content);
+		flipPane.flipToBack();
+	}
+
+	/**
+	 * Flip back to the classifier settings from an advanced pane.
+	 */
+	public void flipToFront() {
+		flipPane.flipToFront();
 	}
 
 

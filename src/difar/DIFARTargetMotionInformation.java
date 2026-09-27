@@ -9,7 +9,7 @@ import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
 import pamMaths.PamQuaternion;
 import pamMaths.PamVector;
-import targetMotionModule.TargetMotionInformation;
+import difar.targetmotion.TargetMotionInformation;
 
 public class DIFARTargetMotionInformation implements TargetMotionInformation {
 

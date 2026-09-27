@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.Timer;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
@@ -17,16 +18,13 @@ import PamController.PamSettings;
 import PamModel.SMRUEnable;
 import PamView.PamSidePanel;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamRawDataBlock;
-import cepstrum.CepstrumDataBlock;
-import fftManager.FFTDataBlock;
-import ltsa.LtsaDataBlock;
-import mel.MelDataBlock;
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParams;
 import networkTransfer.emulator.NetworkEmulator;
 import networkTransfer.mqttClient.PamMqttClient;
 import pamguard.GlobalArguments;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Send near real time data over the network to another PAMGUARD configuration.
@@ -35,8 +33,6 @@ import pamguard.GlobalArguments;
  *
  */
 public class NetworkSender extends PamControlledUnit implements PamSettings {
-	
-	public static final String UNIT_TYPE = "Network Sender";
 
 	/**
 	 * These two left in since they are used in the BatchProcessing plugin. 
@@ -69,31 +65,26 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	private boolean initialisationComplete = false;
 	private NetworkSendSidePanel sidePanel;
 	private NetworkSendProcess commandProcess;
-	private boolean activatedByCommand = false;
 	//PamWarning sendWarning;
 	public NetworkClient client;
 	
 	public NetworkSender(String unitName) {
-		super(UNIT_TYPE, unitName);
+		super("Network Sender", unitName);
 
 		PamSettingManager.getInstance().registerSettings(this);
 		
 		checkCommandLineOptions();
 		
-		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY) && networkSendParams.isModuleActivated()) {
+//		if(this.networkSendParams.hasSendFormat(NetworkSendParams.NETWORKSEND_BYTEARRAY)) {
+//		if(this.networkSendParams.getSendSelection(null, getQueueLength())) {
+		// not really got an option for this - do we always want to send the command data, or does this need to be optionsl ? 
 			commandProcess = new NetworkSendProcess(this, null,NetworkSendParams.NETWORKSEND_BYTEARRAY);
 			commandProcess.setCommandProcess(true);
 			addPamProcess(commandProcess);
-		}
+//		}
 		
 		sidePanel = new NetworkSendSidePanel(this);
-		
-		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
-		//If net sending is enabled then let this run, but otherwise just skip past it.. 
-		if(this.networkSendParams.isModuleActivated()) {
-			initializeClient();
-		}
-		
+		initializeClient();
 	}
 	
 	/**
@@ -114,26 +105,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		String password = GlobalArguments.getParam(NetSendCommandParam.PASSWORD.arg);
 		String useJson = GlobalArguments.getParam(NetSendCommandParam.SENDJSON.arg);
 		String persistenceDir = GlobalArguments.getParam(NetSendCommandParam.PERSISTANCE_DIRECTORY.arg);
-		String senderActive = GlobalArguments.getParam(NetSendCommandParam.ACTIVE.arg);
 
-		/*
-		 * If a runtime arg is passed for activating/deactivating the network sender, then pass to the parameters.
-		 * Assume by default that if this module is present then it should be set to active.
-		 * ST Aug 13 2026
-		 */
-		if(senderActive!=null) {
-			boolean isActive = Boolean.valueOf(senderActive);
-			networkSendParams.setModuleActivated(isActive);
-			if(isActive) {
-				this.activatedByCommand = true;
-				System.out.println("Pamguard is running with network sending ENABLED");
-			}else {
-				System.out.println("Pamguard is running with network sending DISABLED");
-			}
-		}else {
-			networkSendParams.setModuleActivated(true);
-		}
-		
 		if(user!=null) {
 			networkSendParams.userId = user;
 		}
@@ -184,7 +156,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		if(persistenceDir!=null) {
 			networkSendParams.persistenceDirectory = persistenceDir;
-			System.out.println("Setting MQTT Persistance Directory from command line arg to "+persistenceDir);
 		}
 		
 		/*
@@ -197,7 +168,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		 * If persistence directory is set, and the filepath is consistent with the current OS, and it is not a pamguard home-like directory, then move on
 		 */
 		networkSendParams.verifyCorrectPersistanceDirectory();
-		System.out.println("Decided to set persistance directory to "+networkSendParams.persistenceDirectory);
 		//Make it easy on users who may not know the details of MQTT -- if station ID is NOT set, then just set it to 'BaseStation' (the CAB/APS will set its ID to the pb###)
 		//If stationID is set, then move on
 		networkSendParams.checkStationID();
@@ -207,21 +177,23 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		/**
 		 * Do we need code here that will allow both ? 
+		 * This will need updated to allow both, since send fmt is now on a block by block basis, so these commands
+		 * have become irrelevent. 
 		 */
-		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
-		if(useJson!=null) {
-			isSetJson = Boolean.valueOf(useJson);
-		}
-		
-		
-		int sendFmt = 0;
-		if(isSetJson) {
-			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
-		}
-		else {
-			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
-		}
-		networkSendParams.setSendingFormat(sendFmt);		
+//		boolean isSetJson = (networkSendParams.getSendingFormat() & NetworkSendParams.NETWORKSEND_JSON) != 0;
+//		if(useJson!=null) {
+//			isSetJson = Boolean.valueOf(useJson);
+//		}
+//		
+//		
+//		int sendFmt = 0;
+//		if(isSetJson) {
+//			sendFmt = NetworkSendParams.NETWORKSEND_JSON;
+//		}
+//		else {
+//			sendFmt = NetworkSendParams.NETWORKSEND_BYTEARRAY;
+//		}
+//		networkSendParams.setSendingFormat(sendFmt);		
 	}
 
 	public void initializeClient() {
@@ -236,11 +208,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	}
 	
 	public void closeClient() {
-		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client.
-		//Client may have never been initialized
-		if(client!=null) {
-			this.client.close();
-		}
+		this.client.close();
 	}
 
 	/* (non-Javadoc)
@@ -385,78 +353,39 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	
 
 	private void sortDataSources() {
-		ArrayList<PamDataBlock> wanted = listWantedDataSources();
+		ArrayList<PamDataBlock> wanted = PamController.getInstance().getDataBlocks(); // get everything !
 		int nProcess = getNumPamProcesses();
+		// remove all the old processes. 
 		for (int i = nProcess - 1; i >= 1; i--) {
 			removePamProcess(getPamProcess(i));
 		}
+		int totalFormat = 0;
 		for (PamDataBlock aBlock:wanted) {
-			addPamProcess(new NetworkSendProcess(this, aBlock,networkSendParams.getSendingFormat()));
-
+			int fmt = networkSendParams.getSendSelection(aBlock);
+			if (fmt > 0) {
+				addPamProcess(new NetworkSendProcess(this, aBlock, fmt));
+			}
+			totalFormat |= fmt;
 		}
 		
 		// set the command process to use the same format as all of the new processes
 		if(this.commandProcess!=null) {
-			commandProcess.setOutputFormat(networkSendParams.getSendingFormat());
+			commandProcess.setOutputFormat(totalFormat);
 		}
 	}
 
-	/**
-	 * ST added 8/13/2026. 
-	 * 
-	 * The goal with these updates is to hide some of the MQTT net send/receive technical details from a user more focused on acoustics. 
-	 * From a remote device, the command flag "-netSend.active true" will force the PAM Model to add a network send module (if one doesn't already exist).
-	 * To the user this will be presented as a button that simply says "Send data: true/false". When Pamguard is deployed, the net sending will get configured automatically.
-	 * And if a net send module doesn't already exist, one will be added and default to send all blocks that are NOT raw data or (pure) FFT -- LTSA is fine.
-	 * 
-	 * In the future, buttons for selecting the sending modules would be wise, as there are likely contexts I am not considering where only a small selection of blocks should send.
-	 * 
-	 * Hopefully this won't cause trouble in the short term
-	 * 
-	 * @param ArrayList<PamDataBlock> possibles: all data blocks that have the selected send format defined
-	 * @return ArrayList<PamDataBlock> all blocks in the model that are NOT raw data or raw FFT types
-	 */
-	private ArrayList<PamDataBlock> listAndConfigureDefaultWantedDataSources(ArrayList<PamDataBlock> possibles) {
-		System.out.println("Realtime data transmission has been initialized.");
-		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
-		for(PamDataBlock aBlock:possibles) {
-			boolean blockIsRaw = (aBlock instanceof PamRawDataBlock);
-			boolean blockIsFFT = (aBlock instanceof FFTDataBlock);
-			if(blockIsFFT) {
-				boolean blockIsLTSA = (aBlock instanceof LtsaDataBlock);
-				boolean blockIsCepstrum = (aBlock instanceof CepstrumDataBlock);
-				boolean blockIsMel = (aBlock instanceof MelDataBlock);
-				if(blockIsLTSA || blockIsCepstrum || blockIsMel) {
-					blockIsFFT = false;
-				}
-			}
-			if(!blockIsRaw && !blockIsFFT) {
-				wants.add(aBlock);
-				networkSendParams.setDataBlock(aBlock, true);
-				System.out.println("	Adding realtime stream: "+aBlock.getDataName());
-			}
-		}
-		if(wants.size()==0) {
-			System.out.println("	WARNING! Could not find any data streams to transmit in realtime. Check .psfx configuration.");
-		}
-		return wants;
-	}
-	
-	public ArrayList<PamDataBlock> listWantedDataSources() {
-		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.getSendingFormat());
-		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
-		for (PamDataBlock aBlock:possibles) {
-			if (networkSendParams.findDataBlock(aBlock) != null) {
-				wants.add(aBlock);
-			}
-		}
-		if(wants.size()==0 && this.activatedByCommand) {
-			wants = listAndConfigureDefaultWantedDataSources(possibles);
-		}
-		return wants;
-	}
-	
-	
+//	public ArrayList<PamDataBlock> listWantedDataSources() {
+//		ArrayList<PamDataBlock> possibles = listPossibleDataSources(networkSendParams.getSendingFormat());
+//		ArrayList<PamDataBlock> wants = new ArrayList<PamDataBlock>();
+//		for (PamDataBlock aBlock:possibles) {
+//			if (networkSendParams.findDataBlock(aBlock) != null) {
+//				wants.add(aBlock);
+//			}
+//		}
+//		return wants;
+//	}
+//	
+//	
 	public ArrayList<PamDataBlock> listPossibleDataSources(int outputFormat) {
 		ArrayList<PamDataBlock> possibles = new ArrayList<PamDataBlock>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
@@ -513,22 +442,14 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	@Override
 	public void pamToStart() {
 		super.pamToStart();
-		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
-		//If net sending is enabled then let this run, but otherwise just skip past it.. 
-		if(this.networkSendParams.isModuleActivated() && this.client!=null) {
-			this.client.configureClient(this.networkSendParams);
-			runClient();
-		}
+		this.client.configureClient(this.networkSendParams);
+		runClient();
+		
 	}
 	
 	public long lastTransmitErrorPrint = 0;
 
 	public void transmitData(NetworkQueuedObject qo) {
-		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
-		//Dont do anything if the sender is disabled
-		if(this.networkSendParams.isModuleActivated() != true) {
-			return;
-		}
 		if(client==null) {
 			System.out.println("Client is null. Likely due to restarting client");
 			return;
@@ -547,25 +468,13 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	}
 
 	public String getStatus() {
-		if(this.networkSendParams.isModuleActivated() != true) {
-			return "Net Send Disabled";
-		}
 		if(client==null) {
 			return "Disconnected";
 		}
-		
 		return client.getStatus();
 	}
 
 	public void runClient() {
-		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
-		//Dont do anything if the sender is disabled
-		if(this.networkSendParams.isModuleActivated() != true) {
-			return;
-		}
-		if(client==null) {
-			this.initializeClient();
-		}
 		if(client.isConnected()) {
 			return;
 		}
@@ -595,23 +504,6 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		return client.getQueueSize();
 	}
 
-	
-	@Override
-	public String getModuleSummary(boolean clear, String format) {
-		if(format.equals("json")) {
-			String jsonString = String.format("{\"active\":%b,", this.networkSendParams.isModuleActivated());
-			if(this.networkSendParams.isModuleActivated()) {
-				jsonString += String.format("\"connected\":%b,\"serverHost\":\"%s\",\"serverPort\":%d", 
-						this.client.isConnected(),
-						this.networkSendParams.ipAddress,
-						this.networkSendParams.portNumber);
-			}
-			jsonString += "}";
-			return jsonString;
-		}
-		
-		return super.getModuleSummary(clear, format);
-	}
 	
 	
 }

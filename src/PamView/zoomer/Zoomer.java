@@ -297,6 +297,14 @@ public class Zoomer {
 
 		private void doubleClicked(MouseEvent e) {
 //			System.out.println("doubleClick zoomer");
+			if (mousePressPoint == null) {
+				/*
+				 * The display said it couldn't start a zoom area on the preceding mouse press,
+				 * e.g. because a modifier key means the click is being used for something else,
+				 * so don't start a polygon either.
+				 */
+				return;
+			}
 			if (topMostShape != null) {
 				if (topMostShape.isClosed() && topMostShape.containsPoint(e.getComponent(), e.getPoint())) {
 					zoomIn();

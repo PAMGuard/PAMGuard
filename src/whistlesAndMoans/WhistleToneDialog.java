@@ -25,6 +25,7 @@ import PamguardMVC.DataBlock2D;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import cepstrum.CepstrumProcess;
+import deepWhistle.MaskedFFTProcess;
 import fftManager.FFTDataUnit;
 import spectrogramNoiseReduction.SpectrogramNoiseDialogPanel;
 import spectrogramNoiseReduction.SpectrogramNoiseSettings;
@@ -295,6 +296,11 @@ public class WhistleToneDialog extends PamDialog {
 		}
 		// The methods we really need are numbers  0, 1 and 3
 		// the Gaussian smoothing is optional. 
+		
+		if (isAISource()) {
+			return true; //no obligatory methods
+		}
+		
 		int[] required = {0, 1, 3};
 		for (int i = 0; i < required.length; i++) {
 			if (!spectrogramNoiseDialogPanel.hasProcessed(required[i])) {
@@ -304,11 +310,21 @@ public class WhistleToneDialog extends PamDialog {
 		return true;
 	}
 	
+	private boolean isAISource() {
+		//Add other AI based FFT processes here if they are added in the future.
+		return isParentProcess(MaskedFFTProcess.class);
+
+	}
+
+	private boolean isCepstrumSource() {
+		return isParentProcess(CepstrumProcess.class);
+	}
+
 	/**
 	 * Find out if the source of data is a cepstrum, not a spectrogram.
 	 * @return true if a parent process is a cepstrum. 
 	 */
-	private boolean isCepstrumSource( ) {
+	private boolean isParentProcess(Class<?> sourceClass) {
 		if (whistleToneParameters == null || whistleToneParameters.getDataSource() == null) {
 			return false;
 		}
@@ -324,7 +340,7 @@ public class WhistleToneDialog extends PamDialog {
 			if (process == null) {
 				return false;
 			}
-			if (process instanceof CepstrumProcess) {
+			if (sourceClass.isInstance(process)) {
 				return true;
 			}
 			else {
@@ -334,6 +350,7 @@ public class WhistleToneDialog extends PamDialog {
 		
 		return false;
 	}
+	
 
 	@Override
 	public void restoreDefaultSettings() {

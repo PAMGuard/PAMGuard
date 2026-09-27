@@ -22,6 +22,7 @@ import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.plots.RawFFTPlot;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import detectionPlotFX.whistleDDPlot.WhistleDDInfo;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import detectionPlotFX.whistleDDPlot.WhistleDDPlotProvider;
 import detectionPlotFX.whistleDDPlot.WhistleFFTPlot;
 import javafx.event.EventType;
@@ -71,7 +72,21 @@ public class OverlayGroupDisplay extends PamBorderPane {
 	 * Constructor for the group detection display.
 	 */
 	public OverlayGroupDisplay() {
-		
+
+		/*
+		 * Style with the GUI style so the display follows the day / dark / night colour
+		 * schemes. This is the whole content of the advanced pop up menu, and without it
+		 * the only style sheet reaching here is the sliding dialog one from the pop up
+		 * shell, which is a fixed grey whatever scheme is selected: the tab pane (shown
+		 * when there is a super detection as well as the detections) fell back to the
+		 * plain JavaFX Modena look, and the light background showed around the detection
+		 * display and behind the scroll bar.
+		 *
+		 * The settings hiding panes inside keep the sliding style - they register their
+		 * own style sheet, which takes precedence over one inherited from an ancestor.
+		 */
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(this, PamStylesManagerFX.STYLE_GUI);
+		//-fx-background is remapped to the scheme's window background by the GUI style.
 		this.setStyle("-fx-background-color: -fx-background;");
 		//create two displays, one for super detections and the other for the
 		//sub detections. 

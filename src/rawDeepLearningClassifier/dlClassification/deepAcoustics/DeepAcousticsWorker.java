@@ -79,6 +79,13 @@ public class DeepAcousticsWorker extends ArchiveModelWorker {
 
 			List<DeepAcousticResultArray> modelResults = getDeepAcousticsModel().runModel(transformedDataStack4D);
 
+			if (modelResults == null) {
+				//the model failed to run (see the error logged by DeepAcousticsModel.runModel). Return null here
+				//rather than falling through to a confusing NullPointerException on modelResults.size().
+				System.err.println("DeepAcousticsWorker: the model returned no results - the model failed to run on the input data.");
+				return null;
+			}
+
 			List<DeepAcousticsResult> flattenedModelResults = new 	ArrayList<DeepAcousticsResult>();
 			
 			ArrayList<Long> parentID = new ArrayList<Long>(); //to store the parent IDs of the input data units, which will be used to set the parent ID of the model results.

@@ -1,6 +1,8 @@
 package binaryFileStorage;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +13,12 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.background.BackgroundBinaryWriter;
 import PamguardMVC.background.BackgroundDataUnit;
 import PamguardMVC.background.BackgroundManager;
+import annotation.CentralAnnotationsList;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import annotation.binary.AnnotationBinaryData;
 import annotation.binary.AnnotationBinaryHandler;
+import annotation.handler.AnnotationHandler;
 import dataMap.DataMapDrawing;
 
 /**
@@ -272,7 +276,7 @@ public abstract class BinaryDataSource {
 	 * @param pamDataUnit data unit which might contain data annotations
 	 * @param data object data to hold the packed annotation data. 
 	 */
-	private void getPackedAnnotationData(PamDataUnit pamDataUnit, BinaryObjectData data) {
+	public void getPackedAnnotationData(PamDataUnit pamDataUnit, BinaryObjectData data) {
 		int nAnnotation = pamDataUnit.getNumDataAnnotations();
 		ArrayList<AnnotationBinaryData> dataList = null;
 		int totalLength = 0;
@@ -336,6 +340,67 @@ public abstract class BinaryDataSource {
 	 * @return packed binary data object
 	 */
 	abstract public BinaryObjectData getPackedData(PamDataUnit pamDataUnit);
+	/**
+	 * Unpack annotation data. 
+	 * @param createdUnit
+	 * @param binaryObjectData
+	 * @param dataSink
+	 */
+	public int unpackAnnotationData(int fileVersion, PamDataUnit createdUnit, BinaryObjectData binaryObjectData, BinaryDataSink dataSink) {
+
+		//System.out.println("Hello annotation  " + binaryObjectData.getAnnotationDataLength());
+		if (binaryObjectData.getAnnotationDataLength() == 0) {
+			return 0;
+		}
+		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getAnnotationData());
+		DataInputStream dis = new DataInputStream(bis);
+		int nAnnotations = 0;
+		try {
+			nAnnotations = dis.readShort();
+			for (int i = 0; i < nAnnotations; i++) {
+				int nextLength = dis.readShort();
+				String nextIdCode = dis.readUTF();
+				short nextVersion = dis.readShort();
+
+				// 2020/05/13 changed next line from -6 to -8, to match BinaryDataSource.getPackedAnnotationData:
+				// line 294 dos.writeShort(abd.data.length + abd.shortIdCode.length() + 2 + 4 + 2);
+				// see comments just above line 294 for explanation of added numbers
+				byte[] nextData = new byte[nextLength - nextIdCode.length() - 8];
+				int bytesRead = dis.read(nextData);
+
+				DataAnnotationType<?> annotationType = getAnnotationType(nextIdCode, dataSink);
+				AnnotationBinaryData abd = new AnnotationBinaryData(fileVersion, nextVersion, annotationType, nextIdCode, nextData);
+				DataAnnotation an = annotationType.getBinaryHandler().setAnnotationBinaryData(createdUnit, abd);
+				if (an != null) {
+					an.addToDataUnit(createdUnit);
+//					createdUnit.addDataAnnotation(an);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
+		}		
+		return nAnnotations;
+	}
+
+	private DataAnnotationType<?> getAnnotationType(String idCode, BinaryDataSink dataSink) {
+		PamDataBlock parentDataBlock = null;
+		DataAnnotationType<?> annotationType = null;
+		if (dataSink instanceof PamDataBlock) {
+			parentDataBlock = (PamDataBlock) dataSink;
+			AnnotationHandler anHandler = parentDataBlock.getAnnotationHandler();
+			if (anHandler != null) {
+				annotationType = anHandler.findAnnotationTypeFromCode(idCode);
+			}
+		}
+		if (annotationType == null) {
+			annotationType = CentralAnnotationsList.getList().findTypeFromCode(idCode);
+		}
+		if (annotationType == null) {
+			annotationType = CentralAnnotationsList.getDummyAnnotationType();
+		}
+		return annotationType;
+	}
 	
 //	/**
 //	 * 

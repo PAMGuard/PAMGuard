@@ -36,6 +36,8 @@ public class SimDialogPanel {
 
 	private JTextField  noise;
 	
+	private JTextField arrayWobble;
+	
 	private SimTableData simTableData;
 	
 	private JTable simTable;
@@ -60,20 +62,31 @@ public class SimDialogPanel {
 		t.setLayout(new GridBagLayout());
 		t.setBorder(new TitledBorder("Environment"));
 		GridBagConstraints c = new PamGridBagContraints();
-		PamDialog.addComponent(t, new JLabel("Background Noise  "), c);
+		PamDialog.addComponent(t, new JLabel("Background Noise ", JLabel.RIGHT), c);
 		c.gridx++;
 		PamDialog.addComponent(t, noise = new JTextField(6), c);
 		c.gridx++;
 		PamDialog.addComponent(t, new JLabel("<html> dB re.1&mu;Pa/&radic;Hz</html>"), c);
 		c.gridx = 0;
 		c.gridy++;
-		PamDialog.addComponent(t, new JLabel("Propagation Model  "), c);
+		PamDialog.addComponent(t, new JLabel("Propagation Model ", JLabel.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		PamDialog.addComponent(t, propModels = new JComboBox(), c);
 		for (int i = 0; i < simProcess.propagationModels.size(); i++) {
 			propModels.addItem(simProcess.propagationModels.get(i));
 		}
+		c.gridx = 0;
+		c.gridy++;
+		c.gridwidth = 1;
+		PamDialog.addComponent(t, new JLabel("Array Wobble ", JLabel.RIGHT), c);
+		c.gridx++;
+		PamDialog.addComponent(t, arrayWobble = new JTextField(6), c);
+		c.gridx++;
+		PamDialog.addComponent(t, new JLabel(" degrees ", JLabel.LEFT), c);
+		
+		arrayWobble.setToolTipText("Simulate uncertainty in array orientation by adding random wobble for each generated sound");
+		
 		
 		dialogPanel.add(BorderLayout.NORTH, t);
 		
@@ -123,6 +136,7 @@ public class SimDialogPanel {
 //		sampleRate.setText(String.format("%3.0f", simParameters.sampleRate));
 		noise.setText(String.format("%3.0f", simParameters.backgroundNoise));
 		propModels.setSelectedItem(simProcess.getPropagationModel());
+		arrayWobble.setText(Double.valueOf(simParameters.arrayWobble).toString());
 		enableControls();
 		simTableData.fireTableDataChanged();
 	}
@@ -133,7 +147,13 @@ public class SimDialogPanel {
 			simParameters.backgroundNoise = Double.valueOf(noise.getText());
 		}
 		catch (NumberFormatException e) {
-			return false;
+			return PamDialog.showWarning(null, "Parameter error", "Invalid background noise");
+		}
+		try {
+			simParameters.arrayWobble = Double.valueOf(arrayWobble.getText());
+		}
+		catch (NumberFormatException e) {
+			return PamDialog.showWarning(null, "Parameter error", "Invalid array wobble");
 		}
 		PropagationModel pm = (PropagationModel) propModels.getSelectedItem();
 		if (pm == null) {

@@ -81,5 +81,13 @@ public abstract class AbstractLocaliser<T extends PamDataUnit> {
 	public PamDataBlock<T> getDataBlock() {
 		return dataBlock;
 	}
+
+	/**
+	 * Change the data block the localiser is working with.
+	 * @param dataBlock the new data block.
+	 */
+	protected void setDataBlock(PamDataBlock<T> dataBlock) {
+		this.dataBlock = dataBlock;
+	}
 	
 }

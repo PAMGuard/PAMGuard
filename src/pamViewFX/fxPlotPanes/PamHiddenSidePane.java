@@ -186,14 +186,14 @@ public class PamHiddenSidePane extends PamStackPane {
 	public HidingPane createHidingPane(Region displayPane, Node icon, Side side){
 		//create the hiding pane
 		HidingPane hidingPane=new HidingPane(side, displayPane,  this, true);
-		hidingPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(hidingPane, PamStylesManagerFX.STYLE_SLIDING);
 		hidingPane.getStyleClass().add("pane-trans");
 		
 		//the stack pane holds all the different settings panes
 		this.getChildren().add(hidingPane);
 
 		PamButton showButton=hidingPane.getShowButton();
-		showButton.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(showButton, PamStylesManagerFX.STYLE_SLIDING);
 		showButton.setPrefHeight(60);
 		
 		//style show button

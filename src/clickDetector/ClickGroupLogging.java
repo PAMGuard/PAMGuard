@@ -1,6 +1,6 @@
 package clickDetector;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import Localiser.detectionGroupLocaliser.GroupLocInfoLogging;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
@@ -23,7 +23,7 @@ public class ClickGroupLogging extends GroupLocInfoLogging {
 	protected boolean fillDataUnit(SQLTypes sqlTypes, PamDataUnit pamDetection) {
 		// TODO Auto-generated method stub
 		boolean fillOk = super.fillDataUnit(sqlTypes, pamDetection);
-		GroupDetection groupDetection = (GroupDetection) pamDetection;
+		DetectionGroup groupDetection = (DetectionGroup) pamDetection;
 		GroupLocalisation tmLocalisation = groupDetection.getGroupDetectionLocalisation();
 		if (tmLocalisation == null) {
 			groupDetection.makeLocalisation();

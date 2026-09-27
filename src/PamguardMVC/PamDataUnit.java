@@ -1185,6 +1185,14 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	}
 	
 	/**
+	 * Set the base data
+	 * @param basicData
+	 */
+	protected void setBasicData(DataUnitBaseData basicData) {
+		this.basicData = basicData;
+	}
+	
+	/**
 	 * Add in this same capability for target motion analysis here.
 	 */
 

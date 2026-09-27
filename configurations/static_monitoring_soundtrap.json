@@ -1,0 +1,27 @@
+{
+  "configType": "default",
+  "name": "Static monitoring (SoundTrap)",
+  "description": "Configuration for static SoundTrap deployments recorded with the on-board click detector running. Extracts the stored click detections while the audio is processed, and adds whistle and moan detectors at both full and low frequency, a long term spectral average, noise band monitoring and displays, with database and binary storage.\n\nOnly offered when the imported sud files actually contain click detections - there would be nothing for the SoundTrap Click Detector to do otherwise.",
+  "version": "1.0",
+  "author": "PAMGuard",
+  "psfx": "static_monitoring_soundtrap.psfx",
+
+  "minSampleRate": 96000,
+  "targetSampleRate": 96000,
+  "minChannels": 1,
+
+  "medium": "water",
+  "requiredFileTypes": ["SOUND", "SUD_CLICKS"],
+  "runModes": ["NORMAL"],
+
+  "taxa": [
+    {
+      "group": "NBHF"
+    },
+    {
+      "group": "DOLPHIN"
+    }
+  ],
+
+  "keepRawSourceModules": ["soundtrap.STClickControl"]
+}

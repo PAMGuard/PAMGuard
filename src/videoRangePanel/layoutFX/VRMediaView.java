@@ -567,6 +567,7 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 		//the play and pause button
 		playButton = new PamButton(); 
+		playButton.getStyleClass().add("icon-button");
 		//		playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PLAY_ARROW, controlIconSize));
 		playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", controlIconSize));
 		playButton.getStyleClass().add("square-button-trans");
@@ -574,36 +575,42 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 
 		leftFrame = new PamButton(); 
+		leftFrame.getStyleClass().add("icon-button");
 		//		leftFrame.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.CHEVRON_LEFT, controlIconSize));
 		leftFrame.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", controlIconSize));
 		leftFrame.getStyleClass().add("square-button-trans");
 		leftFrame.setTooltip(new Tooltip("Move to the previous frame"));
 
 		rightFrame= new PamButton(); 
+		rightFrame.getStyleClass().add("icon-button");
 		//		rightFrame.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.CHEVRON_RIGHT,controlIconSize));
 		rightFrame.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right",controlIconSize));
 		rightFrame.getStyleClass().add("square-button-trans");
 		rightFrame.setTooltip(new Tooltip("Move to the next frame"));
 
 		nextMedia= new PamButton(); 
+		nextMedia.getStyleClass().add("icon-button");
 		//		nextMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_PREVIOUS,controlIconSize));
 		nextMedia.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-previous",controlIconSize));
 		nextMedia.getStyleClass().add("square-button-trans");
 		nextMedia.setTooltip(new Tooltip("Move to the next image or video"));
 
 		prevMedia= new PamButton(); 
+		prevMedia.getStyleClass().add("icon-button");
 		//		prevMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_NEXT,	controlIconSize));
 		prevMedia.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-next", controlIconSize));
 		prevMedia.getStyleClass().add("square-button-trans");
 		prevMedia.setTooltip(new Tooltip("Move to the previous image or video"));
 
 		skipForward= new PamButton(); 
+		skipForward.getStyleClass().add("icon-button");
 		//		skipForward.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOUBLE_RIGHT,	controlIconSize));
 		skipForward.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-double-right",	controlIconSize));
 		skipForward.getStyleClass().add("square-button-trans");
 		skipForward.setTooltip(new Tooltip("Skip 2 seconds forward"));
 
 		skipBackward= new PamButton(); 
+		skipBackward.getStyleClass().add("icon-button");
 		//		skipBackward.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOUBLE_LEFT,	controlIconSize));
 		skipBackward.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-double-left", controlIconSize));
 		skipBackward.getStyleClass().add("square-button-trans");
@@ -631,6 +638,7 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 
 		volumeButton= new PamButton(); 
+		volumeButton.getStyleClass().add("icon-button");
 		this.setVolumeGraphic(0.5);
 		volumeButton.getStyleClass().add("square-button-trans");
 

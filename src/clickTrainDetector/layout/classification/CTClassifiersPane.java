@@ -80,10 +80,19 @@ public class CTClassifiersPane extends PamBorderPane {
 
 		pamTabPane.getAddTabButton().setOnAction((action)->{
 			CTClassifierPane clssfrPane = new CTClassifierPane(clickTrainControl);
-			clssfrPane.setDefaultSpeciesID(pamTabPane.getTabs().size()+1);
+			//give the new classifier a species ID that is not already in use, so the
+			//uniqueness check does not block the dialog (one above the current maximum).
+			int nextSpeciesID = 1;
+			for (Tab t : pamTabPane.getTabs()) {
+				CTClassifierParams existing = ((ClassifierTab) t).getCTClassifierPane().getParams();
+				if (existing!=null) {
+					nextSpeciesID = Math.max(nextSpeciesID, existing.speciesFlag+1);
+				}
+			}
+			clssfrPane.setDefaultSpeciesID(nextSpeciesID);
 			ClassifierTab tab = new ClassifierTab(clssfrPane, pamTabPane.getTabs().size());
-					
-			pamTabPane.getTabs().add(tab); 
+
+			pamTabPane.getTabs().add(tab);
 		});
 		
 		pamTabPane.setTabMinWidth(70);
@@ -174,10 +183,15 @@ public class CTClassifiersPane extends PamBorderPane {
 
 		CTClassifierParams aClassifierParams; 
 		
-		double[] speciesCodeList = new double[pamTabPane.getTabs().size()]; 
+		double[] speciesCodeList = new double[pamTabPane.getTabs().size()];
 		for (int i=0; i<pamTabPane.getTabs().size(); i++) {
-			aClassifierParams = ((ClassifierTab) pamTabPane.getTabs().get(i)).getCTClassifierPane().getParams(); 
+			aClassifierParams = ((ClassifierTab) pamTabPane.getTabs().get(i)).getCTClassifierPane().getParams();
 			ctClassifierParams.add(aClassifierParams);
+			//record the species code for this classifier so the uniqueness check below
+			//tests the actual codes rather than an array of zeros.
+			if (aClassifierParams!=null) {
+				speciesCodeList[i] = aClassifierParams.speciesFlag;
+			}
 		}
 
 		if (!PamArrayUtils.unique(speciesCodeList) && speciesCodeList.length>1) {

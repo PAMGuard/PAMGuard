@@ -250,7 +250,7 @@ public class BinaryStoreDeleter {
 					PamDataUnit dataUnit = dataSource.sinkData(binaryObjectData, bh, inputFormat);
 					if (dataUnit != null) {
 						dataUnit.getBasicData().mergeBaseData(binaryObjectData.getDataUnitBaseData());
-						binaryStore.unpackAnnotationData(bh.getHeaderFormat(), dataUnit, binaryObjectData, null);
+						dataSource.unpackAnnotationData(bh.getHeaderFormat(), dataUnit, binaryObjectData, null);
 						dataSource.saveData(dataUnit);
 					}
 					

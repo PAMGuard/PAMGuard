@@ -388,6 +388,11 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 
 			//			int iChannel = PamUtils.getSingleChannel(getChannelBitmap());
 			int iChannel = this.getParentDataBlock().getARealChannel(PamUtils.getSingleChannel(getChannelBitmap()));
+			if (iChannel < 0) {
+				//getSingleChannel returns -1 for an empty or multi channel bitmap. Default to the first channel
+				//rather than throwing an index out of bounds further down the line.
+				iChannel = 0;
+			}
 
 			// get the acquisition process. 
 //			try {

@@ -1,0 +1,500 @@
+/*
+ * pamSettingsFlatLaf.css
+ *
+ * Style for the PAMGuard sliding / hiding settings panes, in the FlatLaf Dark
+ * look. It replaces pamSettingsCSS.css, whose mid grey panes, white outlined
+ * buttons and cyan highlight had nothing in common with the FlatLaf theme the
+ * rest of the GUI now uses, so that a settings pane sliding out over a display
+ * no longer looks like it came from a different program.
+ *
+ * This is not a standalone theme. It is the last sheet of the sliding style,
+ * added AFTER pamFlatLafLight.css + pamFlatLafDark.css (+ pamFlatLafNight.css
+ * for the Night scheme) - see PamDefaultStyle.getSlidingDialogCSS(). Those
+ * sheets bring every ordinary control (buttons, combos, spinners, tabs, tables,
+ * scroll bars...); all this sheet adds is
+ *
+ *   1. the FlatLaf palette redeclared on '*', so that the '-flat-*' lookups
+ *      resolve on panes which are not scene roots (see below), and
+ *   2. the PAMGuard specific furniture of the sliding panes - the pane faces,
+ *      the hiding tabs, the close / show buttons, pop overs and charts - which
+ *      the GUI sheets know nothing about.
+ *
+ * The settings panes stay dark in every colour scheme, as they always have: a
+ * sliding pane is a panel sitting on top of a display, and in the Day scheme a
+ * light panel over a light plot would not read as one. The Night scheme is
+ * layered on top by pamSettingsFlatLafNight.css.
+ *
+ *
+ * WHY THE PALETTE IS ON '*'
+ *
+ * The sliding style is only ever attached to panes - ordinary Parent nodes,
+ * never a Scene root (see the PamStylesManagerFX.STYLE_SLIDING call sites, and
+ * the several classes which add getSlidingDialogCSS() to a node themselves). A
+ * '.root' selector matches only a node carrying the 'root' style class, i.e. a
+ * scene root, so the palette blocks of the three GUI sheets do not match here
+ * and every '-flat-*' lookup in their rules would fail to resolve, flooding the
+ * log with "Could not resolve '-flat-foreground'" warnings and painting the
+ * panes in whatever Modena falls back to. Declaring the palette on '*' fixes
+ * that for the pane and everything inside it, exactly as pamSettingsNight.css
+ * used to do for the old sliding sheet.
+ *
+ * A sliding pane nested inside a GUI styled ancestor - the compact detection
+ * display puts its settings hiding pane inside its plot pane - still comes out
+ * dark: the ancestor's copy of the base sheet is the same URL as the first sheet
+ * of the sliding stack, so JavaFX de-duplication demotes the pane's own copy to
+ * the ancestor's position, but the dark override and this sheet stay on the pane
+ * and so still win. The other way round does NOT hold: a GUI styled node nested
+ * inside a sliding pane follows the sliding palette, because the dark override
+ * on the pane redeclares the palette on '.gui-css-root' too and, by the same
+ * de-duplication, beats the node's own copy of the base sheet. That is why a
+ * display which has to follow the colour scheme is kept a sibling of the sliding
+ * panes rather than a descendant of one (see DetectionGroupDisplay and
+ * TDMenuPane).
+ *
+ * The values below are the FlatLaf 3.5.1 dark theme, i.e. the same numbers as
+ * the palette block of pamFlatLafDark.css - keep the two in step. They cannot
+ * simply be inherited from that sheet: its palette is declared on
+ * '.root, .gui-css-root' for the reason given above.
+ *
+ * NB: never attach the sliding style to an ANCESTOR of a pane which also has
+ * it. JavaFX de-duplicates stylesheets by URL and keeps only the first position
+ * in the cascade, so the inner pane's own copy stops counting as the nearest
+ * one - and any GUI style attached in between (as OverlayGroupDisplay does in
+ * the advanced pop up menu) then wins instead, leaving the pane half styled by
+ * each sheet.
+ */
+
+* {
+    /* ---- FlatLaf Dark palette (cf. pamFlatLafDark.css) ---- */
+    -flat-background:            #3c3f41;
+    -flat-foreground:            #bbbbbb;
+    -flat-disabled-foreground:   #8c8c8c;
+    -flat-component-background:  #46494b;
+    -flat-border:                #616465;
+    -flat-disabled-border:       #616465;
+    -flat-focus:                 #3c628c;
+    -flat-focused-border:        #466f9e;
+    -flat-accent:                #4b6eaf;
+    -flat-accent2:               #4b87c8;
+    -flat-checkmark:             #a8a8a8;
+    -flat-underline:             #4b87c8;
+    -flat-link:                  #589df6;
+    -flat-selection-inactive:    #0d293e;
+    -flat-separator:             #505254;
+    -flat-icon:                  #aeaeae;
+    -flat-arrow:                 #9b9b9b;
+    -flat-hover:                 #515456;
+    -flat-pressed:               #5b5e60;
+    -flat-selected:              #666a6c;
+    -flat-menu-hover:            #4b4e50;
+
+    /* ---- the Modena remaps from the palette block of pamFlatLafLight.css,
+            so that controls the sheets don't style explicitly still follow
+            the FlatLaf palette rather than coming out Modena light ---- */
+    -fx-base:                        -flat-background;
+    -fx-background:                  -flat-background;
+    -fx-color:                       -flat-background;
+    -fx-control-inner-background:    -flat-component-background;
+    -fx-control-inner-background-alt:-flat-component-background;
+    -fx-accent:                      -flat-accent;
+    -fx-default-button:              -flat-component-background;
+    -fx-focus-color:                 -flat-focused-border;
+    -fx-faint-focus-color:           #4b7baf44;
+    -fx-selection-bar:               -flat-accent;
+    -fx-selection-bar-non-focused:   -flat-selection-inactive;
+    -fx-outer-border:                -flat-border;
+    -fx-inner-border:                -flat-component-background;
+    -fx-body-color:                  -flat-component-background;
+    -fx-text-box-border:             -flat-border;
+    -fx-text-base-color:             -flat-foreground;
+    -fx-text-background-color:       -flat-foreground;
+    -fx-text-inner-color:            -flat-foreground;
+    -fx-mark-color:                  -flat-arrow;
+    -fx-mark-highlight-color:        transparent;
+    -fx-shadow-highlight-color:      transparent;
+    -fx-disabled-opacity:            0.6;
+
+    /* ---- PAMGuard plot furniture, for the plots and axes which appear inside
+            settings panes (the bode plot, the click classifier...) ---- */
+    -pam-axis-background:  -flat-background;
+    -pam-axis-foreground:  -flat-foreground;
+    -pam-axis-line:        -flat-border;
+    -pam-plot-background:  #2b2b2b;
+    -pam-scroller-body:    rgba(190,190,190,0.30);
+    -pam-scroller-handle:  rgba(215,215,215,0.65);
+    -pam-scroller-grip:    rgba(40,40,40,0.9);
+
+    /*
+     * ---- Legacy PAMGuard colour names ----
+     *
+     * A fair number of panes set an inline style referring to these (search the
+     * source for "-fx-darkbackground"), so they have to keep resolving. They
+     * are now aliases of the FlatLaf palette, which means they also follow the
+     * Night override without needing to be redeclared there.
+     */
+    -fx-pambackground:      -flat-background;
+    -fx-darkbackground:     -flat-background;
+    -fx-darkbackground2:    -flat-component-background;
+    -fx-darkbackground-trans: rgba(60,63,65,0.92);
+    -fx-highlight:          -flat-accent;
+    -fx-highlight_border:   -flat-focused-border;
+    -fx-text:               -flat-foreground;
+    -fx-border_col:         -flat-border;
+    -fx-icon_col:           #afb1b3;
+    -icons-color:           -fx-icon_col;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Panes                                                                       *
+ *                                                                             *
+ * The pane face is the plain FlatLaf window background, so a settings pane is  *
+ * the same colour as the Swing GUI around it and reads as a panel against the  *
+ * darker plot window (-pam-plot-background) it slides out over.                *
+ *                                                                             *
+ ******************************************************************************/
+
+.pane {
+    -fx-background-color: -flat-background;
+}
+
+/* Panes which overlay a display rather than pushing it aside - just enough
+   transparency to show that they are floating over it. */
+.pane-trans {
+    -fx-background-color: -fx-darkbackground-trans;
+}
+
+/* The control strip of the time display's advanced pop up menu (TDMenuPane).
+   Sits flush against the display, so it takes the opaque window background. */
+.pam-menu-pane {
+    -fx-background-color: -flat-background;
+}
+
+/* Scroll panes are transparent by default so that the pane face shows through;
+   .scroll-pane-dark is for the ones which need a face of their own. */
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane-dark,
+.scroll-pane-dark > .viewport {
+    -fx-background: -flat-background;
+    -fx-background-color: -flat-background;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Hiding tab (pamViewFX.fxNodes.hidingPane.HidingTab)                         *
+ *                                                                             *
+ * The tab-like strip which shows and hides a settings pane. Ids rather than    *
+ * style classes, because HidingTab swaps the id to highlight on mouse over.   *
+ *                                                                             *
+ ******************************************************************************/
+
+#hide-tab,
+#show-tab {
+    -fx-background-color: transparent;
+    -fx-border-color: -flat-border;
+    -fx-border-radius: 4 4 0 0;
+    -fx-background-radius: 4 4 0 0;
+}
+
+#hide-tab-highlight {
+    -fx-background-color: -flat-accent;
+    -fx-border-color: -flat-focused-border;
+    -fx-border-radius: 4 4 0 0;
+    -fx-background-radius: 4 4 0 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Close / show buttons of the hiding panes                                    *
+ *                                                                             *
+ * These are ordinary FlatLaf buttons (border layer + face layer, 1px inset)    *
+ * from pamFlatLafLight.css; all that is changed is the corner geometry, so     *
+ * that the corners along the edge of the pane a button sits on stay square     *
+ * and only the outer ones are rounded. Because the hover / armed / focused     *
+ * rules of the base sheet set nothing but -fx-background-color, they keep      *
+ * these radii and give the buttons the normal FlatLaf feedback.                *
+ *                                                                             *
+ ******************************************************************************/
+
+/*
+ * These are all icon-only buttons, so they opt out of the FlatLaf 72px minimum
+ * width the same way .icon-button does in pamFlatLafLight.css - without this a
+ * show button on the side of a graph is nearly three times as wide as its
+ * chevron. HidingPane adds .icon-button to the buttons it styles itself, but the
+ * show buttons built by PamHiddenSidePane and friends only ever get these
+ * classes, so put the sizing here rather than relying on the call sites.
+ */
+.close-button-right,
+.close-button-left,
+.close-button-top,
+.close-button-bottom,
+.close-button-right-trans,
+.close-button-left-trans,
+.close-button-bottom-trans,
+.square-button,
+.square-button-trans {
+    -fx-min-width: 30;
+    -fx-padding: 4 6 4 6;
+}
+
+/* Stretched across the top or bottom of a data model module box, so they must
+   not impose a width on it at all. */
+.module-hide-top,
+.module-hide-bottom {
+    -fx-min-width: 0;
+}
+
+.close-button-right {
+    -fx-background-radius: 0 8 8 0, 0 7 7 0;
+    -fx-border-radius: 0 8 8 0;
+}
+
+.close-button-left {
+    -fx-background-radius: 8 0 0 8, 7 0 0 7;
+    -fx-border-radius: 8 0 0 8;
+}
+
+.close-button-top {
+    -fx-background-radius: 8 8 0 0, 7 7 0 0;
+    -fx-border-radius: 8 8 0 0;
+}
+
+.close-button-bottom {
+    -fx-background-radius: 0 0 8 8, 0 0 7 7;
+    -fx-border-radius: 0 0 8 8;
+}
+
+/*
+ * The '-trans' variants have no face at all: they are used where the button sits
+ * directly on top of a display or an image (the video range panels, the pop up
+ * menu strip) and a button face would hide it. Only the icon shows until the
+ * mouse is over the button, when the normal FlatLaf hover face appears so that
+ * it is clear the button is live.
+ */
+.close-button-right-trans,
+.close-button-left-trans,
+.close-button-bottom-trans,
+.square-button-trans {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.close-button-right-trans:hover,
+.close-button-left-trans:hover,
+.close-button-bottom-trans:hover,
+.square-button-trans:hover {
+    -fx-background-color: -flat-focused-border, -flat-hover;
+}
+
+.close-button-right-trans:armed,
+.close-button-left-trans:armed,
+.close-button-bottom-trans:armed,
+.square-button-trans:armed {
+    -fx-background-color: -flat-focused-border, -flat-pressed;
+}
+
+.close-button-right-trans {
+    -fx-background-radius: 0 8 8 0, 0 7 7 0;
+    -fx-border-radius: 0 8 8 0;
+}
+
+.close-button-left-trans {
+    -fx-background-radius: 8 0 0 8, 7 0 0 7;
+    -fx-border-radius: 8 0 0 8;
+}
+
+.close-button-bottom-trans {
+    -fx-background-radius: 0 0 8 8, 0 0 7 7;
+    -fx-border-radius: 0 0 8 8;
+}
+
+/* Buttons which butt up against another control on every side. */
+.square-button,
+.square-button-trans {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+/* Show / hide buttons of the data model module boxes: rounded on the outside
+   edge only, and no border, so they read as part of the box. */
+.module-hide-top {
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-radius: 5 5 0 0;
+    -fx-border-color: transparent;
+}
+
+.module-hide-bottom {
+    -fx-background-radius: 0 0 5 5;
+    -fx-border-radius: 0 0 5 5;
+    -fx-border-color: transparent;
+}
+
+/* Deleting a module is not undoable, so the button turns red under the mouse. */
+.delete-button:hover {
+    -fx-background-color: #a34343, #7a2c2c;
+}
+
+.delete-button:armed {
+    -fx-background-color: #a34343, #8f3333;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Advanced pop up menu (dataPlotsFX.overlaymark.popUpMenu.TDMenuPane)         *
+ *                                                                             *
+ * Its entries are buttons, but they are read as a menu, so the text is left    *
+ * justified rather than centred like a button. TDMenuPane.styleButton already  *
+ * calls setAlignment(CENTER_LEFT), but a style sheet beats a value set in Java *
+ * - author styles outrank the "user" origin a setter counts as - so the        *
+ * -fx-alignment: center of the .button rule in pamFlatLafLight.css was undoing *
+ * it. Scoped to the menu pane so that the icon-only buttons which share these  *
+ * style classes elsewhere (the video range panels, the settings menu strip)    *
+ * keep their centred graphic.                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.pam-menu-pane .button,
+.pam-menu-pane .toggle-button,
+.pam-menu-pane .menu-button,
+.pam-menu-pane .split-menu-button {
+    -fx-alignment: center-left;
+}
+
+/* The export row at the foot of the menu is icons rather than entries, so those
+   stay centred in their tile. Same specificity as the rule above, so it has to
+   come after it. */
+.pam-menu-pane .icon-button {
+    -fx-alignment: center;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Square tabs (dataPlotsFX.clickPlotFX.ClickControlPane2)                     *
+ *                                                                             *
+ * A tab which keeps the square corners of the pane it is docked in. Everything *
+ * else about the tabs comes from the GUI sheets.                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.tab-square,
+.tab-square:selected {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * PopOver (ControlsFX)                                                        *
+ *                                                                             *
+ ******************************************************************************/
+
+.popover > .border {
+    -fx-stroke: -flat-border;
+    -fx-stroke-width: 1;
+    -fx-fill: -flat-background;
+}
+
+.popover > .content {
+    -fx-background-color: -flat-background;
+    -fx-padding: 8;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Charts                                                                      *
+ *                                                                             *
+ * The JavaFX charts which appear in some settings panes (the noise band bode   *
+ * plot, the click train classifiers...). Modena paints these with a white plot *
+ * area and black labels, which is glaring in a dark pane.                      *
+ *                                                                             *
+ ******************************************************************************/
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+}
+
+.chart-plot-background {
+    -fx-background-color: -pam-plot-background;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: -flat-separator;
+}
+
+.chart-title,
+.chart-legend-item {
+    -fx-text-fill: -flat-foreground;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.axis {
+    -fx-tick-label-fill: -flat-foreground;
+    -fx-font-size: 1em;
+}
+
+.axis-label {
+    -fx-text-fill: -flat-foreground;
+}
+
+/* Series lines are hairline thin by default, which is hard to see on a small
+   settings pane chart. */
+.thin-chart .chart-series-line {
+    -fx-stroke-width: 2px;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ikonli icons                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+/*
+ * The data model module boxes are drawn in a light colour whatever the scheme,
+ * so their icons stay dark. Everything else follows -fx-icon_col.
+ */
+#module-pane .ikonli-font-icon {
+    -fx-icon-color: black;
+    -fx-fill: black;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Segmented button (ControlsFX)                                               *
+ *                                                                             *
+ * Square off the joins so the pills read as one control, matching the 4px      *
+ * corner radius the FlatLaf sheets give a button.                              *
+ *                                                                             *
+ ******************************************************************************/
+
+.segmented-button .toggle-button.left-pill {
+    -fx-background-radius: 4 0 0 4, 3 0 0 3;
+    -fx-border-radius: 4 0 0 4;
+}
+
+.segmented-button .toggle-button.center-pill {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.segmented-button .toggle-button.right-pill {
+    -fx-background-radius: 0 4 4 0, 0 3 3 0;
+    -fx-border-radius: 0 4 4 0;
+}

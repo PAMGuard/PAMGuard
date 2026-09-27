@@ -518,6 +518,8 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 		int dataLength = 0;
 		byte[] data = null;
 		DataUnitBaseData baseData = new DataUnitBaseData();
+		int annotationDataLength = 0;
+		byte[] annotationData = null;
 		try {
 			objectId = ds.readInt();
 			moduleVersion = ds.readInt();
@@ -530,6 +532,11 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 			dataLength = ds.readInt();
 			data = new byte[dataLength];
 			int bytesRead = ds.read(data);
+			if (baseData.isHasBinaryAnnotation()) {
+				annotationDataLength = ds.readShort();
+				annotationData = ds.readNBytes(annotationDataLength);
+//				System.out.println("Network annotations = " + annotationDataLength);
+			}
 //			System.out.printf("NetRX read %d of expected %d bytes\n", bytesRead, dataLength);
 //			if (1>0) return null;
 			ds.close();
@@ -537,6 +544,8 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 			e.printStackTrace();
 		}
 		BinaryObjectData bod = new BinaryObjectData(receivedData.getDataVersion(), objectId, baseData, 0, data, dataLength);
+		bod.setAnnotationData(annotationData, annotationDataLength);
+
 //		baseData.setTimeNanoseconds(nanos);
 //		baseData.setChannelBitmap(channelMap);
 
@@ -549,6 +558,13 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings {
 			System.out.println("Null data unit from dataSource: " + dataSource.getModuleName());
 			return null;
 		}
+		
+		/*
+		 * And unpack annotation data, just as with binary data store. 
+		 */
+		dataSource.unpackAnnotationData(moduleVersion, dataUnit, bod, null);
+		
+		
 //		if (dataUnit.getChannelBitmap() == 0) {
 //			System.out.println("Zero channel bitmap in data unit " + dataUnit.getClass().getName());
 //		}

@@ -19,12 +19,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import PamUtils.PamCalendar;
 import PamUtils.worker.filelist.WavFileType;
 import PamView.component.PamSettingsIconButton;
 import PamView.panel.PamPanel;
+import PamView.component.PamFontIcon;
 
 /**
  * Simpel dialog component which can interact with a file date. 
@@ -44,7 +44,7 @@ public class FileDateDialogStrip {
 	private JButton settingsButton;
 
 //	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settingsIcon =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE);
+	public static PamFontIcon settingsIcon = PamFontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE);
 
 	
 	private Window parent;	

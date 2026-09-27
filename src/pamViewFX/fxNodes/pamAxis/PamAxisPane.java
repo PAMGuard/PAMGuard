@@ -8,6 +8,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import pamViewFX.fxNodes.PamColorsFX;
 
 /**
  * Pane which contains two or more axis and a plot panel. 
@@ -33,10 +34,11 @@ public class PamAxisPane extends Pane {
 //	private Color axisColour=new Color(0.85,0.85,0.85,1);
 	
 	/**
-	 * Stroke colour.
+	 * Stroke colour. Null means follow the current colour scheme - see
+	 * {@link #getStrokeColor()}.
 	 */
-	private Color strokeColor=Color.BLACK;
-	
+	private Color strokeColor = null;
+
 	
 	/**
 	 * left inset property. 
@@ -72,6 +74,9 @@ public class PamAxisPane extends Pane {
 		//add listeners to allow canvas to resize and repaint with the graph changing size; 
 		addResizeListeners();
 		this.getStyleClass().add("pane");
+		//gives the pane the window background colour of the current colour scheme -
+		//without it the pane has no background of its own and shows whatever is behind.
+		this.getStyleClass().add(PamAxisPane2.AXIS_PANE_STYLE_CLASS);
 		repaint();
 	}
 	
@@ -111,7 +116,7 @@ public class PamAxisPane extends Pane {
 	public void repaint(){
 		if (this.getHeight()>0 && this.getWidth()>0){
 
-			canvas.getGraphicsContext2D().setStroke(strokeColor);
+			canvas.getGraphicsContext2D().setStroke(getStrokeColor());
 			canvas.getGraphicsContext2D().setFill(Color.TRANSPARENT);
 			canvas.getGraphicsContext2D().clearRect(0, 0,  canvas.getWidth(), canvas.getHeight());
 			canvas.getGraphicsContext2D().fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -202,16 +207,22 @@ public class PamAxisPane extends Pane {
 //	}
 
 	/**
-	 * Get the stroke colour for the axis
-	 * @return the stroke colour for the axis. 
+	 * Get the stroke colour for the axis. Unless one has been set explicitly this is
+	 * PamColor.AXIS from the current colour scheme, so that the axis follows the
+	 * day / dark / night schemes.
+	 * @return the stroke colour for the axis.
 	 */
 	public Color getStrokeColor() {
+		if (strokeColor == null) {
+			return PamColorsFX.getInstance().getColor(PamColorsFX.PamColor.AXIS);
+		}
 		return strokeColor;
 	}
 
 	/**
-	 * Set the stroke colour for the axis. 
-	 * @param strokeColor- the stroke colour for the axis. 
+	 * Set the stroke colour for the axis.
+	 * @param strokeColor- the stroke colour for the axis, or null to follow the
+	 *                     current colour scheme.
 	 */
 	public void setStrokeColor(Color strokeColor) {
 		this.strokeColor = strokeColor;

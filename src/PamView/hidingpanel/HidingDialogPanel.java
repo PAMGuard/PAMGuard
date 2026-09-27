@@ -18,7 +18,7 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -30,9 +30,13 @@ import javax.swing.Timer;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
 import PamView.PamColors;
 import PamView.ScreenSize;
 import PamView.PamColors.PamColor;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 import PamView.dialog.PamButtonAlpha;
 import PamView.panel.CornerLayoutContraint;
 
@@ -116,20 +120,22 @@ public class HidingDialogPanel {
 		parentListener = new DialogParentListener();
 	}
 
-	ImageIcon getShowButtonImage(int location) {
+	/**
+	 * Size of the show chevron. The images this replaced were 20 x 20 pixels.
+	 */
+	private static final int SHOW_ARROW_SIZE = 20;
+
+	Icon getShowButtonImage(int location) {
 		switch (startLocation) {
 		case CornerLayoutContraint.FIRST_LINE_START:
 		case CornerLayoutContraint.LAST_LINE_START:
-			return new ImageIcon(ClassLoader
-					.getSystemResource("Resources/SidePanelShow2.png"));
+			return PamFontIcon.of(MaterialDesignC.CHEVRON_RIGHT, SHOW_ARROW_SIZE, IconColour.ALPHA_PANEL);
 		case CornerLayoutContraint.FIRST_LINE_END:
 		case CornerLayoutContraint.LAST_LINE_END:
-			return new ImageIcon(ClassLoader
-					.getSystemResource("Resources/SidePanelHide2.png"));
+			return PamFontIcon.of(MaterialDesignC.CHEVRON_LEFT, SHOW_ARROW_SIZE, IconColour.ALPHA_PANEL);
 		}
 
-		return new ImageIcon(ClassLoader
-				.getSystemResource("Resources/SidePanelShow.png"));
+		return PamFontIcon.of(MaterialDesignC.CHEVRON_RIGHT, SHOW_ARROW_SIZE, IconColour.ALPHA_PANEL);
 	}
 
 	/**
@@ -290,7 +296,10 @@ public class HidingDialogPanel {
 		JRootPane rootPane = SwingUtilities.getRootPane(showButton);
 		Component root = SwingUtilities.getRoot(showButton);
 		if (rootPane != registeredRootPane || root != registeredRoot){
-			hidingDialog = null;
+			// The old hidingDialog (if any) is about to become unreachable. It's a genuine
+			// top level Window, so simply dropping the reference leaves it stuck on screen
+			// forever with nothing left to hide it. Close it properly first.
+			closeHidingDialog();
 			if (registeredRootPane != null) {
 				registeredRootPane.removeComponentListener(parentListener);
 				registeredRootPane.removeHierarchyListener(parentListener);
@@ -358,6 +367,41 @@ public class HidingDialogPanel {
 
 	public HidingDialog getHidingDialog() {
 		return hidingDialog;
+	}
+
+	/**
+	 * @return true if the popup dialog currently exists and is visible. Callers that
+	 * need to rebuild/replace this HidingDialogPanel can check this before calling
+	 * {@link #closeHidingDialog()}, in order to restore the open/closed state afterwards.
+	 */
+	public boolean isDialogVisible() {
+		return hidingDialog != null && hidingDialog.isVisible();
+	}
+
+	/**
+	 * @return true if the popup dialog currently exists and is pinned open. Callers that
+	 * need to rebuild/replace this HidingDialogPanel can check this before calling
+	 * {@link #closeHidingDialog()}, in order to restore the pinned state afterwards.
+	 */
+	public boolean isDialogPinned() {
+		return hidingDialog != null && hidingDialog.isPinned();
+	}
+
+	/**
+	 * Properly close and release the floating popup dialog, if one currently exists.
+	 * Must be called before this HidingDialogPanel (or its hidingDialog reference) is
+	 * discarded/replaced - e.g. when the owning display rebuilds its layout - otherwise
+	 * an open popup is orphaned: it's an independent top level Window, so dropping the
+	 * Java reference to it does NOT close it, it just leaves it stuck visible on screen
+	 * with no remaining code path (timer, listeners, pin button) able to hide it.
+	 */
+	public void closeHidingDialog() {
+		hidingTimer.stop();
+		if (hidingDialog != null) {
+			hidingDialog.setVisible(false);
+			hidingDialog.dispose();
+			hidingDialog = null;
+		}
 	}
 
 	private Component findRootPane(Component c) {

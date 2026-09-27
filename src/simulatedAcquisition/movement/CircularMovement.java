@@ -38,7 +38,7 @@ public class CircularMovement extends MovementModel implements PamSettings {
 		nSteps[2] = 360 / circularMovementParams.angleStep + 1;
 		nSteps[1] = Math.round((circularMovementParams.depthRange[1]-circularMovementParams.depthRange[0]) / circularMovementParams.depthStep)+1;
 		nSteps[1] = Math.max(nSteps[1], 1);
-		nSteps[0] = Math.round((circularMovementParams.rangeRange[1]-circularMovementParams.rangeRange[0]) / circularMovementParams.rangeStep)+1;
+		nSteps[0] = (int) Math.round((circularMovementParams.rangeRange[1]-circularMovementParams.rangeRange[0]) / (circularMovementParams.rangeStep+.0001) + 1);
 		nSteps[0] = Math.max(nSteps[0], 1);
 		nSteps[3] = circularMovementParams.directionsPerPoint;
 		iStep[0] = iStep[1] = iStep[2] = 0;

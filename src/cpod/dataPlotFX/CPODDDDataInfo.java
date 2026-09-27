@@ -2,22 +2,16 @@ package cpod.dataPlotFX;
 
 
 
-import PamView.symbol.PamSymbolChooser;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import cpod.CPODClick;
 import cpod.FPODReader;
-import dataPlotsFX.TDManagedSymbolChooserFX;
-import dataPlotsFX.TDSymbolChooserFX;
-import dataPlotsFX.clickPlotFX.ClickSymbolChooserFX;
-import dataPlotsFX.data.TDDataInfoFX;
 import detectionPlotFX.data.DDDataInfo;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import detectionPlotFX.rawDDPlot.RawSpectrumPlot;
 import detectionPlotFX.rawDDPlot.RawWaveformPlot;
 import javafx.geometry.Side;
-import pamViewFX.fxNodes.PamSymbolFX;
 
 /**
  * Data info for showing a CPOD waveform. 

@@ -427,3 +427,37 @@
 .dialog-pane > .content {
   -fx-padding: 0,0,0,0;
 }
+/*******************************************************************************
+ *                                                                             *
+ * Navigation drawer and flip pane buttons                                     *
+ *                                                                             *
+ ******************************************************************************/
+
+.flip-pane-back-button,
+.flip-pane-back-button:hover,
+.flip-pane-back-button:focused,
+.flip-pane-back-button:pressed {
+  -fx-background-radius: 0 5 5 0;
+  -fx-border-radius: 0 5 5 0;
+  -fx-background-color: -color-accent-6;
+}
+
+.navigation-drawer-button,
+.navigation-drawer-button:hover,
+.navigation-drawer-button:focused,
+.navigation-drawer-button:pressed {
+  -fx-alignment: center-left;
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-background-radius: 0;
+  -fx-border-radius: 0;
+}
+
+.navigation-drawer-button-selected,
+.navigation-drawer-button-selected:hover,
+.navigation-drawer-button-selected:focused,
+.navigation-drawer-button-selected:pressed {
+  -fx-background-color: -color-accent-6;
+  -fx-border-color: -color-accent-6;
+  -fx-text-fill: white;
+}

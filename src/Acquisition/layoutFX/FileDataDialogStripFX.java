@@ -93,9 +93,11 @@ public class FileDataDialogStripFX extends PamBorderPane {
 
 //		settingsButton = new PamButton("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		settingsButton = new PamButton("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+		settingsButton.getStyleClass().add("icon-button");
 		formatLabel = new Label("");
 
 		prevButton = new PamButton(); 
+		prevButton.getStyleClass().add("icon-button");
 //		prevButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_LEFT, PamGuiManagerFX.iconSize));
 		prevButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconSize));
 		prevButton.setOnAction((action)->{
@@ -106,6 +108,7 @@ public class FileDataDialogStripFX extends PamBorderPane {
 		prevButton.setStyle("-fx-border-color:  transparent;");
 
 		nextButton = new PamButton(); 
+		nextButton.getStyleClass().add("icon-button");
 //		nextButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_RIGHT, PamGuiManagerFX.iconSize));
 		nextButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconSize));
 		nextButton.setOnAction((action)->{

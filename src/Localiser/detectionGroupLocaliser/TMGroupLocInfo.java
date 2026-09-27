@@ -606,7 +606,13 @@ public class TMGroupLocInfo implements GroupLocInfo {
 	@Override
 	public GpsData getBeamLatLong(LatLong localised){
 		
-		GPSDataBlock gpsDataBlock = (GPSDataBlock) PamController.getInstance().getDataBlock(GpsDataUnit.class, 0);
+		GPSDataBlock gpsDataBlock = null;
+		try {
+		gpsDataBlock = (GPSDataBlock) PamController.getInstance().getDataBlock(GpsDataUnit.class, 0);
+		}
+		catch (Exception e) {
+			
+		}
 	
 		if (gpsDataBlock==null){
 //			System.err.println("TMGrioupLocInfo: No GPS data to get beam lat long:");

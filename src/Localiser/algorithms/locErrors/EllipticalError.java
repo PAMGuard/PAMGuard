@@ -32,12 +32,10 @@ public class EllipticalError implements LocaliserError {
 	 */
 	public EllipticalError(double[][] points){
 		errorEllipse=new ErrorEllipse(points);
-		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
 	}
 	
 	public EllipticalError(ErrorEllipse errorEllipse) {
 		this.errorEllipse = errorEllipse;
-		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
 	}
 	
 	
@@ -45,7 +43,6 @@ public class EllipticalError implements LocaliserError {
 	 * Create an empty elliptical error. The error ellipse needs to be set explicitly. 
 	 */
 	protected EllipticalError(){
-		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
 	}
 
 	/* 
@@ -54,7 +51,6 @@ public class EllipticalError implements LocaliserError {
 	 * @param angles - the rotation of the ellipse, heading pitch and roll in RADIANS. 
 	 */
 	public EllipticalError(double[] angles, double[] errors) {
-		ellipseLocErrorDraw= new EllipseLocErrorDraw(this);
 		errorEllipse = new ErrorEllipse(errors, angles);
 	}
 
@@ -72,6 +68,9 @@ public class EllipticalError implements LocaliserError {
 
 	@Override
 	public LocErrorGraphics getErrorDraw() {
+		if (ellipseLocErrorDraw == null) {
+			ellipseLocErrorDraw = new EllipseLocErrorDraw(this);
+		}
 		return ellipseLocErrorDraw;
 	}
 

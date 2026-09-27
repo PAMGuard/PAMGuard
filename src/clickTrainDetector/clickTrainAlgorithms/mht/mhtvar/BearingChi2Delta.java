@@ -25,9 +25,17 @@ public class BearingChi2Delta extends SimpleChi2VarDelta {
 
 
 	/**
-	 * The last diff value. 
+	 * The last diff value.
 	 */
 	private double lastDiff;
+
+	/**
+	 * The last <i>signed</i> bearing difference (RADIANS, wrapped to (-&pi;, &pi;]).
+	 * Unlike {@link #lastDiff} (which is the unsigned minimum angle used in the
+	 * chi^2 calculation) this preserves the direction of the bearing change so the
+	 * {@link BearingChi2VarParams#bearingJumpDrctn} test works correctly.
+	 */
+	private double lastSignedDiff;
 
 
 	public BearingChi2Delta() {
@@ -58,10 +66,17 @@ public class BearingChi2Delta extends SimpleChi2VarDelta {
 		//this is in RADIANS
 		//System.out.println("Angles: " + pamDataUnit0.getLocalisation().getAngles()[0]); 
 		if (pamDataUnit0.getLocalisation()!=null) {
-			lastDiff = getDifference(pamDataUnit0.getLocalisation().getAngles()[0], pamDataUnit1.getLocalisation().getAngles()[0]); 
-//			lastDiff = pamDataUnit0.getLocalisation().getAngles()[0]-pamDataUnit1.getLocalisation().getAngles()[0]; 
+			double angle0 = pamDataUnit0.getLocalisation().getAngles()[0];
+			double angle1 = pamDataUnit1.getLocalisation().getAngles()[0];
+			lastDiff = getDifference(angle0, angle1);
+			//keep a signed version (direction preserved) for the max bearing jump test.
+			lastSignedDiff = BearingChi2VarParams.signedBearingDiff(angle0, angle1);
+//			lastDiff = pamDataUnit0.getLocalisation().getAngles()[0]-pamDataUnit1.getLocalisation().getAngles()[0];
 		}
-		else lastDiff = 0; 
+		else {
+			lastDiff = 0;
+			lastSignedDiff = 0;
+		}
 
 		return lastDiff; 
 	}
@@ -122,27 +137,10 @@ public class BearingChi2Delta extends SimpleChi2VarDelta {
 		 * changes in absolute bearings and so a sort of tail on click trains. By ensuring this is the absolute 
 		 * value between bearings (lastdiff) then the bearingJump threshold works as it should.
 		 */
-		if (bearingParams.bearingJumpEnable) {
-			double delta;
-			switch (bearingParams.bearingJumpDrctn) {
-			case BOTH:
-				delta= Math.abs(lastDiff); 
-				break;
-			case NEGATIVE:
-				delta = -(lastDiff); 
-				break;
-			case POSITIVE:
-				delta = lastDiff; 
-				break;
-			default:
-				delta = lastDiff; 
-				break;
-			}
-
-			if (delta>bearingParams.maxBearingJump) {
-				//System.out.println("Hello!!!! Reverse Bearing");
-				chi2=chi2+StandardMHTChi2Params.JUNK_TRACK_PENALTY; 
-			}	
+		if (bearingParams.bearingJumpEnable && BearingChi2VarParams.exceedsMaxJump(lastSignedDiff,
+				bearingParams.maxBearingJump, bearingParams.bearingJumpDrctn)) {
+			//System.out.println("Hello!!!! Reverse Bearing");
+			chi2=chi2+StandardMHTChi2Params.JUNK_TRACK_PENALTY;
 		}
 
 		return chi2; 

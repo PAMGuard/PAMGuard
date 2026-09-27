@@ -131,6 +131,7 @@ public class NetworkSendProcess extends PamProcess {
 			
 			byte[] data = networkObjectPacker.packDataUnit(id1,id2, (PamDataBlock) dataBlock, dataUnit);
 			qo = new NetworkQueuedObject(id1, id2, NetworkReceiver.NET_PAM_DATA, quickId, data,((PamDataBlock)dataBlock).getDataName());
+			networkSender.transmitData(qo);
 		}
 
 		// pack the data into a json string
@@ -140,14 +141,14 @@ public class NetworkSendProcess extends PamProcess {
 				//System.out.println("Error creating json string from " + dataBlock.getClass());
 			} else {
 				qo = new  NetworkQueuedObject(jsonString,((PamDataBlock)dataBlock).getDataName());
+				networkSender.transmitData(qo);
 			}
 //			System.out.print("***" + jsonString);
 		}
 		
-		// Add to the output queue
-		if (qo!=null) {
-			networkSender.transmitData(qo);
-		}
+//		// Add to the output queue
+//		if (qo!=null) {
+//		}
 	}
 
 

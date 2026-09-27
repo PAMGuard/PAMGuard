@@ -14,6 +14,7 @@ import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.LoadObserver;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
@@ -122,7 +123,70 @@ public class WavDetExport {
 
 
 	/**
-	 * Create the wav file name 
+	 * Find the raw data block to take wav data from for a group of data units.
+	 * <p>
+	 * Normally this is the raw source of whatever detector made the data units, but
+	 * some data units have no raw source at all: a manual annotation drawn on the
+	 * spectrogram, for one, belongs to a module with no parent process, so its data
+	 * block can't point back at an acquisition. Those fall back to the first raw
+	 * data block in the model, which is the sound the display they were drawn on was
+	 * showing.
+	 *
+	 * @param foundDataUnits - the selected data units, may be null or empty.
+	 * @return the raw data block to take the wav data from, or null if there is none.
+	 */
+	public static PamRawDataBlock findRawDataBlock(DetectionGroupSummary foundDataUnits) {
+		if (foundDataUnits == null || foundDataUnits.getDataList().size() == 0) {
+			return PamController.getInstance().getRawDataBlock(0);
+		}
+
+		PamDataUnit firstUnit = foundDataUnits.getDataList().get(0);
+		PamRawDataBlock rawDataBlock = firstUnit.getParentDataBlock().getRawSourceDataBlock();
+		if (rawDataBlock != null) {
+			return rawDataBlock;
+		}
+
+		/*
+		 * No raw source, so pick a raw block which has the data unit's channels - the
+		 * same choice SpectrogramAnnotationFFTPlot makes, so that the wav file is the
+		 * sound the pop up menu's spectrogram of the annotation was drawn from.
+		 */
+		ArrayList<PamDataBlock> rawBlocks = PamController.getInstance().getRawDataBlocks();
+		if (rawBlocks != null) {
+			int channelMap = firstUnit.getChannelBitmap();
+			for (PamDataBlock rawBlock : rawBlocks) {
+				if (rawBlock instanceof PamRawDataBlock && (rawBlock.getChannelMap() & channelMap) != 0) {
+					return (PamRawDataBlock) rawBlock;
+				}
+			}
+		}
+
+		return PamController.getInstance().getRawDataBlock(0);
+	}
+
+	/**
+	 * The time the last of the selected data units ends, i.e. including its
+	 * duration. {@link DetectionGroupSummary#getLastTimeMillis()} is the start of the
+	 * last unit, so on its own it gives a zero length clip for a single data unit
+	 * selected without a mark - which is exactly the case for a spectrogram
+	 * annotation clicked on the display.
+	 *
+	 * @param foundDataUnits - the selected data units.
+	 * @return the end time of the last data unit in millis.
+	 */
+	public static long getLastEndMillis(DetectionGroupSummary foundDataUnits) {
+		long end = foundDataUnits.getLastTimeMillis();
+		for (PamDataUnit dataUnit : foundDataUnits.getDataList()) {
+			Double duration = dataUnit.getDurationInMilliseconds();
+			if (duration != null) {
+				end = Math.max(end, dataUnit.getTimeMilliseconds() + duration.longValue());
+			}
+		}
+		return end;
+	}
+
+	/**
+	 * Create the wav file name
 	 * @param timeStart
 	 * @return
 	 */
@@ -173,25 +237,29 @@ public class WavDetExport {
 		//this order for .wav files. 
 		//if there is a mark then save limits of mark. If there is one data unit then set limits of data units
 		long start;
-		long end; 
+		long end;
 		if (mark!=null) {
-			start=(long) mark.getLimits()[0]; 
-			end=(long) mark.getLimits()[1]; 
+			start=(long) mark.getLimits()[0];
+			end=(long) mark.getLimits()[1];
 		}
 		else {
-			start=foundDataUnits.getFirstTimeMillis(); 
-			end=foundDataUnits.getLastTimeMillis(); 
+			start=foundDataUnits.getFirstTimeMillis();
+			end=getLastEndMillis(foundDataUnits);
+		}
+
+		/*
+		 * Make sure the clip covers the selected data units as well as the mark. Clicking
+		 * a data unit rather than dragging a box leaves a mark with no width, which would
+		 * otherwise give an empty wav file for a spectrogram annotation.
+		 */
+		if (foundDataUnits!=null && foundDataUnits.getDataList().size()>0) {
+			start = Math.min(start, foundDataUnits.getFirstTimeMillis());
+			end = Math.max(end, getLastEndMillis(foundDataUnits));
 		}
 
 
-		//now search for the raw data block 
-		PamRawDataBlock rawDataBlock;
-		if (foundDataUnits==null || foundDataUnits.getDataList().size()<=0) {
-			rawDataBlock=PamController.getInstance().getRawDataBlock(0);
-		}
-		else {
-			rawDataBlock=foundDataUnits.getDataList().get(0).getParentDataBlock().getRawSourceDataBlock();
-		}
+		//now search for the raw data block
+		PamRawDataBlock rawDataBlock = findRawDataBlock(foundDataUnits);
 
 		//have a bit decision to make here. 
 
@@ -213,7 +281,7 @@ public class WavDetExport {
 
 		int flag=-1; 
 
-		String currentFileS = createFileName(foundDataUnits.getFirstTimeMillis()); 
+		String currentFileS = createFileName(start);
 		File file = new File(currentFileS);
 
 		if (hasAllWavClips) {

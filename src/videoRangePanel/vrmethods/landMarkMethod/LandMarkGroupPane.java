@@ -171,6 +171,7 @@ public class LandMarkGroupPane extends PamBorderPane {
 		landMarkTable.getButtonPane().getChildren().clear(); 
 		
 		PamButton importButton = new PamButton(); 
+		importButton.getStyleClass().add("icon-button");
 //		importButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_IMPORT, PamGuiManagerFX.iconSize));
 		importButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-import", PamGuiManagerFX.iconSize));
 		importButton.setOnAction((action)->{
@@ -184,6 +185,7 @@ public class LandMarkGroupPane extends PamBorderPane {
 		importButton.setTooltip(new Tooltip("Import a landmark group from a .csv file"));
 
 		PamButton exportButton = new PamButton(); 
+		exportButton.getStyleClass().add("icon-button");
 //		exportButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_EXPORT, PamGuiManagerFX.iconSize));
 		exportButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-export", PamGuiManagerFX.iconSize));
 		exportButton.setOnAction((action)->{

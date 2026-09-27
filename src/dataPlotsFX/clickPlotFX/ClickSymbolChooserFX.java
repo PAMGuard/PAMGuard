@@ -22,9 +22,15 @@ public class ClickSymbolChooserFX implements TDSymbolChooserFX {
 	
 	private PamSymbolChooser symbolChooser;
 
+	/**
+	 * How many pixels bigger a click in the current mark is drawn than an unmarked
+	 * one. Kept smaller than the focused highlight's growth so the focused click is
+	 * still the most prominent.
+	 */
+	private static final double MARKED_SYMBOL_GROWTH = 3;
 
 	/**
-	 * Circle with transparent middle to highlight click 
+	 * Circle with transparent middle to highlight click
 	 */
 	public static PamSymbolFX highLightClick= new PamSymbolFX(PamView.PamSymbolType.SYMBOL_CIRCLE, 6, 6, 
 				false, PamUtilsFX.addColorTransparancy(Color.DARKTURQUOISE, 0.3), Color.DARKTURQUOISE);
@@ -95,12 +101,19 @@ public class ClickSymbolChooserFX implements TDSymbolChooserFX {
 			
 		if (type==TDSymbolChooserFX.NORMAL_SYMBOL || type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL_MARKED){
 			symbol =symbolChooser.getPamSymbolFX(clickPlotInfoFX.getTDGraph().getGraphProjector(), dataUnit);
-			if (symbol==null) return null; 
-			symbol.setWidth(calcPixelWidth(dataUnit));
-			symbol.setHeight(getClickHeight(dataUnit));
+			if (symbol==null) return null;
+			/*
+			 * A click which is in the mark is drawn slightly larger than a normal one. This
+			 * is the cue that tells a user whether a Ctrl click selected or deselected a
+			 * click: the symbol grows when it goes into the mark and shrinks back when it
+			 * comes out, which is visible even while the focused highlight sits over it.
+			 */
+			double markedGrowth = (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL_MARKED) ? MARKED_SYMBOL_GROWTH : 0;
+			symbol.setWidth(calcPixelWidth(dataUnit)+markedGrowth);
+			symbol.setHeight(getClickHeight(dataUnit)+markedGrowth);
 		}
 		else if (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
-			symbol=highLightClick; 
+			symbol=highLightClick;
 			symbol.setWidth(calcPixelWidth(dataUnit)+5);
 			symbol.setHeight(getClickHeight(dataUnit)+5);
 		}

@@ -79,6 +79,12 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	private List<TmapPoint> existingMapPoints;
 
 	/**
+	 * Manager for waveform datagrams of the sound files. Null unless the subclass
+	 * creates one in createDatagramManager().
+	 */
+	private DatagramManager datagramManager;
+
+	/**
 	 * @param offlineRawDataStore master controlled unit - acquisition or decimator usually. 
 	 * @param fileDate file date - passed around so that settings can be shared. 
 	 */
@@ -90,6 +96,18 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 //		dataMap = new WavFileDataMap(this, rawDataBlock);
 		dataMap = createDataMap(this, rawDataBlock);
 		rawDataBlock.addOfflineDataMap(dataMap);
+		datagramManager = createDatagramManager();
+	}
+
+	/**
+	 * Create a datagram manager for these files. The base class serves all sorts of file
+	 * types, most of which can't be summarised, so this returns null by default.
+	 * Subclasses which can make a datagram should override.
+	 * 
+	 * @return a datagram manager, or null if these files don't support datagrams.
+	 */
+	protected DatagramManager createDatagramManager() {
+		return null;
 	}
 	
 	public abstract OfflineDataMap<TmapPoint> createDataMap(OfflineFileServer<TmapPoint> offlineFileServer, PamDataBlock pamDataBlock);
@@ -281,7 +299,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 		return true;
 	}
 
-	public void saveSerialisedMap() {
+	public synchronized void saveSerialisedMap() {
 		File mapFile = new File(getMapName());
 		if (dataMap == null) {
 			if (mapFile.exists()) {
@@ -451,8 +469,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 
 	@Override
 	public DatagramManager getDatagramManager() {
-		// TODO Auto-generated method stub
-		return null;
+		return datagramManager;
 	}
 
 	/**

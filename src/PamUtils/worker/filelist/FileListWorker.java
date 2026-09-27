@@ -175,9 +175,20 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 		if (fileList != null) for (int i = 0; i < fileList.length; i++) {
 			File rootFile = new File(fileList[i]);
 			if (rootFile.isFile()) { // add just the one file
+				/*
+				 * Apply the same filter a folder search applies, and honour eachFileTask.
+				 * Without this any file named explicitly - which is what happens when files
+				 * are dragged onto PAMGuard rather than a folder - went into the list whatever
+				 * it was. CPOD/FPOD detection files then ended up being treated as audio, and
+				 * every attempt to read their format threw an UnsupportedAudioFileException.
+				 */
+				if (!fileFilter.accept(rootFile)) {
+					continue;
+				}
 				T newFile = createFile(rootFile);
-				eachFileTask(newFile);
-				newFileList.addFile(newFile);
+				if (eachFileTask(newFile)) {
+					newFileList.addFile(newFile);
+				}
 			}
 			else { // add the entire folder. 
 				addFiles(pamWorker, newFileList, rootFile);

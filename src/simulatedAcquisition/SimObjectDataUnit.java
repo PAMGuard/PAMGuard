@@ -117,6 +117,10 @@ public class SimObjectDataUnit extends PamDataUnit {
 		long timeMillis = PamCalendar.getTimeInMillis();
 		int n = array.getHydrophoneCount();
 		SnapshotGeometry snapshotGeom = ArrayManager.getArrayManager().getSnapshotGeometry(PamUtils.makeChannelMap(n), timeMillis);
+		double arrayWobble = simProcess.getSimParameters().arrayWobble;
+		if (arrayWobble > 0) {
+			snapshotGeom = snapshotGeom.wobbleGeometry(arrayWobble);
+		}
 		//		AcquisitionParameters daqParam = simProcess.g
 		double[][] delays = new double[n][]; // transmission delays
 		double[][] gains = new double[n][]; // transmission gains
@@ -239,55 +243,9 @@ public class SimObjectDataUnit extends PamDataUnit {
 					snip[i+snipOffset] += w[i];
 				}
 			}
-			//			for (int iD = 0; iD < nDelays; iD++) {
-			//				// absolute start sample of the simulated sound after being delayed. 
-			//				w = simSound.getSimSignal().getSignal(sampleRate, 0);
-			//				startSample = simSound.startSampleAtAnimal + (simSound.getHydrophoneDelay(phone, iD) * sampleRate);
-			//				endSample = startSample + w.length;
-			//				w = simSound.getSimSignal().getSignal(sampleRate, startSample-Math.floor(startSample));
-			////				System.out.println(String.format("Sim sound start %3.3f / %3.3f, Snip start %3.3f",
-			////						startSample / sampleRate, simSound.startSample / sampleRate, snipStartSample / sampleRate));
-			//				if (endSample < snipStartSample) {
-			//					simSound.setCompleteChannel(phone);
-			//					continue; // This sound has not reached us yet. 
-			//				}
-			//				if (startSample >= snipStartSample + snip.length) {
-			//					continue; // we've passed the end of this sound.
-			//				}
-			//				tranmissionGain = simSound.getTranmissionGain(phone, iD);
-			//				amplitude = simSound.getSoundAmplitude(phone);
-			//				// now find the overlapping region and copy it into the snip.
-			//				// the generated sound is probably shorter than the snip
-			//				// so loop through the gen sound
-			////				w = simSound.waveform;
-			//				simSound.started = true;
-			//				simOffset = startSample - snipStartSample;
-			////				System.out.println(String.format("Sim sound Chan %d start %3.3f, Snip start %3.3f, offset %3.2f samples",
-			////						phone, startSample / sampleRate, snipStartSample / sampleRate, simOffset));
-			//						
-			//				// i is the sample number within the data unit we're generating (the snip)
-			//				int i = (int) simOffset;
-			//				i = Math.max(i, 0);
-			//				while (i < snip.length) {
-			////				for (i; i < w.length; i++) {
-			//					// calculate the exact position within the simulated sound. 
-			//					simPos = i - simOffset;
-			//					if (simPos > w.length) {
-			//						// only breaks after a complete extra sample since we're interpolating !
-			//						break;
-			//					}
-			////					snip[i] += getInterpolatedAmplitude(w, simPos) *
-			////					amplitude * tranmissionGain / 2; 
-			//					snip[i] += w[(int) simPos] * amplitude * tranmissionGain / 2 * 100; 
-			//					i++;
-			//				}
-			//			}
+			
 		}
-		// here, simSound will either be null or the last sound
-		// if null or last sound has started, then generate new
-		//		if (simSound == null || simSound.started) {
-		//			genSignal(snipStartSample);
-		//		}
+
 	}
 
 	/**

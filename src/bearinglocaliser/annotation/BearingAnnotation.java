@@ -1,5 +1,6 @@
 package bearinglocaliser.annotation;
 
+import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import bearinglocaliser.BearingLocalisation;
@@ -34,6 +35,12 @@ public class BearingAnnotation extends DataAnnotation<BearingAnnotationType> {
 	@Override
 	public String toString() {
 		return bearingLocalisation.getAlgorithmName() + "-" + bearingLocalisation.toString();
+	}
+
+	@Override
+	public void addToDataUnit(PamDataUnit dataUnit) {
+		super.addToDataUnit(dataUnit);
+		dataUnit.setLocalisation(getBearingLocalisation());
 	}
 
 }
