@@ -125,7 +125,7 @@ public class DifarProcess extends PamProcess {
 		crossingDataBlock = new DifarCrossingDataBlock("DIFAR Crossings", this);
 		String crossingTable = difarControl.getUnitName() + " Crossings";
 		DifarCrossingLogging crossingLogging = new DifarCrossingLogging(crossingTable, crossingDataBlock);
-		crossingLogging.setSubLogging(new DifarCrossingSubLogging(crossingTable + " Children", difarControl, crossingDataBlock));
+		crossingLogging.setSubLogging(new DifarCrossingSubLogging(crossingTable + " Children", crossingDataBlock));
 		crossingDataBlock.SetLogging(crossingLogging);
 		crossingDataBlock.setShouldLog(true);
 		crossingDataBlock.setClearAtStart(false);
