@@ -381,6 +381,10 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	}
 
 	public void delete() {
+		if (saved) {
+			difarControl.deleteClip(difarDataUnit);
+			return;
+		}
 		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteFromQueue, difarDataUnit));
 		removeEnablersAndSelecters();
 		enableEnablersAndSelecters();

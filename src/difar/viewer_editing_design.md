@@ -31,14 +31,19 @@ displays, matching and crossings stop seeing it without each checking a flag.
    recalculated from them, else deleted. `alwaysDeleteTrimmedCrossings` deletes instead. This reuses
    the trim code in `CrossingRecorder`, which the Viewer test has shown writes crossing changes to the
    database.
-3. At the next save, compaction drops the clip from its binary file and deletes its database row.
+3. The view reloads, so the map and spectrogram redraw without the clip. The viewer saves before
+   loading, so compaction then drops the clip from its binary file and deletes its database row at
+   once. A clip saved and deleted in the same session was never written, so there is nothing to do.
 
 ## How the user deletes a clip
 
-Through the delete controls that already exist, in the DIFARgram and in the clip display. Both send
-the same delete message. For a clip on the queue it does what it does now. For a saved clip it deletes
-it as above, after a confirmation naming the clip and, if it has one, its crossing. Save controls stay
-disabled for saved clips, as now.
+Through the delete controls that already exist: the DIFARgram's button and key, and the saved clips
+panel's button. All go through `DifarControl.deleteClip`. For a clip on the queue it does what it did
+before. For a saved clip in the Viewer it deletes it as above, after a confirmation naming the clip
+and, if it has one, what happens to its crossing. Save controls stay disabled for saved clips.
+
+In the Viewer a data block tells its observers nothing when a unit is added or removed. So the saved
+clips panel is told directly: it drops a deleted clip, and rebuilds itself after a save.
 
 ## Normal mode
 
@@ -123,7 +128,7 @@ A crossing of three, trimmed to two and recalculated, needs the three-buoy audio
 ## Order of work
 
 1. Bulk rematch into crossing units. Done.
-2. Deleting a saved clip.
+2. Deleting a saved clip. Done.
 3. The dataset upgrade, which uses 1.
 4. The auto-compaction setting.
 

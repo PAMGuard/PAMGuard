@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import PamUtils.PamUtils;
 import PamView.PamColors;
@@ -124,13 +125,32 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 			// mode, so in the viewer a new or newly saved clip is there but not
 			// shown until something else redraws the strip. Later, so the clip
 			// has joined the strip before it is laid out.
-			clipDisplayPanel.updatePanelLater();
+			if (saved && difarControl.isViewer()) {
+				// In the viewer a data block tells its observers nothing when a
+				// clip is added, so the saved strip never hears of a newly saved
+				// clip. Rebuild it from the saved clips, as a new load does, once
+				// the clip has joined them.
+				SwingUtilities.invokeLater(() -> clipDisplayPanel.newViewerTimes(
+						getClipDataBlock().getCurrentViewDataStart(), getClipDataBlock().getCurrentViewDataEnd()));
+			}
+			else {
+				clipDisplayPanel.updatePanelLater();
+			}
 			break;
 		case DIFARMessage.DeleteFromQueue:
 		case DIFARMessage.ProcessFromQueue:
 			// a clip leaves the queue strip once it is taken to be worked or
 			// deleted. Saved clips stay where they are.
 			if (!saved) {
+				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
+				clipDisplayPanel.updatePanel();
+			}
+			break;
+		case DIFARMessage.DeleteDatagramUnit:
+			// a saved clip deleted in the viewer leaves the saved strip. The same
+			// message also puts a clip being worked back on the queue, but that
+			// clip is not marked deleted.
+			if (saved && difarMessage.difarDataUnit != null && difarMessage.difarDataUnit.isDeleted()) {
 				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
 				clipDisplayPanel.updatePanel();
 			}

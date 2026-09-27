@@ -170,7 +170,7 @@ public class DIFARUnitControlPanel implements DIFARDisplayUnit {
 	}
 	
 	public void deleteButton() {
-		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteDatagramUnit, difarControl.getCurrentDemuxedUnit()));
+		difarControl.deleteClip(difarControl.getCurrentDemuxedUnit());
 		enableControls();
 	}
 	@Override

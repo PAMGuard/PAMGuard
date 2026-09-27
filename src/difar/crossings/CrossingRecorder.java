@@ -102,17 +102,41 @@ public class CrossingRecorder {
 		DifarCrossingDataBlock block = difarProcess.getCrossingDataBlock();
 		block.addPamData(crossing);
 
-		DifarParameters params = difarControl.getDifarParameters();
 		for (Map.Entry<DifarCrossing, Set<Long>> hit : affected.entrySet()) {
-			DifarCrossing old = hit.getKey();
-			if (hit.getValue().size() >= MIN_CLIPS && !params.alwaysDeleteTrimmedCrossings
-					&& recalculate(old)) {
-				block.updatePamData(old, System.currentTimeMillis());
-			}
-			else {
-				old.removeAllSubDetections();
-				block.remove(old, true);
-			}
+			trim(hit.getKey(), hit.getValue().size());
+		}
+	}
+
+	/**
+	 * Take a deleted clip out of its crossing, if it has one. The crossing is
+	 * then trimmed by the same rule as when a new crossing claims its clips.
+	 * @param clip the clip being deleted.
+	 */
+	public synchronized void removeClip(DifarDataUnit clip) {
+		forget(clip);
+		DifarCrossing crossing = clip.getCrossing();
+		if (crossing == null) {
+			return;
+		}
+		crossing.removeSubDetection(clip);
+		trim(crossing, crossing.getSubDetectionsCount());
+	}
+
+	/**
+	 * A crossing that has lost clips is recalculated from those it keeps, if
+	 * two or more remain and the settings allow; otherwise it is deleted.
+	 * @param crossing the crossing.
+	 * @param remaining how many clips it keeps.
+	 */
+	private void trim(DifarCrossing crossing, int remaining) {
+		DifarCrossingDataBlock block = difarProcess.getCrossingDataBlock();
+		if (remaining >= MIN_CLIPS && !difarControl.getDifarParameters().alwaysDeleteTrimmedCrossings
+				&& recalculate(crossing)) {
+			block.updatePamData(crossing, System.currentTimeMillis());
+		}
+		else {
+			crossing.removeAllSubDetections();
+			block.remove(crossing, true);
 		}
 	}
 

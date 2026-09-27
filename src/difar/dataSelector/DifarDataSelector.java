@@ -100,7 +100,13 @@ public class DifarDataSelector extends DataSelector {
 			return false;
 		}
 		
-		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getCrossing()==null){
+		/*
+		 * The crossing location, not the crossing unit: a clip joins the saved
+		 * clips just before its crossing unit is made, and displays told of the
+		 * new clip then must still see it as crossed. Until then its location
+		 * comes from its temporary crossing.
+		 */
+		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getCrossLocation()==null){
 			return false;
 		}
 		

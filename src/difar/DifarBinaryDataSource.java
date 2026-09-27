@@ -175,6 +175,7 @@ public class DifarBinaryDataSource extends BinaryDataSource {
 		difarLocalisation.setBearingError(difarControl.getDifarParameters().bearingError);
 		difarDataUnit.setLocalisation(difarLocalisation);
 		difarDataUnit.setLegacyCrossing(payload.legacyCrossing);
+		difarDataUnit.setBinaryVersion(moduleVersion);
 		if (!difarControl.getDifarParameters().loadViewerClips) {
 			difarDataUnit.setDemuxedDecimatedData(null);
 		}

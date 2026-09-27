@@ -23,7 +23,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import Array.ArrayManager;
@@ -63,6 +65,8 @@ import difar.display.DifarMatchProvider;
 import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
 import difar.offline.DifarDataCopyTask;
+import difar.crossings.CrossingLocaliser;
+import difar.crossings.DifarCrossing;
 import difar.offline.RematchTask;
 import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
@@ -70,6 +74,7 @@ import difar.plots.DifarIntensityPlotProvider;
 import difar.trackedGroups.TrackedGroupProcess;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
+import pamScrollSystem.AbstractScrollManager;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskGroupParams;
@@ -910,7 +915,85 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}	
 	
 	public boolean isDeleteEnabled() {
-		return (getCurrentDemuxedUnit() != null && (!isViewer || isQueued(getCurrentDemuxedUnit())));
+		DifarDataUnit unit = getCurrentDemuxedUnit();
+		return unit != null && (!isViewer || isQueued(unit) || isSaved(unit));
+	}
+
+	/**
+	 * @param unit a DIFAR clip.
+	 * @return true if the clip is among the saved clips.
+	 */
+	public boolean isSaved(DifarDataUnit unit) {
+		return unit != null && unit.getParentDataBlock() == difarProcess.getProcessedDifarData();
+	}
+
+	/**
+	 * Delete a clip the user has asked to delete. A clip on the queue is
+	 * deleted as before. A saved clip, in the viewer, is deleted for good:
+	 * it leaves its crossing, which is recalculated or deleted by the usual
+	 * rule, then the view reloads, which writes the deletion to its binary
+	 * file and the database. The user confirms first.
+	 * @param unit the clip.
+	 */
+	public void deleteClip(DifarDataUnit unit) {
+		if (unit == null) {
+			return;
+		}
+		if (!isViewer || !isSaved(unit)) {
+			sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteDatagramUnit, unit));
+			return;
+		}
+		deleteSavedClip(unit);
+	}
+
+	private void deleteSavedClip(DifarDataUnit unit) {
+		int channel = PamUtils.getSingleChannel(unit.getChannelBitmap());
+		String clip = String.format("the clip on channel %d at %s, UID %d", channel,
+				PamCalendar.formatDateTime(unit.getTimeMilliseconds()), unit.getUID());
+		if (unit.getBinaryVersion() < DifarClipPayload.CURRENT_VERSION) {
+			JOptionPane.showMessageDialog(getGuiFrame(),
+					String.format("<html>Cannot delete %s.<p><p>It is in a file written by an older version "
+							+ "of PAMGuard, and older files are read only until the dataset is upgraded.",
+							clip), "Delete DIFAR clip", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		DifarCrossing crossing = unit.getCrossing();
+		String effect = "";
+		if (crossing != null) {
+			int left = crossing.getSubDetectionsCount() - 1;
+			effect = left >= CrossingLocaliser.MIN_CLIPS && !difarParameters.alwaysDeleteTrimmedCrossings
+					? String.format("<p><p>It belongs to crossing UID %d, which will be worked out again from its other %d clips.",
+							crossing.getUID(), left)
+					: String.format("<p><p>It belongs to crossing UID %d, which will be deleted.", crossing.getUID());
+		}
+		int answer = JOptionPane.showConfirmDialog(getGuiFrame(),
+				String.format("<html>Delete %s?%s<p><p>The clip is removed from its binary file and the "
+						+ "database straight away.", clip, effect), "Delete DIFAR clip",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (answer != JOptionPane.OK_OPTION) {
+			return;
+		}
+		difarProcess.getCrossingRecorder().removeClip(unit);
+		ViewerClipStore store = difarProcess.getProcessedDifarData().getViewerClipStore();
+		if (store != null) {
+			store.clipDeleted(unit);
+		}
+		difarProcess.getProcessedDifarData().remove(unit);
+		// clears the clip from the DIFARgram, the unit control panel and the saved strip
+		sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteDatagramUnit, unit));
+		/*
+		 * The map and spectrogram draw from the saved clips, but only redraw when
+		 * told, and core has no notice for a removed data unit. Reload the view so
+		 * they redraw without the clip. The viewer saves before loading, so this
+		 * also writes the deletion at once. Alternatives considered:
+		 * - Send the "offline data loaded" notice without loading. Some core code
+		 *   does this, but twenty modules react to it, some by reloading or
+		 *   rebuilding, so its side effects are hard to vouch for.
+		 * - Move the scrollers back and forth. Each move loads its new range, so
+		 *   this is two reloads rather than one.
+		 * - Do nothing. The displays catch up at the next scroll.
+		 */
+		SwingUtilities.invokeLater(() -> AbstractScrollManager.getScrollManager().reLoad());
 	}
 	
 

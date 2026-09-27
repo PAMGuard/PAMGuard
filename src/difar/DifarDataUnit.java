@@ -111,6 +111,13 @@ public class DifarDataUnit extends ClipDataUnit {
 	 */
 	private long clipStartMillis;
 
+	/**
+	 * The DIFAR module version of the binary file the clip was read from, or
+	 * the current version for a clip made in this session. Files before
+	 * version 3 are read only.
+	 */
+	private int binaryVersion = DifarClipPayload.CURRENT_VERSION;
+
 	/** The match proposed while the clip is worked on, before it is saved. */
 	private DIFARCrossingInfo tempCrossing;
 
@@ -965,6 +972,21 @@ public class DifarDataUnit extends ClipDataUnit {
 			}
 		}
 		tempCrossing = null;
+	}
+
+	/**
+	 * @return the DIFAR module version of the file the clip was read from, or
+	 * the current version for a clip made in this session.
+	 */
+	public int getBinaryVersion() {
+		return binaryVersion;
+	}
+
+	/**
+	 * @param binaryVersion the DIFAR module version of the file the clip was read from.
+	 */
+	public void setBinaryVersion(int binaryVersion) {
+		this.binaryVersion = binaryVersion;
 	}
 
 	/**
