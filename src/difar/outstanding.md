@@ -8,23 +8,26 @@ memory. The design for crossings is in `crossings_design.md`.
 ## Crossings, remaining steps
 
 The aim is reanalysis in the Viewer: new clips from raw audio, with time to correct mistakes. Old
-datasets stay as they are, readable by old PAMGuard versions and pgmatlab.
+datasets are read only until upgraded, and stay readable by old PAMGuard versions and pgmatlab.
 
 Steps 1 to 5 are done: pure rules, crossing units and tables, Normal mode recording crossings as
 clips are saved, clip payload version 3 with buoy edits recalculating crossings, and displays drawing
-crossing units. A clip holds only the match proposed while it is worked on; once saved, its crossing
-is the crossing unit. Still to do, in order:
+crossing units. A clip holds only a temporary crossing while it is worked on; once saved, its crossing
+is the crossing unit.
 
-1. Deleting a clip, in both modes, with the trim rule and a checkbox for
-   `alwaysDeleteTrimmedCrossings`. Editing a clip is then delete and re-mark. Needs a short design
-   note first, since binary files are append-only.
-2. Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
-   bulk rematch into crossing units, or putting clips back on the queue.
-3. Shelved: converting old datasets' crossings, and Viewer compaction.
+Next, in order, as set out in `viewer_editing_design.md`:
 
-The "DIFAR Data Export" offline task used to rematch every clip over a period. It now only updates
-clip rows and relocates existing crossings, the same as after a buoy edit, until bulk rematch is
-rebuilt on crossing units.
+1. Bulk rematch into crossing units. The "DIFAR Data Export" task rematched every clip until step 4,
+   which changed it to relocate existing crossings only. This restores it.
+2. Deleting a saved clip in the Viewer, from the DIFARgram and clip display controls.
+3. Upgrading an old dataset to version 3, with a backup and a rematch.
+4. An auto-compaction setting, writing after every edit.
+
+Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
+putting clips back on the queue; the spectrogram marking clips that belong to a crossing.
+
+Viewer compaction works, and writes clips saved in the Viewer. Converting old datasets' crossings is
+not planned: the upgrade rematches instead, and keeps the old files in a backup.
 
 ## Tests owed
 
