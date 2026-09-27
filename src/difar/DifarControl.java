@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.function.Predicate;
 
 import javax.swing.JFileChooser;
 import javax.swing.JList;
@@ -464,20 +465,29 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 	
 	/**
-	 * Work out or clear the triangulations for a period, after a buoy has
-	 * changed.
+	 * Bring the database up to date for a period, after a buoy has changed:
+	 * the buoy columns of each affected clip's row, and the location of each
+	 * crossing those clips belong to.
 	 * <p>
 	 * The period is the whole time the buoy record is in force, not the loaded
-	 * period, so detections outside the viewer's window are covered too. Both
-	 * tasks mark what they change, so the binary files and the database are
-	 * rewritten. Runs without asking, since the user has already agreed to it.
+	 * period, so detections outside the viewer's window are covered too. No
+	 * binary file is rewritten. Runs without asking, since the user has
+	 * already agreed to it.
 	 * @param startTime start of the period.
 	 * @param endTime end of the period.
+	 * @param affected which clips the change affects.
 	 */
-	public void runCrossingTasks(long startTime, long endTime) {
+	public void runCrossingTasks(long startTime, long endTime, Predicate<DifarDataUnit> affected) {
 		OfflineTaskGroup taskGroup = new OfflineTaskGroup(this, getUnitName());
 		taskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
-		taskGroup.addTask(new UpdateCrossingTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
+		UpdateCrossingTask task = new UpdateCrossingTask(this, affected);
+		taskGroup.addTask(task);
+		/*
+		 * A task group takes each task's on or off state from the offline tasks
+		 * dialog's saved selection, which is off by default. This group is run
+		 * from code, not the dialog, so switch the task on.
+		 */
+		task.setDoRun(true);
 		TaskGroupParams params = taskGroup.getTaskGroupParams();
 		params.dataChoice = TaskGroupParams.PROCESS_SPECIFICPERIOD;
 		params.startRedoDataTime = startTime;
@@ -494,7 +504,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		if (offlineTaskGroup == null) {
 			offlineTaskGroup = new OfflineTaskGroup(this, getUnitName());
 			offlineTaskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
-			offlineTaskGroup.addTask(new UpdateCrossingTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
+			offlineTaskGroup.addTask(new UpdateCrossingTask(this, null));
 			offlineTaskGroup.addTask(new DifarDataCopyTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
 //			offlineTaskGroup.addTask(task);
 		}

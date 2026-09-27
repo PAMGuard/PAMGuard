@@ -1,25 +1,38 @@
 # DIFAR: outstanding work
 
-Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, 25 September 2026.
+Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, 27 September 2026.
 
 Everything known to be unfinished, broken or awkward in the DIFAR module, so none of it depends on
 memory. The design for crossings is in `crossings_design.md`.
 
 ## Crossings, remaining steps
 
-Steps 1 to 3 are done: pure rules, crossing units and tables, and Normal mode recording crossings as
-clips are saved. Still to do, in order:
+The aim is reanalysis in the Viewer: new clips from raw audio, with time to correct mistakes. Old
+datasets stay as they are, readable by old PAMGuard versions and pgmatlab.
 
-1. Clip payload version 3, without the crossing tail. Read versions 0 to 2 into a legacy record. Buoy
-   edits recalculate crossing units, and update the derived columns of clip rows.
-2. Viewer: load crossings, reattach them to clips, convert old crossings in memory. Move displays to
-   crossing units. Delete `DIFARCrossingInfo` and the temporary crossing on each clip.
-3. An offline task that converts a whole dataset's old crossings, tried on a copy of the pilot.
-4. Viewer compaction for clips, then deleting clips, with a checkbox for
-   `alwaysDeleteTrimmedCrossings`.
+Steps 1 to 4 are done: pure rules, crossing units and tables, Normal mode recording crossings as
+clips are saved, and clip payload version 3 with buoy edits recalculating crossings. Still to do, in
+order:
+
+1. Viewer displays draw crossing units. Until then, a crossing shows only while the clips that made
+   it are in memory, and vanishes after a reload, including the one at the end of a buoy edit.
+   Delete `DIFARCrossingInfo` and the temporary crossing on each clip.
+2. Deleting a clip, in both modes, with the trim rule and a checkbox for
+   `alwaysDeleteTrimmedCrossings`. Editing a clip is then delete and re-mark. Needs a short design
+   note first, since binary files are append-only.
+3. Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
+   bulk rematch into crossing units, or putting clips back on the queue.
+4. Shelved: converting old datasets' crossings, and Viewer compaction.
+
+The "DIFAR Data Export" offline task used to rematch every clip over a period. It now only updates
+clip rows and relocates existing crossings, the same as after a buoy edit, until bulk rematch is
+rebuilt on crossing units.
 
 ## Tests owed
 
+- Normal mode buoy edits are untested since step 4. Change a heading after a whale in one session:
+  the crossing should keep its clips and move, and clip rows' `TrueBearing` should change.
+- The pilot's 2013 files opening in the Viewer after step 4. Not needed for new reanalysis.
 - Rung 7b: a deliberately wrong match, chosen in the match selector. The crossing should record
   `OPERATOR` and land away from the others.
 - A three-buoy rung, where a third bearing extends a two-buoy crossing. Needs new audio.
@@ -61,6 +74,11 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
 
 ## Viewer
 
+- A buoy edit in the Viewer loads the buoy's whole period to update clip rows and crossings. For a long
+  deployment that may be slow. Ask first if it proves a nuisance.
+- A crossing whose clips fall in two load chunks of that task is not recalculated. The console lists
+  their UIDs. Rare, since a call spans seconds and chunks are files.
+
 - Scrolling backwards then marking makes a clip that starts before the raw audio in memory. Fix: read
   the clip from the WAV files.
 - The Saved strip does not show newly saved clips until a reload.
@@ -72,6 +90,10 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   until crossings are separate units.
 
 ## Tidying
+
+- R and MATLAB wrappers around `crossing_clips.sql`.
+- pgmatlab: branch `difar-v3-no-tail` in `C:\analysis\pgmatlab` reads version 3 clips, tested on
+  the pilot's version 2 files and a real version 3 file. Open the pull request from the fork.
 
 - Detections from reanalysed WAV files should reference the file and the sample within it. Check what
   the WAV annotation already records.
@@ -95,7 +117,13 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
 - `BinaryOutputStream.createIndexFile` needs a footer that only `writeFooter` sets.
 - `ClipDisplayPanel` skips `updatePanel()` for new data in Viewer.
 - `BINOVERLAPWARNING` is one named warning for every module.
+- An offline task group takes each task's on or off state from the dialog's saved selection, off by
+  default, even when the group is run from code. `runCrossingTasks` switches its task on. The buoy-edit
+  group also shares its settings name with the DIFAR offline tasks group, and registers settings
+  each time it is made.
+- Text columns are padded with spaces to their declared width on insert (`PamTableItem.getPackedValue`)
+  but not on update, so one table holds both forms. `crossing_clips.sql` trims them.
 - A unit moved between blocks keeps its first block as parent, since `addPamData` only sets a missing
   parent. DIFAR now sets it on save.
 - The GPS import dialog's null mouse position is fixed on `fix-gps-import-dialog`. The pull request is
-  not yet opened.
+  open.

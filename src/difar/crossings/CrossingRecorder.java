@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import PamUtils.LatLong;
-import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SubdetectionInfo;
 import difar.DIFARCrossingInfo;
 import difar.DifarControl;
@@ -17,7 +15,6 @@ import difar.DifarDataUnit;
 import difar.DifarMatchSelector;
 import difar.DifarParameters;
 import difar.DifarProcess;
-import difar.targetmotion.TargetMotionResult;
 
 /**
  * Turns the crossing made for a clip into a {@link DifarCrossing} when the
@@ -36,10 +33,11 @@ import difar.targetmotion.TargetMotionResult;
 public class CrossingRecorder {
 
 	/** A crossing needs two bearings. */
-	private static final int MIN_CLIPS = 2;
+	private static final int MIN_CLIPS = CrossingLocaliser.MIN_CLIPS;
 
 	private final DifarProcess difarProcess;
 	private final DifarControl difarControl;
+	private final CrossingLocaliser localiser;
 
 	/** How each clip's current match was chosen, until the clip is saved or dropped. */
 	private final Map<DifarDataUnit, DifarCrossing.MatchChoice> choices = new WeakHashMap<>();
@@ -47,6 +45,7 @@ public class CrossingRecorder {
 	public CrossingRecorder(DifarProcess difarProcess, DifarControl difarControl) {
 		this.difarProcess = difarProcess;
 		this.difarControl = difarControl;
+		this.localiser = new CrossingLocaliser(difarProcess, difarControl);
 	}
 
 	/**
@@ -122,17 +121,7 @@ public class CrossingRecorder {
 	 * @return false if they could not be crossed, so it should be deleted.
 	 */
 	private boolean recalculate(DifarCrossing crossing) {
-		List<PamDataUnit> clips = new ArrayList<>();
-		for (PamDataUnit<?, ?> clip : crossing.getSubDetections()) {
-			clips.add(clip);
-		}
-		if (clips.size() < MIN_CLIPS) {
-			return false;
-		}
-		DifarParameters params = difarControl.getDifarParameters();
-		DifarMatchSelector selector = new DifarMatchSelector(difarProcess,
-				params.detectionTimingError, params.maxBearingResidual, params.maxTimeDelayResidual);
-		DifarMatchSelector.Match match = selector.localise(clips);
+		DifarMatchSelector.Match match = localiser.localise(crossing);
 		if (match == null) {
 			System.out.printf("DIFAR: crossing UID %d could not be recalculated after losing clips, so it is deleted\n",
 					crossing.getUID());
@@ -142,10 +131,7 @@ public class CrossingRecorder {
 			System.out.printf("DIFAR: crossing UID %d recalculated after losing clips, but %s\n",
 					crossing.getUID(), match.getRejectReason());
 		}
-		TargetMotionResult result = match.getResult();
-		Double[] errors = result.getErrors();
-		LatLong location = result.getLatLong();
-		crossing.setResult(location, error(errors, 0), error(errors, 1));
+		CrossingLocaliser.store(crossing, match);
 		return true;
 	}
 

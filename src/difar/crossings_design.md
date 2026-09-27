@@ -60,7 +60,7 @@ Each clip points to the crossing through the usual super-detection link in memor
 
 **The data block.** `DifarCrossingDataBlock` extends `SuperDetDataBlock<DifarCrossing, DifarDataUnit>`, owned by `DifarProcess` beside the queue and the saved clips.
 
-**The database.** `DifarCrossingLogging` extends `SuperDetLogging`. It writes a `DIFAR_Crossing` table, one row per crossing, and a subtable with one row per clip giving the crossing UID, the clip UID, the clip time and the clip's binary file name, as every PAMGuard subtable does. Matching checks time first, then UID, and falls back to the file name if a UID is corrupt. The subtable also carries each clip's channel, buoy name and true bearing, so one query returns a crossing with everything needed to plot it. Viewer compaction moves clips between files, so it must update the file name in these rows. The partner UID string leaves the clip table.
+**The database.** `DifarCrossingLogging` extends `SuperDetLogging`. It writes a `DIFAR_Crossing` table, one row per crossing, and a subtable with one row per clip giving the crossing UID, the clip UID, the clip time and the clip's binary file name, as every PAMGuard subtable does. Matching checks time first, then UID, and falls back to the file name if a UID is corrupt. The subtable holds links only. Everything about a clip, including what comes from its buoy, lives in the clip's own row, so there is one copy to keep current. The query in `crossing_clips.sql` joins the crossing table, the subtable and the clip table, and returns one row per clip per crossing with everything needed to plot it. It can be run straight to CSV, or from R or MATLAB. Viewer compaction moves clips between files, so it must update the file name in these rows. The partner UID string leaves the clip table.
 
 **No binary stream for crossings.** PAMGuard's other super-detections keep their links only in the database, and DIFAR follows them. Clips stay in their own binary files. A setup with no database keeps its clips and bearings, but not its crossings.
 
@@ -79,7 +79,7 @@ The operator sees no change. Matching, the match selector and the save keys work
 3. **Save without range.** The clip is saved and the pending crossing is dropped.
 4. **Replacing.** On save, the new crossing claims its clips from any earlier crossing, as in the design above.
 
-**Buoy edits.** A clip's binary object holds only what was measured: time, channel, and the bearing relative to the buoy. The buoy's position and heading are looked up when needed, so a buoy edit never changes a clip's binary object. The clip's database row is different. It also stores the buoy latitude, longitude and heading and the true bearing, all derived from the buoy at save time. After a buoy edit, `SonobuoyManager` recalculates each affected crossing and updates the derived columns of each affected clip row. The binary files are the record of what was measured, and the database is the ready-to-use view, kept current.
+**Buoy edits.** A clip's binary object holds only what was measured: time, channel, and the bearing relative to the buoy. The buoy's position and heading are looked up when needed, so a buoy edit never changes a clip's binary object. The clip's database row is different. It also stores the buoy latitude, longitude and heading and the true bearing, all derived from the buoy at save time. After a buoy edit, `SonobuoyManager` recalculates each affected crossing from the clips it already holds, keeping its clips and how its match was chosen, and updates the derived columns of each affected clip row, found by UID. A crossing whose clips no longer cross keeps its clips and loses its location. Rematching is a separate decision, not a side effect of a buoy edit. The binary files are the record of what was measured, and the database is the ready-to-use view, kept current.
 
 **Which buoy.** A clip's channel and time already identify its sonobuoy deployment, since a channel holds one deployment at a time. But finding it in SQL means joining on a time range, and end times are often missing. So clip rows also store the deployment's name and its UID. The name carries the operators' own convention, such as the decimal suffix used when a physical buoy moves to a new channel. A physical buoy identity across deployments belongs in the buoy manager, and is outside this work.
 
@@ -125,15 +125,19 @@ Everything stays inside `src/difar`. No core class changes.
 | --- | --- |
 | `DifarCrossing` | New. The crossing super-detection. |
 | `DifarCrossingDataBlock` | New. `SuperDetDataBlock` with `LOAD_OVERLAPTIME`. |
-| `DifarCrossingLogging` | New. `SuperDetLogging` with its clip subtable, including channel, buoy name and true bearing. |
-| `DifarBinaryDataSource` | Version 3 without the crossing tail. Versions 0 to 2 read into a legacy record. |
+| `DifarCrossingLogging` | New. `SuperDetLogging` with its clip subtable, which holds links only. |
+| `crossing_clips.sql` | New. The query joining crossings, their links and the clip rows. |
+| `DifarClipPayload` | New. Writes the clip payload at version 3 and reads versions 0 to 3. |
+| `LegacyCrossing` | New. The inert record of an old clip's crossing tail. |
+| `DifarBinaryDataSource` | Version 3 without the crossing tail, through `DifarClipPayload`. Versions 0 to 2 read into a legacy record. |
+| `CrossingLocaliser` | New. Recalculates a crossing from its clips, for trimming and buoy edits. |
 | `DifarDataUnit` | Drops the temporary crossing and `saveCrossing`. `getDifarCrossing()` returns the clip's crossing. |
 | `DifarProcess` | Holds the pending crossing and the crossing block. `applyMatch` builds a `DifarCrossing`. |
 | `DifarControl` | Save adds the pending crossing to the block. |
 | `DifarParameters` | New setting: recalculate or delete crossings when a clip is deleted. |
-| `DifarSqlLogging` | Writes NULL to the old crossing columns. Adds buoy name and deployment UID columns. |
+| `DifarSqlLogging` | Writes NULL to the old crossing columns. Adds buoy name and deployment UID columns. Updates a clip row's buoy columns by UID. |
 | `SonobuoyManager` | Recalculates crossings and the derived columns of clip rows. Never rewrites clip binary objects. |
-| `UpdateCrossingTask` | Rebuilds crossings from clips. |
+| `UpdateCrossingTask` | After a buoy edit in the viewer, updates clip rows and recalculates crossings over the buoy's period. Never marks a clip changed. |
 | `ClearCrossingTask` | Deleted, as it is unused. |
 | `DIFARCrossingInfo` | Deleted once every caller has moved. |
 
@@ -156,3 +160,5 @@ Everything stays inside `src/difar`. No core class changes.
 3. **Deleting a clip.** Recalculate its crossing when two or more clips remain, else delete it. A setting switches to always deleting.
 4. **Old clip columns.** New rows write NULL. Old datasets are converted, not read by old-format tools.
 5. **Tracked groups.** Left alone for now. They are likely to be dropped or replaced by a general tracking tool later.
+6. **One copy of buoy-derived values.** Buoy position, heading, true bearing, buoy name and deployment UID live in the clip row only. The crossing subtable holds links, and a query joins them.
+7. **Buoy edits relocate, never rematch.** A crossing keeps its clips and its match choice when a buoy changes.

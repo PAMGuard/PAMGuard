@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.awt.Point;
 
 import javax.swing.JOptionPane;
@@ -38,6 +40,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
+import PamguardMVC.superdet.SuperDetection;
 import annotation.handler.AnnotationChoiceHandler;
 import annotation.string.StringAnnotationType;
 import annotation.timestamp.TimestampAnnotation;
@@ -46,6 +49,9 @@ import difar.calibration.CalibrationDataBlock;
 import difar.calibration.CalibrationDataUnit;
 import difar.calibration.CalibrationDialog;
 import difar.calibration.CalibrationHistogram;
+import difar.crossings.CrossingLocaliser;
+import difar.crossings.DifarCrossing;
+import difar.crossings.DifarCrossingDataBlock;
 import difar.dialogs.SonobuoyDialog;
 import difar.display.SonobuoyOverlayGraphics;
 import generalDatabase.DBControl;
@@ -830,18 +836,26 @@ public class SonobuoyManager extends PamProcess {
 	}
 
 	/**
-	 * Work out the triangulations again, or clear them, over the whole time the
-	 * changed record is in force. Only in the viewer: while PAMGuard is
-	 * running, data already written cannot be changed.
+	 * Bring the database up to date with a changed buoy, over the whole time
+	 * the changed record is in force: the buoy columns of each affected clip's
+	 * row, and the location of each crossing those clips belong to. Clips keep
+	 * their crossings, and crossings keep how their match was chosen. No clip
+	 * binary object is rewritten, since a buoy change does not alter what was
+	 * measured.
+	 * <p>
+	 * In the viewer this runs over the whole period, loading it as it goes.
+	 * While PAMGuard is running, only the clips in memory are covered.
 	 * @param record the buoy record that changed.
+	 * @param edited the edited copy, or null where only the heading changed.
 	 */
 	private void carryChangeDownstream(StreamerDataUnit record, StreamerDataUnit edited) {
 		SonobuoyEditEffects effects = getEditEffects(record, edited);
-		if (effects == null || effects.getTriangulations() == 0) {
+		if (effects == null) {
 			return;
 		}
 		if (isViewer()) {
-			difarControl.runCrossingTasks(effects.getReprocessStartTime(), effects.getEndTimeOrLatest());
+			difarControl.runCrossingTasks(effects.getReprocessStartTime(), effects.getEndTimeOrLatest(),
+					clip -> effects.covers(new DifarDetection(clip)));
 		}
 		else {
 			updateLoadedTriangulations(effects);
@@ -849,21 +863,38 @@ public class SonobuoyManager extends PamProcess {
 	}
 
 	/**
-	 * Bring the triangulations held in memory into line with a changed buoy.
+	 * Bring the clips and crossings held in memory into line with a changed
+	 * buoy, while PAMGuard is running.
 	 * <p>
-	 * Used while PAMGuard is running, where the offline tasks cannot be used.
-	 * Detections written to file before the change keep their old
-	 * triangulation until the data are reprocessed in the viewer.
+	 * Each affected clip's row gets the buoy's new values. Each crossing those
+	 * clips belong to is located again from its own clips. Clips that have
+	 * left memory are not covered until the data are reprocessed in the viewer.
 	 * @param effects what the change affects.
 	 */
 	private void updateLoadedTriangulations(SonobuoyEditEffects effects) {
-		PamDataBlock<DifarDataUnit> detections = difarControl.getDifarProcess().getProcessedDifarData();
+		DifarProcess difarProcess = difarControl.getDifarProcess();
+		PamDataBlock<DifarDataUnit> detections = difarProcess.getProcessedDifarData();
+		PamConnection connection = DBControlUnit.findConnection();
+		SQLLogging logging = detections.getLogging();
+		Set<DifarCrossing> crossings = new LinkedHashSet<>();
 		for (DifarDataUnit unit : detections.getDataCopy()) {
-			if (unit.getDifarCrossing() == null || !effects.covers(new DifarDetection(unit))) {
+			if (!effects.covers(new DifarDetection(unit))) {
 				continue;
 			}
-			unit.setDifarCrossing(difarControl.getDifarProcess().getDifarRangeInfo(unit));
-			detections.updatePamData(unit, System.currentTimeMillis());
+			if (connection != null && logging instanceof DifarSqlLogging) {
+				((DifarSqlLogging) logging).updateBuoyColumns(connection, unit);
+			}
+			SuperDetection crossing = unit.getSuperDetection(DifarCrossing.class);
+			if (crossing != null) {
+				crossings.add((DifarCrossing) crossing);
+			}
+		}
+		CrossingLocaliser localiser = new CrossingLocaliser(difarProcess, difarControl);
+		DifarCrossingDataBlock crossingBlock = difarProcess.getCrossingDataBlock();
+		for (DifarCrossing crossing : crossings) {
+			if (localiser.relocate(crossing) != CrossingLocaliser.Outcome.CLIPS_NOT_LOADED) {
+				crossingBlock.updatePamData(crossing, System.currentTimeMillis());
+			}
 		}
 	}
 
@@ -918,7 +949,7 @@ public class SonobuoyManager extends PamProcess {
 
 		@Override
 		public boolean hasTriangulation() {
-			return unit.getDifarCrossing() != null;
+			return unit.getSuperDetection(DifarCrossing.class) != null;
 		}
 	}
 
