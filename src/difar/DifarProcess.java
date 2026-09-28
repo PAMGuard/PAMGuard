@@ -59,6 +59,9 @@ import warnings.WarningSystem;
 
 public class DifarProcess extends PamProcess {
 
+	/** Candidate matches for recent detections, for the matching display. */
+	private DifarMatchLog matchLog = new DifarMatchLog();
+
 	private DifarControl difarControl;
 
 	private PamRawDataBlock rawDataSource;
@@ -104,11 +107,18 @@ public class DifarProcess extends PamProcess {
 		processedDifarData.SetLogging(new DifarSqlLogging(difarControl, processedDifarData));
 		processedDifarData.setBinaryDataSource(new DifarBinaryDataSource(difarControl, processedDifarData));
 		processedDifarData.setShouldLog(true);
+		processedDifarData.setShouldBinary(true);
 		processedDifarData.setClearAtStart(false);
 		addOutputDataBlock(queuedDifarData);
 		addOutputDataBlock(processedDifarData);
 		calibrationDataBlock = new CalibrationDataBlock(this);
 		calibrationDataBlock.SetLogging(new CalibrationLogging(this, calibrationDataBlock));
+		calibrationDataBlock.setShouldLog(true);
+		/*
+		 * A day, like the clips. A calibration is worth keeping for as long as
+		 * the detections it applies to.
+		 */
+		calibrationDataBlock.setNaturalLifetime(24 * 3600);
 		addOutputDataBlock(calibrationDataBlock);
 	}
 
@@ -307,7 +317,13 @@ public class DifarProcess extends PamProcess {
 			sP = difarControl.getDifarParameters().findSpeciesParams(difarDataUnit);
 		}
 		difarDataUnit.setDisplaySampleRate(sP.sampleRate);
-		if (difarDataUnit.triggerName.equals(difarControl.getUnitName())) { // User detection
+		if (difarDataUnit.triggerName == null) {
+			/*
+			 * The trigger name is not stored in the binary file, so it is null
+			 * for a unit loaded in viewer mode. Its frequency limits were set
+			 * when it was first processed, so leave them alone.
+			 */
+		} else if (difarDataUnit.triggerName.equals(difarControl.getUnitName())) { // User detection
 			if (!sP.useMarkedBandsForSpectrogramClips ){
 				double[] frequency = {sP.processFreqMin, sP.processFreqMax};
 				difarDataUnit.setFrequency(frequency);
@@ -550,7 +566,10 @@ public class DifarProcess extends PamProcess {
 			demuxWorker.ppublish(new DemuxWorkerMessage(difarDataUnit, DemuxWorkerMessage.STATUS_DONEDIFARCALC, System.currentTimeMillis()-startTime));
 		}
 
-		difarDataUnit.setLocalisation(new DifarLocalisation(difarDataUnit, LocContents.HAS_BEARING, difarDataUnit.getChannelBitmap()));
+		DifarLocalisation difarLocalisation = new DifarLocalisation(difarDataUnit,
+				LocContents.HAS_BEARING, difarDataUnit.getChannelBitmap());
+		difarLocalisation.setBearingError(difarControl.getDifarParameters().bearingError);
+		difarDataUnit.setLocalisation(difarLocalisation);
 
 		getDifarRangeInfo(difarDataUnit);
 		
@@ -1291,59 +1310,67 @@ public class DifarProcess extends PamProcess {
 			return null;
 		}
 		
+		if (difarDataUnit.getLocalisation() == null) {
+			return null;
+		}
 		int nChan = PamUtils.getNumChannels(rawDataSource.getChannelMap());
 		int thisChan = PamUtils.getSingleChannel(difarDataUnit.getChannelBitmap());
-		int aChan;
-		DifarDataUnit[] matchedUnits = new DifarDataUnit[nChan];
-		matchedUnits[0] = difarDataUnit;
-		
-		int finds = 1;
+		DifarParameters params = difarControl.getDifarParameters();
+
+		/*
+		 * Collect every detection on every other buoy that could be this call,
+		 * rather than the single best overlapping one. The best overlap is not
+		 * always the same call, and picking it early leaves no way back.
+		 */
+		ArrayList<ArrayList<PamDataUnit>> candidatesByBuoy = new ArrayList<>();
 		for (int i = 0; i < nChan; i++) {
-			aChan = PamUtils.getNthChannel(i, rawDataSource.getChannelMap());
+			int aChan = PamUtils.getNthChannel(i, rawDataSource.getChannelMap());
 			if (aChan == thisChan) {
 				continue;
 			}
-			DifarDataUnit match = getMatchingUnit(difarDataUnit, aChan);
-			if (match != null) {
-				matchedUnits[finds++] = match;
-			}
+			candidatesByBuoy.add(getMatchingUnits(difarDataUnit, aChan, params.maxCandidatesPerBuoy));
 		}
-		/*
-		 * Actual number of finds may b e< number of channels. 
-		 */
-		if (finds < 2) return null;
-		
-		ArrayList<PamDataUnit> detectionList = new ArrayList<>();
-		for (int i = 0; i < finds; i++) {
-			if (matchedUnits[i].getLocalisation() == null) continue;
-			detectionList.add(matchedUnits[i]);
-		}
-		
-		if (detectionList.size() < 2) return null;
-		
 
-		if (simplex2D == null) {
-			simplex2D = new Simplex2D();
-		}
-		DIFARTargetMotionInformation tmi = new DIFARTargetMotionInformation(this, detectionList);
-		simplex2D.setStartPoint(tmi.getMeanPosition());
-		long now = System.currentTimeMillis();
-//		System.out.println("Enter simplex model at " + PamCalendar.formatTime(now, true));
-		TargetMotionResult[] locResult = simplex2D.runModel(tmi);
-//		System.out.println("Exit simplex model after ms " + (System.currentTimeMillis()-now));
+		DifarMatchSelector selector = new DifarMatchSelector(this,
+				params.detectionTimingError, params.maxBearingResidual, params.maxTimeDelayResidual);
+		List<DifarMatchSelector.Match> candidates = selector.selectAll(difarDataUnit,
+				new ArrayList<List<PamDataUnit>>(candidatesByBuoy));
+		matchLog.put(difarDataUnit, candidates);
+		DifarMatchSelector.Match match = DifarMatchSelector.chooseMatch(candidates);
+
+		return applyMatch(difarDataUnit, match);
+	}
+
+	/**
+	 * Make a match the crossing for a detection, ready to be saved.
+	 * <p>
+	 * Used for the match chosen automatically, and again when the user picks a
+	 * different one in the match selector, so both go the same way. A null
+	 * match leaves the detection with no crossing.
+	 * @param difarDataUnit the detection being matched.
+	 * @param match the match to use, or null for none.
+	 * @return the crossing, or null if there is none.
+	 */
+	public DIFARCrossingInfo applyMatch(DifarDataUnit difarDataUnit, DifarMatchSelector.Match match) {
 		DIFARCrossingInfo crossInfo = null;
-		if (locResult != null && locResult.length == 1 && localisationOK(detectionList.size(), locResult[0])) {
-//			System.out.println("Localisation latlong = " + locResult[0].getLatLong());
-			LatLong ll = locResult[0].getLatLong();
-			// check the result is vaguely sensible. 
-			if (tmi.getGPSReference().distanceToMiles(ll) < 1000) { 
-				crossInfo = new DIFARCrossingInfo(matchedUnits, locResult[0]);
+		if (match != null) {
+			LatLong ll = match.getResult().getLatLong();
+			DIFARTargetMotionInformation tmi =
+					new DIFARTargetMotionInformation(this, new ArrayList<>(match.getUnits()));
+			// check the result is vaguely sensible.
+			if (tmi.getGPSReference().distanceToMiles(ll) < 1000) {
+				DifarDataUnit[] matchedUnits = new DifarDataUnit[match.getUnits().size()];
+				for (int i = 0; i < matchedUnits.length; i++) {
+					matchedUnits[i] = (DifarDataUnit) match.getUnits().get(i);
+				}
+				crossInfo = new DIFARCrossingInfo(matchedUnits, match.getResult());
 			}
 		}
-		//			crossInfo.setLocation(tmi.metresToLatLong(locResult[0].getLocalisationXYZ()));
-		for (int i = 0; i < finds; i++) {
-			if (matchedUnits[i].getLocalisation() == null) continue;
-			matchedUnits[i].setTempCrossing(crossInfo);
+		difarDataUnit.setTempCrossing(crossInfo);
+		if (match != null) {
+			for (PamDataUnit unit : match.getUnits()) {
+				((DifarDataUnit) unit).setTempCrossing(crossInfo);
+			}
 		}
 		return crossInfo;
 	}
@@ -1351,39 +1378,63 @@ public class DifarProcess extends PamProcess {
 	
 	
 	/**
-	 * Check that the localisation result is reasonable. For two buoys, the 
-	 * chi2 shold be near zero. Need to think a bit about what's acceptable for three. 
-	 * @param nBuoys number of buoys
-	 * @param locResult result. 
-	 * @return true if it seems OKish. 
+	 * Check that the localisation result is reasonable.
+	 * <p>
+	 * The test is how far the fitted position sits from the measurements, in
+	 * degrees and in seconds. Both are quantities an operator can picture, and
+	 * both work the same way for two buoys or three. A fit that fails usually
+	 * means the detections were not the same call.
+	 * <p>
+	 * The previous test compared chi2 with zero for two buoys. Two bearings
+	 * always cross exactly, so that test could never fail.
+	 * @param tmi the detections and buoy positions used for the fit.
+	 * @param locResult result.
+	 * @return true if the fit is close enough to its measurements.
 	 */
-	private boolean localisationOK(int nBuoys, TargetMotionResult locResult) {
-		if (locResult == null) {
+	private boolean localisationOK(DIFARTargetMotionInformation tmi, TargetMotionResult locResult) {
+		if (locResult == null || locResult.getLatLong() == null) {
 			return false;
 		}
-		if (nBuoys == 2 && locResult.getChi2() > 1.0e-6) {
-			return false;
-		}
-		return true;
+		DifarParameters params = difarControl.getDifarParameters();
+		DifarLocalisationResiduals residuals =
+				DifarLocalisationResiduals.calculate(tmi, locResult.getLatLong());
+		return residuals.isWithin(params.maxBearingResidual, params.maxTimeDelayResidual);
 	}
 	
+
 	/**
-	 * Find the best matching unit from other channels. 
-	 * Criteria are that the calls may overlap in time and also that they 
-	 * overlap in frequency. Select the one with the best overlap in 
-	 * frequency.
-	 * @param difarDataUnit main unit to match to
-	 * @param aChan other channel number we're looking for. 
-	 * @return matching unit. 
+	 * @return the candidate matches worked out for recent detections.
 	 */
-	private DifarDataUnit getMatchingUnit(DifarDataUnit difarDataUnit, int aChan) {
-		int thisChan = PamUtils.getSingleChannel(difarDataUnit.getChannelBitmap());
+	public DifarMatchLog getMatchLog() {
+		return matchLog;
+	}
+
+	/**
+	 * Find the detections on another channel that could be the same call.
+	 * <p>
+	 * A detection qualifies if it is the same species, overlaps in frequency,
+	 * and overlaps in time once the maximum delay between the two buoys is
+	 * allowed for. Which of them is the call is decided later, by localising
+	 * each and comparing the results.
+	 * @param difarDataUnit main unit to match to
+	 * @param aChan other channel number we're looking for.
+	 * @param maxUnits most units to return, best overlap first. A cap is only
+	 * likely to matter for an automatic detector on a noisy chorus.
+	 * @return qualifying units, best overlap first. Never null.
+	 */
+	private ArrayList<PamDataUnit> getMatchingUnits(DifarDataUnit difarDataUnit, int aChan, int maxUnits) {
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
-		double arraySep = array.getSeparation(thisChan, aChan, difarDataUnit.getTimeMilliseconds());
-		long sepMillis = (long) (arraySep /  array.getSpeedOfSound() * 1000.); 
+		double speedOfSound = array.getSpeedOfSound();
+		/*
+		 * Allow for clips being marked late or early, as well as for the travel
+		 * time between buoys. Otherwise a call whose clip was marked a little
+		 * late on the far buoy would never be considered.
+		 */
+		long markingSlackMillis = (long) (difarControl.getDifarParameters().maxTimeDelayResidual * 1000.);
+		GpsData thisOrigin = difarDataUnit.getOriginLatLong(false);
 		DifarDataUnit otherUnit;
-		double bestOverlap = 0;
-		DifarDataUnit bestDifarUnit = null;
+		ArrayList<DifarDataUnit> found = new ArrayList<>();
+		ArrayList<Double> scores = new ArrayList<>();
 		double[] thisFreq = difarDataUnit.getFrequency();
 		long thisStart = difarDataUnit.getTimeMilliseconds();
 		long thisEnd = thisStart + (long) (difarDataUnit.getDurationInSeconds() * 1000.);
@@ -1400,22 +1451,41 @@ public class DifarProcess extends PamProcess {
 				}
 				thatStart = otherUnit.getTimeMilliseconds();
 				thatEnd = thatStart + (long) (otherUnit.getDurationInSeconds() * 1000.);
-				long tOverlap = getTimeOverlap(sepMillis, thisStart, thisEnd, thatStart, thatEnd);
+				long travelMillis = getTravelTimeMillis(thisOrigin, otherUnit, speedOfSound);
+				if (!DifarMatchSelector.couldBeSameCall(thisStart, thatStart, travelMillis, markingSlackMillis)) {
+					continue;
+				}
 				double fOverlap = getFreqOverlap(thisFreq, otherUnit.getFrequency());
-				if (tOverlap <= 0 || fOverlap <= 0) {
+				if (fOverlap <= 0) {
+					continue;
+				}
+				// Overlap of the clips is used only to rank candidates within the cap.
+				long tOverlap = Math.max(0, getTimeOverlap(travelMillis + markingSlackMillis,
+						thisStart, thisEnd, thatStart, thatEnd));
+				if (otherUnit.getLocalisation() == null) {
 					continue;
 				}
 				double olapScore = (double) tOverlap / (double) (thisEnd-thisStart) + fOverlap / (thisFreq[1]-thisFreq[0]);
-				if (olapScore > bestOverlap ) {
-					bestOverlap = olapScore;
-					bestDifarUnit = otherUnit;
-				}
-//				if (tOverlap > 0 && fOverlap > 0) {
-//					System.out.println(String.format("Overlapping in t %3.1fs, and f %3.1Hz", (double) tOverlap/1000, fOverlap));
-//				}
+				found.add(otherUnit);
+				scores.add(olapScore);
 			}
 		}
-		return bestDifarUnit;
+		/*
+		 * Sort by overlap, best first, so that the cap keeps the most likely
+		 * candidates. Lists are short, so a simple sort is plenty.
+		 */
+		ArrayList<PamDataUnit> sorted = new ArrayList<>();
+		while (!found.isEmpty() && sorted.size() < maxUnits) {
+			int best = 0;
+			for (int i = 1; i < scores.size(); i++) {
+				if (scores.get(i) > scores.get(best)) {
+					best = i;
+				}
+			}
+			sorted.add(found.remove(best));
+			scores.remove(best);
+		}
+		return sorted;
 	}
 	
 	/**
@@ -1458,6 +1528,32 @@ public class DifarProcess extends PamProcess {
 	 * @param end2 end time of second call in millis
 	 * @return overall in milliseconds or -1 if no overlap. 
 	 */
+	/**
+	 * Longest a sound can take to travel between two buoys, in milliseconds.
+	 * <p>
+	 * The distance comes from the buoy positions of the two detections, which
+	 * are also what the localisation uses. The array geometry cannot be used
+	 * here: PamArray.getSeparation() adds hydrophone offsets to each streamer's
+	 * local coordinates, and a DIFAR buoy is placed by its latitude and
+	 * longitude instead, so its local coordinates are zero and the separation
+	 * between any two buoys came out as zero. That limited matching to clips
+	 * that overlapped in time.
+	 * @param thisOrigin position of the first buoy, or null if not known.
+	 * @param otherUnit a detection on the second buoy.
+	 * @param speedOfSound speed of sound in metres per second.
+	 * @return travel time in milliseconds, or zero if either position is unknown.
+	 */
+	private long getTravelTimeMillis(GpsData thisOrigin, DifarDataUnit otherUnit, double speedOfSound) {
+		if (thisOrigin == null || speedOfSound <= 0) {
+			return 0;
+		}
+		GpsData otherOrigin = otherUnit.getOriginLatLong(false);
+		if (otherOrigin == null) {
+			return 0;
+		}
+		return (long) (thisOrigin.distanceToMetres(otherOrigin) / speedOfSound * 1000.);
+	}
+
 	private long getTimeOverlap(long sepMillis, long start1, long end1, long start2, long end2) {
 		if (start1 > end2 + sepMillis || start2 > end1 + sepMillis) return -1; // no overlap
 		start2 = Math.min(start2, start1-sepMillis);// In case latter portion of detection2 overlaps
@@ -1635,7 +1731,18 @@ public class DifarProcess extends PamProcess {
 //			phoneNumber = daqProcess.getAcquisitionControl().acquisitionParameters.getChannelListIndexes(phoneNumber);
 //		}
 		LatLong hLatLong = difarDataUnit.getOriginLatLong(false);
-		double arrayHead = difarDataUnit.getHydrophoneHeading(false);
+		if (hLatLong == null) {
+			return null;
+		}
+		/*
+		 * The correction this clip suggests is on top of whatever correction the
+		 * buoy already has, and the caller adds the two together. So the heading
+		 * used here has to be the same one the caller uses, which is the buoy
+		 * record's. Reading it from the core array instead gave a different
+		 * number, and the difference landed straight in the stored heading.
+		 */
+		double arrayHead = difarControl.sonobuoyManager.getCompassCorrection(phoneNumber,
+				difarDataUnit.getTimeMilliseconds());
 		double bearing = hLatLong.bearingTo(shipGps);
 		double bearingCorr = bearing - (difarDataUnit.getSelectedAngle() + arrayHead);
 		bearingCorr = PamUtils.constrainedAngle(bearingCorr, 180);

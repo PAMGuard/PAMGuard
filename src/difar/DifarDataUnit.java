@@ -9,10 +9,12 @@ import Filters.FilterMethod;
 import Filters.FilterParams;
 import Filters.FilterType;
 import GPS.GpsData;
+import PamController.PamControlledUnit;
 import PamUtils.FrequencyFormat;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDataUnit;
 import fftManager.Complex;
@@ -281,7 +283,15 @@ public class DifarDataUnit extends ClipDataUnit {
 	
 	private double[] getDecimatedWaveData(int channel, float displaySampRate) {
 		float origSmp = getSourceSampleRate(); 
-		if (displaySampRate == origSmp){
+		/*
+		 * In viewer mode the original waveform is not stored, so there is
+		 * nothing to decimate. The demodulated data is used instead, by the
+		 * caller.
+		 */
+		if (getWaveData(channel) == null) {
+			return null;
+		}
+		if (displaySampRate == origSmp || origSmp <= 0){
 			return getWaveData(channel);
 		}
 		if (decimatedData == null || displaySampRate != lastDecmiatedSampleRate) {
@@ -409,13 +419,69 @@ public class DifarDataUnit extends ClipDataUnit {
 		if (selectedAngle == null) {
 			return null;
 		}
-		GpsData originPos = getOriginLatLong(false);
-		if (originPos == null || originPos.getTrueHeading() == null) {
+		Double heading = getBuoyHeading();
+		if (heading == null) {
 			return (selectedAngle % 360);
 		}
-		return ((selectedAngle + originPos.getTrueHeading()) % 360);
+		return ((selectedAngle + heading) % 360);
 //		double dev = MagneticVariation.getInstance().getVariation(originPos);
 //		return selectedAngle+dev;
+	}
+
+	/**
+	 * The heading correction of the buoy this detection was made on, which
+	 * turns a magnetic DIFAR angle into a true bearing.
+	 * <p>
+	 * It comes from the buoy record in force on this channel at the time of the
+	 * detection. If there are no buoy records at all, it comes from the core
+	 * array, as before.
+	 * @return heading correction in degrees, or null if the buoy has none, or
+	 * if no buoy was in force.
+	 */
+	public Double getBuoyHeading() {
+		SonobuoyHistory history = getSonobuoyHistory();
+		if (history != null && history.getRecordCount() > 0) {
+			SonobuoyRecord buoy = history.getRecordAt(getBuoyChannel(), getTimeMilliseconds());
+			return buoy == null ? null : buoy.getHeading();
+		}
+		GpsData originPos = super.getOriginLatLong(false);
+		return originPos == null ? null : originPos.getTrueHeading();
+	}
+
+	/**
+	 * @return the buoy record in force on this channel at the time of the
+	 * detection, or null if there is none or no buoy records are available.
+	 */
+	public SonobuoyRecord getBuoyRecord() {
+		SonobuoyHistory history = getSonobuoyHistory();
+		if (history == null) {
+			return null;
+		}
+		return history.getRecordAt(getBuoyChannel(), getTimeMilliseconds());
+	}
+
+	/**
+	 * @return the channel of this detection, which DIFAR uses as the buoy's
+	 * streamer index.
+	 */
+	private int getBuoyChannel() {
+		return PamUtils.getSingleChannel(getChannelBitmap());
+	}
+
+	/**
+	 * @return the sonobuoy history of the DIFAR module this detection belongs
+	 * to, or null if it is not yet in a DIFAR data block.
+	 */
+	private SonobuoyHistory getSonobuoyHistory() {
+		PamDataBlock parentBlock = getParentDataBlock();
+		if (parentBlock == null || parentBlock.getParentProcess() == null) {
+			return null;
+		}
+		PamControlledUnit unit = parentBlock.getParentProcess().getPamControlledUnit();
+		if (unit instanceof DifarControl) {
+			return ((DifarControl) unit).getSonobuoyHistory();
+		}
+		return null;
 	}
 
 	public String getTrackedGroup() {
@@ -760,7 +826,7 @@ public class DifarDataUnit extends ClipDataUnit {
 		str += "<br>"+FrequencyFormat.formatFrequencyRange(getFrequency(), true);
 		str += String.format("<br>Amplitude: %3.1fdB", getAmplitudeDB());
 		Double ang = getSelectedAngle();
-		Double buoyHead = origin.getTrueHeading();
+		Double buoyHead = getBuoyHeading();
 		if (ang != null) {
 			str += "<br>" + String.format("DIFAR angle %4.1f%s", ang, LatLong.deg);
 			if (buoyHead == null) {
@@ -940,13 +1006,31 @@ public class DifarDataUnit extends ClipDataUnit {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see PamguardMVC.PamDataUnit#getOriginLatLong(boolean)
+	/**
+	 * The position of the buoy this detection was made on, with its heading
+	 * correction as the true heading.
+	 * <p>
+	 * It comes from the buoy record in force on this channel at the time of the
+	 * detection, not from the core array, whose time lookups can return a
+	 * later record. If there are no buoy records at all, it comes from the core
+	 * array, as before.
+	 * @param recalculate passed to the core array when it is used.
+	 * @return the buoy position, or null if no buoy with a known position was
+	 * in force at the time.
 	 */
 	@Override
 	public GpsData getOriginLatLong(boolean recalculate) {
-		// TODO Auto-generated method stub
-		return super.getOriginLatLong(recalculate);
+		SonobuoyHistory history = getSonobuoyHistory();
+		if (history == null || history.getRecordCount() == 0) {
+			return super.getOriginLatLong(recalculate);
+		}
+		SonobuoyRecord buoy = history.getRecordAt(getBuoyChannel(), getTimeMilliseconds());
+		if (buoy == null || !buoy.hasPosition()) {
+			return null;
+		}
+		GpsData origin = new GpsData(buoy.getLatitude(), buoy.getLongitude(), 0, buoy.getTimeMillis());
+		origin.setTrueHeading(buoy.getHeading());
+		return origin;
 	}
 
 	public void saveGroup() {

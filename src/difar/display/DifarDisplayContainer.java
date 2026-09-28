@@ -52,6 +52,16 @@ public class DifarDisplayContainer extends UserDisplayComponentAdapter {
 			outerDisplayPanel.add(BorderLayout.CENTER, new DisplaySouthPanel(difarControl));
 		}
 		else{
+			/*
+			 * Three panels of about equal height: the clip queue, the actions and
+			 * grams, and the match selector. The selector sits below the grams so
+			 * that it is clear the Save button applies to the match shown there.
+			 */
+			JSplitPane lowerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+			lowerSplitPane.setResizeWeight(0.5);
+			lowerSplitPane.add(new DisplaySouthPanel(difarControl));
+			lowerSplitPane.add(difarControl.getMatchContainer().getMatchPanel());
+
 			horizSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 			horizSplitPane.addPropertyChangeListener(new SplitPaneListener());
 			Integer pos = difarControl.getDifarParameters().horizontalDividerPos;
@@ -59,10 +69,10 @@ public class DifarDisplayContainer extends UserDisplayComponentAdapter {
 				horizSplitPane.setDividerLocation(pos);
 			}
 			else {
-				horizSplitPane.setResizeWeight(0.5);
+				horizSplitPane.setResizeWeight(0.34);
 			}
 			horizSplitPane.add(new DisplayNorthPanel(difarControl));
-			horizSplitPane.add(new DisplaySouthPanel(difarControl));
+			horizSplitPane.add(lowerSplitPane);
 
 			outerDisplayPanel.add(BorderLayout.CENTER, horizSplitPane);
 		}

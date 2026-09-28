@@ -2,6 +2,7 @@ package difar.targetmotion;
 
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.math.FunctionEvaluationException;
@@ -15,6 +16,7 @@ import org.apache.commons.math.optimization.RealConvergenceChecker;
 import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.direct.NelderMead;
 
+import Localiser.algorithms.genericLocaliser.Chi2TimeDelays;
 import pamMaths.PamVector;
 
 
@@ -38,6 +40,20 @@ public class Simplex2D extends AbstractTargetMotionModel {
 	private PamVector[] usedWorldVectors;
 	private ChiSquaredDistribution chi2Dist;
 	private TargetMotionInformation targetMotionInformation;
+
+	/** Measured delays between buoys, or null if not available. */
+	private ArrayList<ArrayList<Double>> timeDelays;
+
+	/** Errors on those delays. */
+	private ArrayList<ArrayList<Double>> timeDelayErrors;
+
+	/** Buoy positions the delays refer to, in metres. */
+	private ArrayList<ArrayList<double[]>> delayPositions;
+
+	private double speedOfSound;
+
+	/** True when the delays can be added to the fit. */
+	private boolean useTimeDelays;
 	private double[] startPoint;
 	private double[] firstStep;
 
@@ -123,7 +139,14 @@ public class Simplex2D extends AbstractTargetMotionModel {
 		usedWorldVectors = new PamVector[nSubDetections];
 		PamVector notRot;
 		int n;
-		int nDegreesFreedom = nSubDetections - 2;
+		/*
+		 * Time delays between detections are an extra constraint on the fit. For
+		 * two buoys the bearings alone always cross exactly, so without the
+		 * delays there is nothing left to test the result against.
+		 */
+		useTimeDelays = setupTimeDelays();
+		int nDelayConstraints = useTimeDelays ? nSubDetections - 1 : 0;
+		int nDegreesFreedom = nSubDetections + nDelayConstraints - 2;
 		TargetMotionResult[] tmResults = new TargetMotionResult[maxVectors];
 		for (int side = 0; side < maxVectors; side++) {
 			for (int i = 0; i < nSubDetections; i++) {
@@ -215,6 +238,44 @@ public class Simplex2D extends AbstractTargetMotionModel {
 		}
 
 		return tmResults;
+	}
+
+	/**
+	 * Collect the time delays, their errors and the positions they refer to.
+	 * <p>
+	 * The delays are only used when every detection contributes a bearing. A
+	 * detection with no usable bearing is left out of the bearing term, and the
+	 * delays are listed for all detections, so mixing the two would compare
+	 * different sets of buoys.
+	 * @return true if the delays can be added to the fit.
+	 */
+	private boolean setupTimeDelays() {
+		timeDelays = targetMotionInformation.getTimeDelays();
+		timeDelayErrors = targetMotionInformation.getTimeDelayErrors();
+		delayPositions = targetMotionInformation.getDelayHydrophonePositions();
+		speedOfSound = targetMotionInformation.getSpeedOfSound();
+		if (timeDelays == null || timeDelayErrors == null || delayPositions == null) {
+			return false;
+		}
+		if (speedOfSound <= 0 || nSubDetections < 2) {
+			return false;
+		}
+		for (int i = 0; i < nSubDetections; i++) {
+			if (faultPoints[i]) {
+				return false;
+			}
+		}
+		int nPairs = nSubDetections * (nSubDetections - 1) / 2;
+		if (timeDelays.size() != 1 || timeDelays.get(0).size() != nPairs) {
+			return false;
+		}
+		if (timeDelayErrors.size() != 1 || timeDelayErrors.get(0).size() != nPairs) {
+			return false;
+		}
+		if (delayPositions.size() != 1 || delayPositions.get(0).size() != nSubDetections) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -376,6 +437,21 @@ public class Simplex2D extends AbstractTargetMotionModel {
 			}
 			if (nUsed == 0) {
 				throw new FunctionEvaluationException(location);
+			}
+			if (useTimeDelays) {
+				/*
+				 * Add the delays a source at this location would produce, then
+				 * compare them with the measured ones. Note that for three or
+				 * more buoys the pairwise delays are not independent, since any
+				 * one of them is the sum of the others. Summing them all still
+				 * finds the right position, but it counts each measurement more
+				 * than once, so the chi2 is larger than the number of degrees of
+				 * freedom implies.
+				 */
+				double[] source = new double[] {location[0], location[1], 0};
+				ArrayList<ArrayList<Double>> predicted =
+						Chi2TimeDelays.calcTimeDelays(source, delayPositions, speedOfSound);
+				chiTot += Chi2TimeDelays.chiSquared(timeDelays, predicted, timeDelayErrors);
 			}
 			if (Double.isNaN(chiTot)) {
 				//				System.out.println("NaN exception in Simplex model");

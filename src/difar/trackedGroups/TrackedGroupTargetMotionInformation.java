@@ -76,6 +76,17 @@ public class TrackedGroupTargetMotionInformation implements TargetMotionInformat
 	}
 
 	@Override
+	public ArrayList<ArrayList<double[]>> getDelayHydrophonePositions() {
+		// time delays are not used for tracked groups.
+		return null;
+	}
+
+	@Override
+	public double getSpeedOfSound() {
+		return 1500.;
+	}
+
+	@Override
 	public ArrayList<ArrayList<Double>> getTimeDelays() {
 		// TODO Auto-generated method stub
 		return null;

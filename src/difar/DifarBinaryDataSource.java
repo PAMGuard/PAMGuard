@@ -262,8 +262,14 @@ public class DifarBinaryDataSource extends BinaryDataSource {
 		double[] freqs = difarFreqResponseFilterParams.getArbFreqs();
 		double[] gains = difarFreqResponseFilterParams.getArbGainsdB();
 		
+		/*
+		 * origDuration is in samples of the original recording, so the source
+		 * sample rate has to be passed as well. Passing zero here made displays
+		 * show a clip duration of Infinity, and stopped the waveform being
+		 * decimated correctly.
+		 */
 		DifarDataUnit difarDataUnit = new DifarDataUnit(clipStart, binaryObjectData.getTimeMilliseconds(), startSample, origDuration, channelMap, 
-				null, null, null, binaryObjectData.getTimeMilliseconds(), null, frequencyRange, 0, displaySampleRate, freqs, gains);
+				null, null, null, binaryObjectData.getTimeMilliseconds(), null, frequencyRange, origSampleRate, displaySampleRate, freqs, gains);
 
 		difarDataUnit.setSelectedAngle(new Double(selAngle));
 		difarDataUnit.setSelectedFrequency(new Double(selFrequency));
@@ -275,7 +281,10 @@ public class DifarBinaryDataSource extends BinaryDataSource {
 		difarDataUnit.setDisplaySampleRate(displaySampleRate);
 		difarDataUnit.setSpeciesCode(difarControl.difarParameters.getSpeciesList(difarControl), speciesCode);
 		difarDataUnit.setTrackedGroup(trackedGroup);
-		difarDataUnit.setLocalisation(new DifarLocalisation(difarDataUnit, LocContents.HAS_BEARING, difarDataUnit.getChannelBitmap()));
+		DifarLocalisation difarLocalisation = new DifarLocalisation(difarDataUnit,
+				LocContents.HAS_BEARING, difarDataUnit.getChannelBitmap());
+		difarLocalisation.setBearingError(difarControl.getDifarParameters().bearingError);
+		difarDataUnit.setLocalisation(difarLocalisation);
 		if (matchedUnits != null) {
 			matchedUnits[0] = difarDataUnit;
 			DIFARCrossingInfo dci = new DIFARCrossingInfo(matchedUnits, latLong, errors);
