@@ -2,13 +2,16 @@ package dataPlotsFX.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.ListIterator;
 
+import pamViewFX.fxNodes.PamSymbolFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import PamController.PamController;
 import PamUtils.Coordinate3d;
@@ -161,6 +164,7 @@ public abstract class TDDataInfoFX {
 	 * @return the currentScaleInfo
 	 */
 	public TDScaleInfo getCurrentScaleInfo() {
+		if (scaleInfoIndex==-1) return null;
 		return scaleInfos.get(scaleInfoIndex);
 	}
 
@@ -350,12 +354,54 @@ public abstract class TDDataInfoFX {
 	private boolean showing = true;
 
 	/**
-	 * Clear any residual drawing objects that get held between calls, 
-	 * e.g. the point of the previous unit plotted which may have been 
-	 * held so that lines can be drawn between points. 
+	 * The list iterators left over from the previous repaint, one per plot pane. Data units are held
+	 * in a linked list, so finding the start of the visible data means walking the list from one end
+	 * of it, which becomes very slow when there are large numbers of detections. Displays generally
+	 * only move a small amount between repaints, so it is far quicker to hang on to the iterator and
+	 * shuffle it to the new start position. See {@link #shuffleCachedIterator(long, int, int)}.
+	 */
+	@SuppressWarnings("unchecked")
+	private ListIterator<PamDataUnit>[] cachedIterators = new ListIterator[PamConstants.MAX_CHANNELS];
+
+	/**
+	 * The channel/sequence bitmap each cached iterator was created for. Iterators are channel
+	 * specific so cannot be reused if the plot channels have changed.
+	 */
+	private int[] cachedIteratorChannels = new int[PamConstants.MAX_CHANNELS];
+
+	/**
+	 * The number of units in the data block when each iterator was cached. If this has changed then
+	 * the list has been structurally modified and the iterator can no longer be used.
+	 */
+	private int[] cachedIteratorCounts = new int[PamConstants.MAX_CHANNELS];
+
+	/**
+	 * The minimum number of steps allowed when shuffling a cached iterator to a new start position.
+	 * If the display has jumped a long way, e.g. the scroll bar has been dragged, then it's not worth
+	 * shuffling and it's quicker to search for the start position from scratch. Above this the limit
+	 * scales with the size of the data block, since a fresh search never has to walk more than half
+	 * the list, so shuffling should never be allowed to cost more than that.
+	 */
+	private static final int MIN_ITERATOR_SHUFFLE = 10000;
+
+	/**
+	 * Clear any residual drawing objects that get held between calls,
+	 * e.g. the point of the previous unit plotted which may have been
+	 * held so that lines can be drawn between points.
 	 */
 	public void clearDraw() {
 		lastPoint = new Point2D[PamConstants.MAX_CHANNELS];
+	}
+
+	/**
+	 * Throw away the list iterators held between repaints. These are only an optimisation, so this
+	 * can be safely called at any time. It should be called whenever something happens which may
+	 * make the iterators invalid, e.g. the number of plot panes or their channels change.
+	 */
+	public void clearIteratorCache() {
+		for (int i = 0; i < cachedIterators.length; i++) {
+			cachedIterators[i] = null;
+		}
 	}
 
 	/**
@@ -402,22 +448,41 @@ public abstract class TDDataInfoFX {
 		
 		synchronized (pamDataBlock.getSynchLock()) {
 
-			//FIXME - shouldn't have to clear every time but seems like we do? 
+			/*
+			 * The data block holds channel and sequence iterators between calls, but only invalidates
+			 * them when viewer data are loaded, not when units are added or removed, so they have to be
+			 * cleared here or they can end up stale. Note that this no longer forces a full search for
+			 * the start of the data on every repaint since getUnitIterator() keeps its own iterators.
+			 */
 			pamDataBlock.clearChannelIterators();
+
+			/*
+			 * True if data units which are off the screen can simply be skipped. Plots which draw lines
+			 * between units, or whose data value depends on the previous unit, need every unit in the
+			 * loop, so they can't cull and need a generous margin either side of the visible time.
+			 */
+			boolean cullOffScreen = canCullOffScreenUnits();
 
 //			scrollStart = PamCalendar.getTimeInMillis();
 			//work out start and stop times
-			long loopEnd = (long) (scrollStart + (tdProjector.getVisibleTime() * 1.5));
-			long loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * 1.5));
-			
-//			System.out.println("Loop start: " + this.getDataName() +  PamCalendar.formatDateTime((long)  loopStart)); 
-//			System.out.println("Loop end: " + this.getDataName() + PamCalendar.formatDateTime((long)  loopEnd)); 
+			long loopEnd, loopStart;
+			if (cullOffScreen) {
+				loopEnd = (long) (scrollStart + (tdProjector.getVisibleTime() * 1.1));
+				loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * 0.1));
+			}
+			else {
+				loopEnd = (long) (scrollStart + (tdProjector.getVisibleTime() * 1.5));
+				loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * 1.5));
+			}
 
-			//find a number close to the index start, 			
+//			System.out.println("Loop start: " + this.getDataName() +  PamCalendar.formatDateTime((long)  loopStart));
+//			System.out.println("Loop end: " + this.getDataName() + PamCalendar.formatDateTime((long)  loopEnd));
+
+			//find a number close to the index start,
 			ListIterator<PamDataUnit> it = getUnitIterator( loopStart,  plotNumber);
-			
-			clearDraw();			
-			
+
+			clearDraw();
+
 			/**
 			 * Need to be careful here. If using line plots then we always want to have the
 			 * first unit outside the screen. This does not matter for scatter points is
@@ -427,32 +492,52 @@ public abstract class TDDataInfoFX {
 			if (it.hasPrevious()) {
 				it.previous();
 			}
-			
+
 			//true to break after painting the next data unit
 			boolean breakNext = false;
 
+			double plotWidth = tdProjector.getWidth();
+
 			while (it.hasNext()) {
 				dataUnit = it.next();
-				count++; 
+				count++;
+
+				if (dataUnit != null && cullOffScreen) {
+					//the data are time ordered so once past the end there is nothing left to draw.
+					if (dataUnit.getTimeMilliseconds() > loopEnd) {
+						break;
+					}
+					/*
+					 * A cheap time to pixel test to skip data units which are not on the screen. This is
+					 * exactly the same test that drawDataUnit(...) makes, but making it here means that
+					 * off screen units don't have to go through the data selector or have their data
+					 * value calculated, both of which can be expensive, e.g. click bearings.
+					 */
+					double timePix = tdProjector.getTimePix(dataUnit.getTimeMilliseconds()-scrollStart);
+					if (timePix < 0 || timePix > plotWidth) {
+						continue;
+					}
+				}
+
 				if (dataUnit!=null && shouldDraw(plotNumber, dataUnit)) {
-					
+
 //					if (dataUnit.getEndTimeInMilliseconds() < loopStart) {
 //						continue;
 //					}
-					
+
 					//at some point we have to stop drawing off the end of the screen but again, for line plots
 					//we want to draw data units that are next if needed. So if past the end of the point that
-					//needs to be painted, set breakNext to true so the next data unit is painted for line plots 
-					//then exit. 
+					//needs to be painted, set breakNext to true so the next data unit is painted for line plots
+					//then exit.
 					if (dataUnit.getTimeMilliseconds() > loopEnd) {
 						breakNext = true;
 					}
-					
+
 					drawCalls++;
-					drawDataUnit(plotNumber, dataUnit, g,  scrollStart, 
+					drawDataUnit(plotNumber, dataUnit, g,  scrollStart,
 							tdProjector ,TDSymbolChooserFX.NORMAL_SYMBOL);
 				}
-				
+
 				if (breakNext) break;
 			}
 			
@@ -475,22 +560,134 @@ public abstract class TDDataInfoFX {
 	 * Gets the list iterator starting at the correct data unit for the display.
 	 * Note that this may be off the screen slightly. It is a rough start found in
 	 * the fastest way possible in order to optimise repaint speed.
-	 * 
+	 * <p>
+	 * The iterator from the previous repaint is reused wherever possible, since shuffling it a short
+	 * distance to the new start position is much quicker than searching the whole list again.
+	 *
 	 * @param loopStart
 	 *            - the start time of the loop
 	 * @return the list iterator.
 	 */
 	private ListIterator<PamDataUnit> getUnitIterator(long loopStart, int plotNumber) {
-		
+
 		if (pamDataBlock.getFirstUnit()==null || this.pamDataBlock.getUnitsCount()<100) {
 			//don't over complicate if not needed
 			return pamDataBlock.getListIterator(0);
 		}
-		
-		//the skip factor
-		int skip = 20; 
 
-		//figure out whether to go backwards or forwards. If the time is nearer the end then want to go backwards. 
+		TDScaleInfo scaleInfo = getScaleInfo();
+		if (scaleInfo == null) {
+			return pamDataBlock.getListIterator(0);
+		}
+		int plotChannels = scaleInfo.getPlotChannels()[plotNumber];
+
+		ListIterator<PamDataUnit> it = shuffleCachedIterator(loopStart, plotNumber, plotChannels);
+		if (it == null) {
+			it = findUnitIterator(loopStart, plotChannels);
+		}
+
+		if (plotNumber >= 0 && plotNumber < cachedIterators.length) {
+			cachedIterators[plotNumber] = it;
+			cachedIteratorChannels[plotNumber] = plotChannels;
+			cachedIteratorCounts[plotNumber] = pamDataBlock.getUnitsCount();
+		}
+
+		return it;
+	}
+
+	/**
+	 * Attempt to move the iterator left over from the previous repaint to a new start time. The
+	 * display usually only moves a small amount between repaints, so this generally only has to step
+	 * over the data units which were drawn last time rather than walking the whole list.
+	 * <p>
+	 * On return, the next call to next() will give a data unit at or just after loopStart, which is
+	 * the same rough positioning that {@link #findUnitIterator(long, int)} gives.
+	 *
+	 * @param loopStart    - the start time of the loop
+	 * @param plotNumber   - the plot pane number
+	 * @param plotChannels - the channel/sequence bitmap for this plot pane
+	 * @return the repositioned iterator, or null if the cached iterator could not be used, in which
+	 *         case the caller must search for the start position from scratch.
+	 */
+	private ListIterator<PamDataUnit> shuffleCachedIterator(long loopStart, int plotNumber, int plotChannels) {
+
+		if (plotNumber < 0 || plotNumber >= cachedIterators.length) {
+			return null;
+		}
+		ListIterator<PamDataUnit> it = cachedIterators[plotNumber];
+		if (it == null || cachedIteratorChannels[plotNumber] != plotChannels) {
+			return null;
+		}
+		/*
+		 * Data units have been added or removed, so the iterator is stale and would throw a
+		 * ConcurrentModificationException the moment it was used.
+		 */
+		if (cachedIteratorCounts[plotNumber] != pamDataBlock.getUnitsCount()) {
+			cachedIterators[plotNumber] = null;
+			return null;
+		}
+
+		int steps = 0;
+		int maxSteps = Math.max(MIN_ITERATOR_SHUFFLE, pamDataBlock.getUnitsCount()/2);
+		try {
+			//walk backwards until we are at or before the start of the data we need.
+			while (it.hasPrevious()) {
+				PamDataUnit unit = it.previous();
+				if (unit == null) {
+					break; //start of the list
+				}
+				if (unit.getTimeMilliseconds() < loopStart) {
+					it.next(); //gone one too far, so step forward over it again.
+					break;
+				}
+				if (++steps > maxSteps) {
+					return null;
+				}
+			}
+			//and now forwards until we reach the start of the data we need.
+			while (it.hasNext()) {
+				PamDataUnit unit = it.next();
+				if (unit == null) {
+					break; //end of the list
+				}
+				if (unit.getTimeMilliseconds() >= loopStart) {
+					it.previous(); //gone one too far, so step back over it again.
+					break;
+				}
+				if (++steps > maxSteps) {
+					return null;
+				}
+			}
+		}
+		catch (ConcurrentModificationException e) {
+			//the list changed under us in some way the unit count didn't pick up.
+			cachedIterators[plotNumber] = null;
+			return null;
+		}
+
+		return it;
+	}
+
+	/**
+	 * Search for the list iterator starting at the correct data unit for the display. Note that this
+	 * may be off the screen slightly. It is a rough start found in the fastest way possible in order
+	 * to optimise repaint speed.
+	 *
+	 * @param loopStart    - the start time of the loop
+	 * @param plotChannels - the channel/sequence bitmap for this plot pane
+	 * @return the list iterator.
+	 */
+	private ListIterator<PamDataUnit> findUnitIterator(long loopStart, int plotChannels) {
+
+		if (pamDataBlock.getFirstUnit()==null || this.pamDataBlock.getUnitsCount()<100) {
+			//don't over complicate if not needed
+			return pamDataBlock.getListIterator(0);
+		}
+
+		//the skip factor
+		int skip = 20;
+
+		//figure out whether to go backwards or forwards. If the time is nearer the end then want to go backwards.
 		long startUnit = pamDataBlock.getFirstUnit().getTimeMilliseconds();
 		long endUnit = pamDataBlock.getLastUnitMillis();
 
@@ -499,10 +696,10 @@ public abstract class TDDataInfoFX {
 
 		int itstart= startStart ? 0 : -1; //-1 starts at end
 
-		ListIterator<PamDataUnit> it; 
-		if (this.getScaleInfo().getPlotChannels()[plotNumber]==0) it = pamDataBlock.getListIterator(itstart);
+		ListIterator<PamDataUnit> it;
+		if (plotChannels==0) it = pamDataBlock.getListIterator(itstart);
 		// we may be plotting data with sequence numbers, so use SequenceIterator just in case
-		else  it = pamDataBlock.getSequenceIterator(this.getScaleInfo().getPlotChannels()[plotNumber], itstart); 
+		else  it = pamDataBlock.getSequenceIterator(plotChannels, itstart);
 
 		//now blast through the list as quickly as possible only check certian times. 
 		int ncount=0; 
@@ -540,10 +737,32 @@ public abstract class TDDataInfoFX {
 
 
 	/**
-	 * Do we want to draw this data unit on this plot ? 
+	 * Can data units which fall outside the visible time period simply be skipped ?
+	 * <p>
+	 * Skipping them means that {@link #shouldDraw(int, PamDataUnit)} and
+	 * {@link #getDataValue(PamDataUnit)} are never called for off screen units, which can save a lot
+	 * of time when there are many detections. It can only be done for plots which draw each data unit
+	 * independently of its neighbours, so it is false by default. It must <b>not</b> be set true if:
+	 * <ul>
+	 * <li>lines are drawn between sequential data units, since the line from the last unit before the
+	 * screen would no longer be drawn;
+	 * <li>the value returned by {@link #getDataValue(PamDataUnit)} depends on the previous data unit,
+	 * e.g. inter-click-interval;
+	 * <li>data units are drawn as shapes which can extend well beyond their start time, e.g. long
+	 * duration clips or contours.
+	 * </ul>
+	 *
+	 * @return true if off screen data units can be skipped without changing what is drawn.
+	 */
+	public boolean canCullOffScreenUnits() {
+		return false;
+	}
+
+	/**
+	 * Do we want to draw this data unit on this plot ?
 	 * @param plotNumber
 	 * @param dataUnit
-	 * @return true if unit should be drawn. 
+	 * @return true if unit should be drawn.
 	 */
 	public boolean shouldDraw(int plotNumber, PamDataUnit dataUnit) {
 		return shouldDraw(plotNumber, dataUnit.getSequenceBitmap());
@@ -623,9 +842,49 @@ public abstract class TDDataInfoFX {
 	 * @param true if it is the last data unit in the list which is being drawn. 
 	 * @return polygon of area drawn on. 
 	 */
-	public Polygon drawDataUnit(int plotNumber,PamDataUnit pamDataUnit, GraphicsContext g, 
+	/**
+	 * Colour of the ring drawn around data units which are in the current mark but
+	 * aren't the focused one. Deliberately light, since a mark can hold a lot of
+	 * units and anything stronger clutters the display.
+	 */
+	private static final Color MARKED_RING_COLOUR = Color.LIGHTGRAY;
+
+	/**
+	 * Line width of the marked ring. Thinner than the focused unit's highlight so
+	 * that the focused unit still stands out as the strongest of the highlights.
+	 */
+	private static final double MARKED_RING_LINE_WIDTH = 1.5;
+
+	/**
+	 * How much bigger than the data unit's symbol the marked ring is drawn, pixels.
+	 */
+	private static final double MARKED_RING_PADDING = 6;
+
+	/**
+	 * Draw a thin ring around a data unit which is part of the current mark but
+	 * isn't the focused unit. Without this, marked units are drawn with exactly the
+	 * same symbol as unmarked ones on most displays, so there's no way to see what's
+	 * in the mark. Matches the highlight the click detector's bearing time display
+	 * draws around individually selected clicks.
+	 *
+	 * @param g graphics context.
+	 * @param pt centre of the data unit in pixels.
+	 * @param symbol symbol the data unit was drawn with, used to size the ring.
+	 */
+	private void drawMarkedRing(GraphicsContext g, Point2D pt, PamSymbolFX symbol) {
+		double w = symbol.getWidth() + MARKED_RING_PADDING;
+		double h = symbol.getHeight() + MARKED_RING_PADDING;
+		//save and restore, or the stroke and line width leak into whatever is drawn next.
+		g.save();
+		g.setStroke(MARKED_RING_COLOUR);
+		g.setLineWidth(MARKED_RING_LINE_WIDTH);
+		g.strokeOval(pt.getX() - w/2, pt.getY() - h/2, w, h);
+		g.restore();
+	}
+
+	public Polygon drawDataUnit(int plotNumber,PamDataUnit pamDataUnit, GraphicsContext g,
 			double scrollStart, TDProjectorFX tdProjector, int type) {
-		
+
 		Double val = getDataValue(pamDataUnit);	
 		
 		if (val == null) {
@@ -672,7 +931,13 @@ public abstract class TDDataInfoFX {
 		//System.out.println("TDDataInfoFX: dataPixelPoint: " + dataPixel + "  " + pt); 
 
 		if ((symbolchoser.getDrawTypes(pamDataUnit) & TDSymbolChooserFX.DRAW_SYMBOLS) != 0) {
-			symbolchoser.getPamSymbol(pamDataUnit,type).draw(g, pt);
+			PamSymbolFX symbol = symbolchoser.getPamSymbol(pamDataUnit,type);
+			if (symbol != null) {
+				symbol.draw(g, pt);
+				if (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL_MARKED) {
+					drawMarkedRing(g, pt, symbol);
+				}
+			}
 			if (type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL && type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL_MARKED ){
 				//System.out.println("Draw CPOD data: HOVER");
 				tdProjector.addHoverData(new HoverData(c, pamDataUnit, 0, plotNumber));

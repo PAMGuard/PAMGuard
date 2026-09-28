@@ -12,7 +12,7 @@ import Localiser.algorithms.genericLocaliser.leastSquares.LeastSquares;
 import Localiser.algorithms.genericLocaliser.simplex.Simplex;
 import Localiser.detectionGroupLocaliser.DetectionGroupLocaliser2;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamController.PamController;
@@ -53,16 +53,16 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 		//these are the default localisers
 		//ADD NEW LOCLAISERS HERE//
 		//least squares algorithm 
-		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("Least Squares", new LeastSquares(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
+		locAlgorithmList.add(new DetectionGroupLocaliser2<DetectionGroup<?>>("Least Squares", new LeastSquares(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
 		//2D simplex localiser
-		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("2D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
+		locAlgorithmList.add(new DetectionGroupLocaliser2<DetectionGroup<?>>("2D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 2 )); 
 		//3D simplex localiser 
-		locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("3D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 3 )); 
+		locAlgorithmList.add(new DetectionGroupLocaliser2<DetectionGroup<?>>("3D Simplex Optimization", new Simplex(), DetectionGroupLocaliser2.BEARINGS_GROUP, 3 )); 
 		
 		//only add MCMC in viewer mode as way too processor intensive for real time operation
 		if (PamController.getInstance().getRunMode()==PamController.RUN_PAMVIEW){
 			//MCMC localiser
-			locAlgorithmList.add(new DetectionGroupLocaliser2<GroupDetection<?>>("MCMC", new Simplex(), DetectionGroupLocaliser2.TIMEDELAY_GROUP, 3 )); 
+			locAlgorithmList.add(new DetectionGroupLocaliser2<DetectionGroup<?>>("MCMC", new Simplex(), DetectionGroupLocaliser2.TIMEDELAY_GROUP, 3 )); 
 		}
 
 //		ClickLocParams clickLocParams=getClickLocParams(); 

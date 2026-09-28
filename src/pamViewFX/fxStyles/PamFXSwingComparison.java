@@ -47,7 +47,7 @@ public class PamFXSwingComparison extends Application {
         // Apply CSS
         Scene scene = new Scene(new VBox()); // Placeholder root; we'll set it later
 //        scene.getStylesheets().add(getClass().getResource("/Resources/css/pamCSS_windows.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("/Resources/css/pamCSS_flatlaf.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/Resources/css/pamFlatLafLight.css").toExternalForm());
 
         GridPane fxGrid = new GridPane();
         fxGrid.setHgap(10);

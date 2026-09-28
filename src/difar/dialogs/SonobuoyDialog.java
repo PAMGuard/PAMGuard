@@ -31,7 +31,11 @@ public class SonobuoyDialog extends StreamerDialog {
 	private SonobuoyManager buoyManager;
 	private PamBorderPanel addonPanel;
 	private PamTextField deployTime, endTime, action, calibration, calStdDev;
+	/** The record being shown. Never changed by the dialog. */
 	private StreamerDataUnit streamerDataUnit;
+
+	/** The edited copy made when OK is pressed, or null. */
+	private StreamerDataUnit editedUnit;
 	protected static SonobuoyDialog singleInstance;
 	
 	public SonobuoyDialog(Window parentFrame) {
@@ -105,15 +109,19 @@ public class SonobuoyDialog extends StreamerDialog {
 //		for (int i = 0; i < streamer.getNumDataAnnotations(); i++){
 //			singleInstance.streamerDataUnit.addDataAnnotation(streamer.getDataAnnotation(i));
 //		}
+		/*
+		 * The dialog reads from the record and edits a clone of its streamer. The
+		 * record itself is left alone, so the caller can compare old and new,
+		 * and Cancel changes nothing.
+		 */
 		singleInstance.streamerDataUnit = streamer;
-		singleInstance.streamerDataUnit.setDatabaseIndex(streamer.getDatabaseIndex());
-		// Now we should have the full streamer data unit and annotations
+		singleInstance.editedUnit = null;
 		singleInstance.defaultStreamer = streamer.getStreamerData().clone();
 		singleInstance.difarControl = difarControl;
 		singleInstance.buoyManager = difarControl.sonobuoyManager;
 		singleInstance.setParams();
 		singleInstance.setVisible(true);
-		return singleInstance.streamerDataUnit;
+		return singleInstance.editedUnit;
 	}
 	
 	public void setParams() {
@@ -151,25 +159,36 @@ public class SonobuoyDialog extends StreamerDialog {
 		
 	}
 
+	/**
+	 * Build an edited copy of the record from the dialog. The record itself is
+	 * not changed. The deployment time keeps its milliseconds unless its text
+	 * was changed, since the text shows whole seconds only.
+	 */
 	public boolean getParams() {
 		
-		boolean ok = super.getParams();
-		streamerDataUnit.setStreamerData(defaultStreamer);
-		Long deployMillis = PamCalendar.millisFromDateString(deployTime.getText(), false);
+		if (!super.getParams()) {
+			return false;
+		}
+		long originalMillis = streamerDataUnit.getTimeMilliseconds();
+		Long deployMillis;
+		if (deployTime.getText().equals(PamCalendar.formatDBDateTime(originalMillis))) {
+			deployMillis = originalMillis;
+		} else {
+			deployMillis = PamCalendar.millisFromDateString(deployTime.getText(), false);
+		}
 		if (deployMillis == null){
 			return showWarning("Invalid deployment timestamp");
 		}
-		streamerDataUnit.setTimeMilliseconds(deployMillis);
+		StreamerDataUnit edited = new StreamerDataUnit(deployMillis, defaultStreamer);
 		
 		// End Time
 		Long endMillis = PamCalendar.millisFromDateString(endTime.getText(), false);
 		if (endMillis != null){
-			buoyManager.addSonobuoyAnnotation(streamerDataUnit, 
-					buoyManager.sonobuoyEndTimeAnnotation, endMillis);
+			TimestampAnnotation end = new TimestampAnnotation(buoyManager.sonobuoyEndTimeAnnotation);
+			end.setTimestamp(endMillis);
+			edited.addDataAnnotation(end);
 		}
-		
-		//If heading has changed, issue a new calibration data unit 
-		Double heading = streamerDataUnit.getStreamerData().getHeading();
+		editedUnit = edited;
 		
 //		buoyManager.addSonobuoyAnnotation(streamerDataUnit, 
 //				buoyManager.sonobuoyActionAnnotation, action.getText());
@@ -183,6 +202,6 @@ public class SonobuoyDialog extends StreamerDialog {
 	@Override
 	public void cancelButtonPressed() {
 		super.cancelButtonPressed();
-		streamerDataUnit = null;
+		editedUnit = null;
 	}
 }

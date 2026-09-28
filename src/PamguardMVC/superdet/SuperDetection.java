@@ -49,6 +49,7 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 	 */
 	private ArrayList<SubdetectionInfo<T>> subdetectionsRemoved = new ArrayList<SubdetectionInfo<T>>();
 	
+
 	private T lastData;
 	
 
@@ -541,6 +542,8 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 	public ArrayList<SubdetectionInfo<T>> getSubdetectionsRemoved() {
 		return subdetectionsRemoved;
 	}
+
+
 
 	/**
 	 * Implemented in the contact collator module for base station to allow for more dynamic detection grouping

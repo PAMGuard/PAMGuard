@@ -2,10 +2,12 @@ package pamViewFX.fxNodes.pamDialogFX;
 
 import java.util.Optional;
 
-import javafx.geometry.Insets;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import helpFX.HelpManager;
+import helpFX.HelpPoint;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.StageStyle;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 import PamController.PamController;
 import PamController.SettingsPane;
@@ -37,7 +39,32 @@ public class PamSettingsDialogFX<T> extends PamDialogFX<T> {
 		this.setOnShown((value)->{
 			settingsPane.paneInitialized();
 		});
-		
+
+		// Add a help button if the settings pane declares a help point
+		addHelpButton(settingsPane.getHelpPointFX());
+	}
+
+	/**
+	 * Add a help "?" button to the dialog pane if a non-null {@link HelpPoint} is provided.
+	 * The button is appended to the existing OK/Cancel button row.
+	 *
+	 * @param helpPoint the help target, or {@code null} to skip adding the button
+	 */
+	private void addHelpButton(HelpPoint helpPoint) {
+		if (helpPoint == null) return;
+		// Use a custom ButtonType so JavaFX doesn't close the dialog on click
+		ButtonType helpButtonType = new ButtonType("?");
+		this.getDialogPane().getButtonTypes().add(helpButtonType);
+		Button helpBtn = (Button) this.getDialogPane().lookupButton(helpButtonType);
+		if (helpBtn != null) {
+			helpBtn.setGraphic(PamGlyphDude.createPamIcon("mdi2h-help-circle-outline", 14));
+			helpBtn.setTooltip(new javafx.scene.control.Tooltip("Open help for this module"));
+			// Prevent the dialog from closing when the help button is clicked
+			helpBtn.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+				event.consume();
+				HelpManager.getInstance().openHelp(helpPoint);
+			});
+		}
 	}
 
 	@Override

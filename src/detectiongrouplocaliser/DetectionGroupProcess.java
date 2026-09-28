@@ -410,7 +410,9 @@ public class DetectionGroupProcess extends PamProcess {
 			}
 		}
 		for (PamDataUnit superData:groupSummary.getSuperDetections()) {
-			if (!DetectionGroupDataUnit.class.isAssignableFrom(superData.getClass())) {
+			if (superData.getClass() != DetectionGroupDataUnit.class) {
+				// exact class match: subclasses (click trains, CPOD trains, click events)
+				// are managed by their own modules and must never be deleted from here.
 				continue;
 			}
 			DetectionGroupDataUnit dgdu = (DetectionGroupDataUnit) superData;

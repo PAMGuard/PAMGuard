@@ -1,6 +1,5 @@
 package rawDeepLearningClassifier.dataSelector;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,11 +14,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
+import PamView.component.PamFontIcon;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 
 /**
@@ -47,13 +46,9 @@ public class DLPredictionPanel implements PamDialogPanel {
 
 		lockButton = new JToggleButton(); 
 
-		FontIcon iconlock = FontIcon.of(MaterialDesignL.LOCK);
-		iconlock.setIconSize(20);
-		iconlock.setIconColor(Color.DARK_GRAY);
+		PamFontIcon iconlock = PamFontIcon.of(MaterialDesignL.LOCK, 20);
 
-		FontIcon iconlockopen = FontIcon.of(MaterialDesignL.LOCK_OPEN);
-		iconlockopen.setIconSize(20);
-		iconlockopen.setIconColor(Color.DARK_GRAY);
+		PamFontIcon iconlockopen = PamFontIcon.of(MaterialDesignL.LOCK_OPEN, 20);
 
 		lockButton.setIcon(iconlockopen);
 

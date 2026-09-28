@@ -145,6 +145,11 @@ public class DBPaneFX extends SettingsPane<DBParameters> {
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("database.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return mainPane;
 	}

@@ -225,6 +225,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	private ModuleHidePane createTopControls(){
 		
 		PamButton settingsButton=new PamButton(); 
+		settingsButton.getStyleClass().add("icon-button");
 //		settingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, Color.WHITE, PamGuiManagerFX.iconSize));
 		settingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, PamGuiManagerFX.iconSize));
 		settingsButton.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
@@ -235,6 +236,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		});
 
 		PamButton removeButton=new PamButton(); 
+		removeButton.getStyleClass().add("icon-button");
 //		removeButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.REMOVE, Color.WHITE, PamGuiManagerFX.iconSize));
 		removeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
 		removeButton.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);

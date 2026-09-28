@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.stream.Collectors;
-
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
@@ -90,7 +89,7 @@ public class PamFFTProcess extends PamProcess {
 
 //	RecyclingDataBlock<FFTDataUnit> recyclingOutputData;
 	private FFTDataBlock outputData;
-	
+
 	private TempOutputStore[] tempStores;
 	
 	private long[] lastChannelMillis = new long[PamConstants.MAX_CHANNELS];
@@ -141,15 +140,14 @@ public class PamFFTProcess extends PamProcess {
 	}*/
 
 	public synchronized void setupFFT() {
-		
+
 //		System.out.println("In call to setupFFT in " + getProcessName());
 		// need to find the existing source data block and remove from observing it.
-		// then find the new one and subscribe to that instead. 
+		// then find the new one and subscribe to that instead.
 		channelCounts = new int[PamConstants.MAX_CHANNELS];
 		// since it's used so much, make a local reference
 		FFTParameters fftParameters = this.fftControl.getFFTParameters();
 
-		
 		int[] chanList = PamUtils.getChannelArray(fftParameters.channelMap);
 		
 		tempStores = new TempOutputStore[PamConstants.MAX_CHANNELS];
@@ -172,22 +170,53 @@ public class PamFFTProcess extends PamProcess {
 			}
 		}
 		
-		//added as null pointer causing exception in FFT module on viewer start up. 
+		//added as null pointer causing exception in FFT module on viewer start up.
 		//26/02/2018
 		if (rawDataBlock==null) return;
 
+		/*
+		 * Work out an EFFECTIVE channel map = the configured channels intersected with the
+		 * channels the source actually provides. A programmatically-generated config (see
+		 * PamWizard) - or a stale config carried over from a previous dataset with more
+		 * channels - can request a channel the source does not have. The FFT output is
+		 * grouped/triggered per channel, so a configured channel the source lacks means the
+		 * output-trigger waits forever for that channel's turn and no FFT is ever emitted
+		 * (in viewer mode this also backs the read-but-unconsumed raw audio up in memory -
+		 * the "no spectrogram until the FFT dialog is opened" symptom).
+		 *
+		 * If there is a mismatch, adopt the effective map as the configured channel map so
+		 * the rest of the process works consistently against the channels that actually
+		 * exist. This is the single place the map is reconciled with the source.
+		 */
+		int sourceChannels = rawDataBlock.getChannelMap();
+		int effectiveChannelMap = fftParameters.channelMap & sourceChannels;
+		if (effectiveChannelMap == 0) {
+			effectiveChannelMap = sourceChannels; //none of the configured channels exist - use all available
+		}
+		if (effectiveChannelMap != fftParameters.channelMap) {
+			int unavailableChannels = fftParameters.channelMap & ~effectiveChannelMap;
+			String droppedChannels = Arrays.stream(PamUtils.getChannelArray(unavailableChannels))
+					.mapToObj(String::valueOf)
+					.collect(Collectors.joining(", "));
+			System.err.printf(
+					"Warning in the configuration of %s.\nFFT configuration requests channels not available in the source data: %s.\nContinuing with the available channels only.\n\n",
+					getProcessName(),
+					droppedChannels);
+			fftParameters.channelMap = effectiveChannelMap;
+		}
+
 		setParentDataBlock(rawDataBlock);
-		
+
 		if (rawDataBlock == null) return;
 //		outputData.setChannelMap(fftControl.fftParameters.channelMap);
 		outputData.sortOutputMaps(
 				rawDataBlock.getChannelMap(),
+
 				rawDataBlock.getSequenceMapObject(), 
 				fftParameters.channelMap);
 		outputData.setFftHop(fftParameters.fftHop);
 		outputData.setFftLength(fftParameters.fftLength);
 
-		
 
 		setProcessName("FFT - " + fftParameters.fftLength + " point, "
 				+ getSampleRate() + " Hz");
@@ -220,13 +249,15 @@ public class PamFFTProcess extends PamProcess {
 			}
 		}
 //		fftData = new ComplexArray(fftParameters.fftLength);
+
+
 		/*
 		 * Tell the output data block - should then get passed on to Spectrogram
 		 * display which can come back and work it out for itself that life has
 		 * changed.
 		 */
 		noteNewSettings();
-		
+
 		makeAnnotations();
 
 	}
@@ -260,7 +291,7 @@ public class PamFFTProcess extends PamProcess {
 	public void newData(PamObservable obs, PamDataUnit pamRawData) {
 		FFTDataUnit pu;
 /*
- * 
+ *
  * 		int i=0;
  * 		System.out.println(pamRawData.getParentDataBlock().);
  * 		
@@ -272,6 +303,7 @@ public class PamFFTProcess extends PamProcess {
 		RawDataUnit rawDataUnit = (RawDataUnit) pamRawData;
 		int iChan = PamUtils.getSingleChannel(rawDataUnit.getChannelBitmap());
 		rawBlocks[iChan] ++;
+
 		// see if the channel is one we want before doing anything.
 		if ((rawDataUnit.getChannelBitmap() & getChannelMap()) == 0){
 			return;
@@ -288,7 +320,7 @@ public class PamFFTProcess extends PamProcess {
 
 		double rawData[] = rawDataUnit.getRawData();
 		int dataPointer = channelPointer[iChan];
-		
+
 		//local copy
 		FFTParameters fftParameters = fftControl.getFFTParameters();
 		
@@ -420,10 +452,11 @@ public class PamFFTProcess extends PamProcess {
 		 */
 		TempOutputStore[] oldStores = tempStores;
 		
-		if (iChan == PamUtils.getHighestChannel(fftParameters.channelMap)) {
-			// time to empty the stores - assume they all have the same
-			// amount of data 
-			int[] chanList = PamUtils.getChannelArray(fftParameters.channelMap);
+		if (iChan == PamUtils.getHighestChannel(fftControl.getFFTParameters().channelMap)) {
+			// time to empty the stores - assume they all have the same amount of data. The
+			// channel map is reconciled with the source channels in setupFFT, so its highest
+			// channel is guaranteed to be present and the output is always triggered.
+			int[] chanList = PamUtils.getChannelArray(fftControl.getFFTParameters().channelMap);
 			try {
 				int n = oldStores[iChan].getN();
 				for (int iF = 0; iF < n; iF++) {
@@ -469,7 +502,15 @@ public class PamFFTProcess extends PamProcess {
 
 	@Override
 	public boolean prepareProcessOK() {
-
+		/*15/06/2026
+		 * ADAPT rather than REJECT. setupFFT() resolves the source block and, if the
+		 * configured channel map requests channels the source does not provide, reconciles
+		 * fftParameters.channelMap down to the channels that actually exist (warning as it
+		 * does so). We therefore just set up and carry on with the available channels rather
+		 * than rejecting the config - an un-prepared process cannot regenerate FFT data in
+		 * viewer mode, so the spectrogram would never load and the read-but-unconsumed raw
+		 * audio would back up in memory.
+		 */
 		setupFFT();
 
 		int fftChannelMap = fftControl.getFFTParameters().channelMap;

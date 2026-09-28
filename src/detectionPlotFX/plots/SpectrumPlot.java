@@ -478,6 +478,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> extends AbstractDete
 
 		Coordinate3d coord;
 		for (int iChan = 0; iChan < logSpectrum.length; iChan++) {
+			if (iChan >= clickLineData.length) continue;
 			g2.setStroke(PamColorsFX.getInstance().getChannelColor(iChan));
 			x0 = 0;
 			y0 = (int) (yScale * (maxLogVal-logSpectrum[iChan][0]));

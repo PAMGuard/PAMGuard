@@ -358,7 +358,7 @@ public class WaveCorrector extends PamDialog {
 		if (bearingLocaliser != null) {
 			angles = bearingLocaliser.localise(delaySecs, click.getTimeMilliseconds());
 		}
-		if (click.getClickLocalisation() != null) {
+		if (click.getClickLocalisation() != null && bearingLocaliser != null) {
 			click.getClickLocalisation().setAnglesAndErrors(angles);
 			click.getClickLocalisation().setArrayAxis(bearingLocaliser.getArrayAxis());
 			click.getClickLocalisation().setSubArrayType(bearingLocaliser.getArrayType());
@@ -373,9 +373,12 @@ public class WaveCorrector extends PamDialog {
 		for (int i = 0; i < n; i++) {
 			gd = clickControl.getClickDetector().getChannelGroupDetector(i);
 
+			if (gd == null) {
+				continue;
+			}
 			int[] phones = gd.getGroupHydrophones();
 			bl = gd.getBearingLocaliser();
-			if (bl != null) {
+			if (bl != null && phones != null) {
 				bl.prepare(phones,0, Correlations.defaultTimingError(clickControl.getClickDetector().getSampleRate()));
 			}
 		}

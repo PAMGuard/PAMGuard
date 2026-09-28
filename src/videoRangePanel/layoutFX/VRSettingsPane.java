@@ -737,6 +737,7 @@ public class VRSettingsPane extends DynamicSettingsPane<VRParameters>{
 			landMarkGroupTable.getButtonPane().getChildren().clear(); 
 
 			PamButton addButton = new PamButton(); 
+			addButton.getStyleClass().add("icon-button");
 //			addButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ADD, PamGuiManagerFX.iconSize));
 			addButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
 			addButton.setOnAction((action)->{
@@ -750,6 +751,7 @@ public class VRSettingsPane extends DynamicSettingsPane<VRParameters>{
 
 
 			PamButton editButton = new PamButton(); 
+			editButton.getStyleClass().add("icon-button");
 //			editButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.EDIT, PamGuiManagerFX.iconSize));
 			editButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pencil", Color.WHITE, PamGuiManagerFX.iconSize));
 			editButton.setOnAction((action)->{
@@ -761,6 +763,7 @@ public class VRSettingsPane extends DynamicSettingsPane<VRParameters>{
 			editButton.setTooltip(new Tooltip("Edit the landmark group"));
 
 			PamButton removeButton = new PamButton(); 
+			removeButton.getStyleClass().add("icon-button");
 //			removeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.DELETE,  PamGuiManagerFX.iconSize));
 			removeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-delete",  Color.WHITE, PamGuiManagerFX.iconSize));
 			removeButton.setOnAction((action)->{
@@ -771,6 +774,7 @@ public class VRSettingsPane extends DynamicSettingsPane<VRParameters>{
 			removeButton.setTooltip(new Tooltip("Delete the landmark group (this cannot be undone)"));
 
 			PamButton importButton = new PamButton(); 
+			importButton.getStyleClass().add("icon-button");
 //			importButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_IMPORT, PamGuiManagerFX.iconSize));
 			importButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-import", Color.WHITE, PamGuiManagerFX.iconSize));
 			importButton.setOnAction((action)->{
@@ -784,6 +788,7 @@ public class VRSettingsPane extends DynamicSettingsPane<VRParameters>{
 			importButton.setTooltip(new Tooltip("Import a Landmark Group from a .csv file"));
 
 			PamButton exportButton = new PamButton(); 
+			exportButton.getStyleClass().add("icon-button");
 //			exportButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_EXPORT, PamGuiManagerFX.iconSize));
 			exportButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-export", Color.WHITE, PamGuiManagerFX.iconSize));
 			exportButton.setOnAction((action)->{

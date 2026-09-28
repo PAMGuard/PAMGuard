@@ -367,6 +367,11 @@ public class RecorderSettings implements Serializable, Cloneable, ManagedParamet
 			}
 		}
 
+		// SUD is a real, supported output format (X3-compressed SoundTrap files).
+		if (RecorderControl.SUD.toString().equals(fileType)) {
+			return RecorderControl.SUD;
+		}
+		
 		AudioFileFormat.Type types[] = AudioSystem.getAudioFileTypes();
 		for (int i = 0; i < types.length; i++) {
 			if (types[i].toString().equals(fileType)) {

@@ -55,6 +55,7 @@ public class SqlitePaneFX implements SystemDialogPaneFX {
 		dbList.setMinWidth(200);
 		
 		Button addButton=new Button(); 
+		addButton.getStyleClass().add("icon-button");
 //		addButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.PLUS, PamGuiManagerFX.iconSize));
 		addButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", PamGuiManagerFX.iconSize));
 		addButton.setOnAction((action)->{
@@ -62,6 +63,7 @@ public class SqlitePaneFX implements SystemDialogPaneFX {
 		});
 		
 		Button browseButton=new Button(); 
+		browseButton.getStyleClass().add("icon-button");
 //		browseButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, PamGuiManagerFX.iconSize));
 		browseButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize));
 		browseButton.setOnAction((action)->{

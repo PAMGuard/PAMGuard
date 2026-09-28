@@ -40,12 +40,12 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 * natural lifetime for the queued data datablock-note there is also 
 	 * some control over this withing the clip generator history section of the hiding panel
 	 */
-	public int queuedDataKeepTime = 60; // minutes
+	public int queuedDataKeepTime = 1440; // minutes
 	
 	/**
 	 * natural lifetime for the processed data datablock
 	 */
-	public int processedDataKeepTime = 10; // minutes
+	public int processedDataKeepTime = 1440; // minutes
 	
 	public boolean clearQueueAtStart = true;
 	
@@ -55,6 +55,48 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 * seconds to prepend to each clip to allow for signal locking of the demux algorithm
 	 */
 	public double secondsToPreceed = 0;
+
+	/**
+	 * Timing error of a single detection, in seconds. Detection times are the
+	 * start of a marked clip, so this is coarse. It sets how much weight the
+	 * arrival time differences carry in a localisation.
+	 */
+	public double detectionTimingError = 2.0;
+
+	/**
+	 * Largest acceptable difference, in seconds, between a measured arrival
+	 * time difference and the one the localised position would produce. Fits
+	 * worse than this are rejected, which usually means the detections were not
+	 * the same call.
+	 */
+	public double maxTimeDelayResidual = 6.0;
+
+	/**
+	 * Largest acceptable difference, in degrees, between a measured bearing and
+	 * the bearing to the localised position.
+	 */
+	public double maxBearingResidual = 20.0;
+
+	/**
+	 * Largest number of detections on each other buoy that are tried as matches
+	 * for one detection. The closest in time and frequency are kept. A larger
+	 * number finds matches in a busy chorus, at the cost of more combinations
+	 * to localise.
+	 */
+	public int maxCandidatesPerBuoy = 10;
+
+	/**
+	 * Standard deviation of a DIFAR bearing, in degrees. This sets how much
+	 * weight bearings carry in a localisation, against the arrival time
+	 * differences.
+	 * <p>
+	 * IWC paper SC-65b-SH08 reports 95% of bearings within 10 degrees of the
+	 * mean, which is a standard deviation of about 5 degrees. A well behaved
+	 * array can reach 2 degrees. Bearings are much worse when the source is
+	 * close to a buoy that has drifted from its recorded position, since a
+	 * small error in the buoy position is then a large error in angle.
+	 */
+	public double bearingError = 5.0;
 	
 	/**
 	 * name of the detector module which can trigger difar clips to be made - eg whistle and moan detector
@@ -350,6 +392,21 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 				ndp.nominalSpreading = 20;
 				ndp.bearingLineWidth = 0.5f;
 				ndp.maxSourceLevel = 180.;
+			}
+			if (ndp.detectionTimingError <= 0) {
+				ndp.detectionTimingError = 2.0;
+			}
+			if (ndp.maxTimeDelayResidual <= 0) {
+				ndp.maxTimeDelayResidual = 6.0;
+			}
+			if (ndp.maxCandidatesPerBuoy <= 0) {
+				ndp.maxCandidatesPerBuoy = 10;
+			}
+			if (ndp.maxBearingResidual <= 0) {
+				ndp.maxBearingResidual = 20.0;
+			}
+			if (ndp.bearingError <= 0) {
+				ndp.bearingError = 5.0;
 			}
 			return ndp;
 		} catch (CloneNotSupportedException e) {

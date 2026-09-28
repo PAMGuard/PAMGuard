@@ -1,0 +1,24 @@
+{
+  "configType": "default",
+  "name": "North Atlantic right whale (deep learning)",
+  "description": "Deep learning detector for North Atlantic right whale upcalls, using the model of Shiu et al. (2020). Adds Sound Acquisition, an FFT engine, the Deep Learning Classifier, a time display and database and binary storage. Detectors run at 2 kHz, so higher sample rate recordings are decimated automatically.\n\nNote that the deep learning model itself is not shipped with PAMGuard. Open the Deep Learning Classifier settings and either download the built-in 'North Atlantic right whale' default model or browse to your own copy.",
+  "version": "1.0",
+  "author": "PAMGuard",
+  "psfx": "right_whale_dl.psfx",
+
+  "minSampleRate": 2000,
+  "targetSampleRate": 2000,
+  "minChannels": 1,
+
+  "medium": "water",
+  "requiredFileTypes": ["SOUND"],
+  "runModes": ["NORMAL"],
+
+  "taxa": [
+    {
+      "group": "BALEEN_WHALE",
+      "species": ["North Atlantic right whale"],
+      "itisCodes": [180537]
+    }
+  ]
+}

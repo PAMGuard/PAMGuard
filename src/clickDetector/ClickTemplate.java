@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import matchedTemplateClassifer.ImportTemplateMAT;
+import matchedTemplateClassifer.MatchTemplate;
+
 /**Class for storing click templates. 
  * <p>
  * Note that the average log spectrum must also be saved as this cannot be back calculated from the average spectrum (see ClickSpectrumTemplateEditDialog class for details) 
@@ -417,10 +420,82 @@ public class ClickTemplate   {
 		clickTemplate.setSpecies(species);
 		clickTemplate.setColor(color);
 //		System.out.println("Sample Rate: "+sampleRate+ " fft"+ CSVResults);
-		
+
 		return clickTemplate;
 	}
-	
 
-	
+	/**
+	 * Get a click template from a MATLAB .mat file. The file format is the same as
+	 * used by the spectrum template classifiers, i.e. a variable <i>spectrum</i>
+	 * (or <i>waveform</i>/<i>wave</i>) holding a 1D array of linear spectrum
+	 * amplitude values and a variable <i>sR</i> holding the sample rate in samples
+	 * per second. The spectrum is normalised to a maximum of one and the log
+	 * spectrum is calculated from it. Standard deviations are not held in the file
+	 * and so are set to zero.
+	 * @param filename - path to the .mat file.
+	 * @return the click template or null if the file could not be read.
+	 */
+	public static ClickTemplate getMATResults(String filename) {
+
+		MatchTemplate matchTemplate = new ImportTemplateMAT().importTemplate(new File(filename));
+		if (matchTemplate == null || matchTemplate.waveform == null || matchTemplate.waveform.length == 0) {
+			return null;
+		}
+
+		//normalise so the maximum value is one - the click spectrum display shows
+		//templates on a 0-1 linear axis.
+		double maxVal = 0;
+		for (double value : matchTemplate.waveform) {
+			if (!Double.isNaN(value) && value > maxVal) {
+				maxVal = value;
+			}
+		}
+
+		double[] spectrum = new double[matchTemplate.waveform.length];
+		double[] spectrumLog = new double[matchTemplate.waveform.length];
+		double[] zeros = new double[matchTemplate.waveform.length];
+		for (int i = 0; i < matchTemplate.waveform.length; i++) {
+			spectrum[i] = maxVal > 0 ? matchTemplate.waveform[i] / maxVal : matchTemplate.waveform[i];
+			//clamp the log values so zero amplitudes do not create -infinity.
+			spectrumLog[i] = spectrum[i] > 0 ? Math.max(10 * Math.log10(spectrum[i]), -100.) : -100.;
+		}
+
+		//species name from the file name, without the extension.
+		String species = new File(filename).getName();
+		int dot = species.lastIndexOf('.');
+		if (dot > 0) {
+			species = species.substring(0, dot);
+		}
+
+		ClickTemplate clickTemplate = new ClickTemplate();
+		clickTemplate.setSpectrum(spectrum);
+		clickTemplate.setSpectrumStd(zeros);
+		clickTemplate.setSpectrumLog(spectrumLog);
+		clickTemplate.setSpectrumStdLog(zeros);
+		clickTemplate.setN(0);
+		clickTemplate.setSampleRate(matchTemplate.sR);
+		clickTemplate.setSpecies(species);
+
+		return clickTemplate;
+	}
+
+	/**
+	 * Load a click template from file, using the file extension to determine the
+	 * format: .mat files are read with {@link #getMATResults(String)} and anything
+	 * else (.csv/.txt) with {@link #getCSVResults(String)}.
+	 * @param filename - path to the template file.
+	 * @return the click template or null if the file could not be read.
+	 */
+	public static ClickTemplate loadTemplateFile(String filename) {
+		if (filename == null) {
+			return null;
+		}
+		if (filename.toLowerCase().endsWith(".mat")) {
+			return getMATResults(filename);
+		}
+		return getCSVResults(filename);
+	}
+
+
+
 }

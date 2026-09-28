@@ -8,7 +8,7 @@ import Localiser.algorithms.genericLocaliser.leastSquares.LeastSquares;
 import Localiser.algorithms.genericLocaliser.simplex.Simplex;
 import Localiser.detectionGroupLocaliser.DetectionGroupLocaliser2;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.DetectionGroup;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamController.PamController;

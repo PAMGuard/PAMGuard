@@ -40,6 +40,9 @@ import java.awt.geom.Path2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -96,6 +99,31 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 	private PamDataUnit lastEvent=null;
 
 	private long lastUpdateTime=-1;
+
+	/**
+	 * Background thread for calculating the (potentially slow) event spectrum so
+	 * that the display doesn't freeze while a user clicks on a click.
+	 */
+	private ExecutorService eventSpectrumExecutor = Executors.newSingleThreadExecutor(r -> {
+		Thread t = new Thread(r, "ClickSpectrum-EventSpectrum");
+		t.setDaemon(true);
+		return t;
+	});
+
+	/**
+	 * Monotonically increasing id for event spectrum calculation requests. Used so that
+	 * a stale background calculation doesn't overwrite the result of a newer one.
+	 */
+	private AtomicLong eventRequestId = new AtomicLong(0);
+
+	/**
+	 * The event a calculation has last been dispatched for, together with the sub detection
+	 * count and channel choice at dispatch time. Used to avoid recalculating the event spectrum
+	 * when the user simply clicks between clicks within the same, unchanged, event.
+	 */
+	private SuperDetection requestedEvent = null;
+	private int requestedSubCount = -1;
+	private int requestedChannelChoice = -1;
 
 	private double[][] logSpectrum;
 
@@ -969,9 +997,11 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 				}
 			}
 			//calculating an event spectrum can take a very long time so we don't delete the last event incase a user
-			//is clicking between one event and un-annotated clicks so whether to draw an event is handled in the paint functions
+			//is clicking between one event and un-annotated clicks so whether to draw an event is handled in the paint functions.
+			//The calculation is dispatched to a background thread (and skipped entirely if the event is unchanged) so that
+			//the display doesn't freeze while the click spectrum itself is shown immediately.
 			if (isViewer && this.clickSpectrumParams.showEventInfo){
-				getEventClick(newClick);
+				updateEventSpectrum(newClick);
 			}
 			if (isViewer) getTemplateClick();
 			sortSouthAxis();
@@ -1013,102 +1043,170 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 	}
 
 
-	public void getEventClick(ClickDetection newClick){
+	/**
+	 * Holder for the results of an event spectrum calculation, so that the (slow) calculation
+	 * can be done on a background thread and the results applied atomically to the display fields.
+	 */
+	private static class EventSpectrumResult {
+		double[][] eventSpectrum;
+		double[][] eventCepstrum;
+		SuperDetection event;
+		long updateTime;
+		int channelChoice;
+	}
 
-		if (newClick==null){
+	/**
+	 * Decide whether the event spectrum needs recalculating and, if so, dispatch the calculation
+	 * to a background thread. The event spectrum is only recalculated when a new event is selected,
+	 * the channel choice changes, or clicks are added to / removed from the current event; simply
+	 * clicking between clicks within the same, unchanged, event is a no-op.
+	 * <p>
+	 * This is called on the Swing event dispatch thread. The cheap change-detection is done here;
+	 * the potentially very slow calculation over every click in the event is done in the background.
+	 * @param newClick - the click that has just been selected.
+	 */
+	public void updateEventSpectrum(ClickDetection newClick) {
+
+		if (newClick == null) {
 			return;
 		}
 
-		ArrayList<double[]> eventFFTs;
-		double[][] meanEvent;
-		int cepLength = FastFFT.nextBinaryExp(clickControl.clickParameters.maxLength);
-		int fftLength=cepLength;
-		int[] hydrophoneMap=PamUtils.getChannelArray(newClick.getChannelBitmap());
-
-
-		SuperDetection currentEvent;
 		//there seems to be an issue here if a click is removed from an event then it returns an error when using the getSuperDetection function
-		currentEvent = newClick.getSuperDetection(0);
-		if (currentEvent==null){
+		final SuperDetection currentEvent = newClick.getSuperDetection(0);
+		if (currentEvent == null) {
+			// not an event click - keep whatever event is currently cached so that clicking between an
+			// event and un-annotated clicks doesn't throw the (expensive) event spectrum away.
 			return;
 		}
 
-		//		if (currentEvent==lastEvent && lastchannelChoice == clickSpectrumParams.channelChoice && lastUpdateTime==newClick.getLastUpdateTime()){
-		//			//System.out.println("last event==currentevent: "+currentEvent);
-		//			//System.out.println("lastUpdateTime: "+newClick.getLastUpdateTime());
-		//			return;
-		//		}
+		final int subDetectionN = currentEvent.getSubDetectionsCount();
+		final int channelChoice = clickSpectrumParams.channelChoice;
 
-		lastEvent=null;
-		eventSpectrum=null;
-		eventCepstrum = null;
-		lastUpdateTime=-1;
+		// nothing relevant has changed since we last dispatched a calculation for this event, so
+		// there is no need to recalculate.
+		if (currentEvent == requestedEvent
+				&& subDetectionN == requestedSubCount
+				&& channelChoice == requestedChannelChoice) {
+			return;
+		}
 
-		lastchannelChoice = clickSpectrumParams.channelChoice;
-		lastEvent=currentEvent;
-		lastUpdateTime=newClick.getLastUpdateTime();
-		int subDetectionN=currentEvent.getSubDetectionsCount(); 
+		requestedEvent = currentEvent;
+		requestedSubCount = subDetectionN;
+		requestedChannelChoice = channelChoice;
+
+		final long requestId = eventRequestId.incrementAndGet();
+		final long updateTime = newClick.getLastUpdateTime();
+		final int nChan = newClick.getNChan();
+		final int channelBitmap = newClick.getChannelBitmap();
+
+		eventSpectrumExecutor.submit(() -> {
+			// a newer request may have superseded this one while it sat in the queue.
+			if (requestId != eventRequestId.get()) {
+				return;
+			}
+			EventSpectrumResult result = computeEventSpectrum(currentEvent, subDetectionN, nChan,
+					channelBitmap, channelChoice, updateTime);
+			applyEventSpectrum(result, requestId);
+		});
+	}
+
+	/**
+	 * Do the actual (potentially slow) calculation of the mean event spectrum and cepstrum over
+	 * every click in the event. This runs on a background thread and does not touch any display
+	 * fields directly - the results are returned and applied by {@link #applyEventSpectrum}.
+	 */
+	private EventSpectrumResult computeEventSpectrum(SuperDetection currentEvent, int subDetectionN,
+			int nChan, int channelBitmap, int channelChoice, long updateTime) {
+
+		EventSpectrumResult result = new EventSpectrumResult();
+		result.event = currentEvent;
+		result.channelChoice = channelChoice;
+		result.updateTime = updateTime;
+
+		if (subDetectionN <= 1) {
+			result.eventSpectrum = null;
+			result.eventCepstrum = null;
+			return result;
+		}
+
+		int cepLength = FastFFT.nextBinaryExp(clickControl.clickParameters.maxLength);
+		int fftLength = cepLength;
+		int[] hydrophoneMap = PamUtils.getChannelArray(channelBitmap);
+
+		double[][] eventCep = new double[1][cepLength];
 		int totalCepChannels = 0;
-		if (subDetectionN > 1) {
-			//			if (clickSpectrumParams.plotCepstrum) {
-			eventCepstrum = new double[1][cepLength];
-			double[] clickCepstrum;
-			for (int i = 0; i < subDetectionN; i++) {
-				ClickDetection aClick = (ClickDetection) currentEvent.getSubDetection(i);
-				if (aClick == null) continue;
-				int nChan = aClick.getNChan();
-				for (int c = 0; c < nChan; c++) {
-					clickCepstrum = aClick.getCepstrum(c, cepLength);
-					totalCepChannels++;
-					for (int s = 0; s < cepLength; s++) {
-						eventCepstrum[0][s] += clickCepstrum[s];
-					}
+		double[] clickCepstrum;
+		for (int i = 0; i < subDetectionN; i++) {
+			ClickDetection aClick = (ClickDetection) currentEvent.getSubDetection(i);
+			if (aClick == null) continue;
+			int aChan = aClick.getNChan();
+			for (int c = 0; c < aChan; c++) {
+				clickCepstrum = aClick.getCepstrum(c, cepLength);
+				totalCepChannels++;
+				for (int s = 0; s < cepLength; s++) {
+					eventCep[0][s] += clickCepstrum[s];
 				}
 			}
+		}
+		if (totalCepChannels > 0) {
 			for (int s = 0; s < cepLength; s++) {
-				eventCepstrum[0][s] /= totalCepChannels;
+				eventCep[0][s] /= totalCepChannels;
 			}
-			//			}
-			//			else {
-			//System.out.println("new click number of channels: "+newClick.getNChan());
-			eventSpectrum=new double[newClick.getNChan()][fftLength];
-			eventFFTs=new ArrayList<double[]>();
+		}
+		result.eventCepstrum = eventCep;
 
-			double[] clickFFT;
-			int n;
-			for (int iChan = 0; iChan < newClick.getNChan(); iChan++) {
-				n=1;
-				for (int i=0; i<subDetectionN;i++){
-					ClickDetection clickr=(ClickDetection) currentEvent.getSubDetection(i);
-					if (clickr==null) continue; 
-					if (containsChannel(clickr,  hydrophoneMap[iChan])){
-						//System.out.println("NumberOfChannels: "+clickr.getNChan()+ "  TotalChan: "+newClick.getNChan()  +"chan: "+hydrophoneMap[iChan]);
-						//have to be careful here..when get power spectra we refer to the group channel number, not the real channel number	
-						clickFFT=clickr.getPowerSpectrum(iChan,fftLength);
-						//System.out.println("Click fft: length: " + clickFFT.length);
-						eventFFTs.add(clickFFT);	
-					}
+		double[][] eventSpec = new double[nChan][fftLength];
+		ArrayList<double[]> eventFFTs = new ArrayList<double[]>();
+		double[] clickFFT;
+		for (int iChan = 0; iChan < nChan; iChan++) {
+			for (int i = 0; i < subDetectionN; i++) {
+				ClickDetection clickr = (ClickDetection) currentEvent.getSubDetection(i);
+				if (clickr == null) continue;
+				if (containsChannel(clickr, hydrophoneMap[iChan])) {
+					//have to be careful here..when get power spectra we refer to the group channel number, not the real channel number
+					clickFFT = clickr.getPowerSpectrum(iChan, fftLength);
+					eventFFTs.add(clickFFT);
 				}
-				eventSpectrum[iChan]=meanSpectrum(eventFFTs);
-				//System.out.println("Create event: "+eventSpectrum[iChan].length);
 			}
-
-			if (clickSpectrumParams.channelChoice == ClickSpectrumParams.CHANNELS_MEANS) {
-				meanEvent=new double[1][eventSpectrum[0].length];
-				for (int i = 0; i <eventSpectrum[0].length; i++) {
-					for (int iChan=0; iChan<newClick.getNChan();iChan++){
-						meanEvent[0][i]+=eventSpectrum[iChan][i];
-					}
-				}
-				eventSpectrum=meanEvent;
-			}
-			//			}
+			eventSpec[iChan] = meanSpectrum(eventFFTs);
 		}
 
-		else{
-			eventSpectrum=null;
-			return;
-		}		
+		if (channelChoice == ClickSpectrumParams.CHANNELS_MEANS) {
+			double[][] meanEvent = new double[1][eventSpec[0].length];
+			for (int i = 0; i < eventSpec[0].length; i++) {
+				for (int iChan = 0; iChan < nChan; iChan++) {
+					meanEvent[0][i] += eventSpec[iChan][i];
+				}
+			}
+			eventSpec = meanEvent;
+		}
+		result.eventSpectrum = eventSpec;
+
+		return result;
+	}
+
+	/**
+	 * Apply the results of a background event spectrum calculation to the display fields and
+	 * trigger a repaint. Guarded by {@link #storedSpectrumLock} since the paint methods read
+	 * these fields, and ignored if a newer calculation request has since been made.
+	 */
+	private void applyEventSpectrum(EventSpectrumResult result, long requestId) {
+		synchronized (storedSpectrumLock) {
+			if (requestId != eventRequestId.get()) {
+				// superseded by a newer request - discard this stale result.
+				return;
+			}
+			eventSpectrum = result.eventSpectrum;
+			eventCepstrum = result.eventCepstrum;
+			lastEvent = result.event;
+			lastUpdateTime = result.updateTime;
+			lastchannelChoice = result.channelChoice;
+			// force the log spectrum to be recalculated on the next paint so that the newly
+			// calculated event spectrum is included.
+			logSpectrum = null;
+		}
+		spectrumPlotPanl.repaint(100);
+		spectrumAxisPanel.repaint(100);
 	}
 
 	private boolean containsChannel(ClickDetection click, int channel){

@@ -3,7 +3,7 @@ package difar.trackedGroups;
 import java.util.ArrayList;
 
 import pamMaths.PamVector;
-import targetMotionModule.TargetMotionResult;
+import difar.targetmotion.TargetMotionResult;
 import GPS.GpsData;
 import PamUtils.LatLong;
 

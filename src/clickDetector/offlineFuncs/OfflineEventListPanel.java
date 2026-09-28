@@ -27,6 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import PamUtils.PamCalendar;
 import PamView.PamColors;
@@ -35,6 +36,7 @@ import PamView.PamSymbolType;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
+import PamView.tables.SortableTableValue;
 import PamguardMVC.PamDataBlock;
 import clickDetector.ClickControl;
 import clickDetector.ClickDataBlock;
@@ -66,6 +68,12 @@ public class OfflineEventListPanel {
 	private JTable eventTable;
 
 	private EventTableModel eventTableModel;
+
+	/**
+	 * Sorter attached to the table so that columns can be sorted by clicking on
+	 * their headers.
+	 */
+	private TableRowSorter<EventTableModel> rowSorter;
 
 	private JRadioButton showAll, showCurrent, showFuture;
 
@@ -220,6 +228,11 @@ public class OfflineEventListPanel {
 		offlineEventDataBlock = clickControl.getClickDetector().getOfflineEventDataBlock();
 		eventTableModel = new EventTableModel();
 		eventTable = new JTable(eventTableModel);
+		rowSorter = new TableRowSorter<>(eventTableModel);
+		for (int i = 0; i < colNames.length; i++) {
+			rowSorter.setSortable(i, isColumnSortable(i));
+		}
+		eventTable.setRowSorter(rowSorter);
 		eventTable.setRowSelectionAllowed(true);
 		JScrollPane scrollPane = new JScrollPane(eventTable);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -242,11 +255,21 @@ public class OfflineEventListPanel {
 			}
 		}
 
+		eventTable.getTableHeader().setToolTipText("Click a column header to sort the table");
 		eventTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		//		tableData.addTableModelListener(moduleTable);
 		setShowSelection(SHOW_SELECTION);
 	}
 
+
+	/**
+	 * Is a column worth sorting on ? The symbol and the comment columns are not.
+	 * @param column column index.
+	 * @return true if the column can be sorted.
+	 */
+	private boolean isColumnSortable(int column) {
+		return column != 0 && column != 9;
+	}
 
 	/**
 	 * Call when an event has been added or removed in order to update the table. 
@@ -285,7 +308,7 @@ public class OfflineEventListPanel {
 	}
 
 	public void setSelectedEvent(OfflineEventDataUnit selectedEvent) {
-		int iRow = findEventRow(selectedEvent);
+		int iRow = findEventViewRow(selectedEvent);
 		if (iRow < 0) {
 			eventTable.clearSelection();
 		}
@@ -301,13 +324,13 @@ public class OfflineEventListPanel {
 	public void setSelectedEvents(ArrayList<OfflineEventDataUnit> selectedEvent) {
 		//		eventTable.getSelectionModel().setValueIsAdjusting(true);
 		if (selectedEvent.size()==0) return; 
-		int iRow=findEventRow(selectedEvent.get(0));
+		int iRow=findEventViewRow(selectedEvent.get(0));
 		if (iRow < 0) {
 			eventTable.clearSelection();
 		}
 		else{
 			for (int i=0; i<selectedEvent.size(); i++){
-				iRow = findEventRow(selectedEvent.get(i));
+				iRow = findEventViewRow(selectedEvent.get(i));
 				if (iRow<0) continue;
 				// see http://www.esus.com/docs/GetQuestionPage.jsp?uid=1295
 				eventTable.getSelectionModel().addSelectionInterval(iRow, iRow);
@@ -321,18 +344,19 @@ public class OfflineEventListPanel {
 	}
 
 	/**
-	 * Finds the row for a specific event. 
+	 * Finds the displayed row for a specific event, taking any sorting of the
+	 * table into account. 
 	 * @param event event to find
-	 * @return row number, or -1 if event not found
+	 * @return row number on the screen, or -1 if event not found
 	 */
-	private int findEventRow(OfflineEventDataUnit event) {
+	private int findEventViewRow(OfflineEventDataUnit event) {
 		if (event == null) {
 			return -1;
 		}
 		int nR = eventTableModel.getRowCount();
 		for (int i = 0; i < nR; i++) {
-			if (getSelectedEvent(i) == event) {
-				return i;
+			if (getEvent(i) == event) {
+				return eventTable.convertRowIndexToView(i);
 			}
 		}
 		return -1;
@@ -348,16 +372,31 @@ public class OfflineEventListPanel {
 	}
 
 	/**
-	 * Find the event corresponding to the given row index
-	 * @param rowIndex row index
+	 * Find the event corresponding to the given row on the screen. If the table
+	 * has been sorted this is not the same as the row in the table model.
+	 * @param rowIndex row index in the table (view coordinates)
 	 * @return Event or null if rowIndex out of range. 
 	 */
 	public OfflineEventDataUnit getSelectedEvent(int rowIndex) {
-		if (rowIndex < 0 || rowIndex >= visibleData.size()) {
+		if (rowIndex < 0 || rowIndex >= eventTable.getRowCount()) {
+			return null;
+		}
+		return getEvent(eventTable.convertRowIndexToModel(rowIndex));
+	}
+
+	/**
+	 * Find the event corresponding to the given row in the table model. Note
+	 * that this is not the same as the row on the screen if the table has been
+	 * sorted.
+	 * @param modelRow row index in the table model
+	 * @return Event or null if modelRow out of range. 
+	 */
+	public OfflineEventDataUnit getEvent(int modelRow) {
+		if (modelRow < 0 || modelRow >= visibleData.size()) {
 			return null;
 		}
 		else {
-			return visibleData.get(rowIndex);
+			return visibleData.get(modelRow);
 		}
 	}
 
@@ -405,8 +444,22 @@ public class OfflineEventListPanel {
 		 */
 		@Override
 		public Class<?> getColumnClass(int col) {
-			if (col == 0) {
+			switch (col) {
+			case 0:
 				return ImageIcon.class;
+			case 1:
+				return Integer.class;
+			case 2:
+			case 3:
+			case 5:
+				// formatted text which sorts on the underlying number.
+				return SortableTableValue.class;
+			case 4:
+				return String.class;
+			case 6:
+			case 7:
+			case 8:
+				return Short.class;
 			}
 			return super.getColumnClass(col);
 		}
@@ -490,7 +543,7 @@ public class OfflineEventListPanel {
 
 		@Override
 		public Object getValueAt(int rowIndex, int colIndex) {
-			OfflineEventDataUnit edu = getSelectedEvent(rowIndex);
+			OfflineEventDataUnit edu = getEvent(rowIndex);
 			if (edu == null) {
 				return null;
 			}
@@ -511,17 +564,18 @@ public class OfflineEventListPanel {
 				if (edu.isSuspectEventTimes()) {
 					str = "?"+ str + "?";
 				}
-				return str;
+				return new SortableTableValue(str, edu.getTimeMilliseconds());
 			case 3:
 				str  = PamCalendar.formatTime(edu.getEventEndTime());
 				if (edu.isSuspectEventTimes()) {
 					str = "?"+ str + "?";
 				}
-				return str;
+				return new SortableTableValue(str, edu.getEventEndTime());
 			case 4:
 				return edu.getEventType();
 			case 5:
-				return String.format("%d (%d)", edu.getNClicks(), edu.getLoadedSubDetectionsCount());
+				return new SortableTableValue(String.format("%d (%d)", edu.getNClicks(), edu.getLoadedSubDetectionsCount()),
+						Integer.valueOf(edu.getNClicks()));
 			case 6:
 				return edu.getMinNumber();
 			case 7:

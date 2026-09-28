@@ -263,6 +263,10 @@
    <tocitem text="CPOD Module " target="sensors.cpod.docs.cpod" image="topic"/>
 
   </tocitem>
+  <tocitem text="SoundTrap SWV Sensor Import ">
+   <tocitem text="Overview " target="sensors.soundtrapSensor.docs.soundtrapSensor" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Displays ">
   <tocitem text="Data Selection ">
@@ -674,7 +678,6 @@
 
   </tocitem>
   <tocitem text="DIFAR ">
-   <tocitem text="Azigram (DIFAR Azigram Engine) " target="localisation.difar.difarAzigram.docs.azigram" image="topic"/>
 
    <tocitem text="DIFAR Directional Audio " target="localisation.difar.difarAudio.docs.directionalAudio" image="topic"/>
 

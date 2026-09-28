@@ -1,0 +1,1561 @@
+/*
+ * pamFlatLafLight.css
+ *
+ * A JavaFX (Modena-based) stylesheet that reproduces the FlatLaf Light look
+ * and feel (com.formdev.flatlaf.FlatLightLaf) used by the PAMGuard Swing GUI,
+ * so that JavaFX panes embedded in the Swing GUI match the surrounding
+ * Swing components as closely as possible.
+ *
+ * All colours below are taken from (or computed from) the FlatLaf 3.5.1
+ * theme definition files FlatLaf.properties / FlatLightLaf.properties:
+ *
+ *   @background                    #f2f2f2
+ *   @foreground                    #000000
+ *   @disabledForeground            tint(#000,55%)            -> #8c8c8c
+ *   @componentBackground           lighten(@background,5%)   -> #ffffff
+ *   @selectionBackground           @accentBaseColor          -> #2675bf
+ *   @selectionInactiveBackground   shade(@background,13%)    -> #d3d3d3
+ *   Component.borderColor          shade(@background,20%)    -> #c2c2c2
+ *   Component.disabledBorderColor  tint(borderColor,20%)     -> #cecece
+ *   Component.focusColor           lighten(#2675bf,31%)      -> #98c2ea
+ *   Component.focusedBorderColor   shade(focusColor,10%)     -> #89afd3
+ *   @accentBase2Color              lighten(saturate(#2675bf,10%),6%) -> #2385e2
+ *   @accentCheckmarkColor          tint(accentBase2,20%)     -> #4e9de8
+ *   @accentUnderlineColor          tint(#2675bf,10%)         -> #3c83c5
+ *   @accentLinkColor               darken(#2675bf,3%)        -> #236db2
+ *   Separator.foreground           shade(@background,15%)    -> #cdcdcd
+ *   PopupMenu.borderColor          shade(@background,28%)    -> #aeaeae
+ *   ToolTip.background             lighten(@background,3%)   -> #fafafa
+ *   @icon                          shade(@background,27%)    -> #b1b1b1
+ *   @buttonArrowColor              tint(#000,40%)            -> #666666
+ *
+ * Fonts are deliberately NOT set: the JavaFX platform default (Segoe UI 12px
+ * on Windows, system font 13px on macOS) matches the FlatLaf defaults.
+ */
+
+/*
+ * The FlatLaf palette is declared on '.root, .gui-css-root' rather than on '.root'
+ * alone. This sheet is attached two ways: to a Scene (dialogs, main GUI), where
+ * '.root' matches the scene root, AND node-by-node to individual content nodes of
+ * the time display (see TDDisplayFX.addGUICSS - it must not cascade into the graph
+ * hiding panes). A '.root' selector only matches a node carrying the 'root' style
+ * class (the scene root), so when the sheet is attached to an ordinary content node
+ * every '-flat-*' lookup would fail to resolve and JavaFX floods the log with
+ * "Could not resolve '-flat-foreground'" warnings and String->Paint cast errors.
+ * TDDisplayFX.addGUICSS adds the 'gui-css-root' style class to each decorated node,
+ * so the palette resolves there too. NB: do NOT use the universal '*' selector for
+ * this - that would define the palette on every node and shadow the dark-mode
+ * override (pamFlatLafDark.css) which redefines the palette on '.root' and relies
+ * on descendants resolving it from the nearest ancestor. The actual paint
+ * properties (-fx-background-color / -fx-text-fill) stay under '.root' below so
+ * they are not forced onto every node.
+ */
+.root, .gui-css-root {
+    /* ---- FlatLaf palette as looked-up colours (usable everywhere) ---- */
+    -flat-background:            #f2f2f2;
+    -flat-foreground:            #000000;
+    -flat-disabled-foreground:   #8c8c8c;
+    -flat-component-background:  #ffffff;
+    -flat-border:                #c2c2c2;
+    -flat-disabled-border:       #cecece;
+    -flat-focus:                 #98c2ea;
+    -flat-focused-border:        #89afd3;
+    -flat-accent:                #2675bf;
+    -flat-accent2:               #2385e2;
+    -flat-checkmark:             #4e9de8;
+    -flat-underline:             #3c83c5;
+    -flat-link:                  #236db2;
+    -flat-selection-inactive:    #d3d3d3;
+    -flat-separator:             #cdcdcd;
+    -flat-icon:                  #b1b1b1;
+    -flat-arrow:                 #666666;
+    -flat-hover:                 #f7f7f7;   /* Button.hoverBackground: darken(#fff,3%)   */
+    -flat-pressed:               #e6e6e6;   /* Button.pressedBackground: darken(#fff,10%) */
+    -flat-selected:              #cccccc;   /* ToggleButton.selectedBackground            */
+    -flat-menu-hover:            #e6e6e6;
+
+    /* ---- remap the Modena looked-up colours so un-styled controls
+            also pick up the FlatLaf palette ---- */
+    -fx-base:                        -flat-background;
+    -fx-background:                  -flat-background;
+    -fx-color:                       -flat-background;
+    -fx-control-inner-background:    -flat-component-background;
+    -fx-control-inner-background-alt:-flat-component-background;
+    -fx-accent:                      -flat-accent;
+    -fx-default-button:              -flat-component-background;
+    -fx-focus-color:                 -flat-focused-border;
+    -fx-faint-focus-color:           #98c2ea44;
+    -fx-selection-bar:               -flat-accent;
+    -fx-selection-bar-non-focused:   -flat-selection-inactive;
+    -fx-outer-border:                -flat-border;
+    -fx-inner-border:                -flat-component-background;
+    -fx-body-color:                  -flat-component-background;
+    -fx-text-box-border:             -flat-border;
+    -fx-text-base-color:             -flat-foreground;
+    -fx-text-background-color:       -flat-foreground;
+    -fx-text-inner-color:            -flat-foreground;
+    -fx-mark-color:                  -flat-arrow;
+    -fx-mark-highlight-color:        transparent;
+    -fx-shadow-highlight-color:      transparent;
+
+    /* ---- PAMGuard plot furniture. These are theme-neutral names (-pam-*)
+            so the rules that use them work with either base sheet; the dark
+            and night override sheets redefine them. ---- */
+    -pam-axis-background:  -flat-background;
+    -pam-axis-foreground:  -flat-foreground;
+    -pam-axis-line:        -flat-border;
+    -pam-plot-background:  #ffffff;          /* PamColor.PlOTWINDOW for the day scheme */
+    -pam-scroller-body:    rgba(70,70,70,0.45);
+    -pam-scroller-handle:  rgba(40,40,40,0.75);
+    -pam-scroller-grip:    rgba(235,235,235,0.9);
+
+    /* legacy PAMGuard names, kept for panes that reference them.
+       Dark grey to match the FlatLaf Swing icon colour. */
+    -fx-icon_col: #4d4d4d;
+    -icons-color: -fx-icon_col;
+    -fx-disabled-opacity: 0.6;
+}
+
+/* Paint the scene root only. These are actual painted properties (not lookups), so
+   they must stay scoped to '.root' - adding them to the palette selector above would
+   force a grey background and black text onto every node the sheet decorates. */
+.root {
+    -fx-background-color: -flat-background;
+    -fx-text-fill: -flat-foreground;
+}
+
+.text {
+    -fx-font-smoothing-type: gray;
+}
+
+.label {
+    -fx-text-fill: -flat-foreground;
+}
+
+.label:disabled {
+    -fx-text-fill: -flat-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+#label-title1 {
+    -fx-font-size: 16pt;
+    -fx-font-weight: bold;
+}
+
+#label-title2 {
+    -fx-font-size: 10pt;
+    -fx-font-weight: bold;
+}
+
+/* mnemonics */
+.button:show-mnemonics > .mnemonic-underline,
+.toggle-button:show-mnemonics > .mnemonic-underline,
+.radio-button:show-mnemonics > .mnemonic-underline,
+.check-box:show-mnemonics > .mnemonic-underline,
+.hyperlink:show-mnemonics > .mnemonic-underline,
+.split-menu-button:show-mnemonics > .mnemonic-underline,
+.menu-button:show-mnemonics > .mnemonic-underline {
+    -fx-stroke: -flat-foreground;
+}
+
+.mnemonic-underline {
+    -fx-stroke: transparent;
+}
+
+
+/********************************************
+*                                           *
+*       Button / ToggleButton               *
+*                                           *
+* FlatLaf: white fill, 1px #c2c2c2 border,  *
+* arc 6 (3px radius), margin 2,14,2,14,     *
+* minimumWidth 72.                          *
+*********************************************/
+
+.button,
+.toggle-button,
+.menu-button,
+.split-menu-button {
+    -fx-background-color: -flat-border, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-padding: 4 14 4 14;
+    -fx-text-fill: -flat-foreground;
+    -fx-alignment: center;
+    -fx-effect: null;
+}
+
+.button {
+    -fx-min-width: 72;
+}
+
+/* Opt-out of the FlatLaf 72px minimum for icon-only buttons (FlatLaf's
+   FlatButtonUI skips Button.minimumWidth when a button has no text, but
+   CSS cannot detect that - so icon-only buttons add this style class). */
+.icon-button {
+    -fx-min-width: 30;
+    -fx-padding: 4 6 4 6;
+}
+
+/* hover: Button.hoverBackground + hoverBorderColor(=focusedBorderColor) */
+.button:hover,
+.toggle-button:hover,
+.menu-button:hover,
+.split-menu-button:hover {
+    -fx-background-color: -flat-focused-border, -flat-hover;
+}
+
+/* focused: focusedBorderColor, background barely changes */
+.button:focused,
+.toggle-button:focused,
+.menu-button:focused,
+.split-menu-button:focused {
+    -fx-background-color: -flat-focused-border, #eaf3fb;
+}
+
+.button:armed,
+.toggle-button:armed,
+.menu-button:showing,
+.split-menu-button:showing {
+    -fx-background-color: -flat-focused-border, -flat-pressed;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -flat-border, -flat-selected;
+}
+
+.toggle-button:selected:hover,
+.toggle-button:selected:focused {
+    -fx-background-color: -flat-focused-border, -flat-selected;
+}
+
+/* default button: white fill with a 2px #4e9de8 border (FlatLightLaf
+   Button.default.borderWidth = 2) */
+.button:default {
+    -fx-background-color: -flat-checkmark, -flat-component-background;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 4, 2;
+    -fx-text-fill: -flat-foreground;
+}
+
+/* Opaque, square icon button used in the acoustic scroller strip. Like the
+   normal .button it keeps the 1px border line (outer background layer + 1px
+   inset), but with square corners, an opaque panel-coloured face and no
+   size/border change on focus, so the scroll arrows sit flush against the
+   scroll bar while staying visually delineated. Sizing/padding is left to
+   .icon-button, which these buttons also carry. Declared after the .button
+   rules so it wins on equal specificity. */
+.opaque-button-square {
+    -fx-background-color: -flat-border, -flat-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-effect: null;
+}
+
+.opaque-button-square:hover {
+    -fx-background-color: -flat-focused-border, -flat-pressed;
+}
+
+.opaque-button-square:focused {
+    -fx-background-color: -flat-focused-border, -flat-background;
+}
+
+.opaque-button-square:armed {
+    -fx-background-color: -flat-focused-border, -flat-selected;
+}
+
+.button:default:hover {
+    -fx-background-color: -flat-checkmark, -flat-hover;
+}
+
+.button:default:armed {
+    -fx-background-color: -flat-checkmark, -flat-pressed;
+}
+
+.button:disabled,
+.toggle-button:disabled,
+.menu-button:disabled,
+.split-menu-button:disabled {
+    -fx-background-color: -flat-disabled-border, -flat-background;
+    -fx-text-fill: -flat-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.button:disabled > .text,
+.toggle-button:disabled > .text {
+    -fx-fill: -flat-disabled-foreground;
+}
+
+/* Zero the vertical padding on the inner label / arrow-button regions so a
+   menu- or split-menu-button is the same height as a plain Button. A Button
+   renders its text directly (no inner region), so only the outer 4 14 4 14
+   padding applies; the menu/split variants wrap the content in a .label and
+   an .arrow-button that keep Modena's ~0.5em vertical padding, which would
+   otherwise stack on top of the outer padding and make them taller. */
+.menu-button > .label,
+.split-menu-button > .label {
+    -fx-padding: 0 0.5em 0 0;
+}
+
+.menu-button > .arrow-button,
+.split-menu-button > .arrow-button {
+    -fx-padding: 0 0 0 0.5em;
+}
+
+/* arrow of menu / split-menu buttons */
+.menu-button > .arrow-button > .arrow,
+.split-menu-button > .arrow-button > .arrow {
+    -fx-background-color: -flat-arrow;
+}
+
+
+/********************************************
+*                                           *
+*       Hyperlink                           *
+*                                           *
+*********************************************/
+
+.hyperlink {
+    -fx-text-fill: -flat-link;
+    -fx-underline: false;
+    -fx-border-color: transparent;
+}
+
+.hyperlink:hover,
+.hyperlink:visited:hover {
+    -fx-underline: true;
+}
+
+.hyperlink:visited {
+    -fx-text-fill: -flat-link;
+}
+
+.hyperlink:focused {
+    -fx-border-color: transparent;
+}
+
+
+/********************************************
+*                                           *
+*       CheckBox                            *
+*                                           *
+* FlatLaf light: 15px white box, 1px        *
+* #aeaeae border, arc 4 (2px radius);       *
+* selected: border + checkmark #4e9de8,     *
+* box stays white.                          *
+*********************************************/
+
+.check-box {
+    -fx-label-padding: 0 0 0 4;
+    -fx-text-fill: -flat-foreground;
+}
+
+.check-box > .box {
+    -fx-background-color: #aeaeae, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 3, 2;
+    -fx-padding: 3;
+    -fx-effect: null;
+}
+
+.check-box:hover > .box,
+.check-box:focused > .box {
+    -fx-background-color: #7b9ebe, -flat-component-background;
+}
+
+.check-box:pressed > .box {
+    -fx-background-color: #7b9ebe, -flat-pressed;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: transparent;
+    -fx-padding: 4.5;
+    -fx-shape: "M927.936 272.992l-68.288-68.288c-12.608-12.576-32.96-12.576-45.536 0l-409.44 409.44-194.752-194.752c-12.576-12.608-32.928-12.608-45.536 0l-68.288 68.288c-12.576 12.576-12.576 32.96 0 45.536l285.824 285.824c12.576 12.576 32.96 12.576 45.536 0l500.48-500.512c12.576-12.576 12.576-32.96 0-45.536z";
+}
+
+.check-box:selected > .box,
+.check-box:indeterminate > .box {
+    -fx-background-color: -flat-checkmark, -flat-component-background;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -flat-checkmark;
+}
+
+.check-box:indeterminate > .box > .mark {
+    -fx-background-color: -flat-checkmark;
+    -fx-shape: "M0,0H10V2H0Z";
+    -fx-padding: 1 4.5 1 4.5;
+}
+
+.check-box:disabled {
+    -fx-text-fill: -flat-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.check-box:disabled > .box {
+    -fx-background-color: #c6c6c6, -flat-background;
+}
+
+.check-box:disabled:selected > .box > .mark {
+    -fx-background-color: #a3a3a3;
+}
+
+
+/********************************************
+*                                           *
+*       RadioButton                         *
+*                                           *
+* Same palette as the checkbox; selected    *
+* dot is 8px @accentCheckmarkColor.         *
+*********************************************/
+
+.radio-button {
+    -fx-label-padding: 0 0 0 4;
+    -fx-text-fill: -flat-foreground;
+}
+
+.radio-button > .radio {
+    -fx-background-color: #aeaeae, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1em;
+    -fx-padding: 3.5;
+    -fx-effect: null;
+}
+
+.radio-button:hover > .radio,
+.radio-button:focused > .radio {
+    -fx-background-color: #7b9ebe, -flat-component-background;
+}
+
+.radio-button:pressed > .radio {
+    -fx-background-color: #7b9ebe, -flat-pressed;
+}
+
+.radio-button:selected > .radio {
+    -fx-background-color: -flat-checkmark, -flat-component-background;
+}
+
+.radio-button > .radio > .dot {
+    -fx-background-color: transparent;
+    -fx-background-radius: 1em;
+    -fx-background-insets: 0;
+    -fx-padding: 4;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -flat-checkmark;
+}
+
+.radio-button:disabled {
+    -fx-text-fill: -flat-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.radio-button:disabled > .radio {
+    -fx-background-color: #c6c6c6, -flat-background;
+}
+
+.radio-button:disabled:selected > .radio > .dot {
+    -fx-background-color: #a3a3a3;
+}
+
+
+/********************************************
+*                                           *
+*       Text input controls                 *
+*                                           *
+* FlatLaf: white, 1px #c2c2c2 border,       *
+* square corners (TextComponent.arc = 0),   *
+* margin 2,6,2,6. Focus swaps the border    *
+* to #89afd3 - no outer glow.               *
+*********************************************/
+
+.text-input {
+    -fx-background-color: -flat-border, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+    -fx-text-fill: -flat-foreground;
+    -fx-prompt-text-fill: -flat-disabled-foreground;
+    -fx-highlight-fill: -flat-accent;
+    -fx-highlight-text-fill: white;
+    -fx-cursor: text;
+    -fx-effect: null;
+}
+
+.text-input:focused {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+    -fx-effect: null;
+}
+
+.text-input:disabled {
+    -fx-background-color: -flat-disabled-border, -flat-background;
+    -fx-text-fill: -flat-disabled-foreground;
+    -fx-opacity: 1.0;
+}
+
+.text-area {
+    -fx-padding: 0;
+}
+
+.text-area .content {
+    -fx-background-color: -flat-component-background;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+}
+
+.text-area:disabled .content {
+    -fx-background-color: -flat-background;
+}
+
+
+/********************************************
+*                                           *
+*       ComboBox / ChoiceBox                *
+*                                           *
+* FlatLaf: white, 1px border, arc 5,        *
+* chevron arrow #666666, no separator for   *
+* non-editable combos.                      *
+*********************************************/
+
+.combo-box-base,
+.choice-box {
+    -fx-background-color: -flat-border, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-padding: 0;
+    -fx-effect: null;
+}
+
+.combo-box-base:hover,
+.choice-box:hover {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+}
+
+.combo-box-base:focused,
+.choice-box:focused,
+.combo-box-base:showing,
+.choice-box:showing {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+}
+
+.combo-box-base:disabled,
+.choice-box:disabled {
+    -fx-background-color: -flat-disabled-border, -flat-background;
+    -fx-opacity: 1.0;
+}
+
+.combo-box > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -flat-foreground;
+    -fx-padding: 3 4 3 7;
+}
+
+.combo-box:disabled > .list-cell,
+.choice-box:disabled > .label {
+    -fx-text-fill: -flat-disabled-foreground;
+}
+
+.choice-box > .label {
+    -fx-text-fill: -flat-foreground;
+    -fx-padding: 1 4 1 7;
+}
+
+.combo-box-base > .arrow-button,
+.choice-box > .open-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 8 0 6;
+}
+
+.combo-box-base > .arrow-button > .arrow,
+.choice-box > .open-button > .arrow {
+    -fx-background-color: -flat-arrow;
+    -fx-shape: "M 0 0 L 1.5 -1.5 L 5 2 L 8.5 -1.5 L 10 0 L 5 5 Z";
+    -fx-padding: 2.5 5 2.5 5;
+    -fx-background-insets: 0;
+}
+
+.combo-box-base:disabled > .arrow-button > .arrow,
+.choice-box:disabled > .open-button > .arrow {
+    -fx-background-color: #a6a6a6;
+}
+
+/* editable combo: square inner editor, subtle separator like FlatLaf */
+.combo-box:editable > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.combo-box:editable > .arrow-button {
+    -fx-background-color: -flat-border, #fafafa;
+    -fx-background-insets: 1 1 1 0, 1 1 1 1;
+    -fx-background-radius: 0 3 3 0, 0 3 3 0;
+}
+
+/* popup list */
+.combo-box-popup > .list-view {
+    -fx-background-color: #aeaeae, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 3);
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 3 8 3 8;
+    -fx-background-color: -flat-component-background;
+    -fx-text-fill: -flat-foreground;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: -flat-menu-hover;
+    -fx-text-fill: -flat-foreground;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background-color: -flat-accent;
+    -fx-text-fill: white;
+}
+
+
+/********************************************
+*                                           *
+*       Spinner                             *
+*                                           *
+* FlatLaf: white, arc 5, right-hand button  *
+* column #fafafa separated by the border    *
+* colour, chevron arrows.                   *
+*********************************************/
+
+.spinner {
+    -fx-background-color: -flat-border, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-pref-width: 100px;
+    -fx-effect: null;
+}
+
+.spinner:focused {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+}
+
+.spinner:disabled {
+    -fx-background-color: -flat-disabled-border, -flat-background;
+    -fx-opacity: 1.0;
+}
+
+.spinner .text-field,
+.spinner .text-field:focused,
+.spinner .text-field:disabled {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 3 6 3 6;
+}
+
+/* default layout: stacked button column on the right */
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: -flat-border, #fafafa;
+    -fx-background-insets: 1 1 0 0, 1 1 0 1;
+    -fx-background-radius: 0 3 0 0, 0 2 0 0;
+    -fx-padding: 2 7 2 7;
+}
+
+.spinner .decrement-arrow-button {
+    -fx-background-insets: 0 1 1 0, 0 1 1 1;
+    -fx-background-radius: 0 0 3 0, 0 0 2 0;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: -flat-border, #ececec;
+}
+
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed {
+    -fx-background-color: -flat-border, -flat-pressed;
+}
+
+.spinner .increment-arrow-button .increment-arrow {
+    -fx-background-color: -flat-arrow;
+    -fx-shape: "M 0 0 L 1.5 1.5 L 5 -2 L 8.5 1.5 L 10 0 L 5 -5 Z";
+    -fx-padding: 2 3.5 2 3.5;
+}
+
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: -flat-arrow;
+    -fx-shape: "M 0 0 L 1.5 -1.5 L 5 2 L 8.5 -1.5 L 10 0 L 5 5 Z";
+    -fx-padding: 2 3.5 2 3.5;
+}
+
+/* split-arrows-horizontal layout (widely used in PAMGuard): decrement
+   button on the left, increment on the right, chevrons pointing out */
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+    -fx-background-color: -flat-border, #fafafa;
+    -fx-background-insets: 1 0 1 1, 1 1 1 1;
+    -fx-background-radius: 3 0 0 3, 2 0 0 2;
+    -fx-padding: 3 6 3 6;
+}
+
+.spinner.split-arrows-horizontal .increment-arrow-button {
+    -fx-background-color: -flat-border, #fafafa;
+    -fx-background-insets: 1 1 1 0, 1 1 1 1;
+    -fx-background-radius: 0 3 3 0, 0 2 2 0;
+    -fx-padding: 3 6 3 6;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button:hover,
+.spinner.split-arrows-horizontal .increment-arrow-button:hover {
+    -fx-background-color: -flat-border, #ececec;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button:pressed,
+.spinner.split-arrows-horizontal .increment-arrow-button:pressed {
+    -fx-background-color: -flat-border, -flat-pressed;
+}
+
+.spinner.split-arrows-horizontal .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: -flat-arrow;
+    -fx-shape: "M 0 0 L 1.5 1.5 L -2 5 L 1.5 8.5 L 0 10 L -5 5 Z";
+    -fx-padding: 3.5 2 3.5 2;
+}
+
+.spinner.split-arrows-horizontal .increment-arrow-button .increment-arrow {
+    -fx-background-color: -flat-arrow;
+    -fx-shape: "M 0 0 L -1.5 1.5 L 2 5 L -1.5 8.5 L 0 10 L 5 5 Z";
+    -fx-padding: 3.5 2 3.5 2;
+}
+
+
+/********************************************
+*                                           *
+*       ToggleSwitch (ControlsFX)           *
+*                                           *
+* Used by PamToggleSwitch. FlatLaf has no   *
+* switch control, so this follows its       *
+* palette: grey off-track, accent on-track, *
+* white thumb. Slightly smaller than the    *
+* ControlsFX default.                       *
+*********************************************/
+
+.toggle-switch > .thumb-area {
+    -fx-background-color: #aeaeae, #d9d9d9;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1em;
+    -fx-padding: 0.6em 1.1em 0.6em 1.1em;
+}
+
+.toggle-switch:selected > .thumb-area {
+    -fx-background-color: -flat-accent;
+    -fx-background-insets: 0;
+}
+
+.toggle-switch > .thumb {
+    -fx-background-color: #aeaeae, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 1em;
+    -fx-padding: 0.6em;
+    -fx-effect: null;
+}
+
+.toggle-switch:selected > .thumb {
+    -fx-background-color: -flat-accent, -flat-component-background;
+}
+
+.toggle-switch:disabled > .thumb-area {
+    -fx-background-color: -flat-disabled-border, -flat-background;
+}
+
+.toggle-switch:disabled:selected > .thumb-area {
+    -fx-background-color: #a3c1de;
+    -fx-background-insets: 0;
+}
+
+.toggle-switch .label {
+    -fx-text-fill: -flat-foreground;
+}
+
+
+/********************************************
+*                                           *
+*       Slider                              *
+*                                           *
+* FlatLaf: 2px #c4c4c4 track, 12px round    *
+* thumb in @accentSliderColor (#2385e2).    *
+*********************************************/
+
+.slider .track {
+    -fx-background-color: #c4c4c4;
+    -fx-background-insets: 1;
+    -fx-background-radius: 2;
+    -fx-pref-height: 4;
+    -fx-pref-width: 4;
+}
+
+.slider .thumb {
+    -fx-background-color: -flat-accent2;
+    -fx-background-insets: 0;
+    -fx-background-radius: 1em;
+    -fx-pref-height: 12;
+    -fx-pref-width: 12;
+    -fx-effect: null;
+}
+
+.slider .thumb:hover {
+    -fx-background-color: #1b79d0;
+}
+
+.slider .thumb:pressed {
+    -fx-background-color: #1971c4;
+}
+
+.slider:focused .thumb {
+    -fx-background-color: #98c2ea80, -flat-accent2;
+    -fx-background-insets: -3, 0;
+}
+
+.slider:disabled .track {
+    -fx-background-color: #d1d1d1;
+}
+
+.slider:disabled .thumb {
+    -fx-background-color: #d1d1d1;
+}
+
+.slider .axis {
+    -fx-tick-label-fill: -flat-disabled-foreground;
+}
+
+
+/********************************************
+*                                           *
+*       ProgressBar / ProgressIndicator     *
+*                                           *
+* FlatLaf: thin 4px bar, track darken(bg,   *
+* 13%) = #d1d1d1, bar @accentSliderColor.   *
+*********************************************/
+
+.progress-bar > .track {
+    -fx-background-color: #d1d1d1;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -flat-accent2;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-padding: 2;
+}
+
+.progress-bar {
+    -fx-pref-height: 4;
+    -fx-effect: null;
+}
+
+.progress-indicator {
+    -fx-progress-color: -flat-accent2;
+}
+
+
+/********************************************
+*                                           *
+*       ScrollBar / ScrollPane              *
+*                                           *
+* FlatLaf (macOS variant): 10px wide,       *
+* track #f5f5f5, pill thumb #dbdbdb with    *
+* 2px insets, no arrow buttons.             *
+*********************************************/
+
+.scroll-bar {
+    -fx-background-color: #f5f5f5;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: #dbdbdb;
+    -fx-background-insets: 2;
+    -fx-background-radius: 1em;
+}
+
+.scroll-bar > .thumb:hover {
+    -fx-background-color: #c2c2c2;
+}
+
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: #a8a8a8;
+}
+
+/* hide the arrow buttons, as FlatLaf does (ScrollBar.showButtons = false) */
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar > .increment-button > .increment-arrow,
+.scroll-bar > .decrement-button > .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-shape: null;
+    -fx-padding: 0;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: #f5f5f5;
+}
+
+
+/********************************************
+*                                           *
+*       Separator / SplitPane               *
+*                                           *
+*********************************************/
+
+.separator > .line {
+    -fx-border-color: -flat-separator;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-insets: 0;
+}
+
+.separator:vertical > .line {
+    -fx-border-width: 0 0 0 1;
+}
+
+.split-pane {
+    -fx-background-color: -flat-background;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: -flat-background;
+    -fx-padding: 0 2 0 2;
+}
+
+
+/********************************************
+*                                           *
+*       TabPane                             *
+*                                           *
+* FlatLaf underlined tabs: flat header on   *
+* @background, 32px tabs, 3px accent        *
+* underline on the selected tab, 1px        *
+* #c2c2c2 line under the whole header,      *
+* hover darken(bg,7%) = #e0e0e0.            *
+*********************************************/
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 0;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -flat-border, -flat-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 6 12 6 12;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 3 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: transparent;
+    -fx-border-color: -flat-underline;
+    -fx-border-width: 0 0 3 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-text-fill: -flat-foreground;
+    -fx-alignment: center;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:disabled > .tab-container > .tab-label {
+    -fx-text-fill: -flat-disabled-foreground;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .focus-indicator {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.tab-pane > .tab-content-area {
+    -fx-background-color: -flat-background;
+    -fx-padding: 0;
+}
+
+/* floating tab panes keep a light border */
+.tab-pane.floating > .tab-content-area {
+    -fx-background-color: -flat-border, -flat-background;
+    -fx-background-insets: 0, 1;
+}
+
+
+/********************************************
+*                                           *
+*       ListView / TreeView / TableView     *
+*                                           *
+* White data areas, no striping, accent     *
+* selection, #d3d3d3 unfocused selection.   *
+*********************************************/
+
+.list-view,
+.tree-view,
+.table-view,
+.tree-table-view {
+    -fx-background-color: -flat-border, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-padding: 1;
+}
+
+.list-view:focused,
+.tree-view:focused,
+.table-view:focused,
+.tree-table-view:focused {
+    -fx-background-color: -flat-focused-border, -flat-component-background;
+}
+
+.list-cell,
+.tree-cell {
+    -fx-background-color: -flat-component-background;
+    -fx-text-fill: -flat-foreground;
+    -fx-padding: 2 6 2 6;
+}
+
+.table-row-cell,
+.tree-table-row-cell {
+    -fx-background-color: -flat-component-background;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-cell,
+.tree-table-cell {
+    -fx-text-fill: -flat-foreground;
+    -fx-padding: 3 4 3 4;
+}
+
+.list-cell:filled:hover,
+.tree-cell:filled:hover,
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
+    -fx-background-color: #ebebeb;
+}
+
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.list-cell:filled:selected:hover,
+.tree-cell:filled:selected:hover,
+.table-row-cell:filled:selected:hover,
+.tree-table-row-cell:filled:selected:hover {
+    -fx-background-color: -flat-selection-inactive;
+    -fx-text-fill: -flat-foreground;
+}
+
+.list-view:focused .list-cell:filled:selected,
+.tree-view:focused .tree-cell:filled:selected,
+.table-view:focused .table-row-cell:filled:selected,
+.tree-table-view:focused .tree-table-row-cell:filled:selected {
+    -fx-background-color: -flat-accent;
+    -fx-text-fill: white;
+}
+
+.list-view:focused .list-cell:filled:selected .text,
+.tree-view:focused .tree-cell:filled:selected .text,
+.table-view:focused .table-row-cell:filled:selected .text,
+.tree-table-view:focused .tree-table-row-cell:filled:selected .text {
+    -fx-fill: white;
+}
+
+.table-row-cell:filled:selected .table-cell,
+.tree-table-row-cell:filled:selected .tree-table-cell {
+    -fx-text-fill: inherit;
+}
+
+/* tree disclosure arrows: chevron in @icon grey */
+.tree-cell > .tree-disclosure-node > .arrow,
+.tree-table-row-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -flat-icon;
+    -fx-shape: "M 0 0 L 1.5 -1.5 L 5 2 L 8.5 -1.5 L 10 0 L 5 5 Z";
+    -fx-padding: 2.5 4 2.5 4;
+    -fx-rotate: -90;
+}
+
+.tree-cell:expanded > .tree-disclosure-node > .arrow,
+.tree-table-row-cell:expanded > .tree-disclosure-node > .arrow {
+    -fx-rotate: 0;
+}
+
+/* table headers: white, 1px separator lines darken(#fff,10%) = #e6e6e6 */
+.table-view > .column-header-background,
+.tree-table-view > .column-header-background {
+    -fx-background-color: -flat-component-background;
+    -fx-background-insets: 0;
+}
+
+.table-view .column-header,
+.tree-table-view .column-header,
+.table-view .filler,
+.tree-table-view .filler {
+    -fx-background-color: transparent, -flat-component-background;
+    -fx-background-insets: 0, 0 1 1 0;
+    -fx-border-color: transparent #e6e6e6 #e6e6e6 transparent;
+    -fx-border-width: 0 1 1 0;
+    -fx-size: 25;
+}
+
+.table-view .column-header .label,
+.tree-table-view .column-header .label {
+    -fx-text-fill: -flat-foreground;
+    -fx-alignment: center-left;
+    -fx-padding: 2 4 2 4;
+}
+
+.table-view .column-header:hover,
+.tree-table-view .column-header:hover {
+    -fx-background-color: transparent, #f2f2f2;
+}
+
+.table-view .arrow,
+.tree-table-view .column-header .arrow {
+    -fx-background-color: -flat-icon;
+}
+
+
+/********************************************
+*                                           *
+*       Menus                               *
+*                                           *
+* White menu background, #aeaeae popup      *
+* border, accent selection, hover #e6e6e6   *
+* in the menu bar.                          *
+*********************************************/
+
+.menu-bar {
+    -fx-background-color: -flat-separator, -flat-component-background;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0;
+}
+
+.menu-bar > .container > .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 4 8 4 8;
+    -fx-min-width: 0;
+}
+
+.menu-bar > .container > .menu-button:hover {
+    -fx-background-color: -flat-menu-hover;
+}
+
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: -flat-accent;
+}
+
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: white;
+}
+
+.context-menu {
+    -fx-background-color: #aeaeae, -flat-component-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-padding: 4 1 4 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 4);
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 4 8 4 8;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -flat-foreground;
+    -fx-padding: 0 16 0 0;
+}
+
+.menu-item:focused,
+.menu-item:hovered {
+    -fx-background-color: -flat-accent;
+}
+
+.menu-item:focused > .label,
+.menu-item:hovered > .label {
+    -fx-text-fill: white;
+}
+
+.menu-item:disabled > .label {
+    -fx-text-fill: -flat-disabled-foreground;
+}
+
+.menu-item > .accelerator-text {
+    -fx-text-fill: #4d4d4d;
+}
+
+.menu-item:focused > .accelerator-text {
+    -fx-text-fill: white;
+}
+
+.menu-item > .right-container > .arrow {
+    -fx-background-color: -flat-arrow;
+}
+
+.menu-item:focused > .right-container > .arrow {
+    -fx-background-color: white;
+}
+
+.radio-menu-item:checked > .left-container > .radio,
+.check-menu-item:checked > .left-container > .check {
+    -fx-background-color: -flat-checkmark;
+}
+
+.radio-menu-item:focused:checked > .left-container > .radio,
+.check-menu-item:focused:checked > .left-container > .check {
+    -fx-background-color: white;
+}
+
+.context-menu .separator > .line {
+    -fx-border-color: #e6e6e6;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-insets: 0;
+}
+
+
+/********************************************
+*                                           *
+*       ToolBar                             *
+*                                           *
+* Flat, transparent buttons; hover          *
+* darken(#fff,12%) = #e0e0e0, arc 6.        *
+*********************************************/
+
+.tool-bar {
+    -fx-background-color: -flat-background;
+    -fx-background-insets: 0;
+    -fx-padding: 2 4 2 4;
+    -fx-spacing: 2;
+}
+
+.tool-bar > .button,
+.tool-bar > .toggle-button,
+.tool-bar > .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 3;
+    -fx-padding: 4 6 4 6;
+    -fx-min-width: 0;
+    -fx-effect: null;
+}
+
+.tool-bar > .button:hover,
+.tool-bar > .toggle-button:hover,
+.tool-bar > .menu-button:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+.tool-bar > .button:armed,
+.tool-bar > .toggle-button:armed {
+    -fx-background-color: #d9d9d9;
+}
+
+.tool-bar > .toggle-button:selected {
+    -fx-background-color: -flat-selected;
+}
+
+
+/********************************************
+*                                           *
+*       Tooltip                             *
+*                                           *
+* FlatLaf: lighten(bg,3%) = #fafafa fill,   *
+* shade(bg,40%) = #919191 border, black     *
+* text, padding 4,6.                        *
+*********************************************/
+
+.tooltip {
+    -fx-background-color: #919191, #fafafa;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-text-fill: -flat-foreground;
+    -fx-padding: 4 6 4 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2);
+    -fx-font-size: 1em;
+}
+
+
+/********************************************
+*                                           *
+*       TitledPane                          *
+*                                           *
+*********************************************/
+
+.titled-pane {
+    -fx-text-fill: -flat-foreground;
+}
+
+.titled-pane > .title {
+    -fx-background-color: -flat-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 5 8 5 8;
+    -fx-font-weight: bold;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+.titled-pane > .title > .arrow-button > .arrow {
+    -fx-background-color: -flat-arrow;
+}
+
+.titled-pane > .content {
+    -fx-background-color: -flat-background;
+    -fx-border-color: -flat-separator;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 8;
+}
+
+.titled-pane:focused > .title {
+    -fx-background-color: -flat-background;
+    -fx-color: -flat-background;
+}
+
+
+/********************************************
+*                                           *
+*       DialogPane                          *
+*                                           *
+*********************************************/
+
+.dialog-pane {
+    -fx-background-color: -flat-background;
+    -fx-padding: 0;
+}
+
+.dialog-pane > .content {
+    -fx-padding: 12;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-padding: 8 12 12 12;
+}
+
+
+/********************************************
+*                                           *
+*       Titled Border (PAMGuard custom)     *
+*                                           *
+* Mirrors the FlatLaf/Swing TitledBorder:   *
+* a plain 1px Separator.foreground line     *
+* with the title inset over the top edge.   *
+*********************************************/
+
+.bordered-titled-title {
+    -fx-background-color: -flat-background;
+    -fx-translate-y: -10;
+    -fx-text-fill: -flat-foreground;
+}
+
+.bordered-titled-border {
+    -fx-content-display: top;
+    -fx-border-insets: 12 4 4 4;
+    -fx-background-color: -flat-background;
+    -fx-border-color: -flat-separator;
+    -fx-border-radius: 3;
+    -fx-border-width: 1;
+}
+
+.bordered-titled-content {
+    -fx-padding: 10 10 10 10;
+}
+
+
+/********************************************
+*                                           *
+*      ikonli icons (PAMGuard custom)       *
+*                                           *
+*********************************************/
+
+.ikonli-font-icon {
+    -fx-text-fill: -fx-icon_col;
+    -fx-fill: -fx-icon_col;
+}
+
+#module-icon .ikonli-font-icon {
+    -fx-icon-color: black;
+}
+
+
+/********************************************
+*                                           *
+*      Navigation drawer / flip pane        *
+*      (PAMGuard custom)                    *
+*                                           *
+* Recoloured to the FlatLaf accent so the   *
+* buttons match the rest of the theme.      *
+*********************************************/
+
+.flip-pane-back-button,
+.flip-pane-back-button:hover,
+.flip-pane-back-button:focused,
+.flip-pane-back-button:pressed {
+    -fx-background-radius: 0 5 5 0;
+    -fx-border-radius: 0 5 5 0;
+    -fx-background-color: -flat-accent;
+}
+
+.navigation-drawer-button,
+.navigation-drawer-button:hover,
+.navigation-drawer-button:focused,
+.navigation-drawer-button:pressed {
+    -fx-alignment: center-left;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-min-width: 0;
+}
+
+.navigation-drawer-button:hover {
+    -fx-background-color: -flat-menu-hover;
+}
+
+.navigation-drawer-button-selected,
+.navigation-drawer-button-selected:hover,
+.navigation-drawer-button-selected:focused,
+.navigation-drawer-button-selected:pressed {
+    -fx-background-color: -flat-accent;
+    -fx-border-color: -flat-accent;
+    -fx-text-fill: white;
+}
+
+.navigation-drawer-button-selected .ikonli-font-icon {
+    -fx-icon-color: white;
+    -fx-fill: white;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * PAMGuard plot furniture                                                     *
+ *                                                                             *
+ * The axis panes, plot areas and scroll bar of the time display and of the    *
+ * data map. Unlike ordinary controls these are bare Panes and Canvases with   *
+ * no background of their own, so before these rules existed they showed       *
+ * whatever happened to be behind them and stayed light whatever the colour    *
+ * scheme.                                                                     *
+ *                                                                             *
+ * The colours come from the theme-neutral -pam-* lookups declared in the      *
+ * palette at the top of this sheet, so the same rules work in the Windows and *
+ * the FlatLaf base sheets and are re-pointed by the dark / night overrides.   *
+ *                                                                             *
+ ******************************************************************************/
+
+/* The pane an axis is drawn on - pamViewFX.fxNodes.pamAxis.PamAxisPane and
+   PamAxisPane2. Sits alongside the plot, so it takes the window background. */
+.pam-axis-pane {
+    -fx-background-color: -pam-axis-background;
+}
+
+/* The plot itself, and the acoustic scroller under the time display. Both show
+   data, so they take the plot window colour rather than the window background. */
+.pam-plot-pane,
+.pam-scroller-pane {
+    -fx-background-color: -pam-plot-background;
+}
+
+/* The draggable visible-range rectangle on the acoustic scroller. */
+.pam-scroller-body {
+    -fx-background-color: -pam-scroller-body;
+}
+
+.pam-scroller-handle {
+    -fx-background-color: -pam-scroller-handle;
+}
+
+.pam-scroller-grip {
+    -fx-stroke: -pam-scroller-grip;
+}
+
+/*
+ * The drag icon which appears on top of the visible-range rectangle when the
+ * rectangle is too narrow to grab. Takes the handle colour so that it reads as
+ * part of the scroller, but opaque so that it stands out against the text box
+ * it sits on top of.
+ */
+.pam-scroller-drag-icon {
+    -fx-background-color: -pam-scroller-handle;
+    -fx-background-radius: 3;
+}
+
+.pam-scroller-drag-glyph {
+    -fx-icon-color: -pam-scroller-grip;
+}
+
+/*
+ * JavaFX NumberAxis, used by PamAxisPane2. Modena derives all of these from
+ * -fx-background / -fx-text-background-color with derive(), which washes out
+ * against a dark background, so set them from the palette directly.
+ */
+.axis {
+    -fx-tick-label-fill: -pam-axis-foreground;
+}
+
+.axis > .axis-label,
+.axis .text {
+    -fx-fill: -pam-axis-foreground;
+    -fx-text-fill: -pam-axis-foreground;
+}
+
+.axis .axis-tick-mark,
+.axis .axis-minor-tick-mark {
+    -fx-stroke: -pam-axis-line;
+}
+
+/* keep Modena's one-sided axis lines, but in a palette colour */
+.axis:top {
+    -fx-border-color: transparent transparent -pam-axis-line transparent;
+}
+
+.axis:right {
+    -fx-border-color: transparent transparent transparent -pam-axis-line;
+}
+
+.axis:bottom {
+    -fx-border-color: -pam-axis-line transparent transparent transparent;
+}
+
+.axis:left {
+    -fx-border-color: transparent -pam-axis-line transparent transparent;
+}

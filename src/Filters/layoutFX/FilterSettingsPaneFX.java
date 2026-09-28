@@ -115,6 +115,11 @@ public class FilterSettingsPaneFX extends SettingsPane<FilterParameters_2>{
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("filters.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return mainPane;
 	}

@@ -8,17 +8,12 @@ package deepWhistle;
 public class DeepWhistleProcess extends MaskedFFTProcess {
 	
 	
-	/**
-	 * Reference to the DeepWhistleMask used in this process.
-	 */
-	private DeepWhistleMask deepWhisltleMask;
-	
 	private DeepWhistleControl deepWhistleControl;
 
 	public DeepWhistleProcess(DeepWhistleControl control) {
 		super(control);
 		this.deepWhistleControl = control;
-		this.setMask(deepWhisltleMask = new DeepWhistleMask(this));
+		// the mask is created in prepareProcess() based on the selected mask type.
 	}
 	
 	

@@ -574,6 +574,11 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("sound_acquisition.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return flipPane;
 	}

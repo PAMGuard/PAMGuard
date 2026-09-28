@@ -12,11 +12,11 @@ public class HydrophoneLocators {
 	
 //	private ArrayList<Class<HydrophoneLocator>> arrayLocators;
 	
-	private boolean isNetwork;
+//	private boolean isNetwork;
 	private boolean isViewer; 
 	
 	private HydrophoneLocators() {
-		isNetwork = (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER);
+//		isNetwork = (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER);
 		isViewer= (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW);
 //		RegisterLocator(new StaticHydrophoneLocatorSystem());
 		RegisterLocator(new StraightHydrophoneLocatorSystem());

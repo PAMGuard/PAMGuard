@@ -16,6 +16,30 @@ public class SpectrogramMarkParams implements Serializable, ManagedParameters {
 	private AnnotationChoices annotationChoices;
 
 	/**
+	 * Show the annotation dialog automatically whenever a new annotation is marked
+	 * out on a display. Boolean rather than boolean so that settings saved before
+	 * this option existed deserialise to null and get the default behaviour (dialog
+	 * shown) rather than a silent false.
+	 */
+	private Boolean showDialogOnNewMark = true;
+
+	/**
+	 * @return true if the annotation dialog should open automatically when a new
+	 *         annotation is marked out.
+	 */
+	public boolean isShowDialogOnNewMark() {
+		return showDialogOnNewMark == null ? true : showDialogOnNewMark;
+	}
+
+	/**
+	 * @param showDialogOnNewMark true to open the annotation dialog automatically
+	 *                            when a new annotation is marked out.
+	 */
+	public void setShowDialogOnNewMark(boolean showDialogOnNewMark) {
+		this.showDialogOnNewMark = showDialogOnNewMark;
+	}
+
+	/**
 	 * @return the annotationChoices
 	 */
 	public AnnotationChoices getAnnotationChoices(SpectrogramMarkAnnotationHandler annotationChoiceHandler) {

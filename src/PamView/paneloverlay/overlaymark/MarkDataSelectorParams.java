@@ -39,6 +39,12 @@ public class MarkDataSelectorParams implements Serializable, Cloneable, ManagedP
 		OverlayMarkDataInfo dataInfo = overlayChoices.get(dataName);
 		if (dataInfo == null) {
 			dataInfo = new OverlayMarkDataInfo(dataName);
+			// Default a newly-seen data block to selected. Without this, box/polygon
+			// marks silently pass zero data units through the observer's mark data
+			// selector (OverlayDataInfo.select defaults to false), so no menu appears
+			// until the user manually ticks the block in 'Mark observer options'.
+			// Single-click selection bypasses this filter, hence the inconsistency.
+			dataInfo.select = true;
 			overlayChoices.put(dataName, dataInfo);
 		}
 		return dataInfo;

@@ -135,18 +135,21 @@ public class NavigationDrawer extends PamBorderPane {
 	public void styleButton(Labeled control){
 		Insets buttonInsets=new Insets(0,leftInset,0,0);
 		control.setAlignment(Pos.CENTER_LEFT);
+		control.getStyleClass().add("navigation-drawer-button");
 		defaultControlStyle( control);
 		control.setPadding(buttonInsets);
 		control.setPrefWidth(Double.MAX_VALUE);
 		control.setPrefHeight(40);
 	}
-	
+
 	private void defaultControlStyle(Labeled control) {
-		control.setStyle("-fx-alignment: center-left; -fx-background-color: transparent;   -fx-border-color: transparent;   -fx-background-radius: 0 0 0 0;  -fx-border-radius: 0 0 0 0;");
+		control.getStyleClass().remove("navigation-drawer-button-selected");
 	}
-	
+
 	private void selectedControlStyle(Labeled control) {
-		control.setStyle("-fx-alignment: center-left; -fx-background-color: -color-accent-6;   -fx-border-color: -color-accent-6;   -fx-background-radius: 0 0 0 0;  -fx-border-radius: 0 0 0 0;");
+		if (!control.getStyleClass().contains("navigation-drawer-button-selected")) {
+			control.getStyleClass().add("navigation-drawer-button-selected");
+		}
 	}
 
 

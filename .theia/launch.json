@@ -1,0 +1,714 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "type": "java",
+      "name": "Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    },
+    {
+      "type": "java",
+      "name": "HydrophoneImport",
+      "request": "launch",
+      "mainClass": "Array.importHydrophoneData.HydrophoneImport",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FastFilterTest",
+      "request": "launch",
+      "mainClass": "Filters.FastFilterTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FilterSpeed",
+      "request": "launch",
+      "mainClass": "Filters.FilterSpeed",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MainPanel",
+      "request": "launch",
+      "mainClass": "JSSHTerminal.MainPanel",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MultiTerminal",
+      "request": "launch",
+      "mainClass": "JSSHTerminal.MultiTerminal",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamguardVersionInfo",
+      "request": "launch",
+      "mainClass": "PamController.PamguardVersionInfo",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "XMLTest",
+      "request": "launch",
+      "mainClass": "PamController.XMLTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MultiportTest",
+      "request": "launch",
+      "mainClass": "PamController.command.MultiportTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestSort",
+      "request": "launch",
+      "mainClass": "PamUtils.TestSort",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "NISTTimeTest",
+      "request": "launch",
+      "mainClass": "PamUtils.time.ntp.NISTTimeTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamWorkerTest",
+      "request": "launch",
+      "mainClass": "PamUtils.worker.PamWorkerTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "SwingChartTest",
+      "request": "launch",
+      "mainClass": "PamView.chart.swing.SwingChartTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ExceptionSpeedTest",
+      "request": "launch",
+      "mainClass": "PamguardMVC.ExceptionSpeedTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ScaleTest2D",
+      "request": "launch",
+      "mainClass": "PamguardMVC.ScaleTest2D",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "LogRegWeka",
+      "request": "launch",
+      "mainClass": "Stats.LogRegWeka",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FluxgateTest",
+      "request": "launch",
+      "mainClass": "angleMeasurement.FluxgateTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestFileDates",
+      "request": "launch",
+      "mainClass": "backupmanager.stream.TestFileDates",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DateRoundingTest",
+      "request": "launch",
+      "mainClass": "binaryFileStorage.DateRoundingTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FileAccessTest",
+      "request": "launch",
+      "mainClass": "binaryFileStorage.FileAccessTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FileWriteTest",
+      "request": "launch",
+      "mainClass": "clickDetector.FileWriteTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "CTTemplateClassifier",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.classification.templateClassifier.CTTemplateClassifier",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TemplateClassification",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.classification.templateClassifier.TemplateClassification",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MHTTests",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.clickTrainAlgorithms.mht.MHTTests",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MHTAlgorithmMAT",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.clickTrainAlgorithms.mht.mhtMAT.MHTAlgorithmMAT",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestMHTAlgorithmFX",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.clickTrainAlgorithms.mht.test.TestMHTAlgorithmFX",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestMHTBitSet",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.clickTrainAlgorithms.mht.test.TestMHTBitSet",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestMHTChi2",
+      "request": "launch",
+      "mainClass": "clickTrainDetector.clickTrainAlgorithms.mht.test.TestMHTChi2",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "CPODImporter",
+      "request": "launch",
+      "mainClass": "cpod.CPODImporter",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "CPODReader",
+      "request": "launch",
+      "mainClass": "cpod.CPODReader",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FPODReader",
+      "request": "launch",
+      "mainClass": "cpod.FPODReader",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "JSONTest",
+      "request": "launch",
+      "mainClass": "dataAnnotation.JSONTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MLDetectionsManager",
+      "request": "launch",
+      "mainClass": "export.MLExport.MLDetectionsManager",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FftTest",
+      "request": "launch",
+      "mainClass": "fftManager.FftTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "WavFileFFTTest",
+      "request": "launch",
+      "mainClass": "fftManager.WavFileFFTTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DBSpeedTest",
+      "request": "launch",
+      "mainClass": "generalDatabase.DBSpeedTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DBTest",
+      "request": "launch",
+      "mainClass": "generalDatabase.DBTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DatabaseFetchSpeed",
+      "request": "launch",
+      "mainClass": "generalDatabase.DatabaseFetchSpeed",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PostgreSQLTest",
+      "request": "launch",
+      "mainClass": "generalDatabase.postgresql.PostgreSQLTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "InfiniteSort",
+      "request": "launch",
+      "mainClass": "gpl.whiten.InfiniteSort",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ConsumerTester",
+      "request": "launch",
+      "mainClass": "ipcomms.ConsumerTester",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ProducerTester",
+      "request": "launch",
+      "mainClass": "ipcomms.ProducerTester",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "Client",
+      "request": "launch",
+      "mainClass": "ishmaelComms.Client",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "UnitTest",
+      "request": "launch",
+      "mainClass": "likelihoodDetectionModule.UnitTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "UnitTest(1)",
+      "request": "launch",
+      "mainClass": "likelihoodDetectionModule.linearAverageSpectra.UnitTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "UnitTest(2)",
+      "request": "launch",
+      "mainClass": "likelihoodDetectionModule.normalizer.UnitTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "UnitTest(3)",
+      "request": "launch",
+      "mainClass": "likelihoodDetectionModule.spectralEti.UnitTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "UnitTest(4)",
+      "request": "launch",
+      "mainClass": "likelihoodDetectionModule.thresholdDetector.UnitTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MTClassifierTest",
+      "request": "launch",
+      "mainClass": "matchedTemplateClassifer.MTClassifierTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MccJnaTest",
+      "request": "launch",
+      "mainClass": "mcc.mccjna.MccJnaTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "MelFilterBank",
+      "request": "launch",
+      "mainClass": "mel.MelFilterBank",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "Shell",
+      "request": "launch",
+      "mainClass": "nidaqdev.networkdaq.Shell",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestHistogram",
+      "request": "launch",
+      "mainClass": "pamMaths.TestHistogram",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "TestRegression",
+      "request": "launch",
+      "mainClass": "pamMaths.TestRegression",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamLauncherFXApp",
+      "request": "launch",
+      "mainClass": "pamViewFX.PamLauncherFXApp",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamLauncherFXAppLauncher",
+      "request": "launch",
+      "mainClass": "pamViewFX.PamLauncherFXAppLauncher",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ConnectioPaneTest",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxNodes.connectionPane.test.ConnectioPaneTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ConnectionPaneTestStarter",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxNodes.connectionPane.test.ConnectionPaneTestStarter",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamDraggableListApp",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxNodes.orderedList.PamDraggableListApp",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamDraggableListAppLauncher",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxNodes.orderedList.PamDraggableListAppLauncher",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamDateAxis",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxNodes.pamAxis.PamDateAxis",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamFXSwingComparison",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxStyles.PamFXSwingComparison",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamSwingFXComparisonLauncher",
+      "request": "launch",
+      "mainClass": "pamViewFX.fxStyles.PamSwingFXComparisonLauncher",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "Pamguard",
+      "request": "launch",
+      "mainClass": "pamguard.Pamguard",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamguardFX",
+      "request": "launch",
+      "mainClass": "pamguard.PamguardFX",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamguardFXLauncher",
+      "request": "launch",
+      "mainClass": "pamguard.PamguardFXLauncher",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "LayeredXyChartsSample",
+      "request": "launch",
+      "mainClass": "qa.chart.fx.LayeredXyChartsSample",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DLDownloadManager",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.DLDownloadManager",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "PamZipModelClassifier",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DeepAcousticsModel",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.deepAcoustics.DeepAcousticsModel",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DeepAcousticsTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.deepAcoustics.DeepAcousticsTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DelphinIDClickTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClickTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DelphinIDUtils",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDUtils",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DelphinIDWhistleTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDWhistleTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "GenericModelParser",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParser",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "GenericModelTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.genericModel.GenericModelTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "KetosModelTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.ketos.KetosModelTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "OrcaSpotWorkerExe",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.orcaSpot.OrcaSpotWorkerExe",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "OrcaSpotWorkerExe2",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.dlClassification.orcaSpot.OrcaSpotWorkerExe2",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FFTSpinnerBug",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.layoutFX.FFTSpinnerBug",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "FFTSpinnerBugLauncher",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.layoutFX.FFTSpinnerBugLauncher",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DLTransformsPaneLauncher",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.layoutFX.dlTransfroms.DLTransformsPaneLauncher",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DLTransformsPaneTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.layoutFX.dlTransfroms.DLTransformsPaneTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "SegmenterTest",
+      "request": "launch",
+      "mainClass": "rawDeepLearningClassifier.segmenter.SegmenterTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "ReportWriterTest",
+      "request": "launch",
+      "mainClass": "reportWriter.ReportWriterTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "AttTest",
+      "request": "launch",
+      "mainClass": "rocca.AttTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "RoccaSpecPopUp",
+      "request": "launch",
+      "mainClass": "rocca.RoccaSpecPopUp",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "RoccaTrainClassifier",
+      "request": "launch",
+      "mainClass": "rocca.RoccaTrainClassifier",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "RoccaTrainClassifier2",
+      "request": "launch",
+      "mainClass": "rocca.RoccaTrainClassifier2",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "RoccaTrainClassifier3",
+      "request": "launch",
+      "mainClass": "rocca.RoccaTrainClassifier3",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "RockBlockTest",
+      "request": "launch",
+      "mainClass": "rockBlock.RockBlockTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "RandomSpeedTest",
+      "request": "launch",
+      "mainClass": "simulatedAcquisition.RandomSpeedTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "SimSpeedTest",
+      "request": "launch",
+      "mainClass": "simulatedAcquisition.SimSpeedTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "GridTest",
+      "request": "launch",
+      "mainClass": "simulatedAcquisition.movement.GridTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "SoundCardList",
+      "request": "launch",
+      "mainClass": "soundPlayback.soundcard.SoundCardList",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "STXMLFile",
+      "request": "launch",
+      "mainClass": "soundtrap.STXMLFile",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DMXMLQueryTest",
+      "request": "launch",
+      "mainClass": "tethys.dbxml.DMXMLQueryTest",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "DeploymentWrapper",
+      "request": "launch",
+      "mainClass": "tethys.deployment.DeploymentWrapper",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "NilusChecker",
+      "request": "launch",
+      "mainClass": "tethys.niluswraps.NilusChecker",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "NilusUnpacker",
+      "request": "launch",
+      "mainClass": "tethys.niluswraps.NilusUnpacker",
+      "projectName": "Pamguard"
+    },
+    {
+      "type": "java",
+      "name": "SpeciesTest",
+      "request": "launch",
+      "mainClass": "tethys.species.SpeciesTest",
+      "projectName": "Pamguard"
+    }
+  ]
+}

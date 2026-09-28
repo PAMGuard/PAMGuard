@@ -9,7 +9,7 @@ import pamMaths.PamVector;
 import GPS.GpsData;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
-import targetMotionModule.TargetMotionInformation;
+import difar.targetmotion.TargetMotionInformation;
 
 public class TrackedGroupTargetMotionInformation implements TargetMotionInformation {
 
@@ -73,6 +73,17 @@ public class TrackedGroupTargetMotionInformation implements TargetMotionInformat
 	@Override
 	public int getNDetections() {
 		return trackedGroupDataUnits.size();
+	}
+
+	@Override
+	public ArrayList<ArrayList<double[]>> getDelayHydrophonePositions() {
+		// time delays are not used for tracked groups.
+		return null;
+	}
+
+	@Override
+	public double getSpeedOfSound() {
+		return 1500.;
 	}
 
 	@Override

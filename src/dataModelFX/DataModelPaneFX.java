@@ -24,6 +24,9 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import pamViewFX.PamGuiTabFX;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
@@ -110,7 +113,7 @@ public class DataModelPaneFX extends PamBorderPane {
 		dataModelSettingsManager = new DataModelSettingsManager(this);
 
 
-		// addDragDropListeners();
+		addDragDropListeners();
 
 		// //TEMP//////////////////////////
 		// Button tempButton=new Button("Temp false");
@@ -237,51 +240,50 @@ public class DataModelPaneFX extends PamBorderPane {
 	}
 
 	// /**
-	// * Add listeners to allow importing via drag and drop of .wav files/other
-	// files
-	// */
-	// public void addDragDropListeners(){
-	//
-	// dataModelPane.setOnDragOver(new EventHandler<DragEvent>() {
-	// @Override
-	// public void handle(DragEvent event) {
-	// Dragboard db = event.getDragboard();
-	// if (db.hasFiles()) {
-	// event.acceptTransferModes(TransferMode.COPY);
-	// } else {
-	// event.consume();
-	// }
-	// }
-	// });
-	//
-	// // Dropping over surface
-	// dataModelPane.setOnDragDropped(new EventHandler<DragEvent>() {
-	// @Override
-	// public void handle(DragEvent event) {
-	// Dragboard db = event.getDragboard();
-	// boolean success = false;
-	// if (db.hasFiles()) {
-	// success = true;
-	// filemport(db.getFiles());
-	// }
-	// event.setDropCompleted(success);
-	// event.consume();
-	// }
-	// });
-	//
-	// }
+	/**
+	 * Add listeners to allow importing via drag and drop of sound files (and other
+	 * files). Importing is only offered while the configuration is blank; once a
+	 * module has been added the drop is no longer accepted so the user uses the
+	 * normal module-setup tools instead.
+	 */
+	private void addDragDropListeners() {
+
+		setOnDragOver((DragEvent event) -> {
+			Dragboard db = event.getDragboard();
+			if (db.hasFiles() && isImportAllowed()) {
+				event.acceptTransferModes(TransferMode.COPY);
+			}
+			event.consume();
+		});
+
+		setOnDragDropped((DragEvent event) -> {
+			Dragboard db = event.getDragboard();
+			boolean success = false;
+			if (db.hasFiles() && isImportAllowed()) {
+				filemport(db.getFiles());
+				success = true;
+			}
+			event.setDropCompleted(success);
+			event.consume();
+		});
+	}
 
 	/**
-	 * Called whenever files are imported into the data model. e.g. by drag and
-	 * drop.
+	 * @return true if files may be imported - i.e. the configuration is still blank.
+	 */
+	private boolean isImportAllowed() {
+		return PamController.getInstance().getNumControlledUnits() == 0;
+	}
+
+	/**
+	 * Called whenever files are imported into the data model, e.g. by drag and drop.
+	 * Hands the files to the {@link PamController.pamWizard.PamWizardManager} which
+	 * offers the user a list of auto-configuration options.
+	 *
+	 * @param files the dropped files/folders.
 	 */
 	public void filemport(List<File> files) {
-		// TODO - some sort of import manager? viewer v real time mode
-		String filePath = null;
-		for (File file : files) {
-			filePath = file.getAbsolutePath();
-			//			System.out.println(filePath);
-		}
+		PamController.getInstance().getPamWizardManager().newImportedFiles(files);
 	}
 
 	/**

@@ -180,6 +180,11 @@ public class BinaryStoreSettingsPaneFX extends SettingsPane<BinaryStoreSettings>
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("binary_storage.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return mainPane;
 	}

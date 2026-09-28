@@ -42,6 +42,7 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 
 
 /**
@@ -70,11 +71,35 @@ public class PamColors implements PamSettings {
 	
 	private JCheckBoxMenuItem[] colourMenuItems;
 
+	/**
+	 * Menu item for the standard Windows look and feel option. Only created on
+	 * Windows - see {@link #getLookAndFeelMenuItem()}.
+	 */
+	private JCheckBoxMenuItem windowsLafMenuItem;
+
 //	private MenuItemEnabler nightMenuEnabler = new MenuItemEnabler(); 
 //	private MenuItemEnabler dayMenuEnabler = new MenuItemEnabler(); 
 //	private MenuItemEnabler printMenuEnabler = new MenuItemEnabler(); 
 	
 	private ColorSettings colorSettings = new ColorSettings();
+
+	/**
+	 * Name of the colour scheme last applied by {@link #setColors()}, so that
+	 * {@link #colourSchemeVersion} only counts real changes.
+	 */
+	private String lastAppliedScheme;
+
+	/**
+	 * Incremented every time the colour scheme actually changes.
+	 * <p>
+	 * Components which are not in a window at the time of a change - the module
+	 * specific part of the top tool bar is added and removed as the user moves
+	 * between tabs, see {@link TopToolBar#setActiveControlledUnit} - miss both the
+	 * look and feel update and the recolouring, and come back still wearing the old
+	 * scheme. Comparing this against the version a component was last styled at
+	 * tells you whether it needs bringing up to date.
+	 */
+	private int colourSchemeVersion;
 
 	
 	private PamColors() {
@@ -90,10 +115,6 @@ public class PamColors implements PamSettings {
 		JMenuItem menuItem;
 		
 		ColourScheme currentScheme = getColourScheme();
-		String currSchemeName = "";
-		if (currentScheme != null) {
-			currSchemeName = currentScheme.getName();
-		}
 
 		int n = colorSettings.getNumSchemes();
 		colourMenuItems = new JCheckBoxMenuItem[n];
@@ -102,8 +123,8 @@ public class PamColors implements PamSettings {
 			colourMenuItems[i] = new JCheckBoxMenuItem(name);
 			colourMenuItems[i].addActionListener(new SelectScheme(name));
 			colorMenu.add(colourMenuItems[i]);
-			colourMenuItems[i].setSelected(name.equalsIgnoreCase(currSchemeName));
 		}
+		updateSchemeMenuItems();
 		JMenu blindMenu = new JMenu("Colour Pallets");
 		colorMenu.add(blindMenu);
 		ButtonGroup bg = new ButtonGroup();
@@ -126,11 +147,102 @@ public class PamColors implements PamSettings {
 		return colorMenu;
 	}
 	
+	/**
+	 * Menu item for the standard Windows look and feel, for the Display menu.
+	 * <p>
+	 * FlatLaf is PAMGuard's standard look, but it isn't to everyone's taste, so on
+	 * Windows the plain Windows look and feel can be had instead. The Windows look
+	 * and feel has no dark mode, so while it is selected the dark colour schemes are
+	 * greyed out in the colour scheme menu.
+	 *
+	 * @return the menu item, or null on platforms where the option isn't offered.
+	 */
+	public JMenuItem getLookAndFeelMenuItem() {
+		if (!PamLookAndFeel.isWindowsLookAndFeelAvailable()) {
+			return null;
+		}
+		windowsLafMenuItem = new JCheckBoxMenuItem("Windows Look and Feel");
+		windowsLafMenuItem.setToolTipText("Use the standard Windows look and feel instead of the "
+				+ "PAMGuard (FlatLaf) one. The Windows look and feel has no dark mode, so the "
+				+ "Dark and Night colour schemes are unavailable while it's selected.");
+		windowsLafMenuItem.setSelected(PamLookAndFeel.isWindowsLookAndFeel());
+		windowsLafMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setWindowsLookAndFeel(windowsLafMenuItem.isSelected());
+			}
+		});
+		return windowsLafMenuItem;
+	}
+
+	/**
+	 * Switch between the standard Windows look and feel and FlatLaf, and restyle
+	 * everything that's open.
+	 * <p>
+	 * The Windows look and feel has no dark mode, so selecting it while a dark
+	 * colour scheme is in use drops back to the Day scheme.
+	 *
+	 * @param windows true for the Windows look and feel, false for FlatLaf.
+	 */
+	public void setWindowsLookAndFeel(boolean windows) {
+		colorSettings.setWindowsLookAndFeel(windows);
+		PamLookAndFeel.setWindowsLookAndFeel(windows);
+		/*
+		 * Nothing about the colour scheme has changed, but every component has just been
+		 * repainted by a different look and feel, so components which are detached from
+		 * the window at the moment need bringing up to date when they come back - see
+		 * PamLookAndFeel.refreshComponentTheme().
+		 */
+		colourSchemeVersion++;
+		if (windows && colourScheme != null && colourScheme.isDark()) {
+			// setColourScheme does the restyling, and ticks the menus afterwards.
+			setColourScheme(ColourScheme.DAYSCHEME);
+		}
+		else {
+			setColors();
+			SwingUtilities.invokeLater(this::colourSchemeChanged);
+		}
+	}
+
+	/**
+	 * Tick the currently selected colour scheme in the colour scheme menu, and grey
+	 * out the dark schemes if the Windows look and feel is in use.
+	 */
+	private void updateSchemeMenuItems() {
+		if (colourMenuItems == null) {
+			return;
+		}
+		String currSchemeName = colourScheme == null ? "" : colourScheme.getName();
+		boolean windowsLaf = PamLookAndFeel.isWindowsLookAndFeel();
+		for (int i = 0; i < colourMenuItems.length; i++) {
+			String name = colourMenuItems[i].getText();
+			boolean darkScheme = PamLookAndFeel.isDarkSchemeName(name);
+			colourMenuItems[i].setSelected(name.equalsIgnoreCase(currSchemeName));
+			colourMenuItems[i].setEnabled(!windowsLaf || !darkScheme);
+			// tool tips still show on a disabled menu item, so say why it's greyed out.
+			colourMenuItems[i].setToolTipText(windowsLaf && darkScheme
+					? "Not available with the Windows look and feel, which has no dark mode" : null);
+		}
+		if (windowsLafMenuItem != null) {
+			windowsLafMenuItem.setSelected(windowsLaf);
+		}
+	}
+
 	protected void setBlindPalet(int selected) {
 		colorSettings.setColourBlindPalet(selected);
 		colorSettings.rebuildSchemes(selected);
 
 		colourScheme = colorSettings.selectScheme(colorSettings.getCurrentScheme());
+		/*
+		 * The scheme keeps its name when only the palette changes, so setColors() will
+		 * not count this as a new version. It very much is one - every whale and channel
+		 * colour has just changed, and there may not even be the same number of them -
+		 * so bump the version and tell the displays about it here, exactly as a scheme
+		 * change does.
+		 */
+		colourSchemeVersion++;
+		setColors();
+		SwingUtilities.invokeLater(this::colourSchemeChanged);
 	}
 
 //	/**
@@ -152,15 +264,9 @@ public class PamColors implements PamSettings {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			colourScheme = colorSettings.selectScheme(schemeName);
-			setColors();
-			if (colourMenuItems != null) {
-				for (int i = 0; i < colourMenuItems.length; i++) {
-					colourMenuItems[i].setSelected(colourMenuItems[i].getText().equals(schemeName));
-				}
-			}
+			setColourScheme(schemeName);
 		}
-		
+
 	}
 	
 	private class EditWhaleColours implements ActionListener {
@@ -212,28 +318,117 @@ public class PamColors implements PamSettings {
 			return;
 		}
 		switch (changeType) {
-		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
+			/*
+			 * The dark look and feel is installed as soon as the colour scheme is restored
+			 * from settings, which is before the main window exists. Any window built
+			 * before that point would have been given the old look and feel, so rebuild
+			 * them all once now that the GUI is up.
+			 */
+			SwingUtilities.invokeLater(new SetColoursLater(true));
+			break;
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 		case PamControllerInterface.CHANGED_DISPLAY_SETTINGS:
-			SwingUtilities.invokeLater(new SetColoursLater());
+			SwingUtilities.invokeLater(new SetColoursLater(false));
 		}
 	}
-	
+
 	class SetColoursLater implements Runnable {
+
+		/**
+		 * Rebuild the UI of every open window before re-colouring, whether or not the
+		 * look and feel has just changed.
+		 */
+		private final boolean refreshLookAndFeel;
+
+		SetColoursLater(boolean refreshLookAndFeel) {
+			this.refreshLookAndFeel = refreshLookAndFeel;
+		}
 
 		@Override
 		public void run() {
+			if (refreshLookAndFeel && PamLookAndFeel.isChangedFromStartup()) {
+				PamLookAndFeel.refreshWindows();
+			}
 			setColors();
 		}
-		
+
 	}
 
+	/**
+	 * Apply the current colour scheme everywhere: install the Swing look and feel
+	 * which goes with it, re-colour every {@link ColorManaged} Swing component, and
+	 * restyle the registered JavaFX displays.
+	 * <p>
+	 * Must run on the event dispatch thread (changing the look and feel from another
+	 * thread can deadlock Swing), so it bounces itself onto the EDT if called from
+	 * elsewhere - notably from the JavaFX application thread, which is where the
+	 * dark mode toggles in the JavaFX GUI live.
+	 */
 	public void setColors() {
+		if (!SwingUtilities.isEventDispatchThread()) {
+			SwingUtilities.invokeLater(this::setColors);
+			return;
+		}
+		String schemeName = colourScheme == null ? null : colourScheme.getName();
+		if (schemeName != null && !schemeName.equals(lastAppliedScheme)) {
+			lastAppliedScheme = schemeName;
+			colourSchemeVersion++;
+		}
+		/*
+		 * Text fields, check boxes, combo box popups, scroll bars, tab headers and
+		 * internal frame title bars are all painted by the look and feel, not by us, so
+		 * a dark scheme needs a dark look and feel.
+		 */
+		if (PamLookAndFeel.setLookAndFeel(colourScheme)) {
+			/*
+			 * Rebuilding the UI of every open window is deliberately left to a later pass of
+			 * the event queue.
+			 *
+			 * Changing the look and feel restyles HTML text components (the help viewer and
+			 * anything else showing HTML), and the Swing text package delivers the resulting
+			 * document change events asynchronously, through
+			 * DefaultStyledDocument.ChangeUpdateRunnable. Rebuilding the component trees in
+			 * this same pass would leave those queued events walking view hierarchies that
+			 * have since been thrown away, which lands in a JDK re-entrancy bug in
+			 * View.forwardUpdate and throws an ArrayIndexOutOfBoundsException out of
+			 * javax.swing.text.CompositeView.getView. Harmless - the views are rebuilt
+			 * anyway - but it fills the log with stack traces. Letting the queue drain first
+			 * keeps the two apart.
+			 */
+			SwingUtilities.invokeLater(() -> {
+				PamLookAndFeel.refreshWindows();
+				recolourComponents();
+			});
+		}
+		else {
+			recolourComponents();
+		}
+	}
+
+	/**
+	 * Apply the current colour scheme to the Swing components which implement
+	 * {@link ColorManaged}, and to the registered JavaFX displays.
+	 */
+	private void recolourComponents() {
 		if (PamGUIManager.isSwing()) notifyAllComponents();
 
-//		javax.swing.UIManager.put("ScrollBar.background", new javax.swing.plaf.ColorUIResource(255,0,0));
-//		javax.swing.UIManager.put("ScrollBar.highlight", new javax.swing.plaf.ColorUIResource(0,255,0));
-//		javax.swing.UIManager.put("Button.foreground", new javax.swing.plaf.ColorUIResource(0,0,255));
+		// and the JavaFX panes embedded in the Swing GUI (time display, data map...).
+		setFXColours();
+	}
+
+	/**
+	 * Restyle the JavaFX displays for the current colour scheme. Wrapped in a try /
+	 * catch so that a system without a working JavaFX toolkit can't stop the Swing
+	 * side of the colour change.
+	 */
+	private void setFXColours() {
+		try {
+			PamStylesManagerFX.getPamStylesManagerFX().updateStyles();
+		}
+		catch (Throwable e) {
+			System.out.println("Unable to update JavaFX styles: " + e.getMessage());
+		}
 	}
 	
 	private void notifyAllComponents() {
@@ -282,7 +477,18 @@ public class PamColors implements PamSettings {
 		if (ColorManaged.class.isAssignableFrom(c.getClass())) {
 			PamColor colourId = ((ColorManaged) c).getColorId();
 			if (colourId != null) {
-				setColor(c, ((ColorManaged) c).getColorId());
+				try {
+					setColor(c, colourId);
+				}
+				catch (Exception e) {
+					/*
+					 * Components are free to override setBackground and do what they like in
+					 * there, so one badly behaved component mustn't be allowed to abort the walk
+					 * and leave the rest of the display in the old colour scheme.
+					 */
+					System.out.printf("Error setting colour of %s: %s\n", c.getClass().getName(), e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 		// try to colour in frmae borderw with a better night time colour. 
@@ -373,6 +579,31 @@ public class PamColors implements PamSettings {
 		return colourScheme.getWhaleColour(col);
 	}
 
+	/**
+	 * Get the colour that symbols left at the default black should be drawn in for
+	 * the current colour scheme.
+	 *
+	 * @return the default symbol colour.
+	 * @see ColourScheme#getDefaultSymbolColour()
+	 */
+	public Color getDefaultSymbolColour() {
+		return colourScheme.getDefaultSymbolColour();
+	}
+
+	/**
+	 * Adapt a symbol or line colour to the current colour scheme, so that symbols
+	 * which have been left at the default black are visible on the dark schemes'
+	 * plot windows. Colours which have actually been chosen, by a module or by the
+	 * user, are returned unchanged.
+	 *
+	 * @param colour the colour a symbol would be drawn in, may be null
+	 * @return the colour to draw it in, the same object if nothing needs changing.
+	 * @see ColourScheme#adaptSymbolColour(Color)
+	 */
+	public Color adaptSymbolColour(Color colour) {
+		return colourScheme.adaptSymbolColour(colour);
+	}
+
 	public Color getChannelColor(int iChan) {
 		Color col = colourScheme.getChannelColour(iChan);
 		if (col == null) {
@@ -418,7 +649,17 @@ public class PamColors implements PamSettings {
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		ColorSettings newSettings = (ColorSettings) pamControlledUnitSettings.getSettings();
 		this.colorSettings = newSettings.clone();
+		/*
+		 * Settings written by an older version won't contain any scheme added since,
+		 * e.g. the Dark scheme, so make sure the list is up to date before selecting.
+		 */
+		colorSettings.checkSchemes();
+		PamLookAndFeel.setWindowsLookAndFeel(colorSettings.isWindowsLookAndFeel());
 		colourScheme = colorSettings.selectScheme(colorSettings.getCurrentScheme());
+		if (PamLookAndFeel.isWindowsLookAndFeel() && colourScheme != null && colourScheme.isDark()) {
+			// the Windows look and feel has no dark mode, so a saved dark scheme can't be honoured.
+			colourScheme = colorSettings.selectScheme(ColourScheme.DAYSCHEME);
+		}
 
 		colourScheme.setWhaleColor(7,  new Color(255,128,192)); // dirty pink
 		colourScheme.setWhaleColor(6,  new Color(255,128,0)); // orange
@@ -558,6 +799,52 @@ public class PamColors implements PamSettings {
 	 */
 	public ColourScheme getColourScheme() {
 		return colourScheme;
+	}
+
+	/**
+	 * Get a counter which increments every time the colour scheme changes.
+	 * <p>
+	 * Anything which can be detached from the window while a scheme change happens
+	 * should remember the version it was last styled at and, when it comes back,
+	 * refresh itself if the version has moved on - see
+	 * {@link TopToolBar#setActiveControlledUnit}.
+	 *
+	 * @return the current colour scheme version.
+	 */
+	public int getColourSchemeVersion() {
+		return colourSchemeVersion;
+	}
+
+	/**
+	 * Set the colour scheme by name and refresh all colours.
+	 * @param schemeName - the scheme name, e.g. ColourScheme.DAYSCHEME or ColourScheme.NIGHTSCHEME
+	 */
+	public void setColourScheme(String schemeName) {
+		colourScheme = colorSettings.selectScheme(schemeName);
+		setColors();
+		/*
+		 * Everything below touches Swing, and this is also called from the JavaFX
+		 * application thread by the dark mode toggles in the JavaFX GUI, so make sure it
+		 * happens on the event dispatch thread. It is queued after the work setColors
+		 * has just queued there.
+		 */
+		SwingUtilities.invokeLater(this::colourSchemeChanged);
+	}
+
+	/**
+	 * Tidy up after a colour scheme change: tick the right item in the colour scheme
+	 * menu, and tell the displays their settings have changed so that anything which
+	 * draws itself rather than being painted by Swing or CSS - the plots, maps and
+	 * the JavaFX canvases - redraws with the new colours. Without that a display
+	 * which isn't scrolling (e.g. anything in viewer mode) keeps the old colours
+	 * until the next time something happens to make it repaint.
+	 */
+	private void colourSchemeChanged() {
+		updateSchemeMenuItems();
+		PamController pamController = PamController.getInstance();
+		if (pamController != null && pamController.isInitializationComplete()) {
+			pamController.notifyModelChanged(PamControllerInterface.CHANGED_DISPLAY_SETTINGS);
+		}
 	}
 
 }

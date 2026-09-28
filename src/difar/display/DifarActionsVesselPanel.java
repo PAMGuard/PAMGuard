@@ -37,6 +37,7 @@ import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
 import difar.DIFARMessage;
 import difar.DifarControl;
+import difar.SonobuoyRecord;
 import difar.DifarParameters;
 
 /**
@@ -186,8 +187,7 @@ public class DifarActionsVesselPanel implements DIFARDisplayUnit{
 			return;
 		}
 		int nChan = PamUtils.getNumChannels(sourceChannelMap);
-		Streamer streamer = null;
-		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+
 		//		if (nChan == 0) {
 //			ArrayManager.getArrayManager().showArrayDialog(difarControl.getGuiFrame());
 //		}
@@ -200,17 +200,23 @@ public class DifarActionsVesselPanel implements DIFARDisplayUnit{
 			menuItem.addActionListener(new DeployChannel(-1));
 			for (int i = 0; i < nChan; i++) {
 				int aChan = PamUtils.getNthChannel(i, sourceChannelMap);
-				int streamerInd = array.getStreamerForPhone(aChan);
-				streamer = array.getStreamer(streamerInd);
-				Double head = streamer.getHeading();
-				StreamerDataUnit sdu = ArrayManager.getArrayManager().getStreamerDatabBlock().getLastUnit(1<<aChan);
-				String name = sdu.getStreamerData().getStreamerName();
-				String deployTime = PamCalendar.formatDateTime2(sdu.getTimeMilliseconds());
-				String str = "Deploy channel " + aChan 
-								+ " (replaces buoy: " + name  
-								+ "@" + deployTime 
-								+ " (" + sdu.getGpsData().toString() + ") "
-								+ " Mag. Correction: " + head; 
+				/*
+				 * Name the buoy in force on this channel now, from the sonobuoy
+				 * history. The array holds whichever record was loaded last,
+				 * which is not always the one in the water.
+				 */
+				SonobuoyRecord buoy = difarControl.getSonobuoyHistory()
+						.getRecordAt(aChan, PamCalendar.getTimeInMillis());
+				String str;
+				if (buoy == null) {
+					str = "Deploy channel " + aChan;
+				}
+				else {
+					str = "Deploy channel " + aChan
+							+ " (replaces buoy: " + buoy.getName()
+							+ "@" + PamCalendar.formatDateTime2(buoy.getTimeMillis())
+							+ " Mag. Correction: " + buoy.getHeading() + ")";
+				}
 				menuItem = popMenu.add(str);
 				menuItem.addActionListener(new DeployChannel(aChan));
 			}
@@ -233,8 +239,7 @@ public class DifarActionsVesselPanel implements DIFARDisplayUnit{
 			return;
 		}
 		int nChan = PamUtils.getNumChannels(sourceChannelMap);
-		Streamer streamer = null;
-		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+
 		//		if (nChan == 0) {
 //			ArrayManager.getArrayManager().showArrayDialog(difarControl.getGuiFrame());
 //		}
@@ -248,15 +253,15 @@ public class DifarActionsVesselPanel implements DIFARDisplayUnit{
 //			menuItem.addActionListener(new DeployChannel(-1));
 			for (int i = 0; i < nChan; i++) {
 				int aChan = PamUtils.getNthChannel(i, sourceChannelMap);
-				int streamerInd = array.getStreamerForPhone(aChan);
-				streamer = array.getStreamer(streamerInd);
-				StreamerDataUnit sdu = ArrayManager.getArrayManager().getStreamerDatabBlock().getLastUnit(1<<aChan);
-				String name = sdu.getStreamerData().getStreamerName();
-				if (sdu==null) return;
-				String deployTime = PamCalendar.formatDateTime2(sdu.getTimeMilliseconds());
-				String str = "End buoy: " + name 
-								+ " (ch " + aChan 
-								+ " delployed @ " + deployTime;
+				// Only a buoy that is in force can be ended.
+				SonobuoyRecord buoy = difarControl.getSonobuoyHistory()
+						.getRecordAt(aChan, PamCalendar.getTimeInMillis());
+				if (buoy == null) {
+					continue;
+				}
+				String str = "End buoy: " + buoy.getName()
+								+ " (ch " + aChan
+								+ " deployed @ " + PamCalendar.formatDateTime2(buoy.getTimeMillis()) + ")";
 				menuItem = popMenu.add(str);
 				menuItem.addActionListener(new EndBuoyChannel(aChan));
 			}

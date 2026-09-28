@@ -9,6 +9,10 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
+import annotation.calcs.snr.SNRAnnotation;
+import annotation.calcs.spl.SPLAnnotation;
+import annotation.string.StringAnnotation;
+import annotation.userforms.UserFormAnnotation;
 import bearinglocaliser.annotation.BearingAnnotation;
 import bearinglocaliser.annotation.BearingAnnotationType;
 import clickDetector.ClickClassifiers.annotation.ClickClassificationType;
@@ -19,6 +23,7 @@ import rawDeepLearningClassifier.logging.DLAnnotation;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Array;
+import us.hebi.matlab.mat.types.Cell;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
 
@@ -50,26 +55,41 @@ public class MLAnnotationsManager {
 		if (parentblock.getAnnotationHandler()==null) return;
 
 		DataAnnotationType annotType;
-		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getAvailableAnnotationTypes();
+		/*
+		 * The types in use, which for a handler that lets the user choose (the
+		 * spectrogram annotations, for one) is a subset of the available ones - taking
+		 * the first getNumUsedAnnotationTypes() of the available list instead would walk
+		 * the wrong types altogether and export none of the annotations the user had
+		 * switched on.
+		 */
+		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getUsedAnnotationTypes();
 
 
-		for (int i=0; i<parentblock.getAnnotationHandler().getNumUsedAnnotationTypes(); i++) {
+		for (int i=0; i<annotationTypes.size(); i++) {
 
 			annotType = annotationTypes.get(i);
 
-			//now iterate through the data annotations within the data unit and find the data annotation	
-			//Maybe not necessary but much safer than assuming data type list is same as annotatio list. 
+			//now iterate through the data annotations within the data unit and find the data annotation
+			//Maybe not necessary but much safer than assuming data type list is same as annotatio list.
 			DataAnnotation dataAnnotation;
+			DataAnnotation foundAnnotation = null;
 			for (int j=0; j<dataUnit.getNumDataAnnotations(); j++) {
-				dataAnnotation=  dataUnit.getDataAnnotation(j); 
+				dataAnnotation=  dataUnit.getDataAnnotation(j);
 				if (dataAnnotation.getDataAnnotationType().getAnnotationName().equals(annotType.getAnnotationName())){
-					//add the annotation even if it null
-					addAnnotations( mlStruct,  index,  dataUnit,  dataAnnotation, annotType);
+					foundAnnotation = dataAnnotation;
 					break;
-				} 
+				}
 			}
 
-		}; 
+			/*
+			 * Add the annotation even if the data unit hasn't got one - it then goes in as
+			 * an empty array. Otherwise the field would be missing for that element of the
+			 * structure array, which is what the dissimilar structure exceptions are about:
+			 * a spectrogram annotation the user left blank is a very ordinary thing.
+			 */
+			addAnnotations( mlStruct,  index,  dataUnit,  foundAnnotation, annotType);
+
+		};
 
 	}
 
@@ -98,10 +118,40 @@ public class MLAnnotationsManager {
 		case DLAnnotationType.NAME:
 			name="dlclassification";
 			break;
+
+		default:
+			/*
+			 * Annotation types whose name is chosen by the user rather than fixed by the
+			 * annotation class - the note and label of a spectrogram annotation are both
+			 * StringAnnotationType, named whatever the module called them. Fall back to the
+			 * annotation name itself; it must never be null, or the field it is added under
+			 * would be too.
+			 */
+			name = toFieldName(annotationType.getAnnotationName());
+			break;
 		}
 
 		return name;
 
+	}
+
+	/**
+	 * Turn an annotation name into something which can be used as a MATLAB
+	 * structure field name or an R list name: lower case, only letters, digits and
+	 * underscores, and never starting with a digit.
+	 *
+	 * @param annotationName - the name of the annotation, may be null.
+	 * @return a name safe to use as a field name.
+	 */
+	private static String toFieldName(String annotationName) {
+		if (annotationName == null || annotationName.length() == 0) {
+			return "annotation";
+		}
+		String name = annotationName.toLowerCase().replaceAll("[^a-z0-9_]", "_");
+		if (!Character.isLetter(name.charAt(0))) {
+			name = "a_" + name;
+		}
+		return name;
 	}
 
 	/**
@@ -145,15 +195,71 @@ public class MLAnnotationsManager {
 			break;
 
 		default:
-			System.out.println("MLAnnotationsManager: Annotation: " + dataAnnotation.getDataAnnotationType().getAnnotationName() 
-					+ " for " + dataUnit + " not yet supported: ");
-			return;
+			/*
+			 * The annotation types which can be added to anything, and so are named by
+			 * whoever added them rather than by a constant - the note, label, SPL and SNR of
+			 * a spectrogram annotation, and logger form data. Dispatched on the annotation
+			 * class since there is no name to switch on.
+			 */
+			annotation = genericAnnotation2MAT(dataAnnotation);
+			if (annotation == null) {
+				System.out.println("MLAnnotationsManager: Annotation: " + dataAnnotation.getDataAnnotationType().getAnnotationName()
+						+ " for " + dataUnit + " not yet supported: ");
+				return;
+			}
+			break;
 
 		}
-		
+
 		mlStruct.set(getAnnotationNameMAT(annotationType),index,annotation);
 
 
+	}
+
+
+	/**
+	 * Convert the annotation types which are not tied to one sort of detection, and
+	 * so have no name constant to switch on: the note and label of a spectrogram
+	 * annotation (strings), the SPL and SNR measurements, and logger form data.
+	 *
+	 * @param dataAnnotation - the annotation to convert.
+	 * @return the MATLAB array for the annotation, or null if it isn't one of these.
+	 */
+	private Array genericAnnotation2MAT(DataAnnotation dataAnnotation) {
+
+		if (dataAnnotation instanceof StringAnnotation) {
+			String string = ((StringAnnotation<?>) dataAnnotation).getString();
+			return Mat5.newString(string == null ? "" : string);
+		}
+
+		if (dataAnnotation instanceof SNRAnnotation) {
+			return Mat5.newScalar(((SNRAnnotation) dataAnnotation).getSnr());
+		}
+
+		if (dataAnnotation instanceof SPLAnnotation) {
+			SPLAnnotation spl = (SPLAnnotation) dataAnnotation;
+			Struct splStruct = Mat5.newStruct();
+			splStruct.set("rms", Mat5.newScalar(spl.getRms()));
+			splStruct.set("zeroPeak", Mat5.newScalar(spl.getZeroPeak()));
+			splStruct.set("peakPeak", Mat5.newScalar(spl.getPeakPeak()));
+			splStruct.set("sel", Mat5.newScalar(spl.getIntegratedSEL()));
+			return splStruct;
+		}
+
+		if (dataAnnotation instanceof UserFormAnnotation) {
+			Object[] formData = ((UserFormAnnotation<?>) dataAnnotation).getLoggerFormData();
+			if (formData == null) {
+				formData = new Object[0];
+			}
+			//the form fields are of any type, so they go out as a cell array of strings.
+			Cell formCell = Mat5.newCell(1, formData.length);
+			for (int i = 0; i < formData.length; i++) {
+				formCell.set(i, Mat5.newString(formData[i] == null ? "" : formData[i].toString()));
+			}
+			return formCell;
+		}
+
+		return null;
 	}
 
 

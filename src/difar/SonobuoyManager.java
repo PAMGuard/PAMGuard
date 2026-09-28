@@ -2,12 +2,17 @@ package difar;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
+import java.awt.Point;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.RowSorter;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
@@ -28,6 +33,7 @@ import PamController.PamController;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -36,10 +42,12 @@ import annotation.handler.AnnotationChoiceHandler;
 import annotation.string.StringAnnotationType;
 import annotation.timestamp.TimestampAnnotation;
 import annotation.timestamp.TimestampAnnotationType;
+import difar.calibration.CalibrationDataBlock;
 import difar.calibration.CalibrationDataUnit;
 import difar.calibration.CalibrationDialog;
 import difar.calibration.CalibrationHistogram;
 import difar.dialogs.SonobuoyDialog;
+import difar.display.SonobuoyOverlayGraphics;
 import generalDatabase.DBControl;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
@@ -75,7 +83,7 @@ public class SonobuoyManager extends PamProcess {
 	public static final int COLUMN_LATITUDE    = 5;
 	public static final int COLUMN_LONGITUDE   = 6;
 	public static final int COLUMN_DEPTH    	= 7;
-	public static final int COLUMN_HEADING    	= 8;	
+	public static final int COLUMN_HEADING    	= 8;
 	public static final int COLUMN_COMPASSCORRECTION = 9;
 	public static final int COLUMN_CALSTDDEV = 10;
 
@@ -88,6 +96,12 @@ public class SonobuoyManager extends PamProcess {
 	public StringAnnotationType calStdDevAnnotation = new StringAnnotationType("CompassStdDev",6);
 	
 	public StreamerDataBlock buoyDataBlock; 
+
+	/**
+	 * Buoy positions for the map. Display only: these units are built from the
+	 * sonobuoy history and are never saved.
+	 */
+	private PamDataBlock<SonobuoyDataUnit> buoyPositions;
 	
 	public String[] columnNames = {"UID",
 			"Name",
@@ -103,6 +117,15 @@ public class SonobuoyManager extends PamProcess {
 //			"Std. Dev. (calibration)"
 	};
 	public Object tableData [][] = null;
+
+	/**
+	 * Whether each row's buoy is the one in force on its channel at the time
+	 * being viewed.
+	 */
+	public boolean rowInForce [] = null;
+
+	/** The records shown in the table, one per row. */
+	private List<SonobuoyRecord> tableRecords = new ArrayList<>();
 	public DefaultTableModel tableDataModel = new SonobuoyTableModel(tableData, columnNames);
 	private AnnotationChoiceHandler annotationHandler;
 	
@@ -118,6 +141,18 @@ public class SonobuoyManager extends PamProcess {
 //		annotationHandler.addAnnotationType(calStdDevAnnotation);
 		annotationHandler.loadAnnotationChoices();
 		sortSQLLogging();
+
+		buoyPositions = new PamDataBlock<SonobuoyDataUnit>(SonobuoyDataUnit.class,
+				"Sonobuoy Positions", this, 0);
+		buoyPositions.setOverlayDraw(new SonobuoyOverlayGraphics(difarControl));
+		buoyPositions.setPamSymbolManager(new StandardSymbolManager(buoyPositions,
+				SonobuoyOverlayGraphics.defaultSymbol, true));
+		/*
+		 * A day, so a buoy stays on the map for as long as the detections made
+		 * on it. These units are rebuilt from the history, never saved.
+		 */
+		buoyPositions.setNaturalLifetime(24 * 3600);
+		addOutputDataBlock(buoyPositions);
 	}
 
 	/**
@@ -438,91 +473,171 @@ public class SonobuoyManager extends PamProcess {
 	
 	/**
 	 * Called after changes have been made to the sonobuoy data: 
-	 * buoy deployed, buoy ended, buoy calibrated, or buoy manually edited 
+	 * buoy deployed, buoy ended, buoy calibrated, or buoy manually edited.
+	 * <p>
+	 * Rows come from the sonobuoy history, one per saved record, so duplicate
+	 * records loaded by the viewer appear once. Records made up at startup to
+	 * stand for the configured array are not saved, and are not shown.
 	 */
 	public synchronized void updateSonobuoyTableData() {
-
-		StreamerDataBlock sdb = buoyDataBlock;
-		StreamerDataUnit sdu = null;
-			ListIterator<StreamerDataUnit> listIterator = sdb.getListIterator(0);
-			int row = 0;
-			while (listIterator.hasNext()) {
-				sdu = listIterator.next();
-				if (sdu.getDatabaseIndex() <= 0){
-					continue;
-				}
-				row++;
+		SonobuoyHistory history = difarControl.getSonobuoyHistory();
+		List<SonobuoyRecord> records = new ArrayList<>();
+		for (SonobuoyRecord record : history.getAllRecords()) {
+			if (record.isSaved()) {
+				records.add(record);
 			}
-			int nRows = row;
-			int nCols = columnNames.length;
-			tableData = new Object[nRows][nCols];
-			StreamerDataUnit prevUnit = null;
-			listIterator = sdb.getListIterator(0);
-			row = 0;
-			while (listIterator.hasNext()) {
-				sdu = listIterator.next();
-				if (sdu == prevUnit){
-					break;
-				}
-				if (sdu.getDatabaseIndex() <= 0){
-					continue;
-				}
-				prevUnit = sdu;
-				setTableData(row,sdu);
+		}
+		JTable table = difarControl.getSonobuoyManagerContainer().getSonobuoyTable();
+		Long selectedUid = getSelectedUid(table);
+		Point scrollPosition = null;
+		if (table.getParent() instanceof JViewport) {
+			scrollPosition = ((JViewport) table.getParent()).getViewPosition();
+		}
 
-				row++;
-			}
-			List<RowSorter.SortKey> sortKeys = null;
-			sortKeys = (List<SortKey>) difarControl.getSonobuoyManagerContainer().getSonobuoyTable().getRowSorter().getSortKeys();
-			tableDataModel.setDataVector(tableData, columnNames); 
-			tableDataModel.fireTableDataChanged();
-			difarControl.getSonobuoyManagerContainer().getSonobuoyTable().getRowSorter().setSortKeys(sortKeys);
+		updateBuoyPositions(records);
+		tableData = new Object[records.size()][columnNames.length];
+		tableRecords = records;
+		for (int row = 0; row < records.size(); row++) {
+			setTableData(row, records.get(row));
+		}
+		updateRowInForce();
+		List<RowSorter.SortKey> sortKeys = null;
+		sortKeys = (List<SortKey>) table.getRowSorter().getSortKeys();
+		tableDataModel.setDataVector(tableData, columnNames);
+		tableDataModel.fireTableDataChanged();
+		table.getRowSorter().setSortKeys(sortKeys);
+
+		restoreSelection(table, selectedUid);
+		if (scrollPosition != null) {
+			Point position = scrollPosition;
+			SwingUtilities.invokeLater(() -> {
+				if (table.getParent() instanceof JViewport) {
+					((JViewport) table.getParent()).setViewPosition(position);
+				}
+			});
+		}
 	}
-	
-	private void setTableData(int row, StreamerDataUnit sdu) {
-		int col = 0;
-		String endTime = null;
-		
-		// Extract DIFAR annotations
-		TimestampAnnotation an = ((TimestampAnnotation) sdu.findDataAnnotation(TimestampAnnotation.class, sonobuoyEndTimeAnnotation.getAnnotationName()));
-		if (an!=null) {
-			endTime = PamCalendar.formatDBDateTime(an.getTimestamp());
+
+	/**
+	 * Rebuild the buoy positions shown on the map, one unit per record.
+	 * @param records the records now held.
+	 */
+	private void updateBuoyPositions(List<SonobuoyRecord> records) {
+		buoyPositions.clearAll();
+		for (SonobuoyRecord record : records) {
+			if (record.hasPosition()) {
+				buoyPositions.addPamData(new SonobuoyDataUnit(record));
+			}
 		}
-		
-		// DIFAR action stored as an Annotation
-//		String actionString = null;
-//		StringAnnotation actionAnnotation = (StringAnnotation) sdu.findDataAnnotation(StringAnnotation.class, sonobuoyActionAnnotation.getAnnotationName());
-//		if (actionAnnotation != null){
-//			actionString = actionAnnotation.getString();
-//		}
-//		
-//		String compassCorrection = null;
-//		StringAnnotation correctionAnnotation = (StringAnnotation) sdu.findDataAnnotation(StringAnnotation.class, calMeanAnnotation.getAnnotationName());
-//		if (correctionAnnotation != null){
-//			compassCorrection = correctionAnnotation.getString();
-//		}
-//
-//		String calStdDev = null;
-//		StringAnnotation stdDevAnnotation = (StringAnnotation) sdu.findDataAnnotation(StringAnnotation.class, calStdDevAnnotation.getAnnotationName());
-//		if (stdDevAnnotation != null){
-//			calStdDev = stdDevAnnotation.getString();
-//		}
-		
-		tableData[row][COLUMN_DATABASEID] = sdu.getUID();
-		tableData[row][COLUMN_NAME] = sdu.getStreamerData().getStreamerName();
-		tableData[row][COLUMN_TIMESTAMP] = PamCalendar.formatDBDateTime(sdu.getTimeMilliseconds());
-		tableData[row][COLUMN_ENDTIME] =  endTime;
-		tableData[row][COLUMN_CHANNEL] = PamUtils.getSingleChannel(sdu.getChannelBitmap());
-		if (sdu.getGpsData()!=null){
-			tableData[row][COLUMN_LATITUDE] = LatLong.formatLatitude(sdu.getGpsData().getLatitude()); 
-			tableData[row][COLUMN_LONGITUDE] = LatLong.formatLongitude(sdu.getGpsData().getLongitude());
+	}
+
+	/**
+	 * Work out which rows hold the buoy in force on their channel, at the time
+	 * being viewed. In the viewer that is where the scroll bar sits, and in
+	 * normal mode it is now.
+	 * @return true if this differs from what the table already showed.
+	 */
+	private boolean updateRowInForce() {
+		boolean[] inForce = new boolean[tableRecords.size()];
+		SonobuoyHistory history = difarControl.getSonobuoyHistory();
+		long viewTime = PamCalendar.getTimeInMillis();
+		for (int row = 0; row < tableRecords.size(); row++) {
+			SonobuoyRecord record = tableRecords.get(row);
+			inForce[row] = record == history.getRecordAt(record.getChannel(), viewTime);
 		}
-		tableData[row][COLUMN_DEPTH] = sdu.getStreamerData().getZ();
-		tableData[row][COLUMN_HEADING] = sdu.getStreamerData().getHeading();
-//		tableData[row][COLUMN_ACTION] = null;//actionString;
-//		tableData[row][COLUMN_COMPASSCORRECTION] = correctionAnnotation;
-//		tableData[row][COLUMN_CALSTDDEV] = calStdDev; 
-		
+		boolean changed = !Arrays.equals(inForce, rowInForce);
+		rowInForce = inForce;
+		return changed;
+	}
+
+	/**
+	 * The time being viewed has changed, so a different buoy may be in force.
+	 * Only the marking of rows changes, so the table is repainted rather than
+	 * rebuilt.
+	 */
+	public void scrollTimeChanged() {
+		if (updateRowInForce() && difarControl.getSonobuoyManagerContainer() != null) {
+			difarControl.getSonobuoyManagerContainer().getSonobuoyTable().repaint();
+		}
+	}
+
+	/**
+	 * @param row a row of the table model.
+	 * @return the channel of the buoy in that row, or -1 if not known.
+	 */
+	public int getRowChannel(int row) {
+		if (tableData == null || row < 0 || row >= tableData.length) {
+			return -1;
+		}
+		Object channel = tableData[row][COLUMN_CHANNEL];
+		return channel instanceof Integer ? (Integer) channel : -1;
+	}
+
+	/**
+	 * @param row a row of the table model.
+	 * @return true if that row's buoy is the one in force on its channel.
+	 */
+	public boolean isRowInForce(int row) {
+		return rowInForce != null && row >= 0 && row < rowInForce.length && rowInForce[row];
+	}
+
+	/**
+	 * @return the UID of the record selected in the table, or null if none.
+	 */
+	private Long getSelectedUid(JTable table) {
+		int viewRow = table.getSelectedRow();
+		if (viewRow < 0 || tableData == null) {
+			return null;
+		}
+		int row = table.convertRowIndexToModel(viewRow);
+		if (row < 0 || row >= tableData.length) {
+			return null;
+		}
+		Object uid = tableData[row][COLUMN_DATABASEID];
+		return uid instanceof Long ? (Long) uid : null;
+	}
+
+	/**
+	 * Select the row showing a record, so a refresh does not lose the user's place.
+	 */
+	private void restoreSelection(JTable table, Long uid) {
+		if (uid == null) {
+			return;
+		}
+		for (int row = 0; row < tableData.length; row++) {
+			if (uid.equals(tableData[row][COLUMN_DATABASEID])) {
+				int viewRow = table.convertRowIndexToView(row);
+				if (viewRow >= 0) {
+					table.setRowSelectionInterval(viewRow, viewRow);
+				}
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Fill one row of the table.
+	 * @param row the row.
+	 * @param record the buoy record.
+	 */
+	private void setTableData(int row, SonobuoyRecord record) {
+		Long endTime = record.getEndTimeMillis();
+		tableData[row][COLUMN_DATABASEID] = record.getUid();
+		tableData[row][COLUMN_NAME] = record.getName();
+		tableData[row][COLUMN_TIMESTAMP] = PamCalendar.formatDBDateTime(record.getTimeMillis());
+		tableData[row][COLUMN_ENDTIME] = endTime == null ? null : PamCalendar.formatDBDateTime(endTime);
+		tableData[row][COLUMN_CHANNEL] = record.getChannel();
+		if (record.hasPosition()) {
+			tableData[row][COLUMN_LATITUDE] = LatLong.formatLatitude(record.getLatitude());
+			tableData[row][COLUMN_LONGITUDE] = LatLong.formatLongitude(record.getLongitude());
+		}
+		tableData[row][COLUMN_DEPTH] = record.getDepth();
+		/*
+		 * Shown to one decimal place. The record keeps its full precision, and
+		 * the column still sorts as a number.
+		 */
+		Double heading = record.getHeading();
+		tableData[row][COLUMN_HEADING] = heading == null ? null : Math.round(heading * 10.) / 10.;
 	}
 
 	class SonobuoyTableModel extends DefaultTableModel {
@@ -553,42 +668,318 @@ public class SonobuoyManager extends PamProcess {
 		}
 	}
 
+	/**
+	 * The compass correction of the buoy on a channel at a time.
+	 * <p>
+	 * Read from the buoy record in force, so a calibration starts from the
+	 * heading actually in use. Falls back to the core array only when there are
+	 * no buoy records at all.
+	 * @param channel the channel.
+	 * @param timeMillis the time.
+	 * @return correction in degrees, or zero if the buoy has not been calibrated.
+	 */
 	public double getCompassCorrection(int channel, long timeMillis) {
+		SonobuoyHistory history = difarControl.getSonobuoyHistory();
+		if (history.getRecordCount() > 0) {
+			SonobuoyRecord record = history.getRecordAt(channel, timeMillis);
+			if (record == null || record.getHeading() == null) {
+				return 0;
+			}
+			return record.getHeading();
+		}
 		SnapshotGeometry geom = ArrayManager.getArrayManager().getSnapshotGeometry(1<<channel, timeMillis);
 		return geom.getReferenceGPS().getHeading();
-//		PamArray currentArray = ArrayManager.getArrayManager().getCurrentArray(); 
-//		return currentArray.getHydrophoneLocator().getArrayHeading(timeMillis, channel);
 	}
 
+	/**
+	 * Calibrate the buoy in force on a channel from a set of ship noise clips.
+	 * The streamer is used only for its channel. The record in force at the
+	 * start of the calibration is the one calibrated.
+	 * @param streamer streamer for the channel being calibrated.
+	 * @param calibrationStartTime time of the first calibration clip.
+	 * @param newHead new compass correction in degrees.
+	 * @param std standard deviation of the correction, in degrees.
+	 * @param numClips number of clips the correction came from.
+	 * @return true if a buoy record was found and calibrated.
+	 */
 	public boolean updateCorrection(Streamer streamer, long calibrationStartTime, Double newHead, Double std, int numClips) {
-		int channel = streamer.getStreamerIndex();
-		streamer.setHeading(newHead);
-		PamArray currentArray = ArrayManager.getArrayManager().getCurrentArray(); 
-		OriginSettings os = streamer.getOriginSettings();
-		if (StaticOriginSettings.class.isAssignableFrom(os.getClass())) {
-			StaticOriginSettings sos = (StaticOriginSettings) os;
-			sos.getStaticPosition().getGpsData().setTrueHeading(newHead);
-			streamer.setOriginSettings(sos);
-	
-			currentArray.updateStreamerAndDataUnit(calibrationStartTime, streamer);
-			StreamerDataUnit sdu = ArrayManager.getArrayManager().getStreamerDatabBlock().getPreceedingUnit(calibrationStartTime, 1<<channel);
-			difarControl.getDifarProcess().getProcessedDifarData().clearOldOrigins(streamer.getStreamerIndex(), sdu.getTimeMilliseconds());
-			difarControl.getDifarProcess().getQueuedDifarData().clearOldOrigins(streamer.getStreamerIndex(), sdu.getTimeMilliseconds());
-			ArrayManager.getArrayManager().getStreamerDatabBlock().updatePamData(sdu, System.currentTimeMillis());
-	
-			
-//			addSonobuoyAnnotation(sdu, calMeanAnnotation, String.format("%6f", newHead));
-//			addSonobuoyAnnotation(sdu, calStdDevAnnotation, String.format("%6f", std));
-			CalibrationDataUnit cdu = new CalibrationDataUnit(calibrationStartTime,	sdu.getUID(), newHead, std, numClips);
-			difarControl.getDifarProcess().getCalibrationDataBlock().addPamData(cdu);
-			difarControl.sonobuoyManager.updateSonobuoyTableData();
-			return true;
-		}
-		else {
+		if (newHead == null) {
 			return false;
 		}
+		StreamerDataUnit record = findRecordUnitAt(streamer.getStreamerIndex(), calibrationStartTime);
+		if (record == null) {
+			return false;
+		}
+		if (!confirmChange(record, null)) {
+			return false;
+		}
+		boolean done = calibrate(record, newHead, std == null ? 0 : std, numClips, calibrationStartTime);
+		if (done) {
+			carryChangeDownstream(record, null);
+		}
+		return done;
 	}
-	
-	
-	
+
+	/**
+	 * Set the compass correction of one buoy record, and log it as a calibration.
+	 * <p>
+	 * This is the one path for any change of heading, whether from ship noise
+	 * clips or typed in. The heading applies to the whole deployment, so
+	 * detections made before the calibration use it too. A heading typed in is
+	 * logged with no clips, which marks it as not measured.
+	 * @param record the buoy record to calibrate.
+	 * @param heading new compass correction in degrees.
+	 * @param stdDev standard deviation of the correction in degrees, zero if
+	 * not measured.
+	 * @param numClips number of clips the correction came from, zero if typed in.
+	 * @param calibrationTime time the calibration is logged at.
+	 * @return false if the record is not a static buoy, and nothing was changed.
+	 */
+	public boolean calibrate(StreamerDataUnit record, double heading, double stdDev, int numClips, long calibrationTime) {
+		Streamer streamer = record.getStreamerData();
+		if (streamer == null || !(streamer.getOriginSettings() instanceof StaticOriginSettings)) {
+			return false;
+		}
+		streamer.setHeading(heading);
+		GpsDataUnit staticPosition = ((StaticOriginSettings) streamer.getOriginSettings()).getStaticPosition();
+		if (staticPosition != null) {
+			staticPosition.getGpsData().setTrueHeading(heading);
+		}
+		saveRecord(record);
+		int channel = streamer.getStreamerIndex();
+		difarControl.getDifarProcess().getProcessedDifarData().clearOldOrigins(channel, record.getTimeMilliseconds());
+		difarControl.getDifarProcess().getQueuedDifarData().clearOldOrigins(channel, record.getTimeMilliseconds());
+		CalibrationDataUnit cdu = new CalibrationDataUnit(calibrationTime, record.getUID(), heading, stdDev, numClips);
+		CalibrationDataBlock calibrations = difarControl.getDifarProcess().getCalibrationDataBlock();
+		calibrations.addPamData(cdu);
+		if (!calibrations.shouldNotify()) {
+			/*
+			 * In viewer mode a data block does not announce new units, so the
+			 * calibration table would not show this one until a reload. It does
+			 * listen for updates.
+			 */
+			calibrations.updatePamData(cdu, System.currentTimeMillis());
+		}
+		updateSonobuoyTableData();
+		return true;
+	}
+
+	/**
+	 * Apply an edit made in the sonobuoy dialog to the record it was made from.
+	 * <p>
+	 * Name, position, depth and times are changed on the record itself. A
+	 * change of heading goes through calibrate(), so it is logged. The dialog
+	 * shows the heading to one decimal place, so a heading within 0.05 degrees
+	 * of the old one counts as unchanged, and keeps its full precision.
+	 * @param record the buoy record that was edited.
+	 * @param edited the edited copy returned by the dialog.
+	 */
+	public boolean applyEdit(StreamerDataUnit record, StreamerDataUnit edited) {
+		Streamer oldStreamer = record.getStreamerData();
+		Double oldHeading = oldStreamer == null ? null : oldStreamer.getHeading();
+		Streamer newStreamer = edited.getStreamerData();
+		Double newHeading = newStreamer.getHeading();
+		boolean headingChanged = newHeading != null
+				&& (oldHeading == null || Math.abs(newHeading - oldHeading) >= 0.05);
+		if (!headingChanged) {
+			newStreamer.setHeading(oldHeading);
+		}
+		record.setStreamerData(newStreamer);
+		if (edited.getTimeMilliseconds() != record.getTimeMilliseconds()) {
+			record.setTimeMilliseconds(edited.getTimeMilliseconds());
+			buoyDataBlock.sortData();
+		}
+		TimestampAnnotation newEnd = findEndTime(edited);
+		if (newEnd != null) {
+			TimestampAnnotation oldEnd = findEndTime(record);
+			if (oldEnd != null) {
+				oldEnd.setTimestamp(newEnd.getTimestamp());
+			} else {
+				record.addDataAnnotation(newEnd);
+			}
+		}
+		if (!confirmChange(record, edited)) {
+			return false;
+		}
+		if (headingChanged) {
+			calibrate(record, newHeading, 0, 0, record.getTimeMilliseconds());
+		} else {
+			saveRecord(record);
+			updateSonobuoyTableData();
+		}
+		carryChangeDownstream(record, edited);
+		return true;
+	}
+
+	/**
+	 * Ask before a change that leaves saved triangulations describing a buoy
+	 * that no longer exists as it was. Nothing is asked when nothing downstream
+	 * is affected.
+	 * @param record the buoy record about to change.
+	 * @param edited the edited copy, or null where only the heading changes.
+	 * @return true to go ahead.
+	 */
+	private boolean confirmChange(StreamerDataUnit record, StreamerDataUnit edited) {
+		SonobuoyEditEffects effects = getEditEffects(record, edited);
+		if (effects == null || !effects.isAnythingAffected()) {
+			return true;
+		}
+		return JOptionPane.showConfirmDialog(difarControl.getGuiFrame(),
+				effects.getMessage(isViewer()), "Change sonobuoy",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+	}
+
+	/**
+	 * Work out the triangulations again, or clear them, over the whole time the
+	 * changed record is in force. Only in the viewer: while PAMGuard is
+	 * running, data already written cannot be changed.
+	 * @param record the buoy record that changed.
+	 */
+	private void carryChangeDownstream(StreamerDataUnit record, StreamerDataUnit edited) {
+		SonobuoyEditEffects effects = getEditEffects(record, edited);
+		if (effects == null || effects.getTriangulations() == 0) {
+			return;
+		}
+		if (isViewer()) {
+			difarControl.runCrossingTasks(effects.getReprocessStartTime(), effects.getEndTimeOrLatest());
+		}
+		else {
+			updateLoadedTriangulations(effects);
+		}
+	}
+
+	/**
+	 * Bring the triangulations held in memory into line with a changed buoy.
+	 * <p>
+	 * Used while PAMGuard is running, where the offline tasks cannot be used.
+	 * Detections written to file before the change keep their old
+	 * triangulation until the data are reprocessed in the viewer.
+	 * @param effects what the change affects.
+	 */
+	private void updateLoadedTriangulations(SonobuoyEditEffects effects) {
+		PamDataBlock<DifarDataUnit> detections = difarControl.getDifarProcess().getProcessedDifarData();
+		for (DifarDataUnit unit : detections.getDataCopy()) {
+			if (unit.getDifarCrossing() == null || !effects.covers(new DifarDetection(unit))) {
+				continue;
+			}
+			unit.setDifarCrossing(difarControl.getDifarProcess().getDifarRangeInfo(unit));
+			detections.updatePamData(unit, System.currentTimeMillis());
+		}
+	}
+
+	/**
+	 * @param record a buoy record.
+	 * @return what changing it affects, or null if it is not in the history.
+	 */
+	private SonobuoyEditEffects getEditEffects(StreamerDataUnit record, StreamerDataUnit edited) {
+		SonobuoyHistory history = difarControl.getSonobuoyHistory();
+		Streamer streamer = record.getStreamerData();
+		if (streamer == null) {
+			return null;
+		}
+		SonobuoyRecord buoy = history.getRecordAt(streamer.getStreamerIndex(),
+				record.getTimeMilliseconds());
+		if (buoy == null) {
+			return null;
+		}
+		PamDataBlock<DifarDataUnit> detections = difarControl.getDifarProcess().getProcessedDifarData();
+		List<SonobuoyEditEffects.Detection> loaded = new ArrayList<>();
+		for (DifarDataUnit unit : detections.getDataCopy()) {
+			loaded.add(new DifarDetection(unit));
+		}
+		long newStart = edited == null ? record.getTimeMilliseconds() : edited.getTimeMilliseconds();
+		TimestampAnnotation newEnd = edited == null ? findEndTime(record) : findEndTime(edited);
+		return new SonobuoyEditEffects(buoy, history, loaded,
+				detections.getCurrentViewDataStart(), detections.getCurrentViewDataEnd(),
+				newStart, newEnd == null ? null : newEnd.getTimestamp());
+	}
+
+	/**
+	 * A DIFAR detection as the edit effects see it: its time, its channel, and
+	 * whether a triangulation is saved for it.
+	 */
+	private static class DifarDetection implements SonobuoyEditEffects.Detection {
+
+		private final DifarDataUnit unit;
+
+		DifarDetection(DifarDataUnit unit) {
+			this.unit = unit;
+		}
+
+		@Override
+		public long getTimeMillis() {
+			return unit.getTimeMilliseconds();
+		}
+
+		@Override
+		public int getChannel() {
+			return PamUtils.getSingleChannel(unit.getChannelBitmap());
+		}
+
+		@Override
+		public boolean hasTriangulation() {
+			return unit.getDifarCrossing() != null;
+		}
+	}
+
+	/**
+	 * @return true in viewer mode.
+	 */
+	private boolean isViewer() {
+		return PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+	}
+
+	/**
+	 * Save a changed buoy record. The record's cached position is cleared,
+	 * since its streamer may have moved.
+	 * <p>
+	 * In normal mode, a change to the latest record on a channel is passed on to
+	 * the array, since that is the buoy in the water now. In the viewer there is
+	 * no single present time, so the array is left alone: saving a record must
+	 * never change which buoy the array shows as current.
+	 */
+	private void saveRecord(StreamerDataUnit record) {
+		record.setGpsData(null);
+		Streamer streamer = record.getStreamerData();
+		int channel = streamer.getStreamerIndex();
+		if (!isViewer() && buoyDataBlock.getLastUnit(1 << channel) == record) {
+			ArrayManager.getArrayManager().getCurrentArray().updateStreamer(channel, streamer);
+		}
+		buoyDataBlock.updatePamData(record, System.currentTimeMillis());
+	}
+
+	/**
+	 * @return the end time annotation of a buoy record, or null if it has none.
+	 */
+	private TimestampAnnotation findEndTime(StreamerDataUnit record) {
+		return (TimestampAnnotation) record.findDataAnnotation(TimestampAnnotation.class,
+				sonobuoyEndTimeAnnotation.getAnnotationName());
+	}
+
+	/**
+	 * @param uid unique identifier of a buoy record.
+	 * @return the stored buoy record with this UID, or null if it is not loaded.
+	 */
+	public StreamerDataUnit findRecordUnit(long uid) {
+		for (StreamerDataUnit unit : buoyDataBlock.getDataCopy()) {
+			if (unit.getUID() == uid) {
+				return unit;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param channel the channel.
+	 * @param timeMillis the time.
+	 * @return the stored buoy record in force on a channel at a time, or null.
+	 */
+	public StreamerDataUnit findRecordUnitAt(int channel, long timeMillis) {
+		SonobuoyRecord record = difarControl.getSonobuoyHistory().getRecordAt(channel, timeMillis);
+		if (record == null || record.getUid() == null) {
+			return null;
+		}
+		return findRecordUnit(record.getUid());
+	}
+
 }

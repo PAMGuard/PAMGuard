@@ -1,5 +1,10 @@
 package dataPlotsFX.rawDataPlotFX;
 
+import java.io.Serializable;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -23,6 +28,7 @@ import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDScaleInfo;
 import dataPlotsFX.layout.TDGraphFX;
+import dataPlotsFX.layout.TDSettingsPane;
 import dataPlotsFX.projector.TDProjectorFX;
 
 
@@ -49,9 +55,19 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 	private TDScaleInfo amplitudeScaleInfo;
 
 	/**
-	 * Observer which waits for incoming sound data and then passes to relevant plot pane. 
+	 * Observer which waits for incoming sound data and then passes to relevant plot pane.
 	 */
 	private RawDataObserver rawObserver;
+
+	/**
+	 * Display settings for the waveform plot.
+	 */
+	private RawSoundParamsFX rawSoundParams = new RawSoundParamsFX();
+
+	/**
+	 * Settings pane which allows a user to change the waveform colours.
+	 */
+	private RawSoundSettingsPane settingsPane;
 
 	public RawSoundDataInfo(TDDataProviderFX tdDataProvider, TDGraphFX tdGraph, AcquisitionControl control,
 			PamRawDataBlock pamDataBlock) {
@@ -85,25 +101,30 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 	@Override
 	public synchronized void drawData(int plotNumber, GraphicsContext g, double scrollStart, TDProjectorFX tdProjector) {
 		// clear screen
-//		System.out.println("Draw data:"); 
 		g.clearRect(0, 0, tdProjector.getWindowRect().getWidth(), tdProjector.getWindowRect().getHeight());
-		
-		// call all panels to repaint.
-		for (int i = 0; i < amplitudeScaleInfo.getNPlots(); i++) {
-			int chan = PamUtils.getSingleChannel(amplitudeScaleInfo.getPlotChannels()[i]);
-			if (chan == -1)
-				continue;
 
-			// check if wrapping
-			if (tdProjector.isWrap())
-				wrapPix = this.getTDGraph().getTDDisplay().getWrapPix();
-			else
-				wrapPix = -1;
-
-			// draw raw sound data.
-			rawChannelData[chan].drawRawSoundData(g, tdProjector.getWindowRect(), tdProjector.getOrientation(),
-					tdProjector.getTimeAxis(), tdProjector.getYAxis(), scrollStart, wrapPix);
+		/*
+		 * Each plot pane shows one channel, so only draw the channel which belongs to
+		 * this pane. (Drawing every channel here would superimpose all the waveforms on
+		 * every pane.)
+		 */
+		if (plotNumber < 0 || plotNumber >= amplitudeScaleInfo.getPlotChannels().length) {
+			return;
 		}
+		int chan = PamUtils.getSingleChannel(amplitudeScaleInfo.getPlotChannels()[plotNumber]);
+		if (chan < 0 || chan >= rawChannelData.length || rawChannelData[chan] == null) {
+			return;
+		}
+
+		// check if wrapping
+		if (tdProjector.isWrap())
+			wrapPix = this.getTDGraph().getTDDisplay().getWrapPix();
+		else
+			wrapPix = -1;
+
+		// draw raw sound data.
+		rawChannelData[chan].drawRawSoundData(g, tdProjector.getWindowRect(), tdProjector.getOrientation(),
+				tdProjector.getTimeAxis(), tdProjector.getYAxis(), scrollStart, wrapPix);
 	}
 
 
@@ -113,6 +134,7 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 	 */
 	private void newRawData(RawDataUnit rawDataUnit){
 		int chan = PamUtils.getSingleChannel(rawDataUnit.getChannelBitmap());
+		if (chan < 0 || chan >= rawChannelData.length) return;
 		if (rawChannelData[chan]==null) configureRawDisplay() ;
 		if (rawChannelData[chan] != null) {
 			rawChannelData[chan].newRawData(rawDataUnit, getBinsPerPixel());
@@ -120,25 +142,87 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 	}
 
 	/**
-	 * Check all settings are correct for the raw data display. 
+	 * Check all settings are correct for the raw data display.
 	 */
 	private void configureRawDisplay() {
 
-		for (int i = 0; i < rawChannelData.length; i++) {
-			int chan = amplitudeScaleInfo.getPlotChannels()[i]; 
-			//			System.out.println("nUser: "+nUsers); 
+		/*
+		 * Note that the plot data are indexed by channel number, not by plot number, so
+		 * that they can be found from an incoming data unit's channel. The list of plot
+		 * channels is indexed by plot number, so the two are only the same when the
+		 * channels in use start at zero and are contiguous.
+		 */
+		boolean[] used = new boolean[rawChannelData.length];
+		for (int i = 0; i < amplitudeScaleInfo.getNPlots(); i++) {
+			int chanMap = amplitudeScaleInfo.getPlotChannels()[i];
 			//for the raw data display 0 indicates that no users are using channel. (On other display sometimes indicates all channels are shown)
-			if (chan == 0) {
-				rawChannelData[i] = null;
+			if (chanMap == 0) {
 				continue;
 			}
-			if (rawChannelData[i] == null) {
-				rawChannelData[i] = new RawSoundPlotDataFX(this, PamUtils.getSingleChannel(chan));
+			int chan = PamUtils.getSingleChannel(chanMap);
+			if (chan < 0 || chan >= rawChannelData.length) {
+				continue;
 			}
-			rawChannelData[i].checkConfig();
+			used[chan] = true;
+			if (rawChannelData[chan] == null) {
+				rawChannelData[chan] = new RawSoundPlotDataFX(this, chan);
+			}
+			rawChannelData[chan].checkConfig();
 		}
+		for (int i = 0; i < rawChannelData.length; i++) {
+			if (!used[i]) {
+				rawChannelData[i] = null;
+			}
+		}
+		updateLineColours();
 		getTDGraph().checkAxis();
 
+	}
+
+	/**
+	 * Get the display settings for the waveform plot.
+	 *
+	 * @return the waveform display parameters.
+	 */
+	public RawSoundParamsFX getRawSoundParams() {
+		return rawSoundParams;
+	}
+
+	/**
+	 * Set the colour of each waveform plot from the current display settings.
+	 */
+	public void updateLineColours() {
+		for (int i = 0; i < rawChannelData.length; i++) {
+			if (rawChannelData[i] != null) {
+				rawChannelData[i].setLineColor(rawSoundParams.getLineColour(i));
+			}
+		}
+	}
+
+	@Override
+	public TDSettingsPane getGraphSettingsPane() {
+		if (settingsPane == null) {
+			settingsPane = new RawSoundSettingsPane(this);
+		}
+		return settingsPane;
+	}
+
+	@Override
+	public Serializable getStoredSettings() {
+		return rawSoundParams;
+	}
+
+	@Override
+	public boolean setStoredSettings(Serializable storedSettings) {
+		if (storedSettings instanceof RawSoundParamsFX) {
+			rawSoundParams = (RawSoundParamsFX) storedSettings;
+			updateLineColours();
+			if (settingsPane != null) {
+				settingsPane.setParams();
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -293,24 +377,92 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 
 
 	/**
-	 * Clear the raw sound data plot panes. 
+	 * Clear the raw sound data plot panes.
 	 */
 	private void clearRawPlotPanes(){
 		for (int i=0; i<rawChannelData.length; i++){
-			if (rawChannelData[i]!=null) rawChannelData[i].clearRawData(); 
+			if (rawChannelData[i]!=null) rawChannelData[i].clearRawData();
 		}
+	}
+
+	@Override
+	public void notifyChange(int changeType) {
+		switch (changeType) {
+		case PamController.CHANGED_OFFLINE_DATASTORE:
+			//everything held is from the old data store, so it is no longer valid. Clearing
+			//the plots also clears what they think they hold, so it is all loaded again.
+			clearRawPlotPanes();
+			break;
+		case PamController.CHANGED_DISPLAY_SETTINGS:
+			//the user has changed the colour scheme or the colour blind palette, so the
+			//standard PAMGuard colours this plot is drawn in have changed.
+			colourSchemeChanged();
+			break;
+		}
+	}
+
+	/**
+	 * The standard PAMGuard colours have changed. Re-read the waveform colours, put
+	 * the current colours on the settings pane and repaint.
+	 */
+	private void colourSchemeChanged() {
+		//may arrive on the event dispatch thread, and everything below is JavaFX.
+		if (!Platform.isFxApplicationThread()) {
+			Platform.runLater(this::colourSchemeChanged);
+			return;
+		}
+		updateLineColours();
+		if (settingsPane != null) {
+			settingsPane.setParams();
+		}
+		getTDGraph().repaint(0);
 	}
 
 	/**
 	 * Viewer mode functions. 
 	 */
 
-	private long diff=100; 
+	private long diff=100;
 	long lastTime=0;
 	private Timeline timeline;
-	private long lastReqStart;
-	private long lastReqEnd;
-	
+
+	/**
+	 * The fraction of the visible time range which is also loaded either side of it.
+	 * <p>
+	 * Without this the waveform is loaded for exactly what is on screen, so any move
+	 * of the display - a click on a scroll arrow, say - reveals data which has never
+	 * been loaded and the user watches it appear. Loading half a screen either side
+	 * means a small move shows data which is already held, with no disk access at
+	 * all. This mirrors the pre-load either side of the visible range which the
+	 * tiled spectrogram does (see {@code Scrolling2DPlotInfo}).
+	 */
+	private static final double LOAD_MARGIN_FRACTION = 0.5;
+
+	/**
+	 * Extra time loaded before the start of the range, in millis. Raw data units are
+	 * up to a second or so long, so an order starting exactly at the range start can
+	 * miss the unit which straddles it.
+	 */
+	private static final long LOAD_LEAD_MILLIS = 1500;
+
+	/**
+	 * Spans of time still to be ordered, most useful first. Ordering them one at a
+	 * time (rather than as one big request) keeps the part of the range the user can
+	 * actually see loading first.
+	 */
+	private final ArrayDeque<double[]> loadQueue = new ArrayDeque<>();
+
+	/** Lock guarding {@link #loadQueue}. */
+	private final Object loadQueueLock = new Object();
+
+	/**
+	 * Incremented every time a fresh load is worked out, so that the completion of an
+	 * order from a superseded load does not carry on ordering spans which are no
+	 * longer wanted.
+	 */
+	private volatile int loadGeneration = 0;
+
+
 	/**
 	 * Order offline data for the spectrogram. This will only call if the scroll bar is moving. Or the last call 
 	 * was less than time "diff" milliseconds before. The call is put into a timer thread which will execute the final 
@@ -349,12 +501,24 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 
 
 	/**
-	 * Order offline viewer data for viewer mode. 
-	 * @return - true if all data load successfully. 
+	 * Order offline viewer data for viewer mode.
+	 * <p>
+	 * Only the parts of the range which are not already held are ordered, and the
+	 * range runs half a screen either side of the visible one. So a move of the
+	 * display smaller than that margin orders nothing at all, and a larger one orders
+	 * only the strip which is genuinely new - the waveform store holds its data
+	 * against absolute time, so everything already loaded stays on screen throughout.
+	 * <p>
+	 * Because the store knows what it holds rather than what was last asked for, an
+	 * order which was cut short (by the user scrolling again, say) leaves the part it
+	 * never reached un-held and it is asked for again next time, instead of being
+	 * left as a gap in the waveform.
+	 *
+	 * @return - true if the load was started, or nothing needed loading.
 	 */
 	private synchronized boolean orderRawData() {
-		
-		//do not try and order an data before everything has set up. 
+
+		//do not try and order an data before everything has set up.
 		if (!PamController.getInstance().isInitializationComplete()) return false;
 
 		if (rawDataBlock == null) {
@@ -363,33 +527,194 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 		if (rawChannelData == null) {
 			return false;
 		}
-		
-		/**
-		 * First cancel the last order and reset pointers in the output images. 
+
+		long visStart = getTDGraph().getTDDisplay().getTimeScroller().getValueMillis();
+		long visible = (long) getTDGraph().getTDDisplay().getVisibleTime();
+		long margin = (long) (visible*LOAD_MARGIN_FRACTION);
+		double loadStart = visStart - margin - LOAD_LEAD_MILLIS;
+		double loadEnd = visStart + visible + margin;
+
+		//What is missing across all the channels on show? They all load from the same
+		//orders, but a channel which has just been added to the display holds nothing
+		//yet, so take the union rather than asking any one of them.
+		List<double[]> required = requiredLoadIntervals(loadStart, loadEnd);
+		if (required.isEmpty()) {
+			//Everything on screen (and the margin either side) is already held: nothing to
+			//load and nothing for the user to watch loading.
+			return true;
+		}
+
+		//Load what is on screen before the margins either side of it.
+		List<double[]> visibleFirst = new ArrayList<double[]>();
+		List<double[]> margins = new ArrayList<double[]>();
+		for (double[] interval : required) {
+			if (interval[1] > visStart && interval[0] < visStart+visible) {
+				visibleFirst.add(interval);
+			}
+			else {
+				margins.add(interval);
+			}
+		}
+		visibleFirst.addAll(margins);
+
+		synchronized (loadQueueLock) {
+			loadQueue.clear();
+			loadQueue.addAll(visibleFirst);
+		}
+
+		orderNextInterval(++loadGeneration);
+
+		return true;
+	}
+
+	/**
+	 * The spans of the given range which are not held by every channel on show.
+	 * @param loadStart - start of the range of interest in millis.
+	 * @param loadEnd - end of the range of interest in millis.
+	 * @return the spans still needing to be loaded, in time order.
+	 */
+	private List<double[]> requiredLoadIntervals(double loadStart, double loadEnd) {
+		List<double[]> all = new ArrayList<double[]>();
+		for (int i = 0; i < rawChannelData.length; i++) {
+			if (rawChannelData[i] != null) {
+				all.addAll(rawChannelData[i].getRequiredLoadIntervals(loadStart, loadEnd));
+			}
+		}
+		//merge the per channel lists into one set of spans covering everything any
+		//channel is missing.
+		all.sort((a, b) -> Double.compare(a[0], b[0]));
+		List<double[]> merged = new ArrayList<double[]>();
+		for (double[] interval : all) {
+			if (!merged.isEmpty() && interval[0] <= merged.get(merged.size()-1)[1]) {
+				double[] last = merged.get(merged.size()-1);
+				last[1] = Math.max(last[1], interval[1]);
+			}
+			else {
+				merged.add(new double[] {interval[0], interval[1]});
+			}
+		}
+		return merged;
+	}
+
+	/**
+	 * Order the next span in the queue, so long as it belongs to the current load.
+	 * @param generation - the load this chain of orders belongs to.
+	 */
+	private void orderNextInterval(int generation) {
+		if (generation != loadGeneration) {
+			return; //a newer load has taken over.
+		}
+		double[] next;
+		synchronized (loadQueueLock) {
+			next = loadQueue.poll();
+		}
+		if (next == null) {
+			Platform.runLater(()->{
+				getTDGraph().repaint(0);
+			});
+			return;
+		}
+
+		/*
+		 * Cancel the previous order. The waveform store is not cleared - it is held
+		 * against absolute time, so anything already loaded is still in the right place
+		 * and carries on being displayed while the new data load. Data arriving at a new
+		 * resolution replace the old data for the same time as they arrive.
 		 */
 		rawDataBlock.cancelDataOrder();
 
-		//clear the plot panes. 
-		clearRawPlotPanes(); 
-
-		long dataStart =getTDGraph().getTDDisplay().getTimeScroller().getValueMillis()-1500;
-		long dataEnd = dataStart + (long) (getTDGraph().getTDDisplay().getVisibleTime())+1500;
-
-		if (lastReqStart == dataStart && lastReqEnd == dataEnd) {
-			return true;
-		}
-		
-		lastReqStart = dataStart;
-		lastReqEnd = dataEnd;
-
-		//Need to know that it's THIS class that is ordering. 
-		//Otherwise the observer can accept FFTData from the FFTDataBlock if another process is ordering. 
+		//Need to know that it's THIS class that is ordering.
+		//Otherwise the observer can accept FFTData from the FFTDataBlock if another process is ordering.
 		super.isOrderring=true;
 
-		rawDataBlock.orderOfflineData(this.rawObserver, new DataLoadObserver(), 
-				dataStart, dataEnd, 0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT);
+		/*
+		 * allowRepeats = true: what does or does not need loading is decided from what the
+		 * store actually holds, so the data block's own 'same request' check must not
+		 * suppress a repeat - an order which was cancelled before it delivered everything
+		 * has to be repeatable, or the part it missed would stay missing.
+		 */
+		rawDataBlock.orderOfflineData(this.rawObserver,
+				new RawLoadObserver(next[0], next[1], generation, storeResolution()),
+				(long) next[0], (long) Math.ceil(next[1]), 0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT, true);
+	}
 
-		return true; 
+	/**
+	 * The resolution (samples per stored value) the waveform plots are holding data
+	 * at. Used to spot the display being zoomed in between an order being placed and
+	 * it completing, in which case what it loaded is already too coarse to count as
+	 * held.
+	 * @return the store resolution, or -1 if there are no plots.
+	 */
+	private double storeResolution() {
+		for (int i = 0; i < rawChannelData.length; i++) {
+			if (rawChannelData[i] != null) {
+				return rawChannelData[i].getBinsPerPixel();
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Load observer for one ordered span. On a genuine completion the span is
+	 * recorded as held by every channel and the next span is ordered.
+	 */
+	private class RawLoadObserver implements PamguardMVC.LoadObserver {
+
+		private final double start;
+		private final double end;
+		private final int generation;
+		private final double resolution;
+
+		RawLoadObserver(double start, double end, int generation, double resolution) {
+			this.start = start;
+			this.end = end;
+			this.generation = generation;
+			this.resolution = resolution;
+		}
+
+		@Override
+		public void setLoadStatus(int loadState) {
+			isOrderring = false;
+
+			/*
+			 * The status is a bitmask which can be OR'd, so it must be tested with '&'. Only
+			 * a completed pass may be recorded as held: an interrupted or partial one stopped
+			 * short, and marking it would leave a permanent gap in the waveform. A pass which
+			 * found no data at all IS complete - the range really does hold nothing (a gap
+			 * between files, say) and asking again would just reload it forever.
+			 */
+			if ((loadState & OfflineDataLoading.REQUEST_INTERRUPTED) != 0
+					|| (loadState & OfflineDataLoading.REQUEST_DATA_PARTIAL_LOAD) != 0) {
+				return;
+			}
+			if ((loadState & OfflineDataLoading.REQUEST_DATA_LOADED) == 0
+					&& (loadState & OfflineDataLoading.REQUEST_NO_DATA) == 0) {
+				return;
+			}
+
+			/*
+			 * Data units are handed to the plots on the FX thread (see RawDataObserver), so
+			 * the last few of this order may not have been added yet. Record the span and
+			 * order the next one from the FX thread too, behind them.
+			 */
+			Platform.runLater(()->{
+				/*
+				 * Unless the display was zoomed in while this order was in flight, in which case
+				 * what it loaded is already too coarse for the display and the store has thrown
+				 * its load state away - marking it now would leave the coarse data on screen for
+				 * good. The zoom triggers a load of its own, so nothing is lost by not marking.
+				 */
+				if (storeResolution() == resolution) {
+					for (int i = 0; i < rawChannelData.length; i++) {
+						if (rawChannelData[i] != null) {
+							rawChannelData[i].markRangeLoaded(start, end);
+						}
+					}
+				}
+				getTDGraph().repaint(0);
+				orderNextInterval(generation);
+			});
+		}
 	}
 
 }

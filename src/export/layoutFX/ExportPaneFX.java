@@ -776,6 +776,19 @@ public class ExportPaneFX {
 			super(null, settingsName);
 		}
 
+		/**
+		 * Override to allow tasks from different data blocks without triggering the
+		 * base-class "cannot combine tasks" error message.  The ExportTaskGroup runs
+		 * tasks sequentially, resetting {@code primaryDataBlock} before each one via
+		 * {@link #runTaskFrom}, so the single-block constraint in the superclass does
+		 * not apply.
+		 */
+		@Override
+		public boolean addTask(OfflineTask task) {
+			setPrimaryDataBlock(null);
+			return super.addTask(task);
+		}
+
 		@Override
 		public String getUnitType() {
 			return "Export Data";

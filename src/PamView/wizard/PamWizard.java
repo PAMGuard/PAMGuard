@@ -68,21 +68,62 @@ abstract public class PamWizard extends PamDialog {
 	}
 
 	/**
-	 * Called when 'previous' button is clicked. 
+	 * Whether a card should be shown at all. Override to skip a page which is not
+	 * relevant to what the user has chosen on an earlier one. All cards are shown
+	 * unless a subclass says otherwise.
+	 *
+	 * @param wizardCard the card
+	 * @return true if the card should be included in the sequence of pages.
+	 */
+	public boolean isCardEnabled(PamWizardCard wizardCard) {
+		return true;
+	}
+
+	/**
+	 * Find the next card to show in a given direction, skipping any that are not
+	 * enabled.
+	 *
+	 * @param from  index to start looking from.
+	 * @param step  +1 to look forwards, -1 to look backwards.
+	 * @return index of the card to show, or -1 if there is not one.
+	 */
+	private int findEnabledCard(int from, int step) {
+		for (int i = from; i >= 0 && i < wizardCards.size(); i += step) {
+			if (isCardEnabled(wizardCards.get(i))) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Show a particular card in the stack.
+	 * @param iCard card index.
+	 */
+	private void showCard(int iCard) {
+		cardLayout.show(cardPanel, wizardCards.get(iCard).getTitle());
+	}
+
+	/**
+	 * Called when 'previous' button is clicked.
 	 */
 	protected void previousButton() {
-		cardLayout.previous(cardPanel);
+		int iPrev = findEnabledCard(getCardIndex()-1, -1);
+		if (iPrev >= 0) {
+			showCard(iPrev);
+		}
 		enableControls();
 	}
 
 	public void enableControls() {
 		int iCard = getCardIndex();
-		prevButton.setEnabled(iCard > 0);
-		boolean isLast = iCard == wizardCards.size()-1;
+		boolean isFirst = findEnabledCard(iCard-1, -1) < 0;
+		boolean isLast = findEnabledCard(iCard+1, +1) < 0;
+		prevButton.setEnabled(!isFirst);
 //		getOkButton().setEnabled(!isLast);
 		getOkButton().setText(isLast ? "Finish" : "Next");
 		getOkButton().setToolTipText(isLast ? "Check values and close" : "Next page");
-		prevButton.setToolTipText(iCard == 0 ? null : "Previous page");
+		prevButton.setToolTipText(isFirst ? null : "Previous page");
 	}
 	
 
@@ -143,9 +184,9 @@ abstract public class PamWizard extends PamDialog {
 		if (checkCurrentCard() == false) {
 			return false;
 		}
-		int iCard = getCardIndex();
-		if (iCard < wizardCards.size()-1) {
-			cardLayout.next(cardPanel);
+		int iNext = findEnabledCard(getCardIndex()+1, +1);
+		if (iNext >= 0) {
+			showCard(iNext);
 			selectNewCard();
 			enableControls();
 			return false;

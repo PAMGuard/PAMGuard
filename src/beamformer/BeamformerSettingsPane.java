@@ -223,6 +223,7 @@ public class BeamformerSettingsPane extends SettingsPane<BeamFormerParams> {
 			// create the button and add the listener
 //			settingsButtons[i] = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
 			settingsButtons[i] = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog",Color.WHITE, PamGuiManagerFX.iconSize));
+			settingsButtons[i].getStyleClass().add("icon-button");
 			settingsButtons[i].setOnAction((action)->{
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override

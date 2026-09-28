@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 
 /**
  * Text area with a character limit
@@ -68,16 +69,39 @@ public class DBTextArea  {
 			commentLength = txt.length();
 		}
 		if (commentLength <= maxChars) {
-			textArea.setBackground(Color.WHITE);
+			textArea.setBackground(normalBackground());
 		}
 		else {
-			textArea.setBackground(Color.PINK);
+			textArea.setBackground(warningBackground());
 			if (policy == POLICY_STOP_TYPING) {
 				textArea.setText(txt.substring(0,maxChars));
 			}
 		}
 	}
-	
+
+	/**
+	 * Normal background for the text area, taken from the look and feel rather than
+	 * being hard wired to white, so that the box doesn't turn white (with white text
+	 * on it) as soon as anything is typed into it in a dark colour scheme.
+	 *
+	 * @return background colour for a comment of acceptable length
+	 */
+	private Color normalBackground() {
+		Color col = UIManager.getColor("TextArea.background");
+		return col == null ? Color.WHITE : col;
+	}
+
+	/**
+	 * Background for a comment which is too long. Pink only works against a light
+	 * background, so blend red into whatever the normal background is instead.
+	 *
+	 * @return warning background colour
+	 */
+	private Color warningBackground() {
+		Color bg = normalBackground();
+		return new Color((bg.getRed() + 255) / 2, bg.getGreen() / 2, bg.getBlue() / 2);
+	}
+
 	public void setDimension(Dimension dim) {
 //		textArea.setMaximumSize(dim);
 //		textArea.setMinimumSize(dim);

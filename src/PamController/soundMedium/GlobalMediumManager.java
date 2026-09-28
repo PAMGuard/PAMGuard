@@ -14,6 +14,9 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamView.dialog.warn.WarnOnce;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
+
+import PamView.component.PamFontIcon;
 
 /**
  * Manages the global medium @see GlobalMedium
@@ -49,6 +52,7 @@ public class GlobalMediumManager implements PamSettings {
 		ButtonGroup buttonGroup = new ButtonGroup(); 
 		
 		JMenu subMenu = new JMenu("Sound Medium");
+		subMenu.setIcon(PamFontIcon.of(MaterialDesignW.WAVES, PamFontIcon.MENU_SIZE));
 		subMenu.setToolTipText("Select gloabl medium, Air or Water");
 		menu.add(subMenu);
 				

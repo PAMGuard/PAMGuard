@@ -39,6 +39,7 @@ import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
 import PamController.command.MulticastController;
 import PamController.command.NetworkController;
+import PamController.command.NetworkControllerResilient;
 import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
 import PamController.fileprocessing.ReprocessManager;
@@ -83,6 +84,7 @@ import generalDatabase.DBControlUnit;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import metadata.MetaDataContol;
+import networkTransfer.receive.NetworkReceiver;
 import offlineProcessing.OfflineTaskManager;
 
 //import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
@@ -141,6 +143,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int RUN_REMOTE = 3;
 	public static final int RUN_NOTHING = 4;
 	public static final int RUN_NETWORKRECEIVER = 5;
+	
+	public static boolean isNetRx() {
+		return getInstance().runMode == RUN_NETWORKRECEIVER;
+	}
 
 	private int runMode = RUN_NORMAL;
 
@@ -286,7 +292,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 		watchdogComms = new WatchdogComms(this);
 
 		if (pamBuoyGlobals.getNetworkControlPort() != null) {
-			networkController = new NetworkController(this);
+			if(pamBuoyGlobals.isNetworkControlResilient()) {
+				networkController = new NetworkControllerResilient(this);
+			}else {
+				networkController = new NetworkController(this);
+			}
 		}
 		if (pamBuoyGlobals.getMulticastAddress() != null) {
 			new MulticastController(this);
@@ -454,7 +464,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * them.
 		 */
 		int loadAns = PamSettingManager.getInstance().loadPAMSettings(runMode);
-
+		
+		if(loadAns!=PamSettingManager.LOAD_SETTINGS_NEW) {
+			forceNetRxIfNecessary();
+		}
+		
 		System.out.println("Pamcontroller: loadPAMSettings: " + loadAns);
 
 		if (loadAns == PamSettingManager.LOAD_SETTINGS_NEW) {
@@ -665,6 +679,29 @@ public class PamController implements PamControllerInterface, PamSettings {
 		// pamStart();
 		// }
 		// });
+	}
+	
+	private void forceNetRxIfNecessary() {
+		System.out.println("Searching for existing network receiver in selected config...");
+		PamControlledUnitSettings netRxSettings = PamSettingManager.getInstance().findSettingsForType(NetworkReceiver.unitTypeString);
+		if(netRxSettings!=null) {
+			if(PamController.isNetRx()) {
+				return;
+			}
+			if(PamGUIManager.getGUIType()!=PamGUIManager.NOGUI) {
+				String message = "The configuration that has been loaded contains a network receiver module, but PAMGuard is not currently in Network Receive mode. Do you want to launch in network receiver mode?";
+				int userResponse = WarnOnce.showWarning("Network Receiver Configuration", message, WarnOnce.YES_NO_OPTION);
+				if(userResponse==JOptionPane.YES_OPTION) {
+					System.out.println("User has selected to change the run mode to network receiver -- modifying runMode now.");
+					this.runMode = RUN_NETWORKRECEIVER;
+				}else {
+					System.out.println("User has been notified that the current config has a network receiver module but not in network receiver mode. User has chosen to NOT boot in network receiver mode.");
+				}
+			}else {
+				System.err.println("The current loaded configuration contains a network receiver module but we are booting up in NO GUI mode. "
+						+ "The network receiver will not run. This behavior can be changed in the PAM Controller object.");
+			}
+		}
 	}
 
 	/**
@@ -1384,7 +1421,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 *  time, things can only move forwards.  
 		 */
 		boolean isRT = globalTimeManager.isRealTime();
-		if (saveSettings && getRunMode() == RUN_NORMAL && isRT == false) { // only true on a button press or network start and it's not real time
+		if (saveSettings && getRunMode() == RUN_NORMAL && isRT == false && PamGUIManager.getGUIType()!=PamGUIManager.NOGUI) { // only true on a button press or network start and it's not real time
 			checkReprocessManager(saveSettings, startTime);
 		}
 		else {
@@ -3267,9 +3304,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 		sum += String.format("<STATUS>%d<\\STATUS>", getPamStatus());
 		sum += String.format("<STATE>%d<\\STATE>", getRealStatus());
 
-		//sum += String.format("\n<SYSTIME>%s<\\SYSTIME>", t);
-		//sum += String.format("\n<STATUS>%d<\\STATUS>", getPamStatus());
-	//	sum += String.format("\n<STATE>%d<\\STATE>", getRealStatus());
 		sum += "\n";
 		return sum;
 	}

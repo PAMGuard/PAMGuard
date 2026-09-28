@@ -176,6 +176,7 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		hbox.setAlignment(Pos.CENTER_LEFT);
 
 		dataSelectorButton = new PamButton();
+		dataSelectorButton.getStyleClass().add("icon-button");
 //		dataSelectorButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		dataSelectorButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		dataSelectorButton.setOnAction((action)->{

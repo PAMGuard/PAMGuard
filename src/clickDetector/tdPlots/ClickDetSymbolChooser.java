@@ -8,7 +8,6 @@ import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.PamColors.PamColor;
 import PamView.symbol.PamSymbolOptions;
 import PamView.symbol.StandardSymbolChooser;
 import PamView.symbol.StandardSymbolManager;
@@ -200,14 +199,19 @@ public class ClickDetSymbolChooser extends StandardSymbolChooser {
 
 
 	public static PamSymbol getDefaultSymbol(boolean makeClone) {
+		/*
+		 * The colour scheme's default symbol colour, not its PLAIN (text / axis)
+		 * colour: this symbol goes in the key beside clicks which are themselves drawn
+		 * in the default symbol colour, so the two have to match.
+		 */
+		Color defaultColour = PamColors.getInstance().getDefaultSymbolColour();
 		if (defaultSymbol == null) {
 			defaultSymbol = new PamSymbol(PamSymbolType.SYMBOL_CIRCLE, 8, 8,
-					true, PamColors.getInstance().getColor(PamColor.PLAIN), 
-					PamColors.getInstance().getColor(PamColor.PLAIN));
+					true, defaultColour, defaultColour);
 		}
-		if (defaultSymbol.getFillColor() != PamColors.getInstance().getColor(PamColor.PLAIN)) {
-			defaultSymbol.setFillColor(PamColors.getInstance().getColor(PamColor.PLAIN));
-			defaultSymbol.setLineColor(PamColors.getInstance().getColor(PamColor.PLAIN));
+		if (defaultSymbol.getFillColor() != defaultColour) {
+			defaultSymbol.setFillColor(defaultColour);
+			defaultSymbol.setLineColor(defaultColour);
 		}
 		// always reset the shape since it may have been messed about with
 		defaultSymbol.setSymbol(PamSymbolType.SYMBOL_CIRCLE);

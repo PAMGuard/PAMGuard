@@ -255,6 +255,7 @@ public class VRImagePane extends PamBorderPane {
 
 		
 		PamButton infoButton = new PamButton(); 
+		infoButton.getStyleClass().add("icon-button");
 //		infoButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.INFO_OUTLINE, Color.WHITE, iconSize)); 
 		infoButton.setGraphic(PamGlyphDude.createPamIcon("mdi2i-information-outline", Color.WHITE, iconSize)); 
 		infoButton.setOnAction((action)->{
@@ -267,6 +268,7 @@ public class VRImagePane extends PamBorderPane {
 
 		
 		PamButton editButton = new PamButton(); 
+		editButton.getStyleClass().add("icon-button");
 //		editButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.TUNE, Color.WHITE, iconSize)); 
 		editButton.setGraphic(PamGlyphDude.createPamIcon("mdi2t-tune", Color.WHITE, iconSize)); 
 		editButton.setOnAction((action)->{
@@ -279,6 +281,7 @@ public class VRImagePane extends PamBorderPane {
 		
 		
 		PamButton settingsButton = new PamButton();
+		settingsButton.getStyleClass().add("icon-button");
 //		settingsButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.SETTINGS, Color.WHITE, iconSize)); 
 		settingsButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, iconSize)); 
 		settingsButton.setOnAction((action)->{
@@ -290,6 +293,7 @@ public class VRImagePane extends PamBorderPane {
 
 
 		PamButton zoomInButton = new PamButton(); 
+		zoomInButton.getStyleClass().add("icon-button");
 //		zoomInButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ZOOM_IN, Color.WHITE, iconSize)); 
 		zoomInButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-magnify-plus-outline", Color.WHITE, iconSize)); 
 		zoomInButton.setOnAction((action)->{
@@ -299,6 +303,7 @@ public class VRImagePane extends PamBorderPane {
 		zoomInButton.getStyleClass().add("square-button-trans");
 
 		PamButton zoomOutButton = new PamButton(); 
+		zoomOutButton.getStyleClass().add("icon-button");
 //		zoomOutButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ZOOM_OUT, Color.WHITE, iconSize)); 
 		zoomOutButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-magnify-minus-outline", Color.WHITE, iconSize)); 
 		zoomOutButton.setOnAction((action)->{
@@ -307,6 +312,7 @@ public class VRImagePane extends PamBorderPane {
 		zoomOutButton.getStyleClass().add("square-button-trans");
 		
 		PamButton zoomReset = new PamButton(); 
+		zoomReset.getStyleClass().add("icon-button");
 //		zoomReset.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.ARROW_EXPAND_ALL, Color.WHITE, iconSize)); 
 		zoomReset.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-expand-all", Color.WHITE, iconSize)); 
 		zoomReset.setOnAction((action)->{
@@ -353,7 +359,8 @@ public class VRImagePane extends PamBorderPane {
 		StackPane.setAlignment(ribbonHolder, Pos.TOP_LEFT);
 		ribbonHolder.setMaxHeight(35);
 		ribbonHolder.maxWidthProperty().bind(stackPane.widthProperty().subtract(imageControls.widthProperty()));
-		ribbonHolder.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+		//registered rather than added directly so the ribbon follows a colour scheme change.
+		PamStylesManagerFX.getPamStylesManagerFX().styleNode(ribbonHolder, PamStylesManagerFX.STYLE_DIALOG);
 		//ribbonHolder.setStyle("-fx-background-color:  -fx-darkbackground-trans"); //from dark stylesheet
 		mainHolder.getChildren().add(ribbonHolder);
 

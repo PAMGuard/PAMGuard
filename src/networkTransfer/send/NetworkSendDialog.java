@@ -16,6 +16,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -45,7 +46,7 @@ public class NetworkSendDialog extends PamDialog {
 
 //	private FormatPanel formatPanel;
 		
-	private NetworkParamsPanel netParamsPanel;
+	private NetParamsPanelWithActivate netParamsPanel;
 	
 	private NetworkSendDialog(Window parentFrame, NetworkSender networkSender) {
 		super(parentFrame, "Network Sending", false);
@@ -53,9 +54,9 @@ public class NetworkSendDialog extends PamDialog {
 
 		tabbedPane = new JTabbedPane();
 		
-		netParamsPanel = new NetworkParamsPanel(this,this.networkSendParams,true);
+		netParamsPanel = new NetParamsPanelWithActivate(this);
 		
-		tabbedPane.add("Connection", netParamsPanel.getNetParamsPanel());
+		tabbedPane.add("Connection", netParamsPanel);
 
 //		formatPanel = new FormatPanel();
 //		tabbedPane.add("Format", formatPanel);
@@ -118,6 +119,89 @@ public class NetworkSendDialog extends PamDialog {
 		
 	}
 
+	private class NetParamsPanelWithActivate extends JPanel {
+		
+		private NetworkParamsPanel netParamsPanel;
+		
+		private JRadioButton activateSend, disableSend;
+		
+		private ActivateSwitch activator;
+		
+				
+		private NetParamsPanelWithActivate(PamDialog parent) {
+			super();
+			
+			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+			
+			JPanel activateSenderPanel = new JPanel();
+			activateSenderPanel.setBorder(new TitledBorder("Activate Sender"));
+			activateSenderPanel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new PamGridBagContraints();
+			ButtonGroup bg = new ButtonGroup();
+			bg.add(activateSend = new JRadioButton("Enable Network Sending"));
+			bg.add(disableSend = new JRadioButton("Disable Network Sending"));
+			activateSend.setToolTipText("Allow connection to host and data transmission");
+			disableSend.setToolTipText("Disable connection to host and data transmission. Network send module will do nothing.");
+			
+			addComponent(activateSenderPanel, activateSend, c);
+			c.gridy++;
+			addComponent(activateSenderPanel, disableSend, c);
+			add(activateSenderPanel);
+			
+			activator = new ActivateSwitch();
+			activateSend.addActionListener(activator);
+			disableSend.addActionListener(activator);
+			
+			netParamsPanel = new NetworkParamsPanel(parent,networkSendParams,true);
+			add(netParamsPanel.getNetParamsPanel());
+
+		}
+		
+		public void setParams(NetworkSendParams networkSendParams) {
+			netParamsPanel.setParams(networkSendParams);
+			setActiveSelect();
+		}
+		
+		public boolean getParams() {
+			networkSendParams.setModuleActivated(this.activateSend.isSelected());
+			return netParamsPanel.getParams();
+		}
+		
+		private void setActiveSelect() {
+			if(networkSendParams.isModuleActivated()) {
+				activateSend.setSelected(true);
+				disableSend.setSelected(false);
+			}else {
+				activateSend.setSelected(false);
+				disableSend.setSelected(true);
+			}
+			
+			activator.runSwap();
+		}
+		
+		private class ActivateSwitch implements ActionListener{
+			
+			public void runSwap() {
+				if(activateSend.isSelected()) {
+					netParamsPanel.panel.setVisible(true);
+				}else {
+					netParamsPanel.panel.setVisible(false);
+				}
+				singleInstance.revalidate();
+				singleInstance.pack();
+				singleInstance.repaint();
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				runSwap();
+				
+			}
+			
+		}
+		
+		
+	}
 	
 	private class DataPanel extends JPanel {
 

@@ -188,6 +188,7 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D implement
 				hBox.setPadding(new Insets(5,5,5,5));
 				
 				PamButton algoOptsButton = new PamButton("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+				algoOptsButton.getStyleClass().add("icon-button");
 				algoOptsButton.setOnAction((action)->{
 					moreAlgorithmOptions() ;
 				});
@@ -232,12 +233,21 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D implement
 		 * @see group3dlocaliser.algorithm.LocaliserAlgorithmProvider#showAlgorithmDialog(java.awt.Window, group3dlocaliser.algorithm.LocaliserAlgorithmParams)
 		 */
 		public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
-			
-			if (currentParams != null && currentParams.getAlgorithmParameters() instanceof TMAnnotationOptions) {
-				TMAnnotationOptions p = (TMAnnotationOptions) currentParams.getAlgorithmParameters();
-				setTmAnnotationOptions(p);
+
+			TMAnnotationOptions p = null; 
+			while (currentParams instanceof LocaliserAlgorithmParams) {
+				Serializable innerP = currentParams.getAlgorithmParameters();
+				
+				if (innerP instanceof TMAnnotationOptions) {
+					p = (TMAnnotationOptions) currentParams.getAlgorithmParameters();
+					setTmAnnotationOptions(p);
+					break;
+				}
+				if (innerP instanceof LocaliserAlgorithmParams) {
+					currentParams = (LocaliserAlgorithmParams) innerP;
+				}
 			}
-			
+
 //			AnnotationSettingsPanel settingsPanel = cbLocaliser.getTmAnnotationType().getSettingsPanel();
 			boolean asd = AnnotationSettingsDialog.showDialog(parent, getTmAnnotationType());
 			

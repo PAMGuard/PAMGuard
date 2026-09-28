@@ -143,6 +143,8 @@ public class StandardSymbolOptions extends PamSymbolOptions implements Serializa
 		else if (isEnabled.length < i+1) {
 			isEnabled = Arrays.copyOf(isEnabled, i+1);
 		}
+		
+		if (i==-1) return;
 		isEnabled[i] = enabled;
 	}
 	

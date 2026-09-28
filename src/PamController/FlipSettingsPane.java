@@ -99,6 +99,7 @@ public abstract class FlipSettingsPane<T> extends SettingsPane<T> {
 	private PamBorderPane createAdvSettingsPane() {
 		
 		backButton = new PamButton(); 
+		backButton.getStyleClass().add("icon-button");
 		backButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
 		
 		backButton.setOnAction((action)->{

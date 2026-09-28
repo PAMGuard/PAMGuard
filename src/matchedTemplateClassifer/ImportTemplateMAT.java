@@ -76,8 +76,14 @@ public class ImportTemplateMAT implements TemplateImport {
 	 */
 	private MatchTemplate getTemplateStruct(Mat5File mfr2) {
 		
-		//the MATLAB file reader. 
-		Struct clicksStruct = mfr.getStruct("clicks"); 
+		//the MATLAB file reader. getStruct throws an exception for missing variables.
+		Struct clicksStruct;
+		try {
+			clicksStruct = mfr.getStruct("clicks");
+		}
+		catch (Exception e) {
+			clicksStruct = null;
+		}
 		Double sampleRateML = getDouble(mfr,"clicks_sR");
 
 //		if (clicksStruct==null) {
@@ -98,9 +104,25 @@ public class ImportTemplateMAT implements TemplateImport {
 	
 	
 	private Double getDouble(Mat5File mfr, String field) {
-		Matrix data = mfr.getMatrix(field); 
+		Matrix data = getMatrix(mfr, field);
 		if (data==null) return null;
 		return data.getDouble(0);
+	}
+
+	/**
+	 * Get a matrix from a .mat file, returning null if the variable does not
+	 * exist (Mat5File.getMatrix throws an exception for missing variables).
+	 * @param mfr - the .mat file.
+	 * @param field - the variable name.
+	 * @return the matrix or null if there is no such variable.
+	 */
+	private Matrix getMatrix(Mat5File mfr, String field) {
+		try {
+			return mfr.getMatrix(field);
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 
@@ -125,10 +147,10 @@ public class ImportTemplateMAT implements TemplateImport {
 
 			
 			//get the waveform or spectrum
-			Matrix waveformML = mfr.getMatrix("waveform");
-			
-			if (waveformML==null) waveformML =  mfr.getMatrix("wave"); //try a different name for the waveform
-			if (waveformML==null) waveformML =  mfr.getMatrix("spectrum"); //might be a spectrum
+			Matrix waveformML = getMatrix(mfr, "waveform");
+
+			if (waveformML==null) waveformML =  getMatrix(mfr, "wave"); //try a different name for the waveform
+			if (waveformML==null) waveformML =  getMatrix(mfr, "spectrum"); //might be a spectrum
 			
 
 			if (sampleRateML==null || waveformML==null) {

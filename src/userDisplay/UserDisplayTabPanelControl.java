@@ -92,9 +92,9 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 	 * @param userDisplayProvider
 	 * @param dpParams 
 	 */
-	public void addUserDisplay(UserDisplayProvider userDisplayProvider, DisplayProviderParameters dpParams) {
+	public UserDisplayComponent addUserDisplay(UserDisplayProvider userDisplayProvider, DisplayProviderParameters dpParams) {
 		if (!userDisplayProvider.canCreate()) {
-			return;
+			return null;
 		}
 		String uniqueName = DisplayNameManager.getInstance().getUniqueName(userDisplayProvider.getName(), dpParams);
 //		System.out.println("Adding display " + userDisplayProvider.getName());
@@ -102,12 +102,12 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 		frame.getUserDisplayComponent().setUniqueName(uniqueName);
 		UserDisplayComponent displayComponent = frame.getUserDisplayComponent();
 		if (displayComponent == null) {
-			return;
+			return null;
 		}
 		if (displayComponent instanceof UserFramePlots) {
 			UserFramePlots userFramePlots = (UserFramePlots) displayComponent;
 //			userFramePlots.setFrame(frame.get);
-			
+
 		}
 		userDisplayTabPanel.add(frame);
 		userDisplayTabPanel.setPosition(frame, 0);
@@ -118,6 +118,7 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 		frame.addInternalFrameListener(new UserDisplayListener(frame));
 		frame.setTitle(frame.getUserDisplayComponent().getFrameTitle());
 		userDisplayControl.enableUserMenus();
+		return displayComponent;
 	}
 
 	public Serializable getSettingsReference() {

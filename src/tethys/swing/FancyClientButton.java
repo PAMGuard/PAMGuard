@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -21,6 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
+import PamView.component.PamFontIcon;
 import tethys.Collection;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
@@ -51,10 +54,9 @@ public class FancyClientButton extends JPanel {
 		c.fill = GridBagConstraints.VERTICAL;
 		clientButton = new JButton("Open Client");
 		clientButton.setToolTipText("Open Tethys web client in default browser");
-		ImageIcon arrowDown= null;
+		Icon arrowDown = null;
 		try {
-			arrowDown = new ImageIcon(ClassLoader
-					.getSystemResource("Resources/SidePanelShowH.png"));
+			arrowDown = PamFontIcon.of(MaterialDesignC.CHEVRON_DOWN, PamFontIcon.ARROW_SIZE);
 		}
 		catch (Exception e) {
 		}

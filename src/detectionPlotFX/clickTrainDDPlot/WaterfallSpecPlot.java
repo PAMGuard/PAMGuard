@@ -242,7 +242,7 @@ public class WaterfallSpecPlot<D extends DetectionGroupDataUnit> extends RawFFTP
 		}
 		
 		SimpleFFTDataUnit fftDataUnit = new SimpleFFTDataUnit(dataUnit.getTimeMilliseconds(), 
-				PamUtils.makeChannelMap(channel), dataUnit.getStartSample(), 
+				PamUtils.makeChannelMap(new int[]{channel}), dataUnit.getStartSample(), 
 				fftLen, fftData, 0, dataUnit.getParentDataBlock().getSampleRate()); 
 		return fftDataUnit; 
 	}

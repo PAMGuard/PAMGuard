@@ -18,7 +18,7 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -30,9 +30,13 @@ import javax.swing.Timer;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
 import PamView.PamColors;
 import PamView.ScreenSize;
 import PamView.PamColors.PamColor;
+import PamView.component.PamFontIcon;
+import PamView.component.PamFontIcon.IconColour;
 import PamView.dialog.PamButtonAlpha;
 import PamView.panel.CornerLayoutContraint;
 
@@ -116,20 +120,22 @@ public class HidingDialogPanel {
 		parentListener = new DialogParentListener();
 	}
 
-	ImageIcon getShowButtonImage(int location) {
+	/**
+	 * Size of the show chevron. The images this replaced were 20 x 20 pixels.
+	 */
+	private static final int SHOW_ARROW_SIZE = 20;
+
+	Icon getShowButtonImage(int location) {
 		switch (startLocation) {
 		case CornerLayoutContraint.FIRST_LINE_START:
 		case CornerLayoutContraint.LAST_LINE_START:
-			return new ImageIcon(ClassLoader
-					.getSystemResource("Resources/SidePanelShow2.png"));
+			return PamFontIcon.of(MaterialDesignC.CHEVRON_RIGHT, SHOW_ARROW_SIZE, IconColour.ALPHA_PANEL);
 		case CornerLayoutContraint.FIRST_LINE_END:
 		case CornerLayoutContraint.LAST_LINE_END:
-			return new ImageIcon(ClassLoader
-					.getSystemResource("Resources/SidePanelHide2.png"));
+			return PamFontIcon.of(MaterialDesignC.CHEVRON_LEFT, SHOW_ARROW_SIZE, IconColour.ALPHA_PANEL);
 		}
 
-		return new ImageIcon(ClassLoader
-				.getSystemResource("Resources/SidePanelShow.png"));
+		return PamFontIcon.of(MaterialDesignC.CHEVRON_RIGHT, SHOW_ARROW_SIZE, IconColour.ALPHA_PANEL);
 	}
 
 	/**

@@ -12,9 +12,12 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 
@@ -25,7 +28,75 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
  *
  */
 public class ScrollBarPane extends PamBorderPane {
-	
+
+	/**
+	 * Style class giving the scroller the plot window colour of the current colour
+	 * scheme.
+	 */
+	public static final String SCROLLER_PANE_STYLE_CLASS = "pam-scroller-pane";
+
+	/**
+	 * Style class for the draggable visible-range rectangle.
+	 */
+	public static final String SCROLLER_BODY_STYLE_CLASS = "pam-scroller-body";
+
+	/**
+	 * Style class for the grab handles at each end of the visible-range rectangle.
+	 */
+	public static final String SCROLLER_HANDLE_STYLE_CLASS = "pam-scroller-handle";
+
+	/**
+	 * Style class for the grip lines drawn on the drag handles.
+	 */
+	public static final String SCROLLER_GRIP_STYLE_CLASS = "pam-scroller-grip";
+
+	/**
+	 * Style class for the drag icon which appears on top of the visible-range
+	 * rectangle when the rectangle is too narrow to grab.
+	 */
+	public static final String SCROLLER_DRAG_ICON_STYLE_CLASS = "pam-scroller-drag-icon";
+
+	/**
+	 * Style class for the glyph drawn inside the drag icon.
+	 */
+	public static final String SCROLLER_DRAG_GLYPH_STYLE_CLASS = "pam-scroller-drag-glyph";
+
+	/**
+	 * The width, in pixels, of the resize handles at either end of the rectangle.
+	 */
+	private static final double DRAG_HANDLE_WIDTH = 8;
+
+	/**
+	 * The minimum width, in pixels, of the visible range rectangle.
+	 */
+	private static final double MIN_PIXEL_WIDTH = 10;
+
+	/**
+	 * The width, in pixels, of the drag icon which appears on a narrow rectangle.
+	 */
+	private static final double DRAG_ICON_WIDTH = 14;
+
+	/**
+	 * The height, in pixels, of the drag icon. Kept short so that the icon floats
+	 * above the text box instead of sitting on top of the range it is showing.
+	 */
+	private static final double DRAG_ICON_HEIGHT = 13;
+
+	/**
+	 * The inset, in pixels, of the drag icon from the top of the scroll bar.
+	 */
+	private static final double DRAG_ICON_INSET = 1;
+
+	/**
+	 * The number of pixels the mouse must move away from the press position before a
+	 * press on one of the resize handles counts as a drag. The handles are only a few
+	 * pixels wide so it is very easy to wobble the mouse by a pixel or two whilst
+	 * clicking on one - without this a click would resize the visible range to
+	 * whatever the rectangle happens to measure on screen.
+	 */
+	private static final double DRAG_THRESHOLD = 3;
+
+
 	/**
 	 * Have dsiplay units in ms instead of seconds. 
 	 */
@@ -86,14 +157,39 @@ public class ScrollBarPane extends PamBorderPane {
 	//values needed to be held for dragging
 	private double dragX;
 
-	private double leftLayoutX; 
-
-	private double rightLayoutX;
+	/**
+	 * The position, in scroll bar pane co-ordinates, at which a resize handle was
+	 * pressed. Resize drags work in deltas from this position so that the rectangle
+	 * does not jump when a drag begins.
+	 */
+	private double pressPosX;
 
 	/**
-	 * The scrollBar. The bit which actually moves. 
+	 * The layout x of the rectangle when a resize handle was pressed.
+	 */
+	private double pressLayoutX;
+
+	/**
+	 * The width of the rectangle when a resize handle was pressed.
+	 */
+	private double pressWidth;
+
+	/**
+	 * True once a press on a resize handle has moved far enough to count as a drag.
+	 * Until it does the visible range is left alone.
+	 */
+	private boolean handleDragging = false;
+
+	/**
+	 * The scrollBar. The bit which actually moves.
 	 */
 	private Pane rectangle;
+
+	/**
+	 * Icon shown on top of the rectangle when it is too narrow to grab, so that the
+	 * user has something obvious to drag.
+	 */
+	private Pane dragIcon;
 
 	/*
 	 *Canvas for drawing stuff on the scroll bar;  
@@ -112,6 +208,10 @@ public class ScrollBarPane extends PamBorderPane {
 	public ScrollBarPane(){
 		createScrollBarPane();
 		//scrollBarPane.setStyle("-fx-background-color: pink"); //TODO- TEMP
+		//the outer pane takes the plot window colour as well as the inner one: callers
+		//pad this pane (the detection display insets it by 5px top and bottom), and
+		//without a background of its own those strips show whatever is behind.
+		this.getStyleClass().add(SCROLLER_PANE_STYLE_CLASS);
 		this.setCenter(scrollBarPane);
 	}
 
@@ -121,7 +221,11 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	private void createScrollBarPane(){
 
-		scrollBarPane=new Pane(); 
+		scrollBarPane=new Pane();
+		//gives the scroller the plot window colour of the current colour scheme. Without
+		//it the pane has no background of its own and shows whatever is behind, which
+		//stayed light in the dark and night schemes.
+		scrollBarPane.getStyleClass().add(SCROLLER_PANE_STYLE_CLASS);
 
 		//create the rectangle which allows users to drag
 		rectangle=createDragRectangle();
@@ -147,9 +251,20 @@ public class ScrollBarPane extends PamBorderPane {
 			layoutRectangle();
 		});
 
-		//if the mouse is clicked somewhere on the scroll pane then the scroll bar needs to move. 
+		//if the mouse is clicked somewhere on the scroll pane then the scroll bar needs to move.
 		scrollBarPane.setOnMouseClicked((event)->{
-			double newlayout; 
+			/*
+			 * Only clicks on the trough itself (the background canvas or the pane) page the
+			 * scroller. Clicks which land on the scroller controls - the rectangle, its
+			 * resize handles, the text box or the drag icon - are the start of a
+			 * press/drag of the scroller and must not also move it. This matters because
+			 * the text box and drag icon overhang a narrow rectangle, so without this a
+			 * click on them jumped the scroller a page to the left or right.
+			 */
+			if (event.getTarget()!=scrollBarPane && event.getTarget()!=drawCanvas) {
+				return;
+			}
+			double newlayout;
 			//PamUtilsFX.nodeFlashEffect(rectangle, PamUtilsFX.addColorTransparancy(Color.WHITE, 0.5), 20d, 0.1);
 			if (event.getX()<rectangle.getLayoutX()){
 				newlayout=rectangle.getLayoutX()-rectangle.getWidth()*scrollClickIncrement; 
@@ -164,9 +279,15 @@ public class ScrollBarPane extends PamBorderPane {
 
 		createTextField();
 
-		scrollBarPane.getChildren().add(drawCanvas); 
-		scrollBarPane.getChildren().add(rectangle); 
-		scrollBarPane.getChildren().add(textBox); 
+		//the drag icon must be created after the text box - it only shows when the
+		//rectangle is narrower than the text box.
+		dragIcon=createDragIcon();
+
+		scrollBarPane.getChildren().add(drawCanvas);
+		scrollBarPane.getChildren().add(rectangle);
+		scrollBarPane.getChildren().add(textBox);
+		//added last so the icon sits on top of the (mostly transparent) text box.
+		scrollBarPane.getChildren().add(dragIcon);
 
 
 
@@ -261,154 +382,140 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	private Pane createDragRectangle(){
 
-		double dragWidth=5; 
-		double lineInset=5; 
-		double minPixelWidth=10; 
+		double dragWidth=DRAG_HANDLE_WIDTH;
+		double lineInset=4;
 
-		String cursorColour = "-fx-background-color: rgba(255, 255, 255, 0.5)";
+		/*
+		 * The body and handle colours come from the style sheet rather than being set
+		 * here, so that they can be inverted for the dark and night schemes - a
+		 * translucent dark grey body is invisible on a dark scroller.
+		 */
 
-		Pane rectangle=new Pane(); 
+		Pane rectangle=new Pane();
 		//rectangle.setStrokeWidth(10);
 		rectangle.layoutYProperty().setValue(0);
 		rectangle.prefHeightProperty().bind(scrollBarPane.heightProperty());
-		rectangle.setStyle(cursorColour);
+		rectangle.getStyleClass().add(SCROLLER_BODY_STYLE_CLASS);
 		rectangle.setPrefWidth(100);
 
-		//create two panes either side of this pane. 
+		//create two panes either side of this pane.
 		Pane leftDrag=new Pane();
 		leftDrag.setCursor(Cursor.W_RESIZE);
 		leftDrag.prefHeightProperty().bind(rectangle.heightProperty());
 		//the layout of the left rectangle is 0,0;
 		leftDrag.setPrefWidth(dragWidth);
-		leftDrag.setStyle(cursorColour); 
+		leftDrag.getStyleClass().add(SCROLLER_HANDLE_STYLE_CLASS);
 
-		//add line decoration to left drag. 
-		Line leftdragLine=new Line(); 
-		leftdragLine.startXProperty().bind(leftDrag.widthProperty().divide(2));
-		leftdragLine.startYProperty().setValue(5);
-		leftdragLine.endXProperty().bind(leftDrag.widthProperty().divide(2));
-		leftdragLine.endYProperty().bind(leftDrag.heightProperty().subtract(lineInset));
-
-		leftDrag.getChildren().add(leftdragLine); 
-		rectangle.getChildren().add(leftDrag); 
+		//add grip line decoration to left drag.
+		addGripLines(leftDrag, lineInset);
+		rectangle.getChildren().add(leftDrag);
 
 		Pane rightDrag=new Pane();
 		rightDrag.setCursor(Cursor.E_RESIZE);
 		rightDrag.prefHeightProperty().bind(rectangle.heightProperty());
 		rightDrag.layoutXProperty().bind(rectangle.widthProperty().subtract(rightDrag.widthProperty()));
 		rightDrag.setPrefWidth(dragWidth);
-		rightDrag.setStyle(cursorColour); 
-		//add line decoration to left drag. 
-		Line rightdragLine=new Line(); 
-		rightdragLine.startXProperty().bind(rightDrag.widthProperty().divide(2));
-		rightdragLine.startYProperty().setValue(5);
-		rightdragLine.endXProperty().bind(rightDrag.widthProperty().divide(2));
-		rightdragLine.endYProperty().bind(rightDrag.heightProperty().subtract(lineInset));
-
-		rightDrag.getChildren().add(rightdragLine); 
-		rectangle.getChildren().add(rightDrag); 
+		rightDrag.getStyleClass().add(SCROLLER_HANDLE_STYLE_CLASS);
+		//add grip line decoration to right drag.
+		addGripLines(rightDrag, lineInset);
+		rectangle.getChildren().add(rightDrag);
 
 		rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
 
-		//now set behaviours 
+		/*
+		 * Note that neither pressing nor releasing a resize handle changes the visible
+		 * range - only an actual drag does (see handleDrag). Pressing a handle used to
+		 * set the range from the measured width of the rectangle, which at small visible
+		 * ranges is the width of the two handles rather than the width the range really
+		 * represents, so a click on a handle jumped the range.
+		 */
 		leftDrag.setOnMousePressed((event)->{
-			rightLayoutX=rectangle.getLayoutX()+rectangle.getWidth();
-			isChanging.set(true);
-			dragStarted(event, leftDrag);
+			handlePressed(event);
 		});
 
 		leftDrag.setOnMouseReleased((event)->{
-			isChanging.set(false);
-			dragging(event); 
+			handleReleased(event);
 		});
 
 		//left drag
 		leftDrag.setOnMouseDragged((event)->{
+			if (!handleDrag(event)) return;
 
 			isChanging.set(true);
 
-			Point2D newPos=scrollBarPane.sceneToLocal(event.getSceneX(), event.getSceneY());
-			double dragPosX=newPos.getX();
+			//work in deltas from where the handle was pressed, using the geometry recorded
+			//at the press, so that the rectangle does not jump as the drag starts.
+			double newLayoutX=pressLayoutX+(dragPosX(event)-pressPosX);
+			double rightEdge=pressLayoutX+pressWidth;
 
-			double widthVal=rectangle.getWidth();
-			double currentVal=rectangle.getLayoutX();
-			//only move rectangle if the mouse has started dragging from inside. 
-			if (dragPosX-dragX<0){
+			double widthVal;
+			double currentVal;
+			if (newLayoutX<0){
 				//don;t let the drag go past left
 				currentVal=0;
+				widthVal=rightEdge;
 			}
-			else if (dragPosX-dragX>scrollBarPane.getWidth()-minPixelWidth) {
-				//don;t let the drag 
-				//System.out.println("AcousticScrollerFX: 2 widthVal: "+widthVal+ " currentVal: "+(dragPosX-dragX)+ " rightLayoutX "+rightLayoutX); 
-				widthVal=minPixelWidth;
+			else if (newLayoutX>scrollBarPane.getWidth()-MIN_PIXEL_WIDTH) {
+				//don;t let the drag go past the right hand end of the pane
+				widthVal=MIN_PIXEL_WIDTH;
 				currentVal=scrollBarPane.getWidth()-widthVal;
-
 			}
 			else{
-				//System.out.println("AcousticScrollerFX: 1 widthVal: "+widthVal+ " currentVal: "+(dragPosX-dragX)+ " rightLayoutX "+rightLayoutX); 
-				widthVal=rightLayoutX-(dragPosX-dragX);
-				currentVal=dragPosX-dragX;
+				widthVal=rightEdge-newLayoutX;
+				currentVal=newLayoutX;
 			}
 
-			//the width cannot be less than 1 pixel
-			widthVal=Math.max(minPixelWidth, widthVal);
+			//the width cannot be less than the minimum
+			widthVal=Math.max(minDragWidth(), widthVal);
 
-			double visAmount=calcScrollBarVal(widthVal)-this.minValueProperty.get(); 
-			//set the visible amount property; 
+			double visAmount=calcScrollBarVal(widthVal)-this.minValueProperty.get();
+			//set the visible amount property;
 			this.visibleAmountProperty.setValue(visAmount);
 			this.currentValueProperty.setValue(calcScrollBarVal(currentVal));
 
-			//need to consume the event so does not pass through node. 
+			//need to consume the event so does not pass through node.
 			event.consume();
-		}); 
+		});
 
-		//now set behaviours 
-		rightDrag.setOnMousePressed((event)->{			
-			leftLayoutX=rectangle.getLayoutX();
-			isChanging.set(true);
+		//now set behaviours
+		rightDrag.setOnMousePressed((event)->{
 			rectangle.setCursor(Cursor.CLOSED_HAND); //Change cursor to hand
-			dragStarted(event, rightDrag);
+			handlePressed(event);
 		});
 
 		rightDrag.setOnMouseReleased((event)->{
-			currentValueProperty.setValue(calcScrollBarVal(rectangle.getLayoutX()));
-			isChanging.set(false);
 			rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
-			dragging(event); 
+			handleReleased(event);
 		});
 
 		//right drag handle
 		rightDrag.setOnMouseDragged((event)->{
+			if (!handleDrag(event)) return;
+
 			isChanging.set(true);
-			Point2D newPos=scrollBarPane.sceneToLocal(event.getSceneX(), event.getSceneY());
-			double dragPosX=newPos.getX();
 
-			double widthVal;
+			//as for the left handle, the new width is the width at the press plus however
+			//far the mouse has moved since.
+			double widthVal=pressWidth+(dragPosX(event)-pressPosX);
 
-			if ((dragPosX-leftLayoutX)<leftDrag.getWidth()){
-				widthVal=minPixelWidth;
-			}
-			else if (dragPosX>scrollBarPane.getWidth()){
-				widthVal=scrollBarPane.getWidth()-leftLayoutX; 
-			}
-			else{
-				widthVal=dragPosX+dragX-leftLayoutX;
+			if (pressLayoutX+widthVal>scrollBarPane.getWidth()){
+				widthVal=scrollBarPane.getWidth()-pressLayoutX;
 			}
 
-			widthVal=Math.max(minPixelWidth, widthVal);
+			widthVal=Math.max(minDragWidth(), widthVal);
 
 			//	        	System.out.println("AcousticScrollerFX: visbleAmount: min: "+minValueProperty.get()+
 			//	        			" max: "+maxValueProperty.get() + " visble: "+calcScrollBarVal(rectangle.getWidth())+
 			//	        			" rectange width: "+rectangle.getWidth());
 
-			//set the visible amount- the width of the rectangle is changed in the property listener. 
+			//set the visible amount- the width of the rectangle is changed in the property listener.
 			//				System.out.println("AcousticScrollerFX: calcScrollBarVal(widthVal) " + calcScrollBarVal(widthVal)
 			//					+  " this.minValueProperty.get() " + this.minValueProperty.get() + " this.maxValueProperty.get() " + this.maxValueProperty.get());
-			double visAmount=calcScrollBarVal(widthVal)-this.minValueProperty.get(); 
+			double visAmount=calcScrollBarVal(widthVal)-this.minValueProperty.get();
 			this.visibleAmountProperty.setValue(visAmount);
-			//need to consume the event so does not pass through node. 
+			//need to consume the event so does not pass through node.
 			event.consume();
-		}); 
+		});
 
 
 		//the rectangle itself. 
@@ -438,10 +545,103 @@ public class ScrollBarPane extends PamBorderPane {
 	}
 
 
+	/**
+	 * Add a pair of vertical grip lines to a drag handle so the resize handles are
+	 * more obvious to the user.
+	 * @param dragPane - the handle pane to decorate.
+	 * @param lineInset - the vertical inset of the lines from the top and bottom of the handle.
+	 */
+	private void addGripLines(Pane dragPane, double lineInset){
+		double offset = 1.8; //horizontal spacing of the grip lines either side of centre.
+		for (int i = -1; i <= 1; i += 2){
+			Line gripLine = new Line();
+			//stroke comes from the style sheet so it can be dark on the light handles of
+			//the dark schemes and light on the dark handles of the day scheme.
+			gripLine.getStyleClass().add(SCROLLER_GRIP_STYLE_CLASS);
+			gripLine.setStrokeWidth(1.4);
+			gripLine.startXProperty().bind(dragPane.widthProperty().divide(2).add(i*offset));
+			gripLine.startYProperty().setValue(lineInset);
+			gripLine.endXProperty().bind(dragPane.widthProperty().divide(2).add(i*offset));
+			gripLine.endYProperty().bind(dragPane.heightProperty().subtract(lineInset));
+			dragPane.getChildren().add(gripLine);
+		}
+	}
+
+
+	/**
+	 * Called when one of the resize handles is pressed. Records the geometry of the
+	 * rectangle and the press position so that any subsequent drag can be worked out
+	 * as a movement from that position. Note that nothing about the scroller is
+	 * changed here - a press which is not followed by a drag must leave the visible
+	 * range exactly as it was.
+	 * @param event - the mouse pressed event.
+	 */
+	private void handlePressed(MouseEvent event){
+		pressPosX=dragPosX(event);
+		pressLayoutX=rectangle.getLayoutX();
+		pressWidth=rectangle.getWidth();
+		handleDragging=false;
+		//need to consume so does not pass to underlying node.
+		event.consume();
+	}
+
+	/**
+	 * Called when one of the resize handles is released.
+	 * @param event - the mouse released event.
+	 */
+	private void handleReleased(MouseEvent event){
+		handleDragging=false;
+		isChanging.set(false);
+		dragging(event);
+		event.consume();
+	}
+
+	/**
+	 * Check whether a mouse drag on one of the resize handles has moved far enough
+	 * from the press position to count as a genuine drag. Until it has, the drag is
+	 * ignored so that clicking on a handle (which is only a few pixels wide, and so
+	 * easy to wobble whilst clicking) does not change the visible range.
+	 * @param event - the mouse dragged event.
+	 * @return true if the handle is being dragged and the visible range should change.
+	 */
+	private boolean handleDrag(MouseEvent event){
+		if (!handleDragging && Math.abs(dragPosX(event)-pressPosX)<DRAG_THRESHOLD){
+			//consume so the part-drag does not pass to the underlying node.
+			event.consume();
+			return false;
+		}
+		handleDragging=true;
+		return true;
+	}
+
+	/**
+	 * The smallest width, in pixels, a resize drag may set the rectangle to. This is
+	 * normally MIN_PIXEL_WIDTH, but a rectangle which is already narrower than that
+	 * (the visible range can be set to anything from the text box) must not be made
+	 * wider by a drag which is trying to make it narrower.
+	 * @return the minimum width in pixels for the drag in progress.
+	 */
+	private double minDragWidth(){
+		return Math.max(1, Math.min(MIN_PIXEL_WIDTH, pressWidth));
+	}
+
+	/**
+	 * The x position of a mouse event in scroll bar pane co-ordinates. Note that this
+	 * must go via the scene because the pane is rotated when the scroller is vertical
+	 * and because events arrive from the handles, the text box and the drag icon.
+	 * @param event - the mouse event.
+	 * @return the x position of the event within the scroll bar pane.
+	 */
+	private double dragPosX(MouseEvent event){
+		Point2D newPos=scrollBarPane.sceneToLocal(event.getSceneX(), event.getSceneY());
+		return newPos.getX();
+	}
+
+
 	private void rectanglePressed(MouseEvent event){
 		isChanging.set(true);
 		dragStarted(event, rectangle);
-		dragging(event); 
+		dragging(event);
 	}
 
 
@@ -571,6 +771,78 @@ public class ScrollBarPane extends PamBorderPane {
 
 
 	/**
+	 * Create the icon which sits on top of the visible range rectangle and lets the
+	 * user drag it when the rectangle is too narrow to grab.
+	 * <p>
+	 * When the visible range is small the two resize handles meet and the text box,
+	 * which is centred on the rectangle, covers whatever is left of it. The only way
+	 * to move the scroller then is to drag the text box, which works but is not at all
+	 * obvious. The icon appears whenever the rectangle is narrower than the text box
+	 * and gives the user something clear to grab hold of.
+	 * @return the drag icon.
+	 */
+	private Pane createDragIcon(){
+
+		//a 3 x 3 grid of dots - the classic drag symbol.
+		Text glyph = PamGlyphDude.createPamIcon("mdi2d-dots-grid", 14);
+		glyph.getStyleClass().add(SCROLLER_DRAG_GLYPH_STYLE_CLASS);
+
+		StackPane dragIcon = new StackPane(glyph);
+		//colours come from the style sheet so the icon inverts with the colour scheme,
+		//just like the rectangle and its handles.
+		dragIcon.getStyleClass().add(SCROLLER_DRAG_ICON_STYLE_CLASS);
+		dragIcon.setMinSize(DRAG_ICON_WIDTH, DRAG_ICON_HEIGHT);
+		dragIcon.setPrefSize(DRAG_ICON_WIDTH, DRAG_ICON_HEIGHT);
+		dragIcon.setMaxSize(DRAG_ICON_WIDTH, DRAG_ICON_HEIGHT);
+		dragIcon.setCursor(Cursor.OPEN_HAND);
+
+		//the icon floats at the top of the rectangle rather than in the middle of it, so
+		//that it is clear of the text box and the range can still be read.
+		dragIcon.layoutXProperty().bind(rectangle.layoutXProperty().add(rectangle.widthProperty().divide(2))
+				.subtract(DRAG_ICON_WIDTH/2.));
+		dragIcon.setLayoutY(DRAG_ICON_INSET);
+
+		//only show the icon when the rectangle is narrower than the text box, i.e. when
+		//the text box covers the rectangle and there is no obvious way to drag it.
+		dragIcon.visibleProperty().bind(rectangle.widthProperty().lessThan(textBox.widthProperty())
+				.and(rectangle.visibleProperty()));
+
+		//dragging the icon moves the rectangle in exactly the same way as dragging its body.
+		dragIcon.setOnMousePressed((event)->{
+			dragIcon.setCursor(Cursor.CLOSED_HAND);
+			rectanglePressed(event);
+		});
+
+		dragIcon.setOnMouseReleased((event)->{
+			dragIcon.setCursor(Cursor.OPEN_HAND);
+			rectangleReleased(event);
+		});
+
+		dragIcon.setOnMouseDragged((event)->{
+			rectangleDragged(event);
+		});
+
+		dragIcon.setOnMouseDragReleased((event)->{
+			isChanging.set(false);
+		});
+
+		//the icon sits on top of the rectangle and text box, so it must keep the text box
+		//showing whilst the mouse is over it.
+		dragIcon.setOnMouseEntered((event)->{
+			setTextBoxVisible(true);
+		});
+
+		dragIcon.setOnMouseExited((event)->{
+			if (!rectangle.contains(rectangle.sceneToLocal(event.getSceneX(), event.getSceneY()))){
+				setTextBoxVisible(false);
+			}
+		});
+
+		return dragIcon;
+	}
+
+
+	/**
 	 * Get the text box that shows the visible amount
 	 * @return - the text field
 	 */
@@ -648,12 +920,15 @@ public class ScrollBarPane extends PamBorderPane {
 	public void dragStarted(MouseEvent event, Node node){
 		//need to do scene converstion and back so that controls with the rectangle can also drag the rectangle...
 		Point2D newPos=node.sceneToLocal(event.getSceneX(), event.getSceneY());
-		if (newPos.getX()>=0 && newPos.getX()<scrollBarPane.getWidth()){
-			// record a delta distance for the drag and drop operation.
-			dragX = newPos.getX();
-			//need to consume so does not pass to underlying node. 
-			event.consume();
-		}
+		/*
+		 * Record a delta distance for the drag and drop operation. Note that this can be
+		 * outside the node - the text box and the drag icon both overhang a narrow
+		 * rectangle - and keeping the true (even negative) offset is what stops the
+		 * rectangle jumping out from under the mouse when the drag begins.
+		 */
+		dragX = newPos.getX();
+		//need to consume so does not pass to underlying node.
+		event.consume();
 	}
 
 	/**
@@ -686,6 +961,15 @@ public class ScrollBarPane extends PamBorderPane {
 
 	public Pane getScrollRectangle(){
 		return this.rectangle;
+	}
+
+	/**
+	 * Get the drag icon which appears on top of the scroll rectangle when the
+	 * rectangle is too narrow to grab.
+	 * @return the drag icon.
+	 */
+	public Pane getDragIcon(){
+		return this.dragIcon;
 	}
 
 	/**

@@ -17,8 +17,15 @@ public class TabInfo implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
 	/**
-	 * The name shown on the tab. 
+	 * The name of the data model tab. This tab is always recreated on startup and
+	 * so is treated specially when tab information is saved and restored.
+	 */
+	public static final String DATA_MODEL_TAB_NAME = "Data Model";
+
+	/**
+	 * The name shown on the tab.
 	 */
 	public String tabName = null;
 

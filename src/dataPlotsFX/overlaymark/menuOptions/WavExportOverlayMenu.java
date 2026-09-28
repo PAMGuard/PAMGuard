@@ -2,7 +2,6 @@ package dataPlotsFX.overlaymark.menuOptions;
 
 import java.io.File;
 
-import PamController.PamController;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamRawDataBlock;
@@ -135,20 +134,25 @@ public class WavExportOverlayMenu  extends ExportOverlayMenu {
 
 	@Override
 	public boolean canBeUsed(DetectionGroupSummary foundDataUnits, int selectedIndex, OverlayMark mark) {
-		//now search for the raw data block 
+		//now search for the raw data block
 		//System.out.println("Can raw data be used?");
-		PamRawDataBlock rawDataBlock;
-		if (foundDataUnits==null || foundDataUnits.getDataList().size()<=0) {
-			rawDataBlock=PamController.getInstance().getRawDataBlock(0);
-		}
-		else {
-			rawDataBlock=foundDataUnits.getDataList().get(0).getParentDataBlock().getRawSourceDataBlock();
-		}
+		PamRawDataBlock rawDataBlock = WavDetExport.findRawDataBlock(foundDataUnits);
+
 		//is there available raw data
 		if (mark!=null && WavDetExport.haveRawData(rawDataBlock, (long) mark.getLimits()[0], (long) mark.getLimits()[1])) {
 			return true;
-		} 
+		}
 
+		/*
+		 * Data units which hold no raw data of their own but sit over a stretch of sound
+		 * which does - a manual annotation drawn on the spectrogram is the case this was
+		 * written for. The clip is then the span of the data units.
+		 */
+		if (foundDataUnits!=null && foundDataUnits.getDataList().size()>0
+				&& WavDetExport.haveRawData(rawDataBlock, foundDataUnits.getFirstTimeMillis(),
+						WavDetExport.getLastEndMillis(foundDataUnits))) {
+			return true;
+		}
 
 		if (foundDataUnits!=null) {
 			//do any of the data units have raw snippets of data that could be used?

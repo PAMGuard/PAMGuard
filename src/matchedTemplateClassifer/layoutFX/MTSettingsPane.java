@@ -527,6 +527,11 @@ public class MTSettingsPane extends SettingsPane<MatchedTemplateParams> {
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("matched_template_classifier.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return mainPane;
 	}

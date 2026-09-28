@@ -174,6 +174,7 @@ public class FilePlaybackSettingsPane extends PlaybackSettingsPane {
 		playbackSpeed.getValueFactory().setValue(1.0);
 
 		defButton=new PamButton();
+		defButton.getStyleClass().add("icon-button");
 //		defButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.REFRESH, PamGuiManagerFX.iconSize-3));
 		defButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
 		defButton.setOnAction((action)->{

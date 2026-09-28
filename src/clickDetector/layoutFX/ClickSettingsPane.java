@@ -907,6 +907,11 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	}
 
 	@Override
+	public helpFX.HelpPoint getHelpPointFX() {
+		return new helpFX.HelpPoint("click_detector.md");
+	}
+
+	@Override
 	public Node getContentNode() {
 		return pamTabbedPane;
 	}

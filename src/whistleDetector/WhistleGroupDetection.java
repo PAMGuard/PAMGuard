@@ -1,6 +1,6 @@
 package whistleDetector;
 
-import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamguardMVC.superdet.AcousticDetectionGroup;
 
 /**
  * Whistle group detection is initially designed to take just one whistle from each 
@@ -10,7 +10,7 @@ import Localiser.detectionGroupLocaliser.GroupDetection;
  * @author Doug
  *
  */
-public class WhistleGroupDetection extends GroupDetection<ShapeDataUnit> {
+public class WhistleGroupDetection extends AcousticDetectionGroup<ShapeDataUnit> {
 
 	public WhistleGroupDetection(ShapeDataUnit firstShape) {
 		super(firstShape);
