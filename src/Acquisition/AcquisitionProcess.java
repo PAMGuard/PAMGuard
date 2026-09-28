@@ -210,8 +210,8 @@ public class AcquisitionProcess extends PamProcess {
 			return;
 		}
 
-		boolean netRX = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
-		if (!netRX) {
+//		boolean netRX = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
+		if (!PamController.isNetRx()) {
 			if (!runningSystem.startSystem(acquisitionControl)) return;
 		}
 		// Log a data unit asap to get the start time
@@ -253,7 +253,7 @@ public class AcquisitionProcess extends PamProcess {
 
 		bufferOverflow = false;
 		//		daqCheckTime = PamCalendar.getTimeInMillis();
-		if (!netRX) {
+		if (!PamController.isNetRx()) {
 			Timer t = new Timer(1, new ReallyStart());
 			t.setRepeats(false);
 			t.start();

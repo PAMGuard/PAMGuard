@@ -111,7 +111,7 @@ public class DbHtDisplayDialog extends PamDialog {
 		boolean e = !autoScale.isSelected();
 		minAmp.setEnabled(e);
 		maxAmp.setEnabled(e);
-		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+		if (PamController.isNetRx()) {
 			drawLines.setEnabled(false);
 			drawLines.setSelected(false);
 		}

@@ -315,6 +315,9 @@ public class Pamguard {
 					String port = args[iArg++];
 					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(port));
 					System.out.println("Setting UDP control port " + port);
+				}else if (anArg.equalsIgnoreCase("-udpResilient")) {
+					pamBuoyGlobals.setNetworkControlResilient();
+					System.out.println("Setting UDP control to be fault resilient");
 				}
 				else if (anArg.equalsIgnoreCase("-multicast") || anArg.equalsIgnoreCase("-mport")) {
 					// multicast control (for multiple PAMGuards) 

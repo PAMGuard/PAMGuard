@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import PamController.PamController;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
@@ -125,7 +126,7 @@ public class AISBinaryDataSource extends BinaryDataSource {
 				charData, fillBits);
 		if (aisDataUnit.decodeMessage()) {
 			
-			if(PamController.PamController.getInstance().getRunMode()==PamController.PamController.RUN_NETWORKRECEIVER) {
+			if(PamController.isNetRx()) {
 				return aisDataUnit;
 			}else {
 				aisDataBlock.addAISData(aisDataUnit);

@@ -119,7 +119,7 @@ public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 		
 
 		gpsDataBlock.SetLogging(new GpsLogger(gpsDataBlock));
-		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER || SMRUEnable.isEnableDecimus()) {
+		if (PamController.isNetRx() || SMRUEnable.isEnableDecimus()) {
 			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
 		}
 

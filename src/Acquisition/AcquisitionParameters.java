@@ -25,7 +25,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 
 	public double voltsPeak2Peak = 2;
 
-	private transient boolean isNetReceive;
+//	private transient boolean isNetReceive;
 
 	/**
 	 * List of channels data are acquired from (not necessarily 0,1,2, etc.)
@@ -61,7 +61,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 		 * this won't work since the constructor is only ever called for a new config, so if an old
 		 * config is loaded, this will never be called.
 		 */
-		isNetReceive = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
+//		isNetReceive = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 			if (ap.daqSystemType != null && SmruDaqSystem.oldCardName.equals(ap.daqSystemType)) {
 				ap.daqSystemType = SmruDaqSystem.newCardName;
 			}
-			ap.isNetReceive = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
+//			ap.isNetReceive = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 			if (ap.ppsParameters == null) {
 				ap.ppsParameters = new PPSParameters();
 			}
@@ -131,7 +131,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 	 * @return a specific hydrophone number from the selected array
 	 */
 	public int getHydrophone(int channel) {
-		if (isNetReceive) {
+		if (PamController.isNetRx()) {
 			return channel;
 		}
 		// first convert the software channel to a channel index (i.e.

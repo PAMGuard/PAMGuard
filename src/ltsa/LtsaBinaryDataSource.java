@@ -22,7 +22,6 @@ public class LtsaBinaryDataSource extends BinaryDataSource {
 
 	private LtsaControl ltsaControl;
 
-	private boolean isNetRx;
 
 	/**
 	 * <p>Module version changes</p>
@@ -36,7 +35,6 @@ public class LtsaBinaryDataSource extends BinaryDataSource {
 		super(ltsaDataBlock);
 		this.ltsaControl = ltsaControl;
 		this.ltsaDataBlock = ltsaDataBlock;
-		isNetRx = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 		//		testFFT();
 //		testLUT();
 	}

@@ -148,12 +148,13 @@ public class PamSettingsGroup implements Comparable<PamSettingsGroup> {
 	public ArrayList<UsedModuleInfo> getUsedModuleInfo() {
 		// search for the PamController unit settings which is
 		// basically a list of unit settings. 
-		PamController pamController = PamController.getInstance();
-		if (pamController == null) {
-			return null;
-		}
-		PamControlledUnitSettings pcu = findUnitSettings(pamController.getUnitType(), 
-				pamController.getUnitName());
+		
+		//ST Removed 9/24/26 -- no need to bother with the PamController singleton, when always calling back to the static final strings
+//		PamController pamController = PamController.getInstance();
+//		if (pamController == null) {
+//			return null;
+//		}
+		PamControlledUnitSettings pcu = findUnitSettings(PamController.unitType, PamController.unitName);
 		if (pcu != null) {
 			return (ArrayList<UsedModuleInfo>) pcu.getSettings();
 		}

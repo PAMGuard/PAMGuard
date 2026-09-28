@@ -141,7 +141,7 @@ PamSettingsSource, DataOutputStore {
 
 	private DataMapSerialiser dataMapSerialiser;
 
-	private boolean isNetRx;
+//	private boolean isNetRx;
 
 	private boolean storesOpen;
 
@@ -190,7 +190,7 @@ PamSettingsSource, DataOutputStore {
 
 		addPamProcess(binaryStoreProcess = new BinaryStoreProcess(this));
 
-		isNetRx = pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER;
+//		isNetRx = pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER;
 
 
 		PamSettingManager.getInstance().registerSettings(this);

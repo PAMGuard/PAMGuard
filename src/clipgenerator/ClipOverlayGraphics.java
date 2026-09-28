@@ -31,7 +31,7 @@ public class ClipOverlayGraphics extends PamDetectionOverlayGraphics {
 
 	private boolean isViewer;
 
-	private boolean isNetReceiver;
+//	private boolean isNetReceiver;
 	
 	public static final SymbolData defSymbol = new SymbolData(PamSymbolType.SYMBOL_DIAMOND, 10, 10, false, Color.RED, Color.CYAN);
 
@@ -42,7 +42,7 @@ public class ClipOverlayGraphics extends PamDetectionOverlayGraphics {
 		super(clipDataBlock, new PamSymbol(defSymbol));
 		this.clipControl = clipControl;
 		isViewer = (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW);
-		isNetReceiver = (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER);
+//		isNetReceiver = (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class ClipOverlayGraphics extends PamDetectionOverlayGraphics {
 			GeneralProjector generalProjector) {		
 		if (generalProjector.getParmeterType(0) == ParameterType.TIME
 				&& generalProjector.getParmeterType(1) == ParameterType.FREQUENCY) {
-			if (isViewer || isNetReceiver) {
+			if (isViewer || PamController.isNetRx()) {
 				return drawViewerMode(g, pamDataUnit, generalProjector);
 			}
 			else {

@@ -134,27 +134,30 @@ public abstract class NetworkClient {
 	boolean initialWarningSet = false;
 	
 	public synchronized void setWarning(String message, int level) {
-		/*if(message==null) {
-			WarningSystem.getWarningSystem().removeWarning(sendWarning);
-			initialWarningSet = false;
-		}else {
-			sendWarning.setWarningMessage(message);
-			sendWarning.setWarnignLevel(level);
-			if(!initialWarningSet) {
-				initialWarningSet = true;
-				WarningSystem.getWarningSystem().addWarning(sendWarning);
+		if(PamController.isNetRx()) {
+			if(message==null) {
+				WarningSystem.getWarningSystem().removeWarning(sendWarning);
+				initialWarningSet = false;
 			}else {
-				WarningSystem.getWarningSystem().updateWarning(sendWarning);
+				sendWarning.setWarningMessage(message);
+				sendWarning.setWarnignLevel(level);
+				if(!initialWarningSet) {
+					initialWarningSet = true;
+					WarningSystem.getWarningSystem().addWarning(sendWarning);
+				}else {
+					WarningSystem.getWarningSystem().updateWarning(sendWarning);
+				}
 			}
-		}*/
+		}
 	}
 	
 	public synchronized void removeWarning() {
-		/*if(!WarningSystem.getWarningSystem().removeWarning(sendWarning)) {
-			WarningSystem.getWarningSystem().forceRemoveWarning(sendWarning);
+		if(PamController.isNetRx()) {
+			if(!WarningSystem.getWarningSystem().removeWarning(sendWarning)) {
+				WarningSystem.getWarningSystem().forceRemoveWarning(sendWarning);
+			}
+			initialWarningSet = false;
 		}
-		initialWarningSet = false;
-		*/
 	}
 
 	public void updateParams(NetworkSendParams networkSendParams2) {

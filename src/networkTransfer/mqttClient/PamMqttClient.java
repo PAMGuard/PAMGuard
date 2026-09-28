@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -23,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
+import PamController.PamController;
 import networkTransfer.NetworkClient;
 import networkTransfer.NetworkParams;
 import networkTransfer.receive.NetworkReceiveParams;
@@ -32,7 +34,7 @@ import networkTransfer.send.NetworkQueuedObject;
 import networkTransfer.send.NetworkSendParams;
 import pamguard.Pamguard;
 
-public class PamMqttClient extends NetworkClient  implements MqttCallback{
+public class PamMqttClient extends NetworkClient  implements MqttCallbackExtended{
 
 	private String stationId;
 	private String serverURI;
@@ -42,7 +44,6 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	private MqttConnectOptions mqttOptions;
 	private IMqttToken connectToken;
 	private MqttDefaultFilePersistence memoryPersistence;
-	private CustomFilePersistence persistence;
 	
 	public NetworkSendParams networkSendParams;
 	public NetworkReceiveParams networkReceiveParams;
@@ -55,7 +56,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	public PamMqttClient(NetworkParams networkParams){
 		super(networkParams);
 		System.out.println("Initializing a new mqtt client.");
-		isAlsoNetRx = PamController.PamController.getInstance().getRunMode()==PamController.PamController.RUN_NETWORKRECEIVER;
+		isAlsoNetRx = PamController.isNetRx();
 		if(networkParams instanceof NetworkSendParams) {
 			isNetRx = false;
 			this.networkSendParams = (NetworkSendParams) networkParams;
@@ -201,9 +202,11 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 			connectToken = mqttClient.connect(mqttOptions);
 			System.out.println("Initializing mqtt client connection");
 			connectToken.waitForCompletion(10000L);
-			if(this.isNetRx){
+			
+			//MQTT Async client handles this automatically. 
+			/*if(this.isNetRx){
 				this.persistence.open(mqttConnectionId, serverURI);
-			}
+			}*/
 			initializing = false;
 		} catch (MqttSecurityException e1) {
 //			e1.printStackTrace();
@@ -411,8 +414,6 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	
 	public void sendMqttMessage(String topicExtension, MqttMessage message, String topicType) throws NetTransmitException {
 				
-		boolean persistenceOpened = true;
-		
 		if(this.mqttClient==null) {
 			throw new NetTransmitException("Mqtt client is not initialized",new NullPointerException());
 		}
@@ -435,29 +436,13 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		// need to work out here if it's a binary message or a JSON message. 
 		String topic = getBaseTransmitTopic(topicType)+topicExtension;
 		
-		/*if(requireReconnect && persistenceOpened) {
-			int keyIdx = 0;
-				try {
-				while(this.persistence.keys().hasMoreElements()) {
-					String key = (String) this.persistence.keys().nextElement();
-					keyIdx = Integer.valueOf(key.split("-")[1]);
-				}
-				String key = "s-"+(keyIdx+1);
-				MqttPublish persistableMessage =  new MqttPublish(topic, message);
-				this.persistence.put(key, persistableMessage);
-				mqttClient.com
-			} catch (MqttPersistenceException e) {
-				System.out.println("Attempted to commit message to persistence directory, but failed. Error: "+e.getMessage());
-			}
-		}else {*/
-			try {
-				mqttClient.publish(topic,message.getPayload(),1,false);
-			}catch (MqttPersistenceException e) {
-				System.out.println("Persistance exception on mqtt publish. "+e.getMessage());
-			}catch (MqttException e) {
-				throw new NetTransmitException(e);
-			}
-		//}
+		try {
+			mqttClient.publish(topic,message.getPayload(),1,false);
+		}catch (MqttPersistenceException e) {
+			System.out.println("Persistance exception on mqtt publish. "+e.getMessage());
+		}catch (MqttException e) {
+			throw new NetTransmitException(e);
+		}
 	}
 
 	public static void test(NetworkParams networkParams) throws ClientConnectFailedException {
@@ -495,34 +480,16 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 	
 	private void generateClientPersistence() throws Exception{
 		if(this.networkParams.persistenceDirectory!=null) {
-			if(!this.isNetRx){
-				Paths.get(networkParams.persistenceDirectory).toFile().mkdirs();
-	        	System.out.println("Setting memory persistance directory to "+this.networkParams.persistenceDirectory);
-	        	memoryPersistence = new MqttDefaultFilePersistence(this.networkParams.persistenceDirectory);
-			}else{
-				System.out.println("Setting memory persistance directory to "+this.networkParams.persistenceDirectory);
-	        	persistence = new CustomFilePersistence(this.networkParams.persistenceDirectory);
-			}
-			
+        	System.out.println("Setting memory persistance directory to "+this.networkParams.persistenceDirectory);
+        	memoryPersistence = new MqttDefaultFilePersistence(this.networkParams.persistenceDirectory);
         }else {
         	System.out.println("Failed to set client file persistance. There will be no persistance confifured for MQTT.");//persistence = new MemoryPersistence();
         }
 	}
 	
 	private void generateMqttClient() throws Exception{
-		if(this.isNetRx){
-			try {
-				mqttClient = new MqttAsyncClient(serverURI,mqttConnectionId,persistence);
-				mqttClient.setCallback(this);
-			} catch (MqttException e) {
-				e.printStackTrace();
-				mqttConfigureError = e.getMessage();
-			}
-		}else {
-			mqttClient = new MqttAsyncClient(serverURI,mqttConnectionId,this.memoryPersistence);
-			mqttClient.setCallback(this);
-		}
-
+		mqttClient = new MqttAsyncClient(serverURI,mqttConnectionId,this.memoryPersistence);
+		mqttClient.setCallback(this);
 	}
 	
 	private void generateMqttOptions() throws Exception{
@@ -531,8 +498,8 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		mqttOptions.setCleanSession(false);
 		mqttOptions.setConnectionTimeout(0);
 		mqttOptions.setMaxInflight(65535);
-		mqttOptions.setMaxReconnectDelay(30000);
-		//mqttOptions.setKeepAliveInterval(0);
+		mqttOptions.setMaxReconnectDelay(1000);
+		mqttOptions.setKeepAliveInterval(0);
 		//mqttOptions.
 		if(this.networkParams.userId!=null&&this.networkParams.password!=null&&!this.networkParams.userId.isEmpty()&&!this.networkParams.password.isEmpty()) {
 			mqttOptions.setUserName(this.networkParams.userId);
@@ -543,6 +510,12 @@ public class PamMqttClient extends NetworkClient  implements MqttCallback{
 		if(this.networkParams.useSSL) {
 			mqttOptions.setSocketFactory(this.getSSLSocketFactory());
 		}
+	}
+
+	@Override
+	public void connectComplete(boolean reconnect, String serverURI) {
+		System.out.println("MQTT Client successfully connected to "+serverURI);
+		
 	}
 
 }
