@@ -123,6 +123,8 @@ import PamguardMVC.dataSelector.DataSelector;
 import dataPlotsFX.data.DataTypeInfo;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
+import fftManager.NonMagnitudeSpectrogramData;
+import fftManager.ScaledFFTDataSource;
 import ltsa.LtsaDataBlock;
 import pamScrollSystem.AbstractPamScroller;
 import pamScrollSystem.AbstractPamScrollerAWT;
@@ -189,9 +191,11 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 	private int xAxisExtent, yAxisExtent;
 	
 	/**
-	 * Params for fading Azigram by intensity
-	 * Use a linear fade between fadeStart and fadeStop when dB levels lower than threshold
-	 * TODO: Create GUI so user can control these params		 * 
+	 * Fade parameters for data units that implement
+	 * NonMagnitudeSpectrogramData. Cells whose alpha value is below
+	 * fadeThreshold fade linearly towards fadeFloorColor, reaching it at
+	 * fadeFloor. A ScaledFFTDataSource replaces these defaults with its own
+	 * recommended values (see refreshRecommendedFade).
 	 */
 	double fadeThreshold = 90; 			 // Start to fade below this amount (dB)
 	double fadeFloor = fadeThreshold-20; // Everything same solid color below this amount
@@ -568,8 +572,13 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			if (sourceFFTDataBlock != null) {
 				sourceFFTDataBlock.addObserver(this);
 				sampleRate = sourceFFTDataBlock.getSampleRate();
+				adoptRecommendedScale(sourceFFTDataBlock);
 			}
 		}
+		// The scale is adopted once, when the source is selected. The fade
+		// values are refreshed on every settings pass, so changes made in the
+		// source's own settings reach an open display straight away.
+		refreshRecommendedFade(sourceFFTDataBlock);
 
 		subscribeRawDataBlock();
 
@@ -619,6 +628,61 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 
 		repaintAll();
+	}
+	
+	/**
+	 * Adopts the recommended amplitude scale of a ScaledFFTDataSource, and
+	 * switches to the HSV colour map if the source's values wrap around.
+	 * <p>
+	 * Some sources output a quantity other than dB, such as bearing in degrees
+	 * from the Azigram plugin. Without this, they inherit the dB default
+	 * {@link SpectrogramParameters#amplitudeLimits}, and most of their range is
+	 * drawn as a single flat colour.
+	 * <p>
+	 * Runs only when the source is selected, so later changes a user makes on
+	 * the Scales tab are kept. Fade values are handled by
+	 * refreshRecommendedFade().
+	 * @param fftDataSource the newly selected FFT data source, or null.
+	 */
+	private void adoptRecommendedScale(FFTDataBlock fftDataSource) {
+		if (fftDataSource == null) {
+			return;
+		}
+		PamProcess parentProcess = fftDataSource.getParentProcess();
+		if (parentProcess instanceof ScaledFFTDataSource) {
+			ScaledFFTDataSource scaledSource = (ScaledFFTDataSource) parentProcess;
+			spectrogramParameters.amplitudeLimits = new double[] {
+					scaledSource.getRecommendedScaleMin(),
+					scaledSource.getRecommendedScaleMax()
+			};
+			if (scaledSource.isCircularScale()) {
+				spectrogramParameters.setColourMap(ColourArrayType.HSV);
+			}
+		}
+	}
+
+	/**
+	 * Adopts the current recommended fade floor and threshold of a
+	 * ScaledFFTDataSource.
+	 * <p>
+	 * Unlike adoptRecommendedScale(), this runs on every settings pass. The
+	 * meaning of a source's alpha values is set by the source and can change
+	 * while running. For example, the Azigram plugin can switch between
+	 * "dB above background" and absolute dB SPL. Refreshing every time means
+	 * such changes reach an open display without reselecting the source.
+	 * The call is cheap and has no side effects when nothing has changed.
+	 * @param fftDataSource the current FFT data source, or null.
+	 */
+	private void refreshRecommendedFade(FFTDataBlock fftDataSource) {
+		if (fftDataSource == null) {
+			return;
+		}
+		PamProcess parentProcess = fftDataSource.getParentProcess();
+		if (parentProcess instanceof ScaledFFTDataSource) {
+			ScaledFFTDataSource scaledSource = (ScaledFFTDataSource) parentProcess;
+			fadeFloor = scaledSource.getRecommendedFadeFloor();
+			fadeThreshold = scaledSource.getRecommendedFadeThreshold();
+		}
 	}
 	
 	public String getFullTitle() {
@@ -2366,11 +2430,12 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 			double[] colval;
 
-			/** getSpectrogramData() will return magnitude for FFTDataUnits or
-			 * direction for Azigram units
-			 */ 
+			/* getSpectrogramData() is the value to colour. getAlphaData() is the
+			 * value that sets the fade. Both are magnitude for ordinary FFT data.
+			 * Fading is applied only to NonMagnitudeSpectrogramData units.
+			 */
 			double[] cellValues = dataUnit.getSpectrogramData();
-			double[] dBlevel = dataUnit.getMagnitudeData();
+			double[] dBlevel = dataUnit.getAlphaData();
 			//System.out.println(cellValues[10]+" "+dBlevel[10]);
 
 
@@ -2423,8 +2488,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				for (int i = minBin; i <= maxBin; i++) {
 					colval = colorValues[getColourIndex(cellValues[i])].clone();
 
-					//Hack to check for Azigram
-					if ( dBlevel[i] != cellValues[i]) {	  
+					if (dataUnit instanceof NonMagnitudeSpectrogramData) {
 						colval = fadePixel(colval,dBlevel[i]);
 					}
 
@@ -2491,8 +2555,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 				double[] colval = colorValues[getColourIndex(floatLine[i])].clone();
 				
-				//Hack to check for Azigram
-				if (dBlevel!=null) {	  
+				// dBlevel is null for ordinary magnitude data, which is not faded
+				if (dBlevel!=null) {
 					colval = fadePixel(colval,dBlevel[i]);
 				}
 				writableRaster.setPixel(xDraw, h - i - 1, colval);
@@ -2503,12 +2567,12 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 		
 		/**
-		 * Hack to display Azigram data on a black background with pseudo transparency
-		 * Eventually would be good to make spectrogram an ARGB image, remove this hack,
-		 * and to provide some user-facing controls for adjusting transparency &
-		 * thresholding of the Azigram. 
- 		 * @param colval - original colour of pixel
-		 * @param dBlevel - level of pixel used to determine fade 
+		 * Pseudo transparency for NonMagnitudeSpectrogramData units. Fades a
+		 * pixel towards fadeFloorColor according to its alpha value.
+		 * A true ARGB image would be cleaner, but would change the shared image
+		 * pipeline.
+		 * @param colval original colour of the pixel
+		 * @param dBlevel alpha value of the pixel, used to set the fade
 		 */
 		public double[] fadePixel(double[] colval, double dBlevel ) {
 			if (dBlevel < fadeFloor) { // Levels below the floor are all the same color as floor
@@ -2600,9 +2664,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				//				}
 				if (imagePos >= 0) {
 					fillSpectrogramFLoatLine(imagePos, scalingImageLine);
-					//Hack to determine if displaying Azigram
-					if (cellValue == fftUnit.getSpectrogramData() )
-						drawSpectrogramLine(writableRaster, imagePos, specFloatData[imagePos], fftUnit.getMagnitudeData());
+					if (fftUnit instanceof NonMagnitudeSpectrogramData)
+						drawSpectrogramLine(writableRaster, imagePos, specFloatData[imagePos], fftUnit.getAlphaData());
 					else 
 						drawSpectrogramLine(writableRaster, imagePos, specFloatData[imagePos], null);
 				}
