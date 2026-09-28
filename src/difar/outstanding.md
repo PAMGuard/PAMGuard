@@ -2,8 +2,23 @@
 
 Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, 27 September 2026.
 
-Everything known to be unfinished, broken or awkward in the DIFAR module, so none of it depends on
-memory. The design for crossings is in `crossings_design.md`.
+A list of everything known to be unfinished, broken or awkward in the DIFAR module, so none of it depends on remembering. The design for crossings is in `crossings_design.md`.
+
+## Parked, 28 September 2026
+
+Parked to finish other projects. Rebased onto upstream `main` at `e07bdfef`, after Doug merged the
+DIFAR refresh (#345), the super-detection loading fix (#348) and the small core fixes (#340, #343,
+#344, #346). The branch holds 22 commits after `explore-difar`.
+
+Works now: reanalysis in the Viewer. Marking, saving, deleting and rematching clips, crossings drawn
+from their crossing units, and upgrading old datasets to version 3.
+
+Not ready to merge: Normal mode is untested since step 4, clip files change to version 3, and the
+pgmatlab reader for version 3 waits on its own pull request. A draft pull request records the status.
+
+To return: read this file, then `viewer_editing_design.md`. For a Viewer test on the simulated data,
+reset, then copy rung 8's database and the contents of its `PAMBinary` folder
+(`cp -R runs/rung8/PAMBinary/. config/PAMBinary/`). Copying the folder itself nests it.
 
 ## Crossings, remaining steps
 
@@ -18,7 +33,12 @@ and after every buoy edit in the Viewer.
 
 Next, in order, as set out in `viewer_editing_design.md`:
 
-1. An auto-compaction setting, writing after every edit. Deletions already write at once.
+1. The queue strip in the Viewer: marked clips do not appear in it. Rebuilding it from the queue's
+   block was tried and removed, because a clip being worked stays in that block and display settings
+   arrive after marking. Send it the add and update notices Normal mode sends, for clips made in the
+   Viewer, without reaching observers that write rows. Check which observers each block has first.
+2. An auto-compaction setting, writing after every edit. Deletions already write at once.
+3. After an upgrade, skip the clip store's backup question for that session.
 
 Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
 putting clips back on the queue; the spectrogram marking clips that belong to a crossing; time
@@ -45,6 +65,8 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
   `OPERATOR` and land away from the others.
 - A three-buoy rung, where a third bearing extends a two-buoy crossing. Needs new audio.
 - An overlap rung: rung 2 twice without a reset, to reproduce the overlapping deployments below.
+- Skipping the core save when a Viewer save is cancelled is untested. It needs a save cancelled by a
+  file name clash, which a leftover binary file from an earlier test produces.
 - `pgmatlab` read one compacted file as 11 objects when it held 3. The file was discarded. Recheck
   once compaction resumes.
 
@@ -88,8 +110,10 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   their UIDs. Rare, since a call spans seconds and chunks are files.
 
 - Scrolling backwards then marking makes a clip that starts before the raw audio in memory. Fix: read
-  the clip from the WAV files.
-- The Saved strip does not show newly saved clips until a reload.
+  the clip from the WAV files. The console reports "requested from Raw input data ... have not yet
+  arrived".
+- Closing the Viewer after a cancelled save loses the clips not yet saved, with only a console
+  message. Warn and offer to stay open.
 - The map draws bearings only once they scroll off the spectrogram's left edge. The map takes the
   scroller start as now. Core Map code.
 - Queued clips are dropped when the window changes, because the queue clears.

@@ -151,14 +151,17 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 	 * Save, and on exit. Clips saved or deleted in the viewer are written
 	 * first. Then the core save rewrites, in place, any other file holding a
 	 * clip that has changed.
+	 * <p>
+	 * If the viewer save is cancelled, the core save is skipped too. Clips
+	 * made in the viewer have no binary file until they are saved, and the
+	 * core save cannot handle a changed clip without one.
 	 */
 	@Override
 	public boolean saveViewerData() {
-		boolean ok = true;
-		if (viewerClipStore != null) {
-			ok = viewerClipStore.compact();
+		if (viewerClipStore != null && !viewerClipStore.compact()) {
+			return false;
 		}
-		return super.saveViewerData() && ok;
+		return super.saveViewerData();
 	}
 
 	/**
