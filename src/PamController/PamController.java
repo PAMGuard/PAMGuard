@@ -465,8 +465,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 */
 		int loadAns = PamSettingManager.getInstance().loadPAMSettings(runMode);
 		
-		forceNetRxIfNecessary();
-
+		if(loadAns!=PamSettingManager.LOAD_SETTINGS_NEW) {
+			forceNetRxIfNecessary();
+		}
+		
 		System.out.println("Pamcontroller: loadPAMSettings: " + loadAns);
 
 		if (loadAns == PamSettingManager.LOAD_SETTINGS_NEW) {
