@@ -1,6 +1,7 @@
 # DIFAR: editing in the Viewer
 
-Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, 27 September 2026.
+Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, 27 September 2026. Duplicate
+UIDs added 29 September 2026.
 
 ## Aim
 
@@ -60,10 +61,14 @@ The upgrade is "Upgrade old DIFAR files to version 3", in the DIFAR offline task
 old copy to database task, which rewrote every clip file at version 3 as a side effect, with no
 backup and no rematch. The upgrade:
 
-1. Backs up every DIFAR binary file, as the clip store's backup does, and does nothing more if the
-   backup fails. The database is not backed up.
-2. Rematches every clip, by running `RematchTask`'s steps, making crossing units.
-3. Marks each clip from an older file as changed, so PAMGuard rewrites its file at version 3.
+1. Reads every DIFAR file once and checks for clips that share a UID, as set out in the next
+   section. It asks before going on if they do.
+2. Backs up every DIFAR binary file, as the clip store's backup does, and copies the database file
+   into the same backup folder. It does nothing more if either copy fails.
+3. Deletes every DIFAR clip row from the database.
+4. As each file loads: drops exact duplicates, renumbers the clips if that was chosen, writes one row
+   per clip, and rematches, by running `RematchTask`'s steps, making crossing units.
+5. Marks each clip from an older file as changed, so PAMGuard rewrites its file at version 3.
 
 It is run over all data, so matching can find partners anywhere in the dataset.
 
@@ -71,6 +76,48 @@ The old crossings were made by buggy code, so they stay in the backup only, as a
 thought at the time. The new crossings are the best current estimate.
 
 This needs bulk rematch, below, which is built first.
+
+## Duplicate UIDs in older datasets
+
+Older DIFAR files can hold different clips with the same UID. In the 2019 voyage data the UID count
+restarted each time PAMGuard crashed: 47,713 clips carry only 8,389 distinct UIDs. The code assumes
+UIDs are unique in three places. Clip rows are updated by UID. Core reattaches a crossing's clips by
+UID alone, within a time window. Compaction keeps one clip per UID. Core's UID check at Viewer startup
+looks for missing UIDs, not repeated ones, so these datasets pass it.
+
+**The check.** Before changing anything, the upgrade reads every DIFAR file once, as core's UID
+repair does, and counts two things: different clips that share a UID, and exact duplicates. An exact
+duplicate is one clip stored twice, with the same UID, channel and start time.
+
+- If no different clips share a UID, every clip keeps its UID.
+- If some do, the upgrade says how many and offers two choices: renumber, or cancel. Cancel changes
+  nothing.
+- Renumbering is offered only when every DIFAR file is older than version 3 and the database holds no
+  crossings. Renumbering would cut the links of crossings already made. Otherwise the upgrade
+  refuses, and says why.
+
+**Renumbering.** Every clip gets a new UID, counting from 1 in time order, then by channel. Files load
+in time order, and each file's clips are renumbered as it loads, before the rematch sees them. So
+crossings are made with the new UIDs. The Viewer's next UID then follows the highest new one. The old
+UIDs survive only in the backup. Other records, such as the MATLAB rematch of the 2019 data, pair with
+clips by channel and start time.
+
+**Exact duplicates** are dropped, and counted in the console. The Viewer already skips the second
+copy of a clip when both are in the same file. But core's Viewer save writes back, from the old file,
+any object it cannot find in memory. So the skipped copy would return with its old UID, and after a
+renumber that UID may belong to another clip. The upgrade therefore drops it from the rewritten file
+as well. A copy in another file loads separately, and is dropped the same way.
+
+**The clip table.** The upgrade rebuilds the DIFAR clip table from the binary files on every run,
+renumbered or not. Older tables can be incomplete: in 2019 the storage setting sometimes reverted to
+binary only. They can also hold duplicate rows, made by the old copy to database task. The upgrade
+deletes every clip row, then writes one row per clip as each file loads, before the rematch updates the
+buoy columns. This is why the database is now backed up.
+
+**A risk to check.** Core writes a rewritten file's footer with a UID range taken from counters, not
+from the file's contents (see the core issues in `outstanding.md`). After a renumber the ranges may be
+wrong. The Viewer's next UID is the highest of these ranges and its own count, so a wrong range can
+only leave a gap. The tests look at the footers.
 
 ## Bulk rematch
 
@@ -127,12 +174,29 @@ On the simulated data, in the Viewer:
 
 A crossing of three, trimmed to two and recalculated, needs the three-buoy audio.
 
+On copies of the 2019 voyage data, each slice in its own scratch folder with the March 2019
+database. The counts below come from the MATLAB rematch file, and should match what the check reports.
+
+5. 28 to 30 January: 2,284 clips, 1,470 of them sharing a UID. The upgrade reports the shared UIDs.
+   Cancel: no backup folder, and the files and database unchanged. Run again and renumber: the backup
+   holds the binary files and the database; the files are at version 3; UIDs run 1 to 2,284 in time
+   order; the clip table has one row per clip, with the same UIDs; crossings are made.
+6. 21 February: 2,413 clips, 442 sharing a UID, and one clip stored twice (old UID 300, channel 2,
+   00:59:15.855). After renumbering it appears once, in the files and in the table.
+7. 10 to 12 February: 3,876 clips, none sharing a UID. No question is asked, and every clip keeps its
+   UID. The clip table is still rebuilt.
+8. After 5, close and reopen the Viewer. Clips load with their new UIDs, crossings draw, and no
+   "skipped a second copy" lines appear. Save a new clip: its UID is above 2,284. Read the rewritten
+   files' footers with pgmatlab, and note their UID ranges.
+
 ## Order of work
 
 1. Bulk rematch into crossing units. Done.
 2. Deleting a saved clip. Done.
-3. The dataset upgrade, which uses 1. Built, test owed.
-4. The auto-compaction setting.
+3. The dataset upgrade, which uses 1. Built, passed on the pilot.
+4. Duplicate UIDs and the clip table rebuild, in the upgrade. Needed to compare with the MATLAB
+   rematch of the 2019 data.
+5. The auto-compaction setting.
 
 ## Also for the feature list
 

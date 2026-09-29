@@ -20,6 +20,14 @@ To return: read this file, then `viewer_editing_design.md`. For a Viewer test on
 reset, then copy rung 8's database and the contents of its `PAMBinary` folder
 (`cp -R runs/rung8/PAMBinary/. config/PAMBinary/`). Copying the folder itself nests it.
 
+## Returned, 29 September 2026
+
+Normal mode tests wait. First, compare PAMGuard's rematch of the 2019 voyage data with the MATLAB
+rematch used for the 2021 source level paper (`DIFAR_Localisation_rematched_v3.csv`, in
+`S:\manuscripts\2019-enrichVoyageReport`). The 2019 files repeat UIDs, so the upgrade must handle
+that first: see "Duplicate UIDs in older datasets" in `viewer_editing_design.md`. After that, a gap
+analysis for reanalysing the 2013 pilot with an automatic detector and the video tracks.
+
 ## Crossings, remaining steps
 
 The aim is reanalysis in the Viewer: new clips from raw audio, with time to correct mistakes. Old
@@ -33,6 +41,8 @@ and after every buoy edit in the Viewer.
 
 Next, in order, as set out in `viewer_editing_design.md`:
 
+0. Duplicate UIDs in older datasets: the upgrade checks, offers to renumber or cancel, drops exact
+   duplicates, and rebuilds the clip table from the binary files, with a database backup.
 1. The queue strip in the Viewer: marked clips do not appear in it. Rebuilding it from the queue's
    block was tried and removed, because a clip being worked stays in that block and display settings
    arrive after marking. Send it the add and update notices Normal mode sends, for clips made in the
@@ -67,6 +77,8 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
 - An overlap rung: rung 2 twice without a reset, to reproduce the overlapping deployments below.
 - Skipping the core save when a Viewer save is cancelled is untested. It needs a save cancelled by a
   file name clash, which a leftover binary file from an earlier test produces.
+- Duplicate UIDs in the upgrade: tests 5 to 8 in `viewer_editing_design.md`, on slices of the 2019
+  voyage data.
 - `pgmatlab` read one compacted file as 11 objects when it held 3. The file was discarded. Recheck
   once compaction resumes.
 
@@ -159,11 +171,12 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   observer, and core has no notice for a removed unit at all. DIFAR tells its saved clips panel
   directly, and reloads the view after a deletion so the map and spectrogram redraw.
 - `BINOVERLAPWARNING` is one named warning for every module.
-- The Viewer never loaded super-detection blocks alongside the blocks they group: a loop in
-  `ViewerScrollerManager` queued the sub-detection block again instead of each super-detection
-  block. Fixed on `fix-superdet-viewer-load` (one commit on upstream `ddbb6374`, pull request
-  PAMGuard/PAMGuard#348) and cherry-picked into `difar-crossings`. DIFAR crossings do not load in the
-  Viewer without it.
+- The Viewer never loaded super-detection blocks alongside the blocks they group. Fixed by
+  PAMGuard/PAMGuard#348, merged into `main`.
+- Core's UID check at Viewer startup finds missing UIDs, not repeated ones. Datasets whose UID count
+  restarted after crashes pass it.
+- The Viewer save writes back, from the old file, any object it cannot find in memory. A unit dropped
+  on load, such as a second copy of a clip, returns in the rewritten file.
 - After an upgrade, the first save of new clips asks again whether to back up the files, though the
   upgrade has just backed them up. The upgrade could tell the clip store.
 - `OfflineTaskGroup.completeTasks` completes every task, ticked or not, though `prepareTasks` only
