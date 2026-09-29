@@ -1405,6 +1405,10 @@ public class DifarProcess extends PamProcess {
 		if (difarDataUnit.getLocalisation() == null) {
 			return null;
 		}
+		if (difarDataUnit.getOriginLatLong(false) == null) {
+			// no buoy with a known position was in force when the clip was made
+			return null;
+		}
 		int nChan = PamUtils.getNumChannels(rawDataSource.getChannelMap());
 		int thisChan = PamUtils.getSingleChannel(difarDataUnit.getChannelBitmap());
 		DifarParameters params = difarControl.getDifarParameters();

@@ -605,6 +605,15 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		return sonobuoyHistorySource.getHistory();
 	}
 
+	/**
+	 * Rebuild the buoy history the next time it is asked for. Offline tasks
+	 * call this after loading buoy records for each chunk of data, since a
+	 * reload can leave the number of records unchanged.
+	 */
+	public void buoyRecordsReloaded() {
+		sonobuoyHistorySource.markStale();
+	}
+
 	public DIFARGram getDifarGram() {
 		return difarGram;
 	}

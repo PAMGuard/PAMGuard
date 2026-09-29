@@ -264,6 +264,12 @@ public class DifarMatchSelector {
 	 * @return the localised group, or null if the fit failed.
 	 */
 	public Match localise(List<PamDataUnit> group) {
+		for (PamDataUnit unit : group) {
+			if (unit.getOriginLatLong(false) == null) {
+				// no buoy position, so nothing to locate from
+				return null;
+			}
+		}
 		ArrayList<PamDataUnit> units = new ArrayList<>(group);
 		DIFARTargetMotionInformation info = new DIFARTargetMotionInformation(difarProcess, units);
 		info.setTimingErrorSeconds(timingErrorSeconds);
