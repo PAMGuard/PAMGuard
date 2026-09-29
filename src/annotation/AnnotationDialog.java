@@ -42,7 +42,6 @@ public class AnnotationDialog extends PamDialog {
 		}
 		summaryPanel.getComponent().setBorder(new TitledBorder(title));
 		JPanel borderPanel = new JPanel();
-//		borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.Y_AXIS));
 		borderPanel.setLayout(new BorderLayout());
 		int IS = 4;
 		borderPanel.setBorder(new EmptyBorder(IS, IS, IS, IS));
