@@ -42,7 +42,8 @@ and after every buoy edit in the Viewer.
 Next, in order, as set out in `viewer_editing_design.md`:
 
 0. Duplicate UIDs in older datasets: the upgrade checks, offers to renumber or cancel, drops exact
-   duplicates, and rebuilds the clip table from the binary files, with a database backup.
+   duplicates, and rebuilds the clip table from the binary files, with a database backup. Passed on
+   a small slice; the full voyage is next.
 1. The queue strip in the Viewer: marked clips do not appear in it. Rebuilding it from the queue's
    block was tried and removed, because a clip being worked stays in that block and display settings
    arrive after marking. Send it the add and update notices Normal mode sends, for clips made in the
@@ -78,9 +79,21 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
 - Skipping the core save when a Viewer save is cancelled is untested. It needs a save cancelled by a
   file name clash, which a leftover binary file from an earlier test produces.
 - Duplicate UIDs in the upgrade: tests 5 to 8 in `viewer_editing_design.md`, on slices of the 2019
-  voyage data. Until renumbering is built, the check stops the upgrade when clips share UIDs. Owed
-  now: on 28 to 30 January it stops, reporting 1,470 different clips sharing 709 UIDs, with no backup
-  folder made; on 10 to 12 February it reports no shared UIDs and upgrades as before.
+  voyage data. The check passed on 28 to 30 January (1,470 different clips sharing 709 UIDs) and 10 to
+  12 February (none). Renumbering and the table rebuild passed on 21 February 00:00 to 06:00: 284
+  clips, 17 UIDs shared by 34 clips, renumbered 1 to 284; 47,827 old clip rows replaced by 284 with
+  the same UIDs; binary files and database backed up; 21 crossings, every clip found in the MATLAB
+  file by channel and start time, 13 of MATLAB's triangulations in that window made with the same
+  clips. Still owed: dropping second copies. The census found none in these binary files, so the
+  clip MATLAB's file holds twice (old UID 300) may be a duplicate made when MATLAB read the files.
+  The full voyage run will show whether any exist.
+- Buoy records loaded with each chunk of the rematch and upgrade passed on 10 to 12 February: every
+  clip found its buoy, and 596 crossings were made (512 of two clips, 84 of three). Against the MATLAB
+  rematch of those days, 471 of its 524 triangulations were made with the same clips, their locations
+  a median 0.55 km apart and 90% within 2.2 km. In 40 more, PAMGuard added a third buoy to a MATLAB
+  pair. PAMGuard crossed 202 clips MATLAB left alone, mostly blue whale calls; MATLAB crossed 17 that
+  PAMGuard did not. Owed: a buoy edit on the simulated data, which runs the same rematch. Normal mode
+  now skips matching a clip with no buoy position, instead of throwing; untested.
 - `pgmatlab` read one compacted file as 11 objects when it held 3. The file was discarded. Recheck
   once compaction resumes.
 
@@ -115,6 +128,25 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
 
 - The choice of mean, mode or mean near mode is only in a right-click menu on the histogram. Make it
   radio buttons in the dialog.
+
+## Rematch on real data
+
+- Core's offline tasks process only clips whose start time lies within their file's time span. A clip
+  marked just before a file rolls over and saved just after sits in the next file, and is skipped: not
+  rematched, its row not updated, not marked as upgraded. 33 of 3,875 clips on 10 to 12 February. At
+  least 7 of the 17 clips MATLAB crossed and PAMGuard did not are in the last minute of an hour. Now
+  the rematch and upgrade process these clips themselves, first in each load. Test owed: on 10 to 12
+  February, 33 clips reported as stored late, all 3,875 upgraded, and fewer MATLAB-only clips.
+- The rematch's console line counted each crossing once, at the clip that started it, and called them
+  clips. It now reports crossings and the clips they hold.
+- Five crossings on 10 to 12 February have location errors over 100 km, and two are placed far outside
+  the survey, one at 131 degrees East. Near-parallel bearings, probably; core printed
+  `FunctionEvaluationException` for its error estimate six times. The distance limit does not catch
+  them. Consider flagging crossings by error rather than rejecting them.
+- Clip rows are updated by UID. The slices use the whole voyage's database, whose clip table holds
+  other days' clips with the same UIDs, so the rematch wrote this slice's buoy values into those rows
+  too, and `crossing_clips.sql` joined them in (5,979 rows for 1,276 clips). The clip table rebuild
+  prevents both. It matters even when the binary files' UIDs are unique.
 
 ## Viewer
 
@@ -177,6 +209,8 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   PAMGuard/PAMGuard#348, merged into `main`.
 - Core's UID check at Viewer startup finds missing UIDs, not repeated ones. Datasets whose UID count
   restarted after crashes pass it.
+- `OfflineTaskGroup.processData` skips loaded units whose start time is outside the file's time span.
+  For modules that store a unit after its start time, such as DIFAR, those units are never processed.
 - The Viewer save writes back, from the old file, any object it cannot find in memory. A unit dropped
   on load, such as a second copy of a clip, returns in the rewritten file.
 - After an upgrade, the first save of new clips asks again whether to back up the files, though the

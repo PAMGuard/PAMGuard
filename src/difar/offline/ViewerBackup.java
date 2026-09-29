@@ -50,15 +50,41 @@ public class ViewerBackup {
 		if (!source.exists() || !copied.add(source)) {
 			return;
 		}
+		makeBackupRoot();
+		Path relative = storeRoot.toPath().relativize(source.toPath());
+		Path target = backupRoot.toPath().resolve(relative);
+		Files.createDirectories(target.getParent());
+		Files.copy(source.toPath(), target, StandardCopyOption.COPY_ATTRIBUTES);
+	}
+
+	/**
+	 * Copy a file from outside the binary store, such as the database, into
+	 * the top of the backup folder, unless it is already there.
+	 * @param file the file.
+	 * @throws IOException if the file does not exist or the copy fails.
+	 */
+	public void copyAlongside(File file) throws IOException {
+		File source = file.getAbsoluteFile();
+		if (!source.isFile()) {
+			throw new IOException("no such file: " + source);
+		}
+		if (!copied.add(source)) {
+			return;
+		}
+		makeBackupRoot();
+		Files.createDirectories(backupRoot.toPath());
+		Files.copy(source.toPath(), backupRoot.toPath().resolve(source.getName()), StandardCopyOption.COPY_ATTRIBUTES);
+	}
+
+	/**
+	 * Name the backup folder, the first time anything is copied.
+	 */
+	private void makeBackupRoot() {
 		if (backupRoot == null) {
 			SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
 			format.setTimeZone(TimeZone.getTimeZone("UTC"));
 			backupRoot = new File(storeRoot.getParentFile(),
 					storeRoot.getName() + "_backup_" + format.format(new Date()));
 		}
-		Path relative = storeRoot.toPath().relativize(source.toPath());
-		Path target = backupRoot.toPath().resolve(relative);
-		Files.createDirectories(target.getParent());
-		Files.copy(source.toPath(), target, StandardCopyOption.COPY_ATTRIBUTES);
 	}
 }

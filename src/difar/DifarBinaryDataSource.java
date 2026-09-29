@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import Filters.FilterParams;
 import PamDetection.LocContents;
+import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
@@ -178,6 +179,16 @@ public class DifarBinaryDataSource extends BinaryDataSource {
 		difarDataUnit.setBinaryVersion(moduleVersion);
 		if (!difarControl.getDifarParameters().loadViewerClips) {
 			difarDataUnit.setDemuxedDecimatedData(null);
+		}
+		DataUnitBaseData baseData = binaryObjectData.getDataUnitBaseData();
+		if (baseData != null && difarDataBlock.isSecondCopy(baseData.getUID(),
+				difarDataUnit.getChannelBitmap(), difarDataUnit.getTimeMilliseconds())) {
+			/*
+			 * A second copy noted by a running upgrade. Core's viewer save
+			 * reads back each stored object it cannot find in memory; returning
+			 * nothing leaves this one out of the rewritten file.
+			 */
+			return null;
 		}
 		return difarDataUnit;
 	}

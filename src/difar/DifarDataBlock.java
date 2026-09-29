@@ -3,6 +3,8 @@ package difar;
 import difar.offline.ViewerClipStore;
 
 import java.util.ListIterator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import PamDetection.LocContents;
 import PamguardMVC.PamDataBlock;
@@ -20,6 +22,12 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 
 	/** Keeps clips saved and deleted in the viewer; saved clips only, made when first needed. */
 	private ViewerClipStore viewerClipStore;
+
+	/**
+	 * Second copies of clips, noted while an upgrade runs so they are left out
+	 * when their files are rewritten. Null at other times.
+	 */
+	private volatile Set<String> secondCopies;
 
 	public DifarDataBlock(String dataName, DifarControl difarControl, boolean isDifarQueue,
 			DifarProcess parentProcess, int channelMap) {
@@ -171,12 +179,70 @@ public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 	 */
 	@Override
 	public void addPamData(DifarDataUnit pamDataUnit, Long uid) {
-		if (difarControl.isViewer() && uid != null && uid > 0
-				&& findUnitByUIDandUTC(uid, pamDataUnit.getTimeMilliseconds()) != null) {
-			System.out.printf("DIFAR: skipped a second copy of clip UID %d\n", uid);
-			return;
+		if (difarControl.isViewer() && uid != null && uid > 0) {
+			DifarDataUnit first = findUnitByUIDandUTC(uid, pamDataUnit.getTimeMilliseconds());
+			// the same clip only: older datasets can give different clips the same UID
+			if (first != null && first.getTimeMilliseconds() == pamDataUnit.getTimeMilliseconds()
+					&& first.getChannelBitmap() == pamDataUnit.getChannelBitmap()) {
+				System.out.printf("DIFAR: skipped a second copy of clip UID %d\n", uid);
+				noteSecondCopy(uid, pamDataUnit.getChannelBitmap(), pamDataUnit.getTimeMilliseconds());
+				return;
+			}
 		}
 		super.addPamData(pamDataUnit, uid);
+	}
+
+	/**
+	 * @param uid a clip's UID, as stored.
+	 * @param channelMap its channel map.
+	 * @param timeMillis its start time.
+	 * @return a key that is the same for two copies of one clip.
+	 */
+	public static String clipKey(long uid, int channelMap, long timeMillis) {
+		return uid + "|" + channelMap + "|" + timeMillis;
+	}
+
+	/**
+	 * Start noting second copies of clips, so that rewriting their files
+	 * leaves them out. Called by the upgrade.
+	 */
+	public void startCollectingSecondCopies() {
+		secondCopies = ConcurrentHashMap.newKeySet();
+	}
+
+	/**
+	 * Stop noting second copies.
+	 * @return how many were noted.
+	 */
+	public int stopCollectingSecondCopies() {
+		Set<String> copies = secondCopies;
+		int n = copies == null ? 0 : copies.size();
+		secondCopies = null;
+		return n;
+	}
+
+	/**
+	 * Note a second copy of a clip, if an upgrade is collecting them.
+	 * @param uid the UID stored with the copy.
+	 * @param channelMap its channel map.
+	 * @param timeMillis its start time.
+	 */
+	public void noteSecondCopy(long uid, int channelMap, long timeMillis) {
+		Set<String> copies = secondCopies;
+		if (copies != null) {
+			copies.add(clipKey(uid, channelMap, timeMillis));
+		}
+	}
+
+	/**
+	 * @param uid the UID stored with a clip read from a file.
+	 * @param channelMap its channel map.
+	 * @param timeMillis its start time.
+	 * @return true if it is a second copy noted by a running upgrade.
+	 */
+	public boolean isSecondCopy(long uid, int channelMap, long timeMillis) {
+		Set<String> copies = secondCopies;
+		return copies != null && copies.contains(clipKey(uid, channelMap, timeMillis));
 	}
 
 	@Override

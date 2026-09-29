@@ -5,13 +5,20 @@ import java.awt.Point;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import Array.ArrayManager;
+import Array.StreamerDataBlock;
+import PamUtils.PamCalendar;
+import PamUtils.PamUtils;
+import binaryFileStorage.DataUnitFileInformation;
 import dataMap.OfflineDataMapPoint;
 import difar.DIFARCrossingInfo;
 import difar.DifarControl;
@@ -26,6 +33,7 @@ import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
 import offlineProcessing.OfflineTask;
+import offlineProcessing.TaskGroupParams;
 import pamScrollSystem.AbstractScrollManager;
 
 /**
@@ -78,7 +86,17 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	private final Set<Long> notLoaded = new LinkedHashSet<>();
 	private final Set<Long> removed = new LinkedHashSet<>();
 	private final Set<Long> kept = new LinkedHashSet<>();
-	private int matched, unmatched, clipRows;
+	private int matched, partners, unmatched, noBuoy, clipRows;
+
+	/** Clips stored after their file began, which core skips. */
+	private int storedLate;
+
+	/**
+	 * Clips with no buoy in force, by channel: how many, and the first and
+	 * last of their start times. A wrong deploy or end time shows up as a run
+	 * of these on one channel.
+	 */
+	private final Map<Integer, long[]> noBuoyByChannel = new TreeMap<>();
 
 	/**
 	 * True from prepareTask to completeTask. Core completes every task in a
@@ -101,6 +119,21 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		this.buoyChanged = buoyChanged;
 		addRequiredDataBlock(crossingBlock);
 		addAffectedDataBlock(crossingBlock);
+		requireBuoyRecords(this);
+	}
+
+	/**
+	 * Have core load the buoy records with each chunk of clips, as the Viewer
+	 * does for a view. Without this a task sees only the buoys loaded for the
+	 * current view, and clips outside it have no buoy position. Core also
+	 * loads records from before each chunk, for buoys deployed earlier.
+	 * @param task a task that matches or locates clips.
+	 */
+	static void requireBuoyRecords(OfflineTask<?> task) {
+		StreamerDataBlock buoyRecords = ArrayManager.getArrayManager().getStreamerDatabBlock();
+		if (buoyRecords != null) {
+			task.addRequiredDataBlock(buoyRecords);
+		}
 	}
 
 	@Override
@@ -138,13 +171,81 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		removed.clear();
 		kept.clear();
 		matched = 0;
+		partners = 0;
 		unmatched = 0;
+		noBuoy = 0;
+		storedLate = 0;
+		noBuoyByChannel.clear();
 	}
 
 	@Override
 	public void newDataLoad(long startTime, long endTime, OfflineDataMapPoint mapPoint) {
+		startLoad();
+		storedLate += processClipsStoredLate(this, startTime);
+	}
+
+	/**
+	 * Get ready for a newly loaded chunk of clips. Used by the upgrade too,
+	 * which runs this task's steps.
+	 */
+	void startLoad() {
 		connection = DBControlUnit.findConnection();
 		pending.clear();
+		// core has just loaded this chunk's buoy records
+		difarControl.buoyRecordsReloaded();
+	}
+
+	/**
+	 * Process the loaded clips that start before their file does.
+	 * <p>
+	 * A clip is stored when it is saved, not when the call starts. A call
+	 * marked just before a file rolls over and saved just after sits in the
+	 * next file, with a start time before that file begins. Core processes
+	 * only units that start within their file's time span, so it skips these.
+	 * They are processed here, before core processes the rest, so clips are
+	 * still taken in time order. A clip the task changes is marked for
+	 * rewriting, as core does.
+	 * <p>
+	 * When the task runs over a chosen period, clips before that period are
+	 * left alone.
+	 * @param task the task to run on each clip.
+	 * @param fileStart start of the loaded file.
+	 * @return how many clips were processed.
+	 */
+	static int processClipsStoredLate(OfflineTask<DifarDataUnit> task, long fileStart) {
+		long notBefore = Long.MIN_VALUE;
+		TaskGroupParams params = task.getOfflineTaskGroup().getTaskGroupParams();
+		if (params.dataChoice == TaskGroupParams.PROCESS_SPECIFICPERIOD) {
+			notBefore = params.startRedoDataTime;
+		}
+		int n = 0;
+		for (DifarDataUnit clip : task.getDataBlock().getDataCopy()) {
+			long time = clip.getTimeMilliseconds();
+			if (time >= fileStart) {
+				continue;
+			}
+			if (time < notBefore) {
+				continue;
+			}
+			n++;
+			if (task.processDataUnit(clip)) {
+				DataUnitFileInformation fileInfo = clip.getDataUnitFileInformation();
+				if (fileInfo != null) {
+					fileInfo.setNeedsUpdate(true);
+				}
+				clip.updateDataUnit(System.currentTimeMillis());
+			}
+		}
+		return n;
+	}
+
+	/**
+	 * Add clips processed by {@link #processClipsStoredLate}, when the upgrade
+	 * runs this task's steps.
+	 * @param n how many.
+	 */
+	void addStoredLate(int n) {
+		storedLate += n;
 	}
 
 	/**
@@ -156,6 +257,7 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		DifarCrossing old = clip.getCrossing();
 		if (old != null && made.contains(old)) {
 			// matched already in this run, as an earlier clip's partner
+			partners++;
 			return false;
 		}
 		if (old != null) {
@@ -169,6 +271,14 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 			removed.add(old.getUID());
 			old.removeAllSubDetections();
 			crossingBlock.remove(old, true);
+		}
+		if (clip.getOriginLatLong(false) == null) {
+			// no buoy with a known position was in force when the clip was made
+			noBuoy++;
+			countNoBuoy(clip);
+			recorder.forget(clip);
+			unmatched++;
+			return false;
 		}
 		DIFARCrossingInfo proposal = difarProcess.getDifarRangeInfo(clip, this::isFreeToMatch);
 		if (proposal == null) {
@@ -229,15 +339,45 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		return crossing == null || (!isKept(crossing) && !made.contains(crossing));
 	}
 
+	/**
+	 * Add a clip with no buoy in force to its channel's count and time range.
+	 * @param clip the clip.
+	 */
+	private void countNoBuoy(DifarDataUnit clip) {
+		int channel = PamUtils.getSingleChannel(clip.getChannelBitmap());
+		long time = clip.getTimeMilliseconds();
+		long[] entry = noBuoyByChannel.get(channel);
+		if (entry == null) {
+			noBuoyByChannel.put(channel, new long[] {1, time, time});
+			return;
+		}
+		entry[0]++;
+		entry[1] = Math.min(entry[1], time);
+		entry[2] = Math.max(entry[2], time);
+	}
+
 	@Override
 	public void completeTask() {
 		if (!running) {
 			return;
 		}
 		running = false;
-		System.out.printf("DIFAR: rematch made crossings for %d clips, left %d clips unmatched, removed %d old crossings, "
+		System.out.printf("DIFAR: rematch made %d crossings holding %d clips, left %d clips unmatched, removed %d old crossings, "
 				+ "and kept %d chosen by the operator, %d of them worked out again. %d clip rows updated\n",
-				matched, unmatched, removed.size(), kept.size(), relocated.size(), clipRows);
+				matched, matched + partners, unmatched, removed.size(), kept.size(), relocated.size(), clipRows);
+		if (storedLate > 0) {
+			System.out.printf("DIFAR: %d of those clips were stored after their file began, and processed separately\n",
+					storedLate);
+		}
+		if (noBuoy > 0) {
+			System.out.printf("DIFAR: %d of the unmatched clips had no buoy with a known position in force when they were made\n",
+					noBuoy);
+			for (Map.Entry<Integer, long[]> entry : noBuoyByChannel.entrySet()) {
+				long[] v = entry.getValue();
+				System.out.printf("DIFAR:   channel %d: %d clips, from %s to %s\n", entry.getKey(), v[0],
+						PamCalendar.formatDateTime(v[1]), PamCalendar.formatDateTime(v[2]));
+			}
+		}
 		if (!notLoaded.isEmpty()) {
 			System.out.printf("DIFAR: %d kept crossings were not worked out again, since their clips were never all loaded together: UIDs %s\n",
 					notLoaded.size(), notLoaded);

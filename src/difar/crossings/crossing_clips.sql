@@ -5,6 +5,9 @@
 -- of anything derived from the buoy and is kept current after buoy edits. The
 -- children table only links the two.
 --
+-- Clip rows are matched by UID and by time, within a second. Older datasets
+-- can give different clips the same UID, so UID alone can join the wrong rows.
+--
 -- Text columns are trimmed, since PAMGuard pads text with spaces when it
 -- inserts a row but not when it updates one.
 --
@@ -38,4 +41,5 @@ SELECT
 FROM DIFAR_Localisation_Crossings AS x
 JOIN DIFAR_Localisation_Crossings_Children AS k ON k.parentUID = x.UID
 JOIN DIFAR_Localisation AS c ON c.UID = k.UID
+    AND ABS(julianday(c.UTC) - julianday(k.UTC)) < 1.0 / 86400
 ORDER BY x.UTC, x.UID, c.UTC;

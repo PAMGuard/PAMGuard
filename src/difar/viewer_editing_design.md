@@ -96,17 +96,23 @@ duplicate is one clip stored twice, with the same UID, channel and start time.
   crossings. Renumbering would cut the links of crossings already made. Otherwise the upgrade
   refuses, and says why.
 
-**Renumbering.** Every clip gets a new UID, counting from 1 in time order, then by channel. Files load
-in time order, and each file's clips are renumbered as it loads, before the rematch sees them. So
+**Renumbering.** Every clip gets a new UID, counting from 1. Files load in time order, and each
+file's clips are renumbered as it loads, in time order then by channel, before the rematch sees them.
+A clip stored just after its file began gets its number with that file, so the order is by file first
+and only nearly by time. So
 crossings are made with the new UIDs. The Viewer's next UID then follows the highest new one. The old
 UIDs survive only in the backup. Other records, such as the MATLAB rematch of the 2019 data, pair with
 clips by channel and start time.
 
 **Exact duplicates** are dropped, and counted in the console. The Viewer already skips the second
-copy of a clip when both are in the same file. But core's Viewer save writes back, from the old file,
-any object it cannot find in memory. So the skipped copy would return with its old UID, and after a
+copy of a clip when both are in the same file; it now checks channel and start time as well as UID,
+since different clips can share a UID. But core's Viewer save writes back, from the old file, any
+object it cannot find in memory. So the skipped copy would return with its old UID, and after a
 renumber that UID may belong to another clip. The upgrade therefore drops it from the rewritten file
-as well. A copy in another file loads separately, and is dropped the same way.
+as well: while the upgrade runs, the data block notes each second copy, and DIFAR's binary source
+returns nothing for a noted copy, which core's save then leaves out. A copy in another file loads
+separately; the upgrade removes it from memory and notes it the same way. The notes are cleared when
+the upgrade ends, since a normal load stops reading a file at the first object that returns nothing.
 
 **The clip table.** The upgrade rebuilds the DIFAR clip table from the binary files on every run,
 renumbered or not. Older tables can be incomplete: in 2019 the storage setting sometimes reverted to
@@ -129,7 +135,20 @@ edit in the Viewer, over the buoy's period.
 
 The offline task group loads one file of clips at a time. A clip near the start or end of a file
 cannot see partners in the next file, as with the old rematch. Loading a margin of clips either side
-would fix that, and is worth doing if files are short. Within a file, clips are matched in time order: each gets the best viable match, chosen
+would fix that, and is worth doing if files are short. In the 2019 data files are hourly, and only 5
+of 4,804 MATLAB triangulations span two clock hours.
+
+Each chunk of clips needs the buoy records in force at its time. The rematch and the upgrade declare
+the buoy records (the array's streamer data) as required, so core loads them with each chunk, and the
+records before it, as the Viewer does for a view. Without this, a task saw only the buoys loaded for
+the current view, and clips outside it had no buoy position. A clip with no buoy position in force is
+left unmatched and counted in the console.
+
+Core processes only clips that start within their file's time span. A clip saved just after a file
+rolls over starts before its file does, so core skips it. The rematch and the upgrade process these
+clips themselves, at the start of each load, so clips are still taken in time order.
+
+Within a file, clips are matched in time order: each gets the best viable match, chosen
 automatically, and its crossing is recorded by the same `CrossingRecorder` rules as saving a clip.
 That is how an operator works through the queue.
 
@@ -196,8 +215,8 @@ database. The counts below come from the MATLAB rematch file, and should match w
 2. Deleting a saved clip. Done.
 3. The dataset upgrade, which uses 1. Built, passed on the pilot.
 4. Duplicate UIDs and the clip table rebuild, in the upgrade. Needed to compare with the MATLAB
-   rematch of the 2019 data. First the check, which for now stops the upgrade when clips share UIDs:
-   built, test owed. Then renumbering, dropping clips stored twice, and the table rebuild.
+   rematch of the 2019 data. The check: done. Renumbering, dropping clips stored twice, and the
+   table rebuild: built, test owed.
 5. The auto-compaction setting.
 
 ## Also for the feature list
