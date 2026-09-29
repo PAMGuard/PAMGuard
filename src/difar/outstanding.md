@@ -78,7 +78,9 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
 - Skipping the core save when a Viewer save is cancelled is untested. It needs a save cancelled by a
   file name clash, which a leftover binary file from an earlier test produces.
 - Duplicate UIDs in the upgrade: tests 5 to 8 in `viewer_editing_design.md`, on slices of the 2019
-  voyage data.
+  voyage data. Until renumbering is built, the check stops the upgrade when clips share UIDs. Owed
+  now: on 28 to 30 January it stops, reporting 1,470 different clips sharing 709 UIDs, with no backup
+  folder made; on 10 to 12 February it reports no shared UIDs and upgrades as before.
 - `pgmatlab` read one compacted file as 11 objects when it held 3. The file was discarded. Recheck
   once compaction resumes.
 

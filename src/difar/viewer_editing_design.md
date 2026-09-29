@@ -177,13 +177,14 @@ A crossing of three, trimmed to two and recalculated, needs the three-buoy audio
 On copies of the 2019 voyage data, each slice in its own scratch folder with the March 2019
 database. The counts below come from the MATLAB rematch file, and should match what the check reports.
 
-5. 28 to 30 January: 2,284 clips, 1,470 of them sharing a UID. The upgrade reports the shared UIDs.
+5. 28 to 30 January: 2,284 clips, 1,470 of them sharing 709 UIDs. The upgrade reports the shared UIDs.
    Cancel: no backup folder, and the files and database unchanged. Run again and renumber: the backup
    holds the binary files and the database; the files are at version 3; UIDs run 1 to 2,284 in time
    order; the clip table has one row per clip, with the same UIDs; crossings are made.
-6. 21 February: 2,413 clips, 442 sharing a UID, and one clip stored twice (old UID 300, channel 2,
-   00:59:15.855). After renumbering it appears once, in the files and in the table.
-7. 10 to 12 February: 3,876 clips, none sharing a UID. No question is asked, and every clip keeps its
+6. 21 February: 2,413 clips stored, one of them twice (old UID 300, channel 2, 00:59:15.855); 441
+   different clips sharing 206 UIDs. After renumbering the clip stored twice appears once, in the
+   files and in the table.
+7. 10 to 12 February: 3,876 clips, none sharing a UID, none stored twice. No question is asked, and every clip keeps its
    UID. The clip table is still rebuilt.
 8. After 5, close and reopen the Viewer. Clips load with their new UIDs, crossings draw, and no
    "skipped a second copy" lines appear. Save a new clip: its UID is above 2,284. Read the rewritten
@@ -195,7 +196,8 @@ database. The counts below come from the MATLAB rematch file, and should match w
 2. Deleting a saved clip. Done.
 3. The dataset upgrade, which uses 1. Built, passed on the pilot.
 4. Duplicate UIDs and the clip table rebuild, in the upgrade. Needed to compare with the MATLAB
-   rematch of the 2019 data.
+   rematch of the 2019 data. First the check, which for now stops the upgrade when clips share UIDs:
+   built, test owed. Then renumbering, dropping clips stored twice, and the table rebuild.
 5. The auto-compaction setting.
 
 ## Also for the feature list

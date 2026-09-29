@@ -6,9 +6,17 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import binaryFileStorage.BinaryDataSink;
+import binaryFileStorage.BinaryFooter;
+import binaryFileStorage.BinaryHeader;
+import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.BinaryOfflineDataMap;
 import binaryFileStorage.BinaryOfflineDataMapPoint;
 import binaryFileStorage.BinaryStore;
+import binaryFileStorage.ModuleFooter;
+import binaryFileStorage.ModuleHeader;
 import dataMap.OfflineDataMapPoint;
 import difar.DifarClipPayload;
 import difar.DifarControl;
@@ -23,6 +31,8 @@ import offlineProcessing.TaskGroupParams;
  * Files before DIFAR module version 3 hold each clip's crossing inside the
  * clip, and are read only. The upgrade:
  * <ol>
+ * <li>reads every DIFAR file once and checks that no two different clips
+ * share a UID. If some do, it stops, since renumbering is not built yet;</li>
  * <li>backs up every DIFAR binary file, beside the binary store, and does
  * nothing more if the backup fails;</li>
  * <li>rematches every clip, exactly as {@link RematchTask} does, making
@@ -72,17 +82,105 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 		upgraded = 0;
 		backedUp = false;
 		if (getOfflineTaskGroup().getTaskGroupParams().dataChoice != TaskGroupParams.PROCESS_ALL) {
-			String message = "The upgrade runs over all data only, so nothing was upgraded. "
-					+ "Choose all data and run it again.";
-			System.out.println("DIFAR: " + message);
-			// the task runs off the Swing thread
-			SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(difarControl.getGuiFrame(),
-					message, getName(), JOptionPane.WARNING_MESSAGE));
+			warn("The upgrade runs over all data only, so nothing was upgraded. "
+					+ "Choose all data and run it again.");
 			return;
+		}
+		UidCensus census = takeCensus();
+		if (census == null) {
+			return;
+		}
+		System.out.println("DIFAR: " + census.summary());
+		if (!census.isUnique()) {
+			warn(String.format("%d different clips share %d UIDs, probably because the UID count "
+					+ "restarted when PAMGuard crashed during recording. The upgrade needs each clip "
+					+ "to have its own UID, and cannot renumber them yet, so nothing was upgraded.",
+					census.getClipsSharingUIDs(), census.getSharedUIDs()));
+			return;
+		}
+		if (census.getExactDuplicates() > 0) {
+			System.out.printf("DIFAR: %d clips are stored twice. The upgrade keeps both copies for now\n",
+					census.getExactDuplicates());
 		}
 		backedUp = backUp();
 		if (backedUp) {
 			rematch.prepareTask();
+		}
+	}
+
+	/**
+	 * Show a warning, and print it to the console.
+	 * @param message the warning.
+	 */
+	private void warn(String message) {
+		System.out.println("DIFAR: " + message);
+		// the task runs off the Swing thread
+		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(difarControl.getGuiFrame(),
+				message, getName(), JOptionPane.WARNING_MESSAGE));
+	}
+
+	/**
+	 * Read every DIFAR binary file once, without loading its clips into the
+	 * data block, and count how their UIDs are used.
+	 * @return the count, or null if there are no files or one cannot be read.
+	 */
+	private UidCensus takeCensus() {
+		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
+		if (binaryStore == null) {
+			System.out.println("DIFAR: no binary store, so nothing was upgraded");
+			return null;
+		}
+		BinaryOfflineDataMap dataMap = (BinaryOfflineDataMap) getDataBlock().getOfflineDataMap(binaryStore);
+		if (dataMap == null) {
+			System.out.println("DIFAR: no DIFAR binary files, so nothing was upgraded");
+			return null;
+		}
+		UidCensus census = new UidCensus();
+		CensusSink sink = new CensusSink(census);
+		for (BinaryOfflineDataMapPoint mapPoint : dataMap.getMapPoints()) {
+			if (!binaryStore.loadData(getDataBlock(), mapPoint, Long.MIN_VALUE, Long.MAX_VALUE, sink)) {
+				warn("Could not read " + mapPoint.getBinaryFile(binaryStore) + ", so nothing was upgraded.");
+				return null;
+			}
+		}
+		return census;
+	}
+
+	/**
+	 * Counts each clip read from a file, and keeps nothing else.
+	 */
+	private static class CensusSink implements BinaryDataSink {
+
+		private final UidCensus census;
+
+		private CensusSink(UidCensus census) {
+			this.census = census;
+		}
+
+		@Override
+		public boolean newDataUnit(BinaryObjectData binaryObjectData, PamDataBlock dataBlock, PamDataUnit dataUnit) {
+			census.add(dataUnit.getUID(), dataUnit.getChannelBitmap(), dataUnit.getTimeMilliseconds());
+			return true;
+		}
+
+		@Override
+		public void newFileHeader(BinaryHeader binaryHeader) {
+		}
+
+		@Override
+		public void newModuleHeader(BinaryObjectData binaryObjectData, ModuleHeader moduleHeader) {
+		}
+
+		@Override
+		public void newModuleFooter(BinaryObjectData binaryObjectData, ModuleFooter moduleFooter) {
+		}
+
+		@Override
+		public void newFileFooter(BinaryObjectData binaryObjectData, BinaryFooter binaryFooter) {
+		}
+
+		@Override
+		public void newDatagram(BinaryObjectData binaryObjectData) {
 		}
 	}
 
