@@ -373,10 +373,16 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 				clip.setUID(nextUID++);
 			}
 		}
-		rematch.startLoad();
+		rematch.startLoad(endTime);
 		writeClipRows(clips);
 		// through this task, so the clips are upgraded as well as rematched
-		rematch.addStoredLate(RematchTask.processClipsStoredLate(this, startTime));
+		int before = RematchTask.processClipsBeforeFile(this, startTime);
+		rematch.addOutsideFile(before);
+		if (before > 0 && RematchTask.noClipsInFile(this, startTime, endTime)) {
+			// core will stop before finishing this load; finish it here
+			loadedDataComplete();
+			RematchTask.saveAffectedBlocks(this);
+		}
 	}
 
 	/**
@@ -394,7 +400,6 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 				kept.add(clip);
 				continue;
 			}
-			System.out.printf("DIFAR: dropped a second copy of clip UID %d, found in another file\n", clip.getUID());
 			block.noteSecondCopy(clip.getUID(), clip.getChannelBitmap(), clip.getTimeMilliseconds());
 			block.remove(clip);
 		}
@@ -443,7 +448,9 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 	@Override
 	public void loadedDataComplete() {
 		if (backedUp) {
-			rematch.loadedDataComplete();
+			// through this task, so the clips are upgraded as well as rematched
+			rematch.addOutsideFile(RematchTask.processClipsAfterFile(this, rematch.getFileEnd()));
+			rematch.relocatePending();
 		}
 	}
 

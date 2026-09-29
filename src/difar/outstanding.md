@@ -87,6 +87,13 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
   clips. Still owed: dropping second copies. The census found none in these binary files, so the
   clip MATLAB's file holds twice (old UID 300) may be a duplicate made when MATLAB read the files.
   The full voyage run will show whether any exist.
+- The full voyage, 2019-enrich-full, upgraded once: 47,853 clips renumbered 1 to 47,853, no second
+  copies, every clip in MATLAB's file found by channel and start time, plus 141 on 24 February that
+  MATLAB's file lacks. 6,037 crossings against MATLAB's 4,804 triangulations; 3,893 of those made with
+  the same clips (81%; 64% for fin whale 20 Hz pulses, about 80% for blue whale calls), locations a
+  median 0.62 km apart. 107 crossings have errors over 100 km. Two files have unreadable headers
+  (`20190126_150000`, `20190220_230752`), yet their clips are in the table. 289 clips had no buoy in
+  force, 215 of them on channel 1. The run left 15 clips with old UIDs (above); rerun from the backup.
 - Buoy records loaded with each chunk of the rematch and upgrade passed on 10 to 12 February: every
   clip found its buoy, and 596 crossings were made (512 of two clips, 84 of three). Against the MATLAB
   rematch of those days, 471 of its 524 triangulations were made with the same clips, their locations
@@ -124,6 +131,25 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   typing its position and variation by hand, with a decimal suffix on the name. A link from a new
   deployment to an earlier one would do this properly.
 
+## Viewer display, from the full voyage
+
+Settings the Viewer needs, such as "all data" on the map, are listed in `viewer_settings.md`. The
+items below are about making fewer of them necessary.
+
+- Buoys appear on the map only with "all data" ticked in the map's plot options. A buoy deployed
+  before the view starts is outside the view's time window. Buoys in force during the view should
+  show without it.
+- The buoy manager's time window controls sit in a bottom panel that starts collapsed. Show it by
+  default. Not essential: use the empty space to its left as a status line, giving the number of
+  buoys in the manager, the first deploy time and last end time, and the first and last buoy names
+  and channels in the loaded window.
+- After the first upgrade, and never on the original files, the Viewer warned at startup that data
+  units lack UIDs and offered to convert again: "Binary Store missing UID's in Processed DIFAR Data",
+  10 units. Core counts a file's units as missing UIDs when its data map point has no UID range,
+  which comes from the file footer. Cancelling loaded the data correctly. Recheck after the rerun,
+  since the first run left files whose clips were never processed; if it persists, list the files
+  whose footers have no UID range.
+
 ## Calibration
 
 - The choice of mean, mode or mean near mode is only in a right-click menu on the histogram. Make it
@@ -134,15 +160,39 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
 - Core's offline tasks process only clips whose start time lies within their file's time span. A clip
   marked just before a file rolls over and saved just after sits in the next file, and is skipped: not
   rematched, its row not updated, not marked as upgraded. 33 of 3,875 clips on 10 to 12 February. At
-  least 7 of the 17 clips MATLAB crossed and PAMGuard did not are in the last minute of an hour. Now
-  the rematch and upgrade process these clips themselves, first in each load. Test owed: on 10 to 12
-  February, 33 clips reported as stored late, all 3,875 upgraded, and fewer MATLAB-only clips.
-- The rematch's console line counted each crossing once, at the clip that started it, and called them
-  clips. It now reports crossings and the clips they hold.
+  least 7 of the 17 clips MATLAB crossed and PAMGuard did not are in the last minute of an hour. The
+  rematch and upgrade now process these clips themselves, first in each load; passed on 10 to 12
+  February. Core also stops at the first clip after its file's end time, which files cut short by a
+  crash can have: on the full voyage 15 clips were renumbered but never processed, so their files
+  were rewritten with their old UIDs, clashing with new ones. These are now processed after core has
+  finished, before the save. On the rerun every clip was processed, yet 13 clips in 10 files kept
+  their old UIDs and their files stayed at version 2. In each of those files every clip starts
+  before the file does. Core counts no clip in the file's span, and returns before calling
+  loadedDataComplete and before saving, so the clips processed at the start of the load never reach
+  their file. The rematch and upgrade now finish such a load themselves. Test owed: a third full
+  voyage run from its backup, then pgmatlab: every readable file at version 3, 47,853 distinct UIDs.
+- The rematch's console line now counts clips in crossings from the crossings themselves. Counting as
+  it went, a clip left unmatched and later taken as a partner stayed counted as unmatched: 12,524
+  clips reported against 12,943 in the crossings, on the full voyage.
 - Five crossings on 10 to 12 February have location errors over 100 km, and two are placed far outside
   the survey, one at 131 degrees East. Near-parallel bearings, probably; core printed
   `FunctionEvaluationException` for its error estimate six times. The distance limit does not catch
   them. Consider flagging crossings by error rather than rejecting them.
+  On the full voyage's first run, the 107 crossings with errors over 100 km are near-parallel
+  bearings: their largest angle between bearings has a median of 1.1 degrees, against 26.5 for the
+  rest. Of 161 crossings whose bearings meet at 2 degrees or less, 65 have errors over 100 km; of
+  1,637 meeting at more than 45 degrees, none do. 25 crossings lie over 1,000 km from a buoy. A
+  minimum angle between bearings, as a matching parameter or a flag, would remove nearly all of them.
+  Decided: a flag and a data selector, with minimum angle and maximum error; see "Crossing quality"
+  in `crossings_design.md`. Not built.
+- The clip data selector ("show only cross bearings", species, channels) lists channels 0 to n-1,
+  where n is the number of channels in the source's channel map, taken when its parameters are first
+  made and then saved. With the 2019 data it offers only channels 0 and 1. It should list the
+  channels actually in use, and extend saved parameters when channels are added. Its "crosses only"
+  test also needs checking against crossing units.
+- Console noise in long runs. `Simplex2D` now counts failed error estimates instead of printing each
+  one, and the rematch summary reports the count. The upgrade's per-clip "dropped a second copy" line
+  is gone; its summary counts them. The per-clip "skipped a second copy" in ordinary loads stays.
 - Clip rows are updated by UID. The slices use the whole voyage's database, whose clip table holds
   other days' clips with the same UIDs, so the rematch wrote this slice's buoy values into those rows
   too, and `crossing_clips.sql` joined them in (5,979 rows for 1,276 clips). The clip table rebuild
@@ -205,10 +255,15 @@ These three probably share one solution: a sonobuoy origin for streamers, manage
   observer, and core has no notice for a removed unit at all. DIFAR tells its saved clips panel
   directly, and reloads the view after a deletion so the map and spectrogram redraw.
 - `BINOVERLAPWARNING` is one named warning for every module.
+- `OfflineTaskGroup` prints "No. viewer units: N" for every file it loads, about a thousand lines for a
+  voyage. Could go to `Debug.out`.
 - The Viewer never loaded super-detection blocks alongside the blocks they group. Fixed by
   PAMGuard/PAMGuard#348, merged into `main`.
 - Core's UID check at Viewer startup finds missing UIDs, not repeated ones. Datasets whose UID count
   restarted after crashes pass it.
+- `OfflineTaskGroup.processData` returns before `loadedDataComplete` and before saving when no loaded
+  unit starts within the file's time span, so a task that processes units outside the span cannot
+  save them.
 - `OfflineTaskGroup.processData` skips loaded units whose start time is outside the file's time span.
   For modules that store a unit after its start time, such as DIFAR, those units are never processed.
 - The Viewer save writes back, from the old file, any object it cannot find in memory. A unit dropped

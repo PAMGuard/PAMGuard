@@ -145,8 +145,12 @@ the current view, and clips outside it had no buoy position. A clip with no buoy
 left unmatched and counted in the console.
 
 Core processes only clips that start within their file's time span. A clip saved just after a file
-rolls over starts before its file does, so core skips it. The rematch and the upgrade process these
-clips themselves, at the start of each load, so clips are still taken in time order.
+rolls over starts before its file does, so core skips it. A file cut short by a crash can end before
+its last clip, and core stops there. The rematch and the upgrade process both kinds themselves:
+clips before the file at the start of each load, so clips are still taken in time order, and clips
+after it once core has finished, before the file is saved. When every clip in a file starts before
+it, core processes nothing and returns without finishing the load or saving; the rematch and the
+upgrade then finish and save that load themselves.
 
 Within a file, clips are matched in time order: each gets the best viable match, chosen
 automatically, and its crossing is recorded by the same `CrossingRecorder` rules as saving a clip.

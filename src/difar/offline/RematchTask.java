@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 import javax.swing.JCheckBox;
@@ -29,6 +30,7 @@ import difar.crossings.CrossingLocaliser;
 import difar.crossings.CrossingRecorder;
 import difar.crossings.DifarCrossing;
 import difar.crossings.DifarCrossingDataBlock;
+import difar.targetmotion.Simplex2D;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
@@ -86,10 +88,14 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	private final Set<Long> notLoaded = new LinkedHashSet<>();
 	private final Set<Long> removed = new LinkedHashSet<>();
 	private final Set<Long> kept = new LinkedHashSet<>();
-	private int matched, partners, unmatched, noBuoy, clipRows;
+	/** Clips processed, and those that belong to a kept crossing. */
+	private int processed, keptClips, noBuoy, clipRows;
 
-	/** Clips stored after their file began, which core skips. */
-	private int storedLate;
+	/** Clips starting outside their file's time span, which core skips. */
+	private int outsideFile;
+
+	/** End of the file just loaded. */
+	private long fileEnd;
 
 	/**
 	 * Clips with no buoy in force, by channel: how many, and the first and
@@ -170,25 +176,66 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		clipRows = 0;
 		removed.clear();
 		kept.clear();
-		matched = 0;
-		partners = 0;
-		unmatched = 0;
+		processed = 0;
+		keptClips = 0;
 		noBuoy = 0;
-		storedLate = 0;
+		outsideFile = 0;
+		Simplex2D.takeFailedErrorEstimates();
 		noBuoyByChannel.clear();
 	}
 
 	@Override
 	public void newDataLoad(long startTime, long endTime, OfflineDataMapPoint mapPoint) {
-		startLoad();
-		storedLate += processClipsStoredLate(this, startTime);
+		startLoad(endTime);
+		int before = processClipsBeforeFile(this, startTime);
+		outsideFile += before;
+		if (before > 0 && noClipsInFile(this, startTime, endTime)) {
+			// core will stop before finishing this load; finish it here
+			loadedDataComplete();
+			saveAffectedBlocks(this);
+		}
+	}
+
+	/**
+	 * @param task a task on clips.
+	 * @param fileStart start of the loaded file.
+	 * @param fileEnd end of the loaded file.
+	 * @return true if no loaded clip starts within the file's time span.
+	 * Core then processes nothing, and returns before calling
+	 * loadedDataComplete and before saving, so any clip processed outside
+	 * core's loop would never reach its file.
+	 */
+	static boolean noClipsInFile(OfflineTask<DifarDataUnit> task, long fileStart, long fileEnd) {
+		for (DifarDataUnit clip : task.getDataBlock().getDataCopy()) {
+			long time = clip.getTimeMilliseconds();
+			if (time >= fileStart && time <= fileEnd) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Save a task's affected data blocks and commit the database, as core
+	 * does at the end of each load it processes.
+	 * @param task the task.
+	 */
+	static void saveAffectedBlocks(OfflineTask<?> task) {
+		for (int i = 0; i < task.getNumAffectedDataBlocks(); i++) {
+			task.getAffectedDataBlock(i).saveViewerData();
+		}
+		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+		if (dbControl != null) {
+			dbControl.commitChanges();
+		}
 	}
 
 	/**
 	 * Get ready for a newly loaded chunk of clips. Used by the upgrade too,
 	 * which runs this task's steps.
 	 */
-	void startLoad() {
+	void startLoad(long fileEnd) {
+		this.fileEnd = fileEnd;
 		connection = DBControlUnit.findConnection();
 		pending.clear();
 		// core has just loaded this chunk's buoy records
@@ -205,26 +252,46 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	 * They are processed here, before core processes the rest, so clips are
 	 * still taken in time order. A clip the task changes is marked for
 	 * rewriting, as core does.
-	 * <p>
-	 * When the task runs over a chosen period, clips before that period are
-	 * left alone.
 	 * @param task the task to run on each clip.
 	 * @param fileStart start of the loaded file.
 	 * @return how many clips were processed.
 	 */
-	static int processClipsStoredLate(OfflineTask<DifarDataUnit> task, long fileStart) {
-		long notBefore = Long.MIN_VALUE;
+	static int processClipsBeforeFile(OfflineTask<DifarDataUnit> task, long fileStart) {
+		return processClips(task, time -> time < fileStart);
+	}
+
+	/**
+	 * Process the loaded clips that start after their file's end time. Core
+	 * stops at the first of these, so they are never processed. Files cut
+	 * short by a crash can have an end time before their last clip. Call
+	 * from loadedDataComplete, which runs before the files are saved.
+	 * @param task the task to run on each clip.
+	 * @param fileEnd end of the loaded file.
+	 * @return how many clips were processed.
+	 */
+	static int processClipsAfterFile(OfflineTask<DifarDataUnit> task, long fileEnd) {
+		return processClips(task, time -> time > fileEnd);
+	}
+
+	/**
+	 * Process the loaded clips whose start time passes a test, marking each
+	 * clip the task changes for rewriting, as core does. When the task runs
+	 * over a chosen period, clips outside that period are left alone.
+	 * @param task the task to run on each clip.
+	 * @param outside the test on a clip's start time.
+	 * @return how many clips were processed.
+	 */
+	private static int processClips(OfflineTask<DifarDataUnit> task, LongPredicate outside) {
+		long notBefore = Long.MIN_VALUE, notAfter = Long.MAX_VALUE;
 		TaskGroupParams params = task.getOfflineTaskGroup().getTaskGroupParams();
 		if (params.dataChoice == TaskGroupParams.PROCESS_SPECIFICPERIOD) {
 			notBefore = params.startRedoDataTime;
+			notAfter = params.endRedoDataTime;
 		}
 		int n = 0;
 		for (DifarDataUnit clip : task.getDataBlock().getDataCopy()) {
 			long time = clip.getTimeMilliseconds();
-			if (time >= fileStart) {
-				continue;
-			}
-			if (time < notBefore) {
+			if (!outside.test(time) || time < notBefore || time > notAfter) {
 				continue;
 			}
 			n++;
@@ -240,12 +307,19 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	}
 
 	/**
-	 * Add clips processed by {@link #processClipsStoredLate}, when the upgrade
-	 * runs this task's steps.
+	 * Add clips processed outside core's loop, when the upgrade runs this
+	 * task's steps.
 	 * @param n how many.
 	 */
-	void addStoredLate(int n) {
-		storedLate += n;
+	void addOutsideFile(int n) {
+		outsideFile += n;
+	}
+
+	/**
+	 * @return end of the file just loaded.
+	 */
+	long getFileEnd() {
+		return fileEnd;
 	}
 
 	/**
@@ -253,15 +327,16 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	 */
 	@Override
 	public boolean processDataUnit(DifarDataUnit clip) {
+		processed++;
 		updateBuoyColumns(clip);
 		DifarCrossing old = clip.getCrossing();
 		if (old != null && made.contains(old)) {
 			// matched already in this run, as an earlier clip's partner
-			partners++;
 			return false;
 		}
 		if (old != null) {
 			if (isKept(old)) {
+				keptClips++;
 				kept.add(old.getUID());
 				if (!relocated.contains(old.getUID())) {
 					pending.add(old);
@@ -277,23 +352,17 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 			noBuoy++;
 			countNoBuoy(clip);
 			recorder.forget(clip);
-			unmatched++;
 			return false;
 		}
 		DIFARCrossingInfo proposal = difarProcess.getDifarRangeInfo(clip, this::isFreeToMatch);
 		if (proposal == null) {
 			recorder.forget(clip);
-			unmatched++;
 			return false;
 		}
 		recorder.record(clip);
 		clip.clearTempCrossing();
 		if (clip.getCrossing() != null) {
 			made.add(clip.getCrossing());
-			matched++;
-		}
-		else {
-			unmatched++;
 		}
 		return false;
 	}
@@ -314,6 +383,15 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 	 */
 	@Override
 	public void loadedDataComplete() {
+		outsideFile += processClipsAfterFile(this, fileEnd);
+		relocatePending();
+	}
+
+	/**
+	 * Work out again the kept crossings met in this load. Used by the upgrade
+	 * too, which runs this task's steps.
+	 */
+	void relocatePending() {
 		for (DifarCrossing crossing : pending) {
 			if (localiser.relocate(crossing) == CrossingLocaliser.Outcome.CLIPS_NOT_LOADED) {
 				notLoaded.add(crossing.getUID());
@@ -362,12 +440,23 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 			return;
 		}
 		running = false;
-		System.out.printf("DIFAR: rematch made %d crossings holding %d clips, left %d clips unmatched, removed %d old crossings, "
-				+ "and kept %d chosen by the operator, %d of them worked out again. %d clip rows updated\n",
-				matched, matched + partners, unmatched, removed.size(), kept.size(), relocated.size(), clipRows);
-		if (storedLate > 0) {
-			System.out.printf("DIFAR: %d of those clips were stored after their file began, and processed separately\n",
-					storedLate);
+		// counted from the crossings, since a clip left unmatched can later be taken as a partner
+		int inCrossings = 0;
+		for (DifarCrossing crossing : made) {
+			inCrossings += crossing.getSubDetectionsCount();
+		}
+		System.out.printf("DIFAR: rematch went through %d clips, made %d crossings holding %d clips, left %d clips unmatched, "
+				+ "removed %d old crossings, and kept %d chosen by the operator, %d of them worked out again. %d clip rows updated\n",
+				processed, made.size(), inCrossings, processed - inCrossings - keptClips,
+				removed.size(), kept.size(), relocated.size(), clipRows);
+		if (outsideFile > 0) {
+			System.out.printf("DIFAR: %d of those clips start outside their file's time span, and were processed separately\n",
+					outsideFile);
+		}
+		int failedErrors = Simplex2D.takeFailedErrorEstimates();
+		if (failedErrors > 0) {
+			System.out.printf("DIFAR: %d error estimates failed while locating crossings, so some errors are unknown\n",
+					failedErrors);
 		}
 		if (noBuoy > 0) {
 			System.out.printf("DIFAR: %d of the unmatched clips had no buoy with a known position in force when they were made\n",

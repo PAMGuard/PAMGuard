@@ -153,6 +153,29 @@ Everything stays inside `src/difar`. No core class changes.
 6. The offline conversion task, tried on a copy of the pilot.
 7. Viewer compaction for clips, then delete with its setting.
 
+## Crossing quality: flags, not rules
+
+Added 30 September 2026. Some crossings match real calls on real buoys, yet their locations cannot be
+trusted, because the geometry is poor. They are kept and flagged, and a data selector on the crossing
+block lets a user hide them. Matching is unchanged, so every true association stays on record.
+
+**Crossing angle.** The angle between the bearings of two clips, from 0 to 180 degrees, not folded.
+Near 0 the bearings point the same way, the lines meet far off or not at all, and the location is
+unreliable. Near 180 the bearings point at each other: the whale lies between the buoys, and the time
+delay pins its place along the line between them, since the localiser fits delays as well as
+bearings. For a crossing of three, the largest angle of any pair is its angle. It is worked out
+when the crossing is located, kept on the crossing, and logged in a new `CrossingAngle` column.
+
+On the full 2019 voyage (first run, 6,037 crossings): 156 crossings at 2 degrees or less have a
+median error of 79 km, and 65 of them are over 100 km; 1,314 between 45 and 90 degrees have a median
+error of 1.0 km and none over 100 km; the 32 above 170 degrees have errors under 1 km.
+
+**Crossing data selector.** On the crossing block, with a minimum crossing angle (default 5 degrees)
+and a maximum location error (the larger of the x and y errors; default off). The default angle
+hides 458 of those 6,037 crossings, including 90 of the 108 with errors over 100 km. Displays and
+exports that honour data selectors use it; the user can turn it off. The rematch summary counts
+crossings below the default angle.
+
 ## Decisions
 
 1. **Database only.** Crossings follow PAMGuard's other super-detections and have no binary stream.
@@ -162,3 +185,7 @@ Everything stays inside `src/difar`. No core class changes.
 5. **Tracked groups.** Left alone for now. They are likely to be dropped or replaced by a general tracking tool later.
 6. **One copy of buoy-derived values.** Buoy position, heading, true bearing, buoy name and deployment UID live in the clip row only. The crossing subtable holds links, and a query joins them.
 7. **Buoy edits rematch.** A buoy error can make old pairings wrong, so matches over the buoy's period are chosen again. Crossings chosen by the operator keep their clips and are worked out again.
+8. **Poor geometry is flagged, not rejected.** Crossing angle and location error are kept on each
+   crossing, and a data selector hides crossings below a minimum angle (5 degrees by default) or
+   above a maximum error. Bearings pointing at each other are not poor geometry: the time delay
+   resolves them.
