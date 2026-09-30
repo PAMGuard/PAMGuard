@@ -228,7 +228,7 @@ public class TrackedGroupDataBlock extends PamDataBlock<PamDataUnit> {
 		}
 		summary += String.format(" (%d bearings)<br><br>",numBearings);
 		summary += lastDetections;
-		summary += String.format("<br>First detected on sonobuoy %s, %3.0° at %s<br>", 
+		summary += String.format("<br>First detected on sonobuoy %s, %3.0f° at %s<br>", 
 				firstBuoy, firstBearing, PamCalendar.formatDateTime(firstDetected));
 		summary += String.format("Sonobuoys: %s", sonobuoys);
 		return summary;

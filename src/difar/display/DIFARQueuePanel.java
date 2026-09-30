@@ -116,13 +116,47 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 	}
 
 	/**
-	 * In the viewer a data block tells its observers nothing when a clip is
-	 * added or removed, so the saved strip never hears of a newly saved clip.
-	 * Rebuild it from the saved clips instead, as a new load does, once the
-	 * clip has joined them. Not done for the queue: a clip being worked stays
-	 * in the queue's block, and a queued clip gets its display settings after
-	 * it is marked, so a rebuild shows stale or duplicate clips there. The
-	 * queue needs the notices normal mode sends; see outstanding.md.
+	 * Draw a clip that has just joined the strip. In the viewer, clips reach
+	 * the strip through the DIFAR module's one path for edits (ViewerEdits),
+	 * which tells the strip as its block would in normal mode. The strip then
+	 * lays the clip out but does not repaint it, so it showed black; remake
+	 * its image and repaint.
+	 * @param clip the clip.
+	 * @return true if the strip shows the clip.
+	 */
+	private boolean drawNewClip(ClipDataUnit clip) {
+		ClipDisplayUnit unit = findUnit(clip);
+		if (unit == null) {
+			return false;
+		}
+		unit.layoutUnit(true);
+		JPanel unitsPanel = clipDisplayPanel.getUnitsPanel();
+		unitsPanel.revalidate();
+		unitsPanel.repaint();
+		clipDisplayPanel.updatePanel();
+		return true;
+	}
+
+	/**
+	 * @param clip a clip.
+	 * @return the strip's display of it, or null if the strip does not show it.
+	 */
+	private ClipDisplayUnit findUnit(ClipDataUnit clip) {
+		JPanel unitsPanel = clipDisplayPanel.getUnitsPanel();
+		synchronized (unitsPanel.getTreeLock()) {
+			for (int i = 0; i < unitsPanel.getComponentCount(); i++) {
+				Component c = unitsPanel.getComponent(i);
+				if (c instanceof ClipDisplayUnit && ((ClipDisplayUnit) c).getClipDataUnit() == clip) {
+					return (ClipDisplayUnit) c;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Rebuild the strip from its data block, as a new load does. The fallback
+	 * for the saved strip if the edit path has not shown a saved clip.
 	 */
 	private void rebuildSavedLater() {
 		SwingUtilities.invokeLater(() -> clipDisplayPanel.newViewerTimes(
@@ -133,14 +167,28 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 	public int difarNotification(DIFARMessage difarMessage) {
 		switch(difarMessage.message) {
 		case DIFARMessage.NewDifarUnit:
-		case DIFARMessage.SaveDatagramUnit:
-		case DIFARMessage.SaveDatagramUnitWithoutRange:
-			if (saved && difarControl.isViewer()) {
-				rebuildSavedLater();
+			// a clip has joined the queue
+			if (difarControl.isViewer()) {
+				if (!saved && difarMessage.difarDataUnit != null) {
+					drawNewClip(difarMessage.difarDataUnit);
+				}
 			}
 			else {
 				// the clip strip only lays itself out again for new clips in normal
 				// mode. Later, so the clip has joined the strip before it is laid out.
+				clipDisplayPanel.updatePanelLater();
+			}
+			break;
+		case DIFARMessage.SaveDatagramUnit:
+		case DIFARMessage.SaveDatagramUnitWithoutRange:
+			// a clip has joined the saved clips
+			if (difarControl.isViewer()) {
+				if (saved && (difarMessage.difarDataUnit == null || !drawNewClip(difarMessage.difarDataUnit))) {
+					// not shown by the edit path: rebuild from the saved clips
+					rebuildSavedLater();
+				}
+			}
+			else {
 				clipDisplayPanel.updatePanelLater();
 			}
 			break;

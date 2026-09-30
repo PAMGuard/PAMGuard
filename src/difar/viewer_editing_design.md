@@ -169,12 +169,32 @@ and its documentation say so. Ways to reduce the dependence, for later:
 - Weigh bearing residuals and time-delay residuals together when two matches compete.
 - Prefer a later match, or one with more buoys, when a clip could join either.
 
+## One path for edits
+
+Added 30 September 2026. In the Viewer, core's data blocks announce updates to their observers but
+not additions or removals, since Viewer data are normally only loaded. So displays never heard of a
+clip marked, saved or deleted, and each display (queue strip, saved strip, map, buttons) had been
+caught up by its own patch. Every interactive edit now goes through one class, `ViewerEdits`:
+
+- **Added:** a clip joining a block is announced to the block's displays, as in Normal mode.
+  Displays are the observers that are not processes; processes observe blocks to process data and
+  must not re-process or write rows because of an edit. Processes that consume saved clips are told
+  explicitly once registered; DIFAR's tracked groups is the first.
+- **Changed:** core's own update notice, which reaches every observer: a new match or crossing.
+- **Removed:** displays are told to redraw once a clip has gone.
+- **Commit:** the saved clips' binary files are written and the database committed, straight away.
+
+The calls are made where the edits happen, on the Swing thread, so notices arrive in the order of
+the edits: a mark joining the queue (before the queue is announced, since that may take the clip
+straight off it), a clip leaving the queue, a save, a saved clip deleted, and a match chosen or
+cleared in the match selector (a new DIFAR message, `MatchChanged`, which also refreshes the
+DIFARgram's buttons). Saves and deletions commit.
+
 ## Auto-compaction
 
-By default, edits are written when the Viewer saves: on File, Save, before loading new data, and on
-exit. A setting, off by default, writes after every edit instead: each saved or deleted clip, and each
-buoy edit, is followed at once by compaction, the crossing changes it caused, and a database commit.
-It writes more often, but a crash then loses at most the edit in progress.
+Saves and deletions in the Viewer now write at once, through the one path above. The setting to
+write after every edit is therefore only still needed for buoy edits, which rematch and write
+through their offline task.
 
 ## Compaction
 
@@ -198,7 +218,7 @@ On the simulated data, in the Viewer:
 A crossing of three, trimmed to two and recalculated, needs the three-buoy audio.
 
 On copies of the 2019 voyage data, each slice in its own scratch folder with the March 2019
-database. The counts below come from the MATLAB rematch file, and should match what the check reports.
+database. The data are the ENRICH sonobuoy data set, AAS 4600, https://doi.org/10.26179/w901-b438. The counts below come from the MATLAB rematch file, and should match what the check reports.
 
 5. 28 to 30 January: 2,284 clips, 1,470 of them sharing 709 UIDs. The upgrade reports the shared UIDs.
    Cancel: no backup folder, and the files and database unchanged. Run again and renumber: the backup

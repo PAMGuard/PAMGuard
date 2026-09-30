@@ -337,9 +337,12 @@ public class ViewerClipStore {
 		if (backup == null) {
 			backup = new ViewerBackup(new File(binaryStore.getBinaryStoreSettings().getStoreLocation()));
 		}
+		int copied = 0;
 		try {
 			for (File data : offGrid) {
-				backup.copy(data);
+				if (backup.copy(data)) {
+					copied++;
+				}
 				backup.copy(binaryStore.swapFileType(data, BinaryStore.indexFileType));
 				backup.copy(binaryStore.swapFileType(data, BinaryStore.noiseFileType));
 			}
@@ -347,7 +350,9 @@ public class ViewerClipStore {
 		catch (IOException e) {
 			return report("backup failed, so nothing was saved: " + e);
 		}
-		System.out.printf("DIFAR: %d original files backed up to %s\n", offGrid.size(), backup.getBackupRoot());
+		if (copied > 0) {
+			System.out.printf("DIFAR: %d original files backed up to %s\n", copied, backup.getBackupRoot());
+		}
 		return true;
 	}
 

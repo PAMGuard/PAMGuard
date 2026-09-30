@@ -47,14 +47,68 @@ Next, in order, as set out in `viewer_editing_design.md`:
 0. Duplicate UIDs in older datasets: the upgrade checks, offers to renumber or cancel, drops exact
    duplicates, and rebuilds the clip table from the binary files, with a database backup. Passed on
    a small slice; the full voyage is next.
-1. The queue strip in the Viewer: marked clips do not appear in it. Rebuilding it from the queue's
-   block was tried and removed, because a clip being worked stays in that block and display settings
-   arrive after marking. Send it the add and update notices Normal mode sends, for clips made in the
-   Viewer, without reaching observers that write rows. Check which observers each block has first.
+1. The queue strip in the Viewer: marked clips did not appear in it until the view reloaded. The
+   queue's block tells its observers nothing in the Viewer, so the strip never received the clip.
+   Built: on a new queued clip, the strip hands it to its own observer on the block, as Normal mode's
+   notice would, reaching no other observer; the saved strip does the same on a save, and rebuilds
+   only if its observer cannot be found. If a clip is not yet in the block, the console says so.
+   Test owed on the 2013 pilot: a mark appears in the queue at once; a save appears in the saved
+   strip at once. First try on the pilot: the strip had no name to find its observer by (it is not a
+   user display), so it is now found when the strip is made; new clips showed black until repainted,
+   now remade and repainted; and a clip queued and at once taken to be worked could be added after it
+   left, so stayed in the strip, now skipped.
+1a. From the same pilot session. Built, test owed: one path for Viewer edits, `ViewerEdits` (see
+   "One path for edits" in `viewer_editing_design.md`), replacing the strip-by-strip patches. It
+   covers the queue and saved strips, the map, writing saves and deletions at once, and the
+   database commit. A "Clear match" button in the match selector uses no match for the clip; a
+   match chosen or cleared sends `MatchChanged`, which redraws the map and refreshes the DIFARgram's
+   buttons ("Save without crossing" had stayed disabled until the view was scrolled). Choosing
+   another match now also clears the previous match's other clips.
+   First pilot test: queue, match choice, buttons and saves passed; saves wrote their binary files
+   at once. Then fixed: crossings' rows were still written only at close, since core writes them
+   when the crossing block is saved, so each commit now saves that block too; the match selector
+   now empties after a save or delete, and is read only for a saved clip, whose crossing is fixed;
+   and a format error in the tracked groups' summary (`%3.0°`, missing its `f`), reached on hovering
+   over the groups panel now that tracked groups hear of saved clips.
+1b. Follow-up, in priority order (30 September 2026):
+   1. **Marking where the raw audio is not in memory** prints "requested from Raw input data ... have
+      not yet arrived" and makes no clip, with nothing shown to the operator. Top of the list.
+   2. **Crossings that collapse onto a buoy.** Four crossings saved on 7 March between 21:20 and
+      21:22 sit exactly on buoy 297, with errors of a few millionths of a metre. Buoy 296's bearings
+      (about 110 degrees true) point almost straight at 297 (108 degrees from 296), so 296's bearing
+      line runs through 297, where 297's own bearing has no meaning: the fit finds a perfect answer
+      at the buoy, and its error estimate, from the curvature there, is near zero. Flag it as
+      degenerate in crossing quality. For the fit itself: Brian suggests a flatter-topped bearing
+      likelihood (sigmoid-like rather than normal or von Mises); a range floor around each buoy, or
+      treating bearings as rays from the buoy rather than lines, are other options. Pure DIFAR code.
+      The four clips also fall in the span of the audio file damaged until 30 September; delete them.
+      A fifth, crossing 14 at 21:33:12 (clips 2000034 on 297, 2000035 on 296 at 109 degrees), was
+      saved after the repair and collapsed the same way, so the audio is not the cause.
+   3. **Scrolling.** The queue and saved strips (both scroll bars, vertical and horizontal), and the
+      buoy manager's table, scroll too slowly with the mouse wheel or the scroll buttons; dragging is
+      fine. The strips' scroll pane is core's
+      (`ClipDisplayPanel`), but DIFAR can set its unit increment from outside; the buoy manager is
+      DIFAR's (`SonobuoyManagerPanel`).
+   5. **New bearings reach the map late.** With "Display only at vessel scroll bar time", the map
+      shows data up to the scroller's time, the left edge of the spectrogram, so a clip saved on screen
+      appears only once it has scrolled off to the left. Try "Look Ahead" for the DIFAR layers in the
+      map's overlay options first; if that is not enough, the map should use the right edge.
+   4. **Classification buttons on clips.** With more than 4 or 5 favourites, the buttons make each
+      clip very tall. Spill them into a second column after about 5 rows, and make them narrower
+      (`DifarClipDecorations`, a single-column `GridLayout` now).
+   - No crossing was seen on the map after saving a clip with a chosen match. Crossings have no map
+     layer of their own: the saved clips' layer ("Processed DIFAR Data") draws each clip's crossing
+     in place of its bearing line. The data map shows crossings in the database. Check the crossing
+     table for this save, and whether the map shows the crossing after scrolling.
+   - A stray click on the spectrogram made a mark of no length, and demultiplexing it threw
+     (`FFTFilter`: n must be greater than 0). Marks shorter than 100 ms, or with no frequency band,
+     are now ignored with a console line; this applies in Normal mode too.
 2. An auto-compaction setting, writing after every edit. Deletions already write at once.
-3. After an upgrade, skip the clip store's backup question for that session. Built: the upgrade hands
-   its backup to the clip store, which adds to it and does not ask. Test owed: upgrade, mark and save
-   a clip, and see no question and no second backup folder.
+3. After an upgrade, skip the clip store's backup question for that session. Done: the upgrade hands
+   its backup to the clip store, which adds to it and does not ask. Passed on the full voyage. The
+   console line then says "25 original files backed up", counting the files the save reshapes, not
+   the copies made; the backup already held them, so none were copied. It now counts copies, and
+   says nothing when none were made. Test owed with the queue strip.
 
 Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
 putting clips back on the queue; the spectrogram marking clips that belong to a crossing; time
@@ -152,13 +206,31 @@ items below are about making fewer of them necessary.
   missing UID's in Processed DIFAR Data"). The files were right: deleting `serialisedBinaryMap.data`
   cleared it. Core updates a rewritten file's map entry with the old file's footer; crash files have
   none, so the entry lost its UID range, and core saved that to the cache at close. The upgrade now
-  re-reads such entries from disk at its end. Test owed: a full voyage upgrade, then a restart
-  without deleting the cache, and no warning.
+  re-reads such entries from disk at its end. Passed on the full voyage: 2 entries refreshed, and a
+  restart keeping the cache gave no warning.
+- On the full voyage after the upgrade, a clip saved in the Viewer did not appear in the saved strip
+  until the view reloaded. Now handed to the saved strip directly (item 1 above); if it recurs, the
+  console line naming a clip not yet in the saved clips shows why. The saved strip is meant to
+  rebuild after a save. Check whether the save button now defers the write to the reload, and
+  whether the strip is told of the new clip.
 
 ## Calibration
 
 - The choice of mean, mode or mean near mode is only in a right-click menu on the histogram. Make it
   radio buttons in the dialog.
+- Calibration exists in Normal mode only: "Start calibration" takes `vesselClipNumber` clips of
+  `vesselClipLength` seconds, `vesselClipSeparation` seconds apart, in the Vessel classification's
+  band, compares their bearings with the ship's from GPS, and sets the buoy's correction from the
+  histogram (`DifarProcess.startBuoyCalibration`, `doBuoyCalibration`). It reads samples by absolute
+  sample number, which counts from 1970 in the Viewer, so it will not work there as it stands.
+- Idea, 30 September 2026: automatic calibration. The ship's position and the buoy's are known, and
+  so is the ship's band. While the ship is within a set distance of a buoy, take calibration clips
+  in that band automatically, and propose the correction. Useful live, and as an offline task in the
+  Viewer, where it would give every buoy of an old voyage a measured correction in one pass. Open
+  questions: minimum as well as maximum distance (near field, the ship's length); rejecting clips
+  whose bearing is dominated by a whale or another source; whether the correction is applied or only
+  proposed; and where calibration sits in Viewer reanalysis (before matching, so buoy edits do not
+  rematch everything twice).
 
 ## Rematch on real data
 
@@ -195,7 +267,7 @@ items below are about making fewer of them necessary.
   and saved. With the 2019 data it offered only channels 0 and 1. It now lists, by channel number,
   the channels of the source, one per array hydrophone, those of loaded clips, and any already
   hidden; saved parameters grow to fit. Its "crosses only" test already reads the crossing unit.
-  Test owed: on the 2019 data it lists channels 0, 1 and 2, and hiding channel 2 hides its clips.
+  Passed on the full voyage: channels 0, 1 and 2 listed, and hiding channel 2 hides its clips.
 - Console noise in long runs. `Simplex2D` now counts failed error estimates instead of printing each
   one, and the rematch summary reports the count. The upgrade's per-clip "dropped a second copy" line
   is gone; its summary counts them. The per-clip "skipped a second copy" in ordinary loads stays.

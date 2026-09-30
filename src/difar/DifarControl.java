@@ -25,7 +25,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import Array.ArrayManager;
@@ -72,9 +71,9 @@ import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
 import difar.trackedGroups.TrackedGroupProcess;
+import difar.offline.ViewerEdits;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
-import pamScrollSystem.AbstractScrollManager;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskGroupParams;
@@ -122,6 +121,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	private DifarDataUnit currentDemuxedUnit = null;
 	private DifarDisplayContainer2 difarDisplayContainer2;
 	private TrackedGroupProcess trackedGroupProcess;
+
+	/** How viewer edits reach displays, files and the database; null in normal mode. */
+	private ViewerEdits viewerEdits;
 	
 	private KeyboardFocusManager keyManager;
 	
@@ -224,6 +226,15 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		
 		case DIFARMessage.DeleteFromQueue:
 			difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
+			if (isViewer) {
+				getViewerEdits().removed(difarProcess.getQueuedDifarData(), message.difarDataUnit);
+			}
+			break;
+		case DIFARMessage.MatchChanged:
+			if (isViewer && message.difarDataUnit != null) {
+				// redraws the map with the new match
+				getViewerEdits().changed(difarProcess.getQueuedDifarData(), message.difarDataUnit);
+			}
 			break;
 		case DIFARMessage.ReturnToQueue:
 			if (!isViewer) {
@@ -247,6 +258,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 				currentDemuxedUnit = null;
 				difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
 				difarProcess.getCrossingRecorder().forget(message.difarDataUnit);
+				if (isViewer) {
+					getViewerEdits().removed(difarProcess.getQueuedDifarData(), message.difarDataUnit);
+				}
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_DELETED, 0L, 0));
 				processNextIfAnyAndCanAndShould();
@@ -261,6 +275,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 				difarProcess.getCrossingRecorder().record(message.difarDataUnit);
 				message.difarDataUnit.clearTempCrossing();
 				completeViewerSave(message.difarDataUnit);
+				viewerSaved(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_SAVED, 0L, 100));
@@ -278,6 +293,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 				difarProcess.finalProcessing(message.difarDataUnit);
 				difarProcess.getCrossingRecorder().forget(message.difarDataUnit);
 				completeViewerSave(message.difarDataUnit);
+				viewerSaved(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_SAVED, 0L, 100));
@@ -750,6 +766,36 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		}
 	}
 
+	/**
+	 * @return how viewer edits reach displays, files and the database, or
+	 * null in normal mode.
+	 */
+	public ViewerEdits getViewerEdits() {
+		if (viewerEdits == null && isViewer) {
+			viewerEdits = new ViewerEdits(this);
+			// tracked groups consume saved clips, as in normal mode
+			viewerEdits.addConsumer(trackedGroupProcess);
+		}
+		return viewerEdits;
+	}
+
+	/**
+	 * After a save in the viewer: the clip has left the queue and joined the
+	 * saved clips, perhaps in a crossing. Tell the displays and consumers,
+	 * and write the files and database now.
+	 * @param unit the saved clip.
+	 */
+	private void viewerSaved(DifarDataUnit unit) {
+		if (!isViewer) {
+			return;
+		}
+		ViewerEdits edits = getViewerEdits();
+		edits.removed(difarProcess.getQueuedDifarData(), unit);
+		edits.added(difarProcess.getProcessedDifarData(), unit);
+		edits.crossingChanged(unit.getCrossing());
+		edits.commit();
+	}
+
 	public TrackedGroupProcess getTrackedGroupProcess() {
 		return trackedGroupProcess;
 	}
@@ -1023,19 +1069,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		difarProcess.getProcessedDifarData().remove(unit);
 		// clears the clip from the DIFARgram, the unit control panel and the saved strip
 		sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteDatagramUnit, unit));
-		/*
-		 * The map and spectrogram draw from the saved clips, but only redraw when
-		 * told, and core has no notice for a removed data unit. Reload the view so
-		 * they redraw without the clip. The viewer saves before loading, so this
-		 * also writes the deletion at once. Alternatives considered:
-		 * - Send the "offline data loaded" notice without loading. Some core code
-		 *   does this, but twenty modules react to it, some by reloading or
-		 *   rebuilding, so its side effects are hard to vouch for.
-		 * - Move the scrollers back and forth. Each move loads its new range, so
-		 *   this is two reloads rather than one.
-		 * - Do nothing. The displays catch up at the next scroll.
-		 */
-		SwingUtilities.invokeLater(() -> AbstractScrollManager.getScrollManager().reLoad());
+		// the displays redraw without the clip, the trimmed crossing's other clips
+		// redraw, and the deletion is written at once
+		ViewerEdits edits = getViewerEdits();
+		edits.removed(difarProcess.getProcessedDifarData(), unit);
+		edits.crossingChanged(crossing);
+		edits.commit();
 	}
 	
 

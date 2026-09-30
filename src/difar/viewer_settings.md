@@ -9,6 +9,13 @@ pull request.
 
 ## Opening a dataset
 
+- **Or pass the database and binary folder as program arguments,** which skips both startup dialogs:
+  `-v -databasefile S:\Data\2019-enrich-full\In2019V01_01.sqlite3 -binaryfolder S:\Data\2019-enrich-full\binary`.
+  One Eclipse debug configuration per dataset. The database name must end in `.sqlite3`, or it is
+  ignored and the dialog appears. A binary folder that does not exist is created, empty, so check the
+  path.
+- **Add `-wavfilefolder <folder>` to set the Viewer's offline audio,** needed to make or measure
+  clips. Unlike the other two, this switch is case-sensitive.
 - **Choose the dataset's own database.** The Viewer offers the last database used. Opening a slice or
   copy with another dataset's database pairs its binary files with the wrong clip rows and crossings.
   Symptom: counts that belong to another dataset, such as crossings in a database that should have

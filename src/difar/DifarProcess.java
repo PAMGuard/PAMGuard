@@ -944,6 +944,9 @@ public class DifarProcess extends PamProcess {
 				null, frequencyRange, getSampleRate(), vesParams.sampleRate, freqs, gains);
 		difarDataUnit.setVessel(true);
 		queuedDifarData.addPamData(difarDataUnit);
+		if (difarControl.isViewer()) {
+			difarControl.getViewerEdits().added(queuedDifarData, difarDataUnit);
+		}
 
 		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit,difarDataUnit));
 		
@@ -1125,6 +1128,12 @@ public class DifarProcess extends PamProcess {
 	}
 
 	/**
+	 * Shortest mark, in milliseconds, that makes a clip. A stray click on the
+	 * spectrogram makes a mark of no length, which DIFAR cannot demultiplex.
+	 */
+	private static final long MIN_CLIP_MILLIS = 100;
+
+	/**
 	 * Called when there is a trigger caused whether by a detection or by a mark being made on the spectrogram. 
 	 * @param channel  (for detections)
 	 * @param signalStartMillis start time in milliseconds
@@ -1138,6 +1147,12 @@ public class DifarProcess extends PamProcess {
 	 */
 	public void difarTrigger(int channelMap, long signalStartMillis, long durationMillis, double[] f,
 			PamDataUnit pamDetection, double displaySampleRate, String triggerSpeciesName, String triggerDataBlockName) {
+		if (durationMillis < MIN_CLIP_MILLIS || (f != null && f.length >= 2 && f[1] <= f[0])) {
+			// a stray click on the spectrogram makes a mark with no length or no band
+			System.out.printf("DIFAR: mark of %d ms ignored, too short or with no frequency band to make a clip\n",
+					durationMillis);
+			return;
+		}
 		int millisToPreceed=(int) (difarControl.getDifarParameters().secondsToPreceed*1000);
 		long clipStartTime = signalStartMillis - millisToPreceed;
 		long startSample;
@@ -1196,6 +1211,10 @@ public class DifarProcess extends PamProcess {
 //		System.out.println("The species is " + speciesLookupItem + " and autoProcess is " + du.canAutoProcess());
 		
 		queuedDifarData.addPamData(du);
+		if (difarControl.isViewer()) {
+			// before the queue is announced, which may take the clip straight off it
+			difarControl.getViewerEdits().added(queuedDifarData, du);
+		}
 
 		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit, du));
 	}
@@ -1450,6 +1469,15 @@ public class DifarProcess extends PamProcess {
 	 */
 	public DIFARCrossingInfo applyMatch(DifarDataUnit difarDataUnit, DifarMatchSelector.Match match,
 			DifarCrossing.MatchChoice choice) {
+		// the previous match's other clips no longer share it
+		DIFARCrossingInfo previous = difarDataUnit.getTempCrossing();
+		if (previous != null && previous.getMatchedUnits() != null) {
+			for (DifarDataUnit unit : previous.getMatchedUnits()) {
+				if (unit != difarDataUnit && unit.getTempCrossing() == previous) {
+					unit.setTempCrossing(null);
+				}
+			}
+		}
 		DIFARCrossingInfo crossInfo = null;
 		if (match != null) {
 			LatLong ll = match.getResult().getLatLong();

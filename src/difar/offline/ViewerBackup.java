@@ -43,18 +43,21 @@ public class ViewerBackup {
 	 * Copy a file into the backup folder, unless it is already there or
 	 * does not exist.
 	 * @param file a file inside the binary store.
+	 * @return true if the file was copied now, false if it does not exist or
+	 * the backup already holds it.
 	 * @throws IOException if the copy fails.
 	 */
-	public void copy(File file) throws IOException {
+	public boolean copy(File file) throws IOException {
 		File source = file.getAbsoluteFile();
 		if (!source.exists() || !copied.add(source)) {
-			return;
+			return false;
 		}
 		makeBackupRoot();
 		Path relative = storeRoot.toPath().relativize(source.toPath());
 		Path target = backupRoot.toPath().resolve(relative);
 		Files.createDirectories(target.getParent());
 		Files.copy(source.toPath(), target, StandardCopyOption.COPY_ATTRIBUTES);
+		return true;
 	}
 
 	/**
