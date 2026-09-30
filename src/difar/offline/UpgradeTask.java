@@ -19,6 +19,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSink;
 import binaryFileStorage.BinaryFooter;
+import binaryFileStorage.BinaryHeaderAndFooter;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.BinaryOfflineDataMap;
@@ -84,6 +85,9 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 	/** Every clip loaded so far in this run, by its UID, channel and start time as stored. */
 	private final Set<String> seen = new HashSet<>();
 
+	/** The backup this run made, handed to the clip store at the end. */
+	private ViewerBackup backup;
+
 	/** The database connection, or null if there is no database. */
 	private PamConnection connection;
 	private int rowsDeleted, rowsWritten;
@@ -111,6 +115,7 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 	public void prepareTask() {
 		upgraded = 0;
 		backedUp = false;
+		backup = null;
 		renumber = false;
 		nextUID = 1;
 		seen.clear();
@@ -301,7 +306,7 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 			System.out.println("DIFAR: no DIFAR binary files, so nothing was upgraded");
 			return false;
 		}
-		ViewerBackup backup = new ViewerBackup(new File(binaryStore.getBinaryStoreSettings().getStoreLocation()));
+		backup = new ViewerBackup(new File(binaryStore.getBinaryStoreSettings().getStoreLocation()));
 		int nFiles = 0;
 		try {
 			for (BinaryOfflineDataMapPoint mapPoint : dataMap.getMapPoints()) {
@@ -423,6 +428,47 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 		}
 	}
 
+	/**
+	 * Refresh the data map entries of rewritten files from the files on disk.
+	 * <p>
+	 * When core rewrites a file in the viewer, it updates the file's map
+	 * entry with the footer of the old file, not the new one. A file cut
+	 * short by a crash has no footer, so its entry loses its footer and with
+	 * it the UID range the map takes from the footer. Core saves the map to
+	 * its cache at close, and on the next start the viewer warns that data
+	 * units lack UIDs, though the new file on disk has a proper footer. Each
+	 * entry holding clips but no UID range is read again here, as core does
+	 * when it builds the map, so the map in memory and its cache are right.
+	 * @return how many entries were refreshed.
+	 */
+	private int refreshMapPoints() {
+		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
+		if (binaryStore == null) {
+			return 0;
+		}
+		BinaryOfflineDataMap dataMap = (BinaryOfflineDataMap) getDataBlock().getOfflineDataMap(binaryStore);
+		if (dataMap == null) {
+			return 0;
+		}
+		int n = 0;
+		for (BinaryOfflineDataMapPoint mapPoint : dataMap.getMapPoints()) {
+			if (mapPoint.getNDatas() <= 0 || mapPoint.getHighestUID() != null) {
+				continue;
+			}
+			File file = mapPoint.getBinaryFile(binaryStore);
+			BinaryHeaderAndFooter onDisk = binaryStore.getFileHeaderAndFooter(file);
+			if (onDisk == null || onDisk.binaryFooter == null || onDisk.binaryFooter.getHighestUID() == null) {
+				continue;
+			}
+			mapPoint.update(binaryStore, file, onDisk.binaryHeader, onDisk.binaryFooter,
+					mapPoint.getModuleHeader(), mapPoint.getModuleFooter(), mapPoint.getDatagram());
+			// the count of units without UIDs is kept once worked out, so clear it
+			mapPoint.setMissingUIDs(0);
+			n++;
+		}
+		return n;
+	}
+
 	private DifarDataBlock getDifarDataBlock() {
 		return (DifarDataBlock) getDataBlock();
 	}
@@ -466,6 +512,12 @@ public class UpgradeTask extends OfflineTask<DifarDataUnit> {
 				upgraded, DifarClipPayload.CURRENT_VERSION,
 				renumber ? String.format(", with new UIDs 1 to %d", nextUID - 1) : "",
 				dropped, rowsDeleted, rowsWritten);
+		// the backup holds every DIFAR file as it was, so later saves need not ask again
+		getDifarDataBlock().getViewerClipStore().adoptBackup(backup);
+		int refreshed = refreshMapPoints();
+		if (refreshed > 0) {
+			System.out.printf("DIFAR: refreshed the data map for %d rewritten files that had no footer\n", refreshed);
+		}
 		if (renumber) {
 			// new clips saved in the viewer follow the new UIDs
 			getDataBlock().getUidHandler().setCurrentUID(Math.max(getDataBlock().getUidHandler().getCurrentUID(), nextUID - 1));

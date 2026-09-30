@@ -302,6 +302,17 @@ public class ViewerClipStore {
 	 * a session whether to copy them first.
 	 * @return false if the user cancelled or a copy failed.
 	 */
+	/**
+	 * Take over a backup already made this session, such as the upgrade's,
+	 * which holds every DIFAR file as it was before. Later saves then add to
+	 * that backup, skipping files it already holds, and do not ask first.
+	 * @param earlier the backup.
+	 */
+	public void adoptBackup(ViewerBackup earlier) {
+		backup = earlier;
+		reshape = Reshape.BACKUP;
+	}
+
 	private boolean backUpOffGridFiles(BinaryStore binaryStore, TimeGrid grid,
 			Collection<BinaryOfflineDataMapPoint> files) {
 		List<File> offGrid = new ArrayList<>();

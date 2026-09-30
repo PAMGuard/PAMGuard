@@ -22,6 +22,9 @@ reset, then copy rung 8's database and the contents of its `PAMBinary` folder
 
 ## Returned, 29 September 2026
 
+The 2019 voyage data are the ENRICH sonobuoy data set, AAS 4600, https://doi.org/10.26179/w901-b438
+(https://data.aad.gov.au/metadata/AAS_4600_ENRICH_Sonobuoy_Data).
+
 Normal mode tests wait. First, compare PAMGuard's rematch of the 2019 voyage data with the MATLAB
 rematch used for the 2021 source level paper (`DIFAR_Localisation_rematched_v3.csv`, in
 `S:\manuscripts\2019-enrichVoyageReport`). The 2019 files repeat UIDs, so the upgrade must handle
@@ -49,7 +52,9 @@ Next, in order, as set out in `viewer_editing_design.md`:
    arrive after marking. Send it the add and update notices Normal mode sends, for clips made in the
    Viewer, without reaching observers that write rows. Check which observers each block has first.
 2. An auto-compaction setting, writing after every edit. Deletions already write at once.
-3. After an upgrade, skip the clip store's backup question for that session.
+3. After an upgrade, skip the clip store's backup question for that session. Built: the upgrade hands
+   its backup to the clip store, which adds to it and does not ask. Test owed: upgrade, mark and save
+   a clip, and see no question and no second backup folder.
 
 Later: deploying and calibrating a buoy in the Viewer (workarounds: import, manual calculation);
 putting clips back on the queue; the spectrogram marking clips that belong to a crossing; time
@@ -143,12 +148,12 @@ items below are about making fewer of them necessary.
   default. Not essential: use the empty space to its left as a status line, giving the number of
   buoys in the manager, the first deploy time and last end time, and the first and last buoy names
   and channels in the loaded window.
-- After the first upgrade, and never on the original files, the Viewer warned at startup that data
-  units lack UIDs and offered to convert again: "Binary Store missing UID's in Processed DIFAR Data",
-  10 units. Core counts a file's units as missing UIDs when its data map point has no UID range,
-  which comes from the file footer. Cancelling loaded the data correctly. Recheck after the rerun,
-  since the first run left files whose clips were never processed; if it persists, list the files
-  whose footers have no UID range.
+- After an upgrade, the Viewer warned at the next start that data units lack UIDs ("Binary Store
+  missing UID's in Processed DIFAR Data"). The files were right: deleting `serialisedBinaryMap.data`
+  cleared it. Core updates a rewritten file's map entry with the old file's footer; crash files have
+  none, so the entry lost its UID range, and core saved that to the cache at close. The upgrade now
+  re-reads such entries from disk at its end. Test owed: a full voyage upgrade, then a restart
+  without deleting the cache, and no warning.
 
 ## Calibration
 
@@ -185,11 +190,12 @@ items below are about making fewer of them necessary.
   minimum angle between bearings, as a matching parameter or a flag, would remove nearly all of them.
   Decided: a flag and a data selector, with minimum angle and maximum error; see "Crossing quality"
   in `crossings_design.md`. Not built.
-- The clip data selector ("show only cross bearings", species, channels) lists channels 0 to n-1,
-  where n is the number of channels in the source's channel map, taken when its parameters are first
-  made and then saved. With the 2019 data it offers only channels 0 and 1. It should list the
-  channels actually in use, and extend saved parameters when channels are added. Its "crosses only"
-  test also needs checking against crossing units.
+- The clip data selector ("show only cross bearings", species, channels) listed channels 0 to n-1,
+  where n was the number of channels in the source's channel map when its parameters were first made
+  and saved. With the 2019 data it offered only channels 0 and 1. It now lists, by channel number,
+  the channels of the source, one per array hydrophone, those of loaded clips, and any already
+  hidden; saved parameters grow to fit. Its "crosses only" test already reads the crossing unit.
+  Test owed: on the 2019 data it lists channels 0, 1 and 2, and hiding channel 2 hides its clips.
 - Console noise in long runs. `Simplex2D` now counts failed error estimates instead of printing each
   one, and the rematch summary reports the count. The upgrade's per-clip "dropped a second copy" line
   is gone; its summary counts them. The per-clip "skipped a second copy" in ordinary loads stays.
@@ -266,6 +272,9 @@ items below are about making fewer of them necessary.
   save them.
 - `OfflineTaskGroup.processData` skips loaded units whose start time is outside the file's time span.
   For modules that store a unit after its start time, such as DIFAR, those units are never processed.
+- `BinaryStore.saveData(File, ...)` updates the rewritten file's map entry with the old file's footer,
+  not the one just written. For a file with no footer, the entry loses its UID range, and the cached
+  map saved at close makes the next start warn that units lack UIDs.
 - The Viewer save writes back, from the old file, any object it cannot find in memory. A unit dropped
   on load, such as a second copy of a clip, returns in the rewritten file.
 - After an upgrade, the first save of new clips asks again whether to back up the files, though the
