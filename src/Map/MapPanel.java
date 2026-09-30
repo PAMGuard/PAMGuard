@@ -1173,6 +1173,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		long earliestToPlot = 0;
 		long latestToPlot = Long.MAX_VALUE;
 		MapDrawingOptions mapDrawingOptions = null;
+//		System.out.println(" Map plot " + dataBlock.getLongDataName());
 		// int n1=0, n2 =0;
 //		try {
 //			synchronized (dataBlock.getSynchLock()) {

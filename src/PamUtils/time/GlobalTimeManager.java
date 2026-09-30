@@ -15,6 +15,8 @@ import javax.swing.JMenuItem;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.DaqSystem;
+import PamController.DataInputStore;
+import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -129,22 +131,31 @@ public class GlobalTimeManager implements PamSettings {
 	
 	/**
 	 * Work out if we're running a real time DAQ system. If we're not then there is 
-	 * no need to do time checks. 
+	 * no need to do time checks. Default is to return true if no input stores were found
+	 * that might say that it's NOT. 
 	 * @return true if it's a realtime system
 	 */
 	public boolean isRealTime() {
 		if (PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
 			return false;
 		}
-		AcquisitionControl daqControl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
-		if (daqControl == null) {
-			return true;
+		ArrayList<PamControlledUnit> dataInputs = PamController.getInstance().findControlledUnits(DataInputStore.class, true);
+		for (int i = 0; i < dataInputs.size(); i++) {
+			DataInputStore dis = (DataInputStore) dataInputs.get(i);
+			if (dis.isRealTime() == false) {
+				return false;
+			}
 		}
-		DaqSystem daqSystem = daqControl.findDaqSystem(null);
-		if (daqSystem == null) {
-			return false;
-		}
-		return daqSystem.isRealTime();
+		return true;
+//		AcquisitionControl daqControl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+//		if (daqControl == null) {
+//			return true;
+//		}
+//		DaqSystem daqSystem = daqControl.findDaqSystem(null);
+//		if (daqSystem == null) {
+//			return false;
+//		}
+//		return daqSystem.isRealTime();
 	}
 
 	/**

@@ -29,6 +29,7 @@ import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -59,10 +60,11 @@ public class GpsTextDisplay extends JPanel {
 	private SimpleMap simpleMap;
 	
 	private GpsTextAreaLabel latitude, longitude, time, date, course, heading, speed, 
-	cursorLat, cursorLong, cursorRange, cursorBearing, magneticDeviation;
+	cursorLat, cursorLong, cursorRange, cursorBearing, magneticDeviation, cursorXY;
 	private Color labelColor=Color.white;
 	private GpsTextAreaLabel cursorReference;
 	private GpsTextAreaLabel lastFixTime;
+	private GpsTextAreaLabel xyLabel;
 	private TextAreaPanel gpsPanel;
 	private TextAreaPanel cursorPanel;
 
@@ -162,6 +164,8 @@ public class GpsTextDisplay extends JPanel {
 		c.gridy++;
 		addComponent(cursorPanel, new GpsTextAreaLabel("Range"), c);
 		c.gridy++;
+		addComponent(cursorPanel, xyLabel = new GpsTextAreaLabel("xy"), c);
+		c.gridy++;
 		if ( SMRUEnable.isEnable() ) {
 			addComponent(cursorPanel, new GpsTextAreaLabel(" "), c);
 			c.gridy++;
@@ -175,6 +179,8 @@ public class GpsTextDisplay extends JPanel {
 		addComponent(cursorPanel, cursorBearing = new GpsTextAreaLabel(""), c);
 		c.gridy++;
 		addComponent(cursorPanel, cursorRange = new GpsTextAreaLabel(""), c);
+		c.gridy++;
+		addComponent(cursorPanel, cursorXY = new GpsTextAreaLabel(""), c);
 		c.gridy++;
 		if ( SMRUEnable.isEnable() ) {
 			addComponent(cursorPanel, cursorRangeNmi = new GpsTextAreaLabel(""), c);
@@ -427,17 +433,21 @@ public class GpsTextDisplay extends JPanel {
 		if (refLatLong == null) {
 			refLatLong = new LatLong();
 		}
-//		else {
 
 		double vessel2CursorRange = refLatLong.distanceToMetres(mouseLatLong);
 		double vessel2CursorRangeNmi = refLatLong.distanceToMiles(mouseLatLong);
 		double v2cAngle = refLatLong.bearingTo(mouseLatLong);
+		double x = refLatLong.distanceToMetresX(mouseLatLong);
+		double y = refLatLong.distanceToMetresY(mouseLatLong);
+		String format;
+		format = Math.min(x, y) > 99.5 ? "#" : "#.0";
+		DecimalFormat dFormat = new DecimalFormat(format);
 
-		cursorRange.setText(String.format("%.0f m", vessel2CursorRange));
+		cursorRange.setText(String.format("%s m", dFormat.format(vessel2CursorRange)));
 		cursorBearing.setText(String.format("%.1f \u00B0T", v2cAngle));
+		cursorXY.setText(String.format("%s,%s m", dFormat.format(x), dFormat.format(y)));
 		if ( SMRUEnable.isEnable() )
 		cursorRangeNmi.setText(String.format("%.1f nmi", vessel2CursorRangeNmi));
-//		}
 		
 		String cursorRef = MasterReferencePoint.getName();
 		if (cursorRef == null) {
