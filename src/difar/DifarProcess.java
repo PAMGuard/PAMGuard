@@ -225,9 +225,10 @@ public class DifarProcess extends PamProcess {
 		@Override
 		protected void done() {
 			difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.DemuxComplete, difarDataUnit));
+			// in the viewer, only a new clip saves itself; a saved clip looked at again does not
 			if (difarControl.getDifarParameters().autoSaveDResult &&
 					difarDataUnit.canAutoSave() &&
-					!difarControl.isViewer() ){
+					(!difarControl.isViewer() || difarControl.isQueued(difarDataUnit))) {
 				cancelAutoSaveTimer();
 				autoSaveTimer = new AutoSaveTimer(difarControl.getCurrentDemuxedUnit());
 				autoSaveTimer.start();
@@ -1217,6 +1218,14 @@ public class DifarProcess extends PamProcess {
 		}
 		
 		du.setLutSpeciesItem(speciesLookupItem);
+		/*
+		 * A classified clip is shown in the queue at its classification's sample
+		 * rate from the start, as it will be once processed, not at the default.
+		 */
+		SpeciesParams classParams = difarControl.getDifarParameters().findSpeciesParams(du);
+		if (classParams != null) {
+			du.setDisplaySampleRate(classParams.sampleRate);
+		}
 //		System.out.println("The species is " + speciesLookupItem + " and autoProcess is " + du.canAutoProcess());
 		
 		queuedDifarData.addPamData(du);
@@ -1237,12 +1246,6 @@ public class DifarProcess extends PamProcess {
 		return !difarControl.isViewer() || difarControl.isQueued(difarDataUnit);
 	}
 
-	/**
-	 * The sample number of a time in the raw data loaded in the viewer, counted
-	 * the same way as the loaded data, from its first unit.
-	 * @param timeMillis a time within the loaded data.
-	 * @return the sample number, or 0 if no raw data is loaded.
-	 */
 	/**
 	 * Padding, in milliseconds, loaded either side of a clip's span when its
 	 * audio has to be read from file in the viewer, as the WAV annotation does.
@@ -1326,6 +1329,12 @@ public class DifarProcess extends PamProcess {
 		WarnOnce.showWarning("DIFAR: no audio for this mark", msg, WarnOnce.WARNING_MESSAGE);
 	}
 
+	/**
+	 * The sample number of a time in the raw data loaded in the viewer, counted
+	 * the same way as the loaded data, from its first unit.
+	 * @param timeMillis a time within the loaded data.
+	 * @return the sample number, or 0 if no raw data is loaded.
+	 */
 	private long viewerSampleNumber(long timeMillis) {
 		RawDataUnit firstUnit = rawDataSource.getFirstUnit();
 		if (firstUnit == null) {

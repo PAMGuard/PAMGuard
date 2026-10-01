@@ -76,6 +76,7 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 		mainPanel = new JPanel(new BorderLayout());
 
 		clipDisplayPanel = new ClipDisplayPanel(this);
+		ScrollSteps.setFor(clipDisplayPanel.getUnitsPanel());
 		
 		makeSymbolModifier();
 		

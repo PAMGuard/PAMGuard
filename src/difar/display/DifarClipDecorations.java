@@ -193,7 +193,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 			PamButton cbmi = new PamButton("Vessel",buttonIcons[2]);
 			cbmi.addActionListener(new VesselListener());
 			add(cbmi);
-			vesselEnabler.addMenuItem(buttonItem);
+			vesselEnabler.addMenuItem(cbmi);
 			ButtonGroup buttonGroup = new ButtonGroup();
 			buttonGroup.add(cbmi);
 			Vector<LookupItem> speciesList = difarControl.getDifarParameters().getSpeciesList(difarControl).getSelectedList();
@@ -223,7 +223,6 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 					menuItem.addActionListener(new SpeciesListener(item));
 					getSpeciesEnabler(item).addMenuItem(menuItem);
 					otherSpecies.add(menuItem);
-					buttonGroup.add(buttonItem);
 				}
 				
 			}

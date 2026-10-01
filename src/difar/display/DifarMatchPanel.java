@@ -71,6 +71,7 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		JScrollPane stripScroller = new JScrollPane(clipStrip,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		stripScroller.setBorder(BorderFactory.createEmptyBorder());
+		ScrollSteps.set(stripScroller);
 		clearButton = new JButton("Clear match");
 		clearButton.setToolTipText("Use no match for this clip; saving it then makes no crossing");
 		clearButton.addActionListener(e -> clearMatch());
