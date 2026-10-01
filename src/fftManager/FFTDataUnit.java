@@ -250,7 +250,26 @@ public class FFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> implemen
 		this.usefulBinRange = usefulBinRange;
 	}
 
+	/**
+	 * The per-bin value a display should colour. Defaults to magnitude.
+	 * Subclasses that display another quantity, such as bearing, override
+	 * this and implement NonMagnitudeSpectrogramData.
+	 * @return the per-bin values to display.
+	 */
 	public double[] getSpectrogramData() {
+		return getMagnitudeData();
+	}
+
+	/**
+	 * The per-bin value a display uses to fade cells towards its floor
+	 * colour. Defaults to magnitude.
+	 * <p>
+	 * A subclass whose displayed value says nothing about signal strength
+	 * should override this. For example, the Azigram plugin displays bearing,
+	 * and returns a calibrated level here so weak cells can be faded.
+	 * @return the per-bin values that set display fading.
+	 */
+	public double[] getAlphaData() {
 		return getMagnitudeData();
 	}
 

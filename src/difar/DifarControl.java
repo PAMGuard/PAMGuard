@@ -57,6 +57,8 @@ import difar.display.DifarDisplayContainer2;
 import difar.display.DifarDisplayProvider;
 import difar.display.DifarDisplayProvider2;
 import difar.display.DifarSidePanel;
+import difar.display.DifarMatchContainer;
+import difar.display.DifarMatchProvider;
 import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
 import difar.offline.DifarDataCopyTask;
@@ -68,6 +70,7 @@ import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
+import offlineProcessing.TaskGroupParams;
 import userDisplay.UserDisplayControl;
 import warnings.PamWarning;
 
@@ -88,6 +91,10 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	private SonobuoyManagerProvider sonobuoyManagerProvider;
 	
 	private SonobuoyManagerContainer sonobuoyManagerContainer;
+
+	private DifarMatchProvider matchProvider;
+
+	private DifarMatchContainer matchContainer;
 	 
 	private SpectrogramObserver spectrogramObserver = new SpectrogramObserver();
 	
@@ -114,6 +121,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	private OfflineTaskGroup offlineTaskGroup;
 	
 	public SonobuoyManager sonobuoyManager;
+
+	/** Which buoy record was in force on each channel at any time. */
+	private SonobuoyHistorySource sonobuoyHistorySource;
 	
 	private static PamWarning warningMessage = new PamWarning("Difar", "", 2);
 
@@ -126,6 +136,8 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		addPamProcess(difarProcess = new DifarProcess(this));
 		addPamProcess(setTrackedGroupProcess(new TrackedGroupProcess(this, difarProcess.getProcessedDifarData(), "Difar Tracked Groups")));
 		addPamProcess(sonobuoyManager = new SonobuoyManager(this));
+		sonobuoyHistorySource = new SonobuoyHistorySource(
+				sonobuoyManager.sonobuoyEndTimeAnnotation.getAnnotationName());
 		// make the displays here
 		displayUnits.add(difarUnitControlPanel = new DIFARUnitControlPanel(this));
 		displayUnits.add(difarGram = new DIFARGram(this));
@@ -140,6 +152,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		}
 		displayProvider = new DifarDisplayProvider(this);
 		UserDisplayControl.addUserDisplayProvider(displayProvider);
+		displayUnits.add(getMatchContainer().getMatchPanel());
+		matchProvider = new DifarMatchProvider(this);
+		UserDisplayControl.addUserDisplayProvider(matchProvider);
 		sonobuoyManagerProvider = new SonobuoyManagerProvider(this);
 		UserDisplayControl.addUserDisplayProvider(sonobuoyManagerProvider);
 		
@@ -326,6 +341,16 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		return difarDisplayContainer2;
 	}
 	
+	/**
+	 * @return the container for the match candidate table, making it if needed.
+	 */
+	public DifarMatchContainer getMatchContainer() {
+		if (matchContainer == null) {
+			matchContainer = new DifarMatchContainer(this);
+		}
+		return matchContainer;
+	}
+
 	public SonobuoyManagerContainer getSonobuoyManagerContainer() {
 		if (sonobuoyManagerContainer == null) {
 			sonobuoyManagerContainer = new SonobuoyManagerContainer(this);
@@ -427,6 +452,33 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		}
 	}
 	
+	/**
+	 * Work out or clear the triangulations for a period, after a buoy has
+	 * changed.
+	 * <p>
+	 * The period is the whole time the buoy record is in force, not the loaded
+	 * period, so detections outside the viewer's window are covered too. Both
+	 * tasks mark what they change, so the binary files and the database are
+	 * rewritten. Runs without asking, since the user has already agreed to it.
+	 * @param startTime start of the period.
+	 * @param endTime end of the period.
+	 */
+	public void runCrossingTasks(long startTime, long endTime) {
+		OfflineTaskGroup taskGroup = new OfflineTaskGroup(this, getUnitName());
+		taskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
+		taskGroup.addTask(new UpdateCrossingTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
+		TaskGroupParams params = taskGroup.getTaskGroupParams();
+		params.dataChoice = TaskGroupParams.PROCESS_SPECIFICPERIOD;
+		params.startRedoDataTime = startTime;
+		params.endRedoDataTime = endTime;
+		/*
+		 * Run straight away. The user has already been told what this does and
+		 * agreed to it, so the offline tasks dialog would only ask again, in
+		 * different words.
+		 */
+		taskGroup.runTasks();
+	}
+
 	private void runOfflineTasks() {
 		if (offlineTaskGroup == null) {
 			offlineTaskGroup = new OfflineTaskGroup(this, getUnitName());
@@ -506,11 +558,24 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
+			sonobuoyHistorySource.connect();
 			difarProcess.setupProcess();
 			break;
 		case PamControllerInterface.OFFLINE_DATA_LOADED:
+			sonobuoyHistorySource.markStale();
 			sonobuoyManager.updateSonobuoyTableData();
+			break;
+		case PamControllerInterface.NEW_SCROLL_TIME:
+			sonobuoyManager.scrollTimeChanged();
 		}
+	}
+
+	/**
+	 * @return which buoy record was in force on each channel at any time, up to
+	 * date with the streamer records.
+	 */
+	public SonobuoyHistory getSonobuoyHistory() {
+		return sonobuoyHistorySource.getHistory();
 	}
 
 	public DIFARGram getDifarGram() {

@@ -2,6 +2,7 @@ package difar.display;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -89,6 +90,7 @@ public class SonobuoyManagerPanel extends PamPanel {
 		           int rendererWidth = component.getPreferredSize().width;
 		           javax.swing.table.TableColumn tableColumn = getColumnModel().getColumn(column);
 		           tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+		           styleRow(component, convertRowIndexToModel(row), isRowSelected(row));
 		           return component;
 		        }
 		    };
@@ -150,37 +152,32 @@ public class SonobuoyManagerPanel extends PamPanel {
 	
 	}
 
+	/**
+	 * @param row a row of the table model.
+	 * @return the buoy record shown in that row, found by its UID, or null.
+	 */
 	public PamDataUnit findDataUnitForRow(int row) {
-		if (row < 0){
+		if (row < 0 || buoyManager.tableData == null || row >= buoyManager.tableData.length) {
 			return null;
 		}
-		int tsCol = SonobuoyManager.COLUMN_TIMESTAMP;
-		int chanCol = SonobuoyManager.COLUMN_CHANNEL;
-		long timestamp = PamCalendar.millisFromDateString((String) buoyManager.tableData[row][tsCol], false);
-
-		int channel = 1<<(int) buoyManager.tableData[row][chanCol];
-		
-		StreamerDataUnit sdu = ArrayManager.getArrayManager().getStreamerDatabBlock().getClosestUnitMillis(timestamp, channel);
-
-		return sdu;
-
+		Object uid = buoyManager.tableData[row][SonobuoyManager.COLUMN_DATABASEID];
+		if (!(uid instanceof Long)) {
+			return null;
+		}
+		return buoyManager.findRecordUnit((Long) uid);
 	}
 
+	/**
+	 * Edit a buoy record. The dialog returns an edited copy, and the sonobuoy
+	 * manager applies it to the record, logging any change of heading as a
+	 * calibration.
+	 * @param sdu the buoy record to edit.
+	 */
 	public void editDataUnit(StreamerDataUnit sdu) {
-		Double heading = sdu.getStreamerData().getHeading();
-		long startTime = sdu.getTimeMilliseconds();
-		StreamerDataUnit modifiedSdu = SonobuoyDialog.showDialog(difarControl.getGuiFrame(), 
+		StreamerDataUnit edited = SonobuoyDialog.showDialog(difarControl.getGuiFrame(),
 				ArrayManager.getArrayManager().getCurrentArray(), sdu, difarControl);
-		if (modifiedSdu != null){
-			Double newHeading = modifiedSdu.getStreamerData().getHeading();
-			if (newHeading != heading  || 
-					modifiedSdu.getTimeMilliseconds() != startTime) {
-				buoyManager.updateCorrection(modifiedSdu.getStreamerData(), PamCalendar.getTimeInMillis(), 
-											 newHeading, 0.0, 0);
-				}
-			ArrayManager.getArrayManager().getStreamerDatabBlock().replaceStreamerDataUnit(sdu, modifiedSdu);
-			buoyManager.overwriteSonobuoyData(modifiedSdu);				
-			buoyManager.updateSonobuoyTableData();
+		if (edited != null) {
+			buoyManager.applyEdit(sdu, edited);
 		}
 	}
 	
@@ -189,6 +186,45 @@ public class SonobuoyManagerPanel extends PamPanel {
 		
 	}
 	
+	/**
+	 * Show which buoy a row belongs to, and which buoy is in force.
+	 * <p>
+	 * Rows carry a faded version of their channel's colour, the same colours
+	 * used for channels elsewhere. The record in force on each channel is shown
+	 * in bold. A selected row keeps the selection colours, so the selection is
+	 * never hidden.
+	 * @param component the cell being drawn.
+	 * @param modelRow the row in the table model.
+	 * @param selected true if the row is selected.
+	 */
+	private void styleRow(Component component, int modelRow, boolean selected) {
+		component.setFont(component.getFont().deriveFont(
+				buoyManager.isRowInForce(modelRow) ? Font.BOLD : Font.PLAIN));
+		if (selected) {
+			return;
+		}
+		int channel = buoyManager.getRowChannel(modelRow);
+		if (channel < 0) {
+			return;
+		}
+		component.setBackground(fadeToBackground(PamColors.getInstance().getChannelColor(channel),
+				sonobuoyTable.getBackground()));
+	}
+
+	/**
+	 * @param colour a channel colour.
+	 * @param background the table background.
+	 * @return the colour mixed well into the background, so text stays readable
+	 * in either a light or a dark colour scheme.
+	 */
+	private static java.awt.Color fadeToBackground(java.awt.Color colour, java.awt.Color background) {
+		double weight = 0.12;
+		return new java.awt.Color(
+				(int) (colour.getRed() * weight + background.getRed() * (1 - weight)),
+				(int) (colour.getGreen() * weight + background.getGreen() * (1 - weight)),
+				(int) (colour.getBlue() * weight + background.getBlue() * (1 - weight)));
+	}
+
 	public void resizeColumnWidth(JTable table) {
 	    final TableColumnModel columnModel = table.getColumnModel();
 	    for (int column = 0; column < table.getColumnCount(); column++) {

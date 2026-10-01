@@ -788,12 +788,6 @@ final public class PamModel implements PamSettings {
 		mi.setHelpPoint("detectors/Pam3DHelp/docs/guiOverview.html");
 
 		// TODO: Move all DIFAR modules into sub-menu under localisation>DIFAR>
-		mi = PamModuleInfo.registerControlledUnit(Azigram.AzigramControl.class.getName(), "DIFAR Azigram Engine");
-		mi.addDependency( new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
-		mi.setModulesMenuGroup(localiserGroup);
-		mi.setToolTipText("(BETA) Azigram engine for multiplexed DIFAR data (BETA)");
-		mi.setHelpPoint("localisation/difar/difarAzigram/docs/azigram.html");
-
 		mi = PamModuleInfo.registerControlledUnit(difar.beamforming.BeamformControl.class.getName(), "DIFAR Directional Audio");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));
 		mi.addDependency(new PamDependency(GpsDataUnit.class, "GPS.GPSControl"));

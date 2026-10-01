@@ -87,6 +87,27 @@ public interface TargetMotionInformation {
 	 * @return a list of hydrophone positions. Each <ArrayList<Point3f> corresponds to the hydrophone positions for one PamDetection. 
 	 */
 	public ArrayList<ArrayList<Point3f>> getHydrophonePos();
+
+	/**
+	 * Hydrophone positions in the form used by
+	 * {@link Localiser.algorithms.genericLocaliser.Chi2TimeDelays}, in metres
+	 * relative to the same origin as getOrigins(). Each row holds a set of
+	 * hydrophones that share a clock, and whose time delays are therefore
+	 * meaningful. For DIFAR, one row holds every buoy of the group, since all
+	 * buoys are recorded on the same device.
+	 * <p>
+	 * This is separate from getHydrophonePos(), which lists the hydrophones of
+	 * each detection separately.
+	 * @return one row per set of synchronised hydrophones, or null if time
+	 * delays are not available.
+	 */
+	public ArrayList<ArrayList<double[]>> getDelayHydrophonePositions();
+
+	/**
+	 * @return the speed of sound in metres per second, used to turn time delays
+	 * into distances.
+	 */
+	public double getSpeedOfSound();
 	
 	/***********GPS************/
 	/**

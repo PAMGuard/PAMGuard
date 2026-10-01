@@ -76,7 +76,7 @@ public class ArrayReferenceSystem implements MasterReferenceSystem {
 
 	@Override
 	public String getError() {
-		if (getLatLong() != null) {
+		if (getLatLong() == null) {
 			return "No hydrophone origin location available - check array manager configuration";
 		}
 		else {
