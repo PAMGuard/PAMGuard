@@ -89,21 +89,25 @@ Next, in order, as set out in `viewer_editing_design.md`:
       fine. The strips' scroll pane is core's
       (`ClipDisplayPanel`), but DIFAR can set its unit increment from outside; the buoy manager is
       DIFAR's (`SonobuoyManagerPanel`).
-   5. **New bearings reach the map late.** With "Display only at vessel scroll bar time", the map
-      shows data up to the scroller's time, the left edge of the spectrogram, so a clip saved on screen
-      appears only once it has scrolled off to the left. Try "Look Ahead" for the DIFAR layers in the
-      map's overlay options first; if that is not enough, the map should use the right edge.
    4. **Classification buttons on clips.** With more than 4 or 5 favourites, the buttons make each
       clip very tall. Spill them into a second column after about 5 rows, and make them narrower
       (`DifarClipDecorations`, a single-column `GridLayout` now).
-   - No crossing was seen on the map after saving a clip with a chosen match. Crossings have no map
-     layer of their own: the saved clips' layer ("Processed DIFAR Data") draws each clip's crossing
-     in place of its bearing line. The data map shows crossings in the database. Check the crossing
-     table for this save, and whether the map shows the crossing after scrolling.
-   - A stray click on the spectrogram made a mark of no length, and demultiplexing it threw
-     (`FFTFilter`: n must be greater than 0). Marks shorter than 100 ms, or with no frequency band,
-     are now ignored with a console line; this applies in Normal mode too.
-2. An auto-compaction setting, writing after every edit. Deletions already write at once.
+   5. **New bearings reach the map late.** With "Display only at vessel scroll bar time", the map
+      draws a layer up to the scroller's time, the left edge of the spectrogram, so a clip saved on
+      screen appears only once it has scrolled off to the left. From `MapPanel` and `SimpleMap`: with a
+      layer's "All" ticked, it draws everything from the start up to that time, and "Look Ahead" is
+      ignored; with "All" unticked, "Look Ahead" draws from that time forward by the layer's "Time
+      (s)", instead of back. So a "Time (s)" equal to the spectrogram's span, with "Look Ahead", draws
+      what the spectrogram shows; "Display all selected data" draws the whole loaded period. Tested
+      on the pilot: Look Ahead changes nothing. `MapPanel` fetches each layer's units from the
+      earliest time up to the scroller's time (`getDataCopy(earliestToPlot, now, ...)`) before
+      `shouldPlot` applies Look Ahead, so units ahead are never fetched; `MapPanel`'s own copy of the
+      Look Ahead test is commented out. "Display all selected data" does what it says, drawing the
+      whole loaded period, but nothing ahead is hidden or faded, so it loses the sense of what was
+      just marked. Wanted: the map drawing what the spectrogram shows, with older data fading. So the
+      fix is core's: fetch forward when Look Ahead is set, or draw up to the spectrogram's right edge.
+2. An auto-compaction setting, writing after every edit. Saves and deletions now write at once;
+   only buoy edits, through their offline task, still wait.
 3. After an upgrade, skip the clip store's backup question for that session. Done: the upgrade hands
    its backup to the clip store, which adds to it and does not ask. Passed on the full voyage. The
    console line then says "25 original files backed up", counting the files the save reshapes, not
@@ -339,6 +343,8 @@ items below are about making fewer of them necessary.
   PAMGuard/PAMGuard#348, merged into `main`.
 - Core's UID check at Viewer startup finds missing UIDs, not repeated ones. Datasets whose UID count
   restarted after crashes pass it.
+- The map's "Look Ahead" does nothing: `MapPanel` fetches a layer's units only up to the scroller's
+  time, before `SimpleMap.shouldPlot` applies Look Ahead.
 - `OfflineTaskGroup.processData` returns before `loadedDataComplete` and before saving when no loaded
   unit starts within the file's time span, so a task that processes units outside the span cannot
   save them.

@@ -23,6 +23,11 @@ pull request.
 
 ## Map
 
+- **New bearings and crossings reach the map late:** a saved clip appears only once it has scrolled
+  off the spectrogram to the left, since the map draws up to the scroller's time. No setting fixes
+  it well. "Display all selected data" draws the whole loaded period, but hides or fades nothing
+  ahead. "Look Ahead" in the Data Overlay options does nothing: core's map fetches only data up to
+  the scroller's time before it applies Look Ahead (a core fault; see `outstanding.md`).
 - **Tick "all data" in the map's plot options for buoys to appear.** Without it the map draws only
   buoy records inside the view's time window, and a buoy deployed before the view starts is not
   drawn. Symptom: no buoys on the map, though bearings and crossings load.
