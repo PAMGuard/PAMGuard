@@ -29,6 +29,7 @@ import PamUtils.LatLong;
 import PamUtils.MatrixOps;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import PamView.dialog.warn.WarnOnce;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
@@ -1165,11 +1166,13 @@ public class DifarProcess extends PamProcess {
 				/*
 				 * In the viewer, samples are counted from the start of the loaded
 				 * data, not from the start of a session, so the clip is found by
-				 * time, as the WAV and SPL annotations do.
+				 * time, as the WAV and SPL annotations do. The raw data in memory
+				 * need not hold the mark (after scrolling back, they often do
+				 * not), so its span may be loaded from the audio files first. The
+				 * sample number is worked out after any load.
 				 */
+				rawDataAll = viewerSamples(clipStartTime, durationMillis + millisToPreceed, channelMap);
 				startSample = viewerSampleNumber(clipStartTime);
-				rawDataAll = rawDataSource.getSamplesForMillis(clipStartTime,
-						durationMillis + millisToPreceed, channelMap);
 			}
 			else {
 				startSample = Math.max(absMillisecondsToSamples(clipStartTime), 0);
@@ -1179,10 +1182,16 @@ public class DifarProcess extends PamProcess {
 				rawData[0] = rawDataAll[0]; // is fine since getSamples was fed a channel map. 
 			}
 		} catch (RawDataUnavailableException e) {
-			System.out.println("Error in DifarProcess.difarTrigger" + e.getMessage());
+			System.out.println("Error in DifarProcess.difarTrigger " + e.getMessage());
+			if (difarControl.isViewer()) {
+				warnNoViewerAudio(clipStartTime, durationMillis + millisToPreceed, e.getMessage());
+			}
 			return;
 		}
 		if (rawData[0] == null) {
+			if (difarControl.isViewer()) {
+				warnNoViewerAudio(clipStartTime, durationMillis + millisToPreceed, "no samples returned");
+			}
 			return;
 		}
 
@@ -1234,6 +1243,89 @@ public class DifarProcess extends PamProcess {
 	 * @param timeMillis a time within the loaded data.
 	 * @return the sample number, or 0 if no raw data is loaded.
 	 */
+	/**
+	 * Padding, in milliseconds, loaded either side of a clip's span when its
+	 * audio has to be read from file in the viewer, as the WAV annotation does.
+	 */
+	private static final long VIEWER_AUDIO_PAD_MILLIS = 1000;
+
+	/**
+	 * In the viewer, get a clip's samples, from memory if the raw data there hold
+	 * them, else from the audio files, through the same offline load the WAV and
+	 * SPL annotations use. Whether memory holds them is core's own test, in
+	 * getSamples, by sample number. The load replaces what the raw data block held, which
+	 * only this module and the annotations read by time; the spectrogram keeps
+	 * its own FFT data.
+	 * @param startMillis start of the clip, including its lead-in
+	 * @param durationMillis length of the clip, including its lead-in
+	 * @param channelMap channels wanted
+	 * @return the samples
+	 * @throws RawDataUnavailableException if the audio files do not hold them either
+	 */
+	private double[][] viewerSamples(long startMillis, long durationMillis, int channelMap)
+			throws RawDataUnavailableException {
+		String miss;
+		try {
+			double[][] samples = rawDataSource.getSamplesForMillis(startMillis, durationMillis, channelMap);
+			if (samples != null) {
+				return samples;
+			}
+			miss = "no samples returned";
+		}
+		catch (RawDataUnavailableException e) {
+			miss = e.getMessage();
+		}
+		System.out.printf("DIFAR: audio for the mark (%s to %s) not taken from memory: %s; %s. "
+				+ "Loading it from the audio files\n",
+				PamCalendar.formatDateTime(startMillis), PamCalendar.formatTime(startMillis + durationMillis, true),
+				miss, describeAudioInMemory());
+		PamProcess source = rawDataSource.getParentProcess();
+		if (source != null) {
+			/*
+			 * The audio file loader adds to whatever the block holds, numbering
+			 * samples afresh from the new load, so clear it first, as the WAV
+			 * annotation does. Without this, a second load was appended to the
+			 * first, and the clip's sample numbers, counted from the first, did
+			 * not match.
+			 */
+			rawDataSource.clearAll();
+			source.getOfflineData(rawDataSource, null, startMillis - VIEWER_AUDIO_PAD_MILLIS,
+					startMillis + durationMillis + VIEWER_AUDIO_PAD_MILLIS, 1);
+		}
+		return rawDataSource.getSamplesForMillis(startMillis, durationMillis, channelMap);
+	}
+
+	/**
+	 * @return the span of raw data in memory, in words, for console lines and warnings
+	 */
+	private String describeAudioInMemory() {
+		RawDataUnit first = rawDataSource.getFirstUnit();
+		RawDataUnit last = rawDataSource.getLastUnit();
+		if (first == null || last == null) {
+			return "no audio in memory";
+		}
+		return String.format("audio in memory from %s to %s (samples %d to %d at %.0f Hz; last unit on channels 0x%x)",
+				PamCalendar.formatDateTime(first.getTimeMilliseconds()),
+				PamCalendar.formatTime(last.getEndTimeInMilliseconds(), true),
+				first.getStartSample(), last.getStartSample() + last.getSampleDuration(),
+				rawDataSource.getSampleRate(), last.getChannelBitmap());
+	}
+
+	/**
+	 * Tell the operator that a mark made no clip because its audio could not be
+	 * found, in memory or in the audio files.
+	 */
+	private void warnNoViewerAudio(long startMillis, long durationMillis, String cause) {
+		String msg = String.format("<html>No clip was made. The audio for this mark could not be found.<br><br>"
+				+ "Mark: %s to %s<br>Memory holds: %s<br>Detail: %s<br><br>"
+				+ "Check that the Viewer's audio folder holds a file for this time.<br>"
+				+ "It is set with -wavfilefolder, or in Sound Acquisition's offline file settings.</html>",
+				PamCalendar.formatDateTime(startMillis),
+				PamCalendar.formatTime(startMillis + durationMillis, true),
+				describeAudioInMemory(), cause);
+		WarnOnce.showWarning("DIFAR: no audio for this mark", msg, WarnOnce.WARNING_MESSAGE);
+	}
+
 	private long viewerSampleNumber(long timeMillis) {
 		RawDataUnit firstUnit = rawDataSource.getFirstUnit();
 		if (firstUnit == null) {

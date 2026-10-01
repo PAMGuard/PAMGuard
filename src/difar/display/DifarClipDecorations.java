@@ -14,6 +14,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -146,6 +147,13 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	 * del,proc,ves
 	 */
 	static Icon[] buttonIcons;
+
+	/**
+	 * Most rows of buttons on a clip before they spill into a second column.
+	 */
+	private static final int MAX_BUTTON_ROWS = 5;
+
+	private static final Insets BUTTON_MARGIN = new Insets(1, 2, 1, 2);
 	
 	/**
 	 * Add more buttons and controls to the E panel of each clip. 
@@ -231,7 +239,24 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 			add(buttonItem);
 			buttonGroup.add(cbmi);
 			
+			arrangeButtons();
 			enableEnablersAndSelecters();
+		}
+
+		/**
+		 * One column of buttons while they fit in MAX_BUTTON_ROWS rows, else two,
+		 * so a long list of favourite species does not make each clip very tall.
+		 * Narrow margins keep two columns from making the clip too wide.
+		 */
+		private void arrangeButtons() {
+			int nButtons = getComponentCount();
+			int nColumns = nButtons > MAX_BUTTON_ROWS ? 2 : 1;
+			setLayout(new GridLayout(0, nColumns, 1, 1));
+			for (Component c : getComponents()) {
+				if (c instanceof AbstractButton) {
+					((AbstractButton) c).setMargin(BUTTON_MARGIN);
+				}
+			}
 		}
 
 		JPopupMenu getJPopupMenu(){
