@@ -78,6 +78,26 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public double maxBearingResidual = 20.0;
 
 	/**
+	 * Metres from a buoy within which a crossing counts as on that buoy. Such a
+	 * crossing has its errors set to this radius, since the fit's own errors
+	 * there are near zero and reflect none of the real sources of error (compass
+	 * calibration, approximate and drifting buoy positions, bearing errors).
+	 * Use {@link #getOnBuoyRadius()}, which repairs settings saved before this
+	 * field existed.
+	 */
+	public double onBuoyRadius = DEFAULT_ON_BUOY_RADIUS;
+
+	/** Default for {@link #onBuoyRadius}, metres. */
+	public static final double DEFAULT_ON_BUOY_RADIUS = 500.0;
+
+	/**
+	 * @return metres from a buoy within which a crossing is on it.
+	 */
+	public double getOnBuoyRadius() {
+		return onBuoyRadius > 0 ? onBuoyRadius : DEFAULT_ON_BUOY_RADIUS;
+	}
+
+	/**
 	 * Largest number of detections on each other buoy that are tried as matches
 	 * for one detection. The closest in time and frequency are kept. A larger
 	 * number finds matches in a busy chorus, at the cost of more combinations
@@ -421,6 +441,9 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 			}
 			if (ndp.maxBearingResidual <= 0) {
 				ndp.maxBearingResidual = 20.0;
+			}
+			if (ndp.onBuoyRadius <= 0) {
+				ndp.onBuoyRadius = DEFAULT_ON_BUOY_RADIUS;
 			}
 			if (ndp.bearingError <= 0) {
 				ndp.bearingError = 5.0;

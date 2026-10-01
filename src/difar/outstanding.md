@@ -74,7 +74,11 @@ Next, in order, as set out in `viewer_editing_design.md`:
    Done on 1 October: items 1, 3 and 4 (`1ab093ec`, `4095541e`, and the next commit).
    1. **Done.** **Marking where the raw audio is not in memory** prints "requested from Raw input data ... have
       not yet arrived" and makes no clip, with nothing shown to the operator. Top of the list.
-   2. **Crossings that collapse onto a buoy.** Four crossings saved on 7 March between 21:20 and
+   2. **Flagged, fit unchanged.** Crossing quality is built: `CrossingAngle` and `OnBuoy` on each
+      crossing, errors set to the on-buoy radius (DIFAR settings, 500 m default), and a crossing data
+      selector hiding narrow and on-buoy crossings by default. Still open: a fit that does not
+      collapse (range floor, rays, or a flatter-topped likelihood).
+      **Crossings that collapse onto a buoy.** Four crossings saved on 7 March between 21:20 and
       21:22 sit exactly on buoy 297, with errors of a few millionths of a metre. Buoy 296's bearings
       (about 110 degrees true) point almost straight at 297 (108 degrees from 296), so 296's bearing
       line runs through 297, where 297's own bearing has no meaning: the fit finds a perfect answer

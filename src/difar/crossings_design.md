@@ -170,8 +170,15 @@ On the full 2019 voyage (first run, 6,037 crossings): 156 crossings at 2 degrees
 median error of 79 km, and 65 of them are over 100 km; 1,314 between 45 and 90 degrees have a median
 error of 1.0 km and none over 100 km; the 32 above 170 degrees have errors under 1 km.
 
-**Crossing data selector.** On the crossing block, with a minimum crossing angle (default 5 degrees)
-and a maximum location error (the larger of the x and y errors; default off). The default angle
+**On a buoy.** Added 1 October 2026. When one buoy's bearing points at another buoy, the fit can
+settle on that buoy, where the second buoy's own bearing has no meaning, with an error near zero. A
+crossing within a radius of one of its own buoys (DIFAR settings, default 500 m, generous because
+DIFAR buoys are not precision instruments) is flagged `OnBuoy`, and its x and y errors are set to the
+radius. The fit's own errors there reflect none of the real sources of error. The location is kept.
+
+**Crossing data selector.** On the crossing block, with a minimum crossing angle (default 5 degrees),
+a maximum location error (the larger of the x and y errors; default off), and hiding on-buoy
+crossings (default on). Rows written before these columns existed have no angle and are shown. The default angle
 hides 458 of those 6,037 crossings, including 90 of the 108 with errors over 100 km. Displays and
 exports that honour data selectors use it; the user can turn it off. The rematch summary counts
 crossings below the default angle.

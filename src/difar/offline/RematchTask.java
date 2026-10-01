@@ -21,6 +21,7 @@ import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import binaryFileStorage.DataUnitFileInformation;
 import dataMap.OfflineDataMapPoint;
+import difar.dataSelector.CrossingSelectParams;
 import difar.DIFARCrossingInfo;
 import difar.DifarControl;
 import difar.DifarDataUnit;
@@ -452,6 +453,21 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		if (outsideFile > 0) {
 			System.out.printf("DIFAR: %d of those clips start outside their file's time span, and were processed separately\n",
 					outsideFile);
+		}
+		int narrow = 0;
+		int onBuoy = 0;
+		CrossingSelectParams defaults = new CrossingSelectParams();
+		for (DifarCrossing crossing : made) {
+			if (crossing.isOnBuoy()) {
+				onBuoy++;
+			}
+			else if (crossing.getCrossingAngle() < defaults.minAngle) {
+				narrow++;
+			}
+		}
+		if (narrow + onBuoy > 0) {
+			System.out.printf("DIFAR: of the crossings made, %d lie on one of their own buoys and %d more cross at under %.0f degrees; "
+					+ "the crossing data selector hides both by default\n", onBuoy, narrow, defaults.minAngle);
 		}
 		int failedErrors = Simplex2D.takeFailedErrorEstimates();
 		if (failedErrors > 0) {

@@ -5,6 +5,7 @@ import java.util.List;
 
 import PamguardMVC.PamDataUnit;
 import difar.DifarControl;
+import difar.DifarDataUnit;
 import difar.DifarMatchSelector;
 import difar.DifarParameters;
 import difar.DifarProcess;
@@ -68,10 +69,39 @@ public class CrossingLocaliser {
 	 * @param crossing the crossing.
 	 * @param match the match its clips gave.
 	 */
-	public static void store(DifarCrossing crossing, DifarMatchSelector.Match match) {
+	public static void store(DifarCrossing crossing, DifarMatchSelector.Match match, double onBuoyRadius) {
 		TargetMotionResult result = match.getResult();
 		Double[] errors = result.getErrors();
 		crossing.setResult(result.getLatLong(), error(errors, 0), error(errors, 1));
+		assess(crossing, onBuoyRadius);
+	}
+
+	/**
+	 * Work out a crossing's quality from the clips it holds in memory, and
+	 * store it. A crossing on one of its buoys has its errors set to the
+	 * radius: the fit's own errors there are near zero and mean nothing.
+	 * @param crossing the crossing, with its result set.
+	 * @param onBuoyRadius metres from a buoy within which a crossing is on it.
+	 */
+	public static void assess(DifarCrossing crossing, double onBuoyRadius) {
+		List<CrossingQuality.Bearing> bearings = new ArrayList<>();
+		List<PamDataUnit<?, ?>> clips = crossing.getSubDetections();
+		if (clips != null) {
+			for (PamDataUnit<?, ?> unit : clips) {
+				if (!(unit instanceof DifarDataUnit)) {
+					continue;
+				}
+				DifarDataUnit clip = (DifarDataUnit) unit;
+				Double trueAngle = clip.getTrueAngle();
+				bearings.add(new CrossingQuality.Bearing(clip.getOriginLatLong(false),
+						trueAngle == null ? Double.NaN : trueAngle));
+			}
+		}
+		CrossingQuality quality = CrossingQuality.of(bearings, crossing.getLocation(), onBuoyRadius);
+		crossing.setQuality(quality.getAngle(), quality.isOnBuoy());
+		if (quality.isOnBuoy()) {
+			crossing.setResult(crossing.getLocation(), onBuoyRadius, onBuoyRadius);
+		}
 	}
 
 	/**
@@ -93,9 +123,10 @@ public class CrossingLocaliser {
 			System.out.printf("DIFAR: crossing UID %d no longer crosses after the buoy change, so its location is cleared\n",
 					crossing.getUID());
 			crossing.setResult(null, Double.NaN, Double.NaN);
+			assess(crossing, difarControl.getDifarParameters().getOnBuoyRadius());
 			return Outcome.NOT_CROSSED;
 		}
-		store(crossing, match);
+		store(crossing, match, difarControl.getDifarParameters().getOnBuoyRadius());
 		if (!match.isAccepted()) {
 			System.out.printf("DIFAR: crossing UID %d recalculated after the buoy change, but %s\n",
 					crossing.getUID(), match.getRejectReason());

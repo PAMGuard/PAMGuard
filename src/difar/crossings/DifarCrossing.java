@@ -34,6 +34,8 @@ public class DifarCrossing extends SuperDetection<DifarDataUnit> {
 	private double xError = Double.NaN;
 	private double yError = Double.NaN;
 	private MatchChoice matchChoice;
+	private double crossingAngle = Double.NaN;
+	private boolean onBuoy;
 
 	/**
 	 * A crossing with no clips yet, as read back from the database. Its clips
@@ -94,6 +96,27 @@ public class DifarCrossing extends SuperDetection<DifarDataUnit> {
 	/** @return error in y, metres, or NaN if not known. */
 	public double getYError() {
 		return yError;
+	}
+
+	/**
+	 * Set how far the location can be trusted, from its geometry (see
+	 * {@link CrossingQuality}).
+	 * @param crossingAngle the largest angle between its bearings, degrees, or NaN.
+	 * @param onBuoy true if it lies on one of its buoys.
+	 */
+	public void setQuality(double crossingAngle, boolean onBuoy) {
+		this.crossingAngle = crossingAngle;
+		this.onBuoy = onBuoy;
+	}
+
+	/** @return the largest angle between its bearings, 0 to 180 degrees, or NaN if not known. */
+	public double getCrossingAngle() {
+		return crossingAngle;
+	}
+
+	/** @return true if the crossing lies on one of its own buoys. */
+	public boolean isOnBuoy() {
+		return onBuoy;
 	}
 
 	/** @return how the clips were chosen, or null if not known. */

@@ -18,7 +18,7 @@ public class DifarCrossingLogging extends SuperDetLogging {
 	/** Longest match choice name, with room to spare. */
 	private static final int MATCH_CHOICE_LENGTH = 20;
 
-	private PamTableItem endTime, clipCount, latitude, longitude, xError, yError, matchChoice;
+	private PamTableItem endTime, clipCount, latitude, longitude, xError, yError, matchChoice, crossingAngle, onBuoy;
 
 	/**
 	 * @param tableName the table, named after the DIFAR module.
@@ -34,6 +34,8 @@ public class DifarCrossingLogging extends SuperDetLogging {
 		tableDef.addTableItem(xError = new PamTableItem("XError", Types.DOUBLE));
 		tableDef.addTableItem(yError = new PamTableItem("YError", Types.DOUBLE));
 		tableDef.addTableItem(matchChoice = new PamTableItem("MatchChoice", Types.CHAR, MATCH_CHOICE_LENGTH));
+		tableDef.addTableItem(crossingAngle = new PamTableItem("CrossingAngle", Types.DOUBLE));
+		tableDef.addTableItem(onBuoy = new PamTableItem("OnBuoy", Types.BOOLEAN));
 		setTableDefinition(tableDef);
 	}
 
@@ -48,6 +50,8 @@ public class DifarCrossingLogging extends SuperDetLogging {
 		xError.setValue(finiteOrNull(crossing.getXError()));
 		yError.setValue(finiteOrNull(crossing.getYError()));
 		matchChoice.setValue(crossing.getMatchChoice() == null ? null : crossing.getMatchChoice().name());
+		crossingAngle.setValue(finiteOrNull(crossing.getCrossingAngle()));
+		onBuoy.setValue(crossing.isOnBuoy());
 	}
 
 	@Override
@@ -63,6 +67,8 @@ public class DifarCrossingLogging extends SuperDetLogging {
 		}
 		crossing.setResult(location, xError.getDoubleValue(), yError.getDoubleValue());
 		crossing.setMatchChoice(parseChoice(matchChoice.getDeblankedStringValue()));
+		// rows written before these columns existed read as an unknown angle, not on a buoy
+		crossing.setQuality(crossingAngle.getDoubleValue(), onBuoy.getBooleanValue());
 		return crossing;
 	}
 

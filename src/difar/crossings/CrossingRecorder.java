@@ -98,6 +98,7 @@ public class CrossingRecorder {
 		Double[] errors = info.getErrors();
 		DifarCrossing crossing = new DifarCrossing(clips, info.getCrossLocation(),
 				error(errors, 0), error(errors, 1), choice == null ? DifarCrossing.MatchChoice.AUTO : choice);
+		CrossingLocaliser.assess(crossing, difarControl.getDifarParameters().getOnBuoyRadius());
 		// adding the clips has taken them out of their earlier crossings
 		DifarCrossingDataBlock block = difarProcess.getCrossingDataBlock();
 		block.addPamData(crossing);
@@ -155,7 +156,7 @@ public class CrossingRecorder {
 			System.out.printf("DIFAR: crossing UID %d recalculated after losing clips, but %s\n",
 					crossing.getUID(), match.getRejectReason());
 		}
-		CrossingLocaliser.store(crossing, match);
+		CrossingLocaliser.store(crossing, match, difarControl.getDifarParameters().getOnBuoyRadius());
 		return true;
 	}
 
