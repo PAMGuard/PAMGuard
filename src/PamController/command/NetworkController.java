@@ -143,7 +143,7 @@ public class NetworkController extends CommandManager {
 	 * over UDP
 	 * @return command string or null if should exit. 
 	 */
-	private String getCommand() {
+	protected String getCommand() {
 		try {
 			receiveSocket.receive(udpPacket);
 		} catch (IOException e) {
