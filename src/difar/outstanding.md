@@ -288,12 +288,11 @@ items below are about making fewer of them necessary.
 - A crossing whose clips fall in two load chunks of that task is not recalculated. The console lists
   their UIDs. Rare, since a call spans seconds and chunks are files.
 
-- Marked clips end early. Clips are cut off at the right edge compared with the box marked on the
-  spectrogram, with "Prepend to clip" at 0. Core's spectrogram draws each FFT column at its window's
-  start (`SpectrogramDisplay`, `xPos` from the FFT unit's time, which `PamFFTProcess` sets to the
-  window's first sample). So the picture sits half a window early: 0.5 s for the pilot's 256 points
-  at 250 Hz. A box drawn round a call ends half a window before the call does. Fix in core (draw
-  columns at the window centre), or in DIFAR (shift each mark by half the source FFT window).
+- Marked clips ended early, cut off at the right edge compared with the box marked on the
+  spectrogram. Core's spectrogram drew each FFT column at its window's start, so the picture sat half
+  a window early: 0.5 s for the pilot's 256 points at 250 Hz. Fixed in core on its own branch,
+  `spectrogram-centred-columns`, which draws columns at the window centre in Normal mode and the
+  Viewer, and cherry-picked here. DIFAR's interim half-window shift of marks is removed.
 - A saved clip's classification cannot be changed in place. The species, Vessel and Other buttons on
   saved clips are disabled; delete the clip and mark the call again. A real edit (reclassify,
   reprocess, save through `ViewerEdits`, rematch if the bearing moves) waits until the need is shown.
@@ -327,9 +326,9 @@ items below are about making fewer of them necessary.
   it, though audio follows. The 2013 pilot has eight gaps, from recorder restarts; at 22:55 a window
   starting at 22:55:44 drew only a 0.3 s file and stopped, though audio resumes at 22:56:27. Marks
   there still make clips, since DIFAR loads each mark's own span.
-- The spectrogram draws each FFT column at its window's start, not its centre, so the picture sits
-  half a window early. Marks drawn round calls end early by that much. See "Marked clips end early"
-  under Viewer.
+- The spectrogram drew each FFT column at its window's start, not its centre, so the picture sat
+  half a window early. Fixed on branch `spectrogram-centred-columns`, for a pull request. The JavaFX
+  spectrogram is not covered.
 - `PamController.updateDataMap()` throws without a binary store.
 - The NMEA simulator keeps writing GPS records in Viewer.
 - `GPSControl` heading interpolation uses the "before" heading twice.
