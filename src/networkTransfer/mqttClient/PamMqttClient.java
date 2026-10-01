@@ -499,7 +499,7 @@ public class PamMqttClient extends NetworkClient  implements MqttCallbackExtende
 		mqttOptions.setConnectionTimeout(0);
 		mqttOptions.setMaxInflight(65535);
 		mqttOptions.setMaxReconnectDelay(1000);
-		mqttOptions.setKeepAliveInterval(0);
+//		mqttOptions.setKeepAliveInterval(0);
 		//mqttOptions.
 		if(this.networkParams.userId!=null&&this.networkParams.password!=null&&!this.networkParams.userId.isEmpty()&&!this.networkParams.password.isEmpty()) {
 			mqttOptions.setUserName(this.networkParams.userId);
