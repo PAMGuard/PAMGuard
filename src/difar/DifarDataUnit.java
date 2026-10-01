@@ -398,6 +398,10 @@ public class DifarDataUnit extends ClipDataUnit {
 	 * @param displaySampleRate the displaySampleRate to set
 	 */
 	public void setDisplaySampleRate(float displaySampleRate) {
+		if (displaySampleRate != this.displaySampleRate) {
+			// the clip's spectrogram is cached by FFT length only, so drop it to redraw at the new rate
+			clearClipSpecData();
+		}
 		this.displaySampleRate = displaySampleRate;
 	}
 

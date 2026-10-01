@@ -289,10 +289,12 @@ public class DifarProcess extends PamProcess {
 					// This situation should not occur, but leave this here to cleanup in case I've missed something
 					time = 0;
 					cancelAutoSaveTimer();
+					if (difarDataUnit != null) {
+						msg = new DemuxWorkerMessage(difarDataUnit, DemuxWorkerMessage.STATUS_SAVED, 
+								0L, 0);
+						difarControl.getDemuxProgressDisplay().newMessage(msg);
+					}
 					this.difarDataUnit = null;
-					msg = new DemuxWorkerMessage(difarDataUnit, DemuxWorkerMessage.STATUS_SAVED, 
-							0L, 0);
-					difarControl.getDemuxProgressDisplay().newMessage(msg);
 					return;
 				}
 				if (difarControl.getDifarParameters().autoSaveDResult

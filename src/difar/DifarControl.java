@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import Array.ArrayManager;
+import fftManager.FFTDataBlock;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -252,6 +253,8 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			currentDemuxedUnit = message.difarDataUnit;
 			break;
 		case DIFARMessage.DeleteDatagramUnit:
+			// a deleted clip must not go on counting down to an auto save
+			difarProcess.cancelAutoSaveTimer();
 			// a new clip is deleted as in normal mode; a saved one being looked
 			// at again is just put away
 			if (!isViewer || isQueued(message.difarDataUnit)) {
@@ -288,6 +291,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		
 			if ((!isViewer || isQueued(message.difarDataUnit)) && canSaveInViewer()) {
 				prepareViewerSave(message.difarDataUnit);
+				difarProcess.cancelAutoSaveTimer();
 				//remove Range/Localisation Information
 				message.difarDataUnit.clearTempCrossing();
 				difarProcess.finalProcessing(message.difarDataUnit);
@@ -414,6 +418,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 //    		}
 
 			double f[] = {f1, f2};
+			startMilliseconds += halfWindowMillis(display);
 //			System.out.println(String.format("Spec mark chan %d %s duration ms %dms, %s", channel, 
 //					PamCalendar.formatDateTime(startMilliseconds), duration, FrequencyFormat.formatFrequencyRange(f, true)));
 			// Get the channel map to generate DIFAR clips for all channels
@@ -437,6 +442,27 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		@Override
 		public String getMarkObserverName() {
 			return getUnitName();
+		}
+
+		/**
+		 * Half the spectrogram's FFT window, in milliseconds. Core's spectrogram
+		 * draws each FFT column at its window's start, so the picture, and a box
+		 * drawn round a call on it, sit half a window early. Shifting the mark
+		 * later by this much makes the clip cover the call the box was drawn
+		 * round. Remove this if core comes to draw columns at the window centre;
+		 * see "Marked clips end early" in outstanding.md.
+		 * @param display the spectrogram marked, or null for a JavaFX display
+		 * @return the shift, or 0 if it cannot be found
+		 */
+		private long halfWindowMillis(SpectrogramDisplay display) {
+			if (display == null) {
+				return 0;
+			}
+			FFTDataBlock fftBlock = display.getSourceFFTDataBlock();
+			if (fftBlock == null || fftBlock.getSampleRate() <= 0) {
+				return 0;
+			}
+			return Math.round(fftBlock.getFftLength() / 2. / fftBlock.getSampleRate() * 1000.);
 		}
 
 		@Override

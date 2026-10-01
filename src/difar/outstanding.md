@@ -71,7 +71,8 @@ Next, in order, as set out in `viewer_editing_design.md`:
    and a format error in the tracked groups' summary (`%3.0°`, missing its `f`), reached on hovering
    over the groups panel now that tracked groups hear of saved clips.
 1b. Follow-up, in priority order (30 September 2026):
-   1. **Marking where the raw audio is not in memory** prints "requested from Raw input data ... have
+   Done on 1 October: items 1, 3 and 4 (`1ab093ec`, `4095541e`, and the next commit).
+   1. **Done.** **Marking where the raw audio is not in memory** prints "requested from Raw input data ... have
       not yet arrived" and makes no clip, with nothing shown to the operator. Top of the list.
    2. **Crossings that collapse onto a buoy.** Four crossings saved on 7 March between 21:20 and
       21:22 sit exactly on buoy 297, with errors of a few millionths of a metre. Buoy 296's bearings
@@ -84,12 +85,12 @@ Next, in order, as set out in `viewer_editing_design.md`:
       The four clips also fall in the span of the audio file damaged until 30 September; delete them.
       A fifth, crossing 14 at 21:33:12 (clips 2000034 on 297, 2000035 on 296 at 109 degrees), was
       saved after the repair and collapsed the same way, so the audio is not the cause.
-   3. **Scrolling.** The queue and saved strips (both scroll bars, vertical and horizontal), and the
+   3. **Done, except the buoy manager.** **Scrolling.** The queue and saved strips (both scroll bars, vertical and horizontal), and the
       buoy manager's table, scroll too slowly with the mouse wheel or the scroll buttons; dragging is
       fine. The strips' scroll pane is core's
       (`ClipDisplayPanel`), but DIFAR can set its unit increment from outside; the buoy manager is
       DIFAR's (`SonobuoyManagerPanel`).
-   4. **Classification buttons on clips.** With more than 4 or 5 favourites, the buttons make each
+   4. **Done.** **Classification buttons on clips.** With more than 4 or 5 favourites, the buttons make each
       clip very tall. Spill them into a second column after about 5 rows, and make them narrower
       (`DifarClipDecorations`, a single-column `GridLayout` now).
    5. **New bearings reach the map late.** With "Display only at vessel scroll bar time", the map
@@ -287,9 +288,15 @@ items below are about making fewer of them necessary.
 - A crossing whose clips fall in two load chunks of that task is not recalculated. The console lists
   their UIDs. Rare, since a call spans seconds and chunks are files.
 
-- Scrolling backwards then marking makes a clip that starts before the raw audio in memory. Fix: read
-  the clip from the WAV files. The console reports "requested from Raw input data ... have not yet
-  arrived".
+- Marked clips end early. Clips are cut off at the right edge compared with the box marked on the
+  spectrogram, with "Prepend to clip" at 0. Core's spectrogram draws each FFT column at its window's
+  start (`SpectrogramDisplay`, `xPos` from the FFT unit's time, which `PamFFTProcess` sets to the
+  window's first sample). So the picture sits half a window early: 0.5 s for the pilot's 256 points
+  at 250 Hz. A box drawn round a call ends half a window before the call does. Fix in core (draw
+  columns at the window centre), or in DIFAR (shift each mark by half the source FFT window).
+- A saved clip's classification cannot be changed in place. The species, Vessel and Other buttons on
+  saved clips are disabled; delete the clip and mark the call again. A real edit (reclassify,
+  reprocess, save through `ViewerEdits`, rematch if the bearing moves) waits until the need is shown.
 - Closing the Viewer after a cancelled save loses the clips not yet saved, with only a console
   message. Warn and offer to stay open.
 - The map draws bearings only once they scroll off the spectrogram's left edge. The map takes the
@@ -315,6 +322,14 @@ items below are about making fewer of them necessary.
 
 ## Core issues for Doug
 
+- The audio file loader stops at a gap between files longer than a second (`WavAudioFile`, "don't
+  carry on if there is a file gap"). A spectrogram window that starts before a gap stays blank after
+  it, though audio follows. The 2013 pilot has eight gaps, from recorder restarts; at 22:55 a window
+  starting at 22:55:44 drew only a 0.3 s file and stopped, though audio resumes at 22:56:27. Marks
+  there still make clips, since DIFAR loads each mark's own span.
+- The spectrogram draws each FFT column at its window's start, not its centre, so the picture sits
+  half a window early. Marks drawn round calls end early by that much. See "Marked clips end early"
+  under Viewer.
 - `PamController.updateDataMap()` throws without a binary store.
 - The NMEA simulator keeps writing GPS records in Viewer.
 - `GPSControl` heading interpolation uses the "before" heading twice.

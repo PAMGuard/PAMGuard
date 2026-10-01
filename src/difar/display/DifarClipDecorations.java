@@ -48,6 +48,8 @@ import clipgenerator.clipDisplay.ClipDisplayUnit;
 import difar.DIFARMessage;
 import difar.DifarControl;
 import difar.DifarDataUnit;
+import difar.DifarParameters;
+import difar.DifarParameters.SpeciesParams;
 
 
 public class DifarClipDecorations extends ClipDisplayDecorations /*implements DIFARDisplayUnit*/ {
@@ -69,6 +71,18 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	 * worked and saved a second time.
 	 */
 	private final boolean saved;
+
+	/**
+	 * Tooltip for the classification buttons on a saved clip, which are shown but
+	 * not used: a saved clip keeps its classification.
+	 */
+	private static final String SAVED_CLASSIFICATION_TIP =
+			"A saved clip keeps its classification. To change it, delete the clip and mark the call again.";
+
+	/**
+	 * The Other button, which offers species not on the clip as buttons.
+	 */
+	private AbstractButton otherButton;
 
 	/**
 	 * @param difarControl the DIFAR module.
@@ -235,6 +249,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 			
 			buttonItem = new PamButton("Other");
 			buttonItem.addActionListener(new OtherListener());
+			otherButton = buttonItem;
 			add(buttonItem);
 			buttonGroup.add(cbmi);
 			
@@ -417,13 +432,31 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	private void vesselSelect() {
 		difarDataUnit.setVessel(!difarDataUnit.isVessel());
 		difarDataUnit.setLutSpeciesItem(null);
+		showAtClassificationRate();
 		if (difarDataUnit.isVessel()) processClip();
 		enableEnablersAndSelecters();
+	}
+
+	/**
+	 * Redraw a queued clip at its new classification's sample rate, so its
+	 * picture changes when the classification does, not only once processed.
+	 */
+	private void showAtClassificationRate() {
+		DifarParameters params = difarControl.getDifarParameters();
+		SpeciesParams sp = params.findSpeciesParams(difarDataUnit);
+		if (sp == null) {
+			sp = params.findSpeciesParams(DifarParameters.Default);
+		}
+		if (sp.sampleRate != difarDataUnit.getDisplaySampleRate()) {
+			difarDataUnit.setDisplaySampleRate(sp.sampleRate);
+			getClipDisplayUnit().layoutUnit(true);
+		}
 	}
 
 	private void speciesSelect(LookupItem lutItem) {
 		difarDataUnit.setVessel(false);
 		difarDataUnit.setLutSpeciesItem(lutItem);
+		showAtClassificationRate();
 		// immediately process it once a species is set. 
 		processClip();
 		enableEnablersAndSelecters();
@@ -505,10 +538,20 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 		deleteEnabler.enableItems(true);//always enabled
 		
 		vesselEnabler.selectItems(difarDataUnit.isVessel());//false default for this
-		vesselEnabler.enableItems(true);//always enabled
+		// a saved clip keeps its classification; it is changed by deleting and marking again
+		vesselEnabler.enableItems(!saved);
+		if (saved) {
+			for (AbstractButton ab : vesselEnabler.getMenuItemList()) {
+				ab.setToolTipText(SAVED_CLASSIFICATION_TIP);
+			}
+		}
+		if (otherButton != null) {
+			otherButton.setEnabled(!saved);
+			otherButton.setToolTipText(saved ? SAVED_CLASSIFICATION_TIP : null);
+		}
 		
 		for (MenuItemEnabler mie:speciesEnablers){
-			mie.enableItems(!difarDataUnit.isVessel());
+			mie.enableItems(!difarDataUnit.isVessel() && !saved);
 			
 			
 			Vector<AbstractButton> itemList = mie.getMenuItemList();
@@ -520,7 +563,12 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 					for(ActionListener al:als){
 						try{
 							lutItem=((SpeciesListener)al).getLookupItem();
-							ab.setToolTipText(ab.isEnabled()?lutItem.getText():"This option will only be enabled when Vessel is unselected");
+							if (saved) {
+								ab.setToolTipText(lutItem.getText() + ". " + SAVED_CLASSIFICATION_TIP);
+							}
+							else {
+								ab.setToolTipText(ab.isEnabled()?lutItem.getText():"This option will only be enabled when Vessel is unselected");
+							}
 							continue getLut;
 						}catch(ClassCastException cce){
 							System.out.println("Not Species Listener");

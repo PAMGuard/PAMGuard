@@ -14,9 +14,11 @@ public class ScrollSteps {
 
 	/**
 	 * Pixels per scroll step. The wheel moves three steps per notch on most
-	 * systems, so a notch moves a little under one clip.
+	 * systems, so a notch moves about 90 pixels. Swing pixels are scaled with
+	 * the screen's display scaling, so a step looks the same size on a 4K
+	 * screen at 150% as on an ordinary screen at 100%.
 	 */
-	public static final int STEP_PIXELS = 40;
+	public static final int STEP_PIXELS = 30;
 
 	private ScrollSteps() {
 	}
@@ -40,7 +42,21 @@ public class ScrollSteps {
 		if (scrollPane == null) {
 			return;
 		}
-		scrollPane.getVerticalScrollBar().setUnitIncrement(STEP_PIXELS);
+		set(scrollPane, STEP_PIXELS);
+	}
+
+	/**
+	 * Set the scroll steps of a scroll pane, with its own vertical step. For a
+	 * table, pass the row height, so a step moves one row. A table otherwise
+	 * steps only to the next row's edge, which can be a few pixels.
+	 * @param scrollPane the scroll pane
+	 * @param verticalStep pixels per vertical step
+	 */
+	public static void set(JScrollPane scrollPane, int verticalStep) {
+		if (scrollPane == null) {
+			return;
+		}
+		scrollPane.getVerticalScrollBar().setUnitIncrement(Math.max(verticalStep, 1));
 		scrollPane.getHorizontalScrollBar().setUnitIncrement(STEP_PIXELS);
 	}
 }
