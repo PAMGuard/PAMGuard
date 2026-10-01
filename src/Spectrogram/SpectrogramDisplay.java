@@ -1163,7 +1163,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				//			System.out.println("New FFT Data for Channel " + dataChannel + " Data length " + fftDataUnit.getFftData().length + " bins");
 				spectrogramPanels[panelNumber].drawSpectrogram(obs, fftDataUnit, panelNumber);
 				if (!viewerMode) {
-					spectrogramProjector.setOffset(newData.getTimeMilliseconds(), spectrogramPanels[panelNumber].imagePos);
+					spectrogramProjector.setOffset(columnTimeMillis(newData), spectrogramPanels[panelNumber].imagePos);
 				}
 				if (!spectrogramPanels[panelNumber].getSize().equals(panelSize)) {
 					panelSize = spectrogramPanels[panelNumber].getSize();
@@ -2500,7 +2500,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				// need to update currentTimeMilliseconds
 				// at the same time as imagePos !
 				imagePos = xDraw;// += spectrogramParameters.pixelsPerSlics;
-				currentTimeMilliseconds = dataUnit.getTimeMilliseconds();
+				currentTimeMilliseconds = columnTimeMillis(dataUnit);
 				//				System.out.println("Current time millis " + PamCalendar.formatTime(currentTimeMilliseconds) + 
 				//						"." + new Integer((int) (currentTimeMilliseconds%1000)));
 			}
@@ -2624,7 +2624,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			// work out how many pixels per millisecond there are on the display image
 			double timeScale = (double) sourceFFTDataBlock.getSampleRate() / (double) sourceFFTDataBlock.getFftHop() / 1000.;
 			double fairGap = Math.max(2.5,  timeScale);
-			double xPos = (fftUnit.getTimeMilliseconds()-s) * timeScale;
+			double xPos = (columnTimeMillis(fftUnit)-s) * timeScale;
 			//			System.out.println(String.format("ch %d,  t %s, samp %d, xpos %3.1f, imagePos %d", 
 			//					this.panelId, PamCalendar.formatTime2(fftUnit.getTimeMilliseconds(), 3), fftUnit.getStartSample(), xPos, imagePos));
 			if (xPos < -.5) {
@@ -4050,6 +4050,23 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		//		System.out.println(String.format("Event channel %d - start %s; duration %4.3fs; Frequency %4.1f to %4.1fHz",
 		//				spectrogramParameters.channelList[spectrogramPanel.panelId],
 		//				PamCalendar.formatTime(startTime), (double) duration / 1000., f1, f2));
+	}
+
+	/**
+	 * The time an FFT column stands for: the centre of its window. FFT units
+	 * carry the time of their window's first sample, so drawing each column at
+	 * that time put the picture half a window early, and marks, overlays and the
+	 * time axis were offset from the sound they showed. With long windows at low
+	 * sample rates this is large: 0.5 s for 256 points at 250 Hz.
+	 * @param fftUnit an FFT data unit from the source block
+	 * @return the time at the centre of its window, in milliseconds
+	 */
+	private long columnTimeMillis(PamDataUnit fftUnit) {
+		long t = fftUnit.getTimeMilliseconds();
+		if (sourceFFTDataBlock == null || sourceFFTDataBlock.getSampleRate() <= 0) {
+			return t;
+		}
+		return t + Math.round(sourceFFTDataBlock.getFftLength() / 2. / sourceFFTDataBlock.getSampleRate() * 1000.);
 	}
 
 	public FFTDataBlock getSourceFFTDataBlock() {
