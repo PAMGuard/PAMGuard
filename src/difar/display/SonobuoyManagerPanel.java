@@ -105,6 +105,7 @@ public class SonobuoyManagerPanel extends PamPanel {
 		sonobuoyTable.setRowSelectionAllowed(true);
 		
 		scrollPane = new PamScrollPane(sonobuoyTable);
+		ScrollSteps.set(scrollPane, sonobuoyTable.getRowHeight());
 		
 		mainPanel.add(scrollPane, BorderLayout.CENTER);
 		new SwingTableColumnWidths(buoyManager.getProcessName(), sonobuoyTable);

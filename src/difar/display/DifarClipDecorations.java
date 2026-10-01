@@ -14,6 +14,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -47,6 +48,8 @@ import clipgenerator.clipDisplay.ClipDisplayUnit;
 import difar.DIFARMessage;
 import difar.DifarControl;
 import difar.DifarDataUnit;
+import difar.DifarParameters;
+import difar.DifarParameters.SpeciesParams;
 
 
 public class DifarClipDecorations extends ClipDisplayDecorations /*implements DIFARDisplayUnit*/ {
@@ -63,9 +66,33 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	private MenuItemEnabler vesselEnabler = new MenuItemEnabler();
 	private ArrayList<MenuItemEnabler> speciesEnablers;
 	
-	public DifarClipDecorations(DifarControl difarControl, ClipDisplayUnit clipDisplayUnit) {
+	/**
+	 * True for a clip already saved, which can be looked at again but not
+	 * worked and saved a second time.
+	 */
+	private final boolean saved;
+
+	/**
+	 * Tooltip for the classification buttons on a saved clip, which are shown but
+	 * not used: a saved clip keeps its classification.
+	 */
+	private static final String SAVED_CLASSIFICATION_TIP =
+			"A saved clip keeps its classification. To change it, delete the clip and mark the call again.";
+
+	/**
+	 * The Other button, which offers species not on the clip as buttons.
+	 */
+	private AbstractButton otherButton;
+
+	/**
+	 * @param difarControl the DIFAR module.
+	 * @param clipDisplayUnit the clip being decorated.
+	 * @param saved true for a saved clip, false for one waiting to be worked.
+	 */
+	public DifarClipDecorations(DifarControl difarControl, ClipDisplayUnit clipDisplayUnit, boolean saved) {
 		super(clipDisplayUnit);
 		this.difarControl = difarControl;
+		this.saved = saved;
 		
 		difarDataUnit = (DifarDataUnit) clipDisplayUnit.getClipDataUnit();
 		speciesEnablers = new ArrayList<MenuItemEnabler>();//(difarControl.getDifarParameters().getSpeciesList(difarControl).getSelectedList().size());
@@ -107,7 +134,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 		}
 
 		MouseAdapter mouseAdapter;
-		if (difarControl.isViewer()) {
+		if (saved) {
 			mouseAdapter = new ViewerMouseFuncs(difarDataUnit);
 		}
 		else {
@@ -134,6 +161,13 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	 * del,proc,ves
 	 */
 	static Icon[] buttonIcons;
+
+	/**
+	 * Most rows of buttons on a clip before they spill into a second column.
+	 */
+	private static final int MAX_BUTTON_ROWS = 5;
+
+	private static final Insets BUTTON_MARGIN = new Insets(1, 2, 1, 2);
 	
 	/**
 	 * Add more buttons and controls to the E panel of each clip. 
@@ -173,7 +207,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 			PamButton cbmi = new PamButton("Vessel",buttonIcons[2]);
 			cbmi.addActionListener(new VesselListener());
 			add(cbmi);
-			vesselEnabler.addMenuItem(buttonItem);
+			vesselEnabler.addMenuItem(cbmi);
 			ButtonGroup buttonGroup = new ButtonGroup();
 			buttonGroup.add(cbmi);
 			Vector<LookupItem> speciesList = difarControl.getDifarParameters().getSpeciesList(difarControl).getSelectedList();
@@ -203,7 +237,6 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 					menuItem.addActionListener(new SpeciesListener(item));
 					getSpeciesEnabler(item).addMenuItem(menuItem);
 					otherSpecies.add(menuItem);
-					buttonGroup.add(buttonItem);
 				}
 				
 			}
@@ -216,10 +249,28 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 			
 			buttonItem = new PamButton("Other");
 			buttonItem.addActionListener(new OtherListener());
+			otherButton = buttonItem;
 			add(buttonItem);
 			buttonGroup.add(cbmi);
 			
+			arrangeButtons();
 			enableEnablersAndSelecters();
+		}
+
+		/**
+		 * One column of buttons while they fit in MAX_BUTTON_ROWS rows, else two,
+		 * so a long list of favourite species does not make each clip very tall.
+		 * Narrow margins keep two columns from making the clip too wide.
+		 */
+		private void arrangeButtons() {
+			int nButtons = getComponentCount();
+			int nColumns = nButtons > MAX_BUTTON_ROWS ? 2 : 1;
+			setLayout(new GridLayout(0, nColumns, 1, 1));
+			for (Component c : getComponents()) {
+				if (c instanceof AbstractButton) {
+					((AbstractButton) c).setMargin(BUTTON_MARGIN);
+				}
+			}
 		}
 
 		JPopupMenu getJPopupMenu(){
@@ -369,6 +420,10 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	}
 
 	public void delete() {
+		if (saved) {
+			difarControl.deleteClip(difarDataUnit);
+			return;
+		}
 		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteFromQueue, difarDataUnit));
 		removeEnablersAndSelecters();
 		enableEnablersAndSelecters();
@@ -377,13 +432,31 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 	private void vesselSelect() {
 		difarDataUnit.setVessel(!difarDataUnit.isVessel());
 		difarDataUnit.setLutSpeciesItem(null);
+		showAtClassificationRate();
 		if (difarDataUnit.isVessel()) processClip();
 		enableEnablersAndSelecters();
+	}
+
+	/**
+	 * Redraw a queued clip at its new classification's sample rate, so its
+	 * picture changes when the classification does, not only once processed.
+	 */
+	private void showAtClassificationRate() {
+		DifarParameters params = difarControl.getDifarParameters();
+		SpeciesParams sp = params.findSpeciesParams(difarDataUnit);
+		if (sp == null) {
+			sp = params.findSpeciesParams(DifarParameters.Default);
+		}
+		if (sp.sampleRate != difarDataUnit.getDisplaySampleRate()) {
+			difarDataUnit.setDisplaySampleRate(sp.sampleRate);
+			getClipDisplayUnit().layoutUnit(true);
+		}
 	}
 
 	private void speciesSelect(LookupItem lutItem) {
 		difarDataUnit.setVessel(false);
 		difarDataUnit.setLutSpeciesItem(lutItem);
+		showAtClassificationRate();
 		// immediately process it once a species is set. 
 		processClip();
 		enableEnablersAndSelecters();
@@ -465,10 +538,20 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 		deleteEnabler.enableItems(true);//always enabled
 		
 		vesselEnabler.selectItems(difarDataUnit.isVessel());//false default for this
-		vesselEnabler.enableItems(true);//always enabled
+		// a saved clip keeps its classification; it is changed by deleting and marking again
+		vesselEnabler.enableItems(!saved);
+		if (saved) {
+			for (AbstractButton ab : vesselEnabler.getMenuItemList()) {
+				ab.setToolTipText(SAVED_CLASSIFICATION_TIP);
+			}
+		}
+		if (otherButton != null) {
+			otherButton.setEnabled(!saved);
+			otherButton.setToolTipText(saved ? SAVED_CLASSIFICATION_TIP : null);
+		}
 		
 		for (MenuItemEnabler mie:speciesEnablers){
-			mie.enableItems(!difarDataUnit.isVessel());
+			mie.enableItems(!difarDataUnit.isVessel() && !saved);
 			
 			
 			Vector<AbstractButton> itemList = mie.getMenuItemList();
@@ -480,7 +563,12 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 					for(ActionListener al:als){
 						try{
 							lutItem=((SpeciesListener)al).getLookupItem();
-							ab.setToolTipText(ab.isEnabled()?lutItem.getText():"This option will only be enabled when Vessel is unselected");
+							if (saved) {
+								ab.setToolTipText(lutItem.getText() + ". " + SAVED_CLASSIFICATION_TIP);
+							}
+							else {
+								ab.setToolTipText(ab.isEnabled()?lutItem.getText():"This option will only be enabled when Vessel is unselected");
+							}
 							continue getLut;
 						}catch(ClassCastException cce){
 							System.out.println("Not Species Listener");
@@ -577,7 +665,9 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+			// a clip being worked is not replaced by one being looked at again
+			if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1
+					&& difarControl.canDemux()) {
 				difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.ProcessFromQueue, difarDataUnit));
 			}
 		}
@@ -587,7 +677,7 @@ public class DifarClipDecorations extends ClipDisplayDecorations /*implements DI
 
 	@Override
 	public JPopupMenu addDisplayMenuItems(JPopupMenu basicMenu) {
-		if (difarControl.isViewer()) {
+		if (saved) {
 			return basicMenu;
 		}
 		displayMenus = new DisplayMenus();

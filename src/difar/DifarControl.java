@@ -17,11 +17,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.function.Predicate;
 
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
@@ -61,11 +63,15 @@ import difar.display.DifarMatchContainer;
 import difar.display.DifarMatchProvider;
 import difar.display.SonobuoyManagerContainer;
 import difar.display.SonobuoyManagerProvider;
-import difar.offline.DifarDataCopyTask;
-import difar.offline.UpdateCrossingTask;
+import difar.crossings.CrossingLocaliser;
+import difar.crossings.DifarCrossing;
+import difar.offline.RematchTask;
+import difar.offline.UpgradeTask;
+import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
 import difar.trackedGroups.TrackedGroupProcess;
+import difar.offline.ViewerEdits;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 import offlineProcessing.OLProcessDialog;
@@ -105,6 +111,8 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	private DIFARUnitControlPanel difarUnitControlPanel;
 	
 	private DIFARQueuePanel difarQueue; // display of queues clips to process. 
+
+	private DIFARQueuePanel savedClips; // display of clips already saved
 	
 	private DifarSidePanel difarSidePanel; // Side panel for easy access to frequenctly used DIFAR controls
 	
@@ -113,6 +121,9 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	private DifarDataUnit currentDemuxedUnit = null;
 	private DifarDisplayContainer2 difarDisplayContainer2;
 	private TrackedGroupProcess trackedGroupProcess;
+
+	/** How viewer edits reach displays, files and the database; null in normal mode. */
+	private ViewerEdits viewerEdits;
 	
 	private KeyboardFocusManager keyManager;
 	
@@ -142,7 +153,10 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		displayUnits.add(difarUnitControlPanel = new DIFARUnitControlPanel(this));
 		displayUnits.add(difarGram = new DIFARGram(this));
 		displayUnits.add(internalActionsPanel=new DifarActionsVesselPanel(this));
-		displayUnits.add(difarQueue = new DIFARQueuePanel(this, "Queued Data"));
+		displayUnits.add(difarQueue = new DIFARQueuePanel(this, "Queued Data",
+				difarProcess.getQueuedDifarData(), false));
+		displayUnits.add(savedClips = new DIFARQueuePanel(this, "Saved Data",
+				difarProcess.getProcessedDifarData(), true));
 		displayUnits.add(demuxProgressDisplay = new DemuxProgressDisplay(this));
 		
 
@@ -207,14 +221,19 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		// use the message here. 
 		switch (message.message) {
 		case DIFARMessage.NewDifarUnit:
-			if (!isViewer) {
-				processNextIfAnyAndCanAndShould();
-			}
+			processNextIfAnyAndCanAndShould();
 			break;
 		
 		case DIFARMessage.DeleteFromQueue:
-			if (!isViewer) {
-				difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
+			difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
+			if (isViewer) {
+				getViewerEdits().removed(difarProcess.getQueuedDifarData(), message.difarDataUnit);
+			}
+			break;
+		case DIFARMessage.MatchChanged:
+			if (isViewer && message.difarDataUnit != null) {
+				// redraws the map with the new match
+				getViewerEdits().changed(difarProcess.getQueuedDifarData(), message.difarDataUnit);
 			}
 			break;
 		case DIFARMessage.ReturnToQueue:
@@ -233,9 +252,17 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			currentDemuxedUnit = message.difarDataUnit;
 			break;
 		case DIFARMessage.DeleteDatagramUnit:
-			if (!isViewer) {
+			// a deleted clip must not go on counting down to an auto save
+			difarProcess.cancelAutoSaveTimer();
+			// a new clip is deleted as in normal mode; a saved one being looked
+			// at again is just put away
+			if (!isViewer || isQueued(message.difarDataUnit)) {
 				currentDemuxedUnit = null;
 				difarProcess.getQueuedDifarData().remove(message.difarDataUnit);
+				difarProcess.getCrossingRecorder().forget(message.difarDataUnit);
+				if (isViewer) {
+					getViewerEdits().removed(difarProcess.getQueuedDifarData(), message.difarDataUnit);
+				}
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_DELETED, 0L, 0));
 				processNextIfAnyAndCanAndShould();
@@ -244,9 +271,13 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			}
 			break;
 		case DIFARMessage.SaveDatagramUnit:
-			if (!isViewer) {
-				message.difarDataUnit.saveCrossing(true);
+			if ((!isViewer || isQueued(message.difarDataUnit)) && canSaveInViewer()) {
+				prepareViewerSave(message.difarDataUnit);
 				difarProcess.finalProcessing(message.difarDataUnit);
+				difarProcess.getCrossingRecorder().record(message.difarDataUnit);
+				message.difarDataUnit.clearTempCrossing();
+				completeViewerSave(message.difarDataUnit);
+				viewerSaved(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_SAVED, 0L, 100));
@@ -257,10 +288,15 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			
 		case DIFARMessage.SaveDatagramUnitWithoutRange:
 		
-			if (!isViewer) {
+			if ((!isViewer || isQueued(message.difarDataUnit)) && canSaveInViewer()) {
+				prepareViewerSave(message.difarDataUnit);
+				difarProcess.cancelAutoSaveTimer();
 				//remove Range/Localisation Information
-				message.difarDataUnit.saveCrossing(false);
+				message.difarDataUnit.clearTempCrossing();
 				difarProcess.finalProcessing(message.difarDataUnit);
+				difarProcess.getCrossingRecorder().forget(message.difarDataUnit);
+				completeViewerSave(message.difarDataUnit);
+				viewerSaved(message.difarDataUnit);
 				currentDemuxedUnit = null;
 				getDemuxProgressDisplay().newMessage(new DemuxWorkerMessage(message.difarDataUnit, 
 						DemuxWorkerMessage.STATUS_SAVED, 0L, 100));
@@ -437,7 +473,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		if (isViewer){
 			JMenu menu = new JMenu(getUnitName());
 			menu.add(menuItem);
-			JMenuItem offlineDataItem = new JMenuItem("Copy DIFAR Binaries to Database");
+			JMenuItem offlineDataItem = new JMenuItem("DIFAR offline tasks...");
 			offlineDataItem.addActionListener(new OfflineTaskAction());
 			menu.add(offlineDataItem);
 			return menu;
@@ -453,20 +489,30 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 	
 	/**
-	 * Work out or clear the triangulations for a period, after a buoy has
-	 * changed.
+	 * Carry a buoy change through the data, over the whole time the buoy
+	 * record is in force: matches in that period are chosen again, crossings
+	 * chosen by the operator keep their clips and are worked out again, and
+	 * affected clips' database rows get the buoy's new values.
 	 * <p>
 	 * The period is the whole time the buoy record is in force, not the loaded
-	 * period, so detections outside the viewer's window are covered too. Both
-	 * tasks mark what they change, so the binary files and the database are
-	 * rewritten. Runs without asking, since the user has already agreed to it.
+	 * period, so detections outside the viewer's window are covered too. No
+	 * binary file is rewritten. Runs without asking, since the user has
+	 * already agreed to it.
 	 * @param startTime start of the period.
 	 * @param endTime end of the period.
+	 * @param affected the clips whose buoy changed.
 	 */
-	public void runCrossingTasks(long startTime, long endTime) {
+	public void runCrossingTasks(long startTime, long endTime, Predicate<DifarDataUnit> affected) {
 		OfflineTaskGroup taskGroup = new OfflineTaskGroup(this, getUnitName());
 		taskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
-		taskGroup.addTask(new UpdateCrossingTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
+		RematchTask task = new RematchTask(this, affected);
+		taskGroup.addTask(task);
+		/*
+		 * A task group takes each task's on or off state from the offline tasks
+		 * dialog's saved selection, which is off by default. This group is run
+		 * from code, not the dialog, so switch the task on.
+		 */
+		task.setDoRun(true);
 		TaskGroupParams params = taskGroup.getTaskGroupParams();
 		params.dataChoice = TaskGroupParams.PROCESS_SPECIFICPERIOD;
 		params.startRedoDataTime = startTime;
@@ -483,12 +529,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		if (offlineTaskGroup == null) {
 			offlineTaskGroup = new OfflineTaskGroup(this, getUnitName());
 			offlineTaskGroup.setPrimaryDataBlock(difarProcess.getProcessedDifarData());
-			offlineTaskGroup.addTask(new UpdateCrossingTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
-			offlineTaskGroup.addTask(new DifarDataCopyTask<DifarDataUnit>(difarProcess.getProcessedDifarData()));
+			offlineTaskGroup.addTask(new RematchTask(this, null));
+			offlineTaskGroup.addTask(new UpgradeTask(this));
 //			offlineTaskGroup.addTask(task);
 		}
 		OLProcessDialog olProcessDialog;
-		olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "DIFAR Data Export");
+		olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "DIFAR offline tasks");
 		olProcessDialog.setVisible(true);
 	}
 	
@@ -578,6 +624,15 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		return sonobuoyHistorySource.getHistory();
 	}
 
+	/**
+	 * Rebuild the buoy history the next time it is asked for. Offline tasks
+	 * call this after loading buoy records for each chunk of data, since a
+	 * reload can leave the number of records unchanged.
+	 */
+	public void buoyRecordsReloaded() {
+		sonobuoyHistorySource.markStale();
+	}
+
 	public DIFARGram getDifarGram() {
 		return difarGram;
 	}
@@ -599,6 +654,54 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 
 	/**
+	 * @return the strip of clips already saved.
+	 */
+	public DIFARQueuePanel getSavedClips() {
+		return savedClips;
+	}
+
+	/**
+	 * In the viewer, make sure the saved clips' UIDs follow every DIFAR UID
+	 * already in use, before this clip joins the saved data and is given one.
+	 * The clip's queue UID is cleared, so the saved data give it a new one;
+	 * queue UIDs start again every viewer session, so they are not unique.
+	 * @param unit the clip about to be saved.
+	 */
+	private void prepareViewerSave(DifarDataUnit unit) {
+		if (!isViewer) {
+			return;
+		}
+		ViewerClipStore store = difarProcess.getProcessedDifarData().getViewerClipStore();
+		if (store != null) {
+			store.prepare();
+		}
+		unit.setUID(0);
+	}
+
+	/**
+	 * In the viewer, record a clip just saved. It is written to its binary
+	 * file and the database when the viewer next saves its data.
+	 * @param unit the clip just saved, now with its UID.
+	 */
+	private void completeViewerSave(DifarDataUnit unit) {
+		if (!isViewer) {
+			return;
+		}
+		ViewerClipStore store = difarProcess.getProcessedDifarData().getViewerClipStore();
+		if (store != null) {
+			store.clipSaved(unit);
+		}
+	}
+
+	/**
+	 * @param unit a DIFAR clip.
+	 * @return true if the clip is waiting on the queue, so has not been saved.
+	 */
+	public boolean isQueued(DifarDataUnit unit) {
+		return unit != null && difarProcess.getQueuedDifarData().getDataCopy().contains(unit);
+	}
+
+	/**
 	 * @return the demuxProgressDisplay
 	 */
 	public DemuxProgressDisplay getDemuxProgressDisplay() {
@@ -617,9 +720,12 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	 * @return true if it's OK to demux the next sound. 
 	 */
 	public boolean canDemux() {
-		return (isViewer() || (currentDemuxedUnit == null
-				&& !difarProcess.isProcessing()
-				));
+		if (difarProcess.isProcessing()) {
+			return false;
+		}
+		// a saved clip being looked at again can be replaced; a new clip
+		// being worked cannot, until it is saved or deleted
+		return currentDemuxedUnit == null || !isQueued(currentDemuxedUnit);
 	}
 	
 	/**
@@ -661,6 +767,36 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * @return how viewer edits reach displays, files and the database, or
+	 * null in normal mode.
+	 */
+	public ViewerEdits getViewerEdits() {
+		if (viewerEdits == null && isViewer) {
+			viewerEdits = new ViewerEdits(this);
+			// tracked groups consume saved clips, as in normal mode
+			viewerEdits.addConsumer(trackedGroupProcess);
+		}
+		return viewerEdits;
+	}
+
+	/**
+	 * After a save in the viewer: the clip has left the queue and joined the
+	 * saved clips, perhaps in a crossing. Tell the displays and consumers,
+	 * and write the files and database now.
+	 * @param unit the saved clip.
+	 */
+	private void viewerSaved(DifarDataUnit unit) {
+		if (!isViewer) {
+			return;
+		}
+		ViewerEdits edits = getViewerEdits();
+		edits.removed(difarProcess.getQueuedDifarData(), unit);
+		edits.added(difarProcess.getProcessedDifarData(), unit);
+		edits.crossingChanged(unit.getCrossing());
+		edits.commit();
 	}
 
 	public TrackedGroupProcess getTrackedGroupProcess() {
@@ -826,20 +962,122 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 
 	public boolean isSaveEnabled() {
 		DifarDataUnit currentDataUnit = getCurrentDemuxedUnit();
-		return (!isViewer && 
-				getCurrentDemuxedUnit() != null && 
+		return (isQueued(getCurrentDemuxedUnit()) &&
 				getCurrentDemuxedUnit().getSelectedAngle() != null);
 	}
 	
 	public boolean isSaveWithoutCrossEnabled() {
-		return (!isViewer && 
-				getCurrentDemuxedUnit() != null &&
+		return (isQueued(getCurrentDemuxedUnit()) &&
 				getCurrentDemuxedUnit().getSelectedAngle() !=null && 
 				getCurrentDemuxedUnit().getTempCrossing() != null);
 	}	
 	
 	public boolean isDeleteEnabled() {
-		return (!isViewer && getCurrentDemuxedUnit() != null);
+		DifarDataUnit unit = getCurrentDemuxedUnit();
+		return unit != null && (!isViewer || isQueued(unit) || isSaved(unit));
+	}
+
+	/**
+	 * @param unit a DIFAR clip.
+	 * @return true if the clip is among the saved clips.
+	 */
+	public boolean isSaved(DifarDataUnit unit) {
+		return unit != null && unit.getParentDataBlock() == difarProcess.getProcessedDifarData();
+	}
+
+	/**
+	 * Delete a clip the user has asked to delete. A clip on the queue is
+	 * deleted as before. A saved clip, in the viewer, is deleted for good:
+	 * it leaves its crossing, which is recalculated or deleted by the usual
+	 * rule, then the view reloads, which writes the deletion to its binary
+	 * file and the database. The user confirms first.
+	 * @param unit the clip.
+	 */
+	public void deleteClip(DifarDataUnit unit) {
+		if (unit == null) {
+			return;
+		}
+		if (!isViewer || !isSaved(unit)) {
+			sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteDatagramUnit, unit));
+			return;
+		}
+		deleteSavedClip(unit);
+	}
+
+	/** Why an older dataset cannot be edited, and what to do about it. */
+	private static final String OLD_FILES_ADVICE = "The data were written by an older version of PAMGuard, "
+			+ "and older DIFAR files are read only. To edit them, run \"Upgrade old DIFAR files\" from "
+			+ "DIFAR offline tasks, over all data. It backs up the files first.";
+
+	/**
+	 * In the viewer, whether the saved clips loaded now include any from files
+	 * before the current version. A dataset is written by one version, so this
+	 * stands for the dataset.
+	 * @return true if an older file's clips are loaded.
+	 */
+	private boolean hasOldClips() {
+		for (DifarDataUnit clip : difarProcess.getProcessedDifarData().getDataCopy()) {
+			if (clip.getBinaryVersion() < DifarClipPayload.CURRENT_VERSION) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * In the viewer, refuse to save a clip into an older dataset, which would
+	 * rewrite a file at the current version and lose the crossings in it.
+	 * @return true if the save may go ahead.
+	 */
+	private boolean canSaveInViewer() {
+		if (!isViewer || !hasOldClips()) {
+			return true;
+		}
+		JOptionPane.showMessageDialog(getGuiFrame(), "<html>Cannot save this clip.<p><p>" + OLD_FILES_ADVICE,
+				"Save DIFAR clip", JOptionPane.WARNING_MESSAGE);
+		return false;
+	}
+
+	private void deleteSavedClip(DifarDataUnit unit) {
+		int channel = PamUtils.getSingleChannel(unit.getChannelBitmap());
+		String clip = String.format("the clip on channel %d at %s, UID %d", channel,
+				PamCalendar.formatDateTime(unit.getTimeMilliseconds()), unit.getUID());
+		if (unit.getBinaryVersion() < DifarClipPayload.CURRENT_VERSION) {
+			JOptionPane.showMessageDialog(getGuiFrame(),
+					String.format("<html>Cannot delete %s.<p><p>%s", clip, OLD_FILES_ADVICE),
+					"Delete DIFAR clip", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		DifarCrossing crossing = unit.getCrossing();
+		String effect = "";
+		if (crossing != null) {
+			int left = crossing.getSubDetectionsCount() - 1;
+			effect = left >= CrossingLocaliser.MIN_CLIPS && !difarParameters.alwaysDeleteTrimmedCrossings
+					? String.format("<p><p>It belongs to crossing UID %d, which will be worked out again from its other %d clips.",
+							crossing.getUID(), left)
+					: String.format("<p><p>It belongs to crossing UID %d, which will be deleted.", crossing.getUID());
+		}
+		int answer = JOptionPane.showConfirmDialog(getGuiFrame(),
+				String.format("<html>Delete %s?%s<p><p>The clip is removed from its binary file and the "
+						+ "database straight away.", clip, effect), "Delete DIFAR clip",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (answer != JOptionPane.OK_OPTION) {
+			return;
+		}
+		difarProcess.getCrossingRecorder().removeClip(unit);
+		ViewerClipStore store = difarProcess.getProcessedDifarData().getViewerClipStore();
+		if (store != null) {
+			store.clipDeleted(unit);
+		}
+		difarProcess.getProcessedDifarData().remove(unit);
+		// clears the clip from the DIFARgram, the unit control panel and the saved strip
+		sendDifarMessage(new DIFARMessage(DIFARMessage.DeleteDatagramUnit, unit));
+		// the displays redraw without the clip, the trimmed crossing's other clips
+		// redraw, and the deletion is written at once
+		ViewerEdits edits = getViewerEdits();
+		edits.removed(difarProcess.getProcessedDifarData(), unit);
+		edits.crossingChanged(crossing);
+		edits.commit();
 	}
 	
 

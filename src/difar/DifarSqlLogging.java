@@ -1,10 +1,14 @@
 package difar;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Types;
+import java.util.StringJoiner;
 
 import GPS.GpsData;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.PamConnection;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
@@ -27,6 +31,10 @@ public class DifarSqlLogging extends SQLLogging {
 	private PamTableItem latitude, longitude, xError, yError, matchedUnits; 
 	private PamTableItem difarGain, sigAmplitude;
 	private PamTableItem triggerName, trackedGroup;
+	private PamTableItem buoyName, deploymentUID;
+
+	/** Buoy names are typed by the operator; this is generous. */
+	private static final int BUOY_NAME_LENGTH = 80;
 
 	protected DifarSqlLogging(DifarControl difarControl, DifarDataBlock difarDataBlock) {
 		super(difarDataBlock);
@@ -51,6 +59,8 @@ public class DifarSqlLogging extends SQLLogging {
 		tableDef.addTableItem(yError = new PamTableItem("YError", Types.DOUBLE));
 		tableDef.addTableItem(matchedUnits = new PamTableItem("MatchedAngles", Types.CHAR, 80));
 		tableDef.addTableItem(trackedGroup = new PamTableItem("TrackedGroup", Types.CHAR, 80));
+		tableDef.addTableItem(buoyName = new PamTableItem("BuoyName", Types.CHAR, BUOY_NAME_LENGTH));
+		tableDef.addTableItem(deploymentUID = new PamTableItem("DeploymentUID", Types.BIGINT));
 		
 		
 		setTableDefinition(tableDef);
@@ -86,35 +96,18 @@ public class DifarSqlLogging extends SQLLogging {
 		
 		difarFrequency.setValue(difarDataUnit.getSelectedFrequency());
 		species.setValue(difarDataUnit.getSpeciesCode());
-		DIFARCrossingInfo difarCrossing = difarDataUnit.getDifarCrossing();
-		if (difarCrossing == null) {
-			latitude.setValue(null);
-			longitude.setValue(null);
-			matchedUnits.setValue(null);
-			xError.setValue(null);
-			yError.setValue(null);
-		}
-		else {
-			latitude.setValue(difarCrossing.getCrossLocation().getLatitude());
-			longitude.setValue(difarCrossing.getCrossLocation().getLongitude());
-			Double[] errors = difarCrossing.getErrors();
-			xError.setValue(errors[0]);
-			yError.setValue(errors[1]);
-			String str = "";
-			DifarDataUnit[] matches = difarCrossing.getMatchedUnits();
-			if (matches.length >= 2) {
-				if (matches[1] == null){
-					// TODO: Matched units shouldn't be null, so figure out why this is happening and fix it.
-					return;
-				}
-				str = String.format("%d",matches[1].getUID());
-				for (int i = 2; i < matches.length; i++) {
-					if (matches[i] == null) continue;
-					str += String.format(";%d",matches[i].getUID());
-				}
-			}
-			matchedUnits.setValue(str);
-		}
+		/*
+		 * Crossings are stored in their own tables. These columns stay only so
+		 * that old databases still open, and are empty in new rows.
+		 */
+		latitude.setValue(null);
+		longitude.setValue(null);
+		xError.setValue(null);
+		yError.setValue(null);
+		matchedUnits.setValue(null);
+		SonobuoyRecord buoy = difarDataUnit.getBuoyRecord();
+		buoyName.setValue(buoy == null ? null : buoy.getName());
+		deploymentUID.setValue(buoy == null ? null : buoy.getUid());
 		if (difarDataUnit.getTrackedGroup() == null){
 			trackedGroup.setValue(null);
 		}
@@ -122,6 +115,45 @@ public class DifarSqlLogging extends SQLLogging {
 			trackedGroup.setValue(difarDataUnit.getTrackedGroup());
 		}
 		
+	}
+
+	/**
+	 * Bring the columns that come from the buoy up to date in a clip's row,
+	 * after the buoy changed: its position, heading, true bearing, name and
+	 * deployment UID. The row is found by UID, so this works for clips loaded
+	 * from binary files in the viewer, which have no database index. Nothing
+	 * else in the row changes, and the clip's binary object is not touched.
+	 * @param connection the database connection.
+	 * @param clip a saved clip.
+	 * @return the number of rows updated: 1, or 0 if the clip has no row.
+	 */
+	public synchronized int updateBuoyColumns(PamConnection connection, DifarDataUnit clip) {
+		SQLTypes sqlTypes = connection.getSqlTypes();
+		setTableData(sqlTypes, clip);
+		PamTableItem[] items = {hydrophoneLatitude, hydrophoneLongitude, buoyHeading, trueAngle, buoyName, deploymentUID};
+		StringJoiner set = new StringJoiner(", ");
+		for (PamTableItem item : items) {
+			set.add(sqlTypes.formatColumnName(item) + " = ?");
+		}
+		String sql = String.format("UPDATE %s SET %s WHERE UID = ?",
+				sqlTypes.formatTableName(getTableDefinition().getTableName()), set);
+		try (PreparedStatement statement = connection.getConnection().prepareStatement(sql)) {
+			int i = 1;
+			for (PamTableItem item : items) {
+				if (item.getValue() == null) {
+					statement.setNull(i++, item.getSqlType());
+				}
+				else {
+					statement.setObject(i++, item.getValue(), item.getSqlType());
+				}
+			}
+			statement.setLong(i, clip.getUID());
+			return statement.executeUpdate();
+		}
+		catch (SQLException e) {
+			System.out.println("DIFAR: could not update the buoy columns of clip UID " + clip.getUID() + ": " + e.getMessage());
+			return 0;
+		}
 	}
 
 	/* (non-Javadoc)

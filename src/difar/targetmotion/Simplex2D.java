@@ -4,6 +4,7 @@ package difar.targetmotion;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MathException;
@@ -28,6 +29,22 @@ import PamDetection.PamDetection;
 import PamUtils.LatLong;
 
 public class Simplex2D extends AbstractTargetMotionModel {
+
+	/**
+	 * Error estimates that failed, usually for near-parallel bearings, whose
+	 * fit wanders a very long way. Counted rather than printed, since a long
+	 * rematch can meet many. Callers report the count.
+	 */
+	private static final AtomicInteger FAILED_ERROR_ESTIMATES = new AtomicInteger();
+
+	/**
+	 * @return how many error estimates have failed since the last call, and
+	 * start counting again.
+	 */
+	public static int takeFailedErrorEstimates() {
+		return FAILED_ERROR_ESTIMATES.getAndSet(0);
+	}
+
 
 	private PamVector[] subDetectionOrigins;
 	private PamVector[] subDetectionHeadings;
@@ -331,12 +348,12 @@ public class Simplex2D extends AbstractTargetMotionModel {
 				dis = err;
 			}
 		} catch (FunctionEvaluationException e) {
-			System.out.println("FunctionEvaluationException estimating LogLikelihood curvature: " + e.getMessage());
+			FAILED_ERROR_ESTIMATES.incrementAndGet();
 			return Double.NaN;
 			// TODO Auto-generated catch block
 			//			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			System.out.println("IllegalArgumentException estimating LogLikelihood curvature: " + e.getMessage());
+			FAILED_ERROR_ESTIMATES.incrementAndGet();
 			return Double.NaN;
 		}
 		return err;
@@ -371,9 +388,9 @@ public class Simplex2D extends AbstractTargetMotionModel {
 			return val;
 
 		} catch (FunctionEvaluationException e) {
-			System.out.println("FunctionEvaluationException estimating LogLikelihood curvature: " + e.getMessage());
+			FAILED_ERROR_ESTIMATES.incrementAndGet();
 		} catch (IllegalArgumentException e) {
-			System.out.println("IllegalArgumentException estimating LogLikelihood curvature: " + e.getMessage());
+			FAILED_ERROR_ESTIMATES.incrementAndGet();
 		}
 		return Double.NaN;
 	}

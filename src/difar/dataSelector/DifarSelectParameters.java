@@ -3,6 +3,7 @@ package difar.dataSelector;
 import generalDatabase.lookupTables.LookupList;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -58,6 +59,24 @@ public class DifarSelectParameters extends DataSelectParams implements Cloneable
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * Make sure every channel in a channel map has a setting, indexed by
+	 * channel number. Channels new to these parameters are shown. Saved
+	 * parameters made when fewer channels were in use grow to fit.
+	 * @param channelMap the channels to cover.
+	 */
+	public void coverChannels(int channelMap) {
+		int needed = PamUtils.getHighestChannel(channelMap) + 1;
+		boolean[] enabled = channelEnabled == null ? new boolean[0] : channelEnabled;
+		if (enabled.length < needed) {
+			int old = enabled.length;
+			enabled = Arrays.copyOf(enabled, needed);
+			Arrays.fill(enabled, old, needed, true);
+		}
+		channelEnabled = enabled;
+		numChannels = channelEnabled.length;
 	}
 
 	@Override

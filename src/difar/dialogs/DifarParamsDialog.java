@@ -139,6 +139,7 @@ public class DifarParamsDialog extends PamDialog {
 	private JCheckBox useSummaryLine;
 
 //	Localisation
+	private JTextField onBuoyRadius;
 	private JTextField detectionTimingError, maxTimeDelayResidual, maxBearingResidual, bearingError,
 			maxCandidatesPerBuoy;
 	private SourcePanel calibrationSourcePanel;
@@ -320,8 +321,16 @@ public class DifarParamsDialog extends PamDialog {
 				+ "for one detection. The closest in time and frequency are kept.<br>"
 				+ "Raise this where many animals are calling at once.</HTML>");
 
+		onBuoyRadius = new JTextField();
+		onBuoyRadius.setName("On-buoy radius (m)");
+		onBuoyRadius.setToolTipText("<HTML>A crossing within this distance of one of its own buoys is flagged<br>"
+				+ "as on that buoy, and its errors are set to this radius. One buoy's<br>"
+				+ "bearing then runs through the other buoy, and the fit's own errors<br>"
+				+ "there are near zero and mean nothing. DIFAR buoys are not precision<br>"
+				+ "instruments, so be generous.</HTML>");
+
 		JComponent[] localisation = {bearingError, detectionTimingError, maxTimeDelayResidual, maxBearingResidual,
-				maxCandidatesPerBuoy};
+				maxCandidatesPerBuoy, onBuoyRadius};
 		PamPanel localisationPanel = new PamPanel(new GridBagLayout());
 		localisationPanel.setBorder(new TitledBorder("Localisation"));
 		PamPanel.layoutGrid(localisationPanel, localisation);
@@ -632,6 +641,7 @@ public class DifarParamsDialog extends PamDialog {
 		detectionTimingError.setText(new Double(difarParameters.detectionTimingError).toString());
 		maxTimeDelayResidual.setText(new Double(difarParameters.maxTimeDelayResidual).toString());
 		maxBearingResidual.setText(new Double(difarParameters.maxBearingResidual).toString());
+		onBuoyRadius.setText(Double.toString(difarParameters.getOnBuoyRadius()));
 		maxCandidatesPerBuoy.setText(new Integer(difarParameters.maxCandidatesPerBuoy).toString());
 
 		secondsToPreceed.setText(new Double(difarParameters.secondsToPreceed).toString());
@@ -710,7 +720,8 @@ public class DifarParamsDialog extends PamDialog {
 			double timingError = Double.valueOf(detectionTimingError.getText());
 			double maxDelay = Double.valueOf(maxTimeDelayResidual.getText());
 			double maxBearing = Double.valueOf(maxBearingResidual.getText());
-			if (bearingSd <= 0 || timingError <= 0 || maxDelay <= 0 || maxBearing <= 0) {
+			double radius = Double.valueOf(onBuoyRadius.getText());
+			if (bearingSd <= 0 || timingError <= 0 || maxDelay <= 0 || maxBearing <= 0 || radius <= 0) {
 				return showWarning("Localisation settings must all be greater than zero");
 			}
 			if (maxBearing > 180) {
@@ -725,6 +736,7 @@ public class DifarParamsDialog extends PamDialog {
 			difarParameters.detectionTimingError = timingError;
 			difarParameters.maxTimeDelayResidual = maxDelay;
 			difarParameters.maxBearingResidual = maxBearing;
+			difarParameters.onBuoyRadius = radius;
 		}catch(Exception e ){
 
 			return showWarning("Localisation Parameter Problem");
@@ -852,6 +864,7 @@ public class DifarParamsDialog extends PamDialog {
 		detectionTimingError.setText(new Double(newDifarParameters.detectionTimingError).toString());
 		maxTimeDelayResidual.setText(new Double(newDifarParameters.maxTimeDelayResidual).toString());
 		maxBearingResidual.setText(new Double(newDifarParameters.maxBearingResidual).toString());
+		onBuoyRadius.setText(Double.toString(newDifarParameters.getOnBuoyRadius()));
 		maxCandidatesPerBuoy.setText(new Integer(newDifarParameters.maxCandidatesPerBuoy).toString());
 
 		secondsToPreceed.setText(new Double(newDifarParameters.secondsToPreceed).toString());

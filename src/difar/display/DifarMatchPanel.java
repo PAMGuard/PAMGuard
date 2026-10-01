@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import java.awt.FlowLayout;
+
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -25,6 +29,7 @@ import difar.DIFARMessage;
 import difar.DifarControl;
 import difar.DifarDataUnit;
 import difar.DifarMatchSelector;
+import difar.crossings.DifarCrossing;
 
 /**
  * Shows which detections on other buoys could have been the same call as the
@@ -54,6 +59,8 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 	/** The detection whose candidates are shown, or null. */
 	private DifarDataUnit currentUnit;
 
+	private JButton clearButton;
+
 	public DifarMatchPanel(DifarControl difarControl) {
 		super(PamColor.BORDER);
 		this.difarControl = difarControl;
@@ -64,7 +71,16 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		JScrollPane stripScroller = new JScrollPane(clipStrip,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		stripScroller.setBorder(BorderFactory.createEmptyBorder());
-		add(BorderLayout.NORTH, stripScroller);
+		ScrollSteps.set(stripScroller);
+		clearButton = new JButton("Clear match");
+		clearButton.setToolTipText("Use no match for this clip; saving it then makes no crossing");
+		clearButton.addActionListener(e -> clearMatch());
+		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttons.add(clearButton);
+		JPanel top = new JPanel(new BorderLayout());
+		top.add(BorderLayout.CENTER, stripScroller);
+		top.add(BorderLayout.EAST, buttons);
+		add(BorderLayout.NORTH, top);
 
 		table.setDefaultRenderer(Object.class, new MatchCellRenderer());
 		table.setFillsViewportHeight(true);
@@ -96,9 +112,25 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		if (match == null) {
 			return;
 		}
-		difarControl.getDifarProcess().applyMatch(currentUnit, match);
+		difarControl.getDifarProcess().applyMatch(currentUnit, match, DifarCrossing.MatchChoice.OPERATOR);
 		tableModel.setUsed(match);
 		updateClipStrip();
+		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.MatchChanged, currentUnit));
+	}
+
+	/**
+	 * Use no match for this detection, for when one was chosen by mistake.
+	 * Saving it then makes no crossing.
+	 */
+	private void clearMatch() {
+		if (currentUnit == null || !difarControl.isQueued(currentUnit)) {
+			return;
+		}
+		difarControl.getDifarProcess().applyMatch(currentUnit, null, DifarCrossing.MatchChoice.OPERATOR);
+		table.clearSelection();
+		tableModel.setUsed(null);
+		updateClipStrip();
+		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.MatchChanged, currentUnit));
 	}
 
 	/**
@@ -150,8 +182,16 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		 * ready once the demultiplexing has finished. That covers both clicking
 		 * a clip in viewer mode and processing one normally.
 		 */
-		if (difarMessage.message == DIFARMessage.DemuxComplete) {
+		switch (difarMessage.message) {
+		case DIFARMessage.DemuxComplete:
 			showUnit(difarMessage.difarDataUnit);
+			break;
+		case DIFARMessage.SaveDatagramUnit:
+		case DIFARMessage.SaveDatagramUnitWithoutRange:
+		case DIFARMessage.DeleteDatagramUnit:
+			// the clip has left the DIFARgram, so its matches no longer apply
+			showUnit(null);
+			break;
 		}
 		return 0;
 	}
@@ -164,7 +204,17 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		List<DifarMatchSelector.Match> matches = unit == null
 				? null : difarControl.getDifarProcess().getMatchLog().get(unit);
 		currentUnit = unit instanceof DifarDataUnit ? (DifarDataUnit) unit : null;
+		/*
+		 * A match can be chosen only for a clip still being worked. A saved
+		 * clip's crossing is fixed: its candidates are shown, but not offered.
+		 */
+		boolean choosable = currentUnit != null && difarControl.isQueued(currentUnit);
+		boolean readOnly = currentUnit != null && !choosable;
 		SwingUtilities.invokeLater(() -> {
+			table.setEnabled(choosable);
+			clearButton.setEnabled(choosable);
+			setBorder(BorderFactory.createTitledBorder(readOnly
+					? "Triangulation match selector (saved clip: read only)" : "Triangulation match selector"));
 			tableModel.setMatches(matches);
 			sizeColumns();
 			updateClipStrip();
