@@ -175,8 +175,9 @@ public class ExtMapMouseHandler extends ExtMouseAdapter {
 				//added this because in FX GUI the pop up menu does not disappear properly. May need to only
 				//call when FX GUI is enabled but does not seem to do any harm in Swing GUI.
 				popMenu.closePopupMenu(e);
-				popMenu.showPopupMenu(e, extMouseAdapters, fxNode);
-				return true;
+				if (popMenu.showPopupMenu(e, extMouseAdapters, fxNode)) {
+					return true;
+				}
 			}
 		}
 		else {
