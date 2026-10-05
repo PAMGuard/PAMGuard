@@ -43,6 +43,10 @@ import PamguardMVC.PamDataUnit;
  */
 public class SonobuoyManagerPanel extends PamPanel {
 
+	/** Default share of the buoy manager's height for the buoy table. */
+	private static final double DEFAULT_TABLE_SHARE = 0.40;
+
+
 	DifarControl difarControl;
 	SonobuoyManager buoyManager;
 	private PamPanel mainPanel;
@@ -73,8 +77,10 @@ public class SonobuoyManagerPanel extends PamPanel {
 			makeMainPanel(),
 			calibrationPanel
 		);	
-		splitPane.setResizeWeight(1);
-		splitPane.setDividerLocation(600);
+		// the buoy table above, the calibrations below, divided at 40% by default
+		SplitPaneMemory.apply(splitPane, DEFAULT_TABLE_SHARE,
+				() -> difarControl.getDifarParameters().buoyManagerDividerFraction,
+				f -> difarControl.getDifarParameters().buoyManagerDividerFraction = f);
 		this.add(splitPane);
 
 	}

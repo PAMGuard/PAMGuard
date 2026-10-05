@@ -188,9 +188,29 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public Integer difarGramDividerPos;
 	
 	/**
-	 * used when the DIFARcontainers were joined - no longer
+	 * used when the DIFARcontainers were joined - no longer. Superseded by
+	 * {@link #queueDividerFraction}; kept so older settings still load.
 	 */
 	public Integer horizontalDividerPos;
+
+	/**
+	 * Where the operator left the divider below the clip strip in the DIFAR
+	 * display, as a fraction of its height, or null for the default.
+	 */
+	public Double queueDividerFraction;
+
+	/**
+	 * Where the operator left the divider between the DIFARGram and the match
+	 * selector, as a fraction of their combined height, or null for the default.
+	 */
+	public Double gramDividerFraction;
+
+	/**
+	 * Where the operator left the divider between the buoy table and the
+	 * calibrations in the buoy manager, as a fraction of its height, or null
+	 * for the default.
+	 */
+	public Double buoyManagerDividerFraction;
 	
 	/**
 	 * list of audio paramerters for processing difar clips - currently just vessel/whale but could be expanded for set for each species of whale 
