@@ -134,6 +134,11 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
 
 ## Tests owed
 
+- Clean up, organise and document the manual DIFAR tests: the simulated two-sonobuoy exercise and
+  its harness (`S:\Data\2019-difar-retest`: `rung.sh`, `runs/`, several configuration copies),
+  the 2019 Viewer fixtures, the 2013 pilot checks, and the batch test sheets. Decide what lives in
+  the repo and what stays with the data.
+
 - Crossing quality passed on the 2013 pilot (1 October 2026): the setting, rematch counts, the new
   columns, on-buoy errors at the radius, and the selector's three settings on the map. Owed: rematch
   the full 2019 voyage and compare the narrow count with the design's 458 of 6,037 (that count
