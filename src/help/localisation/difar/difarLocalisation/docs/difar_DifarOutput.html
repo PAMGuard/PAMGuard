@@ -1,6 +1,6 @@
 <html>
 <head>
-<LINK href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
+<LINK href="../../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
 <title>Difar Module</title>
 </head>
 
@@ -13,30 +13,34 @@ DIFAR Localisation
 Output from the DIFAR System
 </h2>
 
-<p>
-DIFAR results are stored in both the
-<a href="../../../utilities/generalDatabaseHelp/docs/database_database.html">PAMGaurd database</a>
-and in the
-<a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">Binary storage system</a>
-. Each has it's own advantages and disadvantages so it is likely that you will want to use both. 
-</p>
-<p>
-The database can store a single line of information for each localisation in a format
-which can be easily read using a database management system (e.g MS Access). However,
-the database is unable to store the full waveform clip. 
-</p>
-<p>
-The binary store stores data in a system which can only be read by the PAMGuard software.
-However, it is able to store the waveform clip for each DIFAR localisation allowing the
-operator to review data offline using the PAMGuard viewer. 
-</p>
+<p>Before PAMGuard version 2.03, DIFAR results were stored in the <a href="../../../../utilities/BinaryStore/docs/binarystore_overview.html">binary store</a>, with the <a href="../../../../utilities/generalDatabaseHelp/docs/database_database.html">PAMGuard database</a> optionally used for convenience.</p>
+
+<p>The database stores one row for each DIFAR clip, in a format that can be read easily with a database management system (e.g. SQLite). The database is not suited to storing the audio of each DIFAR clip.</p>
+
+<p>The binary store contains the audio of each DIFAR clip, so that the operator can review the data in Viewer mode. DIFAR binary files can be read in MATLAB with pgmatlab, in R with PamBinaries, and in Python with pypamguard.</p>
+
+<h3><a name="Crossings">Triangulations</a></h3>
+
+<p>Before PAMGuard version 2.03, <a href="difar_CrossingBearings.html#Crossings">triangulations</a> were stored in the binary files. From version 2.03 they are stored only in the database, in two tables named after the module. For a module named "DIFAR Localisation" the tables are:</p>
+
+<p><b>DIFAR Localisation Crossings:</b> one row for each triangulation, containing its time, end time, number of DIFAR clips, location (<code>Latitude</code>, <code>Longitude</code>), errors in metres (<code>XError</code>, <code>YError</code>), how its DIFAR clips were chosen (<code>MatchChoice</code>: AUTO, OPERATOR or LEGACY), and its <a href="difar_CrossingBearings.html#Quality">quality</a> (<code>CrossingAngle</code>, <code>OnBuoy</code>).</p>
+
+<p><b>DIFAR Localisation Crossings Children:</b> one row for each DIFAR clip in each triangulation, linking the triangulation to the UID of the DIFAR clip. The time, sonobuoy, bearings and sonobuoy location of each DIFAR clip are stored in the row of the DIFAR clip itself, which is the only copy of any value derived from the sonobuoy. These values are updated after sonobuoys are edited.</p>
+
+<p>The table names use the word "Crossings", the module's internal name for triangulations.</p>
+
+<p>The source code includes an SQL query, <code>src/difar/crossings/crossing_clips.sql</code>, that joins the three tables into one row for each DIFAR clip in each triangulation. It can be run with sqlite3 to produce a CSV file.</p>
+
+<h3><a name="Version3">DIFAR binary files, version 3</a></h3>
+
+<p>From PAMGuard version 2.03, DIFAR binary files are written at version 3. Triangulations are no longer stored within the DIFAR clips, but in the database tables described above. Older files can be read in Viewer mode, but not changed until the dataset has been <a href="difar_ViewerReanalysis.html#Upgrade">upgraded</a>. Reading version 3 files in MATLAB requires a release of pgmatlab that supports them.</p>
 
 <p CLASS="previousLink">
 <a href="difar_GraphicsOutput.html">Previous: Graphics Output</a>
 </p>
 
 <p CLASS="nextLink">
-<a href=""></a>
+<a href="difar_ViewerReanalysis.html">Next: Reanalysis in Viewer mode</a>
 </p>
 
 <br><br><br>

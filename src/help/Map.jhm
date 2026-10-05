@@ -122,6 +122,7 @@
 <mapID target="sensors.analogarray.docs.analogarrayconfig" url="sensors/analogarray/docs/analogarrayconfig.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_ManagingQueue" url="localisation/difar/difarLocalisation/docs/difar_ManagingQueue.html"/>
+<mapID target="localisation.difar.difarLocalisation.docs.difar_ViewerReanalysis" url="localisation/difar/difarLocalisation/docs/difar_ViewerReanalysis.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview" url="visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html"/>
 

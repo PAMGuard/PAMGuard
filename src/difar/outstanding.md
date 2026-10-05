@@ -126,8 +126,18 @@ delays from cross-correlating clips' audio.
 Viewer compaction works, and writes clips saved in the Viewer. Converting old datasets' crossings is
 not planned: the upgrade rematches instead, and keeps the old files in a backup.
 
+## Code, before or after the pull request
+
+- Rename UI labels to match the help's terms: the data selector's "Crossing quality" panel and
+  "Hide crossings on one of their own buoys", and the settings' "Max candidates per buoy" and
+  "On-buoy radius", to triangulation and sonobuoy. Leave database table and column names.
+
 ## Tests owed
 
+- Crossing quality passed on the 2013 pilot (1 October 2026): the setting, rematch counts, the new
+  columns, on-buoy errors at the radius, and the selector's three settings on the map. Owed: rematch
+  the full 2019 voyage and compare the narrow count with the design's 458 of 6,037 (that count
+  included on-buoy crossings, which are now counted separately).
 - The dataset upgrade, "Upgrade old DIFAR files to version 3", passed on the pilot: refusal on loaded data, then all data
   backed up, 6 clips rewritten, crossings made, and pgmatlab reading both files as version 3.
 - Deleting a saved clip passed in the Viewer on the simulated data: an unmatched clip, a clip in a
@@ -308,6 +318,27 @@ items below are about making fewer of them necessary.
 - Sample numbers in Viewer-written headers count from 1970. Nothing in DIFAR reads them.
 - The parked compactor (commit `ff1a2c86`) drops cross-match partners. Do not run it on real data
   until crossings are separate units.
+
+## Documentation
+
+- Help updated October 2026: a new page, `difar_ViewerReanalysis.html`, and changes to
+  `difar_CrossingBearings.html`, `difar_ConfigureProcessing.html`, `difar_DifarOutput.html` and
+  `difar_Overview.html`, with the contents and map entries. Terms made consistent on those pages:
+  DIFAR clip, bearing, match, triangulation, sonobuoy, Viewer mode. Screenshots are marked in HTML
+  comments ("Screenshot:") for Brian to take from the pilot.
+- Relative links fixed across all 16 DIFAR help pages (they were one level too shallow, so the
+  stylesheet and links to other modules' help did not resolve). Check styling in PAMGuard's Help.
+- Australian Marine Mammal Centre references replaced with the Australian Antarctic Division; the
+  demultiplexer is named as it appears in the settings, AMMC_EXPERIMENTAL. MS Access references in
+  the post-processing tutorial replaced with SQLite.
+- Importing sonobuoy deployments and GPS tracks into a Viewer database is described in the
+  post-processing tutorial (Import of Data and Metadata), now linked from the Viewer page. The
+  tutorial is a Word export written for Mixed mode in 2014; still worth a review.
+- The older DIFAR pages still say "clip" about 180 times; a terminology pass over them is a
+  separate job.
+- Dead or doubtful external links: the tutorial's `ftp://ftp.aad.gov.au/...` data link, and the
+  Overview's Southern Ocean Research Partnership link (`marinemammals.gov.au/sorp`).
+- The help's search index (`src/help/JavaHelpSearch`) is built separately; ask Doug how it is rebuilt.
 
 ## Tidying
 

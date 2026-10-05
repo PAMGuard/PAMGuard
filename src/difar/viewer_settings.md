@@ -3,9 +3,9 @@
 Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, started 30 September 2026.
 
 Settings the Viewer needs for DIFAR reanalysis, gathered as they are found. Several look like faults
-when missed. Check this list before reporting a bug. It will go into the help page
-`src/help/localisation/difar/difarLocalisation/docs/difar_PostProcessingTutorial.html` before the
-pull request.
+when missed. Check this list before reporting a bug. It is in the help page
+`src/help/localisation/difar/difarLocalisation/docs/difar_ViewerReanalysis.html` (1 October 2026);
+keep the two in step.
 
 ## Opening a dataset
 
