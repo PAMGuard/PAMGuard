@@ -2,8 +2,6 @@ package difar.display;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -53,24 +51,23 @@ public class DifarDisplayContainer extends UserDisplayComponentAdapter {
 		}
 		else{
 			/*
-			 * Three panels of about equal height: the clip queue, the actions and
-			 * grams, and the match selector. The selector sits below the grams so
-			 * that it is clear the Save button applies to the match shown there.
+			 * Three panels: the clip strip, the actions and grams, and the match
+			 * selector, by default 40%, 32% and 28% of the height. The selector
+			 * sits below the grams so that it is clear the Save button applies to
+			 * the match shown there. Where the operator leaves each divider is
+			 * remembered, as a fraction, from run to run.
 			 */
 			JSplitPane lowerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-			lowerSplitPane.setResizeWeight(0.5);
 			lowerSplitPane.add(new DisplaySouthPanel(difarControl));
 			lowerSplitPane.add(difarControl.getMatchContainer().getMatchPanel());
+			SplitPaneMemory.apply(lowerSplitPane, DEFAULT_GRAM_SHARE / (DEFAULT_GRAM_SHARE + DEFAULT_MATCH_SHARE),
+					() -> difarControl.getDifarParameters().gramDividerFraction,
+					f -> difarControl.getDifarParameters().gramDividerFraction = f);
 
 			horizSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-			horizSplitPane.addPropertyChangeListener(new SplitPaneListener());
-			Integer pos = difarControl.getDifarParameters().horizontalDividerPos;
-			if (pos != null) {
-				horizSplitPane.setDividerLocation(pos);
-			}
-			else {
-				horizSplitPane.setResizeWeight(0.34);
-			}
+			SplitPaneMemory.apply(horizSplitPane, DEFAULT_STRIP_SHARE,
+					() -> difarControl.getDifarParameters().queueDividerFraction,
+					f -> difarControl.getDifarParameters().queueDividerFraction = f);
 			horizSplitPane.add(new DisplayNorthPanel(difarControl));
 			horizSplitPane.add(lowerSplitPane);
 
@@ -122,12 +119,14 @@ public class DifarDisplayContainer extends UserDisplayComponentAdapter {
 
 	}
 
-	class SplitPaneListener implements PropertyChangeListener {
-		@Override
-		public void propertyChange(PropertyChangeEvent arg0) {
-			difarControl.getDifarParameters().horizontalDividerPos = horizSplitPane.getDividerLocation();
-		}
-	}
+	/** Default share of the display's height for the clip strip. */
+	private static final double DEFAULT_STRIP_SHARE = 0.40;
+
+	/** Default share for the actions and grams. */
+	private static final double DEFAULT_GRAM_SHARE = 0.32;
+
+	/** Default share for the match selector. */
+	private static final double DEFAULT_MATCH_SHARE = 0.28;
 
 	@Override
 	public void notifyModelChanged(int changeType) {

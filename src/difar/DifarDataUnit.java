@@ -17,10 +17,10 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDataUnit;
+import difar.crossings.DifarCrossing;
+import difar.crossings.LegacyCrossing;
 import fftManager.Complex;
 import fftManager.FastFFT;
-import generalDatabase.DBControlUnit;
-import generalDatabase.SQLLogging;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 
@@ -111,9 +111,21 @@ public class DifarDataUnit extends ClipDataUnit {
 	 */
 	private long clipStartMillis;
 
-	private DIFARCrossingInfo difarCrossing;
-	
+	/**
+	 * The DIFAR module version of the binary file the clip was read from, or
+	 * the current version for a clip made in this session. Files before
+	 * version 3 are read only.
+	 */
+	private int binaryVersion = DifarClipPayload.CURRENT_VERSION;
+
+	/** The match proposed while the clip is worked on, before it is saved. */
 	private DIFARCrossingInfo tempCrossing;
+
+	/**
+	 * The crossing stored with this clip in files up to module version 2.
+	 * Inert: step 5's conversion turns these into crossing units.
+	 */
+	private LegacyCrossing legacyCrossing;
 	
 	private String trackedGroup;
 
@@ -386,6 +398,10 @@ public class DifarDataUnit extends ClipDataUnit {
 	 * @param displaySampleRate the displaySampleRate to set
 	 */
 	public void setDisplaySampleRate(float displaySampleRate) {
+		if (displaySampleRate != this.displaySampleRate) {
+			// the clip's spectrogram is cached by FFT length only, so drop it to redraw at the new rate
+			clearClipSpecData();
+		}
 		this.displaySampleRate = displaySampleRate;
 	}
 
@@ -847,12 +863,11 @@ public class DifarDataUnit extends ClipDataUnit {
 			str += String.format("<br>Buoy head %3.1f%s, calibrated at %s", buoyHead, LatLong.deg, 
 					PamCalendar.formatDateTime(origin.getTimeInMillis()));
 		}
-		DIFARCrossingInfo xInfo = difarCrossing;
-		if (xInfo == null) xInfo = tempCrossing;
-		if (xInfo != null) {
-			int range = (int) origin.distanceToMetres(xInfo.getCrossLocation());
-			str += "<br>" + String.format("Range %dm,  Location %s %s", range, 
-					xInfo.getCrossLocation().formatLatitude(),xInfo.getCrossLocation().formatLongitude());
+		LatLong cross = getCrossLocation();
+		if (cross != null) {
+			int range = (int) origin.distanceToMetres(cross);
+			str += "<br>" + String.format("Range %dm,  Location %s %s", range,
+					cross.formatLatitude(), cross.formatLongitude());
 		}
 		str += "</html>";
 		return str;
@@ -923,54 +938,75 @@ public class DifarDataUnit extends ClipDataUnit {
 	}
 
 
-//	/**
-//	 * Set the crossing point when multiple matching DIFAR bearings are crossed. 
-//	 * @param crossInfo result from DIFAR localisation. 
-//	 */
-//	public void setDifarCrossing(DIFARCrossingInfo crossInfo) {
-//		this.difarCrossing = crossInfo;
-//	}
 	/**
-	 * Move the crossing info from it's temp position to 
-	 * a saved position. Called just at the point when the difar 
-	 * unit is saved and moved from the queue to the output data block. 
-	 * @param save - save it, or discard it (also from other units associated with 
-	 * this crossing
+	 * @return the crossing this clip belongs to, or null if none. Crossings
+	 * are PAMGuard super-detections, stored in the database and linked to
+	 * their clips when loaded, in both Normal mode and the viewer.
 	 */
-	public void saveCrossing(boolean save) {
+	public DifarCrossing getCrossing() {
+		return (DifarCrossing) getSuperDetection(DifarCrossing.class);
+	}
+
+	/**
+	 * Where this clip's bearing is crossed, for displays: its crossing's
+	 * location if it belongs to one, else the location of the match proposed
+	 * while it is being worked on.
+	 * @return the location, or null if there is none.
+	 */
+	public LatLong getCrossLocation() {
+		DifarCrossing crossing = getCrossing();
+		if (crossing != null) {
+			return crossing.getLocation();
+		}
+		return tempCrossing == null ? null : tempCrossing.getCrossLocation();
+	}
+
+	/**
+	 * Drop the match proposed for this clip, from it and the other clips in
+	 * the proposal. Called once the clip is saved, with or without the match.
+	 */
+	public void clearTempCrossing() {
 		if (tempCrossing == null) {
 			return;
 		}
-		if (save) {
-			difarCrossing = tempCrossing;
-			DifarDataUnit[] detList = tempCrossing.getMatchedUnits();
-			if (this == detList[0]) {
-				for (int i = 1; i < detList.length; i++) {
-					if (detList[i] != null)
-					detList[i].saveCrossing(save);
-				}
+		DIFARCrossingInfo proposal = tempCrossing;
+		for (DifarDataUnit clip : proposal.getMatchedUnits()) {
+			if (clip != null && clip.tempCrossing == proposal) {
+				clip.tempCrossing = null;
 			}
 		}
 		tempCrossing = null;
 	}
-	
-	/**
-	 * 
-	 * @return the crossing point when multiple matching DIFAR bearings are crossed. 
-	 */
-	public DIFARCrossingInfo getDifarCrossing() {
-		return difarCrossing;
-	}
-
-	
 
 	/**
-	 * @param difarCrossing the difarCrossing to set
+	 * @return the DIFAR module version of the file the clip was read from, or
+	 * the current version for a clip made in this session.
 	 */
-	public void setDifarCrossing(DIFARCrossingInfo difarCrossing) {
-		this.difarCrossing = difarCrossing;
+	public int getBinaryVersion() {
+		return binaryVersion;
 	}
 
+	/**
+	 * @param binaryVersion the DIFAR module version of the file the clip was read from.
+	 */
+	public void setBinaryVersion(int binaryVersion) {
+		this.binaryVersion = binaryVersion;
+	}
+
+	/**
+	 * @return the crossing stored with this clip in a file up to module
+	 * version 2, or null if it had none or was written later.
+	 */
+	public LegacyCrossing getLegacyCrossing() {
+		return legacyCrossing;
+	}
+
+	/**
+	 * @param legacyCrossing the crossing read from an old file, or null.
+	 */
+	public void setLegacyCrossing(LegacyCrossing legacyCrossing) {
+		this.legacyCrossing = legacyCrossing;
+	}
 
 	/**
 	 * @return the tempCrossing
@@ -1077,20 +1113,6 @@ public class DifarDataUnit extends ClipDataUnit {
 		return specData;
 	}
 
-	@Override
-	public void updateDataUnit(long updateTime) {
-		// TODO Auto-generated method stub
-		super.updateDataUnit(updateTime);
-		/*
-		 * This is getting called on the queuedDifarData, bug that's occurring since I added something
-		 * to stop it reassigning datablock parent id's when units shift between data blocks. Bugger !
-		 */
-		SQLLogging logging = this.getParentDataBlock().getLogging();
-		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
-		if (logging != null && dbControl != null) {
-			logging.logData(dbControl.getConnection(), this);
-		}
-	}
 }
 
 

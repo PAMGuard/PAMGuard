@@ -188,16 +188,18 @@ public class SonobuoyEditEffects {
 					PamCalendar.formatDateTime(startTime), PamCalendar.formatDateTime(endTime)));
 		}
 		message.append(String.format("%d bearings will be updated.<p>", bearings));
-		if (triangulations == 0) {
+		if (viewer) {
+			message.append(String.format("%d crossings have clips on this buoy. Matches in this period "
+					+ "will be chosen again, so crossings may gain or lose clips. Crossings chosen by "
+					+ "the operator keep their clips and move.", triangulations));
+		} else if (triangulations == 0) {
 			message.append("No saved triangulations are affected.");
 		} else {
 			message.append(String.format("%d triangulations will be worked out again.",
 					triangulations));
-			if (!viewer) {
-				message.append("<p><p>Only those still in memory can be worked out again. "
-						+ "Detections already written to file keep their old triangulation until "
-						+ "the data are reprocessed in Viewer mode, from DIFAR offline tasks.");
-			}
+			message.append("<p><p>Only those still in memory can be worked out again. "
+					+ "Detections already written to file keep their old triangulation until "
+					+ "the data are reprocessed in Viewer mode, from DIFAR offline tasks.");
 		}
 		if (countsAreOfLoadedData) {
 			message.append("<p><p>These counts are of the data loaded now. Any others in the same "

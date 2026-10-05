@@ -708,6 +708,8 @@
     </tocitem>
     <tocitem text="DIFAR Output " target="localisation.difar.difarLocalisation.docs.difar_DifarOutput" image="topic"/>
 
+    <tocitem text="Reanalysis in Viewer mode " target="localisation.difar.difarLocalisation.docs.difar_ViewerReanalysis" image="topic"/>
+
    </tocitem>
   </tocitem>
  </tocitem>

@@ -25,8 +25,8 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
-import PamController.PamController;
 import PamUtils.PamUtils;
 import PamView.PamColors;
 import PamView.panel.PamPanel;
@@ -53,14 +53,30 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	private ClipDisplayPanel clipDisplayPanel;
 
-	public DIFARQueuePanel(DifarControl difarControl, String queueName) {
+	private final ClipDisplayDataBlock clipDataBlock;
+
+	private final boolean saved;
+
+	/**
+	 * A strip of DIFAR clips.
+	 * @param difarControl the DIFAR module.
+	 * @param queueName name of the strip.
+	 * @param clipDataBlock the clips to show.
+	 * @param saved true if the clips are saved ones, which can be looked at
+	 * again but not saved a second time; false for clips waiting to be worked.
+	 */
+	public DIFARQueuePanel(DifarControl difarControl, String queueName,
+			ClipDisplayDataBlock clipDataBlock, boolean saved) {
 		super();
 		this.difarControl = difarControl;
 		this.queueName = queueName;
+		this.clipDataBlock = clipDataBlock;
+		this.saved = saved;
 
 		mainPanel = new JPanel(new BorderLayout());
 
 		clipDisplayPanel = new ClipDisplayPanel(this);
+		ScrollSteps.setFor(clipDisplayPanel.getUnitsPanel());
 		
 		makeSymbolModifier();
 		
@@ -87,7 +103,7 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 	@Override
 	public ClipDisplayDecorations getClipDecorations(
 			ClipDisplayUnit clipDisplayUnit) {
-		return new DifarClipDecorations(difarControl, clipDisplayUnit);
+		return new DifarClipDecorations(difarControl, clipDisplayUnit, saved);
 	}
 
 	@Override
@@ -100,19 +116,97 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 		return mainPanel;
 	}
 
+	/**
+	 * Draw a clip that has just joined the strip. In the viewer, clips reach
+	 * the strip through the DIFAR module's one path for edits (ViewerEdits),
+	 * which tells the strip as its block would in normal mode. The strip then
+	 * lays the clip out but does not repaint it, so it showed black; remake
+	 * its image and repaint.
+	 * @param clip the clip.
+	 * @return true if the strip shows the clip.
+	 */
+	private boolean drawNewClip(ClipDataUnit clip) {
+		ClipDisplayUnit unit = findUnit(clip);
+		if (unit == null) {
+			return false;
+		}
+		unit.layoutUnit(true);
+		JPanel unitsPanel = clipDisplayPanel.getUnitsPanel();
+		unitsPanel.revalidate();
+		unitsPanel.repaint();
+		clipDisplayPanel.updatePanel();
+		return true;
+	}
+
+	/**
+	 * @param clip a clip.
+	 * @return the strip's display of it, or null if the strip does not show it.
+	 */
+	private ClipDisplayUnit findUnit(ClipDataUnit clip) {
+		JPanel unitsPanel = clipDisplayPanel.getUnitsPanel();
+		synchronized (unitsPanel.getTreeLock()) {
+			for (int i = 0; i < unitsPanel.getComponentCount(); i++) {
+				Component c = unitsPanel.getComponent(i);
+				if (c instanceof ClipDisplayUnit && ((ClipDisplayUnit) c).getClipDataUnit() == clip) {
+					return (ClipDisplayUnit) c;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Rebuild the strip from its data block, as a new load does. The fallback
+	 * for the saved strip if the edit path has not shown a saved clip.
+	 */
+	private void rebuildSavedLater() {
+		SwingUtilities.invokeLater(() -> clipDisplayPanel.newViewerTimes(
+				getClipDataBlock().getCurrentViewDataStart(), getClipDataBlock().getCurrentViewDataEnd()));
+	}
+
 	@Override
 	public int difarNotification(DIFARMessage difarMessage) {
-		boolean isViewer = difarControl.isViewer();
 		switch(difarMessage.message) {
-		case DIFARMessage.DeleteFromQueue:
-			if (!isViewer) {
-				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
-				clipDisplayPanel.updatePanel();
-
+		case DIFARMessage.NewDifarUnit:
+			// a clip has joined the queue
+			if (difarControl.isViewer()) {
+				if (!saved && difarMessage.difarDataUnit != null) {
+					drawNewClip(difarMessage.difarDataUnit);
+				}
+			}
+			else {
+				// the clip strip only lays itself out again for new clips in normal
+				// mode. Later, so the clip has joined the strip before it is laid out.
+				clipDisplayPanel.updatePanelLater();
 			}
 			break;
+		case DIFARMessage.SaveDatagramUnit:
+		case DIFARMessage.SaveDatagramUnitWithoutRange:
+			// a clip has joined the saved clips
+			if (difarControl.isViewer()) {
+				if (saved && (difarMessage.difarDataUnit == null || !drawNewClip(difarMessage.difarDataUnit))) {
+					// not shown by the edit path: rebuild from the saved clips
+					rebuildSavedLater();
+				}
+			}
+			else {
+				clipDisplayPanel.updatePanelLater();
+			}
+			break;
+		case DIFARMessage.DeleteFromQueue:
 		case DIFARMessage.ProcessFromQueue:
-			if (!isViewer) {
+			// a clip leaves the queue strip once it is taken to be worked or
+			// deleted. Saved clips stay where they are.
+			if (!saved) {
+				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
+				clipDisplayPanel.updatePanel();
+			}
+			break;
+		case DIFARMessage.DeleteDatagramUnit:
+			// a saved clip deleted in the viewer leaves the saved strip. The same
+			// message also puts a clip being worked back on the queue, but that
+			// clip is not marked deleted.
+			if (saved && difarMessage.difarDataUnit != null && difarMessage.difarDataUnit.isDeleted()) {
 				clipDisplayPanel.removeClip(difarMessage.difarDataUnit);
 				clipDisplayPanel.updatePanel();
 			}
@@ -136,16 +230,14 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	@Override
 	public ClipDisplayDataBlock getClipDataBlock() {
-		/*
-		 * for viewer mode there will never be anything in the queue, so display 
-		 * the processed data instead. 
-		 */
-		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
-			return difarControl.getDifarProcess().getProcessedDifarData();
-		}
-		else {
-			return difarControl.getDifarProcess().getQueuedDifarData();
-		}
+		return clipDataBlock;
+	}
+
+	/**
+	 * @return true if this strip shows saved clips.
+	 */
+	public boolean isSaved() {
+		return saved;
 	}	
 	
 	/**
@@ -157,7 +249,9 @@ public class DIFARQueuePanel implements DIFARDisplayUnit, ClipDisplayParent {
 
 	@Override
 	public String getDisplayName() {
-		return difarControl.getUnitName();
+		// the queue keeps the module's name, so its existing display settings
+		// are kept; the saved strip needs a name of its own for its settings.
+		return saved ? difarControl.getUnitName() + " saved clips" : difarControl.getUnitName();
 	}
 
 	public void	clearQueuePanel() {

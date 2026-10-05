@@ -78,12 +78,47 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public double maxBearingResidual = 20.0;
 
 	/**
+	 * Metres from a buoy within which a crossing counts as on that buoy. Such a
+	 * crossing has its errors set to this radius, since the fit's own errors
+	 * there are near zero and reflect none of the real sources of error (compass
+	 * calibration, approximate and drifting buoy positions, bearing errors).
+	 * Use {@link #getOnBuoyRadius()}, which repairs settings saved before this
+	 * field existed.
+	 */
+	public double onBuoyRadius = DEFAULT_ON_BUOY_RADIUS;
+
+	/** Default for {@link #onBuoyRadius}, metres. */
+	public static final double DEFAULT_ON_BUOY_RADIUS = 500.0;
+
+	/**
+	 * @return metres from a buoy within which a crossing is on it.
+	 */
+	public double getOnBuoyRadius() {
+		return onBuoyRadius > 0 ? onBuoyRadius : DEFAULT_ON_BUOY_RADIUS;
+	}
+
+	/**
 	 * Largest number of detections on each other buoy that are tried as matches
 	 * for one detection. The closest in time and frequency are kept. A larger
 	 * number finds matches in a busy chorus, at the cost of more combinations
 	 * to localise.
 	 */
 	public int maxCandidatesPerBuoy = 10;
+
+	/**
+	 * When a crossing loses clips, to a new crossing or because a clip is
+	 * deleted, delete it even if two or more clips remain. By default it is
+	 * recalculated from the clips it keeps.
+	 */
+	public boolean alwaysDeleteTrimmedCrossings = false;
+
+	/**
+	 * When rematching a period by hand, whether crossings chosen by the operator
+	 * are replaced too. False keeps them, with their clips out of the rematch.
+	 * Named this way round so that settings saved before it existed read as
+	 * false, which keeps operator choices.
+	 */
+	public boolean rematchReplacesOperatorChoices = false;
 
 	/**
 	 * Standard deviation of a DIFAR bearing, in degrees. This sets how much
@@ -111,7 +146,9 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 */
 	public static final int CALIBRATION_USE_MODE = 1;
 	public static final int CALIBRATION_USE_MEAN = 2;
-	public int calibrationChoice = CALIBRATION_USE_MODE;
+	/** The mean of the clips near the mode: ignores stray clips, and is not tied to bin centres. */
+	public static final int CALIBRATION_USE_MEAN_NEAR_MODE = 3;
+	public int calibrationChoice = CALIBRATION_USE_MEAN_NEAR_MODE;
 	
 	/**
 	 * Stores paramaters to correct the frequency response for DIFAR buoys
@@ -151,9 +188,29 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public Integer difarGramDividerPos;
 	
 	/**
-	 * used when the DIFARcontainers were joined - no longer
+	 * used when the DIFARcontainers were joined - no longer. Superseded by
+	 * {@link #queueDividerFraction}; kept so older settings still load.
 	 */
 	public Integer horizontalDividerPos;
+
+	/**
+	 * Where the operator left the divider below the clip strip in the DIFAR
+	 * display, as a fraction of its height, or null for the default.
+	 */
+	public Double queueDividerFraction;
+
+	/**
+	 * Where the operator left the divider between the DIFARGram and the match
+	 * selector, as a fraction of their combined height, or null for the default.
+	 */
+	public Double gramDividerFraction;
+
+	/**
+	 * Where the operator left the divider between the buoy table and the
+	 * calibrations in the buoy manager, as a fraction of its height, or null
+	 * for the default.
+	 */
+	public Double buoyManagerDividerFraction;
 	
 	/**
 	 * list of audio paramerters for processing difar clips - currently just vessel/whale but could be expanded for set for each species of whale 
@@ -404,6 +461,9 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 			}
 			if (ndp.maxBearingResidual <= 0) {
 				ndp.maxBearingResidual = 20.0;
+			}
+			if (ndp.onBuoyRadius <= 0) {
+				ndp.onBuoyRadius = DEFAULT_ON_BUOY_RADIUS;
 			}
 			if (ndp.bearingError <= 0) {
 				ndp.bearingError = 5.0;

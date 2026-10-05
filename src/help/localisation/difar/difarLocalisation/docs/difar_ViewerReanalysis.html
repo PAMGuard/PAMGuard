@@ -1,0 +1,122 @@
+<html>
+<head>
+	<link href="../../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Difar Module</title>
+</head>
+<body>
+<h1>DIFAR Localisation</h1>
+
+<h2>Reanalysis in Viewer mode (PAMGuard version 2.03 or later)</h2>
+
+<p>From PAMGuard version 2.03, DIFAR data can be reanalysed in Viewer mode. The operator can mark new DIFAR clips from the raw audio, save and delete DIFAR clips, choose which DIFAR clips form a triangulation, edit sonobuoys, and match every DIFAR clip again in a single batch task. Each change is written to the binary files and the database immediately.</p>
+
+<p>Reanalysis works in much the same way as the DIFAR module in Normal mode. The queue, the DIFARGram and the triangulation match selector behave as they do in Normal mode. This page describes the differences in Viewer mode.</p>
+
+<h3><a name="Terms">Terms used on this page</a></h3>
+
+<p><b>DIFAR clip:</b> a short section of audio containing one call, recorded on one sonobuoy.</p>
+
+<p><b>Bearing:</b> the direction to the sound source, measured from one DIFAR clip.</p>
+
+<p><b>Match:</b> a set of DIFAR clips on different sonobuoys that are believed to contain the same call.</p>
+
+<p><b>Triangulation:</b> a saved match, with the location where its bearings cross and the error of that location. See <a href="difar_CrossingBearings.html#Crossings">Triangulation</a>.</p>
+
+<h3><a name="Needs">Requirements</a></h3>
+
+<p>Reanalysis requires a DIFAR dataset recorded with PAMGuard. Such a dataset consists of:</p>
+
+<ol>
+<li>a PAMGuard database, which Viewer mode requires in any case;</li>
+<li>audio files whose names contain their start times in a format that PAMGuard can read;</li>
+<li>a binary store module and its folder.</li>
+</ol>
+
+<p><b>Sonobuoy deployments and the vessel track.</b> The database must contain the sonobuoy deployments and the vessel's GPS track. The GPS track is also required for vessel calibration of the sonobuoy compasses. PAMGuard records both during a survey, so a DIFAR dataset recorded with PAMGuard meets this requirement. For data recorded with other systems, the sonobuoy deployments and the vessel track must be imported first, as described in the <a href="difar_PostProcessingTutorial.html#_Toc396467146">post-processing tutorial</a>.</p>
+
+<p><b>Audio files.</b> Audio files are required to mark new DIFAR clips. Set the audio folder in the offline file settings of the Sound Acquisition module, or start PAMGuard with <code>-wavfilefolder</code> (see <a href="#Opening">Opening a dataset</a>). Saved DIFAR clips contain their own audio, so they can be viewed and deleted without the audio files.</p>
+
+<p><b>DIFAR binary files at version 3.</b> Reanalysis writes DIFAR binary files at version 3. Datasets recorded before PAMGuard version 2.03 must be <a href="#Upgrade">upgraded to version 3</a> before DIFAR clips can be saved or deleted. Until then, they can be viewed but not changed.</p>
+
+<h3><a name="Opening">Opening a dataset</a></h3>
+
+<p><b>Open the dataset's own database.</b> PAMGuard offers the most recently used database by default. If a copy or a subset of a dataset is opened with the database of another dataset, its DIFAR clips are paired with the wrong database rows and triangulations.</p>
+
+<p><b>Command line arguments.</b> The startup dialogs can be skipped by passing the files as program arguments:</p>
+
+<p><code>-v -databasefile &lt;database&gt;.sqlite3 -binaryfolder &lt;binary folder&gt; -wavfilefolder &lt;audio folder&gt;</code></p>
+
+<p>The database name must end in <code>.sqlite3</code>; otherwise it is ignored and the dialog appears. A binary folder that does not exist is created empty, so check the path carefully. The argument <code>-wavfilefolder</code> is case-sensitive.</p>
+
+<p><b>Map.</b> The map draws sonobuoys as their own data ("Sonobuoy Positions" in the key), built from the sonobuoy records in the database; they are not stored separately. Enable them on the map, and tick "all data" in their plot options. Otherwise the map draws only the sonobuoy records within the time window of the view, and a sonobuoy deployed before the start of the view is not drawn.</p>
+
+<p><b>Buoy manager.</b> The time window controls for the buoy manager are at its bottom edge, below the calibrations.</p>
+
+<!-- Screenshot: the Viewer with the DIFAR displays, spectrogram, map and buoy manager arranged for reanalysis. -->
+
+<h3><a name="Upgrade">Upgrading an older dataset</a></h3>
+
+<p>Run <b>Upgrade old DIFAR files to version 3</b> from the DIFAR offline tasks (Settings &gt; DIFAR Localisation &gt; Offline tasks), with the data choice set to All Data. The task refuses any other data choice, because matching must be able to find DIFAR clips anywhere in the dataset. The task:</p>
+
+<ol>
+<li>Checks for DIFAR clips that share a UID. Older datasets can contain repeated UIDs as a result of software faults or crashes, and these must be resolved before the upgrade. A confirmation dialog states that the repeated UIDs will be renumbered.</li>
+<li>Copies every DIFAR binary file and the database into a new, dated backup folder beside the binary folder. The task stops if either copy fails.</li>
+<li>Rewrites every DIFAR clip to a version 3 binary file, and ensures that the DIFAR Localisation table of the database contains one row for each DIFAR clip.</li>
+<li>Matches every DIFAR clip again, creating new <a href="difar_CrossingBearings.html#Crossings">triangulations</a>.</li>
+</ol>
+
+<p>Triangulations made by earlier versions of PAMGuard are kept only in the backup, as a record of the original analysis.</p>
+
+<h3><a name="Marking">Marking new DIFAR clips</a></h3>
+
+<p>Draw a box around a call on the spectrogram, as in Normal mode. The audio for the DIFAR clip is read from the audio files, in the same way that annotations read audio in Viewer mode. If the audio cannot be found, no DIFAR clip is made and a warning is shown instead. The usual cause of this warning is a mark within a gap between audio files.</p>
+
+<p><b>Gaps between audio files.</b> PAMGuard stops reading audio at a gap of more than one second. A spectrogram that starts shortly before a gap may therefore remain blank after the gap, even though audio follows. Scroll forward until the spectrogram starts after the gap.</p>
+
+<p><b>Assign Classification.</b> The "Assign Classification" checkbox in the side panel works as it does in Normal mode. When it is checked, a new DIFAR clip takes the selected classification as soon as it is marked, and is shown in the queue at the sample rate for that classification. Changing the classification of a queued DIFAR clip redraws it at the new sample rate.</p>
+
+<h3><a name="Queue">The queue and saved DIFAR clips</a></h3>
+
+<p>New DIFAR clips wait in the <b>Queue</b> strip, as in Normal mode. DIFAR clips that have already been saved are shown in the <b>Saved</b> strip.</p>
+
+<p>A saved DIFAR clip can be opened in the DIFARGram to inspect its bearing, but it cannot be changed or saved again. Its classification buttons (the species buttons, Vessel and Other) are disabled. To change a saved DIFAR clip, delete it and mark the call again.</p>
+
+<!-- Screenshot: the Saved strip, with the disabled classification buttons of a DIFAR clip and their tooltip. -->
+
+<h3><a name="Saving">Saving a DIFAR clip</a></h3>
+
+<p>Process a queued DIFAR clip and select its bearing in the DIFARGram, as in Normal mode. The <b>Triangulation match selector</b> below the DIFARGram lists the matches with DIFAR clips on other sonobuoys, with the best match selected. To use another match, select it in the list. To save the DIFAR clip without a triangulation, press <b>Clear match</b>. Saving a DIFAR clip with a match creates its <a href="difar_CrossingBearings.html#Crossings">triangulation</a>.</p>
+
+<p><b>Auto save</b> works in Viewer mode for new DIFAR clips, as set in the <a href="difar_ConfigureProcessing.html#Automation">Automation</a> settings. Clicking in the DIFARGram, deleting the DIFAR clip, or saving it manually stops the countdown. A saved DIFAR clip that is opened again is never saved automatically.</p>
+
+<!-- Screenshot: the triangulation match selector with two matches, one selected, and the Clear match button. -->
+
+<h3><a name="Deleting">Deleting a DIFAR clip</a></h3>
+
+<p>Press Delete on a saved DIFAR clip, in the Saved strip or in the DIFARGram. PAMGuard asks for confirmation first, naming the DIFAR clip and stating what will happen to its triangulation. A triangulation left with two or more DIFAR clips is recalculated from them. A triangulation left with one DIFAR clip is deleted. The DIFAR clip is removed from its binary file and from the database immediately.</p>
+
+<h3><a name="Buoys">Editing sonobuoys</a></h3>
+
+<p>A change to the location, heading or times of a sonobuoy in the buoy manager can change which DIFAR clips match. After a sonobuoy is edited, PAMGuard therefore matches the DIFAR clips again over the period of that sonobuoy. The triangulations, and the database rows of the DIFAR clips, take the new values for the sonobuoy.</p>
+
+<h3><a name="Rematch">Matching all DIFAR clips again</a></h3>
+
+<p>Run <b>Rematch clips</b> from the DIFAR offline tasks to match every DIFAR clip in a period again. Use it after changing the <a href="difar_ConfigureProcessing.html#Localisation">Localisation</a> settings, or to rebuild the triangulations after many edits. The settings of the task determine whether triangulations chosen by the operator are kept, and recalculated from their DIFAR clips, or replaced. By default they are kept.</p>
+
+<p>DIFAR clips are matched in time order, one file at a time, in the same way that an operator works through the queue. Each DIFAR clip takes its best match among the DIFAR clips that are not already part of a triangulation, so the result can depend on the order.</p>
+
+<p>When the task finishes, the console shows a summary: the number of DIFAR clips matched, the number of triangulations made, the number of triangulations on a sonobuoy or with a small crossing angle, and the number of DIFAR clips that had no sonobuoy location.</p>
+
+<h3><a name="Limits">Known limitations</a></h3>
+
+<p><b>New bearings appear late on the map.</b> The map draws data up to the left edge of the spectrogram, so a DIFAR clip saved on screen appears on the map only once it has scrolled off the spectrogram. "Display all selected data" draws the whole loaded period instead.</p>
+
+<p><b>Matching across file boundaries.</b> Rematch clips and the upgrade load one binary file at a time. A DIFAR clip within a few seconds of the start or end of a file therefore cannot be matched with DIFAR clips in the neighbouring file. This may be addressed in a future version. DIFAR clips saved manually are not affected.</p>
+
+<p><b>Saved DIFAR clips cannot be edited.</b> Delete the DIFAR clip and mark the call again.</p>
+
+<p class="previousLink"><a href="difar_DifarOutput.html">Previous: DIFAR Output</a></p>
+
+<p>&nbsp;</p>
+</body>
+</html>

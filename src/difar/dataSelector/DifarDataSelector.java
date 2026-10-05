@@ -1,5 +1,6 @@
 package difar.dataSelector;
 
+import Array.ArrayManager;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
@@ -52,7 +53,47 @@ public class DifarDataSelector extends DataSelector {
 			selectPanel = new DifarSelectPanel(this);
 		}
 		updateSpecies();
+		int channels = findChannels();
+		difarSelectParameters.coverChannels(channels);
+		selectPanel.updateChannelPanel(channels);
 		return selectPanel;
+	}
+
+	/**
+	 * The channels a user may want to filter: those of the audio source,
+	 * one per hydrophone in the array (DIFAR uses the channel as the buoy's
+	 * streamer index), those of any loaded clip, and any channel already
+	 * hidden, so it can be shown again. The source alone is not enough: in
+	 * the viewer its channel map comes from whatever configuration was saved,
+	 * which need not include every buoy.
+	 * @return a channel map.
+	 */
+	private int findChannels() {
+		int channels = 0;
+		PamDataBlock<PamDataUnit> sourceBlock = difarControl.getDifarProcess().getSourceDataBlock();
+		if (sourceBlock != null) {
+			channels |= sourceBlock.getChannelMap();
+		}
+		ArrayManager arrayManager = ArrayManager.getArrayManager();
+		if (arrayManager != null && arrayManager.getCurrentArray() != null) {
+			int nPhones = Math.min(arrayManager.getCurrentArray().getHydrophoneCount(), 32);
+			for (int i = 0; i < nPhones; i++) {
+				channels |= 1 << i;
+			}
+		}
+		PamDataBlock<?> clips = getPamDataBlock();
+		if (clips != null) {
+			for (Object unit : clips.getDataCopy()) {
+				channels |= ((PamDataUnit) unit).getChannelBitmap();
+			}
+		}
+		boolean[] enabled = difarSelectParameters.channelEnabled;
+		for (int i = 0; enabled != null && i < enabled.length && i < 32; i++) {
+			if (!enabled[i]) {
+				channels |= 1 << i;
+			}
+		}
+		return channels;
 	}
 
 	@Override
@@ -100,7 +141,13 @@ public class DifarDataSelector extends DataSelector {
 			return false;
 		}
 		
-		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getDifarCrossing()==null){
+		/*
+		 * The crossing location, not the crossing unit: a clip joins the saved
+		 * clips just before its crossing unit is made, and displays told of the
+		 * new clip then must still see it as crossed. Until then its location
+		 * comes from its temporary crossing.
+		 */
+		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getCrossLocation()==null){
 			return false;
 		}
 		

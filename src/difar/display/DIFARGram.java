@@ -807,7 +807,9 @@ public class DIFARGram implements DIFARDisplayUnit {
 	 * @param e mouse data. 
 	 */
 	public void setClickedPosition(MouseEvent e) {
-		if (difarControl.isViewer()) {
+		// a new clip can have its bearing chosen in any mode; a saved clip
+		// being looked at again in the viewer is left as it was saved
+		if (difarControl.isViewer() && !difarControl.isQueued(difarControl.getCurrentDemuxedUnit())) {
 			return;
 		}
 		double f = freqAxis.getDataValue(e.getY());

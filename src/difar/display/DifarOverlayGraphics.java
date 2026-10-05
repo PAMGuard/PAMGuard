@@ -8,10 +8,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 
-import difar.DIFARCrossingInfo;
 import difar.DifarControl;
 import difar.DifarDataBlock;
 import difar.DifarDataUnit;
+import difar.crossings.DifarCrossing;
 import pamMaths.PamVector;
 import GPS.GpsData;
 import PamController.PamControlledUnit;
@@ -143,23 +143,33 @@ public class DifarOverlayGraphics extends PamDetectionOverlayGraphics {
 		if (detOrigin == null) return null;
 		double range = difarControl.getDifarProcess().rangeForDataType(difarDataUnit);
 		Coordinate3d crossPoint = null;
-		DIFARCrossingInfo crossInfo = difarDataUnit.getDifarCrossing();
-		if (crossInfo == null) {
-			crossInfo = difarDataUnit.getTempCrossing();
+		/*
+		 * A saved clip draws the crossing it belongs to. A clip being worked on
+		 * draws the match proposed for it.
+		 */
+		DifarCrossing crossing = difarDataUnit.getCrossing();
+		boolean saved = crossing != null && crossing.getLocation() != null;
+		LatLong crossLatLong = null;
+		Double[] errors = null;
+		if (saved) {
+			crossLatLong = crossing.getLocation();
+			errors = new Double[] {crossing.getXError(), crossing.getYError()};
 		}
-		if (crossInfo != null) { // Draw a temporary crossing position with a dashed line
-			LatLong crossLatLong = crossInfo.getCrossLocation();
+		else if (difarDataUnit.getTempCrossing() != null) {
+			crossLatLong = difarDataUnit.getTempCrossing().getCrossLocation();
+			errors = difarDataUnit.getTempCrossing().getErrors();
+		}
+		if (crossLatLong != null) {
 			crossPoint = generalProjector.getCoord3d(crossLatLong.getLatitude(), crossLatLong.getLongitude(), 0);
 			rect = dataSymbol.draw(g2d, crossPoint.getXYPoint());
 			range = detOrigin.distanceToMetres(crossLatLong);
 			generalProjector.addHoverData(crossPoint, pamDetection);
  
 			bounds = rect;
-			Double[] errors = crossInfo.getErrors();
 //			FIXME: Errors is not being set in the viewer is causing a null pointer exception. 
 //			For now disable in viewer mode, but really should fix the underlying cause. 
 //			if (!difarControl.isViewer()){
-				if (errors.length >= 2 && errors[0] != null && errors[1] != null && !Double.isNaN(errors[0]) && !Double.isNaN(errors[1])) {
+				if (errors != null && errors.length >= 2 && errors[0] != null && errors[1] != null && !Double.isNaN(errors[0]) && !Double.isNaN(errors[1])) {
 					LatLong ell = crossLatLong.addDistanceMeters(errors[0], errors[1]);
 					Coordinate3d errPoint = generalProjector.getCoord3d(ell.getLatitude(), ell.getLongitude(), 0);
 					double dx = errPoint.x-crossPoint.x;
@@ -176,7 +186,7 @@ public class DifarOverlayGraphics extends PamDetectionOverlayGraphics {
 //					g.drawLine((int) (crossPoint.x), (int) (crossPoint.y-dy), (int) crossPoint.x, (int) errPoint.y);
 					rect = drawLineOnly(g, difarDataUnit, p1, p2, dataSymbol, drawingOptions);
 					bounds = updateMapBounds(bounds,rect);
-					if (difarDataUnit.getDifarCrossing() != null) // return if this is an old crossbearing
+					if (saved) // a saved crossing is drawn without its bearing line
 						return bounds;
 				}
 //			}

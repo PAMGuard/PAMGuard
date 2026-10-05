@@ -1,0 +1,43 @@
+# DIFAR in the Viewer: settings that must be right
+
+Brian Miller, Australian Antarctic Division. Branch `difar-crossings`, started 30 September 2026.
+
+Settings the Viewer needs for DIFAR reanalysis, gathered as they are found. Several look like faults
+when missed. Check this list before reporting a bug. It is in the help page
+`src/help/localisation/difar/difarLocalisation/docs/difar_ViewerReanalysis.html` (1 October 2026);
+keep the two in step.
+
+## Opening a dataset
+
+- **Or pass the database and binary folder as program arguments,** which skips both startup dialogs:
+  `-v -databasefile S:\Data\2019-enrich-full\In2019V01_01.sqlite3 -binaryfolder S:\Data\2019-enrich-full\binary`.
+  One Eclipse debug configuration per dataset. The database name must end in `.sqlite3`, or it is
+  ignored and the dialog appears. A binary folder that does not exist is created, empty, so check the
+  path.
+- **Add `-wavfilefolder <folder>` to set the Viewer's offline audio,** needed to make or measure
+  clips. Unlike the other two, this switch is case-sensitive.
+- **Choose the dataset's own database.** The Viewer offers the last database used. Opening a slice or
+  copy with another dataset's database pairs its binary files with the wrong clip rows and crossings.
+  Symptom: counts that belong to another dataset, such as crossings in a database that should have
+  none.
+
+## Map
+
+- **New bearings and crossings reach the map late:** a saved clip appears only once it has scrolled
+  off the spectrogram to the left, since the map draws up to the scroller's time. No setting fixes
+  it well. "Display all selected data" draws the whole loaded period, but hides or fades nothing
+  ahead. "Look Ahead" in the Data Overlay options does nothing: core's map fetches only data up to
+  the scroller's time before it applies Look Ahead (a core fault; see `outstanding.md`).
+- **Tick "all data" in the map's plot options for buoys to appear.** Without it the map draws only
+  buoy records inside the view's time window, and a buoy deployed before the view starts is not
+  drawn. Symptom: no buoys on the map, though bearings and crossings load.
+
+## Buoy manager
+
+- **Open the bottom panel for the time window controls.** It starts collapsed. Symptom: no way to
+  change which buoys are listed.
+
+## Offline tasks
+
+- **Run "Upgrade old DIFAR files to version 3" over all data.** The upgrade refuses any other data
+  choice, since matching must find partners anywhere in the dataset.
