@@ -128,6 +128,20 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
 
 ## Code, before or after the pull request
 
+- Reprocessing over existing binaries. A Normal mode rerun over the same data time overwrites every
+  module's binary files (core warns at startup), but DIFAR's database rows and triangulations for the
+  overwritten period remain, pointing at DIFAR clips that are gone. Seen in a rerun of rung 9,
+  5 October 2026. Options, after the pull request:
+  1. A core "keep both" option in the binary store, writing a unique file name on a collision: a
+     question for Doug, since every module overwrites, not only DIFAR.
+  2. DIFAR keeping its tables consistent with its binaries: remove the DIFAR rows and triangulations
+     for an overwritten period, or at least report orphaned rows at Viewer mode startup, as the UID
+     check does.
+  3. Reviving the hour-grid compaction (`TimeGrid`, `ClipMerge`, `CompactionPlan`, parked in
+     `d8100ca6`) to consolidate several DIFAR files per hour, for Viewer mode edits and kept reruns.
+     It was parked because DIFAR clips carried their triangulations; that obstacle is gone now that
+     triangulations live in the database.
+
 - Rename UI labels to match the help's terms: the data selector's "Crossing quality" panel and
   "Hide crossings on one of their own buoys", and the settings' "Max candidates per buoy" and
   "On-buoy radius", to triangulation and sonobuoy. Leave database table and column names.
@@ -138,6 +152,8 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
   its harness (`S:\Data\2019-difar-retest`: `rung.sh`, `runs/`, several configuration copies),
   the 2019 Viewer fixtures, the 2013 pilot checks, and the batch test sheets. Decide what lives in
   the repo and what stays with the data.
+  Always `./rung.sh reset` before a Normal mode run of the simulated exercise; otherwise the run
+  overwrites the previous binaries and leaves their database rows behind.
 
 - Crossing quality passed on the 2013 pilot (1 October 2026): the setting, rematch counts, the new
   columns, on-buoy errors at the radius, and the selector's three settings on the map. Owed: rematch
@@ -312,6 +328,10 @@ items below are about making fewer of them necessary.
   a window early: 0.5 s for the pilot's 256 points at 250 Hz. Fixed in core on its own branch,
   `spectrogram-centred-columns`, which draws columns at the window centre in Normal mode and the
   Viewer, and cherry-picked here. DIFAR's interim half-window shift of marks is removed.
+- Clear match is not remembered. A DIFAR clip saved with Clear match has no record that the operator
+  rejected its matches, so a later rematch (Rematch clips, or the rematch after a sonobuoy edit in
+  Viewer mode) can match it anyway. Not yet seen in practice. Fix: record the operator's "no match" on the clip, and have rematching respect it as it keeps
+  OPERATOR triangulations.
 - A saved clip's classification cannot be changed in place. The species, Vessel and Other buttons on
   saved clips are disabled; delete the clip and mark the call again. A real edit (reclassify,
   reprocess, save through `ViewerEdits`, rematch if the bearing moves) waits until the need is shown.

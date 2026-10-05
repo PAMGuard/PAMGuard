@@ -210,15 +210,57 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		 */
 		boolean choosable = currentUnit != null && difarControl.isQueued(currentUnit);
 		boolean readOnly = currentUnit != null && !choosable;
+		/*
+		 * For a clip being worked, the best match is proposed. For a saved clip,
+		 * only the match it was saved with is marked used, or none if it was
+		 * saved without a triangulation; the rest are shown for reference.
+		 */
+		DifarMatchSelector.Match used = readOnly ? savedMatch(currentUnit, matches)
+				: DifarMatchSelector.chooseMatch(matches);
 		SwingUtilities.invokeLater(() -> {
 			table.setEnabled(choosable);
 			clearButton.setEnabled(choosable);
 			setBorder(BorderFactory.createTitledBorder(readOnly
 					? "Triangulation match selector (saved clip: read only)" : "Triangulation match selector"));
-			tableModel.setMatches(matches);
+			tableModel.setMatches(matches, used);
 			sizeColumns();
 			updateClipStrip();
 		});
+	}
+
+	/**
+	 * The match a saved clip's triangulation was made from: the candidate
+	 * holding exactly the triangulation's DIFAR clips.
+	 * @param clip a saved DIFAR clip.
+	 * @param matches its candidates.
+	 * @return that match, or null if the clip has no triangulation or none of
+	 * the candidates holds its DIFAR clips.
+	 */
+	private static DifarMatchSelector.Match savedMatch(DifarDataUnit clip, List<DifarMatchSelector.Match> matches) {
+		if (clip == null || matches == null) {
+			return null;
+		}
+		Object superDet = clip.getSuperDetection(DifarCrossing.class);
+		if (!(superDet instanceof DifarCrossing)) {
+			return null;
+		}
+		java.util.Set<Long> saved = uids(((DifarCrossing) superDet).getSubDetections());
+		for (DifarMatchSelector.Match match : matches) {
+			if (match.getUnits() != null && saved.equals(uids(match.getUnits()))) {
+				return match;
+			}
+		}
+		return null;
+	}
+
+	private static java.util.Set<Long> uids(List<? extends PamDataUnit> units) {
+		java.util.Set<Long> uids = new java.util.HashSet<>();
+		if (units != null) {
+			for (PamDataUnit unit : units) {
+				uids.add(unit.getUID());
+			}
+		}
+		return uids;
 	}
 
 	/** Rows are candidate groups, best first. */
@@ -234,9 +276,9 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		/** The match that was used, or null. Only this one is marked used. */
 		private DifarMatchSelector.Match used;
 
-		void setMatches(List<DifarMatchSelector.Match> matches) {
+		void setMatches(List<DifarMatchSelector.Match> matches, DifarMatchSelector.Match used) {
 			this.matches = matches;
-			this.used = DifarMatchSelector.chooseMatch(matches);
+			this.used = used;
 			fireTableDataChanged();
 		}
 
