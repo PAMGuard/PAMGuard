@@ -162,7 +162,11 @@ public class StreamerImport  extends DataImport<ArrayList<Double>>{
 		}
 		StreamerDataUnit streamerData=new StreamerDataUnit(timeMillis, streamer);
 		currentArray.setArrayName("Array on " + PamCalendar.formatDateTime(timeMillis));
-		ArrayManager.getArrayManager().addArray(currentArray);
+		/*
+		 * The current array is already in the Array Manager's list, so it is not
+		 * added again. Adding it for every row put one copy in the saved settings
+		 * per row imported: 147 copies of a 32-streamer array after three imports.
+		 */
 		return streamerData;
 	}
 
