@@ -253,7 +253,14 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 		if (recentArrays == null) {
 			recentArrays = new ArrayList<PamArray>();
 		}
-		recentArrays.add(newArray);
+		/*
+		 * The same array is never listed twice. A repeat costs nothing in memory,
+		 * but settings are cloned array by array when they load, so each repeat
+		 * becomes a full copy, and the copies are saved with the settings.
+		 */
+		if (!recentArrays.contains(newArray)) {
+			recentArrays.add(newArray);
+		}
 	}
 
 	public void setCurrentArray(PamArray array) {
