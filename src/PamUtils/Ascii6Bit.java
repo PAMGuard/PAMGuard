@@ -71,13 +71,19 @@ public class Ascii6Bit {
 		int firstBit = 0;
 		int lastBit = 0;
 		char ch;
-		stringData = new String();
+		/*
+		 * Built in a StringBuilder: adding one character at a time to a String
+		 * copies the whole string each time, which takes minutes for settings of
+		 * a megabyte or two, and hangs PAMGuard on close while it saves them.
+		 */
+		StringBuilder builder = new StringBuilder(nChar);
 		while (firstBit < totalBits) {
 			lastBit = Math.min(totalBits-1, firstBit+5);
 			ch = getChar(firstBit, lastBit);
-			stringData += ch;
+			builder.append(ch);
 			firstBit = lastBit + 1;
 		}
+		stringData = builder.toString();
 		/*
 		 * At this point, we need a fix, since some data were recorded into
 		 * the database with an error in the AIS Lookup table used for the encoding
