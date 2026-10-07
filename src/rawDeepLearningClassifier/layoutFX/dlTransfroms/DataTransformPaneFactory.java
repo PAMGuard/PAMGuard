@@ -153,6 +153,11 @@ public class DataTransformPaneFactory {
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Window "},  new String[]{"s"});
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, Double.MAX_VALUE,   1.0);
 			break;
+		case SPEC_TIME_TRIM:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Start bin ", "Time bins "},  new String[]{"bins", "bins"}); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 1, Integer.MAX_VALUE,   1);
+			break;
 		case SPECNORMALISESTD:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Mean ", "Std "}); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, Double.MAX_VALUE,   0.1);

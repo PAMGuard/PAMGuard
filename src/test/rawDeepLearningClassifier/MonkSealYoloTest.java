@@ -17,12 +17,15 @@ import org.junit.jupiter.api.Test;
 
 import rawDeepLearningClassifier.DLDownloadManager;
 import rawDeepLearningClassifier.DLStatus;
+import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
+import rawDeepLearningClassifier.dlClassification.DLDetection;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloClassifier;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloParams;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloPrediction;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloWorker;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.SegmenterProcess;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
 import us.hebi.matlab.mat.types.Matrix;
@@ -150,6 +153,139 @@ public class MonkSealYoloTest {
 		assertEquals(refBoxes.length, nMatch);
 		assertTrue(maxScoreDiff < 0.01);
 		assertTrue(maxBoxDiff < 1.0);
+	}
+
+	/**
+	 * Test the detections which PAMGuard saves from the monk seal model. Segments
+	 * are made in the same way as the segmenter (including the segment duration in
+	 * milliseconds) and each bounding box is converted to a detection in the same
+	 * way as the DLClassifyProcess. The detections should have the time and sample
+	 * limits of the MATLAB bounding boxes and contain the correct section of audio.
+	 */
+	@Test
+	public void monkSealDetectionTest() throws Exception {
+
+		File modelFile = getModelFile();
+		assertNotNull(modelFile, "Unable to download the monk seal model from " + MODEL_URL);
+
+		String wavFilePath = Paths.get(RESOURCE_FOLDER + "monk_seal_hms_clip_20210513_003425.wav").toAbsolutePath().normalize().toString();
+		String refPath = Paths.get(RESOURCE_FOLDER + "monk_seal_hms_matlab_detections.mat").toAbsolutePath().normalize().toString();
+
+		Mat5File matFile = Mat5.readFromFile(refPath);
+		double[] segStart = column(matFile.getMatrix("seg_start"));
+		double[][] refBoxes = DLMatFile.matrix2array(matFile.getMatrix("det_bbox"));
+		double[] refSegment = column(matFile.getMatrix("det_segment"));
+		double[] refLabel = column(matFile.getMatrix("det_label"));
+
+		YoloWorker yoloWorker = new YoloWorker();
+		YoloParams params = new YoloParams();
+		params.modelPath = modelFile.getAbsolutePath();
+		assertEquals(DLStatus.MODEL_LOAD_SUCCESS, yoloWorker.prepModel(params, null));
+		YoloClassifier.setWorkerParams(yoloWorker, params);
+
+		AudioData soundData = DLUtils.loadWavFile(wavFilePath);
+		double[] soundDataD = soundData.getScaledSampleAmplitudes();
+		float sampleRate = soundData.sampleRate;
+
+		int segSamples = (int) Math.round((params.defaultSegmentLen / 1000.) * sampleRate);
+
+		//60 s at 48 kHz overflows an integer if calculated as integer millis x samples.
+		long segMillis = SegmenterProcess.getSegmentMillis(segSamples, sampleRate);
+		assertEquals(60000, segMillis);
+
+		//a realistic start time for the clip - 2021-05-13 00:36:25 UTC.
+		long clipStartMillis = 1620866185000L;
+
+		//make the segments in the same way as the segmenter.
+		ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
+		for (int i = 0; i < segStart.length; i++) {
+			int startSample = (int) segStart[i];
+			GroupedRawData segment = new GroupedRawData(clipStartMillis + (long) (1000.*startSample/sampleRate), 1, startSample, segSamples, segSamples);
+			segment.setUID(i);
+			segment.setFrequency(new double[] {0, sampleRate/2});
+			segment.setDurationInMilliseconds(segMillis);
+			int nCopy = Math.min(segSamples, soundDataD.length - startSample);
+			System.arraycopy(soundDataD, startSample, segment.getRawData()[0], 0, nCopy);
+			groupedData.add(segment);
+		}
+
+		ArrayList<StandardPrediction> predictions = yoloWorker.runModel(groupedData, sampleRate, 0);
+		assertNotNull(predictions);
+
+		int imWidth = yoloWorker.getYoloModel().getImageWidth();
+		int imHeight = yoloWorker.getYoloModel().getImageHeight();
+		double[] freqLims = yoloWorker.getImageFreqLimits();
+		yoloWorker.closeModel();
+
+		//one pixel of the image in samples - the tolerance for comparing to MATLAB.
+		double pixelSamples = segSamples / (double) imWidth;
+
+		int nMatch = 0;
+		for (int i = 0; i < refBoxes.length; i++) {
+			GroupedRawData segment = groupedData.get((int) refSegment[i]);
+
+			//find the matching PAMGuard bounding box
+			YoloPrediction bestMatch = null;
+			double bestIoU = 0;
+			for (StandardPrediction prediction : predictions) {
+				YoloPrediction yoloPrediction = (YoloPrediction) prediction;
+				if (yoloPrediction.getParentSegmentID() != (long) refSegment[i]) continue;
+				if (argMax(yoloPrediction.getPredicitions()) != (int) refLabel[i] - 1) continue;
+				double iou = iou(refBoxes[i], yoloPrediction.getBoundingBox());
+				if (iou > bestIoU) {
+					bestIoU = iou;
+					bestMatch = yoloPrediction;
+				}
+			}
+			if (bestMatch == null || bestIoU < MIN_IOU) continue;
+			nMatch++;
+
+			//convert the box to a detection in the same way as the DLClassifyProcess (no merging).
+			YoloClassifier.setBoxLimits(bestMatch, segment, imWidth, imHeight, freqLims);
+			ArrayList<GroupedRawData> segList = new ArrayList<GroupedRawData>();
+			segList.add(segment);
+			ArrayList<YoloPrediction> predList = new ArrayList<YoloPrediction>();
+			predList.add(bestMatch);
+			DLDetection detection = DLClassifyProcess.makeRawDLDetection(segList, predList, segSamples, segSamples, sampleRate);
+			assertNotNull(detection);
+
+			//the start and end of the MATLAB box in samples from the start of the clip.
+			double refStart = segStart[(int) refSegment[i]] + Math.max(0, refBoxes[i][0] - 0.5) * pixelSamples;
+			double refEnd = segStart[(int) refSegment[i]] + Math.min(imWidth, refBoxes[i][0] + refBoxes[i][2] - 0.5) * pixelSamples;
+
+			long detStart = detection.getStartSample();
+			long detEnd = detStart + detection.getSampleDuration();
+
+			System.out.println(String.format("Detection %d: MATLAB %.2f - %.2f s PAMGuard samples %.2f - %.2f s millis %.3f s freq %.0f - %.0f Hz",
+					i, refStart/sampleRate, refEnd/sampleRate, detStart/(double) sampleRate, detEnd/(double) sampleRate,
+					(detection.getTimeMilliseconds() - clipStartMillis)/1000., detection.getFrequency()[0], detection.getFrequency()[1]));
+
+			//the detection is within its segment
+			assertTrue(detStart >= segment.getStartSample());
+			assertTrue(detEnd <= segment.getStartSample() + segSamples);
+
+			//the start sample and duration match the MATLAB box
+			assertEquals(refStart, detStart, pixelSamples);
+			assertEquals(refEnd, detEnd, pixelSamples);
+
+			//the time in millis agrees with the start sample
+			assertEquals(1000.*detStart/sampleRate, detection.getTimeMilliseconds() - clipStartMillis, 2.);
+			assertEquals(1000.*detection.getSampleDuration()/sampleRate, detection.getDurationInMilliseconds(), 1.);
+
+			//the detection holds the audio from the box
+			double[] wave = detection.getWaveData()[0];
+			assertEquals(detection.getSampleDuration(), wave.length);
+			for (int j = 0; j < Math.min(100, wave.length); j++) {
+				assertEquals(soundDataD[(int) detStart + j], wave[j], 1e-9);
+			}
+
+			//the frequency limits are within the image
+			assertTrue(detection.getFrequency()[0] >= freqLims[0] - 1e-6);
+			assertTrue(detection.getFrequency()[1] <= freqLims[1] + 1e-6);
+			assertTrue(detection.getFrequency()[1] > detection.getFrequency()[0]);
+		}
+
+		assertEquals(refBoxes.length, nMatch);
 	}
 
 	/**

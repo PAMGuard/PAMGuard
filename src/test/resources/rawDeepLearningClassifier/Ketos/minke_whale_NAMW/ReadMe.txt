@@ -27,3 +27,22 @@ Results (14/09/2026)
 
 Python environment used: python 3.10, tensorflow 2.15.1, ketos 2.7.1 (pip install --no-deps), ecosound 0.0.25
 (pip install --no-deps), numpy 1.26.4, scipy 1.15.3, dask-image 2026.5.0, setuptools<81.
+
+60 second version of the model (model_NAMW_20240523_60s.ktpb)
+The python detector computes the median equalizer over the whole file, so each 5 s chunk is denoised using
++/- 30 s of surrounding data. PAMGuard only sees one segment at a time, so this version of the model uses a
+60 s segment (audio_repr_pg_60s.json): the spectrogram, dB conversion and 60 s median equalizer are computed
+over the whole 60 s and the new spec_time_trim transform then keeps the centre 125 time bins (5 s) for the
+model. The centre bin then has exactly the same 60 s of context as python, and the other bins are within
++/- 2.5 s of it.
+
+IMPORTANT: with this model the segmenter hop in PAMGuard must be set to ~5 s (the model classifies only the
+centre 5 s of each 60 s segment), otherwise 55 s out of every 60 s of data is not classified. The trade off
+is that the spectrogram is recomputed for a 60 s window every hop, which is ~12x more FFT work.
+
+Results (25/09/2026), compared to the whole file denoised python scores:
+- 5 s model (model_NAMW_20240523.ktpb):  66.7% within 0.1, 83.4% agree at 0.5 (445 segments).
+- 60 s model (model_NAMW_20240523_60s.ktpb): 100% within 0.1, 100% agree at 0.5, mean abs diff 0.0033
+  (104 segments).
+
+Both models use identical weights - only the metadata (audio_repr.json) inside the zip differs.

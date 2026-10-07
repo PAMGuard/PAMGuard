@@ -55,6 +55,18 @@ public class KetosMinkeDLClassifierTest {
 
 	private static final int BATCH_SIZE = 32;
 
+	/**
+	 * The 60 s model trims the centre 125 time bins of the segment - see audio_repr_pg_60s.json.
+	 */
+	private static final int TRIM_START_BIN = 688;
+
+	/**
+	 * 60 s segments are slower to process so test fewer of them.
+	 */
+	private static final int SEGMENT_STEP_60S = 100;
+
+	private static final int BATCH_SIZE_60S = 8;
+
 	@Test
 	public void ketosMinkeTest() throws Exception {
 
@@ -125,6 +137,91 @@ public class KetosMinkeDLClassifierTest {
 		// ...and be broadly similar to the whole file denoised scores. In python, 85% of all segments
 		// agree at a 0.5 threshold between segment and whole file denoising.
 		assertTrue(fileDetMatch > 0.8);
+	}
+
+
+	/**
+	 * Test the 60 second version of the model. This uses a 60 second segment so that the
+	 * median equalizer has the same 60 seconds of context as the python detector, and then
+	 * trims the centre 5 seconds of the spectrogram for the model. The scores should
+	 * therefore be much closer to the whole file denoised python scores.
+	 * <p>
+	 * Note that in PAMGuard the segmenter hop should be set to ~5 s so that every part of
+	 * the recording is classified.
+	 */
+	@Test
+	public void ketosMinke60sTest() throws Exception {
+
+		String modelPath = Paths.get(RESOURCE_FOLDER + "model_NAMW_20240523_60s.ktpb").toAbsolutePath().normalize().toString();
+		String wavFilePath = Paths.get(RESOURCE_FOLDER + "79296_Brunswick03_002K_M06_UTCm5_CH6_20161227_110000.wav").toAbsolutePath().normalize().toString();
+		Path refPath = Paths.get(RESOURCE_FOLDER + "minke_reference_scores.csv").toAbsolutePath().normalize();
+
+		ArrayList<double[]> reference = readReference(refPath.toString(), SEGMENT_STEP_60S);
+
+		KetosWorker2 ketosWorker2 = new KetosWorker2();
+
+		KetosDLParams params = new KetosDLParams();
+		params.modelPath = modelPath;
+
+		DLStatus status = ketosWorker2.prepModel(params, null);
+		assertEquals(DLStatus.MODEL_LOAD_SUCCESS, status);
+
+		AudioData soundData = DLUtils.loadWavFile(wavFilePath);
+		double[] soundDataD = soundData.getScaledSampleAmplitudes();
+
+		int segSamples = (int) Math.round((params.defaultSegmentLen / 1000.) * soundData.sampleRate);
+		System.out.println("60s model segment length: " + params.defaultSegmentLen + " ms " + segSamples + " samples");
+
+		int nFileDenoiseMatch = 0;
+		int nFileDenoiseDetMatch = 0;
+		int nTested = 0;
+		double sumDiff = 0;
+
+		ArrayList<double[]> batchRef = new ArrayList<double[]>();
+		ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
+
+		for (int i = 0; i <= reference.size(); i++) {
+
+			if (i < reference.size()) {
+				// the model input is the centre 125 time bins of the segment so the segment starts
+				// TRIM_START_BIN spectrogram hops before the reference segment.
+				int startSample = ((int) reference.get(i)[0] - TRIM_START_BIN) * FFT_HOP;
+				if (startSample >= 0 && startSample + segSamples <= soundDataD.length) {
+					GroupedRawData groupedRawData = new GroupedRawData(0, 1, startSample, segSamples, segSamples);
+					groupedRawData.copyRawData(soundDataD, startSample, segSamples, 0);
+					groupedData.add(groupedRawData);
+					batchRef.add(reference.get(i));
+				}
+			}
+
+			if (groupedData.size() == BATCH_SIZE_60S || (i == reference.size() && groupedData.size() > 0)) {
+				ArrayList<StandardPrediction> predictions = ketosWorker2.runModel(groupedData, soundData.sampleRate, 0);
+				for (int j = 0; j < batchRef.size(); j++) {
+					double[] ref = batchRef.get(j);
+					float minke = predictions.get(j).getPrediction()[1];
+					double diff = Math.abs(minke - ref[3]);
+					sumDiff += diff;
+					if (diff < 0.1) nFileDenoiseMatch++;
+					if ((minke >= 0.5) == (ref[3] >= 0.5)) nFileDenoiseDetMatch++;
+					nTested++;
+				}
+				groupedData = new ArrayList<GroupedRawData>();
+				batchRef = new ArrayList<double[]>();
+			}
+		}
+
+		ketosWorker2.closeModel();
+
+		double fileMatch = nFileDenoiseMatch / (double) nTested;
+		double fileDetMatch = nFileDenoiseDetMatch / (double) nTested;
+
+		System.out.println(String.format("Minke whale 60s model: %d segments tested", nTested));
+		System.out.println(String.format("File denoise: %.1f%% within 0.1, %.1f%% agree at 0.5 threshold, mean abs diff %.4f",
+				100 * fileMatch, 100 * fileDetMatch, sumDiff / nTested));
+
+		// measured 100% within 0.1 and 100% agreement at 0.5 (mean abs diff 0.0033)
+		assertTrue(fileMatch > 0.95);
+		assertTrue(fileDetMatch > 0.98);
 	}
 
 	/**

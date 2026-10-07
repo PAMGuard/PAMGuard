@@ -48,6 +48,12 @@ public class YoloClassifier extends ArchiveModelClassifier {
 	}
 
 	@Override
+	public boolean isObjectDetector() {
+		//each bounding box is a separate detection.
+		return true;
+	}
+
+	@Override
 	public StandardModelParams makeParams() {
 		return new YoloParams();
 	}
