@@ -1049,7 +1049,7 @@ public class AcquireNmeaData extends PamProcess implements ModuleStatusManager {
 		
 		ModuleStatus status = processCheck.getStatus();
 		
-		if(PamController.getInstance().getRunMode()==PamController.RUN_NETWORKRECEIVER) {
+		if(PamController.isNetRx()) {
 			status.setStatus(ModuleStatus.STATUS_OK);
 			return status;
 		}

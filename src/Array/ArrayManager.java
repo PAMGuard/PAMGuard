@@ -185,10 +185,16 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 		getCurrentArray().notifyModelChanged(changeType, initComplete);
 
 		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
-			// create data units and save - is this needed in the viewer ? 
-			//			if (PamController.getInstance().getRunMode() == PamController.RUN_NORMAL) {
-			hydrophonesProcess.createArrayData();
-			//			}
+			/*
+			 * Record the array in the database at the start of a run. Not in the
+			 * viewer: there the array is read from the database, and the current
+			 * time at startup is zero, so the records written were dated 1 January
+			 * 1970 and saved on every session. The DIFAR module then used them as
+			 * buoy positions and headings, in place of the real deployment records.
+			 */
+			if (!isViewer) {
+				hydrophonesProcess.createArrayData();
+			}
 		}
 
 		if (changeType == PamControllerInterface.OFFLINE_DATA_LOADED){

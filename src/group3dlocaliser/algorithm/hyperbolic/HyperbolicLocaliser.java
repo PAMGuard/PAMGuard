@@ -85,6 +85,9 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 			//System.out.println("HyperbolicLocaliser: Plane");
 
 			loclaisation = processTOADsPlane(groupDataUnit, geometry, toadInformation);
+			if (loclaisation == null) { // issue suggestion 342
+				return null;
+			}
 			calcErrors(loclaisation.getGroupLocaResult(0),  groupDataUnit,  geometry,  toadInformation,    params);
 			return loclaisation;
 
@@ -92,6 +95,9 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 			//System.out.println("HyperbolicLocaliser: Volume");
 
 			loclaisation =  processTOADs3D(groupDataUnit, geometry, toadInformation);
+			if (loclaisation == null) { // issue suggestion 342
+				return null;
+			}
 			calcErrors(loclaisation.getGroupLocaResult(0),  groupDataUnit,  geometry,  toadInformation,    params);
 			return loclaisation;
 		}
@@ -720,7 +726,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 			for (int i = 0; i < goodLeft.length; i++) {
 				double w = goodScale[i];
 				if (w <= 0) continue;
-				w = 1./Math.sqrt(w);
+				w = 1./Math.sqrt(w); // see issue 342. May not want this second 1/w ? 
 				w = 1./w;
 //				w = 1000.;
 				for (int j = 0; j < goodLeft[i].length; j++) {
@@ -735,6 +741,13 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		Matrix leftMatrix = new Matrix(goodLeft);
 		Matrix rightMatrix = new Matrix(goodRight);
 		Matrix rightPlusErrorMatrix = new Matrix(goodRightError);
+		
+		/*
+		 * Suggested fix from issue 342
+		 */
+		if (leftMatrix.rank() < leftMatrix.getColumnDimension()) {
+		    return null; // under-determined (e.g. < 5 hydrophones in 3D, or a missing pair); caller may fall back to simplex
+		}
 		
 //		Matrix answer = leftMatrix.solve(rightMatrix);
 		Matrix answer = null, leftInverse = null;
@@ -865,20 +878,23 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 			case ArrayManager.ARRAY_TYPE_LINE:
 				//System.out.println("HyperbolicLocaliser: Line");
 				//TODO
+				break;
 			case ArrayManager.ARRAY_TYPE_PLANE:
 				//System.out.println("HyperbolicLocaliser: Plane");
 				errLoc = processTOADsPlane(groupDataUnit, geometry, toadInformation);
 				posVec = errLoc.getPosVec(); 
+				break;
 
 			case ArrayManager.ARRAY_TYPE_VOLUME:
 				//System.out.println("HyperbolicLocaliser: Volume");
 
 				errLoc=  processTOADs3D(groupDataUnit, geometry, toadInformation);
 				posVec = errLoc.getPosVec(); 
+				break;
 
 			}
 			
-			sourcePositions[i]= posVec;
+			sourcePositions[i] = posVec;
 		}
 		
 		//now take the standard deviation of all the measurements

@@ -349,9 +349,17 @@ public class DetectionGroupLocaliser2<T extends SuperDetection> implements Local
 //				//will only have one solution....
 //				nMinFunc=1; 
 //			}
+			ArrayList<PamDataUnit> subDets = groupInfo.getParentDetection().getSubDetections();
+//			for (PamDataUnit aSub : subDets) {
+//				if (aSub.getUID() == 3978013970L) {
+//					System.out.println("Debug pause at data unit " + aSub.getUID());
+//				}
+//			}
 			for (int i=0; i<nMinFunc; i++){
 				PamVector[] angleErrors = groupInfo.getWorldVectorErrors(i);
-				minFunctuions[i]=new Chi2Bearings(groupInfo.getWorldVectors(i), angleErrors, groupInfo.getOrigins(), groupInfo.getRotationVectors(), nDim); 
+				PamVector[] worldVecs = groupInfo.getWorldVectors(i);
+				PamVector[] origins = groupInfo.getOrigins();
+				minFunctuions[i]=new Chi2Bearings(worldVecs, angleErrors, origins, groupInfo.getRotationVectors(), nDim); 
 			}
 			break;
 		case TIMEDELAY_GROUP:

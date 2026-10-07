@@ -213,7 +213,7 @@ public class TrackedGroupDataBlock extends PamDataBlock<PamDataUnit> {
 					lastDetectionTime = PamCalendar.formatTime(unit.getMostRecentDetectionTime());
 				}
 				sonobuoys += unit.getBuoyName() + ", ";
-				lastDetections += String.format("%d bearings on %s. Mean: <b>%3.0°</b> (Latest: %3.0° at %s)<br>",
+				lastDetections += String.format("%d bearings on %s. Mean: <b>%3.0f°</b> (Latest: %3.0f° at %s)<br>",
 						unit.getNumBearings(), unit.getBuoyName(), unit.getMeanBearing(),
 						unit.getMostRecentBearing(), lastDetectionTime);
 				numBearings += unit.getNumBearings();
@@ -228,7 +228,7 @@ public class TrackedGroupDataBlock extends PamDataBlock<PamDataUnit> {
 		}
 		summary += String.format(" (%d bearings)<br><br>",numBearings);
 		summary += lastDetections;
-		summary += String.format("<br>First detected on sonobuoy %s, %3.0° at %s<br>", 
+		summary += String.format("<br>First detected on sonobuoy %s, %3.0f° at %s<br>", 
 				firstBuoy, firstBearing, PamCalendar.formatDateTime(firstDetected));
 		summary += String.format("Sonobuoys: %s", sonobuoys);
 		return summary;

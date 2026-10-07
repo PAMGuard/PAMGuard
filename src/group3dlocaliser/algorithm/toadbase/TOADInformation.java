@@ -1,5 +1,7 @@
 package group3dlocaliser.algorithm.toadbase;
 
+import java.util.Arrays;
+
 import group3dlocaliser.algorithm.hyperbolic.HyperbolicParams;
 
 /**
@@ -161,12 +163,30 @@ public class TOADInformation implements Cloneable {
 	 @Override
 	 public TOADInformation clone()  {
 		 try {
-
-			 return (TOADInformation) super.clone();
+			 TOADInformation c = (TOADInformation) super.clone();
+			 c.toadSeconds = deepCopy(c.toadSeconds);
+			 c.toadErrorsSeconds = deepCopy(c.toadErrorsSeconds);
+			 c.toadScores = deepCopy(c.toadScores);
+			 return c;
 		 } catch (CloneNotSupportedException e) {
 			 e.printStackTrace();
 			 return null;
 		 }
+	 }
+	 
+	 /**
+	  * Deep clone of a 2d array. 
+	  * @param arr
+	  * @return
+	  */
+	 private double[][] deepCopy(double[][] arr){
+		 double[][] copy = new double[arr.length][];
+		 for (int i = 0; i < arr.length; i++) {
+			 if (arr[i] != null) {
+				 copy[i] = Arrays.copyOf(arr[i], arr[i].length);
+			 }
+		 }
+		 return copy;
 	 }
 
 }

@@ -529,6 +529,7 @@ public class DatagramManager {
 	}
 
 	/**
+
 	 * Called on the AWT thread once all datagram creation has finished (or been
 	 * cancelled). Subclasses can override to save whatever they've created.
 	 */
@@ -559,6 +560,7 @@ public class DatagramManager {
 	}
 
 	/**
+
 	 * @return the data store these datagrams belong to.
 	 */
 	public OfflineDataStore getOfflineDataStore() {

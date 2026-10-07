@@ -335,7 +335,7 @@ ul
 
 <p class="AuthorName"><span lang="EN-GB" style="text-transform: uppercase; font-variant: normal !important;">Brian S. Miller</span></p>
 
-<p class="AuthorAddress"><span lang="EN-GB">Australian Marine Mammal Centre, Australian Antarctic Division</span></p>
+<p class="AuthorAddress"><span lang="EN-GB">Australian Antarctic Division</span></p>
 
 <p class="EMailAddress"><span lang="EN-GB"><a href="mailto:brian.miller@aad.gov.au">brian.miller@aad.gov.au</a></span></p>
 
@@ -453,7 +453,7 @@ ul
 
 <h2><a name="_Toc396467144">A technical note on demultiplexers</a></h2>
 
-<p class="MsoBodyText">The PAMGuard DIFAR module includes open-source demultiplexing software created at the Australian Marine Mammal Centre (AMMC). The implementation of this demultiplexing software is fundamentally different than that of Greenridge Sciences Inc. It has worked well in the limited testing that has been conducted, and it appears to give similar results to those from the Greenridge Sciencies demultiplexer.</p>
+<p class="MsoBodyText">The PAMGuard DIFAR module includes open-source demultiplexing software created at the Australian Antarctic Division (listed as AMMC_EXPERIMENTAL in the settings). The implementation of this demultiplexing software is fundamentally different than that of Greenridge Sciences Inc. It has worked well in the limited testing that has been conducted, and it appears to give similar results to those from the Greenridge Sciencies demultiplexer.</p>
 
 <p class="MsoBodyText">To the best of my knowledge, the Greenridge Sciences demultiplexing library used by PAMGuard is based on algorthims and computer-code that has been used successfully over the past 10 years (at the very least) to analyse DIFAR data. Thus, it is recommended over the AMMC demultiplexer, which should work, but has not yet seen extensive use.</p>
 
@@ -477,15 +477,15 @@ ul
 
 <h2><a name="_Toc396467148"><span lang="EN-GB">Database preparation</span></a></h2>
 
-<p class="MsoBodyText"><span lang="EN-GB">Post-processing of DIFAR data requires a database module. All development and testing of the DIFAR module were conducted using the MS Access database module. NB: I have found that the older .mdb Access databases seem to work more reliably than the newer format .accdb database files, especially on computers where MS Access is not installed. </span></p>
+<p class="MsoBodyText"><span lang="EN-GB">Post-processing of DIFAR data requires a database module. Current versions of PAMGuard use SQLite databases. </span></p>
 
-<p class="MsoBodyText"><span lang="EN-GB">If a PAMGuard database has already been created for this dataset (e.g. PAMGuard was used initially when collecting the data), this database can be used in lieu of importing GPS and streamer data into a blank database. However, the more likely scenario is that there is no PAMGuard database, so one must be created. An easy way to create a new database is to simply create a copy of a blank database (e.g. the one distributed with this tutorial). </span></p>
+<p class="MsoBodyText"><span lang="EN-GB">If a PAMGuard database has already been created for this dataset (e.g. PAMGuard was used initially when collecting the data), this database can be used in lieu of importing GPS and streamer data into a blank database. However, the more likely scenario is that there is no PAMGuard database, so one must be created. To create a new database, run PAMGuard in Viewer mode and enter a new file name, ending in .sqlite3, in the database selection dialog. PAMGuard creates the database. </span></p>
 
-<p class="MsoPlainText">copy blank.mdb difarTutorial.mdb</p>
+<p class="MsoPlainText">difarTutorial.sqlite3</p>
 
 <p class="MsoPlainText">&nbsp;</p>
 
-<p class="MsoBodyText">With the blank database created, run PAMGuard in Viewer-mode, and select difarTutorial.mdb as the database.</p>
+<p class="MsoBodyText">With the blank database created, run PAMGuard in Viewer-mode, and select difarTutorial.sqlite3 as the database.</p>
 
 <p class="MsoBodyText"><img border="0" height="187" src="difar_PostProcessingTutorial_files/image002.jpg" width="543" /></p>
 
@@ -655,9 +655,9 @@ ul
 
 <h3><a name="_Toc396467156">Cleanup after import</a></h3>
 
-<p class="MsoBodyText">The GPS Import can result in an MS Access database that has an excessive file size. This provides a good excuse to create a backup of the database now that the GPS track and Sonobuoy Deployment locations have been imported.</p>
+<p class="MsoBodyText">Now that the GPS track and sonobuoy deployments have been imported, this is a good point to back up the database.</p>
 
-<p class="MsoBodyText">Close PAMGuard Viewer, open the database in MS Access, and save the database as a new MS Access database: e.g. difarTutorial-Imported.mdb.</p>
+<p class="MsoBodyText">Close PAMGuard Viewer and copy the database file, e.g. to difarTutorial-Imported.sqlite3.</p>
 
 <p class="MsoBodyText"><img border="0" height="564" src="difar_PostProcessingTutorial_files/image018.jpg" width="470" />&nbsp;</p>
 
@@ -667,7 +667,7 @@ ul
 
 <h2><a name="_Toc396467157">Acoustic Data Files</a></h2>
 
-<p class="MsoBodyText">With sonobuoys and ships tracks imported and verified, it is finally time to make PAMGuard aware of the acoustic data. Again run PAMGuard in Viewer mode, loading the newly saved database: difarTutorial-Imported.mdb.</p>
+<p class="MsoBodyText">With sonobuoys and ships tracks imported and verified, it is finally time to make PAMGuard aware of the acoustic data. Again run PAMGuard in Viewer mode, loading the newly saved database: difarTutorial-Imported.sqlite3.</p>
 
 <p class="MsoBodyText"><img border="0" height="179" src="difar_PostProcessingTutorial_files/image019.jpg" width="536" /></p>
 
@@ -1302,9 +1302,9 @@ ul
 
 <p class="MsoBodyText">To calibrate the compass of a sonobuoy when post-processing, wait until after the sonobuoy-to-be-calibrated appears on the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Map</span></span>, then click on the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Start Calib..</span></span> button on the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Actions</span></span> bar of the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">DIFAR Queue Display</span></span>. Proceed with the calibration as you would in Normal Mode (see Difar Localisation Calibration under the PAMGuard Help System). Once the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Difar calibration</span></span> window indicates <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">Calibration complete</span></span> click <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">OK</span></span>, and a new dialog window should ask if you wish to update the heading. WRITE DOWN the updated heading (either in a separate file or better yet in the correct column of the Streamer Import .csv file), and click Cancel. Clicking OK to accept the heading will likely cause that sonobuoy streamer to disappear. Cancel the Difar calibration window and exit PAMGuard.</p>
 
-<p class="MsoBodyText">Open the PAMGuard database in MS Access, and then open the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">HydrophoneStreamers</span></span> Table. Locate the streamer that was calibrated, and enter the updated heading (i.e. the one you wrote down) into the column for heading. Save the database and now when you re-run PAMGuard in Mixed mode, the hydrophone will be now be calibrated.</p>
+<p class="MsoBodyText">From PAMGuard version 2.03, the heading can be edited directly in the buoy manager in Viewer mode (see Reanalysis in Viewer mode). Alternatively, open the PAMGuard database in an SQLite editor, such as DB Browser for SQLite, and then open the <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">HydrophoneStreamers</span></span> Table. Locate the streamer that was calibrated, and enter the updated heading (i.e. the one you wrote down) into the column for heading. Save the database and now when you re-run PAMGuard in Mixed mode, the hydrophone will be now be calibrated.</p>
 
-<p class="MsoBodyText">As an alternative to editing the database using MS Access, you could enter the compass correction in the 12th column of the Streamer Import .csv, and then import the streamer/sonobuoy deployments with the updated heading into a new PAMGuard database.</p>
+<p class="MsoBodyText">As an alternative to editing the database directly, you could enter the compass correction in the 12th column of the Streamer Import .csv, and then import the streamer/sonobuoy deployments with the updated heading into a new PAMGuard database.</p>
 
 <h1>Automated Detection and DIFAR processing</h1>
 

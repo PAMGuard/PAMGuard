@@ -14,6 +14,7 @@ public class pamBuoyGlobals {
 //	public static Integer useGstreamer     = 0;
 //	public static boolean useNetworkCont   = false;
 	private static Integer networkControlPort = null;
+	private static boolean networkControlResilient = false;
 private static String multicastAddress;
 //	private static boolean useDSP = false;
 private static int mulicastPort;
@@ -23,6 +24,14 @@ private static int mulicastPort;
 	 */
 	public static Integer getNetworkControlPort() {
 		return networkControlPort;
+	}
+	
+	public static void setNetworkControlResilient() {
+		networkControlResilient = true;
+	}
+	
+	public static boolean isNetworkControlResilient() {
+		return networkControlResilient;
 	}
 
 	/**

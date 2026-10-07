@@ -100,10 +100,12 @@ public class PamDialogFX2AWT<T> extends PamDialog {
 	 * pressed. 
 	 */
 	public T showDialog(T params) {
+		T pCopy = params;
+//		System.out.println("showDialog " + params);
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				setParams(params);
+				setParams(pCopy);
 			}
 		});
 		this.setVisible(true);
@@ -113,6 +115,7 @@ public class PamDialogFX2AWT<T> extends PamDialog {
 	public void setParams(T setParams) {
 		this.setParams = setParams;
 		settingsPane.setParams(setParams);
+//		System.out.println("stParams " + setParams);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

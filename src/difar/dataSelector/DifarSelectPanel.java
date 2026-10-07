@@ -47,7 +47,12 @@ public class DifarSelectPanel implements PamDialogPanel {
 	
 	private JCheckBox[] species;
 	
-	private JCheckBox[] channel;
+	private JCheckBox[] channel = new JCheckBox[0];
+
+	/** The channel number each channel checkbox stands for. */
+	private int[] channelNumbers = new int[0];
+
+	private JPanel channelPanel;
 	
 	private JCheckBox crossBearing;
 	
@@ -115,38 +120,13 @@ public class DifarSelectPanel implements PamDialogPanel {
 		updateSpeciesPanel();
 		DifarSelectParameters difarSelectParameters =  difarDataSelector.getDifarSelectParameters();
 		
-		// Loop to add all channels as options
-		JPanel channelPanel = new JPanel();
+		// channels are listed when the dialog opens, from the channels in use
+		channelPanel = new JPanel();
 		channelPanel.setBorder(new TitledBorder("Channel filters"));
 		channelPanel.setLayout(new GridBagLayout());
-		channel = new JCheckBox[difarSelectParameters.numChannels];
-		JLabel channelLabel;
-		c.anchor = GridBagConstraints.WEST;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		for (int i = 0; i < difarSelectParameters.channelEnabled.length; i++){
-			Color chanColor = PamColors.getInstance().getChannelColor(i);
-			c.gridx = 0;
-			channel[i] = new JCheckBox();
-			channel[i].setHorizontalAlignment(SwingConstants.LEFT);
-			channelPanel.add(channel[i], c);
-			c.gridx++;
-			channelLabel = new JLabel("Channel " + i, JLabel.LEFT);
-			channelLabel.setForeground(chanColor);
-			channelPanel.add(channelLabel, c);
-			c.gridx++;
-			channelPanel.add(new JLabel(""),c);
-			c.gridy++;
-		}
-		c.gridx = 0;
 		crossBearing = new JCheckBox();
 		crossBearing.setHorizontalAlignment(SwingConstants.LEFT);
-		channelPanel.add(crossBearing,c);
-		c.gridx++;
-		channelPanel.add(new JLabel("Crosses only", JLabel.LEFT),c);
-		c.gridx++;
-		channelPanel.add(new JLabel(""),c);
-		c.gridy++;
+		updateChannelPanel(PamUtils.makeChannelMap(difarSelectParameters.channelEnabled.length));
 		mainPanel.add(channelPanel,BorderLayout.SOUTH);
 		
 	}
@@ -170,7 +150,9 @@ public class DifarSelectPanel implements PamDialogPanel {
 		}
 		
 		for (int i = 0; i < channel.length; i++){
-			channel[i].setSelected(difarSelectParameters.channelEnabled[i]);
+			int number = channelNumbers[i];
+			channel[i].setSelected(number >= difarSelectParameters.channelEnabled.length
+					|| difarSelectParameters.channelEnabled[number]);
 		}
 		crossBearing.setSelected(difarSelectParameters.showOnlyCrossBearings);
 	}
@@ -187,8 +169,12 @@ public class DifarSelectPanel implements PamDialogPanel {
 				difarSelectParameters.speciesEnabled[i] = species[i].isSelected();
 			}
 		
+			difarSelectParameters.channelEnabled = difarSelectParameters.channelEnabled.clone();
 			for (int i = 0; i < channel.length; i++){
-				difarSelectParameters.channelEnabled[i] = channel[i].isSelected();
+				int number = channelNumbers[i];
+				if (number < difarSelectParameters.channelEnabled.length) {
+					difarSelectParameters.channelEnabled[number] = channel[i].isSelected();
+				}
 			}
 			difarSelectParameters.showOnlyCrossBearings = crossBearing.isSelected();
 		}
@@ -197,6 +183,45 @@ public class DifarSelectPanel implements PamDialogPanel {
 		}
 		difarDataSelector.setDifarSelectParameters(difarSelectParameters);
 		return true;
+	}
+
+	/**
+	 * List a checkbox for each channel in a channel map, labelled with its
+	 * channel number, followed by the "crosses only" checkbox.
+	 * @param channelMap the channels to list.
+	 */
+	public void updateChannelPanel(int channelMap) {
+		channelPanel.removeAll();
+		GridBagConstraints c = new PamGridBagContraints();
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		int n = PamUtils.getNumChannels(channelMap);
+		channel = new JCheckBox[n];
+		channelNumbers = new int[n];
+		for (int i = 0; i < n; i++) {
+			int number = PamUtils.getNthChannel(i, channelMap);
+			channelNumbers[i] = number;
+			c.gridx = 0;
+			channel[i] = new JCheckBox();
+			channel[i].setHorizontalAlignment(SwingConstants.LEFT);
+			channelPanel.add(channel[i], c);
+			c.gridx++;
+			JLabel channelLabel = new JLabel("Channel " + number, JLabel.LEFT);
+			channelLabel.setForeground(PamColors.getInstance().getChannelColor(number));
+			channelPanel.add(channelLabel, c);
+			c.gridx++;
+			channelPanel.add(new JLabel(""), c);
+			c.gridy++;
+		}
+		c.gridx = 0;
+		channelPanel.add(crossBearing, c);
+		c.gridx++;
+		channelPanel.add(new JLabel("Crosses only", JLabel.LEFT), c);
+		c.gridx++;
+		channelPanel.add(new JLabel(""), c);
+		channelPanel.revalidate();
+		channelPanel.repaint();
 	}
 
 	public void updateSpeciesPanel(){

@@ -1164,7 +1164,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		// String tempDataUnitId;
 		ListIterator<PamDataUnit> duIterator;
 		long now = simpleMapRef.getMapTime();
-		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+		if (PamController.isNetRx()) {
 			//Because of data selection and clock drift possibility on both the base and the remote, give a 20 second lookahead
 			now = System.currentTimeMillis()+20*1000L;
 			// simpleMapRef.setm
@@ -1173,6 +1173,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		long earliestToPlot = 0;
 		long latestToPlot = Long.MAX_VALUE;
 		MapDrawingOptions mapDrawingOptions = null;
+//		System.out.println(" Map plot " + dataBlock.getLongDataName());
 		// int n1=0, n2 =0;
 //		try {
 //			synchronized (dataBlock.getSynchLock()) {

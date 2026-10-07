@@ -27,5 +27,13 @@ public interface DataInputStore extends DataStoreInfoHolder {
 	 * @return
 	 */
 	public String getBatchStatus();
+	
+	/**
+	 * Is set up for real time operation. This may depend on specific 
+	 * settings at the time, e.g. in Daq, the type of Daq input or for 
+	 * Tritech acquisition, the type of analysis being conducted.  
+	 * @return true if it's real time, otherwise false
+	 */
+	public boolean isRealTime();
 
 }

@@ -99,10 +99,12 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 		if (rawDataBlock == null) {
 			return null;
 		}
+		
 		SoundFileDatagramManager manager = new SoundFileDatagramManager(this,
 				"Sound Files " + daqControl.getUnitName());
 		rawDataBlock.setDatagramProvider(new SoundFileDatagramProvider(manager, rawDataBlock));
 		return manager;
+
 	}
 
 	@Override

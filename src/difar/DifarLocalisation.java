@@ -4,6 +4,7 @@ import Array.ArrayManager;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
+import difar.crossings.DifarCrossing;
 import pamMaths.PamVector;
 
 /**
@@ -16,17 +17,31 @@ public class DifarLocalisation extends AbstractLocalisation {
 
 	private DifarDataUnit difarDataUnit;
 	
-	/**For DIFAR buoys, 95% of bearings should be within +/- 10 
-	 * degrees of the mean bearing, and if the compass is 
-	 * calibrated, then mean bearing should be pretty close to 
-	 * the actual true bearing. See IWC Paper: SC-65b-SH08
+	/**
+	 * Standard deviation of the bearing, in radians. Set from the DIFAR
+	 * settings, and used to weight this bearing in a localisation.
+	 * <p>
+	 * IWC paper SC-65b-SH08 reports 95% of bearings within 10 degrees of the
+	 * mean, which is a standard deviation of about 5 degrees. Earlier versions
+	 * used the 10 degree bound here, which weighted bearings four times too
+	 * loosely against the arrival time differences.
 	 */
-	private double angleErr[] = {Math.toRadians(10.)};
+	private double angleErr[] = {Math.toRadians(5.)};
 	
 	public DifarLocalisation(DifarDataUnit difarDataUnit, int locContents,
 			int referenceHydrophones) {
 		super(difarDataUnit, locContents, referenceHydrophones);
 		this.difarDataUnit = difarDataUnit;
+	}
+
+	/**
+	 * Set the standard deviation of this bearing.
+	 * @param degrees standard deviation in degrees. Ignored if not positive.
+	 */
+	public void setBearingError(double degrees) {
+		if (degrees > 0) {
+			angleErr = new double[] {Math.toRadians(degrees)};
+		}
 	}
 
 	/* (non-Javadoc)
@@ -44,7 +59,7 @@ public class DifarLocalisation extends AbstractLocalisation {
 	@Override
 	public LocContents getLocContents() {
 		int cont = LocContents.HAS_BEARING;
-		if (difarDataUnit.getDifarCrossing() != null) {
+		if (savedLocation() != null) {
 			cont |= LocContents.HAS_LATLONG;
 		}
 		return new LocContents(cont);
@@ -103,8 +118,7 @@ public class DifarLocalisation extends AbstractLocalisation {
 	 */
 	@Override
 	public LatLong getLatLong(int iSide) {
-		if (difarDataUnit.getDifarCrossing() == null) return null;
-		return difarDataUnit.getDifarCrossing().getCrossLocation();
+		return savedLocation();
 	}
 
 	/* (non-Javadoc)
@@ -112,7 +126,16 @@ public class DifarLocalisation extends AbstractLocalisation {
 	 */
 	@Override
 	public int getNumLatLong() {
-		return (difarDataUnit.getDifarCrossing() == null ? 0 : 1);
+		return (savedLocation() == null ? 0 : 1);
+	}
+
+	/**
+	 * @return the location of the saved crossing this clip belongs to, or
+	 * null if it has none or its crossing has no location.
+	 */
+	private LatLong savedLocation() {
+		DifarCrossing crossing = difarDataUnit.getCrossing();
+		return crossing == null ? null : crossing.getLocation();
 	}
 
 }

@@ -51,7 +51,6 @@ public class DataMapParametersFX implements Cloneable, Serializable, ManagedPara
 	 */
 	public int soundFileDatagramMode = 0; 
 	
-
 	@Override
 	protected DataMapParametersFX clone() {
 		try {

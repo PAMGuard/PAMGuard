@@ -315,6 +315,9 @@ public class Pamguard {
 					String port = args[iArg++];
 					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(port));
 					System.out.println("Setting UDP control port " + port);
+				}else if (anArg.equalsIgnoreCase("-udpResilient")) {
+					pamBuoyGlobals.setNetworkControlResilient();
+					System.out.println("Setting UDP control to be fault resilient");
 				}
 				else if (anArg.equalsIgnoreCase("-multicast") || anArg.equalsIgnoreCase("-mport")) {
 					// multicast control (for multiple PAMGuards) 
@@ -764,8 +767,16 @@ public class Pamguard {
 		 */
 		private static synchronized void disableLogFile() {
 			logFile = null;
-			fileStream.close();
-			fileStream = null;
+			if (fileStream == null) {
+				return;
+			}
+			try {
+				fileStream.close();
+				fileStream = null;
+			}
+			catch (Exception e) {
+				
+			}
 		}
 
 		/**

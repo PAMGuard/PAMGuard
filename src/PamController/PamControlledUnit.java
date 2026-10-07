@@ -786,9 +786,7 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		return isViewer;
 	}
 	
-	public boolean isNetRx() {
-		return PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
-	}
+	
 	/**
 	 * Print a line, with line feed, on the terminal if the verbose 
 	 * level is >= the set level for this module

@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import PamController.PamController;
 import PamController.PamFolders;
 
 /**
@@ -85,7 +86,24 @@ public class SelectFolder {
 		browseButton.setEnabled(enable);
 		includeSubFoldersCheckBox.setEnabled(enable);
 	}
+	
+	private String folderButtonText() {
+		if (PamController.getInstance().getRunMode() == PamController.RUN_NORMAL) {
+			return "Write data to dated sub folders";
+		}
+		else { 
+			return "Include sub folders";
+		}
+	}
 
+	private String folderButtonTip() {
+		if (PamController.getInstance().getRunMode() == PamController.RUN_NORMAL) {
+			return "Data will be written to sub folders organised by date";
+		}
+		else { 
+			return "Search all sub folders of the selected folder";
+		}
+	}
 	private class FolderPanel extends JPanel {
 
 		JFileChooser fc;
@@ -96,7 +114,7 @@ public class SelectFolder {
 			browseButton.addActionListener(new BrowseButton());
 			folderName = new JTextField(textLength);
 			folderName.setEditable(false);
-			includeSubFoldersCheckBox = new JCheckBox("Include sub folders");
+			includeSubFoldersCheckBox = new JCheckBox(folderButtonText());
 			includeSubFoldersCheckBox.addActionListener(new SubFolders());
 			
 			setLayout(new BorderLayout());
@@ -108,7 +126,7 @@ public class SelectFolder {
 			
 			browseButton.setToolTipText("Browse for or Create a folder");
 			folderName.setToolTipText("Currently selected folder. Press Browse to change");
-			includeSubFoldersCheckBox.setToolTipText("Include sub folders");
+			includeSubFoldersCheckBox.setToolTipText(folderButtonTip());
 			
 			setVisibleControls();
 		}

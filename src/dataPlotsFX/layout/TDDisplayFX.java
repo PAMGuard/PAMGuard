@@ -1131,14 +1131,6 @@ public class TDDisplayFX extends PamBorderPane {
 	public boolean isViewer(){
 		return (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW);
 	}
-	
-	/**
-	 * Check whether the display is being used in net rx mode or not. 
-	 * @return true if running in net rx mode. 
-	 */
-	public boolean isNetRx(){
-		return (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER);
-	}
 
 	/**
 	 * Add a data block to the display. Creates a new TDgraph with a new TDDataInfoFX containing the data block.

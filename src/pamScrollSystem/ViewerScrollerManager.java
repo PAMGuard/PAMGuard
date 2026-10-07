@@ -294,7 +294,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			 */
 			ArrayList<SuperDetDataBlock> superBlocks = OfflineSuperDetFilter.findPossibleSuperDetections(pamDataBlock);
 			for (PamDataBlock aBlock : superBlocks) {
-				addToDataQueue(dataLoadQueue, pamDataBlock, minTime, maxTime, true);
+				addToDataQueue(dataLoadQueue, aBlock, minTime, maxTime, true);
 //				DataLoadQueData exItem = findLoadQueueData(dataLoadQueue, aBlock);
 //				if (exItem != null) {
 //					// expand an existing item as necessary

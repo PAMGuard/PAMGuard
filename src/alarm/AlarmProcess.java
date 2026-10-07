@@ -48,7 +48,7 @@ public class AlarmProcess extends PamProcess {
 	 * @return true if a time is needed to reset alarms. 
 	 */
 	private boolean needAlarmTimer() {
-		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
+		if (PamController.isNetRx()) {
 			return true;
 		}
 //		if (PamController.getInstance().findControlledUnit(AcquisitionControl.class, null) == null) {

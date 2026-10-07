@@ -1,16 +1,5 @@
 package networkTransfer.receive;
 
-import networkTransfer.NetworkObject;
-import networkTransfer.NetworkReceiverInterface;
-import networkTransfer.receive.status.BuoyStatusDataBlock;
-import networkTransfer.receive.status.BuoyStatusDataUnit;
-import networkTransfer.receive.status.BuoyStatusLogging;
-import networkTransfer.receive.status.base.NetReceiverStatusManager;
-import networkTransfer.receive.swing.NetworkRXTabPanel;
-import networkTransfer.receive.swing.NetworkReceiveDialog;
-import networkTransfer.receive.swing.NetworkReceiveSidePanel;
-import networkTransfer.receive.swing.RXTableMouseListener;
-
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,23 +9,15 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import AIS.AISDataBlock;
 import AIS.AISDataUnit;
-import binaryFileStorage.BinaryDataSource;
-import binaryFileStorage.BinaryObjectData;
-import binaryFileStorage.BinaryStore;
 import Acquisition.DaqStatusDataUnit;
 import Array.ArrayManager;
 import Array.PamArray;
@@ -65,7 +46,19 @@ import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
+import binaryFileStorage.BinaryDataSource;
+import binaryFileStorage.BinaryObjectData;
+import binaryFileStorage.BinaryStore;
+import networkTransfer.NetworkObject;
+import networkTransfer.NetworkReceiverInterface;
+import networkTransfer.receive.status.BuoyStatusDataBlock;
+import networkTransfer.receive.status.BuoyStatusDataUnit;
+import networkTransfer.receive.status.BuoyStatusLogging;
+import networkTransfer.receive.status.base.NetReceiverStatusManager;
+import networkTransfer.receive.swing.NetworkRXTabPanel;
+import networkTransfer.receive.swing.NetworkReceiveDialog;
+import networkTransfer.receive.swing.NetworkReceiveSidePanel;
+import networkTransfer.receive.swing.RXTableMouseListener;
 
 /**
  * Receive near real time data over the network in the form of packaged PamDataUnits. 

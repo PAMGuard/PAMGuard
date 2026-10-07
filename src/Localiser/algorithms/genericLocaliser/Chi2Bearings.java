@@ -114,7 +114,7 @@ public class Chi2Bearings implements MinimisationFunction {
 		this.rotationVector=rotationVector; 
 		this.usedWorldVectors=wordlVectors;
 		if (wordlVectors == null) {
-			System.out.println("Null world vectors");
+//			System.out.println("Null world vectors");
 		}
 		this.subDetectionOrigins=subDetectionOrigins;
 		this.subDetectionAngleErrors=subDetectionAngleErrors;
@@ -170,6 +170,9 @@ public class Chi2Bearings implements MinimisationFunction {
 		double angle;
 		double chiTot = 0.;
 		for (int i = 0; i < nSubDetections; i++) {
+			if (usedWorldVectors == null) {
+				continue;
+			}
 			if (usedWorldVectors[i] == null) {
 				continue;
 			}

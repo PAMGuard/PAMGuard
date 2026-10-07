@@ -63,7 +63,7 @@ public class ImportGPSDialog extends PamDialog{
 		importGPS.add(BorderLayout.CENTER, p);
 		setDialogComponent(importGPS);
 		
-		setLocation(location);
+		setCloseLocation(location);
 		
 		
 		
