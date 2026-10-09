@@ -260,21 +260,23 @@ public class ButtonControl extends LoggerControl implements LoggerNetworkReceive
 		FormDescription fd = loggerForm.getFormDescription().getFormsControl().findFormDescription(formName);
 		
 		if (fd == null) {
-			System.out.printf("Button form %s - %s unable to find form %s to open\n", loggerForm.getFormDescription().getFormName(),
-					controlDescription.getTitle(), formName);
-			return;
+			if (formName != null) {
+				System.out.printf("Button form %s - %s unable to find form %s to open\n", loggerForm.getFormDescription().getFormName(),
+						controlDescription.getTitle(), formName);
+			}
 		}
-		
-		/*
-		 *  open the other form - depending on it's type if it's subtabs, or popup, then open a new instance, 
-		 *  otherwise, if it's normal, just go to that form. 
-		 */
-		LoggerForm form = fd.activateForm();
-		//then set the appropriate field within the opened form. 
-		String toSetData = controlDescription.getPostTitle();
-		LoggerControl toSetCtrl = form.findInputControl(controlDescription.getControlOnSubform());
-		if (form != null && toSetCtrl != null) {
-			toSetCtrl.setData(toSetData);
+		else {
+			/*
+			 *  open the other form - depending on it's type if it's subtabs, or popup, then open a new instance, 
+			 *  otherwise, if it's normal, just go to that form. 
+			 */
+			LoggerForm form = fd.activateForm();
+			//then set the appropriate field within the opened form. 
+			String toSetData = controlDescription.getPostTitle();
+			LoggerControl toSetCtrl = form.findInputControl(controlDescription.getControlOnSubform());
+			if (form != null && toSetCtrl != null) {
+				toSetCtrl.setData(toSetData);
+			}
 		}
 		
 		runLoggerActions();

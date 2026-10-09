@@ -209,6 +209,7 @@ public class ButtonTopicPanel extends CtrlColPanel {
 		otherForms.removeAllItems();
 		FormsControl formsControl = formDescription.getFormsControl();
 		int nForms = formsControl.getNumFormDescriptions();
+		otherForms.addItem(null);
 		for (int i = 0; i < nForms; i++) {
 			FormDescription aDescription = formsControl.getFormDescription(i);
 			// I think we can let a form subform itself !
