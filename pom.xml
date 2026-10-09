@@ -652,7 +652,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit
 			dependencies which breaks our own testing -->
 			<!--<exclusions>
@@ -668,7 +668,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jdl4pam</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		
 		<dependency>
@@ -821,7 +821,7 @@
 		<dependency>
 			<groupId>net.synedra</groupId>
 			<artifactId>validatorfx</artifactId>
-			<version>0.4.2</version>
+			<version>1.0.0</version>
 		</dependency>
 
 		<!--
