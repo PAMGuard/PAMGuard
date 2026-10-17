@@ -1187,11 +1187,11 @@
 			<version>3.45.3.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/net.sf.ucanaccess/ucanaccess -->
+		<!-- https://github.com/spannm/ucanaccess -->
 		<dependency>
-			<groupId>net.sf.ucanaccess</groupId>
+			<groupId>io.github.spannm</groupId>
 			<artifactId>ucanaccess</artifactId>
-			<version>4.0.4</version>
+			<version>5.2.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-dev -->
