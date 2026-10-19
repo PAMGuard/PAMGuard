@@ -672,7 +672,10 @@ public class SegmenterProcess extends PamProcess {
 				 * in fact multiple segments. Need to iterate through the overflow data. 
 				 */
 				//System.out.println("Current chunk time: " +  PamCalendar.formatDBDateTime(currentRawChunks[i].getTimeMilliseconds(), true) + " Overflow: " + overFlow + " Raw len: " + rawDataChunk.length); 
-				if (overFlow>0 || forcesave) {
+				//a channel that fills its segment exactly, with no overflow, still needs the next
+				//segment started here, so that it keeps the overlap and the hop grid
+				boolean chanFull = currentRawChunks[i].getRawDataPointer()[groupChan] >= currentRawChunks[i].getRawData()[groupChan].length;
+				if (overFlow>0 || forcesave || chanFull) {
 
 					//how many new raw chunks do we need? 
 					if (nextRawChunks[i]==null) {
@@ -879,7 +882,7 @@ public class SegmenterProcess extends PamProcess {
 	private boolean isRawGroupDataFull(GroupedRawData groupedRawData) {
 		if (groupedRawData==null) return false; 
 		for (int i=0; i<groupedRawData.rawData.length; i++) {
-			if ( groupedRawData.rawDataPointer[i] < groupedRawData.rawData[i].length-1) {
+			if ( groupedRawData.rawDataPointer[i] < groupedRawData.rawData[i].length) {
 				return false; 
 			}
 		}

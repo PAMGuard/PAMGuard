@@ -89,8 +89,8 @@ public class GroupedRawData extends PamDataUnit implements PamDetection, Cloneab
 
 		int arrayCopyLen; 
 		//make sure the copy length 
-		if (lastPos>=rawData[groupChan].length) {
-			arrayCopyLen=copyLen-(lastPos-rawData[groupChan].length)-1; 
+		if (lastPos>rawData[groupChan].length) {
+			arrayCopyLen=copyLen-(lastPos-rawData[groupChan].length); 
 			dataOverflow = copyLen - arrayCopyLen; 
 		}
 		else {
