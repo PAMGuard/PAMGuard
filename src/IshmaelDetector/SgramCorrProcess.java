@@ -83,6 +83,7 @@ public class SgramCorrProcess extends IshDetFnProcess
 	protected void prepareMyParams() {
 		SgramCorrParams p = (SgramCorrParams)ishDetControl.ishDetParams;
 		PamDataBlock inputDataBlock = getInputDataBlock();
+		if (inputDataBlock == null) return;	// source not created yet, e.g. while loading modules
 		/*
 		 *  get the unit. first, then check it's null. Due to multithreading it's 
 		 *  possible that checking there are units and then asking for one,without
