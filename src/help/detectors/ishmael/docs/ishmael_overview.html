@@ -51,6 +51,36 @@
 		match of the matched filter.
 	</p>
 	
+	<h3>Peak-picking</h3>
+	<p>All three detectors compute a detection function: one value per FFT slice for the
+		energy sum and spectrogram correlation detectors, and one value per audio sample for
+		the matched filter. The Peak-picking settings turn the detection function into
+		detections, in the same way for all three.</p>
+	<ul>
+		<li><strong>Threshold:</strong> a detection starts when the detection function rises
+			above the threshold.</li>
+		<li><strong>Min time before next detection:</strong> a detection ends once the
+			detection function has stayed at or below the threshold for this time, in seconds.
+			Shorter dips do not split a detection, so sounds closer together than this time are
+			reported as one detection.</li>
+		<li><strong>Min time over threshold:</strong> a detection is kept only if it lasts at
+			least this time, in seconds, from the first to the last value over the threshold.</li>
+		<li>A maximum time over threshold can also be set in the detector's settings (it is not
+			shown in the dialog). Detections over threshold for longer are discarded.</li>
+	</ul>
+	<p>The time a detection function stays over threshold is not the duration of the sound.
+		For the spectrogram correlation detector in particular, the correlation peaks as the
+		kernel lines up with the sound, and may stay over threshold for only a few FFT slices.
+		Set the minimum time from detections of known sounds, not from the duration of the
+		sounds.</p>
+	<p><strong>Versions 2.02.15 to 2.02.19:</strong> in these versions the times were
+		converted with the wrong rate for the energy sum and spectrogram correlation detectors.
+		The minimum time over threshold was effectively divided by the FFT hop, the number of
+		samples between FFT slices; for example, with a hop of 16 samples, 3 s acted as 0.19 s.
+		In 2.02.15 to 2.02.17 the minimum time before next detection was also multiplied by the
+		FFT hop. To reproduce results from those versions, set the minimum time over threshold
+		to the old value divided by the FFT hop. The matched filter was not affected.</p>
+
 	<p>The best way to learn about these detectors is to try the <a
 			href="https://www.pamguard.org/tutorials/getstarted.html">Getting
 			Started</a> PAMGuard tutorial.</p>
