@@ -8,11 +8,15 @@ import org.jamdev.jpamutils.JamArr;
 import PamController.PamController;
 import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
+import PamView.PamAWTUtils;
 import PamView.PamSymbolType;
 import PamView.dialog.GenericSwingDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourBarSymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamView.symbol.modifier.SymbolModifierParams;
@@ -21,6 +25,8 @@ import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 import pamViewFX.symbol.SymbolModifierPane;
+import rawDeepLearningClassifier.dlClassification.DLClassName;
+import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.logging.DLAnnotation;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
@@ -210,6 +216,62 @@ public class DLSymbolModifier extends SymbolModifier {
 		}
 	}
 	
+	/**
+	 * Legend showing either a colour bar for the prediction value of the selected
+	 * class, or a symbol for each class when colouring by the class with the
+	 * highest prediction. Only annotated data are coloured, so this never modifies
+	 * all data.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = new SymbolLegend(getName());
+		String[] classNames = getClassNames();
+
+		if (dlSymbolOptions.colTypeSelection == DLSymbolModifierParams.PREDICITON_COL) {
+			int classIndex = Math.max(dlSymbolOptions.classIndex, 0);
+			String name = classIndex < classNames.length ? classNames[classIndex] : "Class: " + classIndex;
+			legend.addSymbol(new ColourBarSymbolData(symbolData, name + " prediction", dlSymbolOptions.colArray,
+					dlSymbolOptions.clims[0], dlSymbolOptions.clims[1], null));
+		}
+		else if (dlSymbolOptions.colTypeSelection == DLSymbolModifierParams.CLASS_COL) {
+			if (dlSymbolOptions.classColors == null) {
+				return legend;
+			}
+			int n = Math.min(classNames.length, dlSymbolOptions.classColors.length);
+			for (int i = 0; i < n; i++) {
+				Color col = PamAWTUtils.intToColor(dlSymbolOptions.classColors[i]);
+				LegendSymbolData legendSymbol = new LegendSymbolData(symbolData, classNames[i]);
+				legendSymbol.setFillColor(col);
+				legendSymbol.setLineColor(col);
+				legend.addSymbol(legendSymbol);
+			}
+		}
+		return legend;
+	}
+
+	/**
+	 * Get the names of the classes in the current deep learning model.
+	 * @return the class names. Empty if there is no model.
+	 */
+	private String[] getClassNames() {
+		DLClassiferModel model = dlAnnotType == null || dlAnnotType.getDlControl() == null ? null
+				: dlAnnotType.getDlControl().getDLModel();
+		if (model == null) {
+			return new String[0];
+		}
+		DLClassName[] classNames = model.getClassNames();
+		String[] names = new String[model.getNumClasses()];
+		for (int i = 0; i < names.length; i++) {
+			if (classNames != null && classNames.length > i && classNames[i] != null) {
+				names[i] = classNames[i].className;
+			}
+			else {
+				names[i] = "Class: " + i;
+			}
+		}
+		return names;
+	}
+
 	/**
 	 * Check the correct colour array is being used and, if not, change it. 
 	 */

@@ -125,6 +125,9 @@ public class CornerLayout  implements LayoutManager2 {
 				default:
 					y = insets.top;
 				}
+				// move away from the edges the component is anchored to.
+				x -= CornerLayoutContraint.getHorizontalAlign(c.anchor) * c.margin;
+				y -= CornerLayoutContraint.getVerticalAlign(c.anchor) * c.margin;
 				component.setLocation(x, y);
 //				component.repaint();
 			}

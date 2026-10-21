@@ -56,7 +56,12 @@ public class TDManagedSymbolChooserFX implements TDSymbolChooserFX{
 			symbol=ClickSymbolChooserFX.highLightClick;
 		}
 		
-		return symbol; 
+		return symbol;
 	}
-	
+
+	@Override
+	public PamSymbolChooser getPamSymbolChooser() {
+		return pamSymbolChooser;
+	}
+
 }

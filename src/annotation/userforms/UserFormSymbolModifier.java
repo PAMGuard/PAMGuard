@@ -12,12 +12,15 @@ import PamView.GeneralProjector;
 import PamView.PamSymbol;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamView.symbol.modifier.SymbolModifierParams;
 import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
 import loggerForms.FormDescription;
 import loggerForms.controlDescriptions.CdLookup;
 import loggerForms.controlDescriptions.ControlDescription;
@@ -127,6 +130,39 @@ public class UserFormSymbolModifier extends SymbolModifier {
 			userFormSymbolOptions.controlTitle = cd.getTitle(); 
 		}
 		
+	}
+
+	/**
+	 * Legend with the symbol for each item in the selected lookup control (or all
+	 * lookup controls if none is selected). Only annotated data are modified.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = new SymbolLegend(getName());
+		ArrayList<InputControlDescription> ctrls = formDescription.getInputControlDescriptions();
+		if (ctrls == null) {
+			return legend;
+		}
+		String ctrlTitle = userFormSymbolOptions.controlTitle;
+		for (InputControlDescription cd : ctrls) {
+			if (cd.getEType() != ControlTypes.LOOKUP) {
+				continue;
+			}
+			if (ctrlTitle != null && ctrlTitle.equals(cd.getTitle()) == false) {
+				continue;
+			}
+			LookupList luList = ((CdLookup) cd).getLookupList();
+			if (luList == null || luList.getList() == null) {
+				continue;
+			}
+			for (LookupItem luItem : luList.getList()) {
+				PamSymbol symbol = luItem.getSymbol();
+				if (symbol != null) {
+					legend.addSymbol(new LegendSymbolData(symbol.getSymbolData(), luItem.getText()));
+				}
+			}
+		}
+		return legend;
 	}
 
 	@Override

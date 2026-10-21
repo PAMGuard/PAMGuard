@@ -10,11 +10,14 @@ import PamView.PamSymbol;
 import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
+import clickDetector.ClickClassifiers.ClickIdentifier;
 
 public class ClickClassSymbolModifier extends SymbolModifier {
 
@@ -36,6 +39,32 @@ public class ClickClassSymbolModifier extends SymbolModifier {
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * Legend with a symbol for each click type. Unclassified clicks are not
+	 * modified, so this never modifies all clicks.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = new SymbolLegend(getName());
+		ClickIdentifier clickIdentifier = clickControl.getClickIdentifier();
+		if (clickIdentifier == null) {
+			return legend;
+		}
+		String[] speciesList = clickIdentifier.getSpeciesList();
+		PamSymbol[] symbols = clickIdentifier.getSymbols();
+		if (speciesList == null || symbols == null) {
+			return legend;
+		}
+		int n = Math.min(speciesList.length, symbols.length);
+		for (int i = 0; i < n; i++) {
+			if (symbols[i] == null) {
+				continue;
+			}
+			legend.addSymbol(new LegendSymbolData(symbols[i].getSymbolData(), speciesList[i]));
+		}
+		return legend;
 	}
 
 	@Override

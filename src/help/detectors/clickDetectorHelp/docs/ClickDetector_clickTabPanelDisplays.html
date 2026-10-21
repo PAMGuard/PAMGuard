@@ -37,6 +37,38 @@ slightly ahead of the hydrophone array.</p>
 hand
 (vertical) slide bar.</p>
 <p>The horizontal slide bar is disabled during data acquisition.</p>
+<h3>Symbol Key</h3>
+<p>The key shows how the clicks on the display are coloured and shaped.
+To show or hide it, right click on the display and select <i>Show key</i>.
+Use the <i>Key position</i> menu to put the key in any corner of the
+display.</p>
+<p>Clicks are drawn by starting with a default symbol and then applying
+each of the selected symbol modifiers (e.g. click classification, event,
+peak frequency) in turn. Modifiers are selected with the <i>Colour by</i>
+items on the right click menu or with <i>More symbol options ...</i>. The
+key has a section for each modifier, listed in the order they are
+applied, so the default symbol is at the top. Each section shows:</p>
+<ul>
+<li>The name of the modifier and an icon on the right showing what it
+sets. A filled circle means the fill colour is set, a solid outline
+means the line colour is set (a faint outline means it isn't) and a
+triangle means the symbol shape is set. Hover over the icon to see this
+as text.</li>
+<li>The symbols the modifier can produce, e.g. a symbol for each click
+type. Modifiers which colour on a continuous scale, such as peak
+frequency, show a colour bar with the values at either end. Modifiers
+which colour each event or train differently show a sample of the
+colours used.</li>
+</ul>
+<p>Later modifiers in the list overwrite what earlier ones set. If a
+modifier colours every click (e.g. peak frequency), earlier modifiers
+which only set the same colours have no visible effect and are left out
+of the key. Modifiers which only change some clicks (e.g. event colours,
+which only change clicks that are part of an event) are always shown. The
+default section is only shown if some clicks could still be drawn in the
+default colours.</p>
+<p>The key updates automatically whenever the symbol options are
+changed.</p>
 <h3>Manual tracking</h3>
 <p>Click trains identified by eye may be tracked manually.</p>
 <p>To track manually, press the default mouse button anywhere on

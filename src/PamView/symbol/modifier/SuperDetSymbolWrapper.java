@@ -7,6 +7,7 @@ import javax.swing.JMenuItem;
 import PamView.GeneralProjector;
 import PamView.dialog.PamDialogPanel;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import pamViewFX.symbol.SymbolModifierPane;
@@ -39,6 +40,20 @@ public class SuperDetSymbolWrapper extends SymbolModifier {
 		return superDetModifier.getSymbolData(getSymbolChooser().getProjector(), superDet);
 	}
 	
+
+	/**
+	 * The legend of the wrapped super detection modifier but with this modifier's
+	 * name, so it's clear it applies to the super detection. Never modifies all
+	 * data since data units which aren't part of a super detection are left alone.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = superDetModifier.getSymbolLegend();
+		if (legend != null) {
+			legend.setTitle(getName());
+		}
+		return legend;
+	}
 
 	@Override
 	public String getToolTipText() {

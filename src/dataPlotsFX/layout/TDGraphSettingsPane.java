@@ -4,12 +4,15 @@ import dataPlotsFX.TDGraphParametersFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -48,7 +51,17 @@ public class TDGraphSettingsPane extends DynamicSettingsPane<TDGraphParametersFX
 	private ComboBox<String> popUpBox;
 
 	/**
-	 * Pane which shwos which data blocks have been added to the graph. 
+	 * Check box to show or hide the symbol legend.
+	 */
+	private CheckBox showLegendBox;
+
+	/**
+	 * Combo box to select the corner the legend is shown in.
+	 */
+	private ComboBox<String> legendPosBox;
+
+	/**
+	 * Pane which shwos which data blocks have been added to the graph.
 	 */
 	private PamVBox dataBlockLabelPane;
 
@@ -137,10 +150,34 @@ public class TDGraphSettingsPane extends DynamicSettingsPane<TDGraphParametersFX
 		});
 		
 		holder.getChildren().add(new Label("Pop Up Menu Type"));
-		holder.getChildren().add(popUpBox); 
-		
-		
-		return holder; 
+		holder.getChildren().add(popUpBox);
+
+		Label legendLabel = new Label("Legend");
+		PamGuiManagerFX.titleFont2style(legendLabel);
+		VBox.setMargin(legendLabel, new Insets(5, 0, 0, 0));
+		holder.getChildren().add(legendLabel);
+
+		showLegendBox = new CheckBox("Show legend");
+		showLegendBox.setTooltip(new Tooltip("Show a legend of the symbols used to draw data on the graph"));
+		showLegendBox.setOnAction((action)->{
+			legendPosBox.setDisable(!showLegendBox.isSelected());
+			notifySettingsListeners();
+		});
+		holder.getChildren().add(showLegendBox);
+
+		legendPosBox = new ComboBox<String>();
+		// order matches the TDGraphParametersFX.LEGEND_ position flags.
+		legendPosBox.getItems().addAll("Top left", "Top right", "Bottom left", "Bottom right");
+		legendPosBox.setOnAction((action)->{
+			notifySettingsListeners();
+		});
+		PamGridPane legendGrid = new PamGridPane();
+		legendGrid.setHgap(5);
+		legendGrid.add(new Label("Position"), 0, 0);
+		legendGrid.add(legendPosBox, 1, 0);
+		holder.getChildren().add(legendGrid);
+
+		return holder;
 	}
 	
 	
@@ -218,7 +255,11 @@ public class TDGraphSettingsPane extends DynamicSettingsPane<TDGraphParametersFX
 			currParams.plotFillFollowsScheme = false;
 		}
 		currParams.plotFill=backColPicker.getValue();
-		currParams.popUpMenuType=this.popUpBox.getSelectionModel().getSelectedIndex(); 		
+		currParams.popUpMenuType=this.popUpBox.getSelectionModel().getSelectedIndex();
+		currParams.showLegend = showLegendBox.isSelected();
+		if (legendPosBox.getSelectionModel().getSelectedIndex() >= 0) {
+			currParams.legendPosition = legendPosBox.getSelectionModel().getSelectedIndex();
+		}
 		return currParams;
 	}
 
@@ -237,6 +278,13 @@ public class TDGraphSettingsPane extends DynamicSettingsPane<TDGraphParametersFX
 			input.popUpMenuType=0;
 		}
 		this.popUpBox.getSelectionModel().select(input.popUpMenuType);
+
+		showLegendBox.setSelected(input.showLegend);
+		if (input.legendPosition<0 || input.legendPosition>=legendPosBox.getItems().size()) {
+			input.legendPosition=TDGraphParametersFX.LEGEND_BOTTOM_LEFT;
+		}
+		legendPosBox.getSelectionModel().select(input.legendPosition);
+		legendPosBox.setDisable(!input.showLegend);
 	}
 
 	@Override

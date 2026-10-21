@@ -11,6 +11,7 @@ import PamView.dialog.GenericSwingDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamguardMVC.PamDataUnit;
 import pamViewFX.symbol.SymbolModifierPane;
 
@@ -133,6 +134,38 @@ abstract public class SymbolModifier {
 	 */
 	public boolean canModify(int modType) {
 		return (getModifyableBits() & modType) != 0;
+	}
+
+	/**
+	 * Get the legend for this symbol modifier, i.e. a list of the symbols it might
+	 * produce with names, or a colour bar or colour set for modifiers which colour
+	 * on a continuous or arbitrary scale.
+	 * <p>
+	 * The symbols in the legend should be complete symbols, i.e. as though this
+	 * modifier changes everything. The symbol chooser will mask the properties
+	 * which are not actually being modified before the legend is displayed.
+	 * <p>
+	 * The default is a legend with the modifier name as a title and no entries.
+	 * @return the symbol legend. Can be null if the modifier never wants a legend.
+	 */
+	public SymbolLegend getSymbolLegend() {
+		return new SymbolLegend(getName());
+	}
+
+	/**
+	 * Say whether this modifier modifies the symbol of every data unit, or only a
+	 * subset of them. For example, a peak frequency modifier will colour every
+	 * click, whereas an event modifier only colours clicks which are part of an
+	 * event and leaves the rest alone.
+	 * <p>
+	 * This is used to work out which legends are needed: any modifier earlier in
+	 * the list which only changes properties which are then changed for every data
+	 * unit by a later modifier has no visible effect, so doesn't need a legend.
+	 * The default is false which will always show the legend.
+	 * @return true if every data unit is modified.
+	 */
+	public boolean isModifyAll() {
+		return false;
 	}
 
 	public PamDialogPanel getDialogPanel() {

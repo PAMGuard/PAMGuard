@@ -11,6 +11,7 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.GeneralProjector;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.HydrophoneSymbolModifier;
 import PamView.symbol.modifier.SuperDetSymbolModifier;
 import PamView.symbol.modifier.SuperDetSymbolWrapper;
@@ -161,6 +162,24 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 
 
 	abstract protected T createSymbolChooser(String displayName, GeneralProjector projector);
+
+	/**
+	 * Get the symbol legends for a display. There is one legend for each symbol
+	 * modifier which visibly affects the display, in the order the modifiers are
+	 * applied. Use the Swing or FX symbol legend factory to turn these into a
+	 * graphical component.
+	 * @param displayName - the display name
+	 * @param projector - the projector associated with the display
+	 * @return ordered list of symbol legends. May be empty, never null.
+	 * @see PamSymbolChooser#getSymbolLegends()
+	 */
+	public List<SymbolLegend> getSymbolLegends(String displayName, GeneralProjector projector) {
+		PamSymbolChooser symbolChooser = getSymbolChooser(displayName, projector);
+		if (symbolChooser == null) {
+			return new ArrayList<>();
+		}
+		return symbolChooser.getSymbolLegends();
+	}
 
 	/**
 	 * @return the pamDataBlock

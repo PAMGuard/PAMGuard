@@ -71,8 +71,13 @@ public class WhistleTDSymbolChooser implements TDSymbolChooserFX {
 		return symbol; 
 	}
 	
+	@Override
+	public PamSymbolChooser getPamSymbolChooser() {
+		return whistleSymbolChooser;
+	}
+
 	/**
-	 * Notify settings change 
+	 * Notify settings change
 	 */
 	public void notifySettingsChange(){
 		whistleSymbolChooser=whistlePlotInfoFX.getDataBlock().getPamSymbolManager().getSymbolChooser(whistlePlotInfoFX.getTDGraph().getUniqueName(), 

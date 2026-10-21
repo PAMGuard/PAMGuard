@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamView.panel.CornerLayoutContraint;
 import PamguardMVC.PamDataUnit;
 import clickDetector.tdPlots.ClickSymbolOptions;
 
@@ -68,6 +69,31 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	public int colourScheme = COLOUR_BY_TRAIN;
 	
 	public boolean showKey;
+
+	/**
+	 * Corner of the display the key is drawn in. One of the
+	 * CornerLayoutContraint FIRST_LINE_START, FIRST_LINE_END, LAST_LINE_START
+	 * or LAST_LINE_END values.
+	 */
+	public int keyPosition = CornerLayoutContraint.LAST_LINE_START;
+
+	/**
+	 * Get the corner of the display the key is drawn in. Settings saved before
+	 * this option existed won't have a valid value, so these get the old default
+	 * of bottom left.
+	 * @return CornerLayoutContraint anchor for the key.
+	 */
+	public int getKeyPosition() {
+		switch (keyPosition) {
+		case CornerLayoutContraint.FIRST_LINE_START:
+		case CornerLayoutContraint.FIRST_LINE_END:
+		case CornerLayoutContraint.LAST_LINE_START:
+		case CornerLayoutContraint.LAST_LINE_END:
+			return keyPosition;
+		default:
+			return CornerLayoutContraint.LAST_LINE_START;
+		}
+	}
 	
 	/**
 	 * Show little markers for tracked click angles down the sides of the display

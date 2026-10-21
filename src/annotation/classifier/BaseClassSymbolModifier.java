@@ -8,11 +8,14 @@ import PamView.GeneralProjector;
 import PamView.PamSymbolType;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourBarSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
+import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 public class BaseClassSymbolModifier extends SymbolModifier {
 	
@@ -68,6 +71,18 @@ public class BaseClassSymbolModifier extends SymbolModifier {
 		symbolData.setFillColor(col);
 		symbolData.setLineColor(col);
 		return symbolData;
+	}
+
+	/**
+	 * Legend with a colour bar for the classification score. Scores are coloured on
+	 * a log-odds scale from 0.5 to ~1. Only annotated data are modified.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolData legendSymbol = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 10, 10, true, Color.BLACK, Color.BLACK);
+		// FX HOT is the same black-blue-cyan-green-orange-red map as the Swing rainbow array.
+		return new SymbolLegend(getName(), new ColourBarSymbolData(legendSymbol, "Score (log-odds)",
+				ColourArrayType.HOT, 0.5, 1.0, null));
 	}
 
 	private double scaleTrans(double score) {

@@ -1,5 +1,6 @@
 package dataPlotsFX;
 
+import PamView.symbol.PamSymbolChooser;
 import PamguardMVC.PamDataUnit;
 import pamViewFX.fxNodes.PamSymbolFX;
 
@@ -49,6 +50,15 @@ public interface TDSymbolChooserFX {
 	public int getDrawTypes(PamDataUnit dataUnit);
 
 	public PamSymbolFX getPamSymbol(PamDataUnit dataUnit, int type);
+
+	/**
+	 * Get the managed symbol chooser used to pick symbols, if there is one. This
+	 * is used to create the symbol legend on the graph.
+	 * @return the managed symbol chooser, or null if symbols are chosen some other way.
+	 */
+	public default PamSymbolChooser getPamSymbolChooser() {
+		return null;
+	}
 
 	// public Color getLineColor(PamDataUnit pamDataUnit, int type);
 
