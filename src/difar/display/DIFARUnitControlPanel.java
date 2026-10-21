@@ -145,7 +145,8 @@ public class DIFARUnitControlPanel implements DIFARDisplayUnit {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			difarControl.getDifarParameters().zoomDifarFrequency = zoomFrequency.isSelected();
-			difarControl.getDifarGram().zoomFrequency();
+			// the DIFARGram and the match selector both redraw at the new zoom
+			difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.DisplaySettingsChange, null));
 		}
 	}
 		

@@ -189,7 +189,7 @@ crossings below the default angle.
 2. **One crossing per clip.** A clip belongs to one crossing, since it is one event. A new crossing claims its clips, and a grown crossing replaces the smaller one. Keeping both would add confusion and accounting.
 3. **Deleting a clip.** Recalculate its crossing when two or more clips remain, else delete it. A setting switches to always deleting.
 4. **Old clip columns.** New rows write NULL. Old datasets are converted, not read by old-format tools.
-5. **Tracked groups.** Left alone for now. They are likely to be dropped or replaced by a general tracking tool later.
+5. **Tracked groups.** Left alone for now. They are likely to be dropped or replaced by a general tracking tool later. (Removed on 21 October 2026.)
 6. **One copy of buoy-derived values.** Buoy position, heading, true bearing, buoy name and deployment UID live in the clip row only. The crossing subtable holds links, and a query joins them.
 7. **Buoy edits rematch.** A buoy error can make old pairings wrong, so matches over the buoy's period are chosen again. Crossings chosen by the operator keep their clips and are worked out again.
 8. **Poor geometry is flagged, not rejected.** Crossing angle and location error are kept on each

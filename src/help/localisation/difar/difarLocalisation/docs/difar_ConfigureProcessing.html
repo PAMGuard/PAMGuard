@@ -30,13 +30,18 @@
 
 <p>Most DIFAR sonobuoys send data via VHF radio link back to an aircraft of nearby vessel. Consequently, the acoustic data from the three sensors are multiplexed into a single signal prior to transmission. An important part of the processing is therefore the de-multiplexing of the signal back into it's three separate components, and to achieve this, PAMGuard makes use of a software library developed by Greenridge Sciences Inc. Greeneridge Sciences Demultiplexing Library is not included with PAMGuard and must be purchased separately. Upon purchase, you be supplied with a file GreenridgeDemux32.dll or GreenridgeDemux64.dll, and this should be placed in your Program Files (x86)/PAMGuardBeata/lib folder prior to launching PAMGuard.</p>
 
-<p>An alternative to the Greeneridge demultiplexer is the experimental demultiplexer developed at the Australian Antarctic Division, listed as AMMC_EXPERIMENTAL in the settings. This freely available, open-source demultiplexer is included in PAMGuard within the DIFAR module. It does not require purchase, and at the time of writing (July 2014) was not subject to export restrictions by the Australian Defence Export Control Office. However, it is considered beta software and may not be as stable, reliable or robust as the Greeneridge demultiplexer.</p>
+<p>The alternative is the AAD demultiplexer, developed at the Australian Antarctic Division and included in PAMGuard within the DIFAR module. It is free and open source. It has been used on Antarctic voyages, both at sea and in post-processing, since about 2015. Two versions are offered:</p>
 
-<p>The Greeneridge demultiplexer is more robust and better tested, but must be purchased separately. The AMMC_EXPERIMENTAL demultiplexer is included by default.</p>
+<ul>
+<li><strong>AAD (time domain)</strong> demultiplexes every sample of a DIFAR clip at the recording's sample rate, then low-pass filters and decimates to the classification's sample rate. It is the default. (In saved settings and older documentation it is called AMMC_EXPERIMENTAL, after the Australian Marine Mammal Centre, where it was first written.)</li>
+<li><strong>AAD fast (frequency domain)</strong> takes one Fourier transform of each DIFAR clip and keeps only the frequencies it needs: the omnidirectional band, the 15 kHz pilot, and the directional band beside the pilot. It then demultiplexes at the classification's sample rate. It gives the same bearings as AAD (time domain) to within small filter differences, and is several times faster, which matters most when automatic detectors make many DIFAR clips. It is new (October 2026) and still being tested.</li>
+</ul>
+
+<p>With either AAD demultiplexer, the band demultiplexed is set by the classification's sample rate (half of it), and no lock-in time is needed. The Greeneridge demultiplexer is well tested over many years, but must be purchased separately.</p>
 
 <h3><a name="Data">Buffers </a></h3>
 
-<p><a name="Buffers"><b>Prepend to clip:</b> This is the amount of data (in seconds) added to the start of each DIFAR clip.&nbsp;When using the&nbsp;Greeneridge demodulator, this&nbsp;should be set to approximately 3 s or more&nbsp;to enable the phased lock loop in the DIFAR de-multiplexing module to lock onto the carrier signal. When using the AMMC demodulator, this&nbsp;should be set to 0.&nbsp;</a></p>
+<p><a name="Buffers"><b>Prepend to clip:</b> This is the amount of data (in seconds) added to the start of each DIFAR clip.&nbsp;When using the&nbsp;Greeneridge demodulator, this&nbsp;should be set to approximately 3 s or more&nbsp;to enable the phased lock loop in the DIFAR de-multiplexing module to lock onto the carrier signal. When using either AAD demodulator, this&nbsp;should be set to 0.&nbsp;</a></p>
 
 <p><a name="Buffers"><b>Time to keep Raw Data:</b> The time in seconds that raw data are held in memory. Once data are discarded it is no longer possible to make clips from the data for DIFAR processing. Generally a couple of minutes is adequate. Increasing this too much can cause PAMGuard to run out of memory. </a></p>
 
@@ -178,6 +183,10 @@ Setting up a filter for obtaining calibrated intensity measurements from sonobuo
 
 <p><a name="Automation"><b>Auto save processed clips:</b> If you select to Auto save processed data, then once a DIFAR clip has been processed it will automatically be saved after the set delay time using the maximum DIFAR angle and automatically crossing bearings to other detections if more than one buoy is in operation. </a></p>
 
+<p>Auto save offers two choices. <b>With a delay for review</b> shows each processed DIFAR clip on the DIFARGram, and saves it after the set number of seconds unless the operator acts first. A delay of 0 seconds saves straight away, but each DIFAR clip still passes through the DIFARGram.</p>
+
+<p><a name="Unattended"><b>As fast as possible, with no review</b></a> is for fully automated processing, usually from files. In Normal mode, each classified DIFAR clip is processed and saved as soon as it is made, and is not shown on the DIFARGram. PAMGuard waits for DIFAR as it waits for the detector that triggered the DIFAR clip. When processing from files, the audio is held back whenever DIFAR falls behind, so each DIFAR clip is saved soon after its own time, in the binary file for that time. Processing may therefore run more slowly than without DIFAR. Unclassified DIFAR clips, and any DIFAR clip with no bearing, stay in the queue for the operator. In Viewer mode this choice saves as with a delay for review.</p>
+
 <p>Auto save also works in Viewer mode, for new DIFAR clips only. A saved DIFAR clip that is opened again in the DIFARGram is never saved automatically. See <a href="difar_ViewerReanalysis.html#Saving">Reanalysis in Viewer mode</a>.</p>
 
 <p>&nbsp;</p>
@@ -206,6 +215,14 @@ Setting up a filter for obtaining calibrated intensity measurements from sonobuo
 <p><b>Max bearing residual (deg):</b> The largest difference allowed between a measured bearing and the bearing to the location of the triangulation.</p>
 
 <p><b>Max candidates per buoy:</b> The number of DIFAR clips on each other sonobuoy that are considered as matches for one DIFAR clip. The DIFAR clips closest in time and frequency are kept. Increase this value when many animals are calling at once.</p>
+
+<p><b>Time delays by correlation:</b> Measure the arrival time difference between DIFAR clips by cross-correlating their spectrograms, rather than from their start times. See <a href="difar_CrossingBearings.html#Crossings">Triangulation</a>. The spectrograms use the FFT length and hop of the species settings. The correlation is smoothed over 64 ms before its peak is found.</p>
+
+<p><b>Correlation threshold:</b> The smallest correlation peak, between 0 and 1, accepted as an arrival time difference. Below it, the start times of the DIFAR clips are used. Peaks are low, since most of a DIFAR clip's band is noise; a clear call typically gives 0.1 to 0.2. The default is 0.1.</p>
+
+<p><b>Correlation timing error (s):</b> The accuracy of an arrival time difference measured by correlation. It sets the weight these differences are given when a triangulation is calculated. The default is 0.05 s.</p>
+
+<p><b>Max correlated timing residual (s):</b> The largest difference allowed between an arrival time difference measured by correlation and the one predicted by the triangulation. Arrival time differences from start times are still held to the Max timing residual. The default is 0.5 s.</p>
 
 <p><b>On-buoy radius (m):</b> A triangulation within this distance of one of its own sonobuoys is flagged as <a href="difar_CrossingBearings.html#Quality">on that sonobuoy</a>, and its errors are set to this radius. The default is 500 m. DIFAR sonobuoys are not precision instruments: compass calibrations vary, deployment locations are approximate, and sonobuoys drift after deployment. A generous radius is therefore recommended.</p>
 

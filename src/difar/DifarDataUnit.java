@@ -127,10 +127,6 @@ public class DifarDataUnit extends ClipDataUnit {
 	 */
 	private LegacyCrossing legacyCrossing;
 	
-	private String trackedGroup;
-
-	private String tempGroup;
-	
 	/**
 	 * Store the frequency and gain of the filter for
 	 * frequency-intensity calibration
@@ -500,17 +496,6 @@ public class DifarDataUnit extends ClipDataUnit {
 		return null;
 	}
 
-	public String getTrackedGroup() {
-		if (trackedGroup == null){
-			return DifarParameters.DefaultGroup;
-		}
-		return trackedGroup;
-	}
-	
-	public void setTrackedGroup(String newGroup) {
-		trackedGroup = newGroup;
-	}
-	
 	/**
 	 * Set the selected angle from the DIFARGram. Note
 	 * that this is the angle relative to the DIFAR buoy
@@ -832,12 +817,6 @@ public class DifarDataUnit extends ClipDataUnit {
 				str += "<br>Species: " + lsi.getText();
 			}
 		}
-		str += "<br>Group: ";
-		if (trackedGroup == null) {
-			str += "No group assigned";
-		}else {
-			str += trackedGroup;
-		}
 		str += String.format("<br> Channel: %s", PamUtils.getChannelList(getChannelBitmap()));
 		str += "<br>"+FrequencyFormat.formatFrequencyRange(getFrequency(), true);
 		str += String.format("<br>Amplitude: %3.1fdB", getAmplitudeDB());
@@ -1025,24 +1004,6 @@ public class DifarDataUnit extends ClipDataUnit {
 
 
 	/**
-	 * @return the tempCrossing
-	 */
-	public String getTempGroup() {
-		return tempGroup;
-	}
-
-	/**
-	 * @param tempCrossing the tempCrossing to set
-	 */
-	public void setTempGroup(String tempGroup) {
-		if (tempGroup==null){ 
-			this.tempGroup = DifarParameters.DefaultGroup;
-		} else {
-			this.tempGroup = tempGroup;
-		}
-	}
-
-	/**
 	 * The position of the buoy this detection was made on, with its heading
 	 * correction as the true heading.
 	 * <p>
@@ -1067,11 +1028,6 @@ public class DifarDataUnit extends ClipDataUnit {
 		GpsData origin = new GpsData(buoy.getLatitude(), buoy.getLongitude(), 0, buoy.getTimeMillis());
 		origin.setTrueHeading(buoy.getHeading());
 		return origin;
-	}
-
-	public void saveGroup() {
-		trackedGroup = getTempGroup();
-		setTempGroup(null);
 	}
 
 	/**

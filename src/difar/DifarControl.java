@@ -9,6 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +28,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import Array.ArrayManager;
@@ -70,7 +74,6 @@ import difar.offline.UpgradeTask;
 import difar.offline.ViewerClipStore;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
-import difar.trackedGroups.TrackedGroupProcess;
 import difar.offline.ViewerEdits;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
@@ -79,6 +82,10 @@ import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskGroupParams;
 import userDisplay.UserDisplayControl;
 import warnings.PamWarning;
+import warnings.WarningSystem;
+import generalDatabase.DBControlUnit;
+import generalDatabase.EmptyTableDefinition;
+import generalDatabase.PamConnection;
 
 public class DifarControl extends PamControlledUnit implements PamSettings {
 
@@ -120,7 +127,6 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	
 	private DifarDataUnit currentDemuxedUnit = null;
 	private DifarDisplayContainer2 difarDisplayContainer2;
-	private TrackedGroupProcess trackedGroupProcess;
 
 	/** How viewer edits reach displays, files and the database; null in normal mode. */
 	private ViewerEdits viewerEdits;
@@ -138,6 +144,15 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	
 	private static PamWarning warningMessage = new PamWarning("Difar", "", 2);
 
+	/**
+	 * The last PAMGuard version that writes and reads DIFAR tracked groups.
+	 * They were removed in the version after it.
+	 */
+	public static final String LAST_VERSION_WITH_TRACKED_GROUPS = "2.02.19";
+
+	/** The database last checked for old tracked groups, so each is checked once. */
+	private String trackedGroupsCheckedIn;
+
 	public DifarControl(String unitName) {
 	
 		super("DIFAR Processing", unitName);
@@ -145,7 +160,6 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		PamSettingManager.getInstance().registerSettings(this);		
 		
 		addPamProcess(difarProcess = new DifarProcess(this));
-		addPamProcess(setTrackedGroupProcess(new TrackedGroupProcess(this, difarProcess.getProcessedDifarData(), "Difar Tracked Groups")));
 		addPamProcess(sonobuoyManager = new SonobuoyManager(this));
 		sonobuoyHistorySource = new SonobuoyHistorySource(
 				sonobuoyManager.sonobuoyEndTimeAnnotation.getAnnotationName());
@@ -315,11 +329,53 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			break;
 		}
 		
-		// loop over display units, 
+		notifyDisplays(message);
+	}
+
+	/**
+	 * Pass a message to every DIFAR display, with no other action.
+	 * @param message DIFAR message
+	 */
+	private void notifyDisplays(DIFARMessage message) {
 		for (DIFARDisplayUnit difarDisplay:displayUnits) {
 			difarDisplay.difarNotification(message);
 		}
-		
+	}
+
+	/**
+	 * Save a clip processed with no operator (see
+	 * {@link DifarProcess#isUnattended()}), as the DIFARgram's auto save
+	 * does, on the calling thread. Its triangulation is recorded, unless the
+	 * settings save bearings only. The displays are told afterwards, on the
+	 * Swing thread. The clip never reaches the DIFARgram, so the clip the
+	 * operator is working on, if any, is left alone.
+	 * @param unit the clip, demultiplexed and with a bearing.
+	 */
+	void saveUnattended(DifarDataUnit unit) {
+		final int saved;
+		if (difarParameters.autoSaveAngleOnly) {
+			unit.clearTempCrossing();
+			difarProcess.finalProcessing(unit);
+			difarProcess.getCrossingRecorder().forget(unit);
+			saved = DIFARMessage.SaveDatagramUnitWithoutRange;
+		}
+		else {
+			difarProcess.finalProcessing(unit);
+			difarProcess.getCrossingRecorder().record(unit);
+			unit.clearTempCrossing();
+			saved = DIFARMessage.SaveDatagramUnit;
+		}
+		/*
+		 * The queue strip shows every clip added to the queue, and drops one
+		 * only when told it was taken from the queue. Tell it, then that the
+		 * clip was saved, as the DIFARgram's path does. Without the first
+		 * message, saved clips stay on the queue strip until its history
+		 * limits trim them.
+		 */
+		SwingUtilities.invokeLater(() -> {
+			notifyDisplays(new DIFARMessage(DIFARMessage.ProcessFromQueue, unit));
+			notifyDisplays(new DIFARMessage(saved, unit));
+		});
 	}
 	
 
@@ -606,6 +662,10 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			sonobuoyHistorySource.connect();
 			difarProcess.setupProcess();
+			warnIfOldTrackedGroups();
+			break;
+		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
+			warnIfOldTrackedGroups();
 			break;
 		case PamControllerInterface.OFFLINE_DATA_LOADED:
 			sonobuoyHistorySource.markStale();
@@ -614,6 +674,50 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		case PamControllerInterface.NEW_SCROLL_TIME:
 			sonobuoyManager.scrollTimeChanged();
 		}
+	}
+
+	/**
+	 * Tracked groups were removed from DIFAR. If the database holds tracked
+	 * groups from an older version, say that they are no longer read or
+	 * written, and which version still reads them. Checked once for each
+	 * database: at startup, and when the viewer loads a different database.
+	 * An empty table, as in a database made by an older version but never
+	 * used for tracked groups, is not mentioned. The table is left as it is.
+	 */
+	private void warnIfOldTrackedGroups() {
+		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+		if (dbControl == null || dbControl.getConnection() == null) {
+			return;
+		}
+		String database = dbControl.getDatabaseName();
+		if (database == null || database.equals(trackedGroupsCheckedIn)) {
+			return;
+		}
+		trackedGroupsCheckedIn = database;
+		PamConnection connection = dbControl.getConnection();
+		EmptyTableDefinition oldTable = new EmptyTableDefinition(getUnitName() + "Tracked Groups");
+		if (dbControl.getDbProcess() == null || !dbControl.getDbProcess().tableExists(oldTable)) {
+			return;
+		}
+		String tableName = connection.getSqlTypes().formatTableName(oldTable.getTableName());
+		int rows;
+		try (Statement statement = connection.getConnection().createStatement();
+				ResultSet result = statement.executeQuery("SELECT COUNT(*) FROM " + tableName)) {
+			rows = result.next() ? result.getInt(1) : 0;
+		}
+		catch (SQLException e) {
+			System.out.println("DIFAR: could not count the old tracked groups: " + e.getMessage());
+			return;
+		}
+		if (rows == 0) {
+			return;
+		}
+		String message = String.format("This database has %d DIFAR tracked groups (table %s). "
+				+ "Tracked groups were removed after PAMGuard %s, so they are not read or written. "
+				+ "Use PAMGuard %s or earlier to view them.",
+				rows, tableName, LAST_VERSION_WITH_TRACKED_GROUPS, LAST_VERSION_WITH_TRACKED_GROUPS);
+		System.out.println("DIFAR: " + message);
+		WarningSystem.getWarningSystem().addWarning(new PamWarning(getUnitName(), message, 1));
 	}
 
 	/**
@@ -715,6 +819,27 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	}
 
 	/**
+	 * The frequency range to show a DIFAR clip over, in the DIFARGram and in
+	 * the triangulation match selector.
+	 * <p>
+	 * With "Zoom freq" ticked, the range is the DIFAR clip's own frequency
+	 * limits, widened by a quarter of their bandwidth at each end and kept
+	 * within zero and the Nyquist frequency. Otherwise, or if the DIFAR clip has
+	 * no frequency limits, it is zero to the Nyquist frequency.
+	 * @param difarDataUnit the DIFAR clip.
+	 * @return the lowest and highest frequency to show, in Hz.
+	 */
+	public double[] getClipFrequencyLimits(DifarDataUnit difarDataUnit) {
+		double nyquist = difarDataUnit.getDisplaySampleRate() / 2.;
+		double[] fRange = difarDataUnit.getFrequency();
+		if (!getDifarParameters().zoomDifarFrequency || fRange == null) {
+			return new double[] {0., nyquist};
+		}
+		double margin = (fRange[1] - fRange[0]) / 4.;
+		return new double[] {Math.max(0., fRange[0] - margin), Math.min(nyquist, fRange[1] + margin)};
+	}
+
+	/**
 	 * Can the system handle demuxing the next data unit ? 
 	 * Currently used to enable menus on the clip display
 	 * @return true if it's OK to demux the next sound. 
@@ -742,19 +867,6 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		return currentDemuxedUnit;
 	}
 
-	public String getCurrentlySelectedGroup(){
-		return difarGram.getDifarGroupPanel().getCurrentlySelectedGroup();
-	}
-	
-	public void setCurrentlySelectedGroup(String groupName){
-		difarGram.getDifarGroupPanel().setCurrentlySelectedGroup(groupName);
-	}
-
-	public boolean isTrackedGroupSelectable(String groupName){
-		return difarGram.getDifarGroupPanel().isTrackedGroupSelectable(groupName);
-		
-	}
-	
 	/**
 	 * Get the appropriate symbol for the selected species (or none). 
 	 * @param difarDataUnit DIFAR data unit
@@ -776,8 +888,6 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	public ViewerEdits getViewerEdits() {
 		if (viewerEdits == null && isViewer) {
 			viewerEdits = new ViewerEdits(this);
-			// tracked groups consume saved clips, as in normal mode
-			viewerEdits.addConsumer(trackedGroupProcess);
 		}
 		return viewerEdits;
 	}
@@ -799,15 +909,6 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 		edits.commit();
 	}
 
-	public TrackedGroupProcess getTrackedGroupProcess() {
-		return trackedGroupProcess;
-	}
-
-	public TrackedGroupProcess setTrackedGroupProcess(TrackedGroupProcess trackedGroupProcess) {
-		this.trackedGroupProcess = trackedGroupProcess;
-		return trackedGroupProcess;
-	}
-	
 	/**
 	 * Save a set of classifier params. Since this is primarily an
 	 * export function, it will always show the file save dialog

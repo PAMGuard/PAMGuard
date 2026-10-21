@@ -9,6 +9,7 @@
 
 	<h2>Using the DIFARGram Display</h2>
 
+	<!-- Screenshot: retake the DIFAR Localisation displays; this one still shows the Groups panel, which was removed with tracked groups. -->
 	<center>
 		<img alt="Picture of the DIFAR Localisation Displays"
 			src="./images/DIFARLocalisationDisplays.png" />
@@ -28,10 +29,10 @@
 		the&nbsp;Greeneridge demultiplexer correctly locks onto the&nbsp;7.5
 		and 15kHz carrier signals. The lock status is also shown in the
 		progress bar, which will be red if the signal is not locked. If the
-		signal doesn't lock, then the clip should be discarded. NB: The AMMC_EXPERIMENTAL
-		demultiplexer does not presently contain any mechanism for determining
+		signal doesn't lock, then the clip should be discarded. NB: The AAD
+		demultiplexers do not presently contain any mechanism for determining
 		whether a clip contains a correctly multiplexed DIFAR signal,
-		thus&nbsp;when using the AMMC_EXPERIMENTAL demultiplexer, operator experience and
+		thus&nbsp;when using either AAD demultiplexer, operator experience and
 		investigation of the directional signals may be required to determine
 		whether the results of demodulation are sensible.</p>
 
@@ -80,9 +81,10 @@
 	</p>
 
 	<p>
-		The <strong>Zoom Freq</strong> button causes both the spectrogram
-		display and the DIFARGram to zoom in in frequency to slightly more
-		than the frequency limits of the selected sound.
+		The <strong>Zoom Freq</strong> button causes the spectrogram
+		display, the DIFARGram and the DIFAR clips in the Triangulation match
+		selector to zoom in in frequency to slightly more than the frequency
+		limits of each sound: a quarter of the bandwidth above and below.
 	</p>
 
 	<p class="previousLink">
@@ -90,8 +92,7 @@
 	</p>
 
 	<p class="nextLink">
-		<a href="difar_CrossingBearings.html">Next: Advanced Localisation
-			(Crossed Bearings and Tracked Groups)</a>
+		<a href="difar_CrossingBearings.html">Next: Triangulation</a>
 	</p>
 
 	<p>&nbsp;</p>

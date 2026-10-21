@@ -192,6 +192,10 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 			// the clip has left the DIFARgram, so its matches no longer apply
 			showUnit(null);
 			break;
+		case DIFARMessage.DisplaySettingsChange:
+			// colours, amplitude range or frequency zoom
+			clipStrip.displaySettingsChanged();
+			break;
 		}
 		return 0;
 	}
@@ -269,7 +273,7 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 		private static final long serialVersionUID = 1L;
 
 		private final String[] columns = {"Buoys", "Match candidates", "Bearing (deg)",
-				"Timing (s)", "Chi2/dof", "Status"};
+				"Timing (s)", "Correlated", "Chi2/dof", "Status"};
 
 		private List<DifarMatchSelector.Match> matches;
 
@@ -345,14 +349,45 @@ public class DifarMatchPanel extends PamPanel implements DIFARDisplayUnit {
 			case 3:
 				return format(match.getResiduals().getMaxTimeDelayErrorSeconds(), 2);
 			case 4:
-				return format(match.getChi2PerDegreeOfFreedom(), 2);
+				return String.format("%d of %d", match.getCorrelatedCount(), match.getUnits().size() - 1);
 			case 5:
+				return format(match.getChi2PerDegreeOfFreedom(), 2);
+			case 6:
 				if (isUsed(match)) {
 					return "used";
 				}
-				return match.isAccepted() ? "fits, not used" : match.getRejectReason();
+				if (!match.isAccepted()) {
+					return match.getRejectReason();
+				}
+				String taken = takenBy(match);
+				return taken == null ? "fits, not used" : "fits; " + taken;
 			}
 			return null;
+		}
+
+		/**
+		 * Which of a group's other DIFAR clips already belong to a different
+		 * triangulation from the seed's. When a clip is saved, or matched in a
+		 * rematch, those clips are not free, which is often why a group that
+		 * fits better was not used.
+		 * @return for example "ch14 in triangulation 41", or null if none are.
+		 */
+		private String takenBy(DifarMatchSelector.Match match) {
+			Object seedCrossing = currentUnit == null ? null : currentUnit.getSuperDetection(DifarCrossing.class);
+			StringBuilder text = new StringBuilder();
+			for (int i = 1; i < match.getUnits().size(); i++) {
+				PamDataUnit unit = match.getUnits().get(i);
+				Object crossing = unit.getSuperDetection(DifarCrossing.class);
+				if (!(crossing instanceof DifarCrossing) || crossing == seedCrossing) {
+					continue;
+				}
+				if (text.length() > 0) {
+					text.append(", ");
+				}
+				text.append(String.format("ch%d in triangulation %d",
+						PamUtils.getSingleChannel(unit.getChannelBitmap()), ((DifarCrossing) crossing).getUID()));
+			}
+			return text.length() == 0 ? null : text.toString();
 		}
 
 		/** @return the other detections of a group, as channel and time. */

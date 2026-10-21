@@ -97,24 +97,19 @@ public class DifarSqlLogging extends SQLLogging {
 		difarFrequency.setValue(difarDataUnit.getSelectedFrequency());
 		species.setValue(difarDataUnit.getSpeciesCode());
 		/*
-		 * Crossings are stored in their own tables. These columns stay only so
-		 * that old databases still open, and are empty in new rows.
+		 * Crossings are stored in their own tables, and tracked groups were
+		 * removed. These columns stay only so that old databases still open,
+		 * and are empty in new rows.
 		 */
 		latitude.setValue(null);
 		longitude.setValue(null);
 		xError.setValue(null);
 		yError.setValue(null);
 		matchedUnits.setValue(null);
+		trackedGroup.setValue(null);
 		SonobuoyRecord buoy = difarDataUnit.getBuoyRecord();
 		buoyName.setValue(buoy == null ? null : buoy.getName());
 		deploymentUID.setValue(buoy == null ? null : buoy.getUid());
-		if (difarDataUnit.getTrackedGroup() == null){
-			trackedGroup.setValue(null);
-		}
-		else {
-			trackedGroup.setValue(difarDataUnit.getTrackedGroup());
-		}
-		
 	}
 
 	/**

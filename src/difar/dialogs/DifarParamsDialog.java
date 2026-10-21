@@ -113,6 +113,7 @@ public class DifarParamsDialog extends PamDialog {
 //	JComboBox autoProcessSpecies; // in future this will have to be dependant on number of detectors/classifyers/ for now there is only 1
 	JComboBox firstOrder,secondOrder;
 	JCheckBox autoSaveDResult; //moved to actions panel
+	JRadioButton autoSaveForReview, autoSaveUnattended;
 	JTextField autoSaveTime;
 	JCheckBox autoSaveAngleOnly;
 	JCheckBox autoProcess;
@@ -142,6 +143,8 @@ public class DifarParamsDialog extends PamDialog {
 	private JTextField onBuoyRadius;
 	private JTextField detectionTimingError, maxTimeDelayResidual, maxBearingResidual, bearingError,
 			maxCandidatesPerBuoy;
+	private JCheckBox useCorrelation;
+	private JTextField correlationThreshold, correlationTimingError, maxCorrelatedDelayResidual;
 	private SourcePanel calibrationSourcePanel;
 	private JCheckBox loadViewerClips;
 	
@@ -245,10 +248,35 @@ public class DifarParamsDialog extends PamDialog {
 		autoSaveDResult=new JCheckBox();
 		autoSaveDResult.setName("Auto save processed clips");
 		
+		/*
+		 * Two ways to auto save: after a delay, on the DIFARgram, so the
+		 * operator can review each clip; or as fast as possible, with no
+		 * review, for unattended processing of files.
+		 */
+		autoSaveForReview = new JRadioButton("With a delay for review:");
+		autoSaveForReview.setToolTipText("<HTML>Each processed clip is shown on the DIFARGram, and saved after the delay<br>"
+				+ "unless the operator acts first.</HTML>");
 		autoSaveTime=new JTextField(3);
-		autoSaveTime.setName("After how many seconds");
+		autoSaveTime.setToolTipText("Delay before a processed clip is saved, in seconds");
+		autoSaveUnattended = new JRadioButton("As fast as possible, with no review");
+		autoSaveUnattended.setToolTipText("<HTML>Fully automated. In Normal mode each classified clip is processed and saved<br>"
+				+ "as soon as it is made, and is not shown on the DIFARGram. PAMGuard waits for DIFAR,<br>"
+				+ "so processing from files may run more slowly.</HTML>");
+		ButtonGroup autoSaveGroup = new ButtonGroup();
+		autoSaveGroup.add(autoSaveForReview);
+		autoSaveGroup.add(autoSaveUnattended);
+		JPanel reviewRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		reviewRow.add(autoSaveForReview);
+		reviewRow.add(autoSaveTime);
+		reviewRow.add(new JLabel(" seconds"));
+		JPanel unattendedRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		unattendedRow.add(autoSaveUnattended);
+		ActionListener autoSaveChange = e -> enableAutoSave();
+		autoSaveDResult.addActionListener(autoSaveChange);
+		autoSaveForReview.addActionListener(autoSaveChange);
+		autoSaveUnattended.addActionListener(autoSaveChange);
 		
-		JComponent[] autoComps = {autoProcess,/*firstOrder,*/autoSaveDResult,autoSaveTime,/*autoSaveAngleOnly*/};
+		JComponent[] autoComps = {autoProcess,/*firstOrder,*/autoSaveDResult,reviewRow,unattendedRow,/*autoSaveAngleOnly*/};
 		
 		JPanel autoSavePanel = new JPanel(new GridBagLayout());
 		PamPanel.layoutGrid(autoSavePanel, autoComps);
@@ -329,8 +357,31 @@ public class DifarParamsDialog extends PamDialog {
 				+ "there are near zero and mean nothing. DIFAR buoys are not precision<br>"
 				+ "instruments, so be generous.</HTML>");
 
+		useCorrelation = new JCheckBox();
+		useCorrelation.setName("Time delays by correlation");
+		useCorrelation.setToolTipText("<HTML>Measure time delays between DIFAR clips by cross-correlating<br>"
+				+ "their spectrograms, rather than from the clips' start times.<br>"
+				+ "Where a pair does not correlate, its start times are used.</HTML>");
+
+		correlationThreshold = new JTextField();
+		correlationThreshold.setName("Correlation threshold");
+		correlationThreshold.setToolTipText("<HTML>Smallest correlation peak, between 0 and 1, accepted as a time delay.<br>"
+				+ "Peaks are low, since most of a clip's band is noise:<br>"
+				+ "a clear call gives around 0.1 to 0.2.</HTML>");
+
+		correlationTimingError = new JTextField();
+		correlationTimingError.setName("Correlation timing error (s)");
+		correlationTimingError.setToolTipText("<HTML>Accuracy of a time delay measured by correlation.<br>"
+				+ "This sets how much weight those delays carry when a position is calculated.</HTML>");
+
+		maxCorrelatedDelayResidual = new JTextField();
+		maxCorrelatedDelayResidual.setName("Max correlated timing residual (s)");
+		maxCorrelatedDelayResidual.setToolTipText("<HTML>Largest difference allowed between a time delay measured by<br>"
+				+ "correlation and the one the calculated position would produce.</HTML>");
+
 		JComponent[] localisation = {bearingError, detectionTimingError, maxTimeDelayResidual, maxBearingResidual,
-				maxCandidatesPerBuoy, onBuoyRadius};
+				maxCandidatesPerBuoy, onBuoyRadius, useCorrelation, correlationThreshold, correlationTimingError,
+				maxCorrelatedDelayResidual};
 		PamPanel localisationPanel = new PamPanel(new GridBagLayout());
 		localisationPanel.setBorder(new TitledBorder("Localisation"));
 		PamPanel.layoutGrid(localisationPanel, localisation);
@@ -346,6 +397,13 @@ public class DifarParamsDialog extends PamDialog {
 		//*************************************************************************
 		
 	}
+	private void setCorrelationFields(DifarParameters params) {
+		useCorrelation.setSelected(params.useCorrelation);
+		correlationThreshold.setText(Double.toString(params.correlationThreshold));
+		correlationTimingError.setText(Double.toString(params.correlationTimingError));
+		maxCorrelatedDelayResidual.setText(Double.toString(params.maxCorrelatedDelayResidual));
+	}
+
 	class PushUp extends JPanel{
 		PushUp(JComponent jComponent){
 			super();
@@ -643,6 +701,7 @@ public class DifarParamsDialog extends PamDialog {
 		maxBearingResidual.setText(new Double(difarParameters.maxBearingResidual).toString());
 		onBuoyRadius.setText(Double.toString(difarParameters.getOnBuoyRadius()));
 		maxCandidatesPerBuoy.setText(new Integer(difarParameters.maxCandidatesPerBuoy).toString());
+		setCorrelationFields(difarParameters);
 
 		secondsToPreceed.setText(new Double(difarParameters.secondsToPreceed).toString());
 		keepRawDataTime.setText(new Integer(difarParameters.keepRawDataTime).toString());
@@ -668,6 +727,7 @@ public class DifarParamsDialog extends PamDialog {
 		autoProcess.setSelected(difarParameters.autoProcess);
 		autoSaveDResult.setSelected(difarParameters.autoSaveDResult);
 		autoSaveTime.setText(new Float(difarParameters.autoSaveTime).toString());
+		setAutoSaveMode(difarParameters.autoSaveUnattended);
 		
 
 		// Keyboard commands
@@ -741,6 +801,24 @@ public class DifarParamsDialog extends PamDialog {
 
 			return showWarning("Localisation Parameter Problem");
 		}
+		try {
+			double threshold = Double.valueOf(correlationThreshold.getText());
+			double correlationError = Double.valueOf(correlationTimingError.getText());
+			double maxCorrelated = Double.valueOf(maxCorrelatedDelayResidual.getText());
+			if (threshold <= 0 || threshold >= 1) {
+				return showWarning("Correlation threshold must be between 0 and 1");
+			}
+			if (correlationError <= 0 || maxCorrelated <= 0) {
+				return showWarning("Correlation timing settings must be greater than zero");
+			}
+			difarParameters.useCorrelation = useCorrelation.isSelected();
+			difarParameters.correlationThreshold = threshold;
+			difarParameters.correlationTimingError = correlationError;
+			difarParameters.maxCorrelatedDelayResidual = maxCorrelated;
+		}
+		catch (Exception e) {
+			return showWarning("Correlation Parameter Problem");
+		}
 		try{
 			difarParameters.secondsToPreceed = new Double(secondsToPreceed.getText());
 			difarParameters.keepRawDataTime = new Integer(keepRawDataTime.getText());
@@ -785,7 +863,11 @@ public class DifarParamsDialog extends PamDialog {
 			difarParameters.useSummaryLine = useSummaryLine.isSelected();
 			difarParameters.autoProcess = autoProcess.isSelected();
 			difarParameters.autoSaveDResult=autoSaveDResult.isSelected();
-			difarParameters.autoSaveTime=(float) new Float(autoSaveTime.getText());
+			difarParameters.autoSaveUnattended = autoSaveUnattended.isSelected();
+			if (autoSaveForReview.isSelected()) {
+				// the delay is only read when it is used, so a stale entry cannot block OK
+				difarParameters.autoSaveTime=(float) new Float(autoSaveTime.getText());
+			}
 		}catch(Exception e){
 			return showWarning(e.getMessage());
 		}
@@ -866,6 +948,7 @@ public class DifarParamsDialog extends PamDialog {
 		maxBearingResidual.setText(new Double(newDifarParameters.maxBearingResidual).toString());
 		onBuoyRadius.setText(Double.toString(newDifarParameters.getOnBuoyRadius()));
 		maxCandidatesPerBuoy.setText(new Integer(newDifarParameters.maxCandidatesPerBuoy).toString());
+		setCorrelationFields(newDifarParameters);
 
 		secondsToPreceed.setText(new Double(newDifarParameters.secondsToPreceed).toString());
 		keepRawDataTime.setText(new Integer(newDifarParameters.keepRawDataTime).toString());
@@ -883,11 +966,33 @@ public class DifarParamsDialog extends PamDialog {
 		}
 		
 //		autoProcessSpecies.setSelectedItem(newDifarParameters.autoProcessSpecies==null?noAutoItem:newDifarParameters.autoProcessSpecies); // in future this will have to be dependant on number of detectors/classifyers/ for now there is only 1
-		firstOrder.setSelectedItem(newDifarParameters.firstOrder);
+		// the first order and save-angle-only controls are not built, so are not reset
 		autoProcess.setSelected(newDifarParameters.autoProcess);
 		autoSaveDResult.setSelected(newDifarParameters.autoSaveDResult);
 		autoSaveTime.setText(new Float(newDifarParameters.autoSaveTime).toString());
-		autoSaveAngleOnly.setSelected(newDifarParameters.autoSaveAngleOnly);
+		setAutoSaveMode(newDifarParameters.autoSaveUnattended);
+	}
+
+	/**
+	 * Select how processed clips are auto saved, and enable the controls to match.
+	 * @param unattended true to save as fast as possible with no review,
+	 * false to save after a delay for review.
+	 */
+	private void setAutoSaveMode(boolean unattended) {
+		autoSaveUnattended.setSelected(unattended);
+		autoSaveForReview.setSelected(!unattended);
+		enableAutoSave();
+	}
+
+	/**
+	 * The auto save choices apply only when auto save is on, and the delay
+	 * only when saving for review.
+	 */
+	private void enableAutoSave() {
+		boolean on = autoSaveDResult.isSelected();
+		autoSaveForReview.setEnabled(on);
+		autoSaveUnattended.setEnabled(on);
+		autoSaveTime.setEnabled(on && autoSaveForReview.isSelected());
 	}
 	
 	class AudioPanel extends JPanel implements PamDialogPanel{
@@ -1258,7 +1363,8 @@ public class DifarParamsDialog extends PamDialog {
 				}
 				c.gridy++;
 				c.gridx = 0;
-				this.add(dataLabels[i] = new JLabel(aDataBlock.getDataName() + " ", SwingConstants.RIGHT), c);
+				// not the plain data name, which modules of one type share (e.g. DL Classifier Data)
+				this.add(dataLabels[i] = new JLabel(DifarParameters.triggerName(aDataBlock) + " ", SwingConstants.RIGHT), c);
 				c.gridx++;
 				c.anchor = GridBagConstraints.CENTER;
 				this.add(enableBoxes[i] = new JCheckBox(), c);
@@ -1295,7 +1401,7 @@ public class DifarParamsDialog extends PamDialog {
 				if (aDataBlock.isCanClipGenerate() == false) {
 					continue;
 				}
-				cgs = difarParameters.findTriggerParams(acousticDataBlocks.get(i).getDataName());
+				cgs = difarParameters.findTriggerParams(aDataBlock);
 				triggerParams[i] = cgs;
 				if (triggerParams[i] == null) continue;
 				enableBoxes[i].setSelected(cgs != null && cgs.enable);
@@ -1319,10 +1425,10 @@ public class DifarParamsDialog extends PamDialog {
 					continue;
 				}
 				if (triggerParams[i] == null) {
-					triggerParams[i] = difarParameters.new DifarTriggerParams(aDataBlock.getDataName());
+					triggerParams[i] = difarParameters.new DifarTriggerParams(DifarParameters.triggerName(aDataBlock));
 				}
 				triggerParams[i].enable = enableBoxes[i].isSelected();
-				triggerParams[i].dataName = aDataBlock.getDataName();
+				triggerParams[i].dataName = DifarParameters.triggerName(aDataBlock);
 				triggerParams[i].speciesName = speciesLookups[i].getSelectedItem().toString();
 				if (speciesLookups[i].getSelectedItem() == defaultItem){
 						triggerParams[i].speciesLookupItem = null;

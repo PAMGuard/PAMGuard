@@ -90,21 +90,17 @@ public class DIFARGram implements DIFARDisplayUnit {
 
 	public int spectrogramImageChoice;
 
-	private DIFARGroupPanel difarGroupPanel;
-
 	public DIFARGram(DifarControl difarControl) {
 		super();
 		this.difarControl = difarControl;
 		mainPanel = new JPanel(new BorderLayout());
 		axisPanel = new DGAxisPanel();
 		difarUnitControlPanel = difarControl.getDifarUnitControlPanel();
-		difarGroupPanel = new DIFARGroupPanel(difarControl);
 		mainPanel.add(BorderLayout.CENTER, axisPanel);
 
-		// Holds the UnitControlPanel and GroupPanel
+		// Holds the UnitControlPanel
 		PamPanel controlPanel = new PamPanel(new BorderLayout());
-		controlPanel.add(BorderLayout.SOUTH, difarUnitControlPanel.getComponent());
-		controlPanel.add(BorderLayout.CENTER, difarGroupPanel.getComponent());
+		controlPanel.add(BorderLayout.NORTH, difarUnitControlPanel.getComponent());
 		int width = (int) Math.min(controlPanel.getPreferredSize().getWidth(), 120);
 		int height = (int) controlPanel.getPreferredSize().getHeight();
 		controlPanel.setPreferredSize(new Dimension(width,height));
@@ -121,10 +117,6 @@ public class DIFARGram implements DIFARDisplayUnit {
 		return mainPanel;
 	}
 	
-	public DIFARGroupPanel getDifarGroupPanel(){
-		return difarGroupPanel;
-	}
-
 	@Override
 	public int difarNotification(DIFARMessage difarMessage) {
 		switch(difarMessage.message) {
@@ -177,21 +169,7 @@ public class DIFARGram implements DIFARDisplayUnit {
 	}
 
 	private double[] getPlotLimits(DifarDataUnit difarDataUnit) {
-		if (difarControl.getDifarParameters().zoomDifarFrequency) {
-			double[] fRange = difarDataUnit.getFrequency();
-			if (fRange == null) {
-				return new double[]{0., difarDataUnit.getDisplaySampleRate()/2.};
-			}
-			double delt = fRange[1]-fRange[0];
-			double max = fRange[1] + delt/4;
-			double min = fRange[0] - delt/4;
-			max = Math.min(max, difarDataUnit.getDisplaySampleRate()/2.);
-			min = Math.max(0., min);
-			return new double[]{min, max};
-		}
-		else {
-			return new double[]{0., difarDataUnit.getDisplaySampleRate()/2.};
-		}
+		return difarControl.getClipFrequencyLimits(difarDataUnit);
 	}
 
 	public void repaintAll() {
@@ -361,7 +339,9 @@ public class DIFARGram implements DIFARDisplayUnit {
 				
 				if (difarControl.getDifarParameters().showDifarGramSummary) {
 					double[] maxAngleLine = difarDataUnit.getMaximumAngleSummary();
-					if (maxAngleLine != null) {
+					// a saved clip has its surface freed (cleanUpData), and the frequency of
+					// each grid point is worked out from the surface's size
+					if (maxAngleLine != null && difarDataUnit.getSurfaceData() != null) {
 						/**
 						 * Work out the yMax based on the frequency selection of the data unit
 						 */
@@ -773,7 +753,6 @@ public class DIFARGram implements DIFARDisplayUnit {
 		currentUnit.setSelectedAngle(angle);
 		currentUnit.setSelectedFrequency(frequency);
 		difarControl.getDifarProcess().getDifarRangeInfo(currentUnit);
-		difarControl.getDifarProcess().estimateTrackedGroup(currentUnit);
 		difarControl.getDifarProcess().getQueuedDifarData().updatePamData(currentUnit, currentUnit.getTimeMilliseconds());
 		difarControl.getDifarUnitControlPanel().enableControls();
 	}
@@ -912,18 +891,4 @@ public class DIFARGram implements DIFARDisplayUnit {
 		}		
 	}
 
-	/**
-	 * Called when the zoom state of the control panel changes. 
-	 * Remake the axes and repaint the images. 
-	 */
-	public void zoomFrequency() {
-		DifarDataUnit difarDataUnit = difarControl.getCurrentDemuxedUnit();
-		if (difarDataUnit == null) {
-			return;
-		}
-		double[] fRange = getPlotLimits(difarDataUnit);
-		freqAxis.setRange(fRange[0], fRange[1]);
-		freqAxis2.setRange(fRange[0], fRange[1]);
-		repaintAll();
-	}
 }
