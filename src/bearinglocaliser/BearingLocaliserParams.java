@@ -41,7 +41,16 @@ public class BearingLocaliserParams implements Serializable, Cloneable, RawOrFFT
 	@Override
 	protected BearingLocaliserParams clone() {
 		try {
-			return (BearingLocaliserParams) super.clone();
+			// do a hard clone incase some parameter objects have been reused in different places and
+			//are interfering with each other. 
+			BearingLocaliserParams newParams = (BearingLocaliserParams) super.clone();
+			if (rawOrFFTSourceParameters != null) {
+				newParams.rawOrFFTSourceParameters = rawOrFFTSourceParameters.clone();
+			}
+			else {
+				newParams.rawOrFFTSourceParameters = new GroupedSourceParameters();
+			}
+			return newParams;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;
@@ -121,10 +130,16 @@ public class BearingLocaliserParams implements Serializable, Cloneable, RawOrFFT
 	 * @return the channelBitmap or sequenceBitmap
 	 */
 	public int getChannelBitmap() {
+		if (rawOrFFTSourceParameters == null) {
+			return 0;
+		}
 		return this.rawOrFFTSourceParameters.getChanOrSeqBitmap();
 	}
 
 	public int[] getChannelGroups() {
+		if (rawOrFFTSourceParameters == null) {
+			return null;
+		}
 		return this.rawOrFFTSourceParameters.getChannelGroups();
 	}
 

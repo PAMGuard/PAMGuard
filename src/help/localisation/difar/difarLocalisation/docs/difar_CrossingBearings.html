@@ -1,6 +1,6 @@
 <html>
 <head>
-	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<link href="../../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
 	<title>Difar Module</title>
 </head>
 <body>
@@ -8,23 +8,57 @@
 
 <h2>Advanced localisation</h2>
 
-<p>The DIFAR Localisation module has two features intended to aid in real-time localisation of whales:</p>
+<p>The DIFAR Localisation module has two features intended to aid the real-time localisation of whales:</p>
 
-<p>1) The ability to triangulate the location of a calling whale if the same call is received on two different sonobuoys.</p>
+<p>1) Triangulation: the location of a calling whale can be estimated when the same call is received on two or more sonobuoys.</p>
 
-<p>2) The ability to average a time-series of bearings that are believed to originate from a group of calling whales.</p>
+<p>2) Tracked groups: a time series of bearings believed to originate from a group of calling whales can be averaged.</p>
 
 <p>&nbsp;</p>
 
-<h2>Crossing Bearings</h2>
+<h2><a name="Crossings">Triangulation</a></h2>
 
-<p>If more than one buoy is in use then the system will automatically attempt to cross bearings from two or more buoys to give a localisation of a sound source.</p>
+<p>When more than one sonobuoy is in use, PAMGuard attempts to match each saved DIFAR clip with DIFAR clips of the same call on other sonobuoys. The location where the bearings of the matched DIFAR clips cross is the estimated location of the sound source.</p>
 
-<center><img alt="Map with DIFAR bearings and Crossed Bearings" src="./images/MapWithSlider.png" /></center>
+<center><img alt="Map with DIFAR bearings and triangulations" src="./images/MapWithSlider.png" /></center>
 
-<p>When a sound is processed and it's bearing calculated, the system searches back through the list of recently processed DIFAR clips from other buoys and&nbsp;checks if any existing bearings&nbsp;from the same species are close enough in time that they may have been the same sound. If they are, then the crossing point is calculated.</p>
+<h3>Matching</h3>
 
-<p>NB: Crossing points are calculated on a rectangular grid, however sound propagation over long distances will typically follow a great-circle path. Thus&nbsp;crossing points that are very far from both of the sonobuoys may contain errors that arise from&nbsp;applying a rectangular grid&nbsp;that does&nbsp;account for the curved surface of the earth.</p>
+<p>When a DIFAR clip is processed, PAMGuard searches for DIFAR clips on other sonobuoys that could contain the same call. A sound cannot arrive at two sonobuoys further apart in time than the time it takes to travel between them, so only DIFAR clips within that time, plus the detection timing error, are considered. Of these, the DIFAR clips closest in time and frequency are kept, up to the <a href="difar_ConfigureProcessing.html#Localisation">Max candidates per buoy</a>.</p>
+
+<p>Each candidate match is located using both its bearings and the differences in arrival time, as described by Miller et al. (2021). A match whose bearing or timing residual exceeds its limit is rejected, since the DIFAR clips probably do not contain the same call. Of the remaining matches, the match containing the most DIFAR clips, with the lowest bearing and timing residuals, is selected automatically. The operator can override the automatic selection by choosing another match in the <b>Triangulation match selector</b> below the DIFARGram, or can press <b>Clear match</b> to save the DIFAR clip without a triangulation.</p>
+
+<h3>Triangulations</h3>
+
+<p>A saved match becomes a <b>triangulation</b>: one call received on two or more sonobuoys, with the estimated location of the sound source and the error of that location in the x and y directions. A DIFAR clip belongs to at most one triangulation. A new triangulation takes its DIFAR clips from any triangulation they belonged to. When a DIFAR clip is removed from a triangulation, the triangulation is recalculated if two or more DIFAR clips remain, and is deleted if only one remains.</p>
+
+<p>From PAMGuard version 2.03, triangulations are stored only in the database. Earlier versions stored them in the binary files. Triangulations are stored in two database tables named after the module, such as "DIFAR Localisation Crossings" and its "Children" table, which lists the DIFAR clips in each triangulation. See <a href="difar_DifarOutput.html">DIFAR Output</a>.</p>
+
+<p>NB: Triangulations are calculated on a rectangular grid, whereas sound propagation over long distances typically follows a great-circle path. Triangulations that lie very far from the sonobuoys may therefore contain errors that arise from applying a rectangular grid that does not account for the curvature of the earth.</p>
+
+<h3><a name="Quality">Triangulation quality</a></h3>
+
+<p>Some triangulations match the same call on different sonobuoys correctly, yet their location cannot be trusted, because the geometry is poor. These triangulations are kept and flagged rather than rejected, so that every correct match remains on record.</p>
+
+<p><b>Crossing angle:</b> the largest angle between any two bearings of a triangulation, from 0 to 180 degrees. Near 0 degrees the bearings point in the same direction. They cross far away, or not at all, and the location is unreliable. Near 180 degrees the bearings point towards each other. This is not poor geometry: the sound source lies between the sonobuoys, and the difference in arrival times locates it along the line between them.</p>
+
+<p><b>On a sonobuoy:</b> when the bearing from one sonobuoy points at another sonobuoy, the fit can settle on that second sonobuoy, where its own bearing has no meaning. The reported error there is close to zero, and reflects none of the real sources of error. A triangulation within the <a href="difar_ConfigureProcessing.html#Localisation">On-buoy radius</a> of one of its own sonobuoys is flagged, and its errors are set to that radius. Its location is kept.</p>
+
+<p>Both measures are stored with each triangulation, in the <code>CrossingAngle</code> and <code>OnBuoy</code> columns of the database. Triangulations made before these columns existed have no crossing angle until they are <a href="difar_ViewerReanalysis.html#Rematch">matched again</a>.</p>
+
+<h3><a name="Selector">Triangulation data selector</a></h3>
+
+<p>Displays that use data selectors, such as the map, offer a data selector for triangulations. It is enabled by default, and hides:</p>
+
+<ul>
+<li>triangulations whose crossing angle is less than the <b>Smallest crossing angle</b>, 5 degrees by default;</li>
+<li>triangulations on one of their own sonobuoys, unless <b>Hide crossings on one of their own buoys</b> is unticked;</li>
+<li>triangulations whose larger x or y error exceeds the <b>Largest location error</b>, if that option is ticked. It is not ticked by default.</li>
+</ul>
+
+<p>Triangulations with no crossing angle are shown, since nothing is known against them.</p>
+
+<!-- Screenshot: the map's data selection dialog for DIFAR triangulations, showing the Crossing quality panel. -->
 
 <p>&nbsp;</p>
 

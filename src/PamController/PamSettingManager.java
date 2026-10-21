@@ -2282,7 +2282,7 @@ public class PamSettingManager {
 	 * @return the initialSettingsList
 	 */
 	public PamControlledUnitSettings findSettingsForType(String unitType) {
-		if (unitType == null) {
+		if (unitType == null || initialSettingsList == null) {
 			return null;
 		}
 		for (PamControlledUnitSettings aSet:initialSettingsList) {

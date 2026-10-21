@@ -27,6 +27,13 @@ public class PamJFXPanel extends JFXPanel {
 		this.rootPane = root;
 		
 		midBorderPane = new BorderPane(root);
+		/*
+		 * Paint the window background on this pane rather than relying on it being the
+		 * scene root: ValidatorFX swaps the scene root for a transparent overlay pane
+		 * the first time it decorates a control, which would leave the white scene fill
+		 * showing.
+		 */
+		midBorderPane.getStyleClass().add("pam-dialog-pane");
 		
 		this.scene = new Scene(midBorderPane);
 

@@ -56,7 +56,9 @@ public class BearingLocSettingsPane extends SettingsPane<BearingLocaliserParams>
 			@Override
 			public void changed(ObservableValue<? extends GroupedSourceParameters> observable,
 					GroupedSourceParameters oldValue, GroupedSourceParameters newValue) {
-				currentParams.setRawOrFFTSourceParameters(newValue);
+//				currentParams.setRawOrFFTSourceParameters(newValue);
+				// only change the name, not the grouping parameters
+				currentParams.setDataSource(newValue.getDataSource());
 				changeChannelGrouping(currentParams);
 			}
 		});
@@ -72,11 +74,22 @@ public class BearingLocSettingsPane extends SettingsPane<BearingLocaliserParams>
 		}
 		currentParams.setDataSource(newValue.getLongDataName());
 		boolean groupedSource = (newValue instanceof GroupedDataSource);
-		if (groupedSource) {
-			GroupedSourceParameters gsp = ((GroupedDataSource) newValue).getGroupSourceParameters().clone();
-			gsp.setDataSource(currentParams.getDataSource());
-			currentParams.setRawOrFFTSourceParameters(gsp);
-		}
+		/*
+		 * Don't do this since it messes the grouping. Only need to make 
+		 * the above call to setDataSource that sets the name in the GroupedSourceParams
+		 * but leaves everything else alone. 
+		 */
+//		if (groupedSource) {
+//			GroupedSourceParameters gsp = ((GroupedDataSource) newValue).getGroupSourceParameters().clone();
+//			gsp.setDataSource(currentParams.getDataSource());
+//			GroupedSourceParameters currentGSP = currentParams.getRawOrFFTSourceParameters();
+//			if (currentGSP != null) {
+//				gsp.setChannelGroups(currentGSP.getChannelGroups().clone());
+//				gsp.setGroupingType(currentGSP.getGroupingType());
+//				gsp.setChanOrSeqBitmap(currentGSP.getChanOrSeqBitmap());
+//			}
+//			currentParams.setRawOrFFTSourceParameters(gsp);
+//		}
 		groupPane.getGroupedChannelPanel().setParams(currentParams.getRawOrFFTSourceParameters());
 		groupPane.getGroupedChannelPanel().enableGroupBoxes();
 		groupPane.getGroupedChannelPanel().disableAll(groupedSource && false);
@@ -101,6 +114,7 @@ public class BearingLocSettingsPane extends SettingsPane<BearingLocaliserParams>
 	@Override
 	public void setParams(BearingLocaliserParams input) {
 		currentParams = input;
+//		System.out.println("public void setParams(BearingLocaliserParams input)" + input);
 		sourcePane.setParams(input);
 		groupPane.setParams(input);
 		algoPane.setParams(input);

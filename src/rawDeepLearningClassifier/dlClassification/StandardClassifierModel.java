@@ -93,6 +93,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
 				return null;
 			}
+			clearWarning();
 
 			//add time stamps and class names to the model results.
 			ArrayList<ArrayList<? extends PredictionResult>> modelResults = processModelResults(groupedRawData, modelResult);
@@ -238,6 +239,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			return;
 		}
 
+		//the model has loaded so any previous warning no longer applies. 
+		clearWarning();
 
 		if (!dlControl.isViewer()) {
 			//for real time only
@@ -295,7 +298,21 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 
 		status  = checkDLStatus(status);
 
+		if (!getDLWorker().isModelNull()) {
+			//a model has been successfully loaded so any previous warning no longer applies. 
+			clearWarning();
+		}
+
 		return status; 
+	}
+
+	/**
+	 * Remove the classifier warning from the PAMGuard warning system. Called whenever
+	 * the issue that caused the warning has been fixed, e.g. a model has loaded successfully 
+	 * or a different classifier has been selected. 
+	 */
+	public void clearWarning() {
+		WarningSystem.getWarningSystem().removeWarning(dlClassifierWarning);
 	}
 
 	/**
@@ -353,6 +370,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 				WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
 				return;
 			}
+			clearWarning();
 
 			// add time stamps and class names to the model results.
 

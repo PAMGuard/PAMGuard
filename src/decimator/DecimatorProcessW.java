@@ -85,7 +85,6 @@ public class DecimatorProcessW extends PamProcess {
 
 	@Override
 	public void prepareProcess() {
-		System.out.println("Calling prepare process on decimator");
 		super.setupProcess();
 		newSettings();
 	}

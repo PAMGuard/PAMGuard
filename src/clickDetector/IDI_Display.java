@@ -950,7 +950,9 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
 	class MouseFuncs extends MouseAdapter {
 
 		@Override
-		public void mousePressed(MouseEvent e) {}
+		public void mousePressed(MouseEvent e) {
+			showMenu(e);
+		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {

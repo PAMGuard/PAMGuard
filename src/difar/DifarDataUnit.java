@@ -9,16 +9,18 @@ import Filters.FilterMethod;
 import Filters.FilterParams;
 import Filters.FilterType;
 import GPS.GpsData;
+import PamController.PamControlledUnit;
 import PamUtils.FrequencyFormat;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import clipgenerator.ClipDataUnit;
+import difar.crossings.DifarCrossing;
+import difar.crossings.LegacyCrossing;
 import fftManager.Complex;
 import fftManager.FastFFT;
-import generalDatabase.DBControlUnit;
-import generalDatabase.SQLLogging;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 
@@ -109,9 +111,21 @@ public class DifarDataUnit extends ClipDataUnit {
 	 */
 	private long clipStartMillis;
 
-	private DIFARCrossingInfo difarCrossing;
-	
+	/**
+	 * The DIFAR module version of the binary file the clip was read from, or
+	 * the current version for a clip made in this session. Files before
+	 * version 3 are read only.
+	 */
+	private int binaryVersion = DifarClipPayload.CURRENT_VERSION;
+
+	/** The match proposed while the clip is worked on, before it is saved. */
 	private DIFARCrossingInfo tempCrossing;
+
+	/**
+	 * The crossing stored with this clip in files up to module version 2.
+	 * Inert: step 5's conversion turns these into crossing units.
+	 */
+	private LegacyCrossing legacyCrossing;
 	
 	private String trackedGroup;
 
@@ -281,7 +295,15 @@ public class DifarDataUnit extends ClipDataUnit {
 	
 	private double[] getDecimatedWaveData(int channel, float displaySampRate) {
 		float origSmp = getSourceSampleRate(); 
-		if (displaySampRate == origSmp){
+		/*
+		 * In viewer mode the original waveform is not stored, so there is
+		 * nothing to decimate. The demodulated data is used instead, by the
+		 * caller.
+		 */
+		if (getWaveData(channel) == null) {
+			return null;
+		}
+		if (displaySampRate == origSmp || origSmp <= 0){
 			return getWaveData(channel);
 		}
 		if (decimatedData == null || displaySampRate != lastDecmiatedSampleRate) {
@@ -376,6 +398,10 @@ public class DifarDataUnit extends ClipDataUnit {
 	 * @param displaySampleRate the displaySampleRate to set
 	 */
 	public void setDisplaySampleRate(float displaySampleRate) {
+		if (displaySampleRate != this.displaySampleRate) {
+			// the clip's spectrogram is cached by FFT length only, so drop it to redraw at the new rate
+			clearClipSpecData();
+		}
 		this.displaySampleRate = displaySampleRate;
 	}
 
@@ -409,13 +435,69 @@ public class DifarDataUnit extends ClipDataUnit {
 		if (selectedAngle == null) {
 			return null;
 		}
-		GpsData originPos = getOriginLatLong(false);
-		if (originPos == null || originPos.getTrueHeading() == null) {
+		Double heading = getBuoyHeading();
+		if (heading == null) {
 			return (selectedAngle % 360);
 		}
-		return ((selectedAngle + originPos.getTrueHeading()) % 360);
+		return ((selectedAngle + heading) % 360);
 //		double dev = MagneticVariation.getInstance().getVariation(originPos);
 //		return selectedAngle+dev;
+	}
+
+	/**
+	 * The heading correction of the buoy this detection was made on, which
+	 * turns a magnetic DIFAR angle into a true bearing.
+	 * <p>
+	 * It comes from the buoy record in force on this channel at the time of the
+	 * detection. If there are no buoy records at all, it comes from the core
+	 * array, as before.
+	 * @return heading correction in degrees, or null if the buoy has none, or
+	 * if no buoy was in force.
+	 */
+	public Double getBuoyHeading() {
+		SonobuoyHistory history = getSonobuoyHistory();
+		if (history != null && history.getRecordCount() > 0) {
+			SonobuoyRecord buoy = history.getRecordAt(getBuoyChannel(), getTimeMilliseconds());
+			return buoy == null ? null : buoy.getHeading();
+		}
+		GpsData originPos = super.getOriginLatLong(false);
+		return originPos == null ? null : originPos.getTrueHeading();
+	}
+
+	/**
+	 * @return the buoy record in force on this channel at the time of the
+	 * detection, or null if there is none or no buoy records are available.
+	 */
+	public SonobuoyRecord getBuoyRecord() {
+		SonobuoyHistory history = getSonobuoyHistory();
+		if (history == null) {
+			return null;
+		}
+		return history.getRecordAt(getBuoyChannel(), getTimeMilliseconds());
+	}
+
+	/**
+	 * @return the channel of this detection, which DIFAR uses as the buoy's
+	 * streamer index.
+	 */
+	private int getBuoyChannel() {
+		return PamUtils.getSingleChannel(getChannelBitmap());
+	}
+
+	/**
+	 * @return the sonobuoy history of the DIFAR module this detection belongs
+	 * to, or null if it is not yet in a DIFAR data block.
+	 */
+	private SonobuoyHistory getSonobuoyHistory() {
+		PamDataBlock parentBlock = getParentDataBlock();
+		if (parentBlock == null || parentBlock.getParentProcess() == null) {
+			return null;
+		}
+		PamControlledUnit unit = parentBlock.getParentProcess().getPamControlledUnit();
+		if (unit instanceof DifarControl) {
+			return ((DifarControl) unit).getSonobuoyHistory();
+		}
+		return null;
 	}
 
 	public String getTrackedGroup() {
@@ -760,7 +842,7 @@ public class DifarDataUnit extends ClipDataUnit {
 		str += "<br>"+FrequencyFormat.formatFrequencyRange(getFrequency(), true);
 		str += String.format("<br>Amplitude: %3.1fdB", getAmplitudeDB());
 		Double ang = getSelectedAngle();
-		Double buoyHead = origin.getTrueHeading();
+		Double buoyHead = getBuoyHeading();
 		if (ang != null) {
 			str += "<br>" + String.format("DIFAR angle %4.1f%s", ang, LatLong.deg);
 			if (buoyHead == null) {
@@ -781,12 +863,11 @@ public class DifarDataUnit extends ClipDataUnit {
 			str += String.format("<br>Buoy head %3.1f%s, calibrated at %s", buoyHead, LatLong.deg, 
 					PamCalendar.formatDateTime(origin.getTimeInMillis()));
 		}
-		DIFARCrossingInfo xInfo = difarCrossing;
-		if (xInfo == null) xInfo = tempCrossing;
-		if (xInfo != null) {
-			int range = (int) origin.distanceToMetres(xInfo.getCrossLocation());
-			str += "<br>" + String.format("Range %dm,  Location %s %s", range, 
-					xInfo.getCrossLocation().formatLatitude(),xInfo.getCrossLocation().formatLongitude());
+		LatLong cross = getCrossLocation();
+		if (cross != null) {
+			int range = (int) origin.distanceToMetres(cross);
+			str += "<br>" + String.format("Range %dm,  Location %s %s", range,
+					cross.formatLatitude(), cross.formatLongitude());
 		}
 		str += "</html>";
 		return str;
@@ -857,54 +938,75 @@ public class DifarDataUnit extends ClipDataUnit {
 	}
 
 
-//	/**
-//	 * Set the crossing point when multiple matching DIFAR bearings are crossed. 
-//	 * @param crossInfo result from DIFAR localisation. 
-//	 */
-//	public void setDifarCrossing(DIFARCrossingInfo crossInfo) {
-//		this.difarCrossing = crossInfo;
-//	}
 	/**
-	 * Move the crossing info from it's temp position to 
-	 * a saved position. Called just at the point when the difar 
-	 * unit is saved and moved from the queue to the output data block. 
-	 * @param save - save it, or discard it (also from other units associated with 
-	 * this crossing
+	 * @return the crossing this clip belongs to, or null if none. Crossings
+	 * are PAMGuard super-detections, stored in the database and linked to
+	 * their clips when loaded, in both Normal mode and the viewer.
 	 */
-	public void saveCrossing(boolean save) {
+	public DifarCrossing getCrossing() {
+		return (DifarCrossing) getSuperDetection(DifarCrossing.class);
+	}
+
+	/**
+	 * Where this clip's bearing is crossed, for displays: its crossing's
+	 * location if it belongs to one, else the location of the match proposed
+	 * while it is being worked on.
+	 * @return the location, or null if there is none.
+	 */
+	public LatLong getCrossLocation() {
+		DifarCrossing crossing = getCrossing();
+		if (crossing != null) {
+			return crossing.getLocation();
+		}
+		return tempCrossing == null ? null : tempCrossing.getCrossLocation();
+	}
+
+	/**
+	 * Drop the match proposed for this clip, from it and the other clips in
+	 * the proposal. Called once the clip is saved, with or without the match.
+	 */
+	public void clearTempCrossing() {
 		if (tempCrossing == null) {
 			return;
 		}
-		if (save) {
-			difarCrossing = tempCrossing;
-			DifarDataUnit[] detList = tempCrossing.getMatchedUnits();
-			if (this == detList[0]) {
-				for (int i = 1; i < detList.length; i++) {
-					if (detList[i] != null)
-					detList[i].saveCrossing(save);
-				}
+		DIFARCrossingInfo proposal = tempCrossing;
+		for (DifarDataUnit clip : proposal.getMatchedUnits()) {
+			if (clip != null && clip.tempCrossing == proposal) {
+				clip.tempCrossing = null;
 			}
 		}
 		tempCrossing = null;
 	}
-	
-	/**
-	 * 
-	 * @return the crossing point when multiple matching DIFAR bearings are crossed. 
-	 */
-	public DIFARCrossingInfo getDifarCrossing() {
-		return difarCrossing;
-	}
-
-	
 
 	/**
-	 * @param difarCrossing the difarCrossing to set
+	 * @return the DIFAR module version of the file the clip was read from, or
+	 * the current version for a clip made in this session.
 	 */
-	public void setDifarCrossing(DIFARCrossingInfo difarCrossing) {
-		this.difarCrossing = difarCrossing;
+	public int getBinaryVersion() {
+		return binaryVersion;
 	}
 
+	/**
+	 * @param binaryVersion the DIFAR module version of the file the clip was read from.
+	 */
+	public void setBinaryVersion(int binaryVersion) {
+		this.binaryVersion = binaryVersion;
+	}
+
+	/**
+	 * @return the crossing stored with this clip in a file up to module
+	 * version 2, or null if it had none or was written later.
+	 */
+	public LegacyCrossing getLegacyCrossing() {
+		return legacyCrossing;
+	}
+
+	/**
+	 * @param legacyCrossing the crossing read from an old file, or null.
+	 */
+	public void setLegacyCrossing(LegacyCrossing legacyCrossing) {
+		this.legacyCrossing = legacyCrossing;
+	}
 
 	/**
 	 * @return the tempCrossing
@@ -940,13 +1042,31 @@ public class DifarDataUnit extends ClipDataUnit {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see PamguardMVC.PamDataUnit#getOriginLatLong(boolean)
+	/**
+	 * The position of the buoy this detection was made on, with its heading
+	 * correction as the true heading.
+	 * <p>
+	 * It comes from the buoy record in force on this channel at the time of the
+	 * detection, not from the core array, whose time lookups can return a
+	 * later record. If there are no buoy records at all, it comes from the core
+	 * array, as before.
+	 * @param recalculate passed to the core array when it is used.
+	 * @return the buoy position, or null if no buoy with a known position was
+	 * in force at the time.
 	 */
 	@Override
 	public GpsData getOriginLatLong(boolean recalculate) {
-		// TODO Auto-generated method stub
-		return super.getOriginLatLong(recalculate);
+		SonobuoyHistory history = getSonobuoyHistory();
+		if (history == null || history.getRecordCount() == 0) {
+			return super.getOriginLatLong(recalculate);
+		}
+		SonobuoyRecord buoy = history.getRecordAt(getBuoyChannel(), getTimeMilliseconds());
+		if (buoy == null || !buoy.hasPosition()) {
+			return null;
+		}
+		GpsData origin = new GpsData(buoy.getLatitude(), buoy.getLongitude(), 0, buoy.getTimeMillis());
+		origin.setTrueHeading(buoy.getHeading());
+		return origin;
 	}
 
 	public void saveGroup() {
@@ -993,20 +1113,6 @@ public class DifarDataUnit extends ClipDataUnit {
 		return specData;
 	}
 
-	@Override
-	public void updateDataUnit(long updateTime) {
-		// TODO Auto-generated method stub
-		super.updateDataUnit(updateTime);
-		/*
-		 * This is getting called on the queuedDifarData, bug that's occurring since I added something
-		 * to stop it reassigning datablock parent id's when units shift between data blocks. Bugger !
-		 */
-		SQLLogging logging = this.getParentDataBlock().getLogging();
-		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
-		if (logging != null && dbControl != null) {
-			logging.logData(dbControl.getConnection(), this);
-		}
-	}
 }
 
 

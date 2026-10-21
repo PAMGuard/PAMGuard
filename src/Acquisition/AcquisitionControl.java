@@ -968,5 +968,13 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	public DaqSystem getLastSelSystem() {
 		return lastSelSystem;
 	}
+	@Override
+	public boolean isRealTime() {
+		DaqSystem daqSystem = findDaqSystem(null);
+		if (daqSystem == null) {
+			return false;
+		}
+		return daqSystem.isRealTime();
+	}
 
 }

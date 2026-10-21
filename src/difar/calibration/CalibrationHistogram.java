@@ -52,6 +52,22 @@ public class CalibrationHistogram extends PamHistogram {
 		return PamUtils.constrainedAngle(bm.getBearingMean(), maxAngle);
 	}
 
+	/** Clips further than this from the modal bin are left out of the mean near the mode. */
+	public static final double MODE_WINDOW_DEGREES = 5.;
+
+	/**
+	 * @return the mean of the angles within {@link #MODE_WINDOW_DEGREES} of
+	 * the fullest bin, in the histogram's range, or NaN if it is empty.
+	 */
+	public double getMeanNearMode() {
+		double mode = getMode();
+		if (Double.isNaN(mode)) {
+			return Double.NaN;
+		}
+		double mean = CalibrationStats.meanNear(allAngles, mode, MODE_WINDOW_DEGREES);
+		return Double.isNaN(mean) ? mode : PamUtils.constrainedAngle(mean, maxAngle);
+	}
+
 	@Override
 	public double getSTD() {
 		BearingMean bm = new BearingMean(allAngles);

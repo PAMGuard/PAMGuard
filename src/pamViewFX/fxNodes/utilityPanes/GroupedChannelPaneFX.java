@@ -264,6 +264,9 @@ public class GroupedChannelPaneFX {
 			else if (groupType == GROUP_SINGLES) {
 				groupList[i].getSelectionModel().select(i);
 			}
+			else if (groupType == GROUP_USER) {
+				
+			}
 		}
 		enableGroupBoxes();
 	}
@@ -320,6 +323,11 @@ public class GroupedChannelPaneFX {
 //			showChannels(sourceDataBlock.getChannelMap());
 			showChannels(sourceDataBlock.getSequenceMap());
 		}
+//		System.out.println("GRupedpamelsetparams " + params + " group type " + params.getGroupingType());
+//		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//		for (int i = 2; i < stack.length; i++) {
+//			System.out.println("    Called from " + stack[i].getClassName() + ":" + stack[i].getMethodName());
+//		}
 		setGrouping(params.getGroupingType());
 		setChannelGroups(params.getChannelGroups());
 		if (sourceDataBlock != null) {

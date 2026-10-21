@@ -48,7 +48,6 @@
 
 <mapID target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_setup" url="visual_methods/videoRangeHelp/docs/videoRange_Measuring_setup.html"/>
 
-<mapID target="localisation.difar.difarAzigram.docs.azigram" url="localisation/difar/difarAzigram/docs/azigram.html"/>
 
 <mapID target="sound_processing.AcquisitionHelp.docs.AcquisitionSimulator" url="sound_processing/AcquisitionHelp/docs/AcquisitionSimulator.html"/>
 
@@ -123,6 +122,7 @@
 <mapID target="sensors.analogarray.docs.analogarrayconfig" url="sensors/analogarray/docs/analogarrayconfig.html"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_ManagingQueue" url="localisation/difar/difarLocalisation/docs/difar_ManagingQueue.html"/>
+<mapID target="localisation.difar.difarLocalisation.docs.difar_ViewerReanalysis" url="localisation/difar/difarLocalisation/docs/difar_ViewerReanalysis.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview" url="visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html"/>
 

@@ -16,6 +16,7 @@ import PamView.PamColors.PamColor;
 import PamView.PamSidePanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamLabel;
+import PamView.dialog.ScrollingPamLabel;
 
 public class DBSidePanel implements PamSidePanel {
 
@@ -47,7 +48,7 @@ public class DBSidePanel implements PamSidePanel {
 //		c.gridy ++;
 //		PamDialog.addComponent(p, new PamLabel("Database : "), c);
 //		c.gridx ++;
-		PamDialog.addComponent(p, databaseName = new PamLabel(" "), c);
+		PamDialog.addComponent(p, databaseName = new ScrollingPamLabel(25, " "), c);
 
 		c.gridwidth = 1;
 		c.gridx = 0;

@@ -329,7 +329,7 @@ abstract public class PamDialog extends JDialog {
 			super.setVisible(visible);
 		}
 		catch(Exception e){
-			System.out.println("Error in opening dialog....");
+//			System.out.println("Error in opening dialog....");
 			e.printStackTrace();
 		}
 	}

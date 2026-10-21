@@ -76,6 +76,12 @@ public class DIFARMessage {
 	 * Return a demuxed data unit from the DIFARgram back to the queue. 
 	 */
 	public static final int ReturnToQueue = 106;
+
+	/**
+	 * The match of the clip being worked has been chosen or cleared by the
+	 * operator in the match selector.
+	 */
+	public static final int MatchChanged = 108;
 	
 	public int message;
 	

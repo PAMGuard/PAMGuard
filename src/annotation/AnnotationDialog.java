@@ -33,9 +33,15 @@ public class AnnotationDialog extends PamDialog {
 		this.dataUnit = dataUnit;
 		dialogPanel = dataAnnotationType.getDialogPanel();
 		summaryPanel = new DataUnitSummaryPanel();
-		summaryPanel.getComponent().setBorder(new TitledBorder(dataUnit.getParentDataBlock().getDataName()));
+		String title = "Unknown data";
+		if (dataUnit != null) {
+			dataUnit.getClass().getName();
+			if (dataUnit.getParentDataBlock() != null) { // happens in print screen annotations. 
+				title = dataUnit.getParentDataBlock().getDataName();
+			}
+		}
+		summaryPanel.getComponent().setBorder(new TitledBorder(title));
 		JPanel borderPanel = new JPanel();
-//		borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.Y_AXIS));
 		borderPanel.setLayout(new BorderLayout());
 		int IS = 4;
 		borderPanel.setBorder(new EmptyBorder(IS, IS, IS, IS));
