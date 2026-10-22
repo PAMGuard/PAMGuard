@@ -1781,5 +1781,7 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	
 	public PamDataUnit cloneIfAllowed() throws CloneNotSupportedException{
 		return (PamDataUnit) this.clone();
-	}
+	}	
+	
+
 }

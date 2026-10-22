@@ -286,7 +286,7 @@ may not be null.
 	}
 
 	@Override
-	protected AISDataUnit clone() {
+	public AISDataUnit clone() {
 		try {
 			AISDataUnit newUnit = (AISDataUnit) super.clone();
 			newUnit.aisLocalisation = new AISLocalisation(newUnit);
@@ -295,7 +295,7 @@ may not be null.
 			//			}
 			return newUnit;
 		}
-		catch (CloneNotSupportedException Ex) {
+		catch (Exception Ex) {
 			Ex.printStackTrace();
 			return null;
 		}

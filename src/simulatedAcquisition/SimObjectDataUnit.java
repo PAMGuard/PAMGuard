@@ -425,5 +425,4 @@ public class SimObjectDataUnit extends PamDataUnit {
 		this.currentHeight = currentHeight;
 	}
 
-
 }
