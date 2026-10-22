@@ -866,9 +866,20 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	private GroupedRawData packageSegmenterDataUnit(GroupedRawData groupedRawData) {
 		groupedRawData.setFrequency(new double[] {0, this.getSampleRate()/2});
-		groupedRawData.setDurationInMilliseconds((long) (1000*dlControl.getDLParams().rawSampleSize/this.getSampleRate()));
+		groupedRawData.setDurationInMilliseconds(getSegmentMillis(dlControl.getDLParams().rawSampleSize, this.getSampleRate()));
 
 		return groupedRawData;
+	}
+
+	/**
+	 * Get the duration of a segment in milliseconds. Note that long segments (e.g. 60
+	 * seconds at 48 kHz) overflow an integer if calculated in integer milliseconds x samples.
+	 * @param rawSampleSize - the segment size in samples.
+	 * @param sampleRate - the sample rate in samples per second.
+	 * @return the segment duration in milliseconds.
+	 */
+	public static long getSegmentMillis(int rawSampleSize, float sampleRate) {
+		return (long) (1000.*rawSampleSize/sampleRate);
 	}
 
 	/**

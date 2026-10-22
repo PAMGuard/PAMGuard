@@ -6,6 +6,8 @@ import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourSetSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -46,5 +48,15 @@ public class RotateColoursModifier extends SymbolModifier {
 		return symbolData;
 	}
 
+
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		return new SymbolLegend(getName(), ColourSetSymbolData.createWhaleColourSet(symbolData, "Random colours"));
+	}
+
+	@Override
+	public boolean isModifyAll() {
+		return true;
+	}
 
 }

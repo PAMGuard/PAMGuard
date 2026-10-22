@@ -54,6 +54,11 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 	private StandardPlot2DColours datagramColours;
 
 	private PamAxisFX freqAxis; 
+
+	/**
+	 * Draws the blocks showing where sound data exist, under the spectrogram preview.
+	 */
+	private DataAvailabilityBlocks dataAvailability;
 	
 	
 		
@@ -67,6 +72,9 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 		this.datagramColours= new StandardPlot2DColours(); 
 		
 		spectrogramPlot=new SpecDatagramPlot(projector, fftDataBlock, datagramColours, 0, this.acousticScroller.isViewer); 
+
+		//blocks showing where there are sound files at all, drawn under the preview.
+		dataAvailability=new DataAvailabilityBlocks(acousticScroller, fftDataBlock); 
 //		channel=PamUtils.getLowestChannel(fftDataBlock.getChannelMap());
 		channel=PamUtils.getLowestChannel(fftDataBlock.getSequenceMap());
 
@@ -140,6 +148,12 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 	 */
 	private volatile float freqAxisSampleRate = -1;
 
+	/**
+	 * Counter of FFT units offered to the preview, used to take every nth one - see
+	 * {@link SpecDatagramPlot#getPreviewDecimation()}.
+	 */
+	private int unitCount = 0;
+
 	@Override
 	public void addNewData(PamDataUnit rawData) {
 		try{
@@ -147,12 +161,23 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 //					&& PamUtils.hasChannel(rawData.getChannelBitmap(), channel)
 					&& PamUtils.hasChannel(rawData.getSequenceBitmap(), channel)
 					&& lastData!=rawData){
+				lastData=rawData;
 				if (freqAxisSampleRate != fftDataBlock.getSampleRate()) {
 					updateFreqLimits();
 					freqAxisSampleRate = fftDataBlock.getSampleRate();
 				}
+				/*
+				 * Take a coarse sample of the FFTs rather than every one. The preview is drawn
+				 * at scroll-bar resolution, so hundreds of FFTs can be averaged into a single
+				 * image column; averaging sixteen of them is indistinguishable from averaging
+				 * all of them, and everything skipped here costs nothing - no
+				 * getMagnitudeData() (which builds a dB spectrum, and an array to hold it, per
+				 * unit) and no accumulate into the column.
+				 */
+				if (++unitCount % spectrogramPlot.getPreviewDecimation() != 0) {
+					return;
+				}
 				spectrogramPlot.new2DData((FFTDataUnit) rawData);
-				lastData=rawData;
 			}
 		}
 		catch (Exception e){
@@ -171,6 +196,16 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 		canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(),canvas.getHeight());
 		
 		windowRect=new Rectangle(0,0, 	canvas.getWidth(), 		canvas.getHeight());
+
+		/*
+		 * Blocks showing which stretches of time hold sound data at all, drawn first so
+		 * that the spectrogram preview covers them as it loads. Building the preview means
+		 * reading every sound file in the range, which takes long enough that a user
+		 * looking at a duty cycled dataset would otherwise be navigating a blank scroll
+		 * bar; the blocks come from the file map, so they are there immediately.
+		 */
+		dataAvailability.draw(canvas.getGraphicsContext2D(), canvas.getWidth(), canvas.getHeight(),
+				spectrogramPlot.getSpecColors());
 
 //		System.out.println("Projector: top " + projector.getYPix(24000) +" bottom "+ projector.getYPix(0)+ "  height: " + projector.getHeight() 
 //			+ " lims "+	freqAxis.minValProperty().getValue() + "  " + freqAxis.maxValProperty().getValue()); 
@@ -327,11 +362,50 @@ public class FFTScrollBarGraphics implements AcousticScrollerGraphics {
 			return Math.min(super.targetTileMillis(visibleMillis), chunkBudgetMillis());
 		}
 
+		/**
+		 * No minimum image width for the preview.
+		 * <p>
+		 * The default floor of 64 pixels exists to stop a heavily time-compressed
+		 * display degenerating into thousands of sliver-width images. Here it does real
+		 * harm: a whole tile is drawn into a handful of scroll-bar pixels, so a 64 pixel
+		 * image is mostly wasted, and - far worse - the extra width is bought by
+		 * widening the tile's <em>time</em> span (a tile spans
+		 * {@code imgWidth * compression} FFT slices). Since {@link #getLoadChunkMillis()}
+		 * deliberately orders a whole number of tiles, that inflated span became the size
+		 * of every offline order: with the floor in place a long loaded range produced
+		 * tiles - and therefore single orders - of a minute or more of high sample rate
+		 * FFT data, hundreds of megabytes of {@code FFTDataUnit}s live at once, when the
+		 * budget {@link #chunkBudgetMillis()} asked for was thirty. Letting the image be
+		 * as narrow as it likes keeps the tile span at the target, and so keeps each
+		 * order inside the memory budget however long the loaded range is.
+		 */
+		@Override
+		protected int minTileImageWidth() {
+			return 1;
+		}
+
+		/**
+		 * Take every nth FFT unit, chosen so that roughly
+		 * {@link #MAX_FFT_PER_COLUMN} of them are still averaged into each image column.
+		 * @return the decimation factor (at least 1).
+		 */
+		int getPreviewDecimation() {
+			return Math.max(1, getTimeCompression() / MAX_FFT_PER_COLUMN);
+		}
+
 		public void rebuildFinished(){
 			acousticScroller.repaint(0);
 		}
 
 	}
+
+	/**
+	 * How many FFTs are enough to average into one column of the preview. The image
+	 * columns of the scroll-bar preview can each span hundreds of FFTs; sixteen of
+	 * them spread across the column gives the same picture as all of them, so the
+	 * rest are skipped as they arrive.
+	 */
+	private static final int MAX_FFT_PER_COLUMN = 16;
 
 	@Override
 	public boolean orderOfflineData() {

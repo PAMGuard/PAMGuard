@@ -60,6 +60,31 @@ public interface DLClassiferModel {
 	public void closeModel();
 
 	/**
+	 * Wait until any data queued for classification on a separate thread has been
+	 * classified and the results passed back to the classify process. Models which
+	 * run synchronously do not need to override this.
+	 * 
+	 * @param maxWaitMillis - the maximum time to wait in milliseconds.
+	 * @return true if all queued data were classified, false if timed out.
+	 */
+	public default boolean flushModel(long maxWaitMillis) {
+		return true;
+	}
+
+	/**
+	 * Check whether the model is an object detector, i.e. it returns results (e.g.
+	 * bounding boxes) with their own time and frequency limits which can be
+	 * anywhere within a segment and there can be multiple results per segment. Each
+	 * positive result from an object detector is saved as a separate detection
+	 * rather than merged with results from adjacent segments.
+	 *
+	 * @return true if the model is an object detector.
+	 */
+	public default boolean isObjectDetector() {
+		return false;
+	}
+
+	/**
 	 * Get the name of the model.
 	 * 
 	 * @return the name of the model.

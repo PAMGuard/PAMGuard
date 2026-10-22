@@ -31,8 +31,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamScrollers.AbstractPamScrollerFX;
 import pamViewFX.fxNodes.pamScrollers.VisibleRangeObserver;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.concurrent.Task;
@@ -41,7 +40,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 
 /**
@@ -80,6 +78,11 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	 * True if in viewer mode. 
 	 */
 	public boolean isViewer=false; 
+	
+	/**
+	 * True if in network receiver mode. 
+	 */
+	public boolean isNetRx=false; 
 
 	/**
 	 * The acoustic plot.
@@ -173,6 +176,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		super(name, orientation, stepSizeMillis, defaultLoadTime, hasMenu);
 
 		isViewer=PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+		isNetRx = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 
 		//System.out.println("Acoustic ScrollerFX :  Data length:  " + this.getScrollerData().getLength());
 
@@ -252,6 +256,11 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 			//here the range has chnaged i.e. new data has been loaded. Need to redraw the datagrams.
 			//			System.out.println("AcousticScrollerFX: Begin loading data");
 			cancelDataLoadTasks();
+			//redraw straight away, before any loading starts. The tiled preview is keyed on
+			//absolute time so it draws correctly for the new range, and - the point of this -
+			//the blocks showing where there are sound files at all appear immediately rather
+			//than only once the first FFT data arrive.
+			repaint(0);
 			if (isViewer) loadScrollerData();
 		}
 	}
@@ -874,31 +883,62 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	 * Repaint the scroll bar graphics. 
 	 */
 	private long lastTime=0; 
-	/**
-	 * Timer that repaints after time diff has been reached 
-	 */
-	private Timeline timeline;
 
 	/**
-	 * Repaint the canvas. 
-	 * @param diff
+	 * Timer which runs a repaint that was asked for too soon after the last one, once
+	 * enough time has passed. See {@link #repaint(long)}.
+	 */
+	private AnimationTimer repaintTimer;
+
+	/**
+	 * True if a repaint was asked for, and refused because it came too soon, and has
+	 * not been done since.
+	 */
+	private boolean repaintPending = false;
+
+	/**
+	 * The shortest gap (millis since the last repaint) the pending repaint is waiting
+	 * for. The smallest of the intervals asked for while it has been pending, so a
+	 * caller which wants a quick repaint is not held up by one which asked to be lazy.
+	 */
+	private long pendingDiff = 0;
+
+	/**
+	 * Repaint the canvas, at most once every <code>diff</code> milliseconds.
+	 * <p>
+	 * A repaint which comes too soon is not thrown away: it is marked as pending and
+	 * a timer runs it as soon as <code>diff</code> has passed. The timer is armed
+	 * once and left alone. It used to be stopped and rebuilt on every refused call,
+	 * which meant that while data were streaming in - during an offline load an FFT
+	 * unit arrives every millisecond or so, each asking for a repaint - the timer was
+	 * reset long before its keyframe was ever reached, so the deferred repaint never
+	 * actually ran and the scroll bar only updated in the gaps between chunks.
+	 * 
+	 * @param diff - minimum time in millis since the last repaint. If less time than
+	 * this has passed the repaint is deferred rather than done now.
 	 */
 	public synchronized void repaint(long diff){
 		//		System.out.println("AcousticScrollerFX: Reapint acoustic scroller");
+		if (!Platform.isFxApplicationThread()) {
+			//canvas drawing and the timer both have to be on the FX thread.
+			Platform.runLater(()->repaint(diff));
+			return;
+		}
 		long currentTime=System.currentTimeMillis();
 		if (currentTime-lastTime<diff){
-
-			//start a timer. If a repaitn hasn;t be called becuase diff is tto short this will ensure that 
-			//the last reapint which is less than diff is called. This means a final repaint is always called 
-			if (timeline!=null) timeline.stop();
-			timeline = new Timeline(new KeyFrame(
-					Duration.millis(diff),
-					ae -> repaint(0)));
-			timeline.play();
+			//keep the shortest interval asked for while the repaint has been pending, so a
+			//caller which wants a prompt repaint is not held up by a lazier one.
+			if (!repaintPending || diff < pendingDiff) {
+				pendingDiff = diff;
+			}
+			repaintPending = true;
+			armRepaintTimer();
 			//			System.out.println("didn't want to repaint righ tnow");
 			return; 
 		}
 
+		repaintPending = false;
+		pendingDiff = 0;
 		lastTime=currentTime;
 		if (currentGraphicsIndex>=0 && acousticScrollerGraphics.size()>0){
 			this.scrollBarPane.getDrawCanvas().getGraphicsContext2D().clearRect(0, 0, 
@@ -910,6 +950,34 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 			//			System.out.println("didn't like index to repaint!");
 		}
 
+	}
+
+	/**
+	 * Make sure the deferred repaint timer is running. Starting a timer which is
+	 * already running does nothing, so this is safe to call on every refused repaint;
+	 * the timer stops itself once the repaint has been done. Must be called on the FX
+	 * thread.
+	 */
+	private void armRepaintTimer() {
+		if (repaintTimer == null) {
+			repaintTimer = new AnimationTimer() {
+				@Override
+				public void handle(long now) {
+					synchronized (AcousticScrollerFX.this) {
+						if (!repaintPending) {
+							stop();
+							return;
+						}
+						if (System.currentTimeMillis()-lastTime < pendingDiff) {
+							return; //not yet - check again on the next pulse.
+						}
+					}
+					stop();
+					repaint(0); //enough time has passed, so this draws rather than deferring again.
+				}
+			};
+		}
+		repaintTimer.start();
 	}
 
 	/**

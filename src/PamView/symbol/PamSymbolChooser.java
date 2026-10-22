@@ -3,11 +3,16 @@ package PamView.symbol;
 import java.awt.Color;
 import java.awt.Window;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.PamSymbol;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
+import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -333,6 +338,130 @@ abstract public class PamSymbolChooser {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Get the symbol modifiers which are currently in use, in the order in which
+	 * they are applied, i.e. the last one in the list has the final say.
+	 * @return list of active symbol modifiers.
+	 */
+	protected List<SymbolModifier> getActiveSymbolModifiers() {
+		ArrayList<SymbolModifier> active = new ArrayList<>();
+		for (SymbolModifier modifier : symbolModifiers) {
+			if (modifier.getSymbolModifierParams().modBitMap != 0) {
+				active.add(modifier);
+			}
+		}
+		return active;
+	}
+
+	/**
+	 * Get the symbol drawn when no modifier changes anything. This is used for the
+	 * default entry in the legend and for the properties of legend symbols which
+	 * a modifier doesn't change.
+	 * @return the default symbol.
+	 */
+	protected SymbolData getLegendDefaultSymbol() {
+		return new SymbolData();
+	}
+
+	/**
+	 * Get the legends for the symbol modifiers which have a visible effect on the
+	 * display, in the order the modifiers are applied.
+	 * <p>
+	 * Modifiers are applied in order, so a modifier which changes every data unit
+	 * (see {@link SymbolModifier#isModifyAll()}) hides whatever earlier modifiers
+	 * did to the same symbol properties. Legends are therefore only returned for
+	 * modifiers which still change something once this is accounted for and the
+	 * fill / line / shape flags of each legend only show what is still changed.
+	 * Legend symbols have the properties their modifier doesn't change replaced
+	 * with those of the default symbol, so they look like what's drawn.
+	 * <p>
+	 * A "Default" legend is added at the top if some data units might still be drawn
+	 * in the default symbol's colours.
+	 * @return ordered list of symbol legends. May be empty, never null.
+	 */
+	public List<SymbolLegend> getSymbolLegends() {
+		List<SymbolModifier> active = getActiveSymbolModifiers();
+		SymbolData defaultSymbol = getLegendDefaultSymbol();
+		LinkedList<SymbolLegend> legends = new LinkedList<>();
+		int coveredBits = 0;
+		// work backwards since later modifiers overwrite earlier ones.
+		for (int i = active.size()-1; i >= 0; i--) {
+			SymbolModifier modifier = active.get(i);
+			int modBits = modifier.getSymbolModifierParams().modBitMap & SymbolModType.EVERYTHING;
+			int visibleBits = modBits & ~coveredBits;
+			if (modifier.isModifyAll()) {
+				coveredBits |= modBits;
+			}
+			if (visibleBits == 0) {
+				continue;
+			}
+			SymbolLegend legend;
+			try {
+				legend = modifier.getSymbolLegend();
+			}
+			catch (Exception e) {
+				// don't let one bad modifier stop the rest of the legend being shown.
+				System.err.println("Error creating symbol legend for " + modifier.getName() + ": " + e.getMessage());
+				legend = new SymbolLegend(modifier.getName());
+			}
+			if (legend == null) {
+				continue;
+			}
+			legend.setModBits(visibleBits);
+			List<LegendSymbolData> symbols = legend.getSymbols();
+			for (int s = 0; s < symbols.size(); s++) {
+				symbols.set(s, maskLegendSymbol(symbols.get(s), visibleBits, defaultSymbol));
+			}
+			legends.addFirst(legend);
+		}
+		int defaultBits = SymbolModType.EVERYTHING & ~coveredBits;
+		if (legends.isEmpty() || (defaultBits & (SymbolModType.FILLCOLOUR | SymbolModType.LINECOLOUR)) != 0) {
+			SymbolLegend defaultLegend = new SymbolLegend("Default",
+					new LegendSymbolData(defaultSymbol, legends.isEmpty() ? "All" : "Other"));
+			defaultLegend.setModBits(defaultBits);
+			// the default symbol is the starting point the modifiers are applied to, so goes first.
+			legends.addFirst(defaultLegend);
+		}
+		return legends;
+	}
+
+	/**
+	 * Get a string which changes whenever the active modifiers, their order or
+	 * what they modify changes. Displays can compare this with the value they
+	 * had when they last created their legend to see if it needs recreating.
+	 * @return legend state string.
+	 */
+	public String getLegendState() {
+		StringBuilder sb = new StringBuilder();
+		for (SymbolModifier modifier : getActiveSymbolModifiers()) {
+			sb.append(modifier.getName()).append(':').append(modifier.getSymbolModifierParams().modBitMap).append(';');
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Replace the properties of a legend symbol which aren't being modified with
+	 * those of the default symbol.
+	 * @param legendSymbol - the legend symbol as produced by the modifier.
+	 * @param modBits - the properties which are being modified.
+	 * @param defaultSymbol - the default symbol.
+	 * @return a masked copy of the legend symbol.
+	 */
+	private LegendSymbolData maskLegendSymbol(LegendSymbolData legendSymbol, int modBits, SymbolData defaultSymbol) {
+		LegendSymbolData masked = legendSymbol.clone();
+		if ((modBits & SymbolModType.SHAPE) == 0) {
+			masked.symbol = defaultSymbol.symbol;
+		}
+		if ((modBits & SymbolModType.FILLCOLOUR) == 0) {
+			masked.setFillColor(defaultSymbol.getFillColor());
+			masked.fill = defaultSymbol.fill;
+		}
+		if ((modBits & SymbolModType.LINECOLOUR) == 0) {
+			masked.setLineColor(defaultSymbol.getLineColor());
+		}
+		return masked;
 	}
 
 	abstract public void setSymbolOptions(PamSymbolOptions symbolOptions);

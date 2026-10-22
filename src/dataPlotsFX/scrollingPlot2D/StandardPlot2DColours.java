@@ -21,6 +21,15 @@ public class StandardPlot2DColours implements Plot2DColours {
 	
 	private Color[] colourArray=ColourArray.createStandardColourArray(NCOLOUR_DEFUALT, colourArrayType=ColourArrayType.HOT).getColours();
 	
+	/**
+	 * {@link #colourArray} pre-converted to non-premultiplied ARGB integers. Spectrogram
+	 * images are written a whole column at a time with
+	 * {@link javafx.scene.image.PixelWriter#setPixels}, which wants integers, so keeping
+	 * the converted table here means no per-pixel {@link Color} conversion at all.
+	 * Rebuilt by {@link #setColourArray(Color[])} whenever the colour map changes.
+	 */
+	private int[] colourArrayARGB = toARGB(colourArray);
+	
 	
 	/**
 	 * The amplitude limits 
@@ -119,6 +128,33 @@ public class StandardPlot2DColours implements Plot2DColours {
 		return colourArray[getColourIndex(dBLevel)];
 	}
 
+	@Override
+	public int getColoursARGB(double dBLevel) {
+		return colourArrayARGB[getColourIndex(dBLevel)];
+	}
+
+	/**
+	 * Set the colour map array, keeping the pre-converted ARGB table in step with it.
+	 * @param colourArray - the new colour map.
+	 */
+	private void setColourArray(Color[] colourArray) {
+		this.colourArray = colourArray;
+		this.colourArrayARGB = toARGB(colourArray);
+	}
+
+	/**
+	 * Pre-convert a colour map to non-premultiplied ARGB integers.
+	 * @param colours - the colour map.
+	 * @return the same colours as 0xAARRGGBB integers.
+	 */
+	private static int[] toARGB(Color[] colours) {
+		int[] argb = new int[colours.length];
+		for (int i = 0; i < colours.length; i++) {
+			argb[i] = Plot2DColours.toARGB(colours[i]);
+		}
+		return argb;
+	}
+
 	/*
 	 * The current colourmap. 
 	 */
@@ -134,7 +170,7 @@ public class StandardPlot2DColours implements Plot2DColours {
 		this.colourArrayType=colourMap; 
 		if (spectParams!=null) spectParams.setColourMap(colourMap);
 		ColourArray colourArray = ColourArray.createStandardColourArray(NCOLOUR_DEFUALT, colourArrayType);
-		this.colourArray=colourArray.getColours();
+		setColourArray(colourArray.getColours());
 	}
 
 	/**
@@ -146,7 +182,7 @@ public class StandardPlot2DColours implements Plot2DColours {
 		this.colourArrayType=colourMap; 
 		if (spectParams!=null) spectParams.setColourMap(colourMap);
 		ColourArray colourArray = ColourArray.createStandardColourArray(ncolours, colourArrayType);
-		this.colourArray=colourArray.getColours();
+		setColourArray(colourArray.getColours());
 	}
 
 	/**

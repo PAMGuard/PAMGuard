@@ -70,6 +70,22 @@ public class CheckWavFileHeaders extends PamDialog {
 		singleInstance.setVisible(true);
 	}
 
+	/**
+	 * Show the dialog for an explicit list of files, rather than for everything in
+	 * a folder. Used by the offline file store, where the user may have selected
+	 * individual files rather than a whole folder.
+	 * @param parentWin parent window
+	 * @param description text to show at the top of the dialog
+	 * @param files files to check
+	 */
+	public static void showDialog(Window parentWin, String description, List<File> files) {
+		if (singleInstance == null || singleInstance.getOwner() != parentWin) {
+			singleInstance = new CheckWavFileHeaders(parentWin);
+		}
+		singleInstance.setParams(description, files);
+		singleInstance.setVisible(true);
+	}
+
 	private void setParams() {
 		running = ran = false;
 		subFolders = folderInputSystem.getFolderInputParameters().subFolders;
@@ -83,6 +99,20 @@ public class CheckWavFileHeaders extends PamDialog {
 		textArea.setText(" ");
 		allFiles.clear();
 		nFiles = countFiles(folder);
+		progressBar.setValue(0);
+		progressBar.setMaximum(Math.max(nFiles, 1));
+		enableControls();
+	}
+
+	private void setParams(String description, List<File> files) {
+		running = ran = false;
+		folderName.setText(description);
+		textArea.setText(" ");
+		allFiles.clear();
+		if (files != null) {
+			allFiles.addAll(files);
+		}
+		nFiles = allFiles.size();
 		progressBar.setValue(0);
 		progressBar.setMaximum(Math.max(nFiles, 1));
 		enableControls();

@@ -1,7 +1,10 @@
 package Acquisition;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import Acquisition.gpstiming.PPSDialogPanel;
@@ -47,6 +51,11 @@ public class AcquisitionDialog extends PamDialog {
 	private static AcquisitionControl acquisitionControl;
 
 	private OfflineFileDialogPanel offlineDAQDialogPanel;
+
+	/**
+	 * Note shown above the (disabled) file selection panel in viewer mode.
+	 */
+	private JPanel viewerFileNote;
 
 	private PPSDialogPanel ppsDialogPanel;
 
@@ -644,6 +653,10 @@ public class AcquisitionDialog extends PamDialog {
 		if (deviceSpecificPanel != null) {
 			mainPanel.remove(deviceSpecificPanel);
 		}
+		if (viewerFileNote != null) {
+			mainPanel.remove(viewerFileNote);
+			viewerFileNote = null;
+		}
 		currentDaqSystem = acquisitionControl.systemList.get(devNumber);
 
 		deviceSpecificPanel = currentDaqSystem.getDaqSpecificDialogComponent(this);
@@ -654,7 +667,30 @@ public class AcquisitionDialog extends PamDialog {
 			 * detached from every window at the time and still has the old look and feel.
 			 */
 			PamLookAndFeel.refreshComponentTheme(deviceSpecificPanel);
-			mainPanel.add(deviceSpecificPanel, 1);
+
+			int panelIndex = 1;
+			/*
+			 * Offline, the file list is entirely handled by the offline file server, so
+			 * nothing typed into the file or folder panel has any effect. Grey it out and
+			 * say where the files are really selected rather than leaving a live looking
+			 * set of controls which do nothing.
+			 */
+			if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW
+					&& currentDaqSystem instanceof FileInputSystem) {
+				JLabel note = new JLabel("Sound files are selected on the Offline Files tab.");
+				note.setFont(note.getFont().deriveFont(Font.ITALIC));
+				/*
+				 * BorderLayout so that the panel fills the width of the BoxLayout and the
+				 * label sits at the left hand edge rather than being centred.
+				 */
+				viewerFileNote = new JPanel(new BorderLayout());
+				viewerFileNote.setBorder(new EmptyBorder(2, 5, 2, 5));
+				viewerFileNote.add(BorderLayout.WEST, note);
+				mainPanel.add(viewerFileNote, panelIndex++);
+				enableComponents(deviceSpecificPanel, false);
+			}
+			mainPanel.add(deviceSpecificPanel, panelIndex);
+
 			currentDaqSystem.dialogSetParams();
 		}
 
@@ -671,6 +707,21 @@ public class AcquisitionDialog extends PamDialog {
 
 		pack();
 	}
+	/**
+	 * Enable or disable a component and everything inside it.
+	 * @param component component to change
+	 * @param enable true to enable
+	 */
+	private void enableComponents(Component component, boolean enable) {
+		component.setEnabled(enable);
+		if (component instanceof Container) {
+			Component[] children = ((Container) component).getComponents();
+			for (int i = 0; i < children.length; i++) {
+				enableComponents(children[i], enable);
+			}
+		}
+	}
+
 	public DaqSystem getCurrentDaqSystem() {
 		return currentDaqSystem;
 	}

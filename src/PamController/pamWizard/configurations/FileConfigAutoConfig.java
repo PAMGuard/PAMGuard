@@ -1,5 +1,7 @@
 package PamController.pamWizard.configurations;
 
+import java.util.Set;
+
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamController.pamWizard.PamAutoConfig;
 import PamController.pamWizard.PamFileImport;
@@ -140,6 +142,17 @@ public class FileConfigAutoConfig implements PamAutoConfig {
 	@Override
 	public String getConfigName() {
 		return config.getName();
+	}
+
+	/**
+	 * The groups declared in the JSON descriptor. A configuration written for a
+	 * species detects that species whatever the recordings happen to be, so neither
+	 * the sample rate nor the medium plays any part here - whether the files suit
+	 * the configuration at all has already been settled before it is offered.
+	 */
+	@Override
+	public Set<ConfigSpeciesGroup> getSpeciesGroups(double sampleRate, SoundMedium medium) {
+		return config.getGroups();
 	}
 
 	@Override

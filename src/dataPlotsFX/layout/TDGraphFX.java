@@ -3,6 +3,7 @@ package dataPlotsFX.layout;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import PamController.PamController;
@@ -10,7 +11,10 @@ import PamController.SettingsPane;
 import PamUtils.Coordinate3d;
 import PamUtils.PamCalendar;
 import PamUtils.PamCoordinate;
+import PamView.PamColors;
 import PamView.GeneralProjector.ParameterType;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.paneloverlay.overlaymark.ExtMapMouseHandler;
 import PamView.paneloverlay.overlaymark.ExtMouseAdapter;
 import PamView.paneloverlay.overlaymark.ExtPopMenuSimple;
@@ -32,11 +36,13 @@ import pamViewFX.fxNodes.pamAxis.PamAxisPane2;
 import pamViewFX.fxNodes.pamScrollers.AbstractPamScrollerFX;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxPlotPanes.PamHiddenSidePane;
+import pamViewFX.symbol.FXSymbolLegendFactory;
 import soundPlayback.PlaybackProgressMonitor;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataPlotsFX.TDControl;
 import dataPlotsFX.TDGraphParametersFX;
+import dataPlotsFX.TDSymbolChooserFX;
 import dataPlots.layout.DataListInfo;
 import dataPlotsFX.data.DataTypeInfo;
 import dataPlotsFX.data.TDDataInfoFX;
@@ -51,6 +57,7 @@ import dataPlotsFX.projector.TDProjectorFX;
 import dataPlotsFX.sound.SoundOutputManager;
 import fftManager.FFTDataBlock;
 import javafx.animation.KeyFrame;
+import javafx.application.Platform;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -73,8 +80,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
@@ -244,6 +253,21 @@ public class TDGraphFX extends PamBorderPane {
 	 */
 	private double[] lastLimitsZoom = null;
 
+
+	/**
+	 * Gap in pixels between the legend and the edges of the graph.
+	 */
+	private static final double LEGEND_MARGIN = 5;
+
+	/**
+	 * Pane showing the legend for the symbols on the graph. Null if not shown.
+	 */
+	private Pane legendPane;
+
+	/**
+	 * State of the symbol modifiers etc. when the legend was last created.
+	 */
+	private String lastLegendState;
 
 	/**
 	 * A scroll pane which holds the settings tabs
@@ -459,6 +483,7 @@ public class TDGraphFX extends PamBorderPane {
 				for (int i = 0; i < this.tdPlotPanels.size(); i++) {
 					tdPlotPanels.get(i).setPopUpMenuType(graphParameters.popUpMenuType);
 				}
+				checkLegend();
 				this.repaint(100);
 			});
 		}
@@ -1782,9 +1807,150 @@ public class TDGraphFX extends PamBorderPane {
 			}
 			lastCanvasFlag=0; //reset the canvas flag
 		}
+		// symbol settings may have changed so make sure the legend is up to date.
+		checkLegend();
 		// System.out.println("Hoverdata N = " +
 		// graphProjector.getHoverDataList().size());
 		// axisPanel.repaint();
+	}
+
+	/**
+	 * Check whether the symbol legend is out of date and recreate it if it is.
+	 * Symbol options can be changed from several places, not all of which tell
+	 * the graph, so this is called every time the graph is repainted. Working out
+	 * whether anything has changed is quick, the legend is only recreated when it
+	 * has.
+	 */
+	public void checkLegend() {
+		if (!Platform.isFxApplicationThread()) {
+			Platform.runLater(() -> checkLegend());
+			return;
+		}
+		String legendState = getLegendState();
+		if (legendState.equals(lastLegendState)) {
+			return;
+		}
+		lastLegendState = legendState;
+		updateLegend();
+	}
+
+	/**
+	 * Get the data infos which are currently drawn with a managed symbol chooser,
+	 * i.e. those which need a legend.
+	 * @return list of data infos.
+	 */
+	private ArrayList<TDDataInfoFX> getLegendDataInfos() {
+		ArrayList<TDDataInfoFX> legendInfos = new ArrayList<>();
+		DataTypeInfo axisType = graphParameters.currentDataType;
+		synchronized (dataList) {
+			for (TDDataInfoFX dataInfo : dataList) {
+				if (dataInfo == null || !dataInfo.isShowing()) {
+					continue;
+				}
+				if (axisType != null && !dataInfo.hasAxisName(axisType.dataType, axisType.dataUnits)) {
+					continue;
+				}
+				if (getLegendSymbolChooser(dataInfo) != null) {
+					legendInfos.add(dataInfo);
+				}
+			}
+		}
+		return legendInfos;
+	}
+
+	/**
+	 * Get the managed symbol chooser a data info is drawn with.
+	 * @param dataInfo - the data info.
+	 * @return the symbol chooser, or null if it doesn't use one.
+	 */
+	private PamSymbolChooser getLegendSymbolChooser(TDDataInfoFX dataInfo) {
+		TDSymbolChooserFX tdSymbolChooser = dataInfo.getSymbolChooser();
+		return tdSymbolChooser == null ? null : tdSymbolChooser.getPamSymbolChooser();
+	}
+
+	/**
+	 * Get a string which changes whenever the legend would need to be recreated.
+	 * @return legend state string.
+	 */
+	private String getLegendState() {
+		if (!graphParameters.showLegend) {
+			return "hidden";
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append(graphParameters.legendPosition).append(';').append(graphParameters.plotFill).append(';');
+		sb.append(PamColors.getInstance().getColourSchemeVersion()).append(';');
+		for (TDDataInfoFX dataInfo : getLegendDataInfos()) {
+			PamSymbolChooser chooser = getLegendSymbolChooser(dataInfo);
+			sb.append(dataInfo.getDataName()).append('@').append(System.identityHashCode(chooser)).append(':');
+			sb.append(chooser.getLegendState()).append('|');
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Recreate the symbol legend, or remove it if it isn't wanted.
+	 */
+	private void updateLegend() {
+		if (legendPane != null) {
+			mainStackPane.getChildren().remove(legendPane);
+			legendPane = null;
+		}
+		if (!graphParameters.showLegend) {
+			return;
+		}
+		LinkedHashMap<String, List<SymbolLegend>> groups = new LinkedHashMap<>();
+		for (TDDataInfoFX dataInfo : getLegendDataInfos()) {
+			List<SymbolLegend> legends = getLegendSymbolChooser(dataInfo).getSymbolLegends();
+			if (legends != null && legends.size() > 0) {
+				groups.put(dataInfo.getDataName(), legends);
+			}
+		}
+		if (groups.isEmpty()) {
+			return;
+		}
+		Color background = graphParameters.plotFill == null ? Color.WHITE : graphParameters.plotFill;
+		legendPane = FXSymbolLegendFactory.createGroupedLegendPane(groups, background, getLegendForeground(background));
+		// the legend is only for looking at - don't let it get in the way of marking etc.
+		legendPane.setMouseTransparent(true);
+		StackPane.setAlignment(legendPane, getLegendAlignment(graphParameters.legendPosition));
+		StackPane.setMargin(legendPane, new Insets(LEGEND_MARGIN));
+		// plot panels are at the back, the legend goes just in front of them so the
+		// hiding panes still slide over it.
+		int index = Math.min(1, mainStackPane.getChildren().size());
+		mainStackPane.getChildren().add(index, legendPane);
+	}
+
+	/**
+	 * Get the colour for text and outlines in the legend. This is the axis colour
+	 * of the colour scheme if the plot is the scheme's plot window colour, otherwise
+	 * black or white, whichever shows up best on the plot background.
+	 * @param background - the plot background colour.
+	 * @return the legend foreground colour.
+	 */
+	private Color getLegendForeground(Color background) {
+		if (graphParameters.plotFillFollowsScheme) {
+			return PamUtilsFX.awtToFXColor(PamColors.getInstance().getColor(PamColors.PamColor.AXIS));
+		}
+		double luminance = 0.2126 * background.getRed() + 0.7152 * background.getGreen() + 0.0722 * background.getBlue();
+		return luminance > 0.5 ? Color.gray(0.1) : Color.gray(0.9);
+	}
+
+	/**
+	 * Convert a legend position flag to a stack pane alignment.
+	 * @param legendPosition - legend position flag e.g. TDGraphParametersFX.LEGEND_TOP_LEFT
+	 * @return the alignment.
+	 */
+	private static Pos getLegendAlignment(int legendPosition) {
+		switch (legendPosition) {
+		case TDGraphParametersFX.LEGEND_TOP_LEFT:
+			return Pos.TOP_LEFT;
+		case TDGraphParametersFX.LEGEND_TOP_RIGHT:
+			return Pos.TOP_RIGHT;
+		case TDGraphParametersFX.LEGEND_BOTTOM_RIGHT:
+			return Pos.BOTTOM_RIGHT;
+		default:
+			return Pos.BOTTOM_LEFT;
+		}
 	}
 
 	/**

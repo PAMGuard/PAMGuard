@@ -36,6 +36,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -57,6 +58,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -83,16 +85,15 @@ import PamView.CtrlKeyManager;
 import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
-import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.TextKeyItem;
 import PamView.dialog.GroupedSourcePanel;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamLabel;
 import PamView.panel.CornerLayoutContraint;
+import PamView.symbol.legend.SwingSymbolLegendFactory;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.panel.JBufferedPanel;
-import PamView.panel.KeyPanel;
 import PamView.panel.PamPanel;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamView.symbol.SymbolUpdateMonitor;
@@ -110,7 +111,6 @@ import PamguardMVC.superdet.SuperDetection;
 import binaryFileStorage.DataUnitFileInformation;
 import clickDetector.ClickClassifiers.ClickIdInformation;
 import clickDetector.ClickClassifiers.ClickIdentifier;
-import clickDetector.alarm.ClickAlarmParameters;
 import clickDetector.dataSelector.ClickDataSelector;
 import clickDetector.dialogs.ClickDisplayDialog;
 import clickDetector.offlineFuncs.ClicksOffline;
@@ -2561,6 +2561,24 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		menuItem = new JCheckBoxMenuItem("Show key", btDisplayParameters.showKey);
 		menuItem.addActionListener(new ShowKeyAction());
 		menu.add(menuItem);
+		JMenu keyPosMenu = new JMenu("Key position");
+		String[] posNames = {"Top left", "Top right", "Bottom left", "Bottom right"};
+		int[] positions = {CornerLayoutContraint.FIRST_LINE_START, CornerLayoutContraint.FIRST_LINE_END,
+				CornerLayoutContraint.LAST_LINE_START, CornerLayoutContraint.LAST_LINE_END};
+		for (int i = 0; i < positions.length; i++) {
+			int pos = positions[i];
+			menuItem = new JCheckBoxMenuItem(posNames[i], btDisplayParameters.getKeyPosition() == pos);
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					btDisplayParameters.keyPosition = pos;
+					btDisplayParameters.showKey = true;
+					btPlot.createKey();
+				}
+			});
+			keyPosMenu.add(menuItem);
+		}
+		menu.add(keyPosMenu);
 
 		return menu;
 	}
@@ -3031,6 +3049,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		dataSelectDialog.setTab(selectedTab);
 		boolean ok = dataSelectDialog.showDialog();
 		if (ok) {
+			btPlot.createKey();
 			repaintBoth();
 			if (clickControl.getOfflineToolbar() != null) {
 				clickControl.getOfflineToolbar().displayActivated(clickBTDisplay);
@@ -3186,8 +3205,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		BufferedImage b;
 
 
-		private KeyPanel keyPanel;
 		private BufferedImage dougsBufferedImage;
+
+		/**
+		 * State of the symbol modifiers when the key was last created.
+		 */
+		private String lastKeyState;
 		private boolean totalRepaint;
 
 		public BTPlot() {
@@ -3312,6 +3335,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			 * initialisation complete, so needs regeneration. 
 			 */
 			symbolChooser = getSymbolChooser();
+			checkKeyState();
 
 			if (isViewer){
 				((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -3518,9 +3542,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		public void setBackground(Color bg) {
 			// TODO Auto-generated method stub
 			super.setBackground(bg);
-			if (keyPanel != null) {
+			if (getKeyComponent() != null) {
+				// recreate the key so it picks up the new colour scheme.
 				createKey();
-				//				keyPanel.getTitledBorder().setTitleColor(PamColors.getInstance().getColor(PamColor.AXIS));
 			}
 		}
 
@@ -3592,62 +3616,48 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			return tip;
 		}
 
-		public void createKey() {
+		/**
+		 * Get a string describing what the key currently needs to show.
+		 * @return key state string.
+		 */
+		private String getKeyState() {
+			ClickDetSymbolChooser chooser = getSymbolChooser();
+			return System.identityHashCode(chooser) + ";" + chooser.getLegendState();
+		}
+
+		/**
+		 * Symbol options can be changed from several places, not all of which tell
+		 * this display, so check whether the key is out of date each time the plot
+		 * is painted and recreate it if it is.
+		 */
+		private void checkKeyState() {
 			if (!btDisplayParameters.showKey) {
-				this.setKeyPanel(null);
 				return;
 			}
-			keyPanel = new KeyPanel("Species", PamKeyItem.KEY_SHORT);
-			if (btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_SPECIES) {
-				keyPanel.add(new TextKeyItem("Colour by species"));
+			String keyState = getKeyState();
+			if (keyState.equals(lastKeyState)) {
+				return;
 			}
-			else if (btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_TRAIN) {
-				keyPanel.add(new TextKeyItem("Colour by train"));
-			}
-			else if (btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_TRAINANDSPECIES) {
-				keyPanel.add(new TextKeyItem("Colour by train and species"));
-			}
-			else if (btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_HYDROPHONE) {
-				keyPanel.add(new TextKeyItem("Colour by hydrophone"));
-			}
-			ClickAlarmParameters selectParams = getClickDataSelector().getParams();
-//			if (btDisplayParameters.getShowSpecies(0)) {
-			if (selectParams.onlineAutoEvents | selectParams.onlineManualEvents) {
-				keyPanel.add(ClickDetSymbolChooser.getDefaultSymbol(true).makeKeyItem("Unidentified species"));
-			}
+			lastKeyState = keyState;
+			// don't change components in the middle of a paint.
+			SwingUtilities.invokeLater(() -> createKey());
+		}
 
-			//			System.out.println("Create key now " + PamCalendar.formatDateTime(System.currentTimeMillis()));
+		/**
+		 * Create the key from the legends of the symbol modifiers which are
+		 * currently selected for this display.
+		 */
+		public void createKey() {
+			lastKeyState = getKeyState();
+			if (!btDisplayParameters.showKey) {
+				setKeyComponent(null);
+				return;
 
-			ClickIdentifier clickIdentifier = clickControl.getClickIdentifier();
-			PamSymbol bwSymbol;
-			String[] speciesList = clickControl.getClickIdentifier().getSpeciesList();
-			PamSymbol[] symbols = clickControl.getClickIdentifier().getSymbols();
-			if (speciesList != null) {
-				for (int i = 0; i < speciesList.length; i++) {
-					if (selectParams.getUseSpecies(i+1)) {
-//					if (btDisplayParameters.getShowSpecies(i+1)) {
-						if (btDisplayParameters.colourScheme != BTDisplayParameters.COLOUR_BY_TRAIN) {
-							keyPanel.add(symbols[i].makeKeyItem(speciesList[i]));
-						}
-						else {
-							bwSymbol = symbols[i].clone();
-							// the key for "colour by train" shows species shapes in the neutral
-							// symbol colour, which is what the clicks themselves are drawn in.
-							bwSymbol.setFillColor(PamColors.getInstance().getDefaultSymbolColour());
-							bwSymbol.setLineColor(bwSymbol.getFillColor());
-							keyPanel.add(bwSymbol.makeKeyItem(speciesList[i]));
-						}
-					}
-				}
 			}
-			setKeyPanel(keyPanel);
-			try {
-				keyPanel.getTitledBorder().setTitleColor(PamColors.getInstance().getColor(PamColor.AXIS));
-				setKeyPosition(CornerLayoutContraint.LAST_LINE_START);
-			}
-			catch (NullPointerException e) {
-				//				e.printStackTrace();
-			}
+			List<SymbolLegend> legends = getSymbolChooser().getSymbolLegends();
+			setKeyMargin(5);
+			setKeyPosition(btDisplayParameters.getKeyPosition());
+			setKeyComponent(SwingSymbolLegendFactory.createLegendComponent(legends));
 		}
 
 	}
@@ -3763,6 +3773,11 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	class TopControls extends JPanel implements ColorManaged {
 
 
+		/**
+		 * The time currently shown in the time label. 
+		 */
+		private long timeLabelMillis;
+
 		TopControls() {
 			super();
 			setBorder(new EmptyBorder(0, 30, 0, 10));
@@ -3776,6 +3791,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			timeLabel = new PamLabel("Time");
 			cursorLabel = new PamLabel("");
 			amplitudeSelectorLabel = new PamLabel("");
+			JPopupMenu timePopup = new JPopupMenu();
+			JMenuItem copyTime = new JMenuItem("Copy date/time");
+			copyTime.setToolTipText("Copy the display start time to the clipboard as yyyy-MM-dd HH:mm:ss.SSS");
+			copyTime.addActionListener(e -> copyTimeToClipboard(timeLabelMillis));
+			timePopup.add(copyTime);
+			timeLabel.setComponentPopupMenu(timePopup);
 			westBit.add(timeLabel);
 			westBit.add(cursorLabel);
 			westBit.add(amplitudeSelectorLabel);
@@ -3800,8 +3821,19 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		 * Only used in real time ops. 
 		 */
 		void ShowTime() {
-			timeLabel.setText("Start: " + PamCalendar.formatDateTime(getDisplayStartMillis(), true));
+			timeLabelMillis = getDisplayStartMillis();
+			timeLabel.setText("Start: " + PamCalendar.formatDateTime(timeLabelMillis, true));
 		}
+	}
+
+	/**
+	 * Copy a time to the system clipboard in yyyy-MM-dd HH:mm:ss.SSS format, e.g. 
+	 * for pasting into a spreadsheet. 
+	 * @param timeMillis time in milliseconds
+	 */
+	private void copyTimeToClipboard(long timeMillis) {
+		String timeStr = PamCalendar.formatDBDateTime(timeMillis, true);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(timeStr), null);
 	}
 
 	@Override
@@ -4558,6 +4590,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	@Override
 	public void symbolUpdate() {
+		btPlot.createKey();
 		repaintBoth();
 	}
 

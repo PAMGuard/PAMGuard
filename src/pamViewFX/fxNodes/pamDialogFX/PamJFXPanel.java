@@ -27,6 +27,13 @@ public class PamJFXPanel extends JFXPanel {
 		this.rootPane = root;
 		
 		midBorderPane = new BorderPane(root);
+		/*
+		 * Paint the window background on this pane rather than relying on it being the
+		 * scene root: ValidatorFX swaps the scene root for a transparent overlay pane
+		 * the first time it decorates a control, which would leave the white scene fill
+		 * showing.
+		 */
+		midBorderPane.getStyleClass().add("pam-dialog-pane");
 		
 		this.scene = new Scene(midBorderPane);
 
@@ -42,7 +49,22 @@ public class PamJFXPanel extends JFXPanel {
 	 * to get it to resize correctly. 
 	 */
 	public void prePackFX() {
-		if (rootPane != null && midBorderPane != null) {
+		if (rootPane == null || midBorderPane == null) {
+			return;
+		}
+		if (scene != null && scene.getWindow() != null) {
+			/*
+			 * Resize the existing embedded window to the scene rather than creating a new
+			 * scene. Replacing the scene disposes the old embedded scene while JFXPanel may
+			 * still have pixel scale updates queued for it, which throws a
+			 * NullPointerException (sceneState is null) on the FX thread for every repack.
+			 * sizeToScene pushes the new preferred size back to the JFXPanel.
+			 */
+			scene.getRoot().applyCss();
+			scene.getRoot().requestLayout();
+			scene.getWindow().sizeToScene();
+		}
+		else {
 			midBorderPane.getChildren().remove(rootPane);
 			rootPane.autosize();
 			setRoot(rootPane);

@@ -65,7 +65,8 @@ public class AcquisitionConfigurer {
 		// point the folder system at the dropped files/folder.
 		FolderInputParameters folderParams = folderSystem.getFolderInputParameters();
 		List<File> dropped = files.getDroppedFiles();
-		folderParams.setSelectedFiles(dropped.toArray(new File[0]));
+		File[] droppedFiles = dropped.toArray(new File[0]);
+		folderParams.setSelectedFiles(droppedFiles);
 		folderParams.subFolders = true;
 
 		// viewer: enable + point the offline file server so createOfflineDataMap works.
@@ -76,6 +77,13 @@ public class AcquisitionConfigurer {
 				ofp.enable = true;
 				ofp.includeSubFolders = true;
 				ofp.folderName = getFolderName(dropped);
+				/*
+				 * Give the offline server the exact selection as well as the folder. Without
+				 * this it only ever searched the folder, so dropping twenty files from a folder
+				 * of a hundred mapped all one hundred - the wizard said twenty and PAMGuard
+				 * then loaded the lot.
+				 */
+				ofp.setSelectedFiles(droppedFiles);
 				offlineServer.setOfflineFileParameters(ofp);
 			}
 		}

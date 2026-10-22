@@ -6,10 +6,13 @@ import PamView.ColourArray;
 import PamView.GeneralProjector;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourBarSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
 import RightWhaleEdgeDetector.RWEDataUnit;
+import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 public class RWESymbolModifier extends SymbolModifier {
 	
@@ -30,6 +33,21 @@ public class RWESymbolModifier extends SymbolModifier {
 		symbolData.setLineColor(col);
 		symbolData.setFillColor(col);
 		return symbolData;
+	}
+
+	/**
+	 * Legend with a colour bar for the right whale sound type score. 
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		// FX FIRE is the same black-red-orange-yellow-white map as the Swing hot array.
+		return new SymbolLegend(getName(), new ColourBarSymbolData(symbolData, "Score", ColourArrayType.FIRE,
+				0, rwColours.getNumbColours()-1, null));
+	}
+
+	@Override
+	public boolean isModifyAll() {
+		return true;
 	}
 
 }

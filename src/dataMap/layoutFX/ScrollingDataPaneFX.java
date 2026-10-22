@@ -366,6 +366,9 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 */
 	public synchronized int createDataGraphs() {
 		//clear the panes from list and split pane. 
+		for (DataStreamPaneFX oldPane : dataStreamPanels) {
+			oldPane.dispose();
+		}
 		dataStreamPanels.clear();
 		dataPanePanes.getChildren().clear(); 
 

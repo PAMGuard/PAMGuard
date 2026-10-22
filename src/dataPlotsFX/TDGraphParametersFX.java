@@ -104,6 +104,36 @@ public class TDGraphParametersFX implements Serializable, Cloneable, ManagedPara
 	 */
 	public boolean showHidePaneRight = false;
 
+	/**
+	 * Legend in the top left corner of the graph.
+	 */
+	public final static int LEGEND_TOP_LEFT = 0;
+
+	/**
+	 * Legend in the top right corner of the graph.
+	 */
+	public final static int LEGEND_TOP_RIGHT = 1;
+
+	/**
+	 * Legend in the bottom left corner of the graph.
+	 */
+	public final static int LEGEND_BOTTOM_LEFT = 2;
+
+	/**
+	 * Legend in the bottom right corner of the graph.
+	 */
+	public final static int LEGEND_BOTTOM_RIGHT = 3;
+
+	/**
+	 * Show a legend of the symbols used for the data on the graph.
+	 */
+	public boolean showLegend = false;
+
+	/**
+	 * The corner of the graph the legend is shown in, e.g. {@link #LEGEND_BOTTOM_LEFT}
+	 */
+	public int legendPosition = LEGEND_BOTTOM_LEFT;
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()

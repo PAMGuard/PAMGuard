@@ -29,6 +29,13 @@ public class OfflineDAQPane extends SettingsPane<OfflineFileParameters>{
 	//mainpane,
 	private PamBorderPane mainPane;
 
+	/**
+	 * The parameters this pane was last set with. Kept so that settings this pane
+	 * doesn't show, such as an explicit list of selected files, survive a trip
+	 * through the dialog.
+	 */
+	private OfflineFileParameters currentParams;
+
 
 	public OfflineDAQPane(OfflineFileDataStore acquisitionControl){
 		super(null);
@@ -71,6 +78,7 @@ public class OfflineDAQPane extends SettingsPane<OfflineFileParameters>{
 	
 	public void setParams(OfflineFileParameters p) {
 		//enableOffline.setSelected(p.enable);
+		currentParams = p;
 		storageLocation.setFolderName(p.folderName);
 		storageLocation.setIncludeSubFolders(p.includeSubFolders);
 		enableControls();
@@ -92,9 +100,17 @@ public class OfflineDAQPane extends SettingsPane<OfflineFileParameters>{
 	}
 	
 	public OfflineFileParameters getParams() {
-		OfflineFileParameters p = new OfflineFileParameters();
+		OfflineFileParameters p = currentParams == null ? new OfflineFileParameters() : currentParams.clone();
 		p.includeSubFolders = storageLocation.isIncludeSubFolders();
+		String previousFolder = p.folderName;
 		p.folderName = storageLocation.getFolderName(false);
+		/*
+		 * This pane only ever selects a folder, so if the user has changed it then any
+		 * list of individually selected files no longer applies.
+		 */
+		if (previousFolder == null || previousFolder.equals(p.folderName) == false) {
+			p.setSelectedFiles((String[]) null);
+		}
 		if (checkFolder(p.folderName) == false && p.enable) {
 			if (p.folderName == null) {
 				PamDialogFX.showWarning(PamController.getInstance().getMainStage(), "Error in file store", "No storage folder selected");

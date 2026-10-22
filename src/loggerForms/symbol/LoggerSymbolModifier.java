@@ -2,11 +2,17 @@ package loggerForms.symbol;
 
 import PamView.GeneralProjector;
 import PamView.symbol.PamSymbolChooser;
+import PamView.PamSymbol;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
 import loggerForms.FormDescription;
 import loggerForms.FormsDataUnit;
+import loggerForms.controlDescriptions.CdLookup;
 import loggerForms.controlDescriptions.ControlDescription;
 
 abstract public class LoggerSymbolModifier extends SymbolModifier {
@@ -23,6 +29,30 @@ abstract public class LoggerSymbolModifier extends SymbolModifier {
 		controlIndex = formDescription.getControlIndex(controlDescription);
 	}
 	
+	/**
+	 * For lookup controls, a legend with the symbol for each item in the lookup
+	 * list. Otherwise just the title. Only forms with data for the control are
+	 * modified so this never modifies all data.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = new SymbolLegend(getName());
+		if (controlDescription instanceof CdLookup == false) {
+			return legend;
+		}
+		LookupList lutList = ((CdLookup) controlDescription).getLookupList();
+		if (lutList == null || lutList.getList() == null) {
+			return legend;
+		}
+		for (LookupItem lutItem : lutList.getList()) {
+			PamSymbol symbol = lutItem.getSymbol();
+			if (symbol != null) {
+				legend.addSymbol(new LegendSymbolData(symbol.getSymbolData(), lutItem.getText()));
+			}
+		}
+		return legend;
+	}
+
 	/**
 	 * Get the data object for this control from the data unit. 
 	 * @param dataUnit

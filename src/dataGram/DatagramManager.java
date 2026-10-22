@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import PamController.AWTScheduler;
@@ -251,8 +252,35 @@ public class DatagramManager {
 	 * @param updateList
 	 */
 	public void updateDatagrams(ArrayList<PamDataBlock> updateList) {
-		datagramCreator = new DatagramCreator(updateList);
-		AWTScheduler.getInstance().scheduleTask(datagramCreator);
+		DatagramCreator creator = new DatagramCreator(updateList);
+		datagramCreator = creator;
+		if (isGuiBlocking()) {
+			AWTScheduler.getInstance().scheduleTask(creator);
+		}
+		else {
+			/*
+			 * Start the worker directly rather than through the AWTScheduler, which
+			 * would disable the main frame for the duration of the task.
+			 */
+			SwingUtilities.invokeLater(() -> creator.execute());
+		}
+	}
+
+	/**
+	 * Should the main GUI be locked for user input while the datagrams are being made ?
+	 * <p>
+	 * Datagram creation always happens in a worker thread, but tasks scheduled through
+	 * the {@link AWTScheduler} also disable the main frame so that the user can't start
+	 * anything else while they run. That's needed for the standard datagram creation,
+	 * which clears each data block and reloads it from the data store, but not for
+	 * subclasses which summarise their data without disturbing anything the user has
+	 * loaded. Those should override this and return false so that PAMGuard stays usable
+	 * while a long job runs in the background.
+	 *
+	 * @return true to lock the GUI while the datagrams are made.
+	 */
+	protected boolean isGuiBlocking() {
+		return true;
 	}
 	
 	/**
@@ -474,6 +502,9 @@ public class DatagramManager {
 	}
 
 	public void showProgress(DatagramProgress datagramProgress, DatagramCreator datagramCreator) {
+		if (handleProgress(datagramProgress)) {
+			return;
+		}
 		if (PamGUIManager.isSwing()) {
 			if (datagramProgressDialog == null) {
 				datagramProgressDialog = DatagramProgressDialog.showDialog(null, datagramCreator);
@@ -486,6 +517,19 @@ public class DatagramManager {
 	}
 
 	/**
+	 * Called on the AWT thread with each progress update. Subclasses which show progress
+	 * their own way should override this, do whatever they need to and return true, which
+	 * stops the standard progress dialog from appearing.
+	 * 
+	 * @param datagramProgress the progress update
+	 * @return true if the subclass has dealt with it.
+	 */
+	protected boolean handleProgress(DatagramProgress datagramProgress) {
+		return false;
+	}
+
+	/**
+
 	 * Called on the AWT thread once all datagram creation has finished (or been
 	 * cancelled). Subclasses can override to save whatever they've created.
 	 */
@@ -493,6 +537,30 @@ public class DatagramManager {
 	}
 
 	/**
+	 * Time interval of a single datagram time slice, in milliseconds. Subclasses which
+	 * hold more than one type of datagram, each with its own time resolution, should
+	 * override this to return the interval of whichever is currently being shown.
+	 * @return datagram bin size in milliseconds
+	 */
+	protected long getDatagramMillis() {
+		return datagramSettings.datagramSeconds * 1000L;
+	}
+
+	/**
+	 * Cancel datagram creation if it's currently running.
+	 * @return true if there was something to cancel.
+	 */
+	public boolean cancelDatagramCreation() {
+		DatagramCreator creator = datagramCreator;
+		if (creator == null) {
+			return false;
+		}
+		creator.cancelPressed();
+		return true;
+	}
+
+	/**
+
 	 * @return the data store these datagrams belong to.
 	 */
 	public OfflineDataStore getOfflineDataStore() {
@@ -530,7 +598,6 @@ public class DatagramManager {
 		if (dp == null) return null;
 		Iterator<OfflineDataMapPoint> iterator = binaryDataMap.getListIterator();
 		OfflineDataMapPoint mapPoint;
-		DatagramPoint datagramPoint;
 		double[] minMaxVal = {Double.MAX_VALUE, Double.MIN_VALUE};
 		int nDataPoints;
 		Datagram datagram;
@@ -541,8 +608,7 @@ public class DatagramManager {
 			if (!DatagramPoint.class.isAssignableFrom(mapPoint.getClass())) {
 				continue;
 			}
-			datagramPoint = (DatagramPoint) mapPoint;
-			datagram = datagramPoint.getDatagram();
+			datagram = getDatagram(mapPoint);
 			if (datagram == null) {
 				continue;
 			}
@@ -579,7 +645,7 @@ public class DatagramManager {
 		if (offlineDataMap == null) {
 			return null;
 		}
-		long datagramMillis = datagramSettings.datagramSeconds * 1000;
+		long datagramMillis = getDatagramMillis();
 		// round the start and end times up and down a little ...
 		startTimeMillis /= datagramMillis;
 		startTimeMillis *= datagramMillis;
@@ -638,7 +704,6 @@ public class DatagramManager {
 //		Iterator<OfflineDataMapPoint> 
 		iterator = offlineDataMap.getListIterator();
 		OfflineDataMapPoint mapPoint;
-		DatagramPoint datagramPoint;
 		long pointStart, pointEnd;
 		int xBin;
 		Datagram datagram;
@@ -662,16 +727,15 @@ public class DatagramManager {
 			if (!DatagramPoint.class.isAssignableFrom(mapPoint.getClass())) {
 				continue;
 			}
-			datagramPoint = (DatagramPoint) mapPoint;
 			pointStart = mapPoint.getStartTime();
 			pointEnd = mapPoint.getEndTime();
-			if (pointEnd < startTimeMillis - datagramSettings.datagramSeconds*5000) {
+			if (pointEnd < startTimeMillis - datagramMillis*5) {
 				continue;
 			}
 			if (pointStart > endTimeMillis) {
 				break;
 			}
-			datagram = datagramPoint.getDatagram();
+			datagram = getDatagram(mapPoint);
 			if (datagram == null) {
 				continue;
 			}

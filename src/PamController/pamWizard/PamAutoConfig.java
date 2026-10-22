@@ -1,6 +1,10 @@
 package PamController.pamWizard;
 
+import java.util.Collections;
+import java.util.Set;
+
 import PamController.pamWizard.configurations.ConfigApplyContext;
+import PamController.pamWizard.configurations.ConfigSpeciesGroup;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 
 /**
@@ -51,6 +55,30 @@ public interface PamAutoConfig {
 	 * @return the name of the configuration.
 	 */
 	public String getConfigName();
+
+	/**
+	 * The species groups this configuration is worth using for, which the wizard
+	 * picks out among the greyed silhouettes of all the rest.
+	 * <p>
+	 * A configuration read from file names the groups it was written for and
+	 * ignores the recordings. A configuration which is not tied to any species -
+	 * a plain spectrogram, which shows whatever is in the recording - has nothing
+	 * of its own to declare, and can instead answer with the groups the recordings
+	 * are capable of showing at all; see
+	 * {@link ConfigSpeciesGroup#getVisibleGroups(double, SoundMedium)}.
+	 * <p>
+	 * Most code built configurations say nothing about species, so this defaults to
+	 * an empty set.
+	 *
+	 * @param sampleRate the sample rate of the imported recordings in Hz, or zero
+	 *                   if it is not known.
+	 * @param medium     the medium the recordings were made in, or null if it is
+	 *                   not known.
+	 * @return the species groups to pick out, never null.
+	 */
+	default Set<ConfigSpeciesGroup> getSpeciesGroups(double sampleRate, SoundMedium medium) {
+		return Collections.emptySet();
+	}
 
 	/**
 	 * Get the global medium settings for this configuration - i.e. whether the

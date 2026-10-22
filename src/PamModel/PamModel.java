@@ -712,7 +712,6 @@ final public class PamModel implements PamSettings {
 		mi = PamModuleInfo.registerControlledUnit("deepWhistle.DeepWhistleControl", "Deep Whistle");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("AI used to enhance whistle detection");
-		mi.setHidden(!SMRUEnable.isEnable());
 		mi.setModulesMenuGroup(detectorsGroup);	
 				mi.setHelpPoint("detectors/gpl/docs/gpldetector.html");
 

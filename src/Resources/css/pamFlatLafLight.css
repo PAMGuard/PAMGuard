@@ -118,8 +118,13 @@
 
 /* Paint the scene root only. These are actual painted properties (not lookups), so
    they must stay scoped to '.root' - adding them to the palette selector above would
-   force a grey background and black text onto every node the sheet decorates. */
-.root {
+   force a grey background and black text onto every node the sheet decorates.
+   '.pam-dialog-pane' is the pane PamJFXPanel wraps dialog content in: ValidatorFX
+   replaces the scene root with a transparent overlay pane the first time it
+   decorates a control, so the wrapper has to paint the background itself or the
+   white scene fill shows through. */
+.root,
+.pam-dialog-pane {
     -fx-background-color: -flat-background;
     -fx-text-fill: -flat-foreground;
 }

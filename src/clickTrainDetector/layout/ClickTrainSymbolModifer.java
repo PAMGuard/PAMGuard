@@ -8,11 +8,16 @@ import PamView.PamColors;
 import PamView.PamSymbolType;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourBarSymbolData;
+import PamView.symbol.legend.ColourSetSymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.TempCTDataUnit;
+import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 public class ClickTrainSymbolModifer extends SymbolModifier {
 
@@ -76,6 +81,31 @@ public class ClickTrainSymbolModifer extends SymbolModifier {
 		}
 		return null; 
 
+	}
+
+	/**
+	 * Legend showing the chi² colour scale for unconfirmed click trains, the
+	 * random colours of classified click trains and the colour of unclassified
+	 * click trains. Only click trains are modified, so this never modifies all data.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = new SymbolLegend(getName());
+
+		SymbolData tempSymbol = new SymbolData();
+		tempSymbol.symbol = PamSymbolType.SYMBOL_STAR;
+		// the chi2 colours are merged from dark to light grey - the closest standard colour map is black to white.
+		legend.addSymbol(new ColourBarSymbolData(tempSymbol, "Unconfirmed train \u03c7\u00b2", ColourArrayType.REVERSEGREY,
+				0, maxChi2, null));
+
+		legend.addSymbol(ColourSetSymbolData.createWhaleColourSet(new SymbolData(), "Classified train"));
+
+		SymbolData unclassified = new SymbolData();
+		unclassified.setFillColor(Color.GRAY);
+		unclassified.setLineColor(Color.GRAY);
+		legend.addSymbol(new LegendSymbolData(unclassified, "Unclassified train"));
+
+		return legend;
 	}
 
 	/**

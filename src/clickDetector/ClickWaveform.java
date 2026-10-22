@@ -28,7 +28,9 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -99,6 +101,17 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 
 		setPlotPanel(plotPanel = new WavePlot());
 
+		// the click time is drawn on the axis panel, so it needs the popup menu too.
+		waveAxisPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				maybeShowPopup(e);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				maybeShowPopup(e);
+			}
+		});
 		getPlotPanel().addMouseListener(new WaveMouseListener());
 		getPlotPanel().addMouseMotionListener(new WaveMouseListener());
 		if (isViewer) {
@@ -600,6 +613,16 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 		menuItem.addActionListener(new SettingsMenuAction(this));
 		menu.add(menuItem);
 		menu.add(getCopyMenuItem());
+		if (storedClick != null) {
+			long clickMillis = storedClick.getTimeMilliseconds();
+			menuItem = new JMenuItem("Copy click date/time");
+			menuItem.setToolTipText("Copy the click time to the clipboard as yyyy-MM-dd HH:mm:ss.SSS");
+			menuItem.addActionListener(e -> {
+				String timeStr = PamCalendar.formatDBDateTime(clickMillis, true);
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(timeStr), null);
+			});
+			menu.add(menuItem);
+		}
 		return menu;
 	}
 

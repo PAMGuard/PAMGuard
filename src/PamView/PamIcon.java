@@ -14,13 +14,22 @@ public class PamIcon {
 	public final static int LARGE = 3;
 	public final static int OLD = 4;
 
-
 	/**
 	 * Get the  path to the default icon for PAMGuard.
 	 * @param sizeFlag - the size flag. 
 	 * @return
 	 */
 	public static String getPAMGuardIconPath(int sizeFlag) {
+		return  getPAMGuardIconPath( sizeFlag,  false); 
+	}
+
+
+	/**
+	 * Get the  path to the default icon for PAMGuard.
+	 * @param sizeFlag - the size flag. 
+	 * @return
+	 */
+	public static String getPAMGuardIconPath(int sizeFlag, boolean opaque) {
 		
 		//Note: whether the there is a / in front of resource is very important here
 		//putting a / in front of the Resources will mean the class loader will not work
@@ -60,9 +69,16 @@ public class PamIcon {
 			}
 		}
 
-		return path; 
+		//opaque versions (light grey rounded background) only exist for the PAMGuardIcon2 images
+		if (opaque && path.startsWith("Resources/PAMGuardIcon2") && !path.equals("Resources/PAMGuardIcon2Opaque.png")) {
+			path = path.replace(".png", "_opaque.png");
+		}
+
+		return path;
 
 	}
+	
+	
 	
 	public static ImageIcon getPAMGuardImageIcon(int sizeFlag) {
 		return new ImageIcon(ClassLoader.getSystemResource(getPAMGuardIconPath(sizeFlag)));

@@ -398,10 +398,14 @@
  *                                                                             *
  ******************************************************************************/
 
+/* The border path draws the body AND the arrow of a pop over. ControlsFX adds its
+   own popover.css to the pop over's root, i.e. nearer to the path than any sheet
+   of ours, and its white fill then wins whatever the specificity of the rule
+   here - leaving a white arrow on a dark body. Only !important gets past it. */
 .popover > .border {
-    -fx-stroke: -flat-border;
+    -fx-stroke: -flat-border !important;
     -fx-stroke-width: 1;
-    -fx-fill: -flat-background;
+    -fx-fill: -flat-background !important;
 }
 
 .popover > .content {

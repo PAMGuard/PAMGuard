@@ -1,19 +1,19 @@
-package rawDeepLearningClassifier.dlClassification.deepAcoustics;
+package rawDeepLearningClassifier.dlClassification.yolo;
 
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticsResult;
 
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
- * A data unit for the Deep Acoustics method which uses object detection models within spectrograms to predict
- * dolphin whistle detections and then classify to species.
+ * A prediction from a YOLO object detection model (e.g. Deep Acoustics) which detects calls within spectrograms and then
+ * classifies them. Each prediction is a bounding box within the spectrogram image of a segment. 
  * 
  * This class is used to wrap the results from a DeepAcousticsResult into a format that can be used by the standard prediction system.
  * 
  * @author Jamie Macaulay
  *
  */
-public class DeepAcousticsPrediction extends StandardPrediction {
+public class YoloPrediction extends StandardPrediction {
 
 	/**
 	 * The result from the Deep Acoustics model. 
@@ -30,7 +30,7 @@ public class DeepAcousticsPrediction extends StandardPrediction {
 	 * 
 	 * @param result The DeepAcousticsResult containing the predictions.
 	 */
-	public DeepAcousticsPrediction(DeepAcousticsResult result) {
+	public YoloPrediction(DeepAcousticsResult result) {
 		super(result.getPredicitions());
 		this.setResult(result); 
 	}

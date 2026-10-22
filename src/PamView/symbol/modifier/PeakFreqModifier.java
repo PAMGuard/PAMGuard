@@ -8,6 +8,8 @@ import PamView.PamSymbolType;
 import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourBarSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
 import clickDetector.ClickDetection;
@@ -127,6 +129,19 @@ public class PeakFreqModifier extends SymbolModifier {
 	}
 
 
+
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		PeakFreqSymbolOptions opts = (PeakFreqSymbolOptions) getSymbolModifierParams();
+		ColourBarSymbolData colourBar = new ColourBarSymbolData(symbolData, "Peak frequency", opts.freqColourArray,
+				opts.freqLimts[0]/1000., opts.freqLimts[1]/1000., "kHz");
+		return new SymbolLegend(getName(), colourBar);
+	}
+
+	@Override
+	public boolean isModifyAll() {
+		return true;
+	}
 
 	/**
 	 * Check the correct colour array is being used and, if not, change it. 

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import ai.djl.MalformedModelException;
 import ai.djl.engine.EngineException;
+import rawDeepLearningClassifier.dlClassification.yolo.YoloModel;
 
 /**
  * A test class for the Deep Acoustics model.
@@ -26,7 +27,7 @@ public class DeepAcousticsTest {
 		
 		// Add your test logic here.
 		 try {
-			DeepAcousticsModel model = new DeepAcousticsModel(modelFile);
+			YoloModel model = new YoloModel(modelFile);
 			
 			
 			

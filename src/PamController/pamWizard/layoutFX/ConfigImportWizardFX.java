@@ -19,6 +19,7 @@ import PamController.pamWizard.configurations.FileConfigAutoConfig;
 import PamController.pamWizard.configurations.PamConfigDescription;
 import PamController.pamWizard.configurations.PamConfigInspection;
 import PamController.pamWizard.configurations.SpeciesIconFactory;
+import PamController.pamWizard.configurations.SpeciesTooltips;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -35,10 +36,12 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -61,13 +64,19 @@ public class ConfigImportWizardFX {
 
 	private static final int ICON_SIZE = 40;
 
+	/** Horizontal gap between the species icons. */
+	private static final int ICON_GAP = 6;
+
+	/** Width of the configuration list, i.e. of the left hand side of the page. */
+	private static final int LIST_WIDTH = 300;
+
 	private static final String ALL_GROUPS = "All species";
 
 	/** Colour of a species group the selected configuration targets. */
 	private static final javafx.scene.paint.Color ACTIVE_TINT = javafx.scene.paint.Color.BLACK;
 
 	/** Colour of a species group the selected configuration does not target. */
-	private static final javafx.scene.paint.Color MUTED_TINT = javafx.scene.paint.Color.rgb(180, 180, 180);
+	private static final javafx.scene.paint.Color MUTED_TINT = javafx.scene.paint.Color.rgb(204, 204, 204);
 
 	private final ConfigWizardData wizardData;
 
@@ -95,6 +104,12 @@ public class ConfigImportWizardFX {
 	private ComboBox<SoundMedium> mediumChooser;
 	private Label mediumLabel;
 	private final java.util.Map<ConfigSpeciesGroup, ImageView> speciesIcons = new java.util.LinkedHashMap<>();
+	/**
+	 * One tooltip per species icon, kept so that its text can be updated as the
+	 * selection changes. Installing a fresh tooltip each time would stack them up on
+	 * the same icon.
+	 */
+	private final java.util.Map<ConfigSpeciesGroup, Tooltip> speciesTips = new java.util.LinkedHashMap<>();
 	private TextField projectField;
 	private TextField binaryField;
 	private TextField databaseField;
@@ -178,7 +193,12 @@ public class ConfigImportWizardFX {
 		headerLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
 		headerLabel.setPadding(new Insets(0, 0, 8, 0));
 
-		pageHolder.setPrefSize(700, 420);
+		/*
+		 * Wide enough for the configuration list and, beside it, the whole row of
+		 * species icons - one icon per group, on a single line.
+		 */
+		int iconRowWidth = ConfigSpeciesGroup.getDisplayGroups().size() * (ICON_SIZE + ICON_GAP);
+		pageHolder.setPrefSize(Math.max(700, LIST_WIDTH + iconRowWidth + 40), 420);
 
 		BorderPane content = new BorderPane();
 		content.setPadding(new Insets(12));
@@ -334,7 +354,8 @@ public class ConfigImportWizardFX {
 		List<PamAutoConfig> available = wizardData.getAvailableConfigs();
 
 		configList = new ListView<>();
-		configList.setPrefWidth(300);
+		configList.setPrefWidth(LIST_WIDTH);
+		configList.setMinWidth(LIST_WIDTH);
 		configList.setCellFactory(lv -> new ConfigListCell());
 
 		TextArea description = new TextArea();
@@ -355,8 +376,9 @@ public class ConfigImportWizardFX {
 			speciesLabel.setText(speciesText(config));
 			requirementsLabel.setText(requirementsText(config));
 			modulesLabel.setText(modulesText(config));
-			showSpeciesIcons(config);
+			// the medium first: which species groups are picked out depends on it.
 			showMediumChoice(config);
+			showSpeciesIcons(config);
 		});
 
 		groupFilter = new ComboBox<>();
@@ -411,17 +433,25 @@ public class ConfigImportWizardFX {
 	 * always present; which of them are picked out depends on the selection.
 	 */
 	private HBox buildSpeciesIconRow() {
-		HBox row = new HBox(4);
+		HBox row = new HBox(ICON_GAP);
 		row.setAlignment(Pos.CENTER_LEFT);
-		for (ConfigSpeciesGroup group : ConfigSpeciesGroup.values()) {
+		for (ConfigSpeciesGroup group : ConfigSpeciesGroup.getDisplayGroups()) {
 			ImageView view = new ImageView(SpeciesIconFactory.getInstance().getFXImage(group, MUTED_TINT));
 			view.setFitWidth(ICON_SIZE);
 			view.setFitHeight(ICON_SIZE);
 			view.setPreserveRatio(true);
-			javafx.scene.control.Tooltip.install(view, new javafx.scene.control.Tooltip(group.getGroupName()));
+			Tooltip tip = new Tooltip(SpeciesTooltips.getFXTip(group, null, 0, null));
+			Tooltip.install(view, tip);
 			speciesIcons.put(group, view);
+			speciesTips.put(group, tip);
 			row.getChildren().add(view);
 		}
+		/*
+		 * Never let the row be squeezed narrower than the icons it holds: an HBox
+		 * clips its last children rather than wrapping them, so a narrow page would
+		 * quietly hide the last species groups altogether.
+		 */
+		row.setMinWidth(Region.USE_PREF_SIZE);
 		return row;
 	}
 
@@ -432,30 +462,49 @@ public class ConfigImportWizardFX {
 		mediumLabel = new Label("Medium:");
 		mediumChooser = new ComboBox<>(FXCollections.observableArrayList(SoundMedium.values()));
 		mediumChooser.getSelectionModel().select(wizardData.getMedium());
+		/*
+		 * A spectrogram of an air recording has no porpoises in it, so the icons have
+		 * to follow the medium as the user changes it.
+		 */
+		mediumChooser.valueProperty().addListener((obs, old, medium) ->
+				showSpeciesIcons(configList.getSelectionModel().getSelectedItem()));
 		HBox row = new HBox(6, mediumLabel, mediumChooser);
 		row.setAlignment(Pos.CENTER_LEFT);
 		return row;
 	}
 
 	/**
-	 * Pick out the species groups the configuration targets and grey the rest.
+	 * Pick out the species groups the configuration targets and grey the rest. For
+	 * a configuration with no species of its own that means the groups these
+	 * recordings could hold, which depends on the medium showing in the chooser -
+	 * so this must run after {@link #showMediumChoice(PamAutoConfig)}.
 	 *
 	 * @param config the selected configuration, or null if none is selected.
 	 */
 	private void showSpeciesIcons(PamAutoConfig config) {
-		Set<ConfigSpeciesGroup> targeted = new LinkedHashSet<>();
-		if (config instanceof FileConfigAutoConfig) {
-			targeted.addAll(((FileConfigAutoConfig) config).getDescription().getGroups());
-		}
+		double sampleRate = getSampleRate();
+		SoundMedium medium = mediumChooser.getValue();
+		Set<ConfigSpeciesGroup> targeted = SpeciesTooltips.getTargetedGroups(config, sampleRate, medium);
 		for (java.util.Map.Entry<ConfigSpeciesGroup, ImageView> entry : speciesIcons.entrySet()) {
 			ConfigSpeciesGroup group = entry.getKey();
 			boolean active = targeted.contains(group);
 			entry.getValue().setImage(SpeciesIconFactory.getInstance()
 					.getFXImage(group, active ? ACTIVE_TINT : MUTED_TINT));
-			javafx.scene.control.Tooltip.install(entry.getValue(), new javafx.scene.control.Tooltip(active
-					? group.getGroupName() + " - targeted by this configuration"
-					: group.getGroupName() + " - not targeted by this configuration"));
+			speciesTips.get(group).setText(SpeciesTooltips.getFXTip(group, config, sampleRate, medium));
 		}
+	}
+
+	/**
+	 * The sample rate the imported files were recorded at, which is what decides
+	 * the species groups for a configuration with none of its own. The lowest rate
+	 * found is used, so that a mixed set of files is not credited with more than
+	 * all of it can show.
+	 *
+	 * @return the sample rate in Hz, or zero if it could not be read.
+	 */
+	private double getSampleRate() {
+		SoundFileSummary summary = wizardData.getSoundSummary();
+		return (summary == null || !summary.isValid()) ? 0 : summary.getMinSampleRate();
 	}
 
 	/**

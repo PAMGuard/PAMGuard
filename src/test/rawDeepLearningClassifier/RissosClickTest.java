@@ -2,6 +2,7 @@ package test.rawDeepLearningClassifier;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -108,6 +109,82 @@ public class RissosClickTest {
 			assertTrue(false); //make sure the unit test fails
 			return; 
 		}
+	}
+
+	/**
+	 * Run the Risso's dolphin model on every click in a click detector binary file
+	 * (20220603_111000, 5104 clicks) and compare the PAMGuard predictions to the
+	 * predictions made by the same model in Python. The clicks and Python predictions
+	 * (field pyPrediction) are in a .mat file exported from the binary file.
+	 * <p>
+	 * The Python pre-processing is a z-score normalisation (population standard
+	 * deviation) followed by a 64 sample window centred on the maximum positive
+	 * sample. Replaying that in Python with the same SavedModel reproduces
+	 * pyPrediction exactly, so any difference here comes from the PAMGuard transforms.
+	 * Note that jpamutils AudioData stores waveforms as 16 bit integers - these clicks
+	 * peak at ~0.001 of full scale so are quantised to only a few tens of levels
+	 * before normalisation, which (with the sample rather than population standard
+	 * deviation) makes a significant number of clicks fail this test.
+	 */
+	@Test
+	public void clicksPythonComparisonTest() {
+
+		System.out.println("*****RissosClickTest: Compare all clicks to Python predictions*****");
+
+		final float sampleRate = 96000; 
+		//clicks are passed to the model in batches, as the DL classifier does. 
+		final int batchSize = 64; 
+		//maximum allowed difference between PAMGuard and Python for any one click. 
+		final double maxDelta = 0.01; 
+
+		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/rissos_dolphin_click/model_pb.zip";
+		String clicksPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/rissos_dolphin_click/rissos_clicks_20220603_111000_pypredictions.mat";
+
+		ArrayList<PredGroupedRawData> clicks = importClicks(Paths.get(clicksPath).toAbsolutePath().normalize().toString(), 
+				sampleRate, "pyPrediction"); 
+
+		assertNotNull(clicks, "Could not load the clicks from " + clicksPath);
+		assertEquals(5104, clicks.size());
+
+		ArchiveModelWorker modelWorker = new ArchiveModelWorker(); 
+		StandardModelParams modelParams = new StandardModelParams(); 
+		modelParams.modelPath = Paths.get(relModelPath).toAbsolutePath().normalize().toString();
+		//all settings, including the transforms, are in the model zip file
+		modelWorker.prepModel(modelParams, null);
+
+		int nFail = 0; 
+		double maxDiff = 0; 
+		double sumDiff = 0; 
+		long timeStart = System.currentTimeMillis();
+		for (int i=0; i<clicks.size(); i+=batchSize) {
+
+			ArrayList<GroupedRawData> batch = new ArrayList<GroupedRawData>(clicks.subList(i, Math.min(i+batchSize, clicks.size())));
+
+			ArrayList<StandardPrediction> predictions = modelWorker.runModel(batch, sampleRate, 0);
+			assertNotNull(predictions, "The model returned null for the batch starting at click " + i);
+			assertEquals(batch.size(), predictions.size());
+
+			for (int j=0; j<batch.size(); j++) {
+				PredGroupedRawData click = (PredGroupedRawData) batch.get(j); 
+				double pamguard = predictions.get(j).getPrediction()[0]; 
+				double python = click.getPrediction()[0]; 
+				double diff = Math.abs(pamguard-python); 
+
+				sumDiff += diff; 
+				maxDiff = Math.max(maxDiff, diff); 
+				if (diff>maxDelta) {
+					nFail++;
+					System.out.println(String.format("Click UID %d: PAMGuard %.4f Python %.4f delta %.4f", 
+							click.getUID(), pamguard, python, diff)); 
+				}
+			}
+		}
+		long timeEnd = System.currentTimeMillis();
+
+		System.out.println(String.format("Processed %d clicks in %.2f s: mean delta %.5f max delta %.5f; %d clicks differ by more than %.3f", 
+				clicks.size(), (timeEnd-timeStart)/1000., sumDiff/clicks.size(), maxDiff, nFail, maxDelta)); 
+
+		assertEquals(0, nFail, nFail + " of " + clicks.size() + " clicks differ from the Python predictions by more than " + maxDelta);
 	}
 
 //	/**
@@ -324,6 +401,17 @@ public class RissosClickTest {
 	 * Import a bunch of clicks from a .mat file
 	 */
 	public static ArrayList<PredGroupedRawData> importClicks(String filePath, float sR) {
+		return importClicks(filePath, sR, "pred"); 
+	}
+
+	/**
+	 * Import a bunch of clicks from a .mat file
+	 * @param filePath - path to a .mat file with a struct array named binarydata. 
+	 * @param sR - the sample rate. 
+	 * @param predField - the name of the field which holds the reference prediction for each click. 
+	 * @return a list of clicks with reference predictions, or null if the file could not be read. 
+	 */
+	public static ArrayList<PredGroupedRawData> importClicks(String filePath, float sR, String predField) {
 
 		try {
 			Mat5File mfr = Mat5.readFromFile(filePath);
@@ -348,7 +436,7 @@ public class RissosClickTest {
 				Matrix channelMap= mlArrayRetrived.get("channelMap", i);
 				Matrix startSample= mlArrayRetrived.get("startSample", i);
 				Matrix sampleDuration= mlArrayRetrived.get("sampleDuration", i);
-				Matrix pred= mlArrayRetrived.get("pred", i);
+				Matrix pred= mlArrayRetrived.get(predField, i);
 
 				clickData = new PredGroupedRawData(clickmillis.getLong(0), channelMap.getInt(0), startSample.getLong(0), sampleDuration.getLong(0), sampleDuration.getInt(0));
 				clickData.setUID(clickUID.getLong(0));

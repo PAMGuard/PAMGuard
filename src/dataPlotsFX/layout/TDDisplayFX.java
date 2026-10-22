@@ -40,7 +40,11 @@ import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -282,6 +286,13 @@ public class TDDisplayFX extends PamBorderPane {
 		//create the pane which holds the time axis
 		timeAxisPane=new PamAxisPane2(timeAxis, Side.TOP);
 		timeStamp=new Label();
+		MenuItem copyTime = new MenuItem("Copy date/time");
+		copyTime.setOnAction(e -> {
+			ClipboardContent content = new ClipboardContent();
+			content.putString(PamCalendar.formatDBDateTime(getTimeScroller().getValueMillis(), true));
+			Clipboard.getSystemClipboard().setContent(content);
+		});
+		timeStamp.setContextMenu(new ContextMenu(copyTime));
 
 		mousePositionData = new Label();
 		mousePositionData.textProperty().bind(this.mousePosStringProperty); 

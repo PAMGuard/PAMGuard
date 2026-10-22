@@ -3,6 +3,7 @@ package dataMap;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,8 +18,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.ButtonGroup;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -28,6 +35,8 @@ import PamController.OfflineDataStore;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.ColourArray;
+import PamView.ColourArray.ColourArrayType;
+import PamView.component.PamFontIcon;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.dialog.PamLabel;
@@ -36,11 +45,15 @@ import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
 import dataGram.DatagramImageData;
 import dataGram.DatagramManager;
 import dataGram.DatagramProvider;
 import dataGram.DatagramScaleInformation;
 import dataMap.filemaps.SoundFileDatagramManager;
+import dataMap.filemaps.SoundFileDatagramManager.SoundFileDatagramProgress;
+import dataMap.filemaps.SoundFileDatagramProvider;
 
 /**
  * Panelette to go into the main DataPanel to show the data for a single data
@@ -116,6 +129,18 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 	 */
 	private static final Color fileBoundsColour = new Color(0, 0, 0, 120);
 
+	/**
+	 * Colour map used for 3D datagrams. HOT is the rainbow map which was hard wired here
+	 * before this became selectable, so it stays the default.
+	 */
+	private ColourArrayType colourArrayType = ColourArrayType.HOT;
+
+	/**
+	 * Progress display for sound file datagram creation, shown in the top right corner of
+	 * the graph. Null for every stream except sound files.
+	 */
+	private DatagramProgressStrip progressStrip;
+
 	public DataStreamPanel(DataMapControl dataMapControl, ScrollingDataPanel scrollingDataPanel,
 			PamDataBlock dataBlock) {
 		this.dataMapControl = dataMapControl;
@@ -129,6 +154,11 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		 * interesting, so leave those off.
 		 */
 		showFileBounds = isSoundFileStream();
+		ColourArrayType storedColour = dataMapControl.dataMapParameters
+				.getDatagramColourMap(dataBlock.getLongDataName());
+		if (storedColour != null) {
+			colourArrayType = storedColour;
+		}
 
 		dataGraph = new DataGraph();
 		dataName = new DataName();
@@ -137,7 +167,85 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		setBackground(Color.RED);
 		add(BorderLayout.NORTH, dataName);
 		add(BorderLayout.CENTER, dataGraph);
+
+		SoundFileDatagramManager soundFileDgm = getSoundFileDatagramManager();
+		if (soundFileDgm != null) {
+			soundFileDgm.setDatagramMode(dataMapControl.dataMapParameters.soundFileDatagramMode);
+			progressStrip = new DatagramProgressStrip();
+			dataGraph.add(progressStrip, new CornerLayoutContraint(CornerLayoutContraint.FIRST_LINE_END));
+			soundFileDgm.addListener(progressStrip);
+			progressStrip.datagramProgress(soundFileDgm.getProgress());
+		}
+
 		autoHide();
+	}
+
+	/**
+	 * Called when the data map rebuilds its graphs so that this panel can unhook itself
+	 * from anything it was listening to.
+	 */
+	public void dispose() {
+		SoundFileDatagramManager soundFileDgm = getSoundFileDatagramManager();
+		if (soundFileDgm != null && progressStrip != null) {
+			soundFileDgm.removeListener(progressStrip);
+		}
+	}
+
+	/**
+	 * Small progress display which sits in the top right corner of the sound file graph
+	 * while the datagrams are being created, with a cancel button. Hidden the rest of the
+	 * time.
+	 */
+	private class DatagramProgressStrip extends PamPanel implements SoundFileDatagramManager.SoundFileDatagramListener {
+
+		private static final long serialVersionUID = 1L;
+
+		private PamLabel messageLabel;
+		private JProgressBar progressBar;
+
+		DatagramProgressStrip() {
+			super(PamColor.BORDER);
+			setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+			setBorder(BorderFactory.createEtchedBorder());
+			messageLabel = new PamLabel(" ");
+			progressBar = new JProgressBar(0, 100);
+			progressBar.setPreferredSize(new java.awt.Dimension(80, 12));
+			JButton cancelButton = new JButton("Cancel");
+			cancelButton.setMargin(new java.awt.Insets(0, 4, 0, 4));
+			cancelButton.addActionListener(e -> {
+				SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+				if (dgm != null) {
+					dgm.cancelDatagramCreation();
+				}
+			});
+			add(messageLabel);
+			add(progressBar);
+			add(cancelButton);
+			setVisible(false);
+		}
+
+		@Override
+		public void datagramProgress(SoundFileDatagramProgress progress) {
+			if (progress == null) {
+				setVisible(false);
+				dataGraph.revalidate();
+				dataGraph.repaint();
+				return;
+			}
+			String file = progress.currentFile == null ? "" : " " + progress.currentFile;
+			messageLabel.setText(String.format(" Reading sound file %d of %d%s ", progress.filesDone,
+					progress.filesTotal, file));
+			double fraction = progress.getFraction();
+			if (fraction < 0) {
+				progressBar.setIndeterminate(true);
+			} else {
+				progressBar.setIndeterminate(false);
+				progressBar.setValue((int) (fraction * 100));
+			}
+			setVisible(true);
+			dataGraph.revalidate();
+			dataGraph.repaint();
+		}
 	}
 
 	public JPanel getPanel() {
@@ -263,9 +371,15 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			setToolTipText(dataBlock.getDataName());
 		}
 
+		/*
+		 * Painted here rather than in paint() so that the datagram goes down before the
+		 * child components rather than over the top of them. A 3D datagram covers the
+		 * entire graph, which would otherwise hide the datagram progress strip and any
+		 * key panel completely.
+		 */
 		@Override
-		public void paint(Graphics g) {
-			super.paint(g);
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
 			if (getHeight() < 2) {
 				return;
 			}
@@ -449,6 +563,14 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		}
 
 		/**
+		 * Throw away the cached colour array so that it gets rebuilt with a new colour
+		 * map.
+		 */
+		void clearDatagramColours() {
+			datagramColours = null;
+		}
+
+		/**
 		 * Draws colourmap
 		 * 
 		 * @param g
@@ -488,7 +610,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			double[][] imageData = datagramImageData.imageData;
 
 			if (datagramColours == null) {
-				datagramColours = ColourArray.createRainbowArray(NCOLOURPOINTS);
+				datagramColours = ColourArray.createStandardColourArray(NCOLOURPOINTS, colourArrayType);
 			}
 			int nXPoints = imageData.length;
 			int nYPoints = imageData[0].length;
@@ -996,14 +1118,32 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			showDataCountsMenu.addActionListener(new ShowDataCounts());
 			graphMenu.add(showDataCountsMenu);
 
+			if (getScaleType() == DatagramScaleInformation.PLOT_3D) {
+				graphMenu.add(createColourMapMenu());
+			}
+
 			SoundFileDatagramManager soundFileDgm = getSoundFileDatagramManager();
 			if (soundFileDgm != null) {
+				graphMenu.addSeparator();
+				ButtonGroup modeGroup = new ButtonGroup();
+				JRadioButtonMenuItem waveItem = new JRadioButtonMenuItem("Waveform summary",
+						soundFileDgm.getDatagramMode() == SoundFileDatagramProvider.MODE_WAVEFORM);
+				waveItem.addActionListener(e -> setSoundFileDatagramMode(SoundFileDatagramProvider.MODE_WAVEFORM));
+				JRadioButtonMenuItem ltsaItem = new JRadioButtonMenuItem("Long term spectral average",
+						soundFileDgm.getDatagramMode() == SoundFileDatagramProvider.MODE_LTSA);
+				ltsaItem.addActionListener(e -> setSoundFileDatagramMode(SoundFileDatagramProvider.MODE_LTSA));
+				modeGroup.add(waveItem);
+				modeGroup.add(ltsaItem);
+				graphMenu.add(waveItem);
+				graphMenu.add(ltsaItem);
+
 				showFileBoundsMenu = new JCheckBoxMenuItem("Show file boundaries", showFileBounds);
 				showFileBoundsMenu.addActionListener(new ShowFileBounds());
 				graphMenu.add(showFileBoundsMenu);
 
-				if (soundFileDgm.hasAnyDatagram(dataBlock) == false) {
-					JMenuItem createItem = new JMenuItem("Create waveform summary ...");
+				if (soundFileDgm.needsCreating(dataBlock)) {
+					JMenuItem createItem = new JMenuItem(soundFileDgm.hasAnyDatagram(dataBlock)
+							? "Update sound file summaries ..." : "Create sound file summaries ...");
 					createItem.addActionListener(new CreateSoundFileDatagram());
 					graphMenu.add(createItem);
 				}
@@ -1041,6 +1181,49 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			}
 			repaintAll();
 		}
+	}
+
+	/**
+	 * Menu of the available colour maps for a 3D datagram.
+	 */
+	private JMenu createColourMapMenu() {
+		JMenu colourMenu = new JMenu("Colour map");
+		ButtonGroup group = new ButtonGroup();
+		for (ColourArrayType type : ColourArrayType.values()) {
+			JRadioButtonMenuItem item = new JRadioButtonMenuItem(ColourArray.getName(type), type == colourArrayType);
+			item.addActionListener(e -> setColourArrayType(type));
+			group.add(item);
+			colourMenu.add(item);
+		}
+		return colourMenu;
+	}
+
+	/**
+	 * Set the colour map used for 3D datagrams on this stream and remember the choice.
+	 * @param colourArrayType the colour map to use
+	 */
+	public void setColourArrayType(ColourArrayType colourArrayType) {
+		this.colourArrayType = colourArrayType;
+		dataMapControl.dataMapParameters.setDatagramColourMap(dataBlock.getLongDataName(), colourArrayType);
+		dataGraph.clearDatagramColours();
+		repaintAll();
+	}
+
+	/**
+	 * Switch the sound file stream between the waveform summary and the LTSA. Both are
+	 * calculated together, so nothing has to be recomputed.
+	 * @param mode one of the MODE_ constants in SoundFileDatagramProvider
+	 */
+	private void setSoundFileDatagramMode(int mode) {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm == null || dgm.getDatagramMode() == mode) {
+			return;
+		}
+		dgm.setDatagramMode(mode);
+		dataMapControl.dataMapParameters.soundFileDatagramMode = mode;
+		// the two summaries have completely different value ranges.
+		minMaxVal = null;
+		repaintAll();
 	}
 
 	class CreateSoundFileDatagram implements ActionListener {
@@ -1115,7 +1298,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 	 */
 	private boolean checkSoundFileDatagram() {
 		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
-		if (dgm == null || dgm.hasAnyDatagram(dataBlock)) {
+		if (dgm == null || dgm.needsCreating(dataBlock) == false) {
 			return false;
 		}
 		OfflineDataMap dataMap = dataBlock.getDatagrammedMap();
@@ -1123,10 +1306,12 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		if (nFiles == 0) {
 			return false;
 		}
-		String msg = String.format("<html>To show a waveform summary of the sound data, PAMGuard needs to read "
-				+ "all %d sound files.<br>This may take some time, but only has to be done once since the "
-				+ "result is saved<br>alongside the sound files.<br><br>Read the sound files now ?</html>", nFiles);
-		int ans = JOptionPane.showConfirmDialog(PamController.getMainFrame(), msg, "Sound file datagram",
+		String msg = String.format("<html>To summarise the sound data, PAMGuard needs to read all %d sound "
+				+ "files.<br>Both a waveform summary and a long term spectral average are made in the same "
+				+ "pass,<br>so you can switch between them afterwards without any further reading."
+				+ "<br><br>This may take some time, but only has to be done once since the result is saved"
+				+ "<br>alongside the sound files.<br><br>Read the sound files now ?</html>", nFiles);
+		int ans = JOptionPane.showConfirmDialog(PamController.getMainFrame(), msg, "Sound file summaries",
 				JOptionPane.YES_NO_OPTION);
 		if (ans != JOptionPane.YES_OPTION) {
 			return false;
@@ -1148,6 +1333,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 	class DataName extends PamPanel {
 		private JLabel title;
 		private String dataName;
+		private JButton collapseButton;
 
 		private DataName() {
 			super(PamColor.BORDER);
@@ -1160,9 +1346,30 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 //			Font titleFont = title.getFont();
 //			titleFont = titleFont.deriveFont(titleFont.getSize()-2);
 //			title.setFont(titleFont);
+			/*
+			 * Small button on the right to show / hide the graph. Double clicking the bar
+			 * does the same thing, but nobody finds that on their own.
+			 */
+			collapseButton = new JButton();
+			collapseButton.putClientProperty("JButton.buttonType", "toolBarButton");
+			collapseButton.setFocusable(false);
+			collapseButton.setMargin(new Insets(0, 0, 0, 0));
+			collapseButton.addActionListener(e -> toggleGraph());
+			add(BorderLayout.EAST, collapseButton);
+			updateCollapseButton();
 			addMouseListener(new DataNameMouse());
 			setToolTipText("Double click to hide / show data rate graph");
 			setTitle();
+		}
+
+		/**
+		 * Point the chevron the way the graph will move when the button is pressed:
+		 * up to fold it away, down to open it out again.
+		 */
+		private void updateCollapseButton() {
+			collapseButton.setIcon(PamFontIcon.of(graphVisible ? MaterialDesignC.CHEVRON_UP
+					: MaterialDesignC.CHEVRON_DOWN, PamFontIcon.ARROW_SIZE));
+			collapseButton.setToolTipText(graphVisible ? "Hide data rate graph" : "Show data rate graph");
 		}
 
 		private void setTitle() {
@@ -1180,25 +1387,31 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		@Override
 		public void mouseClicked(MouseEvent me) {
 			if (me.getClickCount() == 2) {
-				doubleClick(me);
+				toggleGraph();
 			}
 		}
 
-		private void doubleClick(MouseEvent me) {
-			setGraphVisible(!graphVisible);
-			if (graphVisible) {
-				add(BorderLayout.CENTER, dataGraph);
-			} else {
-				remove(dataGraph);
-			}
-			SwingUtilities.invokeLater(new ShowLater());
-		}
+	}
 
+	/**
+	 * Show or hide the data rate graph, leaving just the title bar when hidden.
+	 */
+	private void toggleGraph() {
+		setGraphVisible(!graphVisible);
+		if (graphVisible) {
+			add(BorderLayout.CENTER, dataGraph);
+		} else {
+			remove(dataGraph);
+		}
+		SwingUtilities.invokeLater(new ShowLater());
 	}
 
 	private void setGraphVisible(boolean b) {
 		graphVisible = b;
 		dataGraph.setVisible(b);
+		if (dataName != null) {
+			dataName.updateCollapseButton();
+		}
 	}
 
 	private class ShowLater implements Runnable {

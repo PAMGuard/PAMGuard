@@ -13,10 +13,15 @@ import dataMap.DataMapDrawing;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import dataMap.filemaps.SoundFileDatagramManager;
+import dataMap.filemaps.SoundFileDatagramManager.SoundFileDatagramProgress;
+import dataMap.filemaps.SoundFileDatagramProvider;
+import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
+import javafx.application.Platform;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -28,7 +33,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.PixelBuffer;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
@@ -36,6 +46,7 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
@@ -51,6 +62,7 @@ import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane;
+import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 
@@ -101,6 +113,12 @@ public class DataStreamPaneFX extends PamBorderPane {
 	private double[] minMaxVal;
 
 	private boolean showDatagram = true;
+
+	/**
+	 * Progress display for sound file datagram creation, sitting in the top right corner
+	 * of the graph. Only ever shown for the raw sound file stream.
+	 */
+	private DatagramProgressBox progressBox;
 
 	/**
 	 * Minimum separation in pixels between drawn file boundary lines.
@@ -169,9 +187,19 @@ public class DataStreamPaneFX extends PamBorderPane {
 		hasDatagram = (dataBlock.getDatagramProvider() != null);
 		dataGraph = new DataGraphFX();
 		dataGraph.setupAxis();
+
 		dataName = new DataMapInfo();
 		dataName.setName(dataBlock.getDataName()); 
 		dataName.setLongName(dataBlock.getLongDataName()); 
+		
+		restoreStoredColours();
+
+		SoundFileDatagramManager soundFileDgm = getSoundFileDatagramManager();
+		if (soundFileDgm != null && progressBox != null) {
+			soundFileDgm.setDatagramMode(scrollingDataPanel.getDataMapParams().soundFileDatagramMode);
+			soundFileDgm.addListener(progressBox);
+			progressBox.datagramProgress(soundFileDgm.getProgress());
+		}
 		
 		this.collapsed.addListener((obsVal, oldVal, newVal)->{
 			if (newVal) {
@@ -429,8 +457,19 @@ public class DataStreamPaneFX extends PamBorderPane {
 			pane.getChildren().add(plotCanvas);
 			pane.getChildren().add(drawCanvas);
 			drawCanvas.toFront();
-			    
-			canvasHolder.setCenter(pane);
+
+			/*
+			 * Stack the progress display over the canvases so that it can sit in the top
+			 * right corner while sound file summaries are being made.
+			 */
+			StackPane canvasStack = new StackPane();
+			canvasStack.getChildren().add(pane);
+			progressBox = new DatagramProgressBox();
+			StackPane.setAlignment(progressBox, Pos.TOP_RIGHT);
+			StackPane.setMargin(progressBox, new Insets(4));
+			canvasStack.getChildren().add(progressBox);
+
+			canvasHolder.setCenter(canvasStack);
 			canvasHolder.setMinWidth(10);
 			canvasHolder.setMinHeight(1);
 
@@ -761,6 +800,14 @@ public class DataStreamPaneFX extends PamBorderPane {
 			return PamUtilsFX.awtToFXColor(PamColors.getInstance().getWhaleColor(iLine+1));
 		}
 		
+		/**
+		 * Throw away the log lookup table so that it gets rebuilt for a new range of
+		 * values.
+		 */
+		void clearLogImageTable() {
+			logimagetable = null;
+		}
+
 		private synchronized void datagramPaint3D(GraphicsContext g) {
 //			System.out.println("Paint 3D Canvas: " + this + "   " + System.currentTimeMillis());
 			
@@ -1313,6 +1360,73 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 
 	/**
+	 * Progress display which sits in the top right corner of the sound file graph while
+	 * the datagrams are being created, with a cancel button. Hidden the rest of the time.
+	 */
+	private class DatagramProgressBox extends PamHBox
+			implements SoundFileDatagramManager.SoundFileDatagramListener {
+
+		private Label messageLabel;
+		private ProgressBar progressBar;
+
+		DatagramProgressBox() {
+			setSpacing(5);
+			setAlignment(Pos.CENTER_LEFT);
+			setPadding(new Insets(3, 6, 3, 6));
+			setStyle("-fx-background-color: -fx-background; -fx-background-radius: 4; -fx-opacity: 0.9;");
+			messageLabel = new Label();
+			progressBar = new ProgressBar();
+			progressBar.setPrefWidth(90);
+			PamButton cancelButton = new PamButton("Cancel");
+			cancelButton.setOnAction(e -> {
+				SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+				if (dgm != null) {
+					dgm.cancelDatagramCreation();
+				}
+			});
+			getChildren().addAll(messageLabel, progressBar, cancelButton);
+			setVisible(false);
+			setManaged(false);
+			setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
+		}
+
+		@Override
+		public void datagramProgress(SoundFileDatagramProgress progress) {
+			/*
+			 * Called from the datagram worker's event thread, which is the AWT one, so
+			 * hop across to the FX thread before touching anything.
+			 */
+			Platform.runLater(() -> update(progress));
+		}
+
+		private void update(SoundFileDatagramProgress progress) {
+			if (progress == null) {
+				setVisible(false);
+				setManaged(false);
+				return;
+			}
+			String file = progress.currentFile == null ? "" : " " + progress.currentFile;
+			messageLabel.setText(String.format("Reading sound file %d of %d%s", progress.filesDone,
+					progress.filesTotal, file));
+			double fraction = progress.getFraction();
+			progressBar.setProgress(fraction < 0 ? ProgressBar.INDETERMINATE_PROGRESS : fraction);
+			setVisible(true);
+			setManaged(true);
+		}
+	}
+
+	/**
+	 * Called when the data map rebuilds its panes so that this pane can unhook itself
+	 * from anything it was listening to.
+	 */
+	public void dispose() {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm != null && progressBox != null) {
+			dgm.removeListener(progressBox);
+		}
+	}
+
+	/**
 	 * @return true if file boundary lines should be drawn on this stream.
 	 */
 	private boolean isShowFileBounds() {
@@ -1366,30 +1480,88 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * @param e the event which asked for the menu
 	 */
 	private void showGraphMenu(ContextMenuEvent e) {
-		if (isSoundFileStream() == false) {
-			return;
-		}
 		ContextMenu menu = new ContextMenu();
 
-		CheckMenuItem boundsItem = new CheckMenuItem("Show file boundaries");
-		boundsItem.setSelected(isShowFileBounds());
-		boundsItem.setOnAction(a->{
-			DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
-			if (params != null) {
-				params.showFileBoundaries = boundsItem.isSelected();
-			}
-			repaint(0);
-		});
-		menu.getItems().add(boundsItem);
-
-		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
-		if (dgm.hasAnyDatagram(dataBlock) == false) {
-			MenuItem createItem = new MenuItem("Create waveform summary...");
-			createItem.setOnAction(a->checkSoundFileDatagram());
-			menu.getItems().add(createItem);
+		if (isHasDatagram() && getScaleType() == DatagramScaleInformation.PLOT_3D) {
+			menu.getItems().add(createColourMapMenu());
 		}
 
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm != null) {
+			if (menu.getItems().isEmpty() == false) {
+				menu.getItems().add(new SeparatorMenuItem());
+			}
+			ToggleGroup modeGroup = new ToggleGroup();
+			RadioMenuItem waveItem = new RadioMenuItem("Waveform summary");
+			waveItem.setSelected(dgm.getDatagramMode() == SoundFileDatagramProvider.MODE_WAVEFORM);
+			waveItem.setOnAction(a->setSoundFileDatagramMode(SoundFileDatagramProvider.MODE_WAVEFORM));
+			RadioMenuItem ltsaItem = new RadioMenuItem("Long term spectral average");
+			ltsaItem.setSelected(dgm.getDatagramMode() == SoundFileDatagramProvider.MODE_LTSA);
+			ltsaItem.setOnAction(a->setSoundFileDatagramMode(SoundFileDatagramProvider.MODE_LTSA));
+			modeGroup.getToggles().addAll(waveItem, ltsaItem);
+			menu.getItems().addAll(waveItem, ltsaItem);
+
+			CheckMenuItem boundsItem = new CheckMenuItem("Show file boundaries");
+			boundsItem.setSelected(isShowFileBounds());
+			boundsItem.setOnAction(a->{
+				DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
+				if (params != null) {
+					params.showFileBoundaries = boundsItem.isSelected();
+				}
+				repaint(0);
+			});
+			menu.getItems().add(boundsItem);
+
+			if (dgm.needsCreating(dataBlock)) {
+				MenuItem createItem = new MenuItem(dgm.hasAnyDatagram(dataBlock)
+						? "Update sound file summaries..." : "Create sound file summaries...");
+				createItem.setOnAction(a->checkSoundFileDatagram());
+				menu.getItems().add(createItem);
+			}
+		}
+
+		if (menu.getItems().isEmpty()) {
+			return;
+		}
 		menu.show(dataGraph, e.getScreenX(), e.getScreenY());
+	}
+
+	/**
+	 * Menu of the available colour maps for a 3D datagram.
+	 */
+	private Menu createColourMapMenu() {
+		Menu colourMenu = new Menu("Colour map");
+		ToggleGroup group = new ToggleGroup();
+		ColourArrayType current = getColourMapArray();
+		for (ColourArrayType type : ColourArrayType.values()) {
+			RadioMenuItem item = new RadioMenuItem(ColourArray.getName(type));
+			item.setSelected(type == current);
+			item.setOnAction(a->setColourArrayType(type));
+			group.getToggles().add(item);
+			colourMenu.getItems().add(item);
+		}
+		return colourMenu;
+	}
+
+	/**
+	 * Switch the sound file stream between the waveform summary and the LTSA. Both are
+	 * calculated together, so nothing has to be recomputed.
+	 * @param mode one of the MODE_ constants in SoundFileDatagramProvider
+	 */
+	private void setSoundFileDatagramMode(int mode) {
+		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
+		if (dgm == null || dgm.getDatagramMode() == mode) {
+			return;
+		}
+		dgm.setDatagramMode(mode);
+		DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
+		if (params != null) {
+			params.soundFileDatagramMode = mode;
+		}
+		// the two summaries have completely different value ranges.
+		minMaxVal = null;
+		dataGraph.clearLogImageTable();
+		repaint(0);
 	}
 
 	/**
@@ -1399,7 +1571,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	private void checkSoundFileDatagram() {
 		SoundFileDatagramManager dgm = getSoundFileDatagramManager();
-		if (dgm == null || dgm.hasAnyDatagram(dataBlock)) {
+		if (dgm == null || dgm.needsCreating(dataBlock) == false) {
 			return;
 		}
 		OfflineDataMap dataMap = dataBlock.getDatagrammedMap();
@@ -1482,7 +1654,35 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	public void setColourArrayType(ColourArrayType colourArrayType) {
 		dataGraph.plotColours2D.setColourMap(colourArrayType);
+		/*
+		 * Remember the choice. The settings pane does this too, but it's only built when
+		 * there's a binary store, so a colour picked from the right click menu would
+		 * otherwise be forgotten.
+		 */
+		DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
+		if (params != null && dataName != null) {
+			PlotParams2D plotCols = params.datagramColours.get(dataName);
+			if (plotCols == null) {
+				plotCols = new PlotParams2D();
+				params.datagramColours.put(dataName, plotCols);
+			}
+			plotCols.setColourMap(colourArrayType);
+		}
 		this.repaint(0);
+	}
+
+	/**
+	 * Apply any colour map stored for this stream from a previous session.
+	 */
+	private void restoreStoredColours() {
+		DataMapParametersFX params = scrollingDataPanel.getDataMapParams();
+		if (params == null || dataName == null) {
+			return;
+		}
+		PlotParams2D plotCols = params.datagramColours.get(dataName);
+		if (plotCols != null) {
+			dataGraph.plotColours2D.setColourMap(plotCols.getColourMap());
+		}
 	}
 
 	/**

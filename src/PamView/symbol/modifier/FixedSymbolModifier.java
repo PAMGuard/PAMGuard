@@ -3,6 +3,7 @@ package PamView.symbol.modifier;
 import PamView.GeneralProjector;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamguardMVC.PamDataUnit;
 
 
@@ -25,6 +26,11 @@ public class FixedSymbolModifier extends SymbolModifier {
 	@Override
 	public SymbolData modifySymbol(SymbolData symbolData, GeneralProjector projector, PamDataUnit dataUnit) {
 		return symbolData;
+	}
+
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		return null;
 	}
 
 	@Override

@@ -7,6 +7,8 @@ import PamView.PamColors;
 import PamView.PamSymbolType;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.ColourSetSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
@@ -35,6 +37,18 @@ public class DLGroupSymbolModifier extends SymbolModifier {
 		symbolData.setLineColor(col);
 
 		return symbolData;
+	}
+
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolData symbolData = new SymbolData();
+		symbolData.symbol = PamSymbolType.SYMBOL_CIRCLE;
+		return new SymbolLegend(getName(), ColourSetSymbolData.createWhaleColourSet(symbolData, "DL group"));
+	}
+
+	@Override
+	public boolean isModifyAll() {
+		return true;
 	}
 
 }

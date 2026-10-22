@@ -227,5 +227,10 @@ public class ClickSymbolChooserFX implements TDSymbolChooserFX {
 		return symbolChooser;
 	}
 
+	@Override
+	public PamSymbolChooser getPamSymbolChooser() {
+		return symbolChooser;
+	}
+
 
 }

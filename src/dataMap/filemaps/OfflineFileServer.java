@@ -155,7 +155,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 				mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_LOADINGMAP, 0, 0, ""));
 				loadSerialisedMap();
 				long t = System.currentTimeMillis();
-				addToMap(new File(offlineFileParameters.folderName), offlineFileParameters.includeSubFolders);
+				addSelectionToMap();
 				dataMap.sortMapPoints();
 				long t2 = System.currentTimeMillis();
 				mapMaker.pPublish(new FileMapProgress(FileMapProgress.STATE_DONECOUNTINGFILES, dataMap.getNumMapPoints(), 0, ""));
@@ -267,6 +267,35 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	 */
 	public abstract FileFilter getFileFilter();
 
+	/**
+	 * Add everything the user selected to the map. This is either an explicit list
+	 * of files and / or folders, or, if no such list has been made, the whole of
+	 * the folder named in the parameters.
+	 * <p>
+	 * Getting this right matters: previously only a folder was ever searched, so
+	 * selecting twenty files out of a folder of a hundred (which is what happens
+	 * when files are dragged into PAMGuard) mapped all one hundred of them.
+	 */
+	private void addSelectionToMap() {
+		String[] searchList = offlineFileParameters.getSearchList();
+		if (searchList == null) {
+			return;
+		}
+		FileFilter fileFilter = getFileFilter();
+		for (int i = 0; i < searchList.length; i++) {
+			if (searchList[i] == null) {
+				continue;
+			}
+			File aFile = new File(searchList[i]);
+			if (aFile.isDirectory()) {
+				addToMap(aFile, offlineFileParameters.includeSubFolders);
+			}
+			else if (aFile.isFile() && fileFilter.accept(aFile)) {
+				addToMap(aFile);
+			}
+		}
+	}
+
 	private void addToMap(File folderName, boolean includeSubFolders) {
 		FileFilter audioFileFilter = getFileFilter();
 		File[] files = folderName.listFiles(audioFileFilter);
@@ -285,7 +314,11 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	}
 
 	public boolean loadSerialisedMap() {
-		File mapFile = new File(getMapName());
+		String mapName = getMapName();
+		if (mapName == null) {
+			return false;
+		}
+		File mapFile = new File(mapName);
 		if (mapFile.exists() == false) {
 			return false;
 		}
@@ -300,15 +333,19 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	}
 
 	public synchronized void saveSerialisedMap() {
-		File mapFile = new File(getMapName());
+		String mapName = getMapName();
+		if (mapName == null) {
+			return;
+		}
+		File mapFile = new File(mapName);
+
 		if (dataMap == null) {
 			if (mapFile.exists()) {
 				mapFile.delete();
 			}
 			return;
 		}
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(mapFile));
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(mapFile))) {
 			oos.writeObject(dataMap.getMapPoints());
 		} catch (IOException e) {
 			System.err.println("Error saving sound file map: " + e.getLocalizedMessage());
@@ -316,8 +353,48 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	}
 
 	private String getMapName() {
-		String mapName = offlineFileParameters.folderName + File.separator + "serialisedSoundFileMap.data";
-		return mapName;
+		File rootFolder = getRootFolder();
+		if (rootFolder == null) {
+			return null;
+		}
+		return rootFolder.getAbsolutePath() + File.separator + "serialisedSoundFileMap.data";
+	}
+
+	/**
+	 * The folder the serialised map is written into. Normally the folder named in
+	 * the parameters, but if that's not a folder (or isn't set at all) fall back to
+	 * the folder holding the first selected file, since the selection may be a list
+	 * of individual files.
+	 * @return folder to write the map into, or null if there is nothing to use.
+	 */
+	public File getRootFolder() {
+		if (offlineFileParameters.folderName != null) {
+			File folder = new File(offlineFileParameters.folderName);
+			if (folder.isDirectory()) {
+				return folder;
+			}
+			File parent = folder.getParentFile();
+			if (parent != null && parent.isDirectory()) {
+				return parent;
+			}
+		}
+		String[] selection = offlineFileParameters.getSelectedFiles();
+		if (selection != null) {
+			for (int i = 0; i < selection.length; i++) {
+				if (selection[i] == null) {
+					continue;
+				}
+				File aFile = new File(selection[i]);
+				if (aFile.isDirectory()) {
+					return aFile;
+				}
+				File parent = aFile.getParentFile();
+				if (parent != null && parent.isDirectory()) {
+					return parent;
+				}
+			}
+		}
+		return null;
 	}
 	/**
 	 * Add a single sound file to the data map 
@@ -380,7 +457,11 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 	@Override
 	public String getDataLocation() {
 		getOfflineFileParameters();
-		return offlineFileParameters.folderName;
+		if (offlineFileParameters.folderName != null) {
+			return offlineFileParameters.folderName;
+		}
+		File rootFolder = getRootFolder();
+		return rootFolder == null ? null : rootFolder.getAbsolutePath();
 	}
 	
 	public TmapPoint findFirstMapPoint(Iterator<TmapPoint> mapIterator, long startMillis, long endMillis) {

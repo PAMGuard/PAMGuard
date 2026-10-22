@@ -1,5 +1,7 @@
 package PamView.panel;
 
+import javax.swing.JComponent;
+
 import PamView.ColorManaged;
 import PamView.PamColors.PamColor;
 
@@ -8,6 +10,8 @@ public class JPanelWithPamKey extends PamPanel implements ColorManaged {
 //	private GridBagLayout gridBagLayout;
 	
 	private KeyPanel keyPanel;
+
+	private JComponent keyComponent;
 //	GridBagLayout.
 //	private int keyPosition = GridBagConstraints.NORTHWEST;
 	
@@ -33,9 +37,29 @@ public class JPanelWithPamKey extends PamPanel implements ColorManaged {
 
 	public void setKeyPosition(int keyPosition) {	
 		gc.anchor = keyPosition;
-		if (keyPanel != null) {
-			replaceKeyPanel(keyPanel);
+		if (keyComponent != null) {
+			JComponent current = keyComponent;
+			keyComponent = null;
+			remove(current);
+			replaceKeyComponent(current);
 		}
+	}
+
+	/**
+	 * Get the gap between the key and the edges of the panel.
+	 * @return gap in pixels.
+	 */
+	public int getKeyMargin() {
+		return gc.margin;
+	}
+
+	/**
+	 * Set the gap between the key and the edges of the panel.
+	 * @param margin - gap in pixels.
+	 */
+	public void setKeyMargin(int margin) {
+		gc.margin = margin;
+		revalidate();
 	}
 
 	public KeyPanel getKeyPanel() {
@@ -43,39 +67,58 @@ public class JPanelWithPamKey extends PamPanel implements ColorManaged {
 	}
 
 	public void setKeyPanel(KeyPanel keyPanel) {
-		if (this.keyPanel == keyPanel) {
+		JComponent newComponent = keyPanel == null ? null : keyPanel.getPanel();
+		this.keyPanel = keyPanel;
+		if (newComponent == keyComponent) {
 			return;
 		}
-		else {
-			replaceKeyPanel(keyPanel);
+		replaceKeyComponent(newComponent);
+	}
+
+	/**
+	 * Get the component currently shown as the key.
+	 * @return the key component, or null if there is no key.
+	 */
+	public JComponent getKeyComponent() {
+		return keyComponent;
+	}
+
+	/**
+	 * Show any component as the key, e.g. a symbol legend from
+	 * {@link PamView.symbol.legend.SwingSymbolLegendFactory}. This replaces any
+	 * key panel which was set with {@link #setKeyPanel(KeyPanel)}.
+	 * @param keyComponent - the key component, or null to remove the key.
+	 */
+	public void setKeyComponent(JComponent keyComponent) {
+		if (this.keyComponent == keyComponent) {
+			return;
 		}
+		this.keyPanel = null;
+		replaceKeyComponent(keyComponent);
 	}
 	
 	protected void drawKeyOnTop() {
-		if (keyPanel != null) {
-			keyPanel.getPanel().repaint(10);
+		if (keyComponent != null) {
+			keyComponent.repaint(10);
 		}
 	}
 	
-	private void replaceKeyPanel(KeyPanel newPanel) {
+	private void replaceKeyComponent(JComponent newComponent) {
 		try {
-			if (keyPanel != null) {
-				//			synchronized (keyPanel) {
-				remove(keyPanel.getPanel());
-				//			}
+			if (keyComponent != null) {
+				remove(keyComponent);
 			}
-			if (newPanel != null) {
-				//			synchronized (newPanel) {	
-				add(newPanel.getPanel(), gc);
-				//			}
+			if (newComponent != null) {
+				add(newComponent, gc);
 			}
 		}
 		catch (Exception e) {
 
 		}
-		keyPanel = newPanel;
+		keyComponent = newComponent;
 		
 		this.invalidate();
+		this.revalidate();
 		this.repaint(10);
 		drawKeyOnTop();
 	}

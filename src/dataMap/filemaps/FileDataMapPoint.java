@@ -23,11 +23,19 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	private FileSubSection fileSubSection;
 
 	/**
-	 * Waveform summary of this sound file, used by the data map. Created on demand by
-	 * SoundFileDatagramManager and saved along with the rest of the map, so it only has
-	 * to be calculated once. Null until it's been made.
+	 * Waveform summary of this sound file (rms and peak), used by the data map. Created
+	 * on demand by SoundFileDatagramManager and saved along with the rest of the map, so
+	 * it only has to be calculated once. Null until it's been made.
 	 */
 	private Datagram datagram;
+
+	/**
+	 * Long term spectral average of this sound file, calculated in the same pass as the
+	 * waveform summary so that the user can flip between the two. Null until it's been
+	 * made.
+	 */
+	private Datagram ltsaDatagram;
+
 
 	public FileDataMapPoint(File soundFile, long startTime, long endTime) {
 		super(startTime, endTime, (int) Math.max(((endTime-startTime)/1000),1), 0);
@@ -59,6 +67,49 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	 */
 	public void setSoundFile(File soundFile) {
 		this.soundFile = soundFile;
+	}
+
+	/**
+	 * The DatagramPoint interface only allows for a single datagram, so this returns the
+	 * waveform one. Code which needs to pick between the two goes through
+	 * {@link SoundFileDatagramManager#getDatagram}.
+	 */
+	@Override
+	public Datagram getDatagram() {
+		return datagram;
+	}
+
+	@Override
+	public void setDatagram(Datagram datagram) {
+		this.datagram = datagram;
+	}
+
+	/**
+	 * @return the waveform (rms and peak) datagram, or null if it hasn't been made.
+	 */
+	public Datagram getWaveformDatagram() {
+		return datagram;
+	}
+
+	/**
+	 * @param datagram the waveform (rms and peak) datagram.
+	 */
+	public void setWaveformDatagram(Datagram datagram) {
+		this.datagram = datagram;
+	}
+
+	/**
+	 * @return the long term spectral average datagram, or null if it hasn't been made.
+	 */
+	public Datagram getLtsaDatagram() {
+		return ltsaDatagram;
+	}
+
+	/**
+	 * @param ltsaDatagram the long term spectral average datagram.
+	 */
+	public void setLtsaDatagram(Datagram ltsaDatagram) {
+		this.ltsaDatagram = ltsaDatagram;
 	}
 
 	@Override

@@ -188,8 +188,15 @@ public class SimpleTransformPane extends DLTransformPane {
 
 		SimpleTransform simpleTransform = (SimpleTransform) currParams;
 
-		//Set the new numbers
-		Number[] params = new Number[spinners.size()]; 
+		//Set the new numbers - keep any extra parameters which do not have a spinner e.g. the window type for a Ketos spectrogram
+		int nParams = spinners.size();
+		if (simpleTransform.getParams()!=null && simpleTransform.getParams().length > nParams) {
+			nParams = simpleTransform.getParams().length;
+		}
+		Number[] params = new Number[nParams];
+		for (int i=spinners.size(); i<nParams; i++) {
+			params[i] = simpleTransform.getParams()[i];
+		}
 		for (int i=0; i<spinners.size(); i++) {
 			//System.out.println("Get params" + spinners.get(i).getValue()); 
 			params[i] = spinners.get(i).getValue(); 

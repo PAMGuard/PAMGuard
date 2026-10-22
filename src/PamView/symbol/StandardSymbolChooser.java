@@ -111,6 +111,39 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 		return symbolData;
 	}
 
+	/**
+	 * Active modifiers in the user selected order, excluding modifiers which are
+	 * disabled or have nothing selected. Matches the logic in getSymbolChoice.
+	 */
+	@Override
+	protected List<SymbolModifier> getActiveSymbolModifiers() {
+		ArrayList<SymbolModifier> active = new ArrayList<>();
+		StandardSymbolOptions options = getSymbolOptions();
+		ArrayList<SymbolModifier> modifiers = getSymbolModifiers();
+		if (modifiers == null) {
+			return active;
+		}
+		int[] mord = options.getModifierOrder(this);
+		boolean[] enabled = options.isEnabled(this);
+		for (int i = 0; i < mord.length; i++) {
+			int ind = mord[i];
+			if (ind >= modifiers.size() || ind >= enabled.length || !enabled[ind]) {
+				continue;
+			}
+			SymbolModifier modifier = modifiers.get(ind);
+			if (modifier.getSymbolModifierParams().modBitMap == 0) {
+				continue;
+			}
+			active.add(modifier);
+		}
+		return active;
+	}
+
+	@Override
+	protected SymbolData getLegendDefaultSymbol() {
+		return getFixedSymbol();
+	}
+
 	public ArrayList<JMenuItem> getQuickMenuItems(Window frame, SymbolUpdateMonitor component, int whatCanChange, 
 			boolean andDetails, boolean andSuperDetoptions) {
 		return getQuickMenuItems(frame, component, null, whatCanChange, andDetails);

@@ -6,6 +6,8 @@ import PamView.GeneralProjector;
 import PamView.PamSymbolType;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -35,6 +37,16 @@ public class UserSymbolModifier extends SymbolModifier {
 	@Override
 	public SymbolData getSymbolData(GeneralProjector projector, PamDataUnit dataUnit) {
 		return symbolData;
+	}
+
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		return new SymbolLegend(getName(), new LegendSymbolData(symbolData, "User symbol"));
+	}
+
+	@Override
+	public boolean isModifyAll() {
+		return true;
 	}
 
 }

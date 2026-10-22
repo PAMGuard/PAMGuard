@@ -3,6 +3,7 @@ package PamController.pamWizard.swing;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -33,6 +34,7 @@ import PamController.pamWizard.configurations.FileConfigAutoConfig;
 import PamController.pamWizard.configurations.PamConfigDescription;
 import PamController.pamWizard.configurations.PamConfigInspection;
 import PamController.pamWizard.configurations.SpeciesIconFactory;
+import PamController.pamWizard.configurations.SpeciesTooltips;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamView.dialog.PamDialog;
 import PamView.wizard.PamWizard;
@@ -46,9 +48,14 @@ import PamView.wizard.PamWizardCard;
  * happened. The species filter here is for narrowing a long list down by hand,
  * not for deciding what is possible.
  * <p>
- * Every species group is shown as an icon beneath the description, with the ones
- * the selected configuration targets picked out in black and the rest greyed, so
- * that what a configuration is <i>not</i> for is as clear as what it is for.
+ * Every species group is shown as an icon beneath the description, all on one
+ * row, with the ones the selected configuration targets picked out in black and
+ * the rest in a light grey, so that what a configuration is <i>not</i> for is as
+ * clear as what it is for. A plain spectrogram detects nothing of its own, so
+ * for that the groups picked out are the ones which live in the chosen medium and
+ * which the imported files are fast enough to show. Each icon carries a tooltip
+ * naming its group and saying why it is or is not picked out (see
+ * {@link SpeciesTooltips}), for a reader who does not recognise the silhouette.
  *
  * @author Jamie Macaulay
  */
@@ -58,13 +65,24 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 
 	private static final int ICON_SIZE = 40;
 
+	/** Horizontal gap between the species icons. */
+	private static final int ICON_GAP = 6;
+
+	/**
+	 * Width of the configuration list, and so of the split pane's left hand side.
+	 * Fixed, so that the divider can be put in the same place as the width the list
+	 * was packed at and the detail panel is left with exactly the width it asked
+	 * for - enough for the species icons to sit in a single row.
+	 */
+	private static final int LIST_WIDTH = 300;
+
 	private static final String ALL_GROUPS = "All species";
 
 	/** Colour of a species group the selected configuration targets. */
 	private static final Color ACTIVE_TINT = Color.BLACK;
 
 	/** Colour of a species group the selected configuration does not target. */
-	private static final Color MUTED_TINT = new Color(0xB4, 0xB4, 0xB4);
+	private static final Color MUTED_TINT = new Color(0xCC, 0xCC, 0xCC);
 
 	private final DefaultListModel<PamAutoConfig> listModel = new DefaultListModel<>();
 	private final JList<PamAutoConfig> configList = new JList<>(listModel);
@@ -89,7 +107,8 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 	 * One icon per species group, all of them always shown. The groups a
 	 * configuration targets are drawn in the normal icon colour and the rest are
 	 * greyed, so the reader can see at a glance both what a configuration is for and
-	 * what it is not.
+	 * what it is not. Only the groups worth drawing are here - see
+	 * {@link ConfigSpeciesGroup#getDisplayGroups()}.
 	 */
 	private final Map<ConfigSpeciesGroup, JLabel> speciesIcons = new LinkedHashMap<>();
 
@@ -122,9 +141,12 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 		 * thing.
 		 */
 		listScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		listScroller.setPreferredSize(new Dimension(LIST_WIDTH, 260));
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listScroller, createDetailPanel());
-		split.setDividerLocation(300);
+		split.setDividerLocation(LIST_WIDTH);
+		// any extra width the dialog ends up with goes to the details, not to the list.
+		split.setResizeWeight(0);
 		add(BorderLayout.CENTER, split);
 	}
 
@@ -138,16 +160,28 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 
 	/**
 	 * The row of species group icons shown under the description.
+	 * <p>
+	 * A grid rather than a flow, so that the groups always read as one row: a flow
+	 * silently wraps the last few icons onto a second line as soon as the panel is
+	 * a little narrower than the whole row, which reads as two unrelated sets of
+	 * animals rather than one list. The row asks for the width it needs and the
+	 * detail panel it sits in passes that request on to the dialog.
 	 */
 	private JPanel createSpeciesIconPanel() {
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
-		for (ConfigSpeciesGroup group : ConfigSpeciesGroup.values()) {
+		List<ConfigSpeciesGroup> groups = ConfigSpeciesGroup.getDisplayGroups();
+		JPanel icons = new JPanel(new GridLayout(1, groups.size(), ICON_GAP, 0));
+		for (ConfigSpeciesGroup group : groups) {
 			JLabel label = new JLabel(SpeciesIconFactory.getInstance()
-					.getSwingIcon(group, ICON_SIZE, MUTED_TINT));
-			label.setToolTipText(group.getGroupName());
+					.getSwingIcon(group, ICON_SIZE, MUTED_TINT), JLabel.CENTER);
+			label.setToolTipText(SpeciesTooltips.getSwingTip(group, null, 0, null));
 			speciesIcons.put(group, label);
-			panel.add(label);
+			icons.add(label);
 		}
+
+		// held to the left so that the icons keep their size in a wider dialog.
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(BorderLayout.WEST, icons);
+		panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 		return panel;
 	}
 
@@ -158,6 +192,11 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
 		panel.add(mediumLabel);
 		panel.add(mediumChooser);
+		/*
+		 * A spectrogram of an air recording has no porpoises in it, so the icons have
+		 * to follow the medium as the user changes it.
+		 */
+		mediumChooser.addActionListener(e -> showSpeciesIcons(configList.getSelectedValue()));
 		return panel;
 	}
 
@@ -286,8 +325,9 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 	 * Show what a configuration does in the panel beside the list.
 	 */
 	private void showDetails(PamAutoConfig config) {
-		showSpeciesIcons(config);
+		// the medium first: which species groups are picked out depends on it.
 		showMediumChoice(config);
+		showSpeciesIcons(config);
 
 		if (config == null) {
 			descriptionArea.setText("");
@@ -341,24 +381,37 @@ public class ConfigSelectionCard extends PamWizardCard<ConfigWizardData> {
 	}
 
 	/**
-	 * Pick out the species groups the configuration targets and grey the rest.
+	 * Pick out the species groups the configuration targets and grey the rest. For
+	 * a configuration with no species of its own that means the groups these
+	 * recordings could hold, which depends on the medium showing in the chooser -
+	 * so this must run after {@link #showMediumChoice(PamAutoConfig)}.
 	 *
 	 * @param config the selected configuration, or null if none is selected.
 	 */
 	private void showSpeciesIcons(PamAutoConfig config) {
-		Set<ConfigSpeciesGroup> targeted = new LinkedHashSet<>();
-		if (config instanceof FileConfigAutoConfig) {
-			targeted.addAll(((FileConfigAutoConfig) config).getDescription().getGroups());
-		}
+		double sampleRate = getSampleRate();
+		SoundMedium medium = (SoundMedium) mediumChooser.getSelectedItem();
+		Set<ConfigSpeciesGroup> targeted = SpeciesTooltips.getTargetedGroups(config, sampleRate, medium);
 		for (Map.Entry<ConfigSpeciesGroup, JLabel> entry : speciesIcons.entrySet()) {
 			ConfigSpeciesGroup group = entry.getKey();
 			boolean active = targeted.contains(group);
 			entry.getValue().setIcon(SpeciesIconFactory.getInstance()
 					.getSwingIcon(group, ICON_SIZE, active ? ACTIVE_TINT : MUTED_TINT));
-			entry.getValue().setToolTipText(active
-					? group.getGroupName() + " - targeted by this configuration"
-					: group.getGroupName() + " - not targeted by this configuration");
+			entry.getValue().setToolTipText(SpeciesTooltips.getSwingTip(group, config, sampleRate, medium));
 		}
+	}
+
+	/**
+	 * The sample rate the imported files were recorded at, which is what decides
+	 * the species groups for a configuration with none of its own. The lowest rate
+	 * found is used, so that a mixed set of files is not credited with more than
+	 * all of it can show.
+	 *
+	 * @return the sample rate in Hz, or zero if it could not be read.
+	 */
+	private double getSampleRate() {
+		SoundFileSummary summary = (wizardData == null) ? null : wizardData.getSoundSummary();
+		return (summary == null || !summary.isValid()) ? 0 : summary.getMinSampleRate();
 	}
 
 	/**

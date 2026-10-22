@@ -3,6 +3,8 @@ package matchedTemplateClassifer.annotation;
 import PamView.GeneralProjector;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
+import PamView.symbol.legend.LegendSymbolData;
+import PamView.symbol.legend.SymbolLegend;
 import PamView.symbol.modifier.SymbolModType;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataUnit;
@@ -35,6 +37,20 @@ public class MatchedClickSymbolModifier extends SymbolModifier {
 //		}
 		ClickDetection clickDet = (ClickDetection) dataUnit;
 		return mtControl.getSymbolData(clickDet.getClickType());
+	}
+
+	/**
+	 * Legend with the symbol for clicks classified by the matched template
+	 * classifier. Other clicks are not modified.
+	 */
+	@Override
+	public SymbolLegend getSymbolLegend() {
+		SymbolLegend legend = new SymbolLegend(getName());
+		SymbolData symbolData = mtControl.getMTParams().pamSymbol;
+		if (symbolData != null) {
+			legend.addSymbol(new LegendSymbolData(symbolData, mtControl.getUnitName()));
+		}
+		return legend;
 	}
 
 }

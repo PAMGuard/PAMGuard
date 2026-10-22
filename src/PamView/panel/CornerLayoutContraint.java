@@ -24,6 +24,12 @@ public class CornerLayoutContraint  implements Serializable, Cloneable {
 	public int anchor = FIRST_LINE_START;
 
 	/**
+	 * Gap in pixels between the component and the edges of the container
+	 * it's anchored to.
+	 */
+	public int margin = 0;
+
+	/**
 	 * Construct a corner layout constraint with the given anchor
 	 * @param anchor
 	 */

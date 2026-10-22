@@ -146,8 +146,17 @@ public class DataTransformPaneFactory {
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 1, Integer.MAX_VALUE,   1);	
 			break;
 		case REDUCETONALNOISE_MEDIAN:
-			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.REDUCETONALNOISE_MEDIAN.toString()); 
+			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.REDUCETONALNOISE_MEDIAN.toString());
 			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
+		case MEDIAN_EQUALIZER:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Window "},  new String[]{"s"});
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, Double.MAX_VALUE,   1.0);
+			break;
+		case SPEC_TIME_TRIM:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Start bin ", "Time bins "},  new String[]{"bins", "bins"}); 
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 1, Integer.MAX_VALUE,   1);
 			break;
 		case SPECNORMALISESTD:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Mean ", "Std "}); 
@@ -182,8 +191,18 @@ public class DataTransformPaneFactory {
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   100.); //hmmmm would be nice to have the sample rate here...
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
 			break;
+		case SPECFREQZERO:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Min. Freq. ", "Max. Freq. "},  new String[]{"Hz", "Hz"}, 2);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   10.);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   10.);
+			break;
+		case SPEC_IMADJUST:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Low tol. ", "High tol. "},  new String[]{"", ""}, 2);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 1.0,   0.01);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 1.0,   0.01);
+			break;
 		case SPECRESIZE:
-			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Time bins", "Freq. bins"},  new String[]{"", ""}); 
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Time bins", "Freq. bins"},  new String[]{"", ""});
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   1);
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0,Integer.MAX_VALUE,   1);
 			break;

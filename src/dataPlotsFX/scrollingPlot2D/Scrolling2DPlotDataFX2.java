@@ -11,7 +11,9 @@ import dataPlotsFX.projector.TimeProjectorFX;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -91,6 +93,17 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	private static final int MAXIMAGESIZE = 3092;
 
 	/**
+	 * Default minimum width of a tile image in pixels. A floor here stops the tiling
+	 * degenerating into a huge number of one or two pixel wide images on a heavily
+	 * time-compressed display. It is a <b>default</b> rather than a constant because
+	 * it has a side effect: widening the image widens the tile's time span with it
+	 * (the span is {@code imgWidth * compression} slices), and a display which sizes
+	 * its offline orders from the tile span - as the scroll-bar preview does - then
+	 * orders more data per order than it meant to. See {@link #minTileImageWidth()}.
+	 */
+	private static final int MIN_TILE_IMAGE_WIDTH = 64;
+
+	/**
 	 * Maximum number of consecutive empty image columns which are filled by
 	 * duplicating the previous column (see
 	 * {@link #fillColumnGap(SpecTile, int, SpecTile, int)}). Only enough to repair the
@@ -104,6 +117,14 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 
 	/** Quick reference transform for horizontal spectrogram (default orientation). */
 	private static final Affine horzAffine = new Affine();
+
+	/**
+	 * Pixel format for the bulk column writes. Non-premultiplied ARGB, matching what
+	 * {@link PixelWriter#setColor} converts a {@link Color} to internally, so the
+	 * images come out pixel for pixel the same as they did when written a pixel at a
+	 * time.
+	 */
+	private static final PixelFormat<java.nio.IntBuffer> ARGB_FORMAT = PixelFormat.getIntArgbInstance();
 
 	/** Channel this plot shows data from. */
 	private int iChannel;
@@ -307,6 +328,32 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 		return visibleMillis / 4.0;
 	}
 
+	/**
+	 * The narrowest a tile image is allowed to be, in pixels. Overridden where a tile
+	 * image of a handful of pixels is exactly what is wanted and the floor would do
+	 * harm - the scroll-bar preview draws a whole tile into a few pixels of the scroll
+	 * bar, so a wide image is wasted work, and worse, the extra width is bought by
+	 * widening the tile's <em>time</em> span, which is what its offline orders are
+	 * sized from.
+	 *
+	 * @return the minimum tile image width in pixels (at least 1).
+	 */
+	protected int minTileImageWidth() {
+		return MIN_TILE_IMAGE_WIDTH;
+	}
+
+	/**
+	 * The number of FFT slices currently averaged into one image column. Subclasses
+	 * use this to decide how much of the incoming data they actually need - at a
+	 * compression of, say, 256 there is nothing to be gained from routing every one
+	 * of those 256 FFTs into the column average.
+	 *
+	 * @return the current time compression (at least 1).
+	 */
+	protected int getTimeCompression() {
+		return Math.max(1, timeCompression);
+	}
+
 	/* ===================== configuration ===================== */
 
 	@Override
@@ -348,8 +395,9 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			imgW = MAXIMAGESIZE;
 			slices = imgW * newComp;
 		}
-		if (imgW < 64) {
-			imgW = 64;
+		int minImgW = Math.max(1, minTileImageWidth());
+		if (imgW < minImgW) {
+			imgW = minImgW;
 			slices = imgW * newComp;
 		}
 		long newTileMillis = Math.max(1, Math.round(slices * newTimeScale * 1000.));
@@ -608,13 +656,14 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			return;
 		}
 		int col = tile.accumCol;
+		int[] argb = columnScratch(tile.nBins);
+		short[] powers = tile.colData[col];
 		for (int i = 0; i < tile.nBins; i++) {
 			double avg = tile.accum[i] / tile.accumCount;
-			tile.writer.setColor(col, tile.nBins - 1 - i, specColors.getColours(avg));
-			tile.colData[col][i] = (short) (avg * DECIBEL_INT_SCALE);
+			argb[tile.nBins - 1 - i] = specColors.getColoursARGB(avg);
+			powers[i] = (short) (avg * DECIBEL_INT_SCALE);
 		}
-		tile.colWritten[col] = true;
-		tile.hasData = true;
+		writeColumn(tile, col, argb);
 		if (finalise) {
 			for (int i = 0; i < tile.nBins; i++) {
 				tile.accum[i] = 0;
@@ -679,12 +728,49 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	private void copyColumn(SpecTile srcTile, int srcCol, SpecTile dstTile, int dstCol) {
 		short[] src = srcTile.colData[srcCol];
 		short[] dst = dstTile.colData[dstCol];
+		int[] argb = columnScratch(dstTile.nBins);
 		for (int i = 0; i < dstTile.nBins; i++) {
 			dst[i] = src[i];
-			dstTile.writer.setColor(dstCol, dstTile.nBins - 1 - i, specColors.getColours(src[i] / DECIBEL_INT_SCALE));
+			argb[dstTile.nBins - 1 - i] = specColors.getColoursARGB(src[i] / DECIBEL_INT_SCALE);
 		}
-		dstTile.colWritten[dstCol] = true;
-		dstTile.hasData = true;
+		writeColumn(dstTile, dstCol, argb);
+	}
+
+	/**
+	 * Scratch buffer used to build one image column as ARGB integers before it is
+	 * written. Every caller holds {@link #tileLock}, so one buffer is enough; it is
+	 * grown on demand and never shrunk.
+	 */
+	private int[] columnScratch = new int[0];
+
+	/**
+	 * Get the column scratch buffer, growing it if this tile has more bins than the
+	 * last one written. Must be called with {@link #tileLock} held.
+	 *
+	 * @param nBins - the number of bins (image rows) to be written.
+	 * @return a buffer of at least nBins ints.
+	 */
+	private int[] columnScratch(int nBins) {
+		if (columnScratch.length < nBins) {
+			columnScratch = new int[nBins];
+		}
+		return columnScratch;
+	}
+
+	/**
+	 * Write a prepared column of ARGB pixels into a tile image with a single
+	 * {@link PixelWriter#setPixels} call. Writing the column in one go rather than a
+	 * {@code setColor} per pixel is around twice as quick, which matters because a
+	 * column is written for every {@code timeCompression} FFTs that arrive.
+	 *
+	 * @param tile - the tile to write into.
+	 * @param col  - the image column to write.
+	 * @param argb - the column pixels, row 0 first, at least {@code tile.nBins} long.
+	 */
+	private void writeColumn(SpecTile tile, int col, int[] argb) {
+		tile.writer.setPixels(col, 0, 1, tile.nBins, ARGB_FORMAT, argb, 0, 1);
+		tile.colWritten[col] = true;
+		tile.hasData = true;
 	}
 
 	/**
@@ -946,7 +1032,9 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	public void reBuildImage() {
 		Thread thread = new Thread(() -> {
 			recolourTiles(null);
-			rebuildFinished();
+			//rebuildFinished() ends up repainting a canvas (e.g. the acoustic scroll bar),
+			//which must happen on the FX thread - this one is a plain background thread.
+			runRebuildFinished();
 		});
 		thread.setDaemon(true);
 		thread.start();
@@ -955,8 +1043,23 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 	@Override
 	protected boolean reBuildImage(Task<Boolean> task) {
 		boolean ok = recolourTiles(task);
-		rebuildFinished();
+		//called from a Task's background thread, so marshal the repaint onto the FX thread.
+		runRebuildFinished();
 		return ok;
+	}
+
+	/**
+	 * Call {@link #rebuildFinished()} on the FX thread. Implementations repaint a
+	 * canvas from it, and both re-colour paths above run on a background thread, so
+	 * calling it directly touched a {@link GraphicsContext} off the FX thread.
+	 */
+	private void runRebuildFinished() {
+		if (Platform.isFxApplicationThread()) {
+			rebuildFinished();
+		}
+		else {
+			Platform.runLater(this::rebuildFinished);
+		}
 	}
 
 	/**
@@ -976,14 +1079,16 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 					if (task != null && task.isCancelled()) {
 						return false;
 					}
+					int[] argb = columnScratch(tile.nBins);
 					for (int col = 0; col < tile.imgWidth; col++) {
 						if (!tile.colWritten[col]) {
 							continue;
 						}
+						short[] powers = tile.colData[col];
 						for (int i = 0; i < tile.nBins; i++) {
-							double avg = tile.colData[col][i] / DECIBEL_INT_SCALE;
-							tile.writer.setColor(col, tile.nBins - 1 - i, specColors.getColours(avg));
+							argb[tile.nBins - 1 - i] = specColors.getColoursARGB(powers[i] / DECIBEL_INT_SCALE);
 						}
+						writeColumn(tile, col, argb);
 					}
 				}
 			}

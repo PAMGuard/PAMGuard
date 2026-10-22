@@ -146,11 +146,13 @@ public class ScrollingDataPanel extends PamBorderPanel {
 	}
 
 	public void showHideGraph() {
-		DataStreamPanel dsp;
-//		frameResized();
-		scrolledPanel.invalidate();
-		scrollPanelContainer.invalidate();
-		invalidate();
+		/*
+		 * invalidate() only marks the panels as needing a layout, it doesn't make one
+		 * happen, so a graph which had just been shown again sat at its collapsed size
+		 * until something else (a mouse move, a scroll) happened to validate the tree.
+		 * revalidate() queues the layout so the data map appears straight away.
+		 */
+		scrolledPanel.revalidate();
 		scrolledPanel.repaint();
 		scrollPanelContainer.repaint();
 		repaint();
@@ -347,6 +349,9 @@ public class ScrollingDataPanel extends PamBorderPanel {
 	 */
 	public int createDataGraphs() {
 		scrolledPanel.removeAll();
+		for (DataStreamPanel oldPanel : dataStreamPanels) {
+			oldPanel.dispose();
+		}
 		dataStreamPanels.clear();
 		ArrayList<PamDataBlock> dataBlocks = dataMapControl.getMappedDataBlocks();
 		if (dataBlocks == null) {
@@ -361,7 +366,7 @@ public class ScrollingDataPanel extends PamBorderPanel {
 			dataStreamPanels.add(aStreamPanel);
 			scrolledPanel.add(aStreamPanel.getPanel());
 		}
-		scrolledPanel.invalidate();
+		scrolledPanel.revalidate();
 		return dataBlocks.size();
 	}
 	

@@ -367,6 +367,13 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		return spectrogramColours.getColours(dBLevel);
 	}
 
+	@Override
+	public int getColoursARGB(double dBLevel) {
+		//delegate so that the pre-converted colour table is used rather than converting
+		//a Color per pixel (spectrogram images are written a column at a time).
+		return spectrogramColours.getColoursARGB(dBLevel);
+	}
+
 
 
 	/**

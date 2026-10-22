@@ -145,6 +145,13 @@ public class FileDateDialogStrip {
 		fileTime.setText(PamCalendar.formatDateTime(fileDateMillis));
 	}
 	
+	/**
+	 * Clear the file date, for when there are no files to take a date from.
+	 */
+	public void clearDate() {
+		fileTime.setText("");
+	}
+	
 	public void setFormat(String format) {
 		formatLabel.setText(format);
 	}

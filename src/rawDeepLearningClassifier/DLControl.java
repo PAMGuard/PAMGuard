@@ -43,11 +43,13 @@ import rawDeepLearningClassifier.defaultModels.DLDefaultModelManager;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier;
 import rawDeepLearningClassifier.dlClassification.deepAcoustics.DeepAcousticsClassifier;
+import rawDeepLearningClassifier.dlClassification.yolo.YoloClassifier;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
@@ -346,6 +348,7 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		dlModels.add(new PamZipModelClassifier(this));
 		dlModels.add(new DelphinIDClassifier(this));
 		dlModels.add(new DeepAcousticsClassifier(this));
+		dlModels.add(new YoloClassifier(this));
 
 		
 		//it is important the Generic Model is last because we need to check 
@@ -439,6 +442,14 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		this.segmenterProcess.setupSegmenter();
 		this.dlClassifyProcess.setupProcess();
 		this.checkModelParams();
+
+		// warnings from classifiers which are no longer selected are no longer relevant.
+		DLClassiferModel currentModel = getDLModel();
+		for (DLClassiferModel aModel : dlModels) {
+			if (aModel != currentModel && aModel instanceof StandardClassifierModel) {
+				((StandardClassifierModel) aModel).clearWarning();
+			}
+		}
 
 		// this is a bit of a hack. Annotations are added to data units but the
 		// datablock knows nothing about them

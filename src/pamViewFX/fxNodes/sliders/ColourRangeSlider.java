@@ -2,11 +2,11 @@ package pamViewFX.fxNodes.sliders;
 
 import java.util.Locale;
 
+import org.controlsfx.control.PopOver;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
@@ -57,9 +57,9 @@ public class ColourRangeSlider extends PamRangeSlider {
 	private ColourArrayType colourMap = ColourArrayType.RED;
 
 	/**
-	 * Context menu allowing the user to type new absolute (min/max) limits.
+	 * Pop over allowing the user to type new absolute (min/max) limits.
 	 */
-	private ContextMenu limitsContextMenu;
+	private PopOver limitsPopOver;
 
 	/**
 	 * Text field for the minimum (low) absolute limit.
@@ -82,21 +82,23 @@ public class ColourRangeSlider extends PamRangeSlider {
 	 */
 	public ColourRangeSlider() {
 		super();
-		initLimitsContextMenu();
+		initLimitsPopOver();
 	}
 
 
 	public ColourRangeSlider(Orientation orientation) {
 		super();
 		this.orientationProperty().set(orientation);
-		initLimitsContextMenu();
+		initLimitsPopOver();
 	}
 
 	/**
-	 * Create the right-click context menu which lets the user change the absolute
-	 * (min/max) limits of the slider by typing in new values.
+	 * Create the right-click pop over which lets the user change the absolute
+	 * (min/max) limits of the slider by typing in new values. A pop over is used
+	 * rather than a context menu because a menu item highlights its whole content
+	 * on hover and focus.
 	 */
-	private void initLimitsContextMenu() {
+	private void initLimitsPopOver() {
 		minField = new TextField();
 		maxField = new TextField();
 		minField.setPrefColumnCount(6);
@@ -119,17 +121,15 @@ public class ColourRangeSlider extends PamRangeSlider {
 		grid.add(maxField, 1, 2);
 		grid.add(applyButton, 1, 3);
 
-		CustomMenuItem menuItem = new CustomMenuItem(grid);
-		//keep the menu open while the user types / clicks in the fields.
-		menuItem.setHideOnClick(false);
-
-		limitsContextMenu = new ContextMenu(menuItem);
+		limitsPopOver = new PopOver(grid);
+		limitsPopOver.setDetachable(false);
 
 		setOnContextMenuRequested(e -> {
-			//prefill with the current limits each time the menu is shown.
+			//prefill with the current limits each time the pop over is shown.
 			minField.setText(formatLimit(getMin()));
 			maxField.setText(formatLimit(getMax()));
-			limitsContextMenu.show(this, e.getScreenX(), e.getScreenY());
+			limitsPopOver.show(this, e.getScreenX(), e.getScreenY());
+			minField.requestFocus();
 			e.consume();
 		});
 	}
@@ -145,11 +145,11 @@ public class ColourRangeSlider extends PamRangeSlider {
 	}
 
 	/**
-	 * Parse and apply the limits from the text fields, then hide the menu.
+	 * Parse and apply the limits from the text fields, then hide the pop over.
 	 */
 	private void applyLimitsAndHide() {
 		if (applyLimits()) {
-			limitsContextMenu.hide();
+			limitsPopOver.hide();
 		}
 	}
 
@@ -195,7 +195,7 @@ public class ColourRangeSlider extends PamRangeSlider {
 
 	/**
 	 * Set a callback which is run after the user applies new absolute limits via the
-	 * right-click menu. Owners can use this to persist the new limits and recolour.
+	 * right-click pop over. Owners can use this to persist the new limits and recolour.
 	 *
 	 * @param onLimitsChanged the callback, or null to clear.
 	 */

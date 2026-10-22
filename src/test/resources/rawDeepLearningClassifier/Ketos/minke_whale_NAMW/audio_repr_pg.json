@@ -1,0 +1,42 @@
+{
+  "framework_info": {
+    "framework": "Ketos"
+  },
+  "model_info": {
+    "output_shape": [-1, 2],
+    "input_shape": [-1, 125, 104, 1]
+  },
+  "class_info": {
+    "name_class": ["Noise", "Minke whale"],
+    "num_class": 2
+  },
+  "transforms": [
+    {
+      "name": "load_audio_scipy",
+      "params": {"sr": 2000}
+    },
+    {
+      "name": "spectrogramketos",
+      "params": {"fft": 256, "hop": 80, "window_size": 5.128, "window_type": 2}
+    },
+    {
+      "name": "freq_trim",
+      "params": {"fmin": 0, "fmax": 812.5}
+    },
+    {
+      "name": "amplitude_to_decibel",
+      "params": {}
+    },
+    {
+      "name": "median_equalizer",
+      "params": {"window_duration": 60.0}
+    }
+  ],
+  "description": "North Atlantic minke whale pulse-train detector (version 20240829). Mouy X, Awbery T, Davis G, Fernandez-Betelu O, Iorio-Merlo V, Transue L, Van Parijs S, Risch D (2025). Zenodo. https://doi.org/10.5281/zenodo.15151160",
+  "version_info": {
+    "version": 1
+  },
+  "seg_size": {
+    "size_ms": 5128.0
+  }
+}

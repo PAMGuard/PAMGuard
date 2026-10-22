@@ -2,6 +2,7 @@ package rawDeepLearningClassifier.dlClassification;
 
 import java.util.ArrayList;
 import java.util.List;
+import Acquisition.AcquisitionProcess;
 import PamDetection.RawDataUnit;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamUtils;
@@ -87,6 +88,11 @@ public class DLClassifyProcess extends PamProcess {
 	 */
 	private DLGroupDataBlock dlGroupDetectionDataBlock;
 
+	/**
+	 * The maximum time to wait for a model to classify queued data when flushing the classifier. 
+	 */
+	private static final long MAX_FLUSH_WAIT_MILLIS = 60000; 
+
 	public DLClassifyProcess(DLControl dlControl, SegmenterDataBlock parentDataBlock) {
 		super(dlControl, null);
 
@@ -147,6 +153,11 @@ public class DLClassifyProcess extends PamProcess {
 					+ " A new instance has been created: Possible de-serialization error.");
 		}
 
+
+		//clear any data left over from a previous run so it is not classified at the start of the next one. 
+		if (classificationBuffer!=null) {
+			classificationBuffer.clear(); 
+		}
 
 		//important for downstream processes such as the bearing localiser.
 		dlModelResultDataBlock.setChannelMap(dlControl.getDLParams().groupedSourceParams.getChannelBitmap());
@@ -609,7 +620,18 @@ public class DLClassifyProcess extends PamProcess {
 				 * classification. 
 				 * 2) Annotated an existing data unit with a deep learning annotation. 
 				 */
-				if (pamRawData.getParentDataUnit() instanceof RawDataUnit) {
+				if (pamRawData.getParentDataUnit() instanceof RawDataUnit && isObjectDetector()) {
+					/****Object detector - each positive result (e.g. bounding box) is a detection and is never merged****/
+					for (int j=0; j<dlDataUnits.size(); j++) {
+						if (dlDataUnits.get(j).getPredicitionResult().isBinaryClassification()) {
+							DLDetection dlDetection = makeRawDLDetection(singleList(pamRawData), singleList(dlDataUnits.get(j).getPredicitionResult()));
+							if (dlDetection!=null) {
+								this.dlDetectionDataBlock.addPamData(dlDetection);
+							}
+						}
+					}
+				}
+				else if (pamRawData.getParentDataUnit() instanceof RawDataUnit) {
 
 					for (int j=0; j<dlDataUnits.size(); j++) {
 						/****Make our own data units****/
@@ -740,6 +762,30 @@ public class DLClassifyProcess extends PamProcess {
 	 * @return a DL detection with merged raw data. 
 	 */
 	private synchronized DLDetection makeRawDLDetection(ArrayList<GroupedRawData> groupDataBuffer, ArrayList<PredictionResult> modelResult) {
+		DLDetection dlDetection = makeRawDLDetection(groupDataBuffer, modelResult, dlControl.getDLParams().sampleHop, 
+				dlControl.getDLParams().rawSampleSize, getSampleRate()); 
+		if (dlDetection!=null) {
+			addDLAnnotation(dlDetection,modelResult); 
+		}
+		return dlDetection;
+	}
+
+	/**
+	 * Make a positive DL detection from a number of model results and corresponding
+	 * chunks of raw sound data. The time and frequency limits of the detection are
+	 * those of the model results, so for object detectors (e.g. YOLO) the raw data
+	 * is trimmed to the bounding boxes. The detection is not annotated with the
+	 * model results.
+	 * 
+	 * @param groupDataBuffer - the raw data chunks (these may overlap).
+	 * @param modelResult     - the model results.
+	 * @param sampleHop       - the hop between raw data chunks in samples.
+	 * @param rawSampleSize   - the size of each raw data chunk in samples.
+	 * @param sampleRate      - the sample rate in samples per second.
+	 * @return a DL detection with merged raw data.
+	 */
+	public static DLDetection makeRawDLDetection(ArrayList<GroupedRawData> groupDataBuffer, ArrayList<? extends PredictionResult> modelResult, 
+			int sampleHop, int rawSampleSize, float sampleRate) {
 
 		//System.out.println("DLClassifyProcess: makeRawDLDetection: " + groupDataBuffer.size() + " data units, " + modelResult.size() + " model results");
 		
@@ -751,19 +797,19 @@ public class DLClassifyProcess extends PamProcess {
 
 		//need to merge the raw data chunks- these are overlapping which is a bit of pain but should be OK if we only copy in the hop lengths.
 		double[][] rawdata = new double[PamUtils.getNumChannels(groupDataBuffer.get(0).getChannelBitmap())]
-				[dlControl.getDLParams().sampleHop*(groupDataBuffer.size()-1) + dlControl.getDLParams().rawSampleSize]; 
+				[sampleHop*(groupDataBuffer.size()-1) + rawSampleSize]; 
 
 		//copy all data into a new data buffer making sure to compensate for hop size. 
 		for (int i=0; i<groupDataBuffer.size(); i++) {
 
-			int copyLen = dlControl.getDLParams().sampleHop; 
+			int copyLen = sampleHop; 
 
 			//at the end have to copy the entire length or else we miss the end of the detection...
-			if (i==groupDataBuffer.size()-1) copyLen = dlControl.getDLParams().rawSampleSize; 
+			if (i==groupDataBuffer.size()-1) copyLen = rawSampleSize; 
 
 			for (int j=0; j<chans; j++) {
 				System.arraycopy(groupDataBuffer.get(i).getRawData()[j], 0, rawdata[j], 
-						i*dlControl.getDLParams().sampleHop, copyLen);
+						i*sampleHop, copyLen);
 			}
 		}
 
@@ -826,19 +872,23 @@ public class DLClassifyProcess extends PamProcess {
 
 
 		
-		basicData.setTimeMilliseconds(startMillis); 
-		basicData.setMillisecondDuration(((double) rawdata[0].length)/getSampleRate()*1000);
-		
-		basicData.setSampleDuration((long) (groupDataBuffer.size()*dlControl.getDLParams().rawSampleSize));
+		//the start sample and duration are those of the (possibly trimmed) raw data. For most models this is the start
+		//of the first segment but for object detectors (e.g. YOLO) it is the start of the earliest bounding box.
+		basicData.setTimeMilliseconds(startMillis);
+		basicData.setStartSample(startSample);
+		basicData.setMillisecondDuration(((double) rawdata[0].length)/sampleRate*1000);
+
+		basicData.setSampleDuration((long) rawdata[0].length);
 
 		//		System.out.println("Model result: " + modelResult.size()); 
-		DLDetection dlDetection = new DLDetection(basicData, rawdata, getSampleRate()); 
-		addDLAnnotation(dlDetection,modelResult); 
+		DLDetection dlDetection = new DLDetection(basicData, rawdata, sampleRate); 
+		//the constructor does not copy the duration in millis from the base data.
+		dlDetection.setDurationInMilliseconds(((double) rawdata[0].length)/sampleRate*1000);
 
-		//System.out.println("DLClassifyProcess: freqLims: " + freqLims + " sample rate: " + this.getSampleRate());
+		//System.out.println("DLClassifyProcess: freqLims: " + freqLims + " sample rate: " + sampleRate);
 		if (freqLims==null) {
 			//set default frequency limits
-			dlDetection.setFrequency(new double[] {0, this.getSampleRate()/2});
+			dlDetection.setFrequency(new double[] {0, sampleRate/2});
 		}
 		else {
 			//set frequency limits from model results
@@ -858,7 +908,7 @@ public class DLClassifyProcess extends PamProcess {
 	 * @param targetEndSample - the target end sample.
 	 * @return trimmed raw data.
 	 */
-	private double[][] trimRawData(double[][] rawdata, long rawStartSample, long targetStartSample, long targetEndSample) {
+	private static double[][] trimRawData(double[][] rawdata, long rawStartSample, long targetStartSample, long targetEndSample) {
 
 		//trime the rawdata which starts at rawStartSample to the target start and end sample
 		int startOffset = (int) (targetStartSample-rawStartSample);
@@ -869,7 +919,8 @@ public class DLClassifyProcess extends PamProcess {
 
 		double[][] trimmedData = new double[rawdata.length][];
 		for (int i=0; i<rawdata.length; i++) {
-			trimmedData[i] = new double[(int) (targetEndSample-targetStartSample+1)];
+			//the end sample is exclusive - never copy past the end of the raw data. 
+			trimmedData[i] = new double[(int) Math.min(targetEndSample-targetStartSample, rawdata[i].length-startOffset)];
 
 			System.arraycopy(rawdata[i], startOffset, trimmedData[i], 0, 
 					trimmedData[i].length);
@@ -910,6 +961,23 @@ public class DLClassifyProcess extends PamProcess {
 		}
 
 		return bestResult;
+	}
+
+	/**
+	 * Check whether the current model is an object detector. The results from an
+	 * object detector are never merged into a single detection.
+	 * 
+	 * @return true if the current model is an object detector.
+	 */
+	private boolean isObjectDetector() {
+		DLClassiferModel model = dlControl.getDLModel(); 
+		return model!=null && model.isObjectDetector(); 
+	}
+
+	private static <T> ArrayList<T> singleList(T item) {
+		ArrayList<T> list = new ArrayList<T>(1); 
+		list.add(item); 
+		return list; 
 	}
 
 	/**
@@ -960,17 +1028,83 @@ public class DLClassifyProcess extends PamProcess {
 
 	@Override
 	public void pamStop() {
-		//make sure to run the last data in the buffer.
-		if (this.classificationBuffer.size()>0) {
+		//make sure to run the last data in the buffer. Usually this has already happened
+		//when the LASTDATA notification arrived, in which case there is nothing to do. 
+		flushClassifier(); 
+		//21/11/2022 - it seems like this causes a memory leak when models are reopened and closed every file...
+		//this.dlControl.getDLModel().closeModel(); 
+	}
+
+	@Override
+	public void receiveSourceNotification(int type, Object object) {
+		/*
+		 * LASTDATA arrives in order after the last data unit, so everything has now
+		 * been passed to this process. Classify and save it all before passing the
+		 * notification on - PamController waits for the notification to reach every
+		 * process before closing the binary stores, so results saved here are written
+		 * to the current files.
+		 */
+		if (type==AcquisitionProcess.LASTDATA) {
+			flushClassifier(); 
+		}
+		super.receiveSourceNotification(type, object);
+	}
+
+	/**
+	 * Classify any data remaining in the classification buffer, wait for the
+	 * model to finish any queued work, and then save any pending detections or
+	 * annotations. Everything is then cleared so nothing carries over to the next
+	 * run.
+	 * <p>
+	 * Not synchronized - the model's worker thread passes results back through
+	 * synchronized methods (e.g. makeRawDLDetection), so holding the lock while
+	 * waiting for it would deadlock.
+	 */
+	private void flushClassifier() {
+		if (classificationBuffer.size()>0) {
 			if (classificationBuffer.get(0) instanceof GroupedRawData) {
 				runRawModel(); //raw data or raw data units
 			}
-			if (classificationBuffer.get(0) instanceof SegmenterDetectionGroup) {
+			else if (classificationBuffer.get(0) instanceof SegmenterDetectionGroup) {
 				runDetectionGroupModel(); //any other data units. 
 			}
 		}
-		//21/11/2022 - it seems like this causes a memory leak when models are reopened and closed every file...
-		//this.dlControl.getDLModel().closeModel(); 
+		classificationBuffer.clear(); 
+
+		//in real time mode the model runs on another thread - wait for the results to come back. 
+		if (dlControl.getDLModel()!=null) {
+			dlControl.getDLModel().flushModel(MAX_FLUSH_WAIT_MILLIS); 
+		}
+
+		savePendingResults(); 
+	}
+
+	/**
+	 * Save any detections or annotations still held in the merge buffers and clear them. 
+	 */
+	private synchronized void savePendingResults() {
+		if (groupRawDataBuffer==null) return; 
+
+		for (int i=0; i<groupRawDataBuffer.length; i++) {
+			if (groupDetectionBuffer[i].size()>0) {
+				saveGroupDetection(i); 
+			}
+			else if (groupRawDataBuffer[i].size()>0) {
+				PamDataUnit parent = groupRawDataBuffer[i].get(0).getParentDataUnit(); 
+				if (parent instanceof RawDataUnit || lastParentDataUnit[i]==null || dlControl.getDLParams().forceSave) {
+					DLDetection dlDetection = makeRawDLDetection(groupRawDataBuffer[i], modelResultDataBuffer[i]);
+					if (dlDetection!=null) {
+						this.dlDetectionDataBlock.addPamData(dlDetection);
+					}
+				}
+				else {
+					//the last detection (e.g. click) is only annotated when the next one arrives - so do it now. 
+					addDLAnnotation(lastParentDataUnit[i], modelResultDataBuffer[i]); 
+				}
+			}
+			clearBuffer(i); 
+			lastParentDataUnit[i] = null; 
+		}
 	}
 
 	/**

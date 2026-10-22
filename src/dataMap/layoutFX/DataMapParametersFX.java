@@ -45,7 +45,12 @@ public class DataMapParametersFX implements Cloneable, Serializable, ManagedPara
 	 */
 	public boolean showFileBoundaries = true; 
 	
-
+	/**
+	 * Which summary to show for raw sound files - see the MODE_ constants in
+	 * dataMap.filemaps.SoundFileDatagramProvider.
+	 */
+	public int soundFileDatagramMode = 0; 
+	
 	@Override
 	protected DataMapParametersFX clone() {
 		try {
