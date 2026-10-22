@@ -192,7 +192,8 @@ public class LogSettings extends DbSpecial {
 
 		ResultSet result = pamCursor.openReadOnlyCursor(con, "ORDER BY Id");
 
-		String settingString = null;
+		// rows are joined in a StringBuilder: joining Strings copies the whole lot for each row
+		StringBuilder settingString = null;
 
 		String partString;
 
@@ -262,13 +263,13 @@ public class LogSettings extends DbSpecial {
 				}
 				lastTimeMillis = timeMillis;
 				if (iString == 0 || settingString == null) {
-					settingString = new String(partString);
+					settingString = new StringBuilder(partString);
 				}
 				else {
-					settingString += partString;
+					settingString.append(partString);
 				}
 				if (iString == nStrings - 1) {
-					Ascii6Bit newData = new Ascii6Bit(settingString, spares);
+					Ascii6Bit newData = new Ascii6Bit(settingString.toString(), spares);
 					byte[] byteData = newData.getByteData(); 
 					boolean deserialisationError = false;
 					//					ByteArrayInputStream inputBuffer = new ByteArrayInputStream(byteData);
