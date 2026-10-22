@@ -36,6 +36,7 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	 */
 	private Datagram ltsaDatagram;
 
+
 	public FileDataMapPoint(File soundFile, long startTime, long endTime) {
 		super(startTime, endTime, (int) Math.max(((endTime-startTime)/1000),1), 0);
 		this.soundFile = soundFile;
@@ -109,6 +110,16 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	 */
 	public void setLtsaDatagram(Datagram ltsaDatagram) {
 		this.ltsaDatagram = ltsaDatagram;
+	}
+
+	@Override
+	public Datagram getDatagram() {
+		return datagram;
+	}
+
+	@Override
+	public void setDatagram(Datagram datagram) {
+		this.datagram = datagram;
 	}
 
 	@Override

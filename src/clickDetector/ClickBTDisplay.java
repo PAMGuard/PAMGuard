@@ -3652,6 +3652,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (!btDisplayParameters.showKey) {
 				setKeyComponent(null);
 				return;
+
 			}
 			List<SymbolLegend> legends = getSymbolChooser().getSymbolLegends();
 			setKeyMargin(5);

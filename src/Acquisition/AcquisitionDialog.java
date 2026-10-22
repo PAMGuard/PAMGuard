@@ -667,6 +667,7 @@ public class AcquisitionDialog extends PamDialog {
 			 * detached from every window at the time and still has the old look and feel.
 			 */
 			PamLookAndFeel.refreshComponentTheme(deviceSpecificPanel);
+
 			int panelIndex = 1;
 			/*
 			 * Offline, the file list is entirely handled by the offline file server, so
@@ -689,6 +690,7 @@ public class AcquisitionDialog extends PamDialog {
 				enableComponents(deviceSpecificPanel, false);
 			}
 			mainPanel.add(deviceSpecificPanel, panelIndex);
+
 			currentDaqSystem.dialogSetParams();
 		}
 

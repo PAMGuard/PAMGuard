@@ -105,6 +105,7 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 		rawDataBlock.setDatagramProvider(new SoundFileDatagramProvider(manager, rawDataBlock));
 		return manager;
 
+
 	}
 
 	@Override

@@ -338,6 +338,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 			return;
 		}
 		File mapFile = new File(mapName);
+
 		if (dataMap == null) {
 			if (mapFile.exists()) {
 				mapFile.delete();
