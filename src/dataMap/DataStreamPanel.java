@@ -3,6 +3,7 @@ package dataMap;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,6 +36,7 @@ import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
+import PamView.component.PamFontIcon;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.dialog.PamLabel;
@@ -43,6 +45,8 @@ import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+
 import dataGram.DatagramImageData;
 import dataGram.DatagramManager;
 import dataGram.DatagramProvider;
@@ -1329,6 +1333,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 	class DataName extends PamPanel {
 		private JLabel title;
 		private String dataName;
+		private JButton collapseButton;
 
 		private DataName() {
 			super(PamColor.BORDER);
@@ -1341,9 +1346,30 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 //			Font titleFont = title.getFont();
 //			titleFont = titleFont.deriveFont(titleFont.getSize()-2);
 //			title.setFont(titleFont);
+			/*
+			 * Small button on the right to show / hide the graph. Double clicking the bar
+			 * does the same thing, but nobody finds that on their own.
+			 */
+			collapseButton = new JButton();
+			collapseButton.putClientProperty("JButton.buttonType", "toolBarButton");
+			collapseButton.setFocusable(false);
+			collapseButton.setMargin(new Insets(0, 0, 0, 0));
+			collapseButton.addActionListener(e -> toggleGraph());
+			add(BorderLayout.EAST, collapseButton);
+			updateCollapseButton();
 			addMouseListener(new DataNameMouse());
 			setToolTipText("Double click to hide / show data rate graph");
 			setTitle();
+		}
+
+		/**
+		 * Point the chevron the way the graph will move when the button is pressed:
+		 * up to fold it away, down to open it out again.
+		 */
+		private void updateCollapseButton() {
+			collapseButton.setIcon(PamFontIcon.of(graphVisible ? MaterialDesignC.CHEVRON_UP
+					: MaterialDesignC.CHEVRON_DOWN, PamFontIcon.ARROW_SIZE));
+			collapseButton.setToolTipText(graphVisible ? "Hide data rate graph" : "Show data rate graph");
 		}
 
 		private void setTitle() {
@@ -1361,25 +1387,31 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		@Override
 		public void mouseClicked(MouseEvent me) {
 			if (me.getClickCount() == 2) {
-				doubleClick(me);
+				toggleGraph();
 			}
 		}
 
-		private void doubleClick(MouseEvent me) {
-			setGraphVisible(!graphVisible);
-			if (graphVisible) {
-				add(BorderLayout.CENTER, dataGraph);
-			} else {
-				remove(dataGraph);
-			}
-			SwingUtilities.invokeLater(new ShowLater());
-		}
+	}
 
+	/**
+	 * Show or hide the data rate graph, leaving just the title bar when hidden.
+	 */
+	private void toggleGraph() {
+		setGraphVisible(!graphVisible);
+		if (graphVisible) {
+			add(BorderLayout.CENTER, dataGraph);
+		} else {
+			remove(dataGraph);
+		}
+		SwingUtilities.invokeLater(new ShowLater());
 	}
 
 	private void setGraphVisible(boolean b) {
 		graphVisible = b;
 		dataGraph.setVisible(b);
+		if (dataName != null) {
+			dataName.updateCollapseButton();
+		}
 	}
 
 	private class ShowLater implements Runnable {

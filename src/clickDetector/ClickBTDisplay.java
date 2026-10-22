@@ -36,6 +36,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -3771,6 +3772,11 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	class TopControls extends JPanel implements ColorManaged {
 
 
+		/**
+		 * The time currently shown in the time label. 
+		 */
+		private long timeLabelMillis;
+
 		TopControls() {
 			super();
 			setBorder(new EmptyBorder(0, 30, 0, 10));
@@ -3784,6 +3790,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			timeLabel = new PamLabel("Time");
 			cursorLabel = new PamLabel("");
 			amplitudeSelectorLabel = new PamLabel("");
+			JPopupMenu timePopup = new JPopupMenu();
+			JMenuItem copyTime = new JMenuItem("Copy date/time");
+			copyTime.setToolTipText("Copy the display start time to the clipboard as yyyy-MM-dd HH:mm:ss.SSS");
+			copyTime.addActionListener(e -> copyTimeToClipboard(timeLabelMillis));
+			timePopup.add(copyTime);
+			timeLabel.setComponentPopupMenu(timePopup);
 			westBit.add(timeLabel);
 			westBit.add(cursorLabel);
 			westBit.add(amplitudeSelectorLabel);
@@ -3808,8 +3820,19 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		 * Only used in real time ops. 
 		 */
 		void ShowTime() {
-			timeLabel.setText("Start: " + PamCalendar.formatDateTime(getDisplayStartMillis(), true));
+			timeLabelMillis = getDisplayStartMillis();
+			timeLabel.setText("Start: " + PamCalendar.formatDateTime(timeLabelMillis, true));
 		}
+	}
+
+	/**
+	 * Copy a time to the system clipboard in yyyy-MM-dd HH:mm:ss.SSS format, e.g. 
+	 * for pasting into a spreadsheet. 
+	 * @param timeMillis time in milliseconds
+	 */
+	private void copyTimeToClipboard(long timeMillis) {
+		String timeStr = PamCalendar.formatDBDateTime(timeMillis, true);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(timeStr), null);
 	}
 
 	@Override
