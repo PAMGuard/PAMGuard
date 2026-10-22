@@ -410,6 +410,21 @@ public class PamCalendar {
 
 		return df.format(d);
 	}
+	
+	/**
+	 * format a time string in RFC3339 format
+	 * @param timeInMillis
+	 * @return
+	 */
+	public static String formatRFC3339(long timeInMillis) {
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(timeInMillis);
+		c.setTimeZone(defaultTimeZone);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		df.setTimeZone(defaultTimeZone);
+		String ts =  df.format(c.getTime());
+		return ts;
+	}
 
 
 	/**
