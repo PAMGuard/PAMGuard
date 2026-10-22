@@ -511,30 +511,25 @@ public class TCPSendClient extends NetworkClient{
 
 	@Override
 	public boolean connect() throws ClientConnectFailedException {
-		// TODO Auto-generated method stub
+		ensureQueueThread();
 		return openConnection();
 	}
 
 	@Override
 	public void disconnect() {
-		try {
-			if(this.tcpSocket!=null) {
-				tcpSocket.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		// reset socket and writer so that isConnected() reports correctly and 
+		// the next send re-opens the connection. 
+		closeConnection();
 	}
 
 	@Override
 	public boolean isConnected() {
-		return tcpSocket.isConnected();
-		
+		return tcpSocket != null && tcpSocket.isConnected() && !tcpSocket.isClosed();
 	}
 
 	@Override
 	public void sendNetworkQueuedObject(NetworkQueuedObject qo) {
+		ensureQueueThread();
 		this.queueDataObject(qo);
 		
 	}
@@ -542,14 +537,26 @@ public class TCPSendClient extends NetworkClient{
 	@Override
 	public void notifyModelChanged(int changeType) {
 		if(changeType== PamController.INITIALIZATION_COMPLETE) {
+			ensureQueueThread();
+		}
+	}
+
+	/**
+	 * Make sure the queue worker thread is running. It may not be if the client 
+	 * was created after initialisation completed (e.g. module added at runtime), 
+	 * or if it was stopped by a previous close(). 
+	 */
+	private synchronized void ensureQueueThread() {
+		if (queueWorkerThread == null || queueWorkerThread.isDone()) {
 			startQueueThread();
 		}
 	}
 
 	@Override
 	public void configureClient(NetworkParams networkParams) {
-		// TODO Auto-generated method stub
-		
+		this.networkSendParams = (NetworkSendParams) networkParams;
+		this.networkParams = networkParams;
+		closeConnection();
 	}
 
 	
