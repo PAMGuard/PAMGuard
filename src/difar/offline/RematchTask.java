@@ -25,6 +25,7 @@ import difar.dataSelector.CrossingSelectParams;
 import difar.DIFARCrossingInfo;
 import difar.DifarControl;
 import difar.DifarDataUnit;
+import difar.DifarMatchSelector;
 import difar.DifarProcess;
 import difar.DifarSqlLogging;
 import difar.crossings.CrossingLocaliser;
@@ -94,6 +95,9 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 
 	/** Clips starting outside their file's time span, which core skips. */
 	private int outsideFile;
+
+	/** The residuals of the crossings made in this run, for a CSV file. */
+	private TriangulationResidualLog residualLog = new TriangulationResidualLog();
 
 	/** End of the file just loaded. */
 	private long fileEnd;
@@ -183,6 +187,9 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		outsideFile = 0;
 		Simplex2D.takeFailedErrorEstimates();
 		noBuoyByChannel.clear();
+		// start counting correlations afresh for this run's summary
+		difarProcess.getClipDelays().takeSummary();
+		residualLog = new TriangulationResidualLog();
 	}
 
 	@Override
@@ -362,10 +369,29 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 		}
 		recorder.record(clip);
 		clip.clearTempCrossing();
-		if (clip.getCrossing() != null) {
-			made.add(clip.getCrossing());
+		DifarCrossing crossing = clip.getCrossing();
+		if (crossing != null && made.add(crossing)) {
+			residualLog.add(crossing, DifarMatchSelector.chooseMatch(difarProcess.getMatchLog().get(clip)),
+					difarControl.getSonobuoyHistory());
 		}
 		return false;
+	}
+
+	/** Write the residuals of the crossings made, beside the database. */
+	private void writeResiduals() {
+		try {
+			java.io.File file = residualLog.write();
+			if (file != null) {
+				System.out.printf("DIFAR: residuals of %d crossings, %d time delays, written to %s\n",
+						residualLog.getTriangulationCount(), residualLog.getDelayCount(), file);
+			}
+			else if (residualLog.getDelayCount() > 0) {
+				System.out.println("DIFAR: the database is not a single file, so the crossing residuals were not written");
+			}
+		}
+		catch (java.io.IOException e) {
+			System.out.println("DIFAR: the crossing residuals could not be written: " + e);
+		}
 	}
 
 	private void updateBuoyColumns(DifarDataUnit clip) {
@@ -469,6 +495,11 @@ public class RematchTask extends OfflineTask<DifarDataUnit> {
 			System.out.printf("DIFAR: of the crossings made, %d lie on one of their own buoys and %d more cross at under %.0f degrees; "
 					+ "the crossing data selector hides both by default\n", onBuoy, narrow, defaults.minAngle);
 		}
+		String correlations = difarProcess.getClipDelays().takeSummary();
+		if (correlations != null) {
+			System.out.println(correlations);
+		}
+		writeResiduals();
 		int failedErrors = Simplex2D.takeFailedErrorEstimates();
 		if (failedErrors > 0) {
 			System.out.printf("DIFAR: %d error estimates failed while locating crossings, so some errors are unknown\n",

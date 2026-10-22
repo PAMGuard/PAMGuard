@@ -29,9 +29,9 @@ import generalDatabase.DBControlUnit;
  * <li>{@link #added} tells a block's displays of a new clip, as the block
  * does in normal mode. Displays are the observers that are not processes:
  * processes observe blocks to process data, and should not re-process or
- * write rows because of an edit. Processes that consume clips, such as
- * tracked groups, are told explicitly, once registered with
- * {@link #addConsumer}.</li>
+ * write rows because of an edit. Processes that consume clips, such as a
+ * tracker, are told explicitly, once registered with {@link #addConsumer}.
+ * None is registered now: tracked groups, the only one, were removed.</li>
  * <li>{@link #changed} uses core's own update notice, which reaches every
  * observer.</li>
  * <li>{@link #removed} tells displays to redraw once a clip has gone.</li>
@@ -57,8 +57,8 @@ public class ViewerEdits {
 
 	/**
 	 * Tell a process of each clip saved in the viewer, as it would hear in
-	 * normal mode. For processes that consume localisations, such as tracked
-	 * groups.
+	 * normal mode. For processes that consume localisations, such as a
+	 * tracker.
 	 * @param consumer the process.
 	 */
 	public void addConsumer(PamObserver consumer) {

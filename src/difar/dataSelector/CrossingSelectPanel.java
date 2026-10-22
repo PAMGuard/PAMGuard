@@ -29,11 +29,11 @@ public class CrossingSelectPanel implements PamDialogPanel {
 
 	private final JTextField maxErrorKm = new JTextField(5);
 
-	private final JCheckBox hideOnBuoy = new JCheckBox("Hide crossings on one of their own buoys");
+	private final JCheckBox hideOnBuoy = new JCheckBox("Hide triangulations on one of their own sonobuoys");
 
 	public CrossingSelectPanel(CrossingDataSelector selector) {
 		this.selector = selector;
-		mainPanel.setBorder(new TitledBorder("Crossing quality"));
+		mainPanel.setBorder(new TitledBorder("Triangulation quality"));
 		GridBagConstraints c = new PamGridBagContraints();
 		mainPanel.add(new JLabel("Smallest crossing angle (deg) ", JLabel.RIGHT), c);
 		c.gridx++;
@@ -47,9 +47,9 @@ public class CrossingSelectPanel implements PamDialogPanel {
 		c.gridy++;
 		c.gridwidth = 2;
 		mainPanel.add(hideOnBuoy, c);
-		minAngle.setToolTipText("<HTML>Crossings whose bearings meet at a smaller angle are hidden.<br>"
+		minAngle.setToolTipText("<HTML>Triangulations whose bearings meet at a smaller angle are hidden.<br>"
 				+ "Near 0 the bearings point the same way and the location is unreliable.</HTML>");
-		useMaxError.setToolTipText("Hide crossings whose larger x or y error exceeds this");
+		useMaxError.setToolTipText("Hide triangulations whose larger x or y error exceeds this");
 		hideOnBuoy.setToolTipText("<HTML>Within the on-buoy radius set in the DIFAR settings.<br>"
 				+ "Their errors are set to that radius.</HTML>");
 		useMaxError.addActionListener(e -> maxErrorKm.setEnabled(useMaxError.isSelected()));
@@ -78,13 +78,13 @@ public class CrossingSelectPanel implements PamDialogPanel {
 			p.maxErrorKm = Double.valueOf(maxErrorKm.getText());
 		}
 		catch (NumberFormatException e) {
-			return PamDialog.showWarning(null, "Crossing selector", "Angle and error must be numbers");
+			return PamDialog.showWarning(null, "Triangulation filter", "Angle and error must be numbers");
 		}
 		if (p.minAngle < 0 || p.minAngle > 180) {
-			return PamDialog.showWarning(null, "Crossing selector", "The angle must be from 0 to 180 degrees");
+			return PamDialog.showWarning(null, "Triangulation filter", "The angle must be from 0 to 180 degrees");
 		}
 		if (p.maxErrorKm <= 0) {
-			return PamDialog.showWarning(null, "Crossing selector", "The largest error must be greater than zero");
+			return PamDialog.showWarning(null, "Triangulation filter", "The largest error must be greater than zero");
 		}
 		p.useMaxError = useMaxError.isSelected();
 		p.hideOnBuoy = hideOnBuoy.isSelected();

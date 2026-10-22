@@ -132,6 +132,9 @@ public class SonobuoyManager extends PamProcess {
 
 	/** The records shown in the table, one per row. */
 	private List<SonobuoyRecord> tableRecords = new ArrayList<>();
+
+	/** Re-marks the buoy in force as time passes, outside the viewer. */
+	private Timer inForceTimer;
 	public DefaultTableModel tableDataModel = new SonobuoyTableModel(tableData, columnNames);
 	private AnnotationChoiceHandler annotationHandler;
 	
@@ -195,11 +198,34 @@ public class SonobuoyManager extends PamProcess {
 	@Override
 	public void pamStart() {
 		updateSonobuoyTableData();
+		startInForceTimer();
 	}
 
 	@Override
 	public void pamStop() {
-		// TODO Auto-generated method stub
+		stopInForceTimer();
+	}
+
+	/**
+	 * Outside the viewer, time moves on with no NEW_SCROLL_TIME, so the buoy
+	 * in force on a channel can change while nothing tells the table. Check
+	 * once a second of wall-clock time. Each check reads the data time and
+	 * repaints the table only if the marking changed.
+	 */
+	private void startInForceTimer() {
+		stopInForceTimer();
+		if (isViewer()) {
+			return;
+		}
+		inForceTimer = new Timer(1000, e -> scrollTimeChanged());
+		inForceTimer.start();
+	}
+
+	private void stopInForceTimer() {
+		if (inForceTimer != null) {
+			inForceTimer.stop();
+			inForceTimer = null;
+		}
 	}
 	
 	
@@ -558,6 +584,7 @@ public class SonobuoyManager extends PamProcess {
 
 	/**
 	 * The time being viewed has changed, so a different buoy may be in force.
+	 * Called on NEW_SCROLL_TIME in the viewer, and by a timer otherwise.
 	 * Only the marking of rows changes, so the table is repainted rather than
 	 * rebuilt.
 	 */

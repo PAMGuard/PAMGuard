@@ -82,6 +82,50 @@ public class SonobuoyHistory {
 	}
 
 	/**
+	 * When the sonobuoy in force on a channel at a time was deployed.
+	 * <p>
+	 * A sonobuoy can have several records on its channel: its deployment, then
+	 * calibrations and edits. The deployment is the earliest of an unbroken run
+	 * of records ending with the one in force. A run is broken where a record
+	 * ended before the next one, or where the sonobuoy name changes. A name
+	 * missing from either record does not break it. Names are compared exactly,
+	 * so "158" and "158.0" count as different sonobuoys.
+	 * @param channel the channel.
+	 * @param timeMillis the time in milliseconds.
+	 * @return the time of the deployment record, or null if no sonobuoy was in
+	 * force.
+	 */
+	public Long getDeploymentTime(int channel, long timeMillis) {
+		NavigableMap<Long, SonobuoyRecord> records = recordsByChannel.get(channel);
+		if (records == null) {
+			return null;
+		}
+		Map.Entry<Long, SonobuoyRecord> entry = records.floorEntry(timeMillis);
+		if (entry == null || entry.getValue().hasEndedBy(timeMillis)) {
+			return null;
+		}
+		SonobuoyRecord deployment = entry.getValue();
+		Map.Entry<Long, SonobuoyRecord> earlier = records.lowerEntry(entry.getKey());
+		while (earlier != null && sameSonobuoy(earlier.getValue(), deployment)) {
+			deployment = earlier.getValue();
+			earlier = records.lowerEntry(earlier.getKey());
+		}
+		return deployment.getTimeMillis();
+	}
+
+	/**
+	 * @return true if a later record on the same channel continues the
+	 * sonobuoy of an earlier one.
+	 */
+	private static boolean sameSonobuoy(SonobuoyRecord earlier, SonobuoyRecord later) {
+		if (earlier.hasEndedBy(later.getTimeMillis())) {
+			return false;
+		}
+		return earlier.getName() == null || later.getName() == null
+				|| earlier.getName().equals(later.getName());
+	}
+
+	/**
 	 * When a record stops being the one in force on its channel.
 	 * <p>
 	 * A record holds until the next record on its channel takes over, or until

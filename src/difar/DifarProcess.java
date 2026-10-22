@@ -48,6 +48,7 @@ import difar.calibration.CalibrationHistogram;
 import difar.calibration.CalibrationLogging;
 import difar.calibration.CalibrationProcess;
 import difar.demux.AmmcDemux;
+import difar.demux.AadFastDemux;
 import difar.demux.DifarDemux;
 import difar.demux.DifarResult;
 import difar.demux.NativeDemux;
@@ -69,6 +70,9 @@ public class DifarProcess extends PamProcess {
 	/** Candidate matches for recent detections, for the matching display. */
 	private DifarMatchLog matchLog = new DifarMatchLog();
 
+	/** Time delays between clips measured by correlation, cached. */
+	private ClipDelays clipDelays;
+
 	private DifarControl difarControl;
 
 	private PamRawDataBlock rawDataSource;
@@ -79,6 +83,7 @@ public class DifarProcess extends PamProcess {
 
 	private DifarDemux nativeDemux = new NativeDemux(difarControl);
 	private DifarDemux ammcDemux = new AmmcDemux();
+	private DifarDemux aadFastDemux = new AadFastDemux();
 	private DifarDemux difarDemux = ammcDemux;
 	
 	private DifarDataBlock processedDifarData;
@@ -100,6 +105,17 @@ public class DifarProcess extends PamProcess {
 	private DifarDemuxWorker demuxWorker;
 	
 	private Timer autoSaveTimer;
+
+	/**
+	 * Held while a clip is demultiplexed and its DIFARgram calculated, and
+	 * while an unattended clip is saved. Clips can be worked on more than one
+	 * thread (see {@link #isUnattended()}), and the demultiplexer and the
+	 * matching are not safe to run on two clips at once.
+	 */
+	private final Object clipLock = new Object();
+
+	/** Stage times of unattended clips, or null when not asked for. */
+	private DifarStageTiming stageTiming = DifarStageTiming.create();
 
 	private Simplex2D simplex2D;
 	
@@ -193,7 +209,9 @@ public class DifarProcess extends PamProcess {
 		protected Integer doInBackground() throws Exception {
 			try {
 				startMillis = System.currentTimeMillis();
-				processDifarUnit(difarDataUnit, this);
+				synchronized (clipLock) {
+					processDifarUnit(difarDataUnit, this);
+				}
 			}
 			catch (Exception e) {
 				// print the stack trace here, otherwise doinbackground wont' show exceptions
@@ -363,10 +381,9 @@ public class DifarProcess extends PamProcess {
 		
 		
 		demuxDataUnit(difarDataUnit, demuxWorker, startTime);
+		if (timing(difarDataUnit)) stageTiming.endDemux();
 
 		calculateDifarGram(difarDataUnit, demuxWorker, startTime);
-
-		estimateTrackedGroup(difarDataUnit);
 		
 	}
 
@@ -395,6 +412,10 @@ public class DifarProcess extends PamProcess {
  			break;
 		case AMMC_EXPERIMENTAL:
 			difarDemux = ammcDemux;
+			gainCorrection = 1;
+			break;
+		case AAD_FAST:
+			difarDemux = aadFastDemux;
 			gainCorrection = 1;
 			break;
 		}	
@@ -596,50 +617,22 @@ public class DifarProcess extends PamProcess {
 				LocContents.HAS_BEARING, difarDataUnit.getChannelBitmap());
 		difarLocalisation.setBearingError(difarControl.getDifarParameters().bearingError);
 		difarDataUnit.setLocalisation(difarLocalisation);
+		if (timing(difarDataUnit)) stageTiming.endGram();
 
 		getDifarRangeInfo(difarDataUnit);
+		if (timing(difarDataUnit)) stageTiming.endMatch();
 		
 		getDifarAmplitude(difarDataUnit);
+		if (timing(difarDataUnit)) stageTiming.endAmplitude();
 		
 		
-		if (demuxWorker == null) {
+		// an unattended clip is not shown on the DIFARgram, so it sends no message
+		if (demuxWorker == null && !isUnattended()) {
 			difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.DemuxComplete, difarDataUnit));
 		}
 
 	}
 
-	/**
-	 * Match the selected bearing to the nearest mean-bearing to a group, and
-	 * Make sure that the matching group is highlighted in the groups panel. 
-	 * @param difarDataUnit
-	 */
-	public void estimateTrackedGroup(DifarDataUnit difarDataUnit) {
-		if (difarControl.isViewer()){
-			try{
-			difarControl.setCurrentlySelectedGroup(difarDataUnit.getTrackedGroup());
-			} finally {
-				difarControl.setCurrentlySelectedGroup(DifarParameters.DefaultGroup);
-			}
-			return;
-		}
-		if (difarDataUnit.isVessel()) {
-			difarControl.setCurrentlySelectedGroup(DifarParameters.DefaultGroup);
-			difarDataUnit.setTempGroup(DifarParameters.DefaultGroup);
-		}
-		String bestGroup = difarControl.getTrackedGroupProcess().getTrackedGroups().getNearestGroup(difarDataUnit);
-		difarControl.setCurrentlySelectedGroup(bestGroup);
-		
-		String selectedGroup = difarControl.getCurrentlySelectedGroup();
-		// now check that the group exists in the datablock AND hasn't been removed from the display
-		if (bestGroup==null || !difarControl.isTrackedGroupSelectable(bestGroup) || 
-				!bestGroup.equals(selectedGroup)){ 
-			bestGroup = DifarParameters.DefaultGroup;
-		}						
-		
-		difarDataUnit.setTempGroup(bestGroup);
-		difarControl.setCurrentlySelectedGroup(bestGroup);
-	}
-	
 	/**
 	 * creates false lock data for viewer saying loacked all the time
 	 */
@@ -952,7 +945,7 @@ public class DifarProcess extends PamProcess {
 			difarControl.getViewerEdits().added(queuedDifarData, difarDataUnit);
 		}
 
-		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit,difarDataUnit));
+		announceNewClip(difarDataUnit);
 		
 		return difarDataUnit.getTimeMilliseconds();
 	}
@@ -982,20 +975,15 @@ public class DifarProcess extends PamProcess {
 		// This is getting to be quite a convoluted mess, and should probably be refactored.
 		// Maybe need a new class to consolidate triggerParams, triggerSpeciesName, speciesParams,
 		// triggerObservers -- basically all paramters for species, triggers, and lookupTables...
-		int nBlocks = difarControl.difarParameters.getNumTriggersEnabled();
-		for (int i = 0; i < nBlocks; i++) {
-			DifarTriggerParams triggerParams = difarControl.difarParameters.getTriggerParams(i);
-			
-			if (db.getDataName().equals(triggerParams.dataName)){
-				triggerSpeciesName = triggerParams.speciesName;
-				//System.out.println("The datablock was from " + dataName + " and will be treated as " + triggerSpeciesName);
-			}
-
+		// by the block's long name, since modules of one type share a data name
+		DifarTriggerParams triggerParams = difarControl.difarParameters.findTriggerParams(db);
+		if (triggerParams != null) {
+			triggerSpeciesName = triggerParams.speciesName;
 		}
 		
 		SpeciesParams sP = difarControl.difarParameters.findSpeciesParams(DifarParameters.Default);
 
-		difarTrigger(pd.getChannelBitmap(), pd.getTimeMilliseconds(), duration, f, pd, sP.sampleRate, triggerSpeciesName, db.getDataName());
+		difarTrigger(pd.getChannelBitmap(), pd.getTimeMilliseconds(), duration, f, pd, sP.sampleRate, triggerSpeciesName, DifarParameters.triggerName(db));
 	}
 
 	@Override
@@ -1092,12 +1080,16 @@ public class DifarProcess extends PamProcess {
 	@Override
 	public void pamStart() {
 		setDataKeepTimes();
+		if (stageTiming != null) {
+			stageTiming.startRun();
+		}
 	}
 
 	@Override
 	public void pamStop() {
-		
-
+		if (stageTiming != null) {
+			stageTiming.close();
+		}
 	}
 	
 	/**
@@ -1236,7 +1228,96 @@ public class DifarProcess extends PamProcess {
 			difarControl.getViewerEdits().added(queuedDifarData, du);
 		}
 
-		difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit, du));
+		announceNewClip(du);
+	}
+
+	/**
+	 * Whether new clips are processed and saved with no operator.
+	 * <p>
+	 * True in normal mode when clips are auto-processed and auto saved as
+	 * fast as possible, with no review. No one reviews such a clip, so it
+	 * is processed and saved straight away, on the thread that made it (for a
+	 * detector's clip, the detector's own thread). PAMGuard then waits for
+	 * DIFAR as it waits for that detector. When DIFAR is slow, the audio is
+	 * held back until it catches up, so each clip is written soon after its
+	 * own time, while the binary file for that time is still open. At Stop,
+	 * DIFAR's clips are covered by whatever wait PAMGuard gives the detector.
+	 * <p>
+	 * When clips are auto saved with a delay for review, or in the viewer,
+	 * clips go to the queue and are worked one at a time on the DIFARgram.
+	 * A delay of 0 s still goes by the DIFARgram.
+	 * @return true if new clips are processed and saved where they are made.
+	 */
+	public boolean isUnattended() {
+		if (difarControl.isViewer()) {
+			return false;
+		}
+		DifarParameters params = difarControl.getDifarParameters();
+		return params.autoProcess && params.autoSaveDResult && params.autoSaveUnattended;
+	}
+
+	/**
+	 * A new clip has joined the queue. An unattended clip is processed and
+	 * saved now (see {@link #isUnattended()}). Any other clip is announced, so
+	 * the queue and the DIFARgram can take it.
+	 * @param difarDataUnit the new clip, already in the queue.
+	 */
+	private void announceNewClip(DifarDataUnit difarDataUnit) {
+		if (isUnattended() && difarDataUnit.canAutoProcess()) {
+			processUnattended(difarDataUnit);
+		}
+		else {
+			difarControl.sendDifarMessage(new DIFARMessage(DIFARMessage.NewDifarUnit, difarDataUnit));
+		}
+	}
+
+	/**
+	 * Process and save a clip with no operator, on the calling thread.
+	 * <p>
+	 * The steps are those of the DIFARgram's auto save, with no delay:
+	 * demultiplex, calculate the DIFARgram, pick the strongest bearing,
+	 * match it with clips on other buoys, and save. A clip with no bearing
+	 * cannot be saved automatically, and is left in the queue for the
+	 * operator, as it would be on the DIFARgram.
+	 * @param difarDataUnit the clip, in the queue.
+	 */
+	private void processUnattended(DifarDataUnit difarDataUnit) {
+		long lockRequested = System.nanoTime();
+		synchronized (clipLock) {
+			if (stageTiming != null) {
+				stageTiming.begin(difarDataUnit, lockRequested);
+			}
+			try {
+				processDifarUnit(difarDataUnit, null);
+			}
+			catch (Exception e) {
+				// as the DIFARgram's worker does: report it, and leave the clip in the queue
+				e.printStackTrace();
+				endTiming(difarDataUnit, "error");
+				return;
+			}
+			if (!difarDataUnit.canAutoSave()) {
+				System.out.printf("DIFAR: clip at %s has no bearing, so is left in the queue\n",
+						PamCalendar.formatDBDateTime(difarDataUnit.getTimeMilliseconds()));
+				endTiming(difarDataUnit, "no bearing");
+				return;
+			}
+			difarControl.saveUnattended(difarDataUnit);
+			endTiming(difarDataUnit, "saved");
+		}
+	}
+
+	/**
+	 * @return true if this clip's stages are being timed (see {@link DifarStageTiming}).
+	 */
+	private boolean timing(DifarDataUnit difarDataUnit) {
+		return stageTiming != null && stageTiming.isTiming(difarDataUnit);
+	}
+
+	private void endTiming(DifarDataUnit difarDataUnit, String outcome) {
+		if (timing(difarDataUnit)) {
+			stageTiming.end(outcome);
+		}
 	}
 
 	/**
@@ -1414,7 +1495,6 @@ public class DifarProcess extends PamProcess {
 		}
 		
 //		getDifarAmplitude(difarDataUnit);
-		difarDataUnit.saveGroup();
 		difarDataUnit.clearOandAngles();
 
 		difarDataUnit.cleanUpData();
@@ -1551,6 +1631,14 @@ public class DifarProcess extends PamProcess {
 
 		DifarMatchSelector selector = new DifarMatchSelector(this,
 				params.detectionTimingError, params.maxBearingResidual, params.maxTimeDelayResidual);
+		if (params.useCorrelation) {
+			List<PamDataUnit> all = new ArrayList<>();
+			for (List<PamDataUnit> buoyCandidates : candidatesByBuoy) {
+				all.addAll(buoyCandidates);
+			}
+			selector.setArrivalTimes(getCorrelatedArrivals(difarDataUnit, all),
+					params.correlationTimingError, params.maxCorrelatedDelayResidual);
+		}
 		List<DifarMatchSelector.Match> candidates = selector.selectAll(difarDataUnit,
 				new ArrayList<List<PamDataUnit>>(candidatesByBuoy));
 		matchLog.put(difarDataUnit, candidates);
@@ -1633,6 +1721,44 @@ public class DifarProcess extends PamProcess {
 	
 
 	/**
+	 * Correlate a seed clip with each of its candidate partners.
+	 * <p>
+	 * Each partner whose best peak passes the threshold gets an arrival time:
+	 * the seed's time plus the measured delay. The others keep their detection
+	 * times when localised. Every partner's peak height, or the reason it could
+	 * not be correlated, is kept for the triangulation residual log.
+	 * @param seed the clip the delays are measured from.
+	 * @param others clips on other sonobuoys; the seed itself is skipped.
+	 * @return the results, never null.
+	 */
+	public CorrelatedArrivals getCorrelatedArrivals(DifarDataUnit seed, List<? extends PamDataUnit> others) {
+		CorrelatedArrivals arrivals = new CorrelatedArrivals(seed);
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		double speedOfSound = array == null ? 1500. : array.getSpeedOfSound();
+		double margin = difarControl.getDifarParameters().maxCorrelatedDelayResidual;
+		GpsData seedOrigin = seed.getOriginLatLong(false);
+		for (PamDataUnit unit : others) {
+			if (!(unit instanceof DifarDataUnit) || unit == seed) {
+				continue;
+			}
+			DifarDataUnit other = (DifarDataUnit) unit;
+			double maxDelay = getTravelTimeMillis(seedOrigin, other, speedOfSound) / 1000. + margin;
+			arrivals.add(other, getClipDelays().measure(seed, other, maxDelay));
+		}
+		return arrivals;
+	}
+
+	/**
+	 * @return the cache of time delays between clips measured by correlation.
+	 */
+	public synchronized ClipDelays getClipDelays() {
+		if (clipDelays == null) {
+			clipDelays = new ClipDelays(difarControl);
+		}
+		return clipDelays;
+	}
+
+	/**
 	 * @return the candidate matches worked out for recent detections.
 	 */
 	public DifarMatchLog getMatchLog() {
@@ -1682,6 +1808,10 @@ public class DifarProcess extends PamProcess {
 					continue;
 				}
 				if (!isSameSpecies(difarDataUnit, otherUnit)) {
+					continue;
+				}
+				if (otherUnit.getOriginLatLong(false) == null) {
+					// no buoy with a known position was in force, so it cannot be located
 					continue;
 				}
 				thatStart = otherUnit.getTimeMilliseconds();

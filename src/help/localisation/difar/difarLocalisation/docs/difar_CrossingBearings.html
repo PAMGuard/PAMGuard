@@ -8,11 +8,7 @@
 
 <h2>Advanced localisation</h2>
 
-<p>The DIFAR Localisation module has two features intended to aid the real-time localisation of whales:</p>
-
-<p>1) Triangulation: the location of a calling whale can be estimated when the same call is received on two or more sonobuoys.</p>
-
-<p>2) Tracked groups: a time series of bearings believed to originate from a group of calling whales can be averaged.</p>
+<p>The DIFAR Localisation module estimates the location of a calling whale by triangulation, when the same call is received on two or more sonobuoys.</p>
 
 <p>&nbsp;</p>
 
@@ -26,7 +22,11 @@
 
 <p>When a DIFAR clip is processed, PAMGuard searches for DIFAR clips on other sonobuoys that could contain the same call. A sound cannot arrive at two sonobuoys further apart in time than the time it takes to travel between them, so only DIFAR clips within that time, plus the detection timing error, are considered. Of these, the DIFAR clips closest in time and frequency are kept, up to the <a href="difar_ConfigureProcessing.html#Localisation">Max candidates per buoy</a>.</p>
 
+<p>Arrival time differences are normally taken from the start times of the DIFAR clips. When <a href="difar_ConfigureProcessing.html#Localisation">Time delays by correlation</a> is selected, they are measured instead by cross-correlating the spectrogram of the omnidirectional channel of each candidate with that of the DIFAR clip being matched, over the frequency band the two DIFAR clips share. This is far more precise when DIFAR clips are placed loosely around their calls, for example by a detector with a long window. A candidate whose correlation peak is below the threshold keeps the time difference from its start time. The correlation assumes that the demultiplexed audio of a DIFAR clip starts at the DIFAR clip's time, which holds for both AAD demultiplexers; the Greeneridge demultiplexer can trim the start of a DIFAR clip without recording it.</p>
+
 <p>Each candidate match is located using both its bearings and the differences in arrival time, as described by Miller et al. (2021). A match whose bearing or timing residual exceeds its limit is rejected, since the DIFAR clips probably do not contain the same call. Of the remaining matches, the match containing the most DIFAR clips, with the lowest bearing and timing residuals, is selected automatically. The operator can override the automatic selection by choosing another match in the <b>Triangulation match selector</b> below the DIFARGram, or can press <b>Clear match</b> to save the DIFAR clip without a triangulation.</p>
+
+<p>The match selector lists, for each candidate match, the number of sonobuoys, the other DIFAR clips, the largest bearing and timing residuals, how many of the other DIFAR clips had their arrival time measured by correlation, chi-squared per degree of freedom, and its status. A match that fits but includes a DIFAR clip already in another triangulation says so, for example "fits; ch14 in triangulation 41". Matching takes DIFAR clips only from those not yet in a triangulation, so such a match was not available when the DIFAR clip was matched, even if it fits better.</p>
 
 <h3>Triangulations</h3>
 
@@ -48,42 +48,40 @@
 
 <h3><a name="Selector">Triangulation data selector</a></h3>
 
-<p>Displays that use data selectors, such as the map, offer a data selector for triangulations. It is enabled by default, and hides:</p>
+<p>Displays that use data selectors, such as the map, offer a data selector for triangulations, in their options for <b>DIFAR Crossings</b>. Each display has its own. Its <b>Triangulation quality</b> panel is enabled by default, and hides:</p>
 
 <ul>
 <li>triangulations whose crossing angle is less than the <b>Smallest crossing angle</b>, 5 degrees by default;</li>
-<li>triangulations on one of their own sonobuoys, unless <b>Hide crossings on one of their own buoys</b> is unticked;</li>
+<li>triangulations on one of their own sonobuoys, unless <b>Hide triangulations on one of their own sonobuoys</b> is unticked;</li>
 <li>triangulations whose larger x or y error exceeds the <b>Largest location error</b>, if that option is ticked. It is not ticked by default.</li>
 </ul>
 
 <p>Triangulations with no crossing angle are shown, since nothing is known against them.</p>
 
-<!-- Screenshot: the map's data selection dialog for DIFAR triangulations, showing the Crossing quality panel. -->
+<!-- Screenshot: the map's data selection dialog for DIFAR triangulations, showing the Triangulation quality panel. -->
+
+<h3><a name="BearingSelector">Showing bearings by triangulation</a></h3>
+
+<p>The data selector for DIFAR bearings, in a display's options for <b>Processed DIFAR Data</b>, has a <b>Triangulations</b> panel. It chooses which bearings to show:</p>
+
+<ul>
+<li><b>All bearings, triangulated or not.</b> The default.</li>
+<li><b>Only bearings in a triangulation.</b> Bearings that are not part of a triangulation are hidden.</li>
+</ul>
+
+<p><b>Hide bearings in a triangulation on one of its own sonobuoys</b> also hides the bearings of triangulations <a href="#Quality">on a sonobuoy</a>, whose location cannot be trusted. It is not ticked by default.</p>
+
+<p>A bearing still being worked on, with a proposed match but no saved triangulation, counts as triangulated, and is not hidden as on a sonobuoy, since its triangulation cannot yet be judged.</p>
+
+<p>Each display keeps its own settings, so one map can show every bearing while another shows only triangulated ones.</p>
+
+<p>This replaces the <b>Crosses only</b> box of earlier versions. Settings saved with it ticked become <b>Only bearings in a triangulation</b>.</p>
 
 <p>&nbsp;</p>
 
 <h2>Tracked Groups</h2>
 
-<p><br type="_moz" />
-<strong>Groups </strong>is a feature that allows the operator to semi-automatically assign a text label to bearings that are believed to originate from a closely spaced group of calling whales. Summary statistics for each group are then calculated and can be plotted on the PAMGuard Map. The <strong>Groups</strong> panel on the DifarGram is used to manage and view the list of&nbsp;<strong>Groups </strong>as well as assign groups to DIFAR clips.</p>
-
-<center><img alt="PAMGuard Map with Tracked Groups" src="./images/trackedGroups.png" /></center>
-
-<h3>Adding and removing groups</h3>
-
-<p>Groups can be created and removed using the buttons. The <strong>Add group</strong> button will create a dialog-window that&nbsp;asks the user to type the name of a new group, and upon&nbsp;accepting the dialog-window&nbsp;the name of the new group is added to the list-box in the Groups panel. The <strong>Remove group </strong>button&nbsp;removes the currently-selected group&#39;s label&nbsp;from the list-box. When a group is removed from the list-box, new bearings cannot be assigned to that group, however the PAMGuard database and map&nbsp;will retain the entry for that group. Groups that have been removed&nbsp;can be re-added to the list-box using the <strong>Add group</strong> button and typing the name of a previously removed group. NB: Group names are case sensitive, so &quot;Apple&quot; and &quot;apple&quot; are considered two different groups. The default group &quot;No group&quot; is always present in the list-box and cannot be removed. Summary statistics for the default group are not plotted on the map.</p>
-
-<h3>Assigning Groups</h3>
-
-<p>Assigning&nbsp;a group to a DIFAR clip involves&nbsp;selecting name of the group&nbsp;in the <strong>Groups</strong>&nbsp;panel before&nbsp;saving the clip. The selected/highlighted group&nbsp;will be&nbsp;assigned to the&nbsp;DIFAR clip when the clip is saved. The&nbsp;Groups module will then&nbsp;calculate a summary of&nbsp;the bearings from all of the DIFAR clips from that sonobuoy that were assigned to that group. Summary statistics include the mean and standard deviation of&nbsp;bearings to that group, the first and last bearings and detection times, and the total number of&nbsp;DIFAR clips assigned to that&nbsp;group. All summary statistics are calculated per-sonobuoy.</p>
-
-<p>After the first clip has been assigned to a group, PAMGuard will&nbsp;suggest&nbsp;that DIFAR clips with closely matching bearings be assigned to that group. When new clips appear in the DifarGram, the group with the closest-matching&nbsp;mean-bearing will be automatically highlighted. PAMGuard will only suggest groups that match closely to the bearing&nbsp;selected in the DifarGram.&nbsp;If the closest-matching mean-bearing is more than 10 degrees from that of the clip, then the default group will be selected (i.e. PAMGuard will not attempt to creat new groups, but the user should feel free to do so). NB: Because summary statistics are created for each group per-sonobuoy, automatic suggestions for a group&nbsp;will not work on newly deployed sonobuoys until at least one DIFAR clip has been assigned to that group on that sonobuoy.</p>
-
-<h3>Viewing Summary Statistics</h3>
-
-<center><img alt="DifarGram with Controls for Tracking Groups" src="./images/TrackedGroupsMap.png" /></center>
-
-<p class="previousLink">Tracked groups&nbsp;can be&nbsp;displayed on the PAMGuard Map in the same way as other detections (i.e. by right clicking on the map and selecting DIFAR Tracked Groups from the popup-menu). Tracked groups are shown on the map as semi-transparent wedges originating from each sonobuoy. The wedges are centred on the mean-bearing for that group, and the width of the wedges is four&nbsp;standard-deviations&nbsp;(two standard deviations anticlockwise from the mean-bearing, and two standard deviations clockwise from the mean-bearing).&nbsp;Hovering the mouse over the broad end of the wedge will popup the summary statistics for that group and that sonobuoy. Hovering the mouse over the name of the Group in the list-box on the DifarGram will display the summary statistics for all of the sonobuoys on which that group was detected.</p>
+<p>Tracked groups have been removed. PAMGuard 2.02.19 and earlier could label DIFAR clips with a group name and show a summary of each group's bearings on the map. The feature was little used and slowed processing more and more over long runs. Databases made with those versions keep their tracked groups table, but PAMGuard no longer reads or writes it, and warns when it finds one. Use PAMGuard 2.02.19 or earlier to view old tracked groups.</p>
 
 <p class="previousLink"><a href="difar_UsingDifarGramDisplay.html">Previous: Using the DIFARGram Display</a></p>
 

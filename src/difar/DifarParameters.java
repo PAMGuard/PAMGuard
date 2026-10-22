@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import Filters.FilterParams;
 import Filters.FilterType;
 import PamModel.parametermanager.ManagedParameters;
+import PamController.PamControlledUnit;
+import PamguardMVC.PamDataBlock;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -70,6 +72,48 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 * the same call.
 	 */
 	public double maxTimeDelayResidual = 6.0;
+
+	/**
+	 * Measure time delays between DIFAR clips by cross-correlating their
+	 * spectrograms, rather than from the clips' start times.
+	 */
+	public boolean useCorrelation = false;
+
+	/**
+	 * Smallest correlation peak, between 0 and 1, accepted as a time delay.
+	 * Below it, the delay comes from the clips' start times.
+	 */
+	public double correlationThreshold = 0.1;
+
+	/**
+	 * Timing error of a delay measured by correlation, in seconds. It sets the
+	 * weight those delays carry in a localisation.
+	 */
+	public double correlationTimingError = 0.05;
+
+	/**
+	 * Largest acceptable difference, in seconds, between a delay measured by
+	 * correlation and the one the localised position would produce.
+	 */
+	public double maxCorrelatedDelayResidual = 0.5;
+
+	/**
+	 * Half width, in seconds, of the triangular window the correlation is
+	 * smoothed with before its peaks are found. Not shown in the settings.
+	 */
+	public double correlationSmoothing = 0.064;
+
+	/**
+	 * Closest two correlation peaks may be, in seconds. Not shown in the
+	 * settings; only the highest peak is used for now.
+	 */
+	public double correlationMinSeparation = 0.15;
+
+	/**
+	 * Shortest overlap of two clips at which a delay is considered, as a
+	 * fraction of the shorter clip. Not shown in the settings.
+	 */
+	public double correlationMinOverlap = 0.5;
 
 	/**
 	 * Largest acceptable difference, in degrees, between a measured bearing and
@@ -261,13 +305,6 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	}
 	
 	
-	private ArrayList<String> groupList = new ArrayList<String>();
-	public  ArrayList<String> getGroupDefaults(){
-		ArrayList<String> defaults = new ArrayList<String>();
-		defaults.add(DefaultGroup);
-		return defaults;
-	}
-	
 	//used for buoy calibration
 	public int vesselClipLength=10;
 	public int vesselClipSeparation=10;
@@ -316,15 +353,39 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 */
 	public boolean showDifarGramFreqLimits = true;
 
-	public static enum DifarDemuxTypes{GREENERIDGE, AMMC_EXPERIMENTAL}
+	/**
+	 * Demultiplexers. Settings store the constant's name, so names never change and new
+	 * ones go at the end; what users see is the display name.
+	 * <ul>
+	 * <li>GREENERIDGE: Greeneridge Sciences' library, a phase-locked loop; licensed separately</li>
+	 * <li>AMMC_EXPERIMENTAL: the AAD demultiplexer, in the time domain (AmmcDemux). Named when
+	 * it was new, at the Australian Marine Mammal Centre; in use on voyages since about 2015</li>
+	 * <li>AAD_FAST: the AAD demultiplexer in the frequency domain, at the output sample rate
+	 * (AadFastDemux); the same results to within filter differences, and much faster</li>
+	 * </ul>
+	 */
+	public static enum DifarDemuxTypes {
+		GREENERIDGE("Greeneridge (PLL; licensed library)"),
+		AMMC_EXPERIMENTAL("AAD (time domain)"),
+		AAD_FAST("AAD fast (frequency domain)");
+
+		private final String displayName;
+
+		DifarDemuxTypes(String displayName) {
+			this.displayName = displayName;
+		}
+
+		@Override
+		public String toString() {
+			return displayName;
+		}
+	}
 
 	public DifarDemuxTypes demuxType=DifarDemuxTypes.AMMC_EXPERIMENTAL;
 	
 	public static final String Default = "Unclassified";
 
 	public static final String CalibrationClip = "Vessel";
-	
-	public static final String DefaultGroup = "No group";
 	
 	public static enum DifarOutputTypes{BARTLETT, MVDR}
 	
@@ -334,6 +395,16 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	public float autoSaveTime =  3.0f; //seconds
 	
 	public boolean autoSaveDResult=false;
+
+	/**
+	 * How processed clips are auto saved. False saves each clip after
+	 * autoSaveTime, on the DIFARgram, so an operator can review it. True
+	 * saves each clip as fast as possible with no review: in Normal mode a
+	 * classified clip is processed and saved where it is made, and never
+	 * shown on the DIFARgram (see DifarProcess.isUnattended). Settings saved
+	 * before this option existed load as false.
+	 */
+	public boolean autoSaveUnattended=false;
 	
 	/**
 	 * when auto saving the difar result either the angle can be saved or the angle and range can be saved if it has range
@@ -467,6 +538,24 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 			}
 			if (ndp.bearingError <= 0) {
 				ndp.bearingError = 5.0;
+			}
+			if (ndp.correlationThreshold <= 0) {
+				ndp.correlationThreshold = 0.1;
+			}
+			if (ndp.correlationTimingError <= 0) {
+				ndp.correlationTimingError = 0.05;
+			}
+			if (ndp.maxCorrelatedDelayResidual <= 0) {
+				ndp.maxCorrelatedDelayResidual = 0.5;
+			}
+			if (ndp.correlationSmoothing <= 0) {
+				ndp.correlationSmoothing = 0.064;
+			}
+			if (ndp.correlationMinSeparation <= 0) {
+				ndp.correlationMinSeparation = 0.15;
+			}
+			if (ndp.correlationMinOverlap <= 0) {
+				ndp.correlationMinOverlap = 0.5;
 			}
 			return ndp;
 		} catch (CloneNotSupportedException e) {
@@ -815,6 +904,69 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 
 
 	/**
+	 * The name DIFAR uses for a trigger data block: in the Automation panel,
+	 * to store its settings, and in each clip's TriggerName column.
+	 * <p>
+	 * It must tell apart blocks that share a data name, as several Deep
+	 * Learning classifiers all make "DL Classifier Data". So it is the long
+	 * name (module name and data name), unless the data name already contains
+	 * the module name, as for Ishmael detectors ("Ishmael spectrogram
+	 * correlation Bp20 00500 events"), where the long name would repeat it.
+	 * @param dataBlock trigger data block
+	 * @return the name, or null for a null block.
+	 */
+	public static String triggerName(PamDataBlock dataBlock) {
+		if (dataBlock == null) {
+			return null;
+		}
+		String dataName = dataBlock.getDataName();
+		PamControlledUnit unit = null;
+		if (dataBlock.getParentProcess() != null) {
+			unit = dataBlock.getParentProcess().getPamControlledUnit();
+		}
+		if (unit != null && dataName != null && dataName.contains(unit.getUnitName())) {
+			return dataName;
+		}
+		return dataBlock.getLongDataName();
+	}
+
+	/**
+	 * Find the trigger parameters for a data block.
+	 * <p>
+	 * Triggers are stored by {@link #triggerName(PamDataBlock)}. Settings saved
+	 * earlier may use the long name, or the plain data name (before October
+	 * 2026, which could not tell apart blocks with the same data name). Those
+	 * are matched too, and returned as a new copy keyed by the trigger name,
+	 * so that blocks sharing a data name do not share, and overwrite, one set
+	 * of settings. Saving the Automation panel rewrites them.
+	 * @param dataBlock trigger data block
+	 * @return trigger parameters, or null if there are none for this block.
+	 */
+	public DifarTriggerParams findTriggerParams(PamDataBlock dataBlock) {
+		if (dataBlock == null) {
+			return null;
+		}
+		String name = triggerName(dataBlock);
+		DifarTriggerParams tp = findTriggerParams(name);
+		if (tp != null) {
+			return tp;
+		}
+		DifarTriggerParams old = findTriggerParams(dataBlock.getLongDataName());
+		if (old == null) {
+			old = findTriggerParams(dataBlock.getDataName());
+		}
+		if (old == null) {
+			return null;
+		}
+		DifarTriggerParams copy = new DifarTriggerParams(name);
+		copy.enable = old.enable;
+		copy.speciesName = old.speciesName;
+		copy.speciesLookupItem = old.speciesLookupItem;
+		copy.channelSelection = old.channelSelection;
+		return copy;
+	}
+
+	/**
 	 * Clear all trigger parameters. 
 	 */
 	public void clearAllTriggerParams() {
@@ -833,44 +985,6 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 		return triggerParams.add(tP);
 	}
 	
-	public boolean addTrackedGroup(String listItem){
-		if (groupList == null) {
-			groupList = getGroupDefaults();
-		}
-		if (groupList.contains(listItem)){
-			return false;
-		}
-		return groupList.add(listItem);
-	}
-	
-	public void removeTrackedGroup(String listItem){
-		// Make it impossible to remove the DefaultGroup
-		if (listItem.equals(DefaultGroup)) {
-			return;
-		}
-		// groupList should never be null, but just in case
-		if (groupList == null){
-			groupList = getGroupDefaults();
-			return;
-		}
-		
-		// Loop over the list and remove the item if found
-		for (int i = 0; i < groupList.size(); i++){
-			if (groupList.get(i).equals(listItem)){
-				groupList.remove(i);
-			}
-		}
-	}
-	
-	public ArrayList<String> getTrackedGroupList() {
-		if (groupList == null){
-			groupList = getGroupDefaults();
-		} else if (groupList.size()==0){
-			groupList = getGroupDefaults();
-		}
-		return groupList;
-	}
-	
 	public FilterParams getDifarFreqResponseFilterParams(){
 		if (difarFreqResponseFilterParams == null ||
 				 !difarFreqResponseFilterParams.filterType.equals(FilterType.FIRARBITRARY)){
@@ -882,17 +996,6 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	@Override
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
-		try {
-			Field field = this.getClass().getDeclaredField("groupList");
-			ps.put(new PrivatePamParameterData(this, field) {
-				@Override
-				public Object getData() throws IllegalArgumentException, IllegalAccessException {
-					return groupList;
-				}
-			});
-		} catch (NoSuchFieldException | SecurityException e) {
-			e.printStackTrace();
-		}
 		try {
 			Field field = this.getClass().getDeclaredField("speciesList");
 			ps.put(new PrivatePamParameterData(this, field) {

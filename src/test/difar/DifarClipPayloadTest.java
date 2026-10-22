@@ -176,6 +176,16 @@ public class DifarClipPayloadTest {
 	}
 
 	@Test
+	public void version3WritesAnEmptyTrackedGroupWhenThereIsNone() throws IOException {
+		// tracked groups were removed, but the slot stays so the format is unchanged
+		DifarClipPayload written = clip(audio());
+		written.trackedGroup = null;
+		DifarClipPayload read = read(write(written), 3);
+		assertClipFields(read);
+		assertEquals("", read.trackedGroup);
+	}
+
+	@Test
 	public void version3RoundTripsWithoutAudio() throws IOException {
 		DifarClipPayload read = read(write(clip(null)), 3);
 		assertClipFields(read);

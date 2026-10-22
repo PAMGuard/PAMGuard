@@ -329,4 +329,37 @@ public class SonobuoyHistoryTest {
 				new SonobuoyRecord(1, replaced, null, "D", -66.1, 150.1, 95.0)));
 		assertEquals(Long.valueOf(replaced), history.getInForceUntil(endsLater));
 	}
+	/** A sonobuoy deployed once and calibrated twice was deployed with its first record. */
+	@Test
+	public void deploymentIsTheFirstRecordOfTheSonobuoy() {
+		SonobuoyHistory history = new SonobuoyHistory();
+		history.setRecords(Arrays.asList(
+				record(3, "2018-07-31 14:00:00.000", "42", 47.7, -63.9, 0),
+				record(3, "2018-07-31 14:30:00.000", "42", 47.7, -63.9, 2.5),
+				record(3, "2018-07-31 15:10:00.000", "42", 47.7, -63.9, 3.0)));
+		assertEquals(utc("2018-07-31 14:00:00.000"), history.getDeploymentTime(3, utc("2018-07-31 16:00:00.000")));
+		assertEquals(utc("2018-07-31 14:00:00.000"), history.getDeploymentTime(3, utc("2018-07-31 14:45:00.000")));
+	}
+
+	/** A new name on the channel is a new sonobuoy, even without an end time. */
+	@Test
+	public void newNameIsANewDeployment() {
+		// channel 0 of the 2019 voyage: 157.0, then 159.0 from 18:51
+		SonobuoyHistory history = new SonobuoyHistory();
+		history.setRecords(voyageRecords());
+		assertEquals(utc("2019-02-12 18:51:13.485"), history.getDeploymentTime(0, utc("2019-02-12 19:32:00.000")));
+		assertEquals(utc("2019-02-12 16:21:08.812"), history.getDeploymentTime(0, utc("2019-02-12 17:00:00.000")));
+	}
+
+	/** A sonobuoy that ended, then a record after it, is a new deployment. */
+	@Test
+	public void recordAfterAnEndIsANewDeployment() {
+		SonobuoyHistory history = new SonobuoyHistory();
+		history.setRecords(Arrays.asList(
+				new SonobuoyRecord(5, utc("2018-07-31 14:00:00.000"), utc("2018-07-31 15:00:00.000"), null, 47.7, -63.9, 0.),
+				new SonobuoyRecord(5, utc("2018-07-31 16:00:00.000"), null, null, 47.8, -63.8, 0.)));
+		assertEquals(utc("2018-07-31 16:00:00.000"), history.getDeploymentTime(5, utc("2018-07-31 16:30:00.000")));
+		assertNull(history.getDeploymentTime(5, utc("2018-07-31 15:30:00.000")), "no sonobuoy in force between them");
+		assertNull(history.getDeploymentTime(9, utc("2018-07-31 15:30:00.000")), "no records on the channel");
+	}
 }

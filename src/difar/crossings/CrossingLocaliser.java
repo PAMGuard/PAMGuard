@@ -61,6 +61,11 @@ public class CrossingLocaliser {
 		DifarParameters params = difarControl.getDifarParameters();
 		DifarMatchSelector selector = new DifarMatchSelector(difarProcess,
 				params.detectionTimingError, params.maxBearingResidual, params.maxTimeDelayResidual);
+		if (params.useCorrelation && clips.get(0) instanceof DifarDataUnit) {
+			// delays measured from the first clip, which need not be the seed it was matched from
+			selector.setArrivalTimes(difarProcess.getCorrelatedArrivals((DifarDataUnit) clips.get(0), clips),
+					params.correlationTimingError, params.maxCorrelatedDelayResidual);
+		}
 		return selector.localise(clips);
 	}
 

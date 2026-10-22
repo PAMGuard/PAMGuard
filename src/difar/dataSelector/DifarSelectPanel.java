@@ -1,40 +1,37 @@
 package difar.dataSelector;
 
-import generalDatabase.lookupTables.LookupList;
-
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamUtils.PamUtils;
 import PamView.PamColors;
-import PamView.PamColors.PamColor;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
-import PamguardMVC.PamConstants;
 
 public class DifarSelectPanel implements PamDialogPanel {
 
+	/**
+	 * The most classes listed in one column. More classes go into further
+	 * columns, so a long list does not push the dialog off the screen.
+	 */
+	private static final int MAX_CLASS_ROWS = 10;
+
 	private DifarDataSelector difarDataSelector;
-	
+
 	private JPanel mainPanel;
 
 	private JTextField minFreq;
@@ -44,44 +41,44 @@ public class DifarSelectPanel implements PamDialogPanel {
 	private JTextField minAmplitude;
 
 	private JTextField minLength;
-	
+
 	private JCheckBox[] species;
-	
+
 	private JCheckBox[] channel = new JCheckBox[0];
 
 	/** The channel number each channel checkbox stands for. */
 	private int[] channelNumbers = new int[0];
 
 	private JPanel channelPanel;
-	
-	private JCheckBox crossBearing;
-	
+
 	private JPanel speciesPanel;
-	
+
 	private JButton selectAll, selectNone;
-	
-	
-	
+
+	private JRadioButton allBearings, triangulatedBearings;
+
+	private JCheckBox hideOnBuoy;
+
 	public DifarSelectPanel(DifarDataSelector difarDataSelector) {
 		this.difarDataSelector = difarDataSelector;
-		
+
 		mainPanel = new JPanel();
 		mainPanel.setBorder(new TitledBorder("Show DIFAR data"));
 		mainPanel.setLayout(new BorderLayout());
-		
-		
+
+
 		// Time-frequency selection options
 		JPanel tfPanel = new JPanel();
 		tfPanel.setBorder(new TitledBorder("Time-Frequency filters"));
 		tfPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		
+
 		tfPanel.add(new JLabel("Min frequency ", JLabel.RIGHT), c);
 		c.gridx++;
 		tfPanel.add(minFreq = new JTextField(6), c);
 		c.gridx++;
 		tfPanel.add(new JLabel(" Hz", JLabel.LEFT), c);
-		
+
 		c.gridx = 0;
 		c.gridy++;
 		tfPanel.add(new JLabel("Max frequency ", JLabel.RIGHT), c);
@@ -100,35 +97,66 @@ public class DifarSelectPanel implements PamDialogPanel {
 
 		c.gridx = 0;
 		c.gridy++;
-		tfPanel.add(new JLabel("Min	length ", JLabel.RIGHT), c);
+		tfPanel.add(new JLabel("Min length ", JLabel.RIGHT), c);
 		c.gridx++;
 		tfPanel.add(minLength = new JTextField(6), c);
 		c.gridx++;
 		tfPanel.add(new JLabel(" milliseconds", JLabel.LEFT), c);
 		c.gridy++;
 		mainPanel.add(tfPanel,BorderLayout.NORTH);
-		
+
 		// Loop to add all species as options
 		speciesPanel = new JPanel();
 		speciesPanel.setBorder(new TitledBorder("Classification filters"));
 		speciesPanel.setLayout(new GridBagLayout());
 
 		mainPanel.add(speciesPanel,BorderLayout.CENTER);
-		c.gridx = 0;
-		c.gridy = 0;
-		
+
 		updateSpeciesPanel();
 		DifarSelectParameters difarSelectParameters =  difarDataSelector.getDifarSelectParameters();
-		
+
 		// channels are listed when the dialog opens, from the channels in use
 		channelPanel = new JPanel();
 		channelPanel.setBorder(new TitledBorder("Channel filters"));
 		channelPanel.setLayout(new GridBagLayout());
-		crossBearing = new JCheckBox();
-		crossBearing.setHorizontalAlignment(SwingConstants.LEFT);
 		updateChannelPanel(PamUtils.makeChannelMap(difarSelectParameters.channelEnabled.length));
-		mainPanel.add(channelPanel,BorderLayout.SOUTH);
-		
+
+		// channels and triangulations side by side, to keep the dialog short
+		JPanel southPanel = new JPanel(new BorderLayout());
+		southPanel.add(channelPanel, BorderLayout.WEST);
+		southPanel.add(makeTriangulationPanel(), BorderLayout.CENTER);
+		mainPanel.add(southPanel,BorderLayout.SOUTH);
+
+	}
+
+	/**
+	 * The choice of which bearings to show, by whether they are part of a
+	 * triangulation.
+	 */
+	private JPanel makeTriangulationPanel() {
+		JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(new TitledBorder("Triangulations"));
+		GridBagConstraints c = new PamGridBagContraints();
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		panel.add(new JLabel("Which bearings to show:"), c);
+		c.gridy++;
+		panel.add(allBearings = new JRadioButton("All bearings, triangulated or not"), c);
+		c.gridy++;
+		panel.add(triangulatedBearings = new JRadioButton("Only bearings in a triangulation"), c);
+		c.gridy++;
+		panel.add(hideOnBuoy = new JCheckBox("Hide bearings in a triangulation on one of its own sonobuoys"), c);
+		ButtonGroup group = new ButtonGroup();
+		group.add(allBearings);
+		group.add(triangulatedBearings);
+		allBearings.setToolTipText("Show every bearing that passes the filters above");
+		triangulatedBearings.setToolTipText("Hide bearings that are not part of a triangulation");
+		hideOnBuoy.setToolTipText("<html>A triangulation is on a sonobuoy when it lies within the on-buoy radius<br>"
+				+ "of one of its own sonobuoys, often because one bearing points at another sonobuoy.<br>"
+				+ "Its location cannot be trusted. See Triangulation quality in the DIFAR help,<br>"
+				+ "under Advanced localisation.</html>");
+		return panel;
 	}
 
 	@Override
@@ -144,17 +172,23 @@ public class DifarSelectPanel implements PamDialogPanel {
 		maxFreq.setText(String.format("%3.1f", difarSelectParameters.maxFreq));
 		minAmplitude.setText(String.format("%3.1f", difarSelectParameters.minAmplitude));
 		minLength.setText(String.format("%3.1f", difarSelectParameters.minLengthMillis));
-		
+
 		for (int i = 0; i < species.length; i++){
 			species[i].setSelected(difarSelectParameters.speciesEnabled[i]);
 		}
-		
+
 		for (int i = 0; i < channel.length; i++){
 			int number = channelNumbers[i];
 			channel[i].setSelected(number >= difarSelectParameters.channelEnabled.length
 					|| difarSelectParameters.channelEnabled[number]);
 		}
-		crossBearing.setSelected(difarSelectParameters.showOnlyCrossBearings);
+		if (difarSelectParameters.bearingsShown == DifarSelectParameters.BEARINGS_TRIANGULATED) {
+			triangulatedBearings.setSelected(true);
+		}
+		else {
+			allBearings.setSelected(true);
+		}
+		hideOnBuoy.setSelected(difarSelectParameters.hideOnBuoyBearings);
 	}
 
 	@Override
@@ -168,7 +202,7 @@ public class DifarSelectPanel implements PamDialogPanel {
 			for (int i = 0; i < species.length; i++){
 				difarSelectParameters.speciesEnabled[i] = species[i].isSelected();
 			}
-		
+
 			difarSelectParameters.channelEnabled = difarSelectParameters.channelEnabled.clone();
 			for (int i = 0; i < channel.length; i++){
 				int number = channelNumbers[i];
@@ -176,7 +210,9 @@ public class DifarSelectPanel implements PamDialogPanel {
 					difarSelectParameters.channelEnabled[number] = channel[i].isSelected();
 				}
 			}
-			difarSelectParameters.showOnlyCrossBearings = crossBearing.isSelected();
+			difarSelectParameters.bearingsShown = triangulatedBearings.isSelected()
+					? DifarSelectParameters.BEARINGS_TRIANGULATED : DifarSelectParameters.BEARINGS_ALL;
+			difarSelectParameters.hideOnBuoyBearings = hideOnBuoy.isSelected();
 		}
 		catch (NumberFormatException e) {
 			return false;
@@ -187,7 +223,7 @@ public class DifarSelectPanel implements PamDialogPanel {
 
 	/**
 	 * List a checkbox for each channel in a channel map, labelled with its
-	 * channel number, followed by the "crosses only" checkbox.
+	 * channel number.
 	 * @param channelMap the channels to list.
 	 */
 	public void updateChannelPanel(int channelMap) {
@@ -210,56 +246,60 @@ public class DifarSelectPanel implements PamDialogPanel {
 			JLabel channelLabel = new JLabel("Channel " + number, JLabel.LEFT);
 			channelLabel.setForeground(PamColors.getInstance().getChannelColor(number));
 			channelPanel.add(channelLabel, c);
-			c.gridx++;
-			channelPanel.add(new JLabel(""), c);
 			c.gridy++;
 		}
-		c.gridx = 0;
-		channelPanel.add(crossBearing, c);
-		c.gridx++;
-		channelPanel.add(new JLabel("Crosses only", JLabel.LEFT), c);
-		c.gridx++;
-		channelPanel.add(new JLabel(""), c);
 		channelPanel.revalidate();
 		channelPanel.repaint();
 	}
 
+	/**
+	 * List a checkbox for each class, in columns of at most
+	 * {@link #MAX_CLASS_ROWS}, filled top to bottom then left to right.
+	 */
 	public void updateSpeciesPanel(){
-		GridBagConstraints c = new PamGridBagContraints();
-
-		c.anchor = GridBagConstraints.WEST;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-
 		speciesPanel.removeAll();
 		DifarSelectParameters difarSelectParameters =  difarDataSelector.getDifarSelectParameters();
-		species = new JCheckBox[difarSelectParameters.speciesEnabled.length];
-		for (int i = 0; i < difarSelectParameters.speciesEnabled.length; i++){
-			c.gridx = 0;
+		int n = difarSelectParameters.speciesEnabled.length;
+		int nColumns = Math.max(1, (n + MAX_CLASS_ROWS - 1) / MAX_CLASS_ROWS);
+		int nRows = Math.max(1, (n + nColumns - 1) / nColumns);
+
+		GridBagConstraints c = new PamGridBagContraints();
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		species = new JCheckBox[n];
+		for (int i = 0; i < n; i++){
+			int column = i / nRows;
+			c.gridy = i % nRows;
+			c.gridx = column * 3;
+			c.weightx = 0;
 			species[i] = new JCheckBox();
 			species[i].setHorizontalAlignment(SwingConstants.LEFT);
 			speciesPanel.add(species[i], c);
 			c.gridx++;
 			speciesPanel.add(new JLabel(difarSelectParameters.speciesList.getLookupItem(i).getSymbol(), JLabel.LEFT), c);
 			c.gridx++;
+			c.weightx = 1;
 			speciesPanel.add(new JLabel(difarSelectParameters.speciesList.getLookupItem(i).getText(), JLabel.LEFT), c);
-			c.gridy++;
 		}
-		c.gridwidth = 2;
-		c.weightx = 0.5;
-		c.gridx = 0;
-		selectAll = new JButton("Select All");
+
+		// the buttons below the list, the first under the first column
+		JPanel buttonPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints b = new PamGridBagContraints();
+		buttonPanel.add(selectAll = new JButton("Select All"), b);
+		b.gridx++;
+		buttonPanel.add(selectNone = new JButton("Select None"), b);
 		selectAll.addActionListener(activateAll);
-		speciesPanel.add(selectAll, c);
-		c.gridx++;
-		selectNone = new JButton("Select None");
 		selectNone.addActionListener(deactivateAll);
-		speciesPanel.add(selectNone, c);
-		c.gridx++;
-		c.gridy++;
-		speciesPanel.invalidate();
+		c.gridx = 0;
+		c.gridy = nRows;
+		c.gridwidth = nColumns * 3;
+		c.weightx = 1;
+		c.fill = GridBagConstraints.NONE;
+		speciesPanel.add(buttonPanel, c);
+		speciesPanel.revalidate();
+		speciesPanel.repaint();
 	}
-	
+
 	ActionListener activateAll = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -277,5 +317,5 @@ public class DifarSelectPanel implements PamDialogPanel {
 			}
 		}
 	};
-	
+
 }

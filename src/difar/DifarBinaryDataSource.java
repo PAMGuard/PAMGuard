@@ -90,7 +90,6 @@ public class DifarBinaryDataSource extends BinaryDataSource {
 		payload.selectedAngle = toFloat(ddu.getSelectedAngle());
 		payload.selectedFrequency = toFloat(ddu.getSelectedFrequency());
 		payload.speciesCode = ddu.getSpeciesCode();
-		payload.trackedGroup = ddu.getTrackedGroup();
 		try {
 			payload.write(dos);
 		}
@@ -170,7 +169,6 @@ public class DifarBinaryDataSource extends BinaryDataSource {
 		difarDataUnit.setDifarGain(payload.gain);
 		difarDataUnit.setDisplaySampleRate(payload.displaySampleRate);
 		difarDataUnit.setSpeciesCode(difarControl.difarParameters.getSpeciesList(difarControl), payload.speciesCode);
-		difarDataUnit.setTrackedGroup(payload.trackedGroup == null ? DifarParameters.DefaultGroup : payload.trackedGroup);
 		DifarLocalisation difarLocalisation = new DifarLocalisation(difarDataUnit,
 				LocContents.HAS_BEARING, difarDataUnit.getChannelBitmap());
 		difarLocalisation.setBearingError(difarControl.getDifarParameters().bearingError);
