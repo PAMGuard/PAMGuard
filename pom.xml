@@ -644,6 +644,13 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<!-- gt-epsg-hsql brings in hsqldb 2.7.2, whose trigger handling
+			breaks UPDATE statements in UCanAccess. Fixed in 2.7.3. -->
+			<dependency>
+				<groupId>org.hsqldb</groupId>
+				<artifactId>hsqldb</artifactId>
+				<version>2.7.4</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -1187,11 +1194,11 @@
 			<version>3.45.3.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/net.sf.ucanaccess/ucanaccess -->
+		<!-- https://github.com/spannm/ucanaccess -->
 		<dependency>
-			<groupId>net.sf.ucanaccess</groupId>
+			<groupId>io.github.spannm</groupId>
 			<artifactId>ucanaccess</artifactId>
-			<version>4.0.4</version>
+			<version>5.2.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-dev -->
