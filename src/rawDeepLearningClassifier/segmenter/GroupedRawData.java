@@ -134,7 +134,7 @@ public class GroupedRawData extends PamDataUnit implements PamDetection, Cloneab
 
 
 	@Override
-	protected GroupedRawData clone()  {
+	public GroupedRawData clone()  {
 		try {
 			GroupedRawData groupedRawData =  (GroupedRawData) super.clone();
 			
@@ -146,7 +146,7 @@ public class GroupedRawData extends PamDataUnit implements PamDetection, Cloneab
 
 			return groupedRawData;
 
-		} catch (CloneNotSupportedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}

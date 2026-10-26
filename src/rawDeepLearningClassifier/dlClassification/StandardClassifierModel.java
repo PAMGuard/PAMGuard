@@ -116,9 +116,9 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 					int count =0 ; 
 					while (workerThread.getQueue().size()>getMaxQueueSize()) {
 						try {
-							Thread.sleep(100);
+							Thread.sleep(1); // was 100 ms: the model clears the queue in a few ms, so long sleeps leave it idle
 							count++;
-							if (count%50==0) {
+							if (count%5000==0) {
 								System.out.println(getName() + " deep learning model waiting for queue to clear...");
 							}
 						} catch (InterruptedException e) {

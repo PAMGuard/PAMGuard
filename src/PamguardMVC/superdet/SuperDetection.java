@@ -148,8 +148,32 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 		}
 		// no need to do anything if the subdet is part of this superdet, otherwise remove it. 
 		if (superDet != this) {
+			if (isReloadedCopyOf(superDet)) {
+				/*
+				 * In the viewer, super detections are reloaded as new objects
+				 * when the load period changes, while their sub detections may
+				 * stay loaded and still refer to the old copy. That is not a
+				 * move to a different super detection: addSuperDetection,
+				 * below, replaces the old copy. Removing it here would mark the
+				 * sub detection as changed, and the next viewer save would
+				 * rewrite its binary file with nothing changed.
+				 */
+				return;
+			}
 			superDet.removeSubDetection(subDetection);
 		}
+	}
+
+	/**
+	 * Whether another super detection object is an earlier copy of this one:
+	 * the same UID, in the same data block. A UID of 0 means none has been
+	 * assigned yet, so it identifies nothing.
+	 * @param other another super detection object.
+	 * @return true if other is a copy of this super detection.
+	 */
+	private boolean isReloadedCopyOf(SuperDetection other) {
+		return getUID() != 0 && other.getUID() == getUID() &&
+				getParentDataBlock() != null && other.getParentDataBlock() == getParentDataBlock();
 	}
 	
 	/**

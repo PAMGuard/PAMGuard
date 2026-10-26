@@ -1139,11 +1139,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			int startbyte;
 			RawDataUnit newDataUnit = null;
 			long ms;
-			long maxSamples = (long) Integer.MAX_VALUE * 2L;
-			if (currentFile.getMaxSamples() > 0) {
-				maxSamples = currentFile.getMaxSamples();
-			}
-			long maxBytes = maxSamples * audioFormat.getFrameSize();
+			long maxBytes = getMaxBytes();
 			long totalBytesRead = 0;
 			long blockEndTime = 0; // needed to set Calendar at end of a file. 
 
@@ -1165,12 +1161,16 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 						bytesRead = 0;
 					}
 					if (openNextFile(totalSamples + bytesRead / audioFormat.getFrameSize())) {
+						// the byte limit applies per file, so restart the count for the merged file
+						maxBytes = getMaxBytes();
+						totalBytesRead = 0;
 						try {
 							int newBytes = audioStream.read(byteArray, bytesRead, blockSize - bytesRead);
 							if (newBytes == -1) {
 								break;
 							}
 							bytesRead += newBytes;
+							totalBytesRead += newBytes;
 						} catch (Exception ex) {
 							ex.printStackTrace();
 							break; // file read error
@@ -1277,6 +1277,18 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			//					+ fileName.getSelectedItem().toString());
 
 		}
+	}
+
+	/**
+	 * Maximum number of bytes to read from the current file. Only set when the
+	 * file defines a sample limit (e.g. a HARP chunk), otherwise unlimited.
+	 * @return maximum bytes to read from the current file
+	 */
+	private long getMaxBytes() {
+		if (currentFile != null && currentFile.getMaxSamples() > 0) {
+			return currentFile.getMaxSamples() * audioFormat.getFrameSize();
+		}
+		return Long.MAX_VALUE;
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package difar;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.vecmath.Point3f;
 
@@ -50,6 +51,18 @@ public class DIFARTargetMotionInformation implements TargetMotionInformation {
 
 	/** Buoy positions in metres, in one row, matching the delays. */
 	private ArrayList<ArrayList<double[]>> delayHydrophonePositions;
+
+	/**
+	 * Arrival times measured by correlation, in milliseconds, for the
+	 * detections that have one; null if none were measured.
+	 */
+	private Map<PamDataUnit, Double> arrivalMillis;
+
+	/** Timing error of a delay measured by correlation, in seconds. */
+	private double correlationErrorSeconds;
+
+	/** For each delay, in the order of the delays, whether both ends were measured by correlation. */
+	private ArrayList<Boolean> correlatedDelays;
 
 	private double speedOfSound = getArraySpeedOfSound();
 	
@@ -148,11 +161,15 @@ public class DIFARTargetMotionInformation implements TargetMotionInformation {
 		ArrayList<Integer> indexM2 = PamUtils.indexM2(nUnits);
 		ArrayList<Double> delays = new ArrayList<>();
 		ArrayList<Double> errors = new ArrayList<>();
+		correlatedDelays = new ArrayList<>();
 		for (int j = 0; j < indexM1.size(); j++) {
-			long t1 = difarDataUnits.get(indexM1.get(j)).getTimeMilliseconds();
-			long t2 = difarDataUnits.get(indexM2.get(j)).getTimeMilliseconds();
-			delays.add((t2 - t1) / 1000.);
-			errors.add(timingErrorSeconds * Math.sqrt(2.));
+			PamDataUnit u1 = difarDataUnits.get(indexM1.get(j));
+			PamDataUnit u2 = difarDataUnits.get(indexM2.get(j));
+			delays.add((arrivalMillis(u2) - arrivalMillis(u1)) / 1000.);
+			double e1 = arrivalErrorSeconds(u1);
+			double e2 = arrivalErrorSeconds(u2);
+			errors.add(Math.sqrt(e1 * e1 + e2 * e2));
+			correlatedDelays.add(isCorrelated(u1) && isCorrelated(u2));
 		}
 		timeDelays = new ArrayList<>();
 		timeDelays.add(delays);
@@ -160,6 +177,56 @@ public class DIFARTargetMotionInformation implements TargetMotionInformation {
 		timeDelayErrors.add(errors);
 		delayHydrophonePositions = new ArrayList<>();
 		delayHydrophonePositions.add(buoyPositions);
+	}
+
+	/**
+	 * Use arrival times measured by correlation in place of detection times.
+	 * <p>
+	 * Each correlated arrival time is the seed's time plus the delay measured
+	 * between the seed and that detection, so the seed is in the map with its
+	 * own time. A delay between two correlated detections then has the
+	 * correlation timing error; a delay involving a detection without one has
+	 * mostly the detection timing error. Each correlated arrival is given an
+	 * error of the correlation error over root two, so that a delay between
+	 * two of them has the correlation error.
+	 * @param arrivalMillis arrival times in milliseconds, for the detections
+	 * that have one. Null for none.
+	 * @param correlationErrorSeconds timing error of a delay measured by
+	 * correlation, in seconds.
+	 */
+	public void setArrivalTimes(Map<PamDataUnit, Double> arrivalMillis, double correlationErrorSeconds) {
+		this.arrivalMillis = arrivalMillis;
+		this.correlationErrorSeconds = correlationErrorSeconds;
+		timeDelays = null;
+		timeDelayErrors = null;
+		delayHydrophonePositions = null;
+		correlatedDelays = null;
+	}
+
+	/**
+	 * @return for each delay, in the order of {@link #getTimeDelays()}, whether
+	 * both of its detections had arrival times measured by correlation.
+	 */
+	public ArrayList<Boolean> getCorrelatedDelays() {
+		if (correlatedDelays == null) {
+			calculateTimeDelays();
+		}
+		return correlatedDelays;
+	}
+
+	/** @return true if a detection has an arrival time measured by correlation. */
+	private boolean isCorrelated(PamDataUnit unit) {
+		return arrivalMillis != null && arrivalMillis.containsKey(unit);
+	}
+
+	/** @return a detection's arrival time in milliseconds, by correlation if measured. */
+	private double arrivalMillis(PamDataUnit unit) {
+		return isCorrelated(unit) ? arrivalMillis.get(unit) : unit.getTimeMilliseconds();
+	}
+
+	/** @return the error of a detection's arrival time, in seconds. */
+	private double arrivalErrorSeconds(PamDataUnit unit) {
+		return isCorrelated(unit) ? correlationErrorSeconds / Math.sqrt(2.) : timingErrorSeconds;
 	}
 
 	/**
@@ -179,6 +246,7 @@ public class DIFARTargetMotionInformation implements TargetMotionInformation {
 		timeDelays = null;
 		timeDelayErrors = null;
 		delayHydrophonePositions = null;
+		correlatedDelays = null;
 	}
 
 	@Override

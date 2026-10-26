@@ -75,7 +75,7 @@ public abstract class DLTaskThread extends Thread {
 				}
 				else {
 					//						System.out.println("ORCASPOT THREAD SLEEP: "); ; 
-					Thread.sleep(10);
+					Thread.sleep(1); // was 10 ms
 					//						System.out.println("ORCASPOT THREAD DONE: "); ; 
 				}
 

@@ -293,6 +293,16 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		NetworkSendParams p = NetworkSendDialog.showDialog(parentFrame, this, networkSendParams);
 		if (p != null) {
 			networkSendParams = (NetworkSendParams) p.clone();
+			if (client != null) {
+				boolean isMqtt = (client instanceof PamMqttClient);
+				if (isMqtt != networkSendParams.mqtt) {
+					client.close();
+					client = null;
+					initializeClient();
+				} else {
+					client.configureClient(networkSendParams);
+				}
+			}
 			sortDataSources();
 		}
 	}
@@ -512,7 +522,10 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		super.pamToStart();
 		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
 		//If net sending is enabled then let this run, but otherwise just skip past it.. 
-		if(this.networkSendParams.isModuleActivated() && this.client!=null) {
+		if(this.networkSendParams.isModuleActivated()) {
+			if (this.client == null) {
+				initializeClient();
+			}
 			this.client.configureClient(this.networkSendParams);
 			runClient();
 		}

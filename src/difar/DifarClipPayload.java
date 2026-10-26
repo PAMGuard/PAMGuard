@@ -52,7 +52,11 @@ public class DifarClipPayload {
 	public float selectedAngle;
 	public float selectedFrequency;
 	public String speciesCode;
-	/** Null in version 0 files, which have no tracked group. */
+	/**
+	 * The tracked group slot. Tracked groups were removed from PAMGuard, but
+	 * the slot is kept so the format stays at version 3: it is written empty
+	 * when null, and what is read is not used. Null in version 0 files.
+	 */
 	public String trackedGroup;
 
 	/** Read from versions 0 and 1 only; later versions keep it in the data unit header. */
@@ -80,7 +84,7 @@ public class DifarClipPayload {
 		dos.writeFloat(selectedAngle);
 		dos.writeFloat(selectedFrequency);
 		dos.writeUTF(speciesCode);
-		dos.writeUTF(trackedGroup);
+		dos.writeUTF(trackedGroup == null ? "" : trackedGroup);
 		if (demuxData == null) {
 			dos.writeFloat(0);
 			return;

@@ -21,9 +21,17 @@ public class DifarLocalisationResiduals {
 
 	private final double maxTimeDelayErrorSeconds;
 
-	private DifarLocalisationResiduals(double maxBearingErrorDegrees, double maxTimeDelayErrorSeconds) {
+	/** Largest error of a delay measured by correlation at both ends, or NaN if none. */
+	private final double maxCorrelatedDelayErrorSeconds;
+
+	/** Largest error of a delay taken from detection times, or NaN if none. */
+	private final double maxDetectionDelayErrorSeconds;
+
+	private DifarLocalisationResiduals(double maxBearingErrorDegrees, double[] delayErrors) {
 		this.maxBearingErrorDegrees = maxBearingErrorDegrees;
-		this.maxTimeDelayErrorSeconds = maxTimeDelayErrorSeconds;
+		this.maxTimeDelayErrorSeconds = delayErrors[0];
+		this.maxCorrelatedDelayErrorSeconds = delayErrors[1];
+		this.maxDetectionDelayErrorSeconds = delayErrors[2];
 	}
 
 	/**
@@ -36,10 +44,10 @@ public class DifarLocalisationResiduals {
 	 */
 	public static DifarLocalisationResiduals calculate(TargetMotionInformation info, LatLong location) {
 		if (info == null || location == null) {
-			return new DifarLocalisationResiduals(Double.NaN, Double.NaN);
+			return new DifarLocalisationResiduals(Double.NaN, new double[] {Double.NaN, Double.NaN, Double.NaN});
 		}
 		PamVector source = info.latLongToMetres(location);
-		return new DifarLocalisationResiduals(maxBearingError(info, source), maxTimeDelayError(info, source));
+		return new DifarLocalisationResiduals(maxBearingError(info, source), maxTimeDelayErrors(info, source));
 	}
 
 	/**
@@ -74,20 +82,23 @@ public class DifarLocalisationResiduals {
 
 	/**
 	 * @return the largest difference between a measured time delay and the
-	 * delay from the fitted position, in seconds, or NaN if there were no
-	 * delays.
+	 * delay from the fitted position, in seconds: over all delays, over the
+	 * delays measured by correlation, and over the delays from detection
+	 * times. Each is NaN if there were no such delays.
 	 */
-	private static double maxTimeDelayError(TargetMotionInformation info, PamVector source) {
+	private static double[] maxTimeDelayErrors(TargetMotionInformation info, PamVector source) {
+		double[] worst = {Double.NaN, Double.NaN, Double.NaN};
 		ArrayList<ArrayList<Double>> measured = info.getTimeDelays();
 		ArrayList<ArrayList<double[]>> positions = info.getDelayHydrophonePositions();
 		double speedOfSound = info.getSpeedOfSound();
 		if (measured == null || positions == null || speedOfSound <= 0) {
-			return Double.NaN;
+			return worst;
 		}
+		ArrayList<Boolean> correlated = info instanceof DIFARTargetMotionInformation
+				? ((DIFARTargetMotionInformation) info).getCorrelatedDelays() : null;
 		double[] sourcePos = new double[] {source.getElement(0), source.getElement(1), 0};
 		ArrayList<ArrayList<Double>> predicted =
 				Chi2TimeDelays.calcTimeDelays(sourcePos, positions, speedOfSound);
-		double worst = Double.NaN;
 		for (int k = 0; k < measured.size() && k < predicted.size(); k++) {
 			for (int m = 0; m < measured.get(k).size() && m < predicted.get(k).size(); m++) {
 				Double delay = measured.get(k).get(m);
@@ -95,12 +106,22 @@ public class DifarLocalisationResiduals {
 					continue;
 				}
 				double error = Math.abs(delay - predicted.get(k).get(m));
-				if (Double.isNaN(worst) || error > worst) {
-					worst = error;
+				// DIFAR delays are all in one row, so m indexes the flags
+				boolean byCorrelation = correlated != null && m < correlated.size() && correlated.get(m);
+				worst[0] = larger(worst[0], error);
+				if (byCorrelation) {
+					worst[1] = larger(worst[1], error);
+				}
+				else {
+					worst[2] = larger(worst[2], error);
 				}
 			}
 		}
 		return worst;
+	}
+
+	private static double larger(double worst, double error) {
+		return Double.isNaN(worst) || error > worst ? error : worst;
 	}
 
 	/**
@@ -130,6 +151,22 @@ public class DifarLocalisationResiduals {
 	 */
 	public double getMaxTimeDelayErrorSeconds() {
 		return maxTimeDelayErrorSeconds;
+	}
+
+	/**
+	 * @return the largest error of a time delay measured by correlation at
+	 * both ends, in seconds, or NaN if there were none.
+	 */
+	public double getMaxCorrelatedDelayErrorSeconds() {
+		return maxCorrelatedDelayErrorSeconds;
+	}
+
+	/**
+	 * @return the largest error of a time delay taken from detection times,
+	 * in seconds, or NaN if there were none.
+	 */
+	public double getMaxDetectionDelayErrorSeconds() {
+		return maxDetectionDelayErrorSeconds;
 	}
 
 	/**

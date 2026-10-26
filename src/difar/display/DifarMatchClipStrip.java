@@ -41,6 +41,10 @@ import difar.DifarDataUnit;
  * top frequency around the edge of the spectrogram. A clip in the match in use
  * is framed in its channel colour, matching the map, and the rest are framed in
  * grey.
+ * <p>
+ * Each clip is shown over the same frequency range as in the DIFARGram, so
+ * with "Zoom freq" ticked it shows the band of the call rather than zero to
+ * the Nyquist frequency.
  */
 public class DifarMatchClipStrip extends JPanel {
 
@@ -88,6 +92,15 @@ public class DifarMatchClipStrip extends JPanel {
 			}
 		}
 		revalidate();
+		repaint();
+	}
+
+	/**
+	 * Draw every clip again, after the colours, amplitude range or frequency
+	 * zoom have changed.
+	 */
+	public void displaySettingsChanged() {
+		images.clear();
 		repaint();
 	}
 
@@ -183,8 +196,7 @@ public class DifarMatchClipStrip extends JPanel {
 			g.drawString(String.format("Ch%d", PamUtils.getSingleChannel(unit.getChannelBitmap())),
 					metrics.charWidth('c') / 2, getHeight() - metrics.getDescent());
 
-			ClipDisplayParameters params = difarControl.getClipDisplayParams(unit);
-			double topFrequency = unit.getDisplaySampleRate() / 2. * params.frequencyScale;
+			double topFrequency = difarControl.getClipFrequencyLimits(unit)[1];
 			String frequency = FrequencyFormat.formatFrequency(topFrequency, true);
 			size = metrics.getStringBounds(frequency, g);
 			Graphics2D g2d = (Graphics2D) g;
@@ -198,7 +210,10 @@ public class DifarMatchClipStrip extends JPanel {
 		}
 	}
 
-	/** Draws one clip's spectrogram, scaled to the strip's height. */
+	/**
+	 * Draws one clip's spectrogram over its frequency range, scaled to the
+	 * strip's height.
+	 */
 	private class ClipImagePanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
@@ -215,9 +230,18 @@ public class DifarMatchClipStrip extends JPanel {
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			BufferedImage image = getImage(unit);
-			if (image != null) {
-				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+			if (image == null) {
+				return;
 			}
+			// image rows run from the Nyquist frequency at the top to zero at the bottom
+			double[] fRange = difarControl.getClipFrequencyLimits(unit);
+			double nyquist = unit.getDisplaySampleRate() / 2.;
+			int h = image.getHeight();
+			int top = h - (int) Math.round(fRange[1] / nyquist * h);
+			int bottom = h - (int) Math.round(fRange[0] / nyquist * h);
+			top = Math.max(0, Math.min(h - 1, top));
+			bottom = Math.max(top + 1, Math.min(h, bottom));
+			g.drawImage(image, 0, 0, getWidth(), getHeight(), 0, top, image.getWidth(), bottom, null);
 		}
 	}
 

@@ -77,6 +77,7 @@ public class EnergySumProcess extends IshDetFnProcess {
 	protected void prepareMyParams() {
 		EnergySumParams p = (EnergySumParams)ishDetControl.ishDetParams;
 		PamDataBlock inputDataBlock = getInputDataBlock();		//might be null
+		if (inputDataBlock == null) return;	// source not created yet, e.g. while loading modules
 		
 		FFTDataUnit lastFFTUnit = ((FFTDataUnit)inputDataBlock.getLastUnit());
 		if (lastFFTUnit != null) {

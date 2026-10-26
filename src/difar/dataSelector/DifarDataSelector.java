@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import difar.DifarControl;
 import difar.DifarDataUnit;
+import difar.crossings.DifarCrossing;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -147,10 +148,22 @@ public class DifarDataSelector extends DataSelector {
 		 * new clip then must still see it as crossed. Until then its location
 		 * comes from its temporary crossing.
 		 */
-		if (difarSelectParameters.showOnlyCrossBearings && difarDataUnit.getCrossLocation()==null){
+		if (difarSelectParameters.bearingsShown == DifarSelectParameters.BEARINGS_TRIANGULATED
+				&& difarDataUnit.getCrossLocation() == null) {
 			return false;
 		}
-		
+
+		/*
+		 * A clip with only a proposed match, still being worked on, has no
+		 * saved triangulation to judge yet, so it is shown.
+		 */
+		if (difarSelectParameters.hideOnBuoyBearings) {
+			DifarCrossing crossing = difarDataUnit.getCrossing();
+			if (crossing != null && crossing.isOnBuoy()) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -210,6 +223,7 @@ public class DifarDataSelector extends DataSelector {
 	@Override
 	public void setParams(DataSelectParams dataSelectParams) {
 		difarSelectParameters = (DifarSelectParameters) dataSelectParams;
+		difarSelectParameters.upgrade();
 	}
 
 	/* (non-Javadoc)

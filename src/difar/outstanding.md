@@ -126,6 +126,184 @@ delays from cross-correlating clips' audio.
 Viewer compaction works, and writes clips saved in the Viewer. Converting old datasets' crossings is
 not planned: the upgrade rematches instead, and keeps the old files in a backup.
 
+## Normal mode lost DIFAR clips at Stop: fixed 12 October 2026
+
+Found on the 2013 pilot's first complete Koogu run (`koogu-auto/runs/2026-10-10_1209_first-complete-run`,
+build 7697a9a). In the Viewer, DIFAR clips and triangulations stopped at 2013-03-08 00:30:52, whatever
+the load period.
+
+- **A. The queue outlived the binary store.** When the audio files ran out, the binary store closed,
+  but DIFAR kept working through its queue. Triangulations still reached the database; their clips
+  were written nowhere. About 870 clips were lost.
+- **B. DIFAR fell behind the audio without limit.** File audio ran at 80 to 100 times real time. A
+  clip is written into whichever binary file is open when DIFAR saves it, and files roll over by the
+  master clock, not clip time. The lag grew to about 6 hours, so late clips sat in files hours away
+  from their own time, and the Viewer found them only when the load period covered both.
+
+**Cause.** DIFAR worked its queue outside PAMGuard's data flow. A detector's clip was put in the queue
+and DIFAR returned at once, so PAMGuard counted it as done. The clip was then demultiplexed on a
+Swing worker, and saved by a Swing timer on the Swing thread, one clip at a time. Even with a delay
+of 0 s, a save waited for the timer's first tick, 100 ms later, behind display drawing. At 100 times
+real time, 100 ms is 10 s of data per clip. PAMGuard never held the audio back for this queue, and
+did not wait for it at Stop.
+
+**Fix, on `difar-unattended-save`.** Auto save has two choices in the Automation settings: "With a
+delay for review" (as before) and "As fast as possible, with no review"
+(`DifarParameters.autoSaveUnattended`, false for older settings). With the second, auto-process on,
+in Normal mode, DIFAR processes and saves each classified clip where it is made, on the thread that
+made it (`DifarProcess.isUnattended`, `processUnattended`; `DifarControl.saveUnattended`). For the
+Koogu trigger this is the deep learning classifier's worker. PAMGuard's existing pause for slow
+modules then holds the audio back. No core changes. Saving with a delay for review, at any delay
+including 0 s, and the Viewer, work as before.
+
+**Result, 2013 pilot rerun** (`koogu-auto/runs/2026-10-12_1207_unattended-save`, build 8f5cbb0):
+- All 2,591 DIFAR clips in the database are in the binary files (footers 5,182, halved). None lost.
+- Of 1,632 clips in triangulations, 12 sit in the next file after their own time, each within 25 s
+  of the hour boundary: a detector reports a call only after its analysis window. None further out.
+- No "Error in DifarProcess.difarTrigger" and no "has no bearing" in the console.
+- 745 triangulations (603 two-clip, 142 three-clip), against 749 on the first run.
+- About 14 minutes of wall clock for 18 hours of data, 77 times real time on average, dropping to
+  about 25 times through continuous three-channel calling.
+
+Still open:
+- The deep learning classifier did not wait for its own worker at Stop. On the rerun it wrote three
+  results at 06:10:26 after its binary file had closed ("in file null"). **Fix written, not yet
+  tested on the pilot** (branch `dl-sound-file-batches`, 19 October 2026): a busy flag in
+  `DLTaskThread`, `waitForResults` on the model, and a wait of up to 120 s in
+  `DLClassifyProcess.pamStop`. Binary files close in `pamHasStopped`, after every module's
+  `pamStop`, so waiting there is enough. PAMGuard restarts the classifier at every file, so the
+  wait also runs at each file boundary. Test: rerun the pilot and check for no "in file null" and
+  no "still classifying" in the console.
+  **Tested 20 October 2026 (run 4, five triggers, three models): not fixed.** Nine "Storing
+  binary object ... from DL Model Data in file null with no module header" lines at the end of the
+  audio (06:10:08 to 06:10:30), three per model, and no "still classifying". So the wait covers the
+  detections but not the Model Data stream, or the end of the audio does not go through the same
+  path as Stop. Small: the last few predictions of a run are lost from the binary files.
+  **Traced 21 October 2026.** PAMGuard stops in three steps: `pamStop` on every module, then
+  `flushDataBlockBuffers` empties the queues between modules (multithreaded runs), then
+  `pamHasStopped` closes the binary files. The last 20 s or so of audio is still queued at
+  `pamStop`, so it reaches the classifier only in the flush, and nothing waited for it there.
+  Detections take the same path, so they can be lost too. Also, `pamStop` ran the leftover input
+  buffer without emptying it, so a later batch could classify the same segments again.
+  **Fix:** `DLClassifyProcess` overrides `flushDataBlockBuffers` to run the leftover buffer and
+  wait for the worker; `runRemainingData` empties the buffer after running it. Test: rerun the
+  pilot and check for no "in file null" and no "still classifying" in the console.
+- The classifier also warns, many times a run, that its raw data are shorter than its model
+  results' time limits, always by 600 samples (2.4 s at 250 Hz). Nothing is trimmed, so detections
+  keep their audio. Cause not traced. A guess: merged segments overlap (window 1,125 samples, hop
+  500, so 625 samples of overlap each), and the raw data and the results' span count the overlap
+  differently. 625 is close to 600 but not equal, so that is not the whole story. Noted only, not
+  reported.
+- The threaded observers' pause gives up after about 100 short sleeps, then lets data through. Lag
+  stayed under a minute on the pilot, but is not strictly bounded.
+- A clip the operator saves by hand on the DIFARgram is not locked against an unattended save. Only
+  matters if the operator works the queue during an unattended run.
+- **Test.** After a Normal mode run, every child clip in the database must be found in the binary
+  files, in the file for its own time. A candidate for PAMGuard's test framework, not only the
+  pilot's `run.sh`.
+
+## Deep learning speed: tried, 19 October 2026
+
+Three Koogu models (song, D-call, fin 20 Hz) on 20 busy one-hour files of 1 kHz Kerguelen 2015
+audio, with no displays. Times are from `pamguard_timing.py` in the reanalysis repo (first to last
+prediction row, so Start to the last result).
+
+| Run | Elapsed |
+|---|---|
+| Before the queue polling sleeps were shortened | 452 s |
+| With shorter sleeps (merged on `difar-unattended-save`) | 281 s |
+| Batches of 20 s instead of 1 s, for sound files | 300 s |
+| Same, under Java Flight Recorder | 415 s |
+| One 250 Hz decimator feeding all three models, profiled (song hop wrongly 2 s) | 372 s |
+| Same, database committed every 500 rows instead of 10, profiled | 490 s |
+
+What we learned:
+- Larger batches do not help. The fixed cost of each model call is small. Removed.
+- Committing less often does not help. Reverted.
+- Java code is a small share of the run. Within it, Koogu's resampling (jpamutils spline and IIR
+  filter) dominates. It runs per segment and so repeats on overlapping audio: about 4.4 times for
+  the song model (22 s window, 5 s hop). Skipped when the input is already at the model's rate, so
+  a 250 Hz decimator upstream removes it. The pilot already does this.
+- With multithreading, each classifier runs on its own thread, so one model and three models take
+  about the same time: the slowest chain sets the pace.
+- Native samples count threads waiting on the disk or in TensorFlow as busy, so they show where
+  threads spend time, not what limits the run. They pointed at SQLite commits, which were not the
+  limit.
+- Run times vary widely between runs. Compare settings only with repeat runs.
+
+Not pursued: parallel PAMGuard runs over parts of a dataset (the Batch Processor), and detecting
+in Python then importing detections for DIFAR. Both stay options for the full reanalysis.
+
+## Five triggers on the 2013 pilot: 20 and 21 October 2026
+
+Five detectors trigger DIFAR on the 2013 pilot (18 h of 3-channel audio, 8 buoys): Koogu song,
+D-call and fin 20 Hz, and spectrogram correlation for song and fin 20 Hz. No displays, "As fast as
+possible, with no review", stage timing on (`-Ddifar.stageTiming`, `DifarStageTiming`). The test
+and its benchmark log are in `pamguard-tests`, `2013-abwv-pilot/multi-detector`.
+
+| Run | Change | Wall time | Real time | DIFAR busy | Demux | Save | Clips | Triangulations |
+|---|---|---|---|---|---|---|---|---|
+| 4 | five triggers, AAD time domain demux (`e0c811e3`) | 2457 s | 26 times | 1670 s | 1215 s | 340 s | 6667 | 1156 |
+| 5 | AAD fast demux (`52860b34`) | 1242 s | 52 times | 552 s | 111 s | 324 s | 6667 | 1151 |
+| 6 | Ishmael minimum time fixed, 16 GB heap, short DIFAR keep times (`04263e57`) | 1361 s | 48 times | 607 s | 112 s | 374 s | 5807 | 1044 |
+| 7 | tracked groups removed (`f5efd3d2`) | 710 s | 92 times | 263 s | 96 s | 67 s | 5807 | 1044 |
+
+Run 4's wall time is to its last clip; PAMGuard was closed by hand much later.
+
+What we learned:
+- **The demux was most of DIFAR's time.** The new AAD fast demux (`AadFastDemux`, frequency
+  domain, at the output rate) is 11 times faster on the pilot and 17 times on one 42 s clip, and
+  doubles the speed of the whole run. Bearings match the time domain demux: run 5 against run 4,
+  same clips and triangulations, apart from the pinned clips below.
+- **Pinned bearings at exactly 180 and 270 degrees** come from clips shorter than the DIFARgram
+  FFT. Zero padding makes the Bartlett surface symmetric, and the tie goes to the first maximum.
+  Not caused by either demux, and not a missing pilot tone. To handle in the quality gate below.
+- **The Ishmael minimum time was applied in FFT slices, not seconds,** in PAMGuard 2.02.15 to
+  2.02.19 (PR #159). Fixed on `ishmael-peak-picker` (see `IshPeakPicker`). Run 6 against run 5:
+  the only change is 855 song and 5 fin spectrogram correlation clips gone, all shorter than
+  their minimum time; matched bearings and positions identical. Old results can be reproduced
+  on a fixed PAMGuard by setting the minimum time to the old value divided by the FFT hop.
+- **Now the save step is slowest, and it slows as the run goes.** In run 6 the median save per
+  clip grows from 4 ms to 178 ms over the first 15 minutes of wall time, for every trigger alike,
+  then drops to 18 ms and grows again. Run 5 shows the same, less smoothly. Memory is not the
+  cause (16 GB heap, plenty free). Demux, DIFARgram and match times stay flat all run.
+- **Cause: tracked groups.** The tracked group process observes the saved clips, so its work is
+  timed as part of the save. A tracked group should summarise one group's bearings from one buoy,
+  but `TrackedGroupDataUnit` never set its buoy start time (the lines were commented out), so no
+  clip found its group and every clip made a new one: 5,807 rows in the run 6 tracked groups
+  table, one per clip. Each new clip then refitted a position over every group unit held (8 hours
+  of data time). Up to 15 minutes into run 6, the median save grows close to linearly with the
+  clips held, about 0.05 ms per clip. The drop at 16 minutes, with the clips held unchanged, is
+  not explained; nor why, late in the run, some threads are slow while others are fast. Perhaps a
+  clip waits for the tracked group thread only when its queue falls far enough behind.
+- **Fix: tracked groups removed** (branch `difar-remove-tracked-groups`, 21 October 2026). They
+  were unused, and slated for removal. The DIFAR binary format stays at version 3: the tracked
+  group slot is written empty and ignored on reading. The `TrackedGroup` column of the clip table
+  stays, empty in new rows. A database with an old tracked groups table gets a warning at startup
+  naming the last version that reads it (`DifarControl.LAST_VERSION_WITH_TRACKED_GROUPS`, 2.02.19).
+  The stage timing loses its `group` column.
+- **Run 7 (21 October 2026) confirms it.** Twice as fast as run 6 (710 s against 1361 s, 92
+  times real time). DIFAR's save totals 67 s against 374 s; the median save per clip stays under
+  15 ms through the run instead of climbing to 160 ms. Clips and triangulations are identical
+  to run 6 (5,807 and 1,044). The old configuration loaded, and was re-saved at the end without
+  the group list. A smaller rise remains, from about 6 to 14 ms, through the busiest calling
+  hours: probably matching against more clips. Not pursued.
+- The warning first fired on every launch of this test: its starting database has an empty
+  tracked groups table, made by an older PAMGuard. It now fires only when the table has rows,
+  and once per database: at startup, and when the Viewer loads a different database.
+- Run 7 also had one `IndexOutOfBoundsException` at startup, in core
+  (`PamObservable.getPamObserver`, from the Deep Learning segmenter's thread setting sample
+  rates). Probably a race between threads over the observer list. Not in run 6, no DIFAR code
+  in the stack, and the run was unaffected. Watch for it in later runs.
+
+### DIFAR quality gate (parked)
+
+Not started. In unattended mode, a clip that fails a check should still be saved, without a
+bearing, and not used in triangulation. Checks to start with: clip shorter than the DIFARgram
+FFT (the pinned bearings), and pilot tone SNR too low. Brian's idea for later: such a clip could
+still join a triangulation by time delay alone. How often each check fires decides whether that
+is worth it.
+
 ## Code, before or after the pull request
 
 - Reprocessing over existing binaries. A Normal mode rerun over the same data time overwrites every
@@ -142,9 +320,9 @@ not planned: the upgrade rematches instead, and keeps the old files in a backup.
      It was parked because DIFAR clips carried their triangulations; that obstacle is gone now that
      triangulations live in the database.
 
-- Rename UI labels to match the help's terms: the data selector's "Crossing quality" panel and
-  "Hide crossings on one of their own buoys", and the settings' "Max candidates per buoy" and
-  "On-buoy radius", to triangulation and sonobuoy. Leave database table and column names.
+- Rename UI labels to match the help's terms: the settings' "Max candidates per buoy" and
+  "On-buoy radius", to triangulation and sonobuoy. Leave database table and column names. The
+  data selector's labels are done ("Triangulation quality").
 
 ## Tests owed
 
@@ -343,6 +521,21 @@ items below are about making fewer of them necessary.
 - Sample numbers in Viewer-written headers count from 1970. Nothing in DIFAR reads them.
 - The parked compactor (commit `ff1a2c86`) drops cross-match partners. Do not run it on real data
   until crossings are separate units.
+- A single click in the DIFARgram on a saved clip counts as an edit (`DIFARGram.java:763` updates the
+  clip), so the next scroll asks to save. Seen on the 2013 pilot, 11 October 2026, after a stray
+  click. Clicks on saved clips should change nothing until the operator acts.
+- The Viewer save dialog does not say what changed, and Cancel leaves the change pending, so the
+  dialog returns at every scroll. Name the changed clips, and offer to discard.
+- Changing the load period silently rewrote, in place, every DIFAR file holding a clip in a
+  triangulation, with no edits. Seen again on 12 October after A and B were fixed; only timestamps
+  changed (footers identical). Cause, confirmed with a breakpoint: the triangulations reload as new
+  objects, clips still loaded refer to the old copies, and core's `SuperDetection.addSubDetection`
+  unlinked each clip from its old copy (`checkExistingSuperDetections`), which in the viewer marks
+  the clip as changed (`PamDataUnit.removeSuperDetection`). Linking already skips that in the
+  viewer. Fixed in core on `difar-unattended-save` (0761825): a reloaded copy of the same super
+  detection (same UID, same data block) is no longer unlinked. Rechecked 12 October: no data files
+  changed after several load period changes. Next: a small core pull request for Doug, separate
+  from DIFAR.
 
 ## Documentation
 
@@ -365,6 +558,13 @@ items below are about making fewer of them necessary.
   Overview's Southern Ocean Research Partnership link (`marinemammals.gov.au/sorp`).
 - The help's search index (`src/help/JavaHelpSearch`) is built separately; ask Doug how it is rebuilt.
 
+## Panels, low priority
+
+- Merge the buoy manager into the DIFAR localisation panel, perhaps as part of its actions. Make
+  the buoy manager and the calibration panel collapsible. Then let the user choose one consolidated
+  DIFAR localisation panel, with everything DIFAR on it, or the separate panels as now: they are
+  meant to be composable.
+
 ## Tidying
 
 - R and MATLAB wrappers around `crossing_clips.sql`.
@@ -376,11 +576,96 @@ items below are about making fewer of them necessary.
   the WAV annotation already records.
 - `canMark()` in DIFAR's spectrogram observer is dead code; its caller is commented out.
 - `ClearCrossingTask` is unused. Delete it with `DIFARCrossingInfo`.
-- Tracked groups are old and unused. Drop them, or replace them with a general tracking tool.
+- Tracked groups: removed on 21 October 2026 (branch `difar-remove-tracked-groups`; see "Five
+  triggers on the 2013 pilot"). A tracker could replace them later, for example PAMGuard's existing
+  multiple hypothesis tracking. `ViewerEdits.addConsumer` is kept for such a tracker in the Viewer.
 - The simulated sonobuoy test document lives in the data folder. Consider moving it into the repo.
+
+## Timing errors and sonobuoy positions
+
+From the DCLDE 2024 rematch, 5 October 2026. Both timing limits are absolute times, and neither
+suits every dataset. The max timing residual of 6 s came from the median sonobuoy separation of the
+2019 voyage; the DCLDE sonobuoys are much closer. The max correlated timing residual of 0.5 s was a
+placeholder with no error budget behind it. A delay's error has three parts: how well it is
+measured (correlation: tens of ms; start times: about a second), where each sonobuoy is (100 m is
+0.07 s), and drift since deployment (0.5 knots for 3 hours is 2.8 km, nearly 2 s). Correlation
+cannot see drift: a clean peak gives a precise but biased delay.
+
+1. **Measure first.** The rematch writes every triangulation's residuals, one row per delay, to
+   `<database>_triangulation_residuals_<time>.csv` beside the database: separation, measured and
+   predicted delay, residual, whether correlated, hours since each sonobuoy's deployment, and the
+   bearing residual at each end. Built. Use it to see whether drift dominates, and to choose the
+   settings below.
+2. **An error for each delay, and limits in units of it.** sigma_ij^2 = sigma_t,i^2 + sigma_t,j^2 +
+   (sigma_p,i^2 + sigma_p,j^2) / c^2, where sigma_t is the timing error (detection or correlation)
+   and sigma_p a sonobuoy's position error, growing with time since deployment: sigma_p = sigma_p0 +
+   drift rate x hours deployed. Reject a fit when any residual exceeds k sigma, k about 3; the same
+   for bearings. The candidate window in `getMatchingUnits` uses the same sigma instead of borrowing
+   the residual limit. Two physical settings, position error and drift rate, replace two arbitrary
+   limits, and the rule works for close sonobuoys, old sonobuoys and correlated delays alike.
+3. **Separation as a diagnostic.** Where the travel time between two sonobuoys is under about
+   3 sigma, timing cannot tell a right match from a wrong one; say so in the console.
+4. **Later: a model of sonobuoy positions.** A Kalman or particle filter with each sonobuoy's
+   position, velocity and compass correction as its state, updated from the residuals of confident
+   triangulations and from the research vessel as a source of known position. Matching then uses
+   its predicted positions and their covariances as sigma_p, and matching and the filter can
+   alternate, EM style. The state-space idea from September, now with a defined place to plug in.
+
+## Functional tests of correlation (next)
+
+From parking the DCLDE 2024 reanalysis, 6 October 2026: test time delays by
+correlation on data whose timing is known before relying on it on 32 loosely
+synchronised sonobuoys. Notes on what DCLDE taught are in
+S:\manuscripts\2023-DCLDE\TODO.md and DATA_ISSUES.md.
+
+1. **Synthetic first.** Simulated DIFAR clips (simulateDifar, with w15 in double
+   precision) of one call at known positions, through ClipDelays and the match
+   selector: correlated arrival times should reproduce the simulated delays to a
+   frame or two, and a deliberately wrong pairing should fail the correlated
+   residual. The ClipCorrelator unit tests cover spectrograms only, not the path
+   through matching.
+2. **AAD recordings.** All channels share one multichannel A/D converter, so
+   delays between sonobuoys are exact to a few samples. A voyage with a research
+   vessel track (ENRICH 2019 or later) gives a known source: correlated delays
+   on vessel noise or calibration transmissions should match those predicted
+   from the vessel and sonobuoy positions.
+3. **Then real calls on AAD data:** peak heights for blue whale and other call
+   types, the threshold, and how often correlation and start-time delays
+   disagree.
 
 ## Core issues for Doug
 
+- A data unit has one database index, but a sub-detection logged in its own table and also linked
+  from a super-detection's subtable has two rows. `SQLLogging.logSubtableData()` writes and
+  updates the subtable row through the unit's index and leaves the unit holding the subtable row's
+  index (the lines that saved and restored it are commented out). The unit's next update is then
+  written into its own table at the subtable row's index, over a different unit. In the 2013 pilot
+  Normal mode run of 12 October 2026, 417 of 2,591 DIFAR clip rows were overwritten this way, each
+  time a later triangulation claimed clips from an earlier one. Fixed for DIFAR in
+  `DifarCrossingSubLogging.logSubtableData()`, which hands each clip its subtable index only while
+  the standard method runs. Any other module whose sub-detections have their own table (click
+  detector clicks in offline events, if clicks are logged) may have the same problem. A core fix
+  would make DIFAR's override unnecessary. Check: `check_run_db.py` in the 2013 pilot test
+  folder, `S:\brian_mil\Documents\Pamguard\2013-abwv-pilot`.
+  Tested 12 October 2026: a Normal mode rerun of the pilot passed it, with 2,591 clip rows, all
+  with their own UID, and all 1,632 link rows finding their clip. Detections and triangulations
+  were unchanged (745). Viewer saves use the same code but have not been retested.
+
+- Settings were saved and loaded with quadratic string building. `Ascii6Bit.createStringData()`
+  added one character at a time with `+=`, and `LogSettings` joined stored rows the same way, so
+  each addition recopied everything. Closing the Viewer on the DCLDE 2024 database took about ten
+  minutes and looked like a hang. Fixed with `StringBuilder` on branch `settings-string-building`:
+  output identical, 3 MB of settings now encodes in 0.13 s. Test: `test/PamUtils/Ascii6BitTest`.
+- The streamer import added the current array to the Array Manager's list once per row imported,
+  and `ArrayManager.addArray` did not check for repeats. In memory these were references to one
+  array, but settings are cloned array by array when they load, so each became a full copy. The
+  DCLDE 2024 database held 150 arrays (three imports of 49 rows, each a 32-streamer array), 2.3 MB
+  of settings. Fixed on branch `streamer-import-duplicates`: the import no longer adds the array,
+  and `addArray` ignores an array already listed. Existing copies stay until deleted.
+- `Correlations.getCorrelation()` is off by about 14% of the peak against a direct sum, even with
+  zero padding. The likely cause is how it fills the negative frequencies (`fftLength-i-1` rather
+  than `fftLength-i`) and the packed DC and Nyquist terms. The route inside `getDelay()` is
+  accurate. DIFAR's `ClipCorrelator` uses that route instead.
 - The audio file loader stops at a gap between files longer than a second (`WavAudioFile`, "don't
   carry on if there is a file gap"). A spectrogram window that starts before a gap stays blank after
   it, though audio follows. The 2013 pilot has eight gaps, from recorder restarts; at 22:55 a window
@@ -443,3 +728,22 @@ items below are about making fewer of them necessary.
   parent. DIFAR now sets it on save.
 - The GPS import dialog's null mouse position is fixed on `fix-gps-import-dialog`. The pull request is
   open.
+- Stored settings override `-wavfilefolder` in the Viewer. The command line sets the folder, then
+  restored settings set it back to the stored path (`Setting offline wav file folder to ...`). If
+  that path is gone, Sound Files show no data. Seen on the 2013 pilot, 12 October 2026.
+- The map's DIFAR data selectors fail to load their settings at Viewer startup: `CompoundParams
+  cannot be cast to DifarSelectParameters`, for Queued and Processed DIFAR Data. Possibly core now
+  wraps the selector in a compound one, since clips have a parent triangulation. Check whether DIFAR
+  or core should handle it.
+- The data map's time axis rarely scales to the data. Normal mode file runs write settings and other
+  rows at wall-clock time, and the start defaults to 1970. Settings changes made outside the data's
+  time would be better on their own list than on the data axis.
+- Coupled scrollers overflowed the stack once in the Viewer (`ViewerScrollerManager.followCoupledScroller`
+  and `PamScrollSlider.valueSetMillis` calling each other), after a cancelled DIFAR save dialog.
+  Not reproduced on a fresh load. Watch for it.
+- Storage Options keeps any data with a binary output out of the database by default
+  (`StorageOptions.setBlockOptions`), overriding DIFAR's own request (`DifarProcess`,
+  `setShouldLog(true)`). So DIFAR clips go to binary files only unless the user ticks Database. The
+  triangulation design treats clip rows in the database as the one source of truth for buoy-derived
+  values, so DIFAR wants them logged. A question for Doug: let a data block declare its preferred
+  storage default.
