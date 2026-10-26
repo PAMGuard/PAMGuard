@@ -113,16 +113,6 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	}
 
 	@Override
-	public Datagram getDatagram() {
-		return datagram;
-	}
-
-	@Override
-	public void setDatagram(Datagram datagram) {
-		this.datagram = datagram;
-	}
-
-	@Override
 	public Long getLowestUID() {
 		// TODO Auto-generated method stub
 		return null;
