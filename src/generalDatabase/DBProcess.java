@@ -2,12 +2,7 @@ package generalDatabase;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,7 +39,6 @@ import generalDatabase.ColumnMetaData.METACOLNAMES;
 import generalDatabase.clauses.FromClause;
 import generalDatabase.clauses.PAMSelectClause;
 import generalDatabase.pamCursor.PamCursor;
-import generalDatabase.ucanAccess.UCanAccessSystem;
 import generalDatabase.version.VersionDataBlock;
 import generalDatabase.version.VersionDataUnit;
 import generalDatabase.version.VersionLogging;
@@ -1120,10 +1114,6 @@ public class DBProcess extends PamProcess {
 
 	private boolean addColumn(EmptyTableDefinition tableDef, PamTableItem tableItem) {
 
-		if (databaseControll.databaseSystem.getClass() == UCanAccessSystem.class) {
-			return addColumnUsingCOM(tableDef, tableItem);
-		}
-
 		SQLTypes sqlTypes = databaseControll.databaseSystem.getSqlTypes();
 		String addString = "ALTER TABLE " + sqlTypes.formatTableName(tableDef.getTableName());
 
@@ -1186,78 +1176,6 @@ public class DBProcess extends PamProcess {
 		}
 		return true;
 
-	}
-
-	/**
-	 * Special version for UCAnAccess according to ideas at
-	 * http://stackoverflow.com/questions/35260429/how-to-alter-table-using-ucanaccess
-	 * 
-	 * @param tableDef
-	 * @param tableItem
-	 * @return
-	 */
-	private boolean addColumnUsingCOM(EmptyTableDefinition tableDef, PamTableItem tableItem) {
-		// close the database first.
-
-		String dbFileSpec = databaseControll.databaseSystem.getDatabaseName();
-		SQLTypes sqlTypes = databaseControll.databaseSystem.getSqlTypes();
-//		databaseControll.closeConnection();
-		PrintWriter pw = null;
-		File vbsFile = null;
-		try {
-			vbsFile = File.createTempFile("AlterTable", ".vbs");
-			vbsFile.deleteOnExit();
-			pw = new PrintWriter(vbsFile);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		pw.println("Set conn = CreateObject(\"ADODB.Connection\")");
-		pw.println("conn.Open \"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + dbFileSpec + "\"");
-
-//		addString += " ADD COLUMN " + sqlTypes.formatColumnName(tableItem.getName()) + " ";
-//		addString += sqlTypes.typeToString(tableItem.getSqlType(), tableItem.getLength(), tableItem.isCounter());
-
-		String exeString = String.format("conn.Execute \"ALTER TABLE %s ADD COLUMN %s %s\"", tableDef.getTableName(),
-				tableItem.getName(), sqlTypes.typeToString(tableItem.getSqlType(), tableItem.getLength()));
-		System.out.println(exeString);
-//		pw.println("conn.Execute \"ALTER TABLE " + tableDef.tableName + "  ADD COLUMN " + 
-//		tableItem.getName() + " " + " YESNO\"");
-		pw.println(exeString);
-		pw.println("conn.Close");
-		pw.println("Set conn = Nothing");
-		pw.close();
-
-		// ... and execute it
-		Process p;
-		try {
-			p = Runtime.getRuntime().exec("CSCRIPT.EXE \"" + vbsFile.getAbsolutePath() + "\"");
-			p.waitFor();
-			BufferedReader rdr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			int errorLines = 0;
-			String line = rdr.readLine();
-			while (line != null) {
-				errorLines++;
-				System.out.println(line); // display error line(s), if any
-				line = rdr.readLine();
-			}
-			if (errorLines == 0) {
-				System.out.println("The operation completed successfully.");
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-//		databaseControll.reOpenConnection();
-		return false;
 	}
 
 	/**
