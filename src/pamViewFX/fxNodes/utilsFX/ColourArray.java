@@ -25,7 +25,7 @@ public class ColourArray implements Cloneable, Serializable{
 
 	}
 
-	public static enum ColourArrayType{GREY, REVERSEGREY, INFERNO, HOT, HSV, FIRE, PARULA, BLUE,  GREEN, RED, PATRIOTIC, MATLAB,}
+	public static enum ColourArrayType{GREY, REVERSEGREY, INFERNO, HOT, HSV, FIRE, PARULA, BLUE,  GREEN, RED, PATRIOTIC, MATLAB, COPPER}
 
 	public static String getName(ColourArrayType type) {
 		switch (type){
@@ -53,6 +53,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return "Inferno (multicoloured)";
 		case MATLAB:
 			return "Pastel (multicoloured)";
+		case COPPER:
+			return "Copper";
 		default:
 			return "Unknown";
 		}
@@ -90,6 +92,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return ColourArrayType.PARULA;
 		case "Pastel (multicoloured)":
 			return ColourArrayType.MATLAB;
+		case "Copper":
+			return ColourArrayType.COPPER;
 		default:
 			return ColourArrayType.GREY;
 		}
@@ -139,6 +143,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return createParulaArray(nPoints);
 		case MATLAB:
 			return createMATLABArray(nPoints);
+		case COPPER:
+			return createCopperArray(nPoints);
 		default:
 			return createMergedArray(nPoints, Color.GREEN, Color.RED);
 		}
@@ -177,6 +183,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return "  linear-gradient(#3e26a8 0%, #4367fd 20%, #1caadf 40%, #48cb86 %, #eaba30 80%, #f9fb15 100%)";
 		case MATLAB:
 			return "  linear-gradient(#0072bd 0%, #da5319 17%, #edb120 33%,  #7e2f8e 50%, #77ac30 67%,  #4dbeee 83%, #a2142f 100% )";
+		case COPPER:
+			return "  linear-gradient(black 0%, #ff9f65 80%, #ffc77f 100%)";
 		default:
 			return "  linear-gradient(black 0%, blue 20%, cyan 40%, green 60%, orange 80%, red 100%)";
 		}
@@ -270,6 +278,17 @@ public class ColourArray implements Cloneable, Serializable{
 			colors[4]= Color.color(0.918400, 0.73080,  0.18900);
 			colors[5]= Color.color(0.9769,   0.98390,  0.0805000);
 			return colors; 
+		case COPPER:
+			// MATLAB copper: r = min(1, 1.25x), g = 0.7812x, b = 0.4975x. Red saturates at x=0.8
+			// so evenly spaced stops every 0.2 reproduce it exactly.
+			colors=new Color[6];
+			colors[0]= Color.color(0,    0,       0);
+			colors[1]= Color.color(0.25, 0.15624, 0.0995);
+			colors[2]= Color.color(0.5,  0.31248, 0.199);
+			colors[3]= Color.color(0.75, 0.46872, 0.2985);
+			colors[4]= Color.color(1.0,  0.62496, 0.398);
+			colors[5]= Color.color(1.0,  0.7812,  0.4975);
+			return colors; 
 		case INFERNO:
 			return InfernoColorMap.getInfernoColourMap();
 		default :
@@ -296,6 +315,16 @@ public class ColourArray implements Cloneable, Serializable{
 	private static ColourArray createMATLABArray(int nPoints) {
 		Color[] matlab=getColorList(ColourArrayType.MATLAB); 
 		return createMultiColouredArray(nPoints, matlab);
+	}
+
+	/**
+	 * Create the MATLAB copper colour array (black to light copper). 
+	 * @param nPoints - the size of the colour map
+	 * @return the colourmap.
+	 */
+	private static ColourArray createCopperArray(int nPoints) {
+		Color[] copper=getColorList(ColourArrayType.COPPER); 
+		return createMultiColouredArray(nPoints, copper);
 	}
 
 	private static ColourArray createParulaArray(int nPoints) {

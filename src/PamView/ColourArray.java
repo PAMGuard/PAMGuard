@@ -37,7 +37,7 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 //	public static final int GREEN = 4;
 //	public static final int HOT = 5;
 	
-	public static enum ColourArrayType{GREY, REVERSEGREY, BLUE,  GREEN, RED, HOT, HSV, FIRE, PATRIOTIC}
+	public static enum ColourArrayType{GREY, REVERSEGREY, BLUE,  GREEN, RED, HOT, HSV, FIRE, PATRIOTIC, COPPER}
 	
 	public static String getName(ColourArrayType type) {
 		switch (type){
@@ -59,6 +59,8 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 			return "Fire (multicoloured)";
 		case PATRIOTIC:
 			return "Red-White-Blue";
+		case COPPER:
+			return "Copper";
 		default:
 			return "Unknown";
 		}
@@ -87,6 +89,8 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 			return createHotArray(nPoints);
 		case PATRIOTIC:
 			return createPatrioticArray(nPoints);
+		case COPPER:
+			return createCopperArray(nPoints);
 		default:
 			return createMergedArray(nPoints, Color.GREEN, Color.RED);
 		}
@@ -154,6 +158,19 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 		// that's three stages in total.  		
 		return createMultiColouredArray(nPoints, Color.RED, Color.WHITE, Color.BLUE);
 	}
+	/**
+	 * MATLAB copper colour array (black to light copper). Red saturates at 0.8 of
+	 * the range so evenly spaced stops every 0.2 reproduce it exactly. 
+	 * @param nPoints
+	 * @return
+	 */
+	public static ColourArray createCopperArray(int nPoints) {
+		return createMultiColouredArray(nPoints, new Color(0f, 0f, 0f),
+				new Color(0.25f, 0.15624f, 0.0995f), new Color(0.5f, 0.31248f, 0.199f),
+				new Color(0.75f, 0.46872f, 0.2985f), new Color(1.0f, 0.62496f, 0.398f),
+				new Color(1.0f, 0.7812f, 0.4975f));
+	}
+	
 	/**
 	 * Create a multicoloured array of colours that merges in turn between each of
 	 * the colours given in the list. 
