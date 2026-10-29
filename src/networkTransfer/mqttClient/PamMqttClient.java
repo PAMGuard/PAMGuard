@@ -34,7 +34,7 @@ import networkTransfer.send.NetworkQueuedObject;
 import networkTransfer.send.NetworkSendParams;
 import pamguard.Pamguard;
 
-public class PamMqttClient extends NetworkClient  implements MqttCallbackExtended{
+public class PamMqttClient extends NetworkClient  implements MqttCallbackExtended {
 
 	private String stationId;
 	private String serverURI;

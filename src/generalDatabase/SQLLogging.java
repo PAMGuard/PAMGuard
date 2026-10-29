@@ -293,7 +293,7 @@ public abstract class SQLLogging {
 	 * @param pamDataUnit
 	 * @param superDetection 
 	 */
-	protected void fillTableData(SQLTypes sqlTypes, PamDataUnit pamDataUnit, PamDataUnit superDetection) {
+	public void fillTableData(SQLTypes sqlTypes, PamDataUnit pamDataUnit, PamDataUnit superDetection) {
 		
 		EmptyTableDefinition emptyTableDef = getTableDefinition();
 
