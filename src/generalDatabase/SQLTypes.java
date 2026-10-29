@@ -88,6 +88,7 @@ public class SQLTypes {
 		case Types.LONGVARBINARY:
 			return "LONGVARBINARY(" + length + ")";
 		case Types.LONGVARCHAR:
+			length = 255;
 			return "LONGVARCHAR(" + length + ")";
 		case Types.NULL:
 			return "NULL";
@@ -112,6 +113,7 @@ public class SQLTypes {
 		case Types.VARBINARY:
 			return "VARBINARY(" + length + ")";
 		case Types.VARCHAR:
+			length = 255;
 			return "VARCHAR(" + length + ")";
 		}
 		return null;
