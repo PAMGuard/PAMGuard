@@ -3,8 +3,6 @@ package rawDeepLearningClassifier.layoutFX;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import javax.swing.SwingUtilities;
-
 import org.controlsfx.control.PopOver;
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
@@ -16,6 +14,14 @@ import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
+import javafx.util.Duration;
+import javafx.scene.text.Text;
+import javafx.scene.Cursor;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.animation.Timeline;
+import javafx.animation.KeyValue;
+import javafx.animation.KeyFrame;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -136,15 +142,45 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	private PamValidator validator;
 
 	/**
-	 * Pane which shows a warning if the segment length does not match the default
-	 * segment length of the model e.g. because the source sample rate has changed.
+	 * Warning sign shown next to the window/hop info label if the segment length does
+	 * not match the default segment length of the model e.g. because the source sample
+	 * rate has changed.
 	 */
-	private PamVBox segWarningPane;
+	private Label segWarningIcon;
 
 	/**
-	 * Label which describes the segment length mismatch.
+	 * The icon inside segWarningIcon. Its colour is animated when the warning appears.
 	 */
-	private Label segWarningLabel;
+	private Text segWarningGlyph;
+
+	/**
+	 * Label in the tooltip which describes the segment length mismatch.
+	 */
+	private Label segWarningTooltipLabel;
+
+	/**
+	 * Label in the pop over which describes the segment length mismatch.
+	 */
+	private Label segWarningPopLabel;
+
+	/**
+	 * Pop over shown when the user clicks the warning sign.
+	 */
+	private PopOver segWarningPopOver;
+
+	/**
+	 * Animation which pulses the warning sign between red and orange.
+	 */
+	private Timeline segWarningPulse;
+
+	/**
+	 * Fraction between orange (0) and red (1) used by the pulse animation.
+	 */
+	private final DoubleProperty segWarningRedness = new SimpleDoubleProperty(0);
+
+	private static final Color SEG_WARN_ORANGE = Color.web("#ef6c00");
+
+	private static final Color SEG_WARN_RED = Color.web("#d50000");
 
 
 	public DLSettingsPane(DLControl dlControl){
@@ -301,9 +337,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		vBox.getChildren().add(segmenterGridPane);
 
-		vBox.getChildren().add(infoLabel = new Label());
-
-		vBox.getChildren().add(createSegWarningPane());
+		infoLabel = new Label();
+		HBox infoBox = new HBox(5, infoLabel, createSegWarningIcon());
+		infoBox.setAlignment(Pos.CENTER_LEFT);
+		vBox.getChildren().add(infoBox);
 
 
 		Label label2 = new Label("Deep Learning Model"); 
@@ -375,31 +412,91 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	}
 
 	/**
-	 * Create the pane which warns users that the segment length does not match
-	 * the model's default segment length and allows them to fix it with one click.
-	 * @return the warning pane.
+	 * Create the warning sign which tells users that the segment length does not match
+	 * the model's default segment length. Hovering shows a tooltip and clicking shows a
+	 * pop over, both with the warning text and a button to set the correct segment
+	 * length and hop.
+	 * @return the warning sign.
 	 */
-	private Pane createSegWarningPane() {
-		segWarningLabel = new Label();
-		segWarningLabel.setWrapText(true);
-		segWarningLabel.setMaxWidth(Double.MAX_VALUE);
-		segWarningLabel.setGraphic(PamGlyphDude.createPamIcon("mdi2a-alert-outline", Color.web("#ef6c00"), PamGuiManagerFX.iconSize));
+	private Label createSegWarningIcon() {
+		segWarningGlyph = PamGlyphDude.createPamIcon("mdi2a-alert", SEG_WARN_ORANGE, PamGuiManagerFX.iconSize);
+
+		segWarningIcon = new Label();
+		segWarningIcon.setGraphic(segWarningGlyph);
+		segWarningIcon.setCursor(Cursor.HAND);
+		segWarningIcon.setVisible(false);
+		segWarningIcon.managedProperty().bind(segWarningIcon.visibleProperty());
+
+		//colour the icon from the pulse animation.
+		segWarningRedness.addListener((obs, oldVal, newVal)->{
+			setSegWarningColour(SEG_WARN_ORANGE.interpolate(SEG_WARN_RED, newVal.doubleValue()));
+		});
+
+		//pulse between orange and red for 5 seconds (10 x 0.5 s) and then stay orange.
+		segWarningPulse = new Timeline(
+				new KeyFrame(Duration.ZERO, new KeyValue(segWarningRedness, 0)),
+				new KeyFrame(Duration.millis(500), new KeyValue(segWarningRedness, 1)));
+		segWarningPulse.setAutoReverse(true);
+		segWarningPulse.setCycleCount(10);
+		segWarningPulse.setOnFinished((e)->segWarningRedness.set(0));
+
+		//tooltip on hover
+		segWarningTooltipLabel = new Label();
+		Tooltip tooltip = new Tooltip();
+		tooltip.setGraphic(createSegWarningContent(segWarningTooltipLabel));
+		tooltip.setShowDelay(Duration.millis(300));
+		tooltip.setShowDuration(Duration.INDEFINITE);
+		//give the user time to move the mouse into the tooltip to press the button.
+		tooltip.setHideDelay(Duration.seconds(2));
+		segWarningIcon.setTooltip(tooltip);
+
+		//pop over on click
+		segWarningPopLabel = new Label();
+		PamBorderPane popHolder = new PamBorderPane(createSegWarningContent(segWarningPopLabel));
+		popHolder.setPadding(new Insets(5,5,5,5));
+		segWarningPopOver = new PopOver(popHolder);
+		segWarningPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_LEFT);
+		segWarningIcon.setOnMouseClicked((e)->{
+			tooltip.hide();
+			if (segWarningPopOver.isShowing()) segWarningPopOver.hide();
+			else segWarningPopOver.show(segWarningIcon);
+		});
+
+		return segWarningIcon;
+	}
+
+	/**
+	 * Set the colour of the warning sign.
+	 * @param colour - the colour.
+	 */
+	private void setSegWarningColour(Color colour) {
+		segWarningGlyph.setStyle("-fx-icon-code: \"mdi2a-alert\"; -fx-icon-color: "
+				+ PamGlyphDude.colourToHex(colour) + "; -fx-icon-size: " + PamGuiManagerFX.iconSize + ";");
+	}
+
+	/**
+	 * Create the content for the segment warning tooltip or pop over: the warning text
+	 * and a button to set the model's default segment length and hop.
+	 * @param textLabel - the label which will hold the warning text.
+	 * @return the content node.
+	 */
+	private Pane createSegWarningContent(Label textLabel) {
+		textLabel.setWrapText(true);
+		textLabel.setMaxWidth(350);
 
 		PamButton setDefaultSegButton = new PamButton("Set model segment length and hop");
 		setDefaultSegButton.setTooltip(new Tooltip("Set the segment length to the model's default for the current "
 				+ "source sample rate and the hop to half the segment length"));
 		setDefaultSegButton.setOnAction((action)->{
 			setModelDefaultSegment();
+			if (segWarningPopOver!=null) segWarningPopOver.hide();
 		});
 
-		segWarningPane = new PamVBox();
-		segWarningPane.setSpacing(5);
-		segWarningPane.setAlignment(Pos.CENTER_LEFT);
-		segWarningPane.getChildren().addAll(segWarningLabel, setDefaultSegButton);
-		segWarningPane.setVisible(false);
-		segWarningPane.managedProperty().bind(segWarningPane.visibleProperty());
-
-		return segWarningPane;
+		PamVBox content = new PamVBox();
+		content.setSpacing(5);
+		content.setAlignment(Pos.CENTER_LEFT);
+		content.getChildren().addAll(textLabel, setDefaultSegButton);
+		return content;
 	}
 
 	/**
@@ -423,7 +520,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * segment length is stored in samples.
 	 */
 	private void checkSegmentLength() {
-		if (segWarningPane==null) return;
+		if (segWarningIcon==null) return;
 
 		boolean show = false;
 		Double segLen = getModelDefaultSegLen();
@@ -436,19 +533,26 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			//allow a sample of leeway for rounding errors
 			if (defaultSamples>0 && Math.abs(currentSamples-defaultSamples)>1) {
 				show = true;
-				segWarningLabel.setText(String.format("The segment length (%d samples, %.1f ms) does not match the model's "
+				String warnText = String.format("The segment length (%d samples, %.1f ms) does not match the model's "
 						+ "default segment length of %.1f ms which is %d samples at %.0f Hz. "
 						+ "This often happens if the source has a different sample rate.",
-						currentSamples, 1000.*currentSamples/sR, segLen, defaultSamples, sR));
+						currentSamples, 1000.*currentSamples/sR, segLen, defaultSamples, sR);
+				segWarningTooltipLabel.setText(warnText);
+				segWarningPopLabel.setText(warnText);
 			}
 		}
 
-		if (segWarningPane.isVisible()!=show) {
-			segWarningPane.setVisible(show);
-			//resize the dialog to fit the warning
-			SwingUtilities.invokeLater(()->{
-				dlControl.settingsDialogChange();
-			});
+		if (segWarningIcon.isVisible()!=show) {
+			segWarningIcon.setVisible(show);
+			if (show) {
+				//draw attention to the new warning
+				segWarningPulse.playFromStart();
+			}
+			else {
+				segWarningPulse.stop();
+				segWarningRedness.set(0);
+				segWarningPopOver.hide();
+			}
 		}
 	}
 
