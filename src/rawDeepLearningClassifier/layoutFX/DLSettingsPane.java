@@ -7,6 +7,7 @@ import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import clickDetector.ClickDetection;
@@ -174,6 +175,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		vBox.setSpacing(5);
 
 		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", null, true, false, true);
+		excludeOwnDataBlocks();
 		setDefaultSourceList();
 		
 //		sourcePane.addSourceType(ClickDetection.class, false);
@@ -477,6 +479,27 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
 	/**
+	 * Exclude all data blocks produced by this deep learning module from the
+	 * source list. A module must never use its own output as its input (that
+	 * would be recursive), although output from <i>other</i> deep learning
+	 * modules is still allowed.
+	 */
+	@SuppressWarnings("rawtypes")
+	private void excludeOwnDataBlocks() {
+		if (sourcePane == null || dlControl == null) return;
+		for (int i = 0; i < dlControl.getNumPamProcesses(); i++) {
+			PamProcess process = dlControl.getPamProcess(i);
+			if (process == null) continue;
+			for (int j = 0; j < process.getNumOutputDataBlocks(); j++) {
+				PamDataBlock block = process.getOutputDataBlock(j);
+				if (block != null) {
+					sourcePane.excludeDataBlock(block, true);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Set the allowed sources for this type of model. 
 	 * @param currentClassifierModel - the allowed sources. 
 	 */
@@ -660,6 +683,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	public void setParams(RawDLParams currParams) {
 				
 		sourcePane.sourceChanged();
+		excludeOwnDataBlocks();
 		sourcePane.setSourceList();
 		sourcePane.setParams(currParams.groupedSourceParams);
 
