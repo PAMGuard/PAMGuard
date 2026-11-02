@@ -1,6 +1,9 @@
 package rawDeepLearningClassifier.layoutFX;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+
+import javax.swing.SwingUtilities;
 
 import org.controlsfx.control.PopOver;
 import PamController.PamGUIManager;
@@ -25,6 +28,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -40,6 +44,7 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import warnings.PamWarning;
 
 /**
@@ -129,6 +134,17 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	private String currentClassifierModel;
 
 	private PamValidator validator;
+
+	/**
+	 * Pane which shows a warning if the segment length does not match the default
+	 * segment length of the model e.g. because the source sample rate has changed.
+	 */
+	private PamVBox segWarningPane;
+
+	/**
+	 * Label which describes the segment length mismatch.
+	 */
+	private Label segWarningLabel;
 
 
 	public DLSettingsPane(DLControl dlControl){
@@ -287,6 +303,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		vBox.getChildren().add(infoLabel = new Label());
 
+		vBox.getChildren().add(createSegWarningPane());
+
 
 		Label label2 = new Label("Deep Learning Model"); 
 		label2.setPadding(new Insets(5,0,0,0));
@@ -352,7 +370,97 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//just incase this is not called from the FX thread
 		Platform.runLater(()->{
 			infoLabel.setText(text);
+			checkSegmentLength();
 		});
+	}
+
+	/**
+	 * Create the pane which warns users that the segment length does not match
+	 * the model's default segment length and allows them to fix it with one click.
+	 * @return the warning pane.
+	 */
+	private Pane createSegWarningPane() {
+		segWarningLabel = new Label();
+		segWarningLabel.setWrapText(true);
+		segWarningLabel.setMaxWidth(Double.MAX_VALUE);
+		segWarningLabel.setGraphic(PamGlyphDude.createPamIcon("mdi2a-alert-outline", Color.web("#ef6c00"), PamGuiManagerFX.iconSize));
+
+		PamButton setDefaultSegButton = new PamButton("Set model segment length and hop");
+		setDefaultSegButton.setTooltip(new Tooltip("Set the segment length to the model's default for the current "
+				+ "source sample rate and the hop to half the segment length"));
+		setDefaultSegButton.setOnAction((action)->{
+			setModelDefaultSegment();
+		});
+
+		segWarningPane = new PamVBox();
+		segWarningPane.setSpacing(5);
+		segWarningPane.setAlignment(Pos.CENTER_LEFT);
+		segWarningPane.getChildren().addAll(segWarningLabel, setDefaultSegButton);
+		segWarningPane.setVisible(false);
+		segWarningPane.managedProperty().bind(segWarningPane.visibleProperty());
+
+		return segWarningPane;
+	}
+
+	/**
+	 * Get the model's default segment length in milliseconds.
+	 * @return the default segment length in millis or null if the current model has no default segment length.
+	 */
+	private Double getModelDefaultSegLen() {
+		if (modelSelectPane==null || modelSelectPane.currentClassifierModel==null) return null;
+		Serializable modelSettings = modelSelectPane.currentClassifierModel.getDLModelSettings();
+		if (!(modelSettings instanceof StandardModelParams)) return null;
+		Double segLen = ((StandardModelParams) modelSettings).defaultSegmentLen;
+		if (segLen==null || segLen<=0) return null;
+		return segLen;
+	}
+
+	/**
+	 * Check whether the segment length matches the default segment length of the
+	 * current model at the current source sample rate. If not, show a warning with a
+	 * button to set the correct segment length and hop. A mismatch usually happens
+	 * when the source is changed to one with a different sample rate because the
+	 * segment length is stored in samples.
+	 */
+	private void checkSegmentLength() {
+		if (segWarningPane==null) return;
+
+		boolean show = false;
+		Double segLen = getModelDefaultSegLen();
+		@SuppressWarnings("rawtypes")
+		PamDataBlock source = sourcePane.getSource();
+		if (segLen!=null && source!=null && source.getSampleRate()>0 && !segmenterGridPane.isDisabled()) {
+			float sR = source.getSampleRate();
+			int defaultSamples = (int) (segLen*sR/1000.);
+			int currentSamples = windowLength.getValue()==null ? 0 : windowLength.getValue();
+			//allow a sample of leeway for rounding errors
+			if (defaultSamples>0 && Math.abs(currentSamples-defaultSamples)>1) {
+				show = true;
+				segWarningLabel.setText(String.format("The segment length (%d samples, %.1f ms) does not match the model's "
+						+ "default segment length of %.1f ms which is %d samples at %.0f Hz. "
+						+ "This often happens if the source has a different sample rate.",
+						currentSamples, 1000.*currentSamples/sR, segLen, defaultSamples, sR));
+			}
+		}
+
+		if (segWarningPane.isVisible()!=show) {
+			segWarningPane.setVisible(show);
+			//resize the dialog to fit the warning
+			SwingUtilities.invokeLater(()->{
+				dlControl.settingsDialogChange();
+			});
+		}
+	}
+
+	/**
+	 * Set the segment length to the model's default segment length for the current
+	 * source sample rate and set the hop to half the segment length.
+	 */
+	private void setModelDefaultSegment() {
+		Double segLen = getModelDefaultSegLen();
+		if (segLen==null || sourcePane.getSource()==null) return;
+		setSegmentLength(segLen);
+		setHopLength(segLen/2);
 	}
 
 	/**
@@ -410,6 +518,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		segmenterGridPane.setDisable(!segEnable);	
 		infoLabel.setDisable(!segEnable);	
+
+		checkSegmentLength();
 	}
 
 
@@ -475,6 +585,9 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			classifierPane.setCenter(null); 
 			setDefaultSourceList();
 		}
+
+		//the model may have a different default segment length.
+		checkSegmentLength();
 	}
 
 
