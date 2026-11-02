@@ -39,6 +39,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import geoMag.MagneticVariation;
+import jsonStorage.JSONSQLWrapper;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 
@@ -122,6 +123,8 @@ public class ProcessNmeaData extends PamProcess implements ClockUpdateObserver {
 		if (PamController.isNetRx() || SMRUEnable.isEnableDecimus()) {
 			gpsDataBlock.setBinaryDataSource(new GPSBinaryDataSource(gpsDataBlock));
 		}
+		
+//		gpsDataBlock.setJSONDataSource(new JSONSQLWrapper(new GpsLogger(gpsDataBlock)));
 
 		magneticVariation = MagneticVariation.getInstance();
 

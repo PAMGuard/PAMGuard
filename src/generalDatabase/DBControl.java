@@ -25,6 +25,8 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.PamSettingsGroup;
 import PamController.PamSettingsSource;
+import PamModel.CommonPluginInterface;
+import PamModel.PamModel;
 import PamModel.SMRUEnable;
 import PamView.PamSidePanel;
 import PamView.dialog.warn.WarnOnce;
@@ -36,6 +38,7 @@ import generalDatabase.layoutFX.DBGuiFX;
 import generalDatabase.lookupTables.LookUpTables;
 import generalDatabase.lookupTables.LookupList;
 import generalDatabase.pamCursor.PamCursor;
+import generalDatabase.plugins.DBPluginInterface;
 import generalDatabase.sqlite.SqliteSystem;
 import loggerForms.FormsControl;
 import offlineProcessing.DataCopyTask;
@@ -144,6 +147,14 @@ PamSettingsSource {
 		addDatabaseSystem(new SqliteSystem(this, settingsStore));
 		addDatabaseSystem(new MySQLSystem(this, settingsStore));
 		addDatabaseSystem(new MSAccessSystem(this, settingsStore));
+		/**
+		 * Add suitable plugins that satisfy the DBPluginInterface
+		 */
+		ArrayList<CommonPluginInterface> dbPlugins = PamModel.getPamModel().getPluginType(DBPluginInterface.class);
+		for (CommonPluginInterface cpi : dbPlugins) {
+			DBPluginInterface dbPlugin = (DBPluginInterface) cpi;
+			addDatabaseSystem(dbPlugin.getDatabaseSystem(this, settingsStore));
+		}
 		//		addDatabaseSystem(new UCanAccessSystem(this, settingsStore));
 		if (SMRUEnable.isEnable()) {
 //			addDatabaseSystem(new PostgreSQLSystem(this, settingsStore));
