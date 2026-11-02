@@ -12,6 +12,7 @@ import PamController.pamWizard.PamAutoConfig;
 import PamController.pamWizard.PamFileImport;
 import PamController.pamWizard.PamImportFileType;
 import PamController.pamWizard.SoundFileSummary;
+import PamController.pamWizard.SpectrogramOptions;
 import PamController.pamWizard.configurations.ConfigApplyContext;
 import PamController.pamWizard.configurations.ConfigSpeciesGroup;
 import PamController.pamWizard.configurations.ConfigWizardData;
@@ -29,6 +30,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -39,6 +41,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -53,10 +56,12 @@ import javafx.stage.FileChooser;
  * The JavaFX import wizard: takes the user from a set of dropped files to a
  * working PAMGuard configuration.
  * <p>
- * The same four pages as the Swing wizard - what was imported, which
- * configuration to use, where to put the data, and a summary - built as a single
- * dialog whose content is swapped as the user moves through. The storage page is
- * skipped for configurations which have nothing to store.
+ * The same five pages as the Swing wizard - what was imported, which
+ * configuration to use, where to put the data, how to calculate the spectrogram,
+ * and a summary - built as a single dialog whose content is swapped as the user
+ * moves through. The storage page is skipped for configurations which have
+ * nothing to store, and the spectrogram page for configurations which do not
+ * build a spectrogram.
  *
  * @author Jamie Macaulay
  */
@@ -114,6 +119,11 @@ public class ConfigImportWizardFX {
 	private TextField binaryField;
 	private TextField databaseField;
 	private TextArea summaryArea;
+	private CheckBox decimateCheck;
+	private ComboBox<String> rateChooser;
+	private ComboBox<Integer> fftLengthChooser;
+	private TextField fftHopField;
+	private Label resolutionLabel;
 	private Label binaryRowLabel;
 	private HBox binaryRow;
 	private Label databaseRowLabel;
@@ -187,6 +197,8 @@ public class ConfigImportWizardFX {
 				this::readSelectionPage, () -> true));
 		pages.add(new WizardPage("Where should PAMGuard put the data it creates?", this::buildStoragePage,
 				this::readStoragePage, wizardData::needsStoragePaths));
+		pages.add(new WizardPage("How should the spectrogram be calculated?", this::buildSpectrogramPage,
+				this::readSpectrogramPage, wizardData::needsSpectrogramOptions));
 		pages.add(new WizardPage("PAMGuard will now build this configuration", this::buildSummaryPage,
 				() -> true, () -> true));
 
@@ -779,7 +791,136 @@ public class ConfigImportWizardFX {
 
 	/*
 	 * ------------------------------------------------------------------
-	 * Page 4 - summary
+	 * Page 4 - spectrogram (decimation and FFT)
+	 * ------------------------------------------------------------------
+	 */
+
+	private javafx.scene.Node buildSpectrogramPage() {
+		SpectrogramOptions options = wizardData.getApplyContext().getSpectrogramOptions();
+		float sourceRate = wizardData.getSourceSampleRate();
+
+		Label sourceLabel = new Label(sourceRate > 0
+				? "The imported files are sampled at " + SoundFileSummary.formatRate(sourceRate) + "."
+				: "The sample rate of the imported files is not known.");
+
+		decimateCheck = new CheckBox("Decimate the data before the FFT");
+		decimateCheck.setSelected(options.isDecimate());
+		decimateCheck.setTooltip(new Tooltip("Add a Decimator between Sound Acquisition and the FFT. Useful for "
+				+ "viewing low frequency sounds\nin high sample rate recordings - the spectrogram shows only the "
+				+ "frequencies of interest\nand is much quicker to calculate."));
+
+		rateChooser = new ComboBox<>();
+		rateChooser.setEditable(true);
+		for (Float rate : SpectrogramOptions.getPresetRates(sourceRate)) {
+			rateChooser.getItems().add(formatRate(rate));
+		}
+		float rate = options.getDecimatedSampleRate();
+		if (rate <= 0) {
+			rate = SpectrogramOptions.suggestDecimatedRate(sourceRate);
+		}
+		rateChooser.setValue(formatRate(rate));
+		rateChooser.setPrefWidth(110);
+		Label rateLabel = new Label("Decimated sample rate (Hz):");
+		rateChooser.disableProperty().bind(decimateCheck.selectedProperty().not());
+		rateLabel.disableProperty().bind(decimateCheck.selectedProperty().not());
+
+		fftLengthChooser = new ComboBox<>(FXCollections.observableArrayList(SpectrogramOptions.getFFTLengths()));
+		fftLengthChooser.setValue(options.getFftLength());
+		fftLengthChooser.setPrefWidth(110);
+		fftLengthChooser.setTooltip(new Tooltip("Longer FFTs give finer frequency resolution but coarser time resolution"));
+
+		fftHopField = new TextField(Integer.toString(options.getFftHop()));
+		fftHopField.setPrefWidth(110);
+		fftHopField.setMaxWidth(110);
+		fftHopField.setTooltip(new Tooltip("Number of samples between successive FFTs. Half the FFT length is usual."));
+
+		resolutionLabel = new Label();
+		resolutionLabel.setStyle("-fx-font-style: italic;");
+		resolutionLabel.setPadding(new Insets(10, 0, 0, 0));
+
+		// keep the hop at half the FFT length, which is what almost everyone wants.
+		fftLengthChooser.valueProperty().addListener((obs, old, len) -> {
+			if (len != null) {
+				fftHopField.setText(Integer.toString(len / 2));
+			}
+			updateResolution();
+		});
+		fftHopField.textProperty().addListener((obs, old, text) -> updateResolution());
+		decimateCheck.selectedProperty().addListener((obs, old, sel) -> updateResolution());
+		// the editor text, so that typed rates update the resolution as they are typed.
+		rateChooser.getEditor().textProperty().addListener((obs, old, text) -> updateResolution());
+		rateChooser.valueProperty().addListener((obs, old, text) -> updateResolution());
+
+		GridPane grid = new GridPane();
+		grid.setHgap(8);
+		grid.setVgap(6);
+		grid.add(sourceLabel, 0, 0, 2, 1);
+		grid.add(decimateCheck, 0, 1, 2, 1);
+		grid.add(rateLabel, 0, 2);
+		grid.add(rateChooser, 1, 2);
+		grid.add(new Label("FFT length (samples):"), 0, 3);
+		grid.add(fftLengthChooser, 1, 3);
+		grid.add(new Label("FFT hop (samples):"), 0, 4);
+		grid.add(fftHopField, 1, 4);
+
+		updateResolution();
+		return new VBox(6, grid, resolutionLabel);
+	}
+
+	/**
+	 * Read the spectrogram page's controls into a new set of options.
+	 *
+	 * @return the options, or null if a number could not be read.
+	 */
+	private SpectrogramOptions readSpectrogramControls() {
+		SpectrogramOptions options = new SpectrogramOptions();
+		options.setDecimate(decimateCheck.isSelected());
+		Integer len = fftLengthChooser.getValue();
+		options.setFftLength(len == null ? 0 : len);
+		try {
+			options.setFftHop(Integer.parseInt(fftHopField.getText().trim()));
+			String rate = rateChooser.getEditor().getText();
+			// the rate only matters, and so only has to be readable, when decimating.
+			if (rate != null && !rate.trim().isEmpty() && options.isDecimate()) {
+				options.setDecimatedSampleRate(Float.parseFloat(rate.trim()));
+			}
+		}
+		catch (NumberFormatException e) {
+			return null;
+		}
+		return options;
+	}
+
+	private boolean readSpectrogramPage() {
+		SpectrogramOptions options = readSpectrogramControls();
+		if (options == null) {
+			warn("Spectrogram", "Please enter numbers for the decimated sample rate and FFT hop.");
+			return false;
+		}
+		String error = options.validate(wizardData.getSourceSampleRate());
+		if (error != null) {
+			warn("Spectrogram", error);
+			return false;
+		}
+		wizardData.getApplyContext().setSpectrogramOptions(options);
+		return true;
+	}
+
+	private void updateResolution() {
+		if (resolutionLabel == null || fftHopField == null || fftLengthChooser == null) {
+			return;
+		}
+		SpectrogramOptions options = readSpectrogramControls();
+		resolutionLabel.setText(options == null ? "" : options.describeResolution(wizardData.getSourceSampleRate()));
+	}
+
+	private static String formatRate(float rate) {
+		return (rate == Math.rint(rate)) ? String.format("%.0f", rate) : Float.toString(rate);
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * Page 5 - summary
 	 * ------------------------------------------------------------------
 	 */
 
@@ -828,6 +969,9 @@ public class ConfigImportWizardFX {
 		}
 
 		ConfigApplyContext context = wizardData.getApplyContext();
+		if (selected.hasSpectrogramOptions()) {
+			text.append(context.getSpectrogramOptions().describe(wizardData.getSourceSampleRate()));
+		}
 		if (selected.needsBinaryStore() && context.getBinaryFolder() != null) {
 			text.append("Binary data will be written to ")
 					.append(context.getBinaryFolder().getAbsolutePath()).append("\n");

@@ -104,6 +104,9 @@ public class ConfigSummaryCard extends PamWizardCard<ConfigWizardData> {
 		}
 
 		ConfigApplyContext context = data.getApplyContext();
+		if (selected.hasSpectrogramOptions()) {
+			text.append(context.getSpectrogramOptions().describe(data.getSourceSampleRate()));
+		}
 		if (selected.needsBinaryStore() && context.getBinaryFolder() != null) {
 			text.append("Binary data will be written to ")
 					.append(context.getBinaryFolder().getAbsolutePath()).append("\n");

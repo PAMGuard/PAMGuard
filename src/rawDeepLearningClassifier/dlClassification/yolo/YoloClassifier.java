@@ -15,7 +15,8 @@ import rawDeepLearningClassifier.dlClassification.genericModel.StandardPredictio
 
 /**
  * A classifier for YOLO object detection models which detect calls within
- * spectrogram images, e.g. models trained using MATLAB's yolov4ObjectDetector.
+ * spectrogram images, e.g. models trained using MATLAB's yolov4ObjectDetector
+ * or Ultralytics YOLOv8/YOLO11 models.
  * <p>
  * This extends the ArchiveModelClassifier to provide functionality for
  * interpreting the results from a YOLO model, which detects objects within
@@ -114,7 +115,6 @@ public class YoloClassifier extends ArchiveModelClassifier {
 		//the main difference between YOLO and most other models is that multiple results can be returned per segment.
 		//Therefore the number of predictions does not correspond to the number of input data units
 
-		YoloModel yoloModel = getYoloWorker().getYoloModel();
 		double[] freqLims = getYoloWorker().getImageFreqLimits();
 
 		ArrayList<ArrayList<? extends PredictionResult>>  processedResults = new ArrayList<ArrayList<? extends PredictionResult>>();
@@ -138,7 +138,7 @@ public class YoloClassifier extends ArchiveModelClassifier {
 					//the detection threshold has already been applied by the model
 					prediction.setBinaryClassification(true);
 
-					setBoxLimits(prediction, dataUnit, yoloModel.getImageWidth(), yoloModel.getImageHeight(), segFreqLims);
+					setBoxLimits(prediction, dataUnit, segFreqLims);
 
 					aSegmentResult.add(prediction);
 				}
@@ -148,6 +148,19 @@ public class YoloClassifier extends ArchiveModelClassifier {
 		}
 
 		return processedResults;
+	}
+
+	/**
+	 * Set the start time, duration and frequency limits of a prediction from its
+	 * bounding box using the image the box is referenced to (see
+	 * {@link YoloPrediction#setImage(int, int, double)}).
+	 *
+	 * @param prediction  - the prediction.
+	 * @param segment     - the segment the prediction was made from.
+	 * @param freqLims    - the minimum and maximum frequency of the image in Hz.
+	 */
+	public static void setBoxLimits(YoloPrediction prediction, PamDataUnit segment, double[] freqLims) {
+		setBoxLimits(prediction, segment, prediction.getImageWidth(), prediction.getImageHeight(), freqLims, prediction.getPixelOffset());
 	}
 
 	/**
@@ -162,18 +175,36 @@ public class YoloClassifier extends ArchiveModelClassifier {
 	 * @param freqLims    - the minimum and maximum frequency of the image in Hz.
 	 */
 	public static void setBoxLimits(YoloPrediction prediction, PamDataUnit segment, int imWidth, int imHeight, double[] freqLims) {
+		setBoxLimits(prediction, segment, imWidth, imHeight, freqLims, 0.5);
+	}
+
+	/**
+	 * Set the start time, duration and frequency limits of a prediction from its
+	 * bounding box.
+	 *
+	 * @param prediction  - the prediction.
+	 * @param segment     - the segment the prediction was made from.
+	 * @param imWidth     - the width of the image (time axis) in pixels.
+	 * @param imHeight    - the height of the image (frequency axis) in pixels.
+	 * @param freqLims    - the minimum and maximum frequency of the image in Hz.
+	 * @param pixelOffset - the pixel coordinate of the left and top edges of the
+	 *                    image. 0.5 for MATLAB pixel coordinates (the image spans
+	 *                    0.5 to width+0.5) and 0 for Ultralytics models (the image
+	 *                    spans 0 to width).
+	 */
+	public static void setBoxLimits(YoloPrediction prediction, PamDataUnit segment, int imWidth, int imHeight, double[] freqLims, double pixelOffset) {
 
 		//the start and end of the box as a fraction of the image width.
-		double startFrac = clamp((prediction.getX() - 0.5) / imWidth);
-		double endFrac = clamp((prediction.getX() + prediction.getWidth() - 0.5) / imWidth);
+		double startFrac = clamp((prediction.getX() - pixelOffset) / imWidth);
+		double endFrac = clamp((prediction.getX() + prediction.getWidth() - pixelOffset) / imWidth);
 
 		prediction.setTimeMillis(segment.getTimeMilliseconds() + (long) (startFrac * segment.getDurationInMilliseconds()));
 		prediction.setStartSample(segment.getStartSample() + (long) (startFrac * segment.getSampleDuration()));
 		prediction.setDuratioSamples((int) ((endFrac - startFrac) * segment.getSampleDuration()));
 
 		//the top of the image is the highest frequency.
-		double topFrac = clamp((prediction.getY() - 0.5) / imHeight);
-		double bottomFrac = clamp((prediction.getY() + prediction.getHeight() - 0.5) / imHeight);
+		double topFrac = clamp((prediction.getY() - pixelOffset) / imHeight);
+		double bottomFrac = clamp((prediction.getY() + prediction.getHeight() - pixelOffset) / imHeight);
 
 		double bandWidth = freqLims[1] - freqLims[0];
 		prediction.setFreqLimits(new double[] {freqLims[1] - bottomFrac*bandWidth, freqLims[1] - topFrac*bandWidth});

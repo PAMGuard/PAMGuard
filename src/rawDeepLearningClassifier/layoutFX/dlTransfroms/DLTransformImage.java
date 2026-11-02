@@ -529,7 +529,8 @@ public abstract class DLTransformImage extends PamBorderPane{
 		float sampleRate;
 		switch (dlTransform.getDLTransformType()) {
 		case DECIMATE: 
-		case DECIMATE_SCIPY:			
+		case DECIMATE_SCIPY:
+		case DECIMATE_POLY:
 			//decimation sampleRate
 			sampleRate = simpleTransform.getParams()[0].floatValue();
 			double seconds = ((WaveTransform) currentTransform).getWaveData().getLengthInSeconds();

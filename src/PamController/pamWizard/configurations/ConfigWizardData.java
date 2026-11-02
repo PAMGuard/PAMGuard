@@ -155,6 +155,30 @@ public class ConfigWizardData {
 	}
 
 	/**
+	 * Whether the user should be shown the spectrogram page, to choose decimation and
+	 * the FFT length and hop.
+	 *
+	 * @return true if the spectrogram page is needed.
+	 */
+	public boolean needsSpectrogramOptions() {
+		return selectedConfig != null && selectedConfig.hasSpectrogramOptions();
+	}
+
+	/**
+	 * Sample rate of the imported sound files, which the spectrogram options are
+	 * checked against.
+	 *
+	 * @return the lowest sample rate of the imported files in Hz, or zero if unknown.
+	 */
+	public float getSourceSampleRate() {
+		SoundFileSummary summary = getSoundSummary();
+		if (summary == null || !summary.isValid()) {
+			return 0;
+		}
+		return summary.getMinSampleRate();
+	}
+
+	/**
 	 * Whether a decimator will be added or retuned when this configuration is
 	 * applied, because the imported data are at a higher sample rate than its
 	 * detectors expect.

@@ -6,6 +6,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import bearinglocaliser.algorithms.BearingAlgorithm;
 import bearinglocaliser.algorithms.BearingAlgorithmParams;
 import bearinglocaliser.algorithms.BearingAlgorithmProvider;
@@ -86,7 +87,7 @@ public class BearingProcess extends PamInstantProcess {
 	 * Organise bearing groups - one for each channel group
 	 * that is to be localised. 
 	 */
-	public void prepareBearingGroups() {
+	public synchronized void prepareBearingGroups() {
 		
 		setSourceDataBlock();
 		
@@ -137,10 +138,18 @@ public class BearingProcess extends PamInstantProcess {
 		return null;
 	}
 
-	public void estimateBearings(PamDataUnit pamDataUnit) {
+	/**
+	 * Estimate bearings for a data unit, adding a bearing annotation to it if
+	 * successful. Synchronised since interactively edited units are processed on a
+	 * background thread (see {@link BearingUpdateScheduler}) and the algorithms
+	 * hold working buffers which can't be shared.
+	 * @param pamDataUnit data unit to localise.
+	 * @return true if a bearing was calculated for the unit's own channel group.
+	 */
+	public synchronized boolean estimateBearings(PamDataUnit pamDataUnit) {
 		BearingAlgorithmGroup bag = findAlgorithmGroup(pamDataUnit.getChannelBitmap());
 		if (bag == null) {
-			return;
+			return false;
 		}
 		if (bearingLocaliserControl.getBearingLocaliserParams().doAllGroups) {
 			for (int i = 0; i < bearingAlgorithmGroups.length; i++) {
@@ -155,6 +164,32 @@ public class BearingProcess extends PamInstantProcess {
 		}
 		if (estimateBearings(pamDataUnit, bag)) {
 			bearingDataBlock.addPamData(pamDataUnit);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check the raw or FFT data needed to localise a data unit are loaded. In viewer
+	 * mode they generally won't be, since nothing else has asked for them, so load
+	 * them if not. Does nothing in real time, where the data are already flowing.
+	 * @param dataUnit data unit about to be localised.
+	 */
+	public void checkSourceDataLoad(PamDataUnit dataUnit) {
+		PamDataBlock rawOrFFTBlock = getParentDataBlock();
+		if (rawOrFFTBlock == null || !bearingLocaliserControl.isViewer()) {
+			return;
+		}
+		if (rawOrFFTBlock == bearingLocaliserControl.getDetectionMonitor().getParentDataBlock()) {
+			// the detections hold their own data.
+			return;
+		}
+		long dataStart = dataUnit.getTimeMilliseconds();
+		long dataEnd = dataUnit.getEndTimeInMilliseconds();
+		if (!rawOrFFTBlock.hasDataRange(dataStart, dataEnd)) {
+			OfflineDataLoadInfo offlineLoadInfo = new OfflineDataLoadInfo(dataStart, dataEnd);
+			offlineLoadInfo.setLoadKeepLayers(2);
+			rawOrFFTBlock.getOfflineData(offlineLoadInfo);
 		}
 	}
 

@@ -116,6 +116,19 @@ public interface PamAutoConfig {
 	}
 
 	/**
+	 * Whether this configuration builds a spectrogram, and so should be shown the
+	 * wizard's spectrogram page, where the user can choose to decimate the data and
+	 * set the FFT length and hop. The choices are handed over in
+	 * {@link ConfigApplyContext#getSpectrogramOptions()} through
+	 * {@link #setApplyContext}.
+	 *
+	 * @return true if the spectrogram options apply.
+	 */
+	default boolean hasSpectrogramOptions() {
+		return false;
+	}
+
+	/**
 	 * Give the configuration the storage locations and other choices the user made
 	 * in the wizard, immediately before {@link #createConfiguration} is called.
 	 * Configurations which store nothing can ignore this.

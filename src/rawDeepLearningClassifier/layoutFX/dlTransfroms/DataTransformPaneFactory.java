@@ -43,6 +43,7 @@ public class DataTransformPaneFactory {
 		switch (dlTransfrom.getDLTransformType()) {
 		case DECIMATE:
 		case DECIMATE_SCIPY:
+		case DECIMATE_POLY:
 			double sR;
 			if (((SimpleTransform) dlTransfrom).getParams()!=null){
 				sR = ((SimpleTransform) dlTransfrom).getParams()[0].doubleValue(); 

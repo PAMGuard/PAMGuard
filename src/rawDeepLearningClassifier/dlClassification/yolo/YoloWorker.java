@@ -71,8 +71,18 @@ public class YoloWorker extends ArchiveModelWorker {
 			//the parent IDs of the input data units, which will be used to set the parent ID of the model results.
 			ArrayList<Long> parentID = new ArrayList<Long>();
 
+			//the image each result is referenced to [width, height].
+			ArrayList<int[]> imageSize = new ArrayList<int[]>();
+
 			for (int i=0; i<modelResults.size(); i++) {
 				List<DeepAcousticsResult> segmentResults = modelResults.get(i);
+
+				//Ultralytics boxes are in pixels of the spectrogram rather than the model input image.
+				int[] segImageSize = new int[] {modelResults.get(i).getImWidth(), modelResults.get(i).getImHeight()};
+				if (segImageSize[0] <= 0 || segImageSize[1] <= 0) {
+					segImageSize = new int[] {getYoloModel().getImageWidth(), getYoloModel().getImageHeight()};
+				}
+
 				if (minOverlapThreshold!=1) {
 					//combine overlapping boxes within a segment.
 					segmentResults = BoundingBoxMerger.combineBoxes(segmentResults, minOverlapThreshold);
@@ -82,6 +92,7 @@ public class YoloWorker extends ArchiveModelWorker {
 				for (int j = 0;j < segmentResults.size(); j++) {
 					//record which input data unit this result came from.
 					parentID.add(dataUnits.get(i).getUID());
+					imageSize.add(segImageSize);
 				}
 			}
 
@@ -93,6 +104,7 @@ public class YoloWorker extends ArchiveModelWorker {
 				//create a new YoloPrediction object from the model result
 				dlModelResult = new YoloPrediction(flattenedModelResults.get(i));
 				dlModelResult.setParentSegmentID(parentID.get(i)); //set the ID to the UID of the input data unit (which is usually the segment UID).
+				dlModelResult.setImage(imageSize.get(i)[0], imageSize.get(i)[1], getYoloModel().getBoxPixelOffset());
 				dlModelResults.add(dlModelResult);
 			}
 

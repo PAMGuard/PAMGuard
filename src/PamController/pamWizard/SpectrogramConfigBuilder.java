@@ -6,10 +6,17 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import Acquisition.AcquisitionControl;
+import PamController.pamWizard.configurations.DefaultConfigLoader;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
+import decimator.DecimatorControl;
+import decimator.DecimatorParams;
+import fftManager.FFTParameters;
+import fftManager.PamFFTControl;
 import PamUtils.worker.filelist.FileListData;
 import PamUtils.worker.filelist.WavFileType;
 import dataMap.DataMapControl;
@@ -26,8 +33,8 @@ import dataPlotsFX.layout.TDGraphFX;
 
 /**
  * Builds a "view a spectrogram of sound files" PAMGuard configuration: Sound
- * Acquisition (pointed at the dropped files) + FFT + an FX Time Display showing a
- * spectrogram, with a Spectrogram Annotation overlay for manual annotation
+ * Acquisition (pointed at the dropped files) + optional Decimator + FFT + an FX
+ * Time Display showing a spectrogram, with a Spectrogram Annotation overlay for manual annotation
  * (viewer only). Works in both GUIs - in the FX GUI the time display is its own
  * module ({@link TDDisplayController}); in the Swing GUI a User Display module is
  * added and the FX time display is created within it.
@@ -40,6 +47,9 @@ public class SpectrogramConfigBuilder {
 	public static final String FFT_CLASS = "fftManager.PamFFTControl";
 	public static final String SPECTROGRAM_ANNOTATION_CLASS = "annotationMark.spectrogram.SpectrogramAnnotationModule";
 
+	/** Unit name of the decimator added when the user asks for decimation. */
+	public static final String DECIMATOR_NAME = "Decimator";
+
 	/** Visible time range of the spectrogram display, in milliseconds. */
 	public static final long VISIBLE_MILLIS = 20_000L;
 
@@ -47,6 +57,7 @@ public class SpectrogramConfigBuilder {
 	public static final long LOADED_MILLIS = 60L * 60L * 1000L; // 1 hour
 
 	private AcquisitionControl acquisitionControl;
+	private DecimatorControl decimatorControl;
 	private PamControlledUnit fftControl;
 	private PamControlledUnit annotationControl;
 
@@ -59,9 +70,30 @@ public class SpectrogramConfigBuilder {
 	 *               real-time build.
 	 */
 	public void build(PamFileImport files, boolean viewer) {
+		build(files, viewer, null);
+	}
 
-		// 1. Add acquisition + FFT, and the (GUI-dependent) time display.
+	/**
+	 * Build the spectrogram configuration.
+	 *
+	 * @param files   the dropped/scanned files.
+	 * @param viewer  true for the viewer-mode build (adds the Spectrogram Annotation
+	 *                module and the 1 h / auto-load viewer setup), false for a live
+	 *                real-time build.
+	 * @param options decimation and FFT choices from the wizard. Null uses the FFT
+	 *                module defaults, with no decimation.
+	 */
+	public void build(PamFileImport files, boolean viewer, SpectrogramOptions options) {
+		if (options == null) {
+			options = new SpectrogramOptions();
+		}
+
+		// 1. Add acquisition (+ decimator) + FFT, and the (GUI-dependent) time display.
 		acquisitionControl = (AcquisitionControl) PamAutoConfigUtils.addModule(ACQUISITION_CLASS, "Sound Acquisition");
+		if (options.isDecimate()) {
+			decimatorControl = (DecimatorControl) PamAutoConfigUtils.addModule(DefaultConfigLoader.DECIMATOR_CLASS,
+					DECIMATOR_NAME);
+		}
 		fftControl = PamAutoConfigUtils.addModule(FFT_CLASS, "FFT Engine");
 		Supplier<TDDisplayFX> displaySupplier = PamAutoConfigUtils.addTimeDisplay("Spectrogram");
 		if (viewer) {
@@ -72,6 +104,11 @@ public class SpectrogramConfigBuilder {
 
 		// 2. Point acquisition at the dropped sound files (and enable the offline map).
 		configureAcquisition(files, viewer);
+
+		// 2b. Chain acquisition -> (decimator ->) FFT with the chosen FFT length / hop.
+		//     Must follow configureAcquisition, which sets the sample rate and channels.
+		configureDecimator(options);
+		configureFFT(options);
 
 		// 3. Rebuild the data model so connections form and displays appear.
 		PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_PROCESS_SETTINGS);
@@ -106,6 +143,20 @@ public class SpectrogramConfigBuilder {
 	}
 
 	/**
+	 * @return the Sound Acquisition module added by {@link #build}, or null before then.
+	 */
+	public AcquisitionControl getAcquisitionControl() {
+		return acquisitionControl;
+	}
+
+	/**
+	 * @return the annotation module added by a viewer {@link #build}, or null.
+	 */
+	public PamControlledUnit getAnnotationControl() {
+		return annotationControl;
+	}
+
+	/**
 	 * @return true once the sound-file datamap has been built (has a valid first time).
 	 */
 	private boolean isDataMapReady() {
@@ -124,6 +175,60 @@ public class SpectrogramConfigBuilder {
 	 */
 	private void configureAcquisition(PamFileImport files, boolean viewer) {
 		AcquisitionConfigurer.configure(acquisitionControl, files, viewer);
+	}
+
+	/**
+	 * Point the decimator (if there is one) at the acquisition raw data, decimating
+	 * every channel to the chosen sample rate.
+	 */
+	private void configureDecimator(SpectrogramOptions options) {
+		if (decimatorControl == null) {
+			if (options.isDecimate()) {
+				System.err.println("SpectrogramConfigBuilder: decimator module could not be added - FFT will use full rate data");
+			}
+			return;
+		}
+		PamRawDataBlock acquisitionData = acquisitionControl.getAcquisitionProcess().getRawDataBlock();
+		DecimatorParams params = new DecimatorParams(options.getDecimatedSampleRate(),
+				DefaultConfigLoader.DECIMATOR_FILTER_ORDER);
+		params.rawDataSource = acquisitionData.getLongDataName();
+		params.channelMap = acquisitionData.getChannelMap();
+		decimatorControl.setDecimatorParams(params);
+		decimatorControl.setupControlledUnit();
+	}
+
+	/**
+	 * Set the FFT length and hop, and its source - the decimator output if there is
+	 * a decimator, otherwise the acquisition raw data.
+	 */
+	private void configureFFT(SpectrogramOptions options) {
+		if (!(fftControl instanceof PamFFTControl)) {
+			return;
+		}
+		PamFFTControl pamFFTControl = (PamFFTControl) fftControl;
+		PamRawDataBlock sourceData;
+		if (decimatorControl != null) {
+			sourceData = decimatorControl.getDecimatorProcess().getOutputDataBlock();
+		}
+		else {
+			sourceData = acquisitionControl.getAcquisitionProcess().getRawDataBlock();
+		}
+		FFTParameters params = pamFFTControl.getFftParameters().clone();
+		params.fftLength = options.getFftLength();
+		params.fftHop = options.getFftHop();
+		params.dataSourceName = sourceData.getLongDataName();
+		/*
+		 * The Swing FFT dialog selects its source by index, not by name, so set the
+		 * index too - otherwise the dialog shows (and on OK reverts to) the first raw
+		 * data block, which is Sound Acquisition.
+		 */
+		int sourceIndex = PamController.getInstance().getDataBlocks(RawDataUnit.class, true).indexOf(sourceData);
+		if (sourceIndex >= 0) {
+			params.dataSource = sourceIndex;
+		}
+		params.channelMap = sourceData.getChannelMap();
+		pamFFTControl.setFFTParameters(params);
+		pamFFTControl.setupControlledUnit();
 	}
 
 	/**

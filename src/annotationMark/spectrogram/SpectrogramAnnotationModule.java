@@ -204,8 +204,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 	private void doAnnotationDialog(MarkDataUnit adu, Point locOnScreen, OverlayMark overlayMark, boolean repaintOnFXThread) {
 		boolean store = manualAnnotate(adu, locOnScreen);
 		if (store) {
-			getAnnotationDataBlock().addPamData(adu);
-			getAnnotationDataBlock().sortData();
+			storeNewMark(adu);
 		}
 		if (overlayMark != null) {
 			if (repaintOnFXThread) {
@@ -214,6 +213,25 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 			else {
 				overlayMark.repaintOwner();
 			}
+		}
+	}
+
+	/**
+	 * Add a new annotation to the data block.
+	 * <p>
+	 * In viewer mode data blocks don't tell their observers about new data (that
+	 * would happen for every unit loaded from the database), so modules which work
+	 * on the annotations - e.g. a bearing localiser using them as its detection
+	 * source - would never hear about one the user has just drawn. Send them an
+	 * update for it instead.
+	 *
+	 * @param adu the new annotation.
+	 */
+	private void storeNewMark(MarkDataUnit adu) {
+		getAnnotationDataBlock().addPamData(adu);
+		getAnnotationDataBlock().sortData();
+		if (isViewer) {
+			getAnnotationDataBlock().updateObservers(adu);
 		}
 	}
 
@@ -343,8 +361,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 					showAnnotationDialogAndStore(adu, locOnScreen, overlayMark);
 					return true;
 				}
-				getAnnotationDataBlock().addPamData(adu);
-				getAnnotationDataBlock().sortData();
+				storeNewMark(adu);
 				overlayMark.repaintOwner();
 //				if (swingDisplay != null) {
 //					swingDisplay.repaint(0);
@@ -698,8 +715,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 				//				boolean ans = MarkAnnotationDialog.showDialog(SwingUtilities.getWindowAncestor(mouseEvent.getComponent()), 
 				//						SpectrogramAnnotationModule.this, adu);
 				if (store == true) {
-					getAnnotationDataBlock().addPamData(adu);
-					getAnnotationDataBlock().sortData();
+					storeNewMark(adu);
 				}
 				if (display != null) {
 					display.repaint(0);
