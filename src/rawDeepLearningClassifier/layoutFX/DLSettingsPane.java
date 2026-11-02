@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
@@ -14,8 +16,9 @@ import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
+import javafx.scene.layout.Region;
+import javafx.animation.PauseTransition;
 import javafx.util.Duration;
-import javafx.scene.text.Text;
 import javafx.scene.Cursor;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.DoubleProperty;
@@ -151,17 +154,18 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	/**
 	 * The icon inside segWarningIcon. Its colour is animated when the warning appears.
 	 */
-	private Text segWarningGlyph;
-
-	/**
-	 * Label in the tooltip which describes the segment length mismatch.
-	 */
-	private Label segWarningTooltipLabel;
+	private FontIcon segWarningGlyph;
 
 	/**
 	 * Label in the pop over which describes the segment length mismatch.
 	 */
 	private Label segWarningPopLabel;
+
+	/**
+	 * True if the user clicked the warning sign, so the pop over should stay open
+	 * when the mouse moves away.
+	 */
+	private boolean segWarningPinned = false;
 
 	/**
 	 * Pop over shown when the user clicks the warning sign.
@@ -413,13 +417,15 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	/**
 	 * Create the warning sign which tells users that the segment length does not match
-	 * the model's default segment length. Hovering shows a tooltip and clicking shows a
-	 * pop over, both with the warning text and a button to set the correct segment
-	 * length and hop.
+	 * the model's default segment length. Hovering over the sign shows a tooltip style
+	 * pop over and clicking pins it open. The pop over has the warning text and a
+	 * button to set the correct segment length and hop. A pop over is used rather than
+	 * a JavaFX Tooltip because a Tooltip closes before the user can press its button.
 	 * @return the warning sign.
 	 */
 	private Label createSegWarningIcon() {
-		segWarningGlyph = PamGlyphDude.createPamIcon("mdi2a-alert", SEG_WARN_ORANGE, PamGuiManagerFX.iconSize);
+		segWarningGlyph = FontIcon.of(MaterialDesignA.ALERT, PamGuiManagerFX.iconSize, SEG_WARN_ORANGE);
+		setSegWarningColour(SEG_WARN_ORANGE);
 
 		segWarningIcon = new Label();
 		segWarningIcon.setGraphic(segWarningGlyph);
@@ -440,38 +446,68 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		segWarningPulse.setCycleCount(10);
 		segWarningPulse.setOnFinished((e)->segWarningRedness.set(0));
 
-		//tooltip on hover
-		segWarningTooltipLabel = new Label();
-		Tooltip tooltip = new Tooltip();
-		tooltip.setGraphic(createSegWarningContent(segWarningTooltipLabel));
-		tooltip.setShowDelay(Duration.millis(300));
-		tooltip.setShowDuration(Duration.INDEFINITE);
-		//give the user time to move the mouse into the tooltip to press the button.
-		tooltip.setHideDelay(Duration.seconds(2));
-		segWarningIcon.setTooltip(tooltip);
-
-		//pop over on click
+		//the pop over with the warning text and a button to fix the segment length.
 		segWarningPopLabel = new Label();
-		PamBorderPane popHolder = new PamBorderPane(createSegWarningContent(segWarningPopLabel));
-		popHolder.setPadding(new Insets(5,5,5,5));
-		segWarningPopOver = new PopOver(popHolder);
+		Pane popContent = createSegWarningContent(segWarningPopLabel);
+		popContent.setPadding(new Insets(5,5,5,5));
+		segWarningPopOver = new PopOver(popContent);
 		segWarningPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_LEFT);
+		segWarningPopOver.setDetachable(false);
+		segWarningPopOver.setOnHidden((e)->segWarningPinned=false);
+
+		//hover behaviour: show after a short delay, hide shortly after the mouse leaves
+		//the sign and the pop over (so the user can move into the pop over to press the button).
+		PauseTransition showDelay = new PauseTransition(Duration.millis(300));
+		showDelay.setOnFinished((e)->showSegWarningPopOver());
+		PauseTransition hideDelay = new PauseTransition(Duration.millis(500));
+		hideDelay.setOnFinished((e)->{
+			if (!segWarningPinned) segWarningPopOver.hide();
+		});
+
+		segWarningIcon.setOnMouseEntered((e)->{
+			hideDelay.stop();
+			showDelay.playFromStart();
+		});
+		segWarningIcon.setOnMouseExited((e)->{
+			showDelay.stop();
+			hideDelay.playFromStart();
+		});
+		popContent.setOnMouseEntered((e)->hideDelay.stop());
+		popContent.setOnMouseExited((e)->hideDelay.playFromStart());
+
+		//click pins the pop over open, or closes it if it is already pinned.
 		segWarningIcon.setOnMouseClicked((e)->{
-			tooltip.hide();
-			if (segWarningPopOver.isShowing()) segWarningPopOver.hide();
-			else segWarningPopOver.show(segWarningIcon);
+			showDelay.stop();
+			hideDelay.stop();
+			if (segWarningPinned) {
+				segWarningPopOver.hide();
+			}
+			else {
+				showSegWarningPopOver();
+				segWarningPinned = true;
+			}
 		});
 
 		return segWarningIcon;
 	}
 
 	/**
-	 * Set the colour of the warning sign.
+	 * Show the segment warning pop over below the warning sign.
+	 */
+	private void showSegWarningPopOver() {
+		if (!segWarningPopOver.isShowing() && segWarningIcon.isVisible()) {
+			segWarningPopOver.show(segWarningIcon);
+		}
+	}
+
+	/**
+	 * Set the colour of the warning sign. Only the colour and size are set in the
+	 * style so the icon code (set when the icon was created) is not re-parsed.
 	 * @param colour - the colour.
 	 */
 	private void setSegWarningColour(Color colour) {
-		segWarningGlyph.setStyle("-fx-icon-code: \"mdi2a-alert\"; -fx-icon-color: "
-				+ PamGlyphDude.colourToHex(colour) + "; -fx-icon-size: " + PamGuiManagerFX.iconSize + ";");
+		segWarningGlyph.setStyle("-fx-icon-color: " + PamGlyphDude.colourToHex(colour)
+				+ "; -fx-icon-size: " + PamGuiManagerFX.iconSize + ";");
 	}
 
 	/**
@@ -482,7 +518,9 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private Pane createSegWarningContent(Label textLabel) {
 		textLabel.setWrapText(true);
-		textLabel.setMaxWidth(350);
+		//a fixed width so the wrapped text has a sensible size.
+		textLabel.setPrefWidth(350);
+		textLabel.setMinHeight(Region.USE_PREF_SIZE);
 
 		PamButton setDefaultSegButton = new PamButton("Set model segment length and hop");
 		setDefaultSegButton.setTooltip(new Tooltip("Set the segment length to the model's default for the current "
@@ -537,7 +575,6 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 						+ "default segment length of %.1f ms which is %d samples at %.0f Hz. "
 						+ "This often happens if the source has a different sample rate.",
 						currentSamples, 1000.*currentSamples/sR, segLen, defaultSamples, sR);
-				segWarningTooltipLabel.setText(warnText);
 				segWarningPopLabel.setText(warnText);
 			}
 		}
