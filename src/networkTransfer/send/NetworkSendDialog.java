@@ -89,7 +89,7 @@ public class NetworkSendDialog extends PamDialog {
 		dataPanel.setParams(NetworkSendParams.NETWORKSEND_BOTH);
 		netParamsPanel.setParams(networkSendParams);
 		tabbedPane.invalidate();
-		
+	
 	}
 
 	@Override

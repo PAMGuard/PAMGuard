@@ -1118,7 +1118,7 @@ final public class PamModel implements PamSettings {
 	/**
 	 * Get plugins of a given types. 
 	 * @param pluginType
-	 * @return
+	 * @return Array list of plugins. Always returns a list, even if emtpy
 	 */
 	public ArrayList<CommonPluginInterface> getPluginType(Class pluginType) {
 		ArrayList<CommonPluginInterface> ofType = new ArrayList<>();
