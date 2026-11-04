@@ -1,17 +1,30 @@
 package rawDeepLearningClassifier.layoutFX;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
+import javafx.scene.layout.Region;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.scene.Cursor;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.animation.Timeline;
+import javafx.animation.KeyValue;
+import javafx.animation.KeyFrame;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,6 +37,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -35,10 +49,12 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.validator.PamValidator;
+import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import warnings.PamWarning;
 
 /**
@@ -129,6 +145,48 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private PamValidator validator;
 
+	/**
+	 * Warning sign shown next to the window/hop info label if the segment length does
+	 * not match the default segment length of the model e.g. because the source sample
+	 * rate has changed.
+	 */
+	private Label segWarningIcon;
+
+	/**
+	 * The icon inside segWarningIcon. Its colour is animated when the warning appears.
+	 */
+	private FontIcon segWarningGlyph;
+
+	/**
+	 * Label in the pop over which describes the segment length mismatch.
+	 */
+	private Label segWarningPopLabel;
+
+	/**
+	 * True if the user clicked the warning sign, so the pop over should stay open
+	 * when the mouse moves away.
+	 */
+	private boolean segWarningPinned = false;
+
+	/**
+	 * Pop over shown when the user clicks the warning sign.
+	 */
+	private PopOver segWarningPopOver;
+
+	/**
+	 * Animation which pulses the warning sign between red and orange.
+	 */
+	private Timeline segWarningPulse;
+
+	/**
+	 * Fraction between orange (0) and red (1) used by the pulse animation.
+	 */
+	private final DoubleProperty segWarningRedness = new SimpleDoubleProperty(0);
+
+	private static final Color SEG_WARN_ORANGE = Color.web("#ef6c00");
+
+	private static final Color SEG_WARN_RED = Color.web("#d50000");
+
 
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
@@ -174,6 +232,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		vBox.setSpacing(5);
 
 		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", null, true, false, true);
+		excludeOwnDataBlocks();
 		setDefaultSourceList();
 		
 //		sourcePane.addSourceType(ClickDetection.class, false);
@@ -283,7 +342,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		vBox.getChildren().add(segmenterGridPane);
 
-		vBox.getChildren().add(infoLabel = new Label());
+		infoLabel = new Label();
+		HBox infoBox = new HBox(5, infoLabel, createSegWarningIcon());
+		infoBox.setAlignment(Pos.CENTER_LEFT);
+		vBox.getChildren().add(infoBox);
 
 
 		Label label2 = new Label("Deep Learning Model"); 
@@ -350,7 +412,198 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//just incase this is not called from the FX thread
 		Platform.runLater(()->{
 			infoLabel.setText(text);
+			checkSegmentLength();
 		});
+	}
+
+	/**
+	 * Create the warning sign which tells users that the segment length does not match
+	 * the model's default segment length. Hovering over the sign shows a tooltip style
+	 * pop over and clicking pins it open. The pop over has the warning text and a
+	 * button to set the correct segment length and hop. A pop over is used rather than
+	 * a JavaFX Tooltip because a Tooltip closes before the user can press its button.
+	 * @return the warning sign.
+	 */
+	private Label createSegWarningIcon() {
+		segWarningGlyph = FontIcon.of(MaterialDesignA.ALERT, PamGuiManagerFX.iconSize, SEG_WARN_ORANGE);
+		//the theme sets the colour of this style class, which would override the warning colours.
+		segWarningGlyph.getStyleClass().remove("ikonli-font-icon");
+
+		segWarningIcon = new Label();
+		segWarningIcon.setGraphic(segWarningGlyph);
+		segWarningIcon.setCursor(Cursor.HAND);
+		segWarningIcon.setVisible(false);
+		segWarningIcon.managedProperty().bind(segWarningIcon.visibleProperty());
+
+		//colour the icon from the pulse animation.
+		segWarningRedness.addListener((obs, oldVal, newVal)->{
+			setSegWarningColour(SEG_WARN_ORANGE.interpolate(SEG_WARN_RED, newVal.doubleValue()));
+		});
+
+		//pulse between orange and red for 5 seconds (10 x 0.5 s) and then stay orange.
+		segWarningPulse = new Timeline(
+				new KeyFrame(Duration.ZERO, new KeyValue(segWarningRedness, 0)),
+				new KeyFrame(Duration.millis(500), new KeyValue(segWarningRedness, 1)));
+		segWarningPulse.setAutoReverse(true);
+		segWarningPulse.setCycleCount(10);
+		segWarningPulse.setOnFinished((e)->segWarningRedness.set(0));
+
+		//the pop over with the warning text and a button to fix the segment length.
+		segWarningPopLabel = new Label();
+		Pane popContent = createSegWarningContent(segWarningPopLabel);
+		popContent.setPadding(new Insets(5,5,5,5));
+		segWarningPopOver = new PopOver(popContent);
+		segWarningPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_LEFT);
+		segWarningPopOver.setDetachable(false);
+		segWarningPopOver.setOnHidden((e)->segWarningPinned=false);
+
+		//hover behaviour: show after a short delay, hide shortly after the mouse leaves
+		//the sign and the pop over (so the user can move into the pop over to press the button).
+		PauseTransition showDelay = new PauseTransition(Duration.millis(300));
+		showDelay.setOnFinished((e)->showSegWarningPopOver());
+		PauseTransition hideDelay = new PauseTransition(Duration.millis(500));
+		hideDelay.setOnFinished((e)->{
+			if (!segWarningPinned) segWarningPopOver.hide();
+		});
+
+		segWarningIcon.setOnMouseEntered((e)->{
+			hideDelay.stop();
+			showDelay.playFromStart();
+		});
+		segWarningIcon.setOnMouseExited((e)->{
+			showDelay.stop();
+			hideDelay.playFromStart();
+		});
+		popContent.setOnMouseEntered((e)->hideDelay.stop());
+		popContent.setOnMouseExited((e)->hideDelay.playFromStart());
+
+		//click pins the pop over open, or closes it if it is already pinned.
+		segWarningIcon.setOnMouseClicked((e)->{
+			showDelay.stop();
+			hideDelay.stop();
+			if (segWarningPinned) {
+				segWarningPopOver.hide();
+			}
+			else {
+				showSegWarningPopOver();
+				segWarningPinned = true;
+			}
+		});
+
+		return segWarningIcon;
+	}
+
+	/**
+	 * Show the segment warning pop over below the warning sign.
+	 */
+	private void showSegWarningPopOver() {
+		if (!segWarningPopOver.isShowing() && segWarningIcon.isVisible()) {
+			segWarningPopOver.show(segWarningIcon);
+		}
+	}
+
+	/**
+	 * Set the colour of the warning sign. Do not use setStyle here - changing the
+	 * inline style of a FontIcon whose icon code is already set resets its font to the
+	 * system font, and the icon then draws as a stack of horizontal lines.
+	 * @param colour - the colour.
+	 */
+	private void setSegWarningColour(Color colour) {
+		segWarningGlyph.setIconColor(colour);
+	}
+
+	/**
+	 * Create the content for the segment warning tooltip or pop over: the warning text
+	 * and a button to set the model's default segment length and hop.
+	 * @param textLabel - the label which will hold the warning text.
+	 * @return the content node.
+	 */
+	private Pane createSegWarningContent(Label textLabel) {
+		textLabel.setWrapText(true);
+		//a fixed width so the wrapped text has a sensible size.
+		textLabel.setPrefWidth(350);
+		textLabel.setMinHeight(Region.USE_PREF_SIZE);
+
+		PamButton setDefaultSegButton = new PamButton("Set model segment length and hop");
+		setDefaultSegButton.setTooltip(new Tooltip("Set the segment length to the model's default for the current "
+				+ "source sample rate and the hop to half the segment length"));
+		setDefaultSegButton.setOnAction((action)->{
+			setModelDefaultSegment();
+			if (segWarningPopOver!=null) segWarningPopOver.hide();
+		});
+
+		PamVBox content = new PamVBox();
+		content.setSpacing(5);
+		content.setAlignment(Pos.CENTER_LEFT);
+		content.getChildren().addAll(textLabel, setDefaultSegButton);
+		return content;
+	}
+
+	/**
+	 * Get the model's default segment length in milliseconds.
+	 * @return the default segment length in millis or null if the current model has no default segment length.
+	 */
+	private Double getModelDefaultSegLen() {
+		if (modelSelectPane==null || modelSelectPane.currentClassifierModel==null) return null;
+		Serializable modelSettings = modelSelectPane.currentClassifierModel.getDLModelSettings();
+		if (!(modelSettings instanceof StandardModelParams)) return null;
+		Double segLen = ((StandardModelParams) modelSettings).defaultSegmentLen;
+		if (segLen==null || segLen<=0) return null;
+		return segLen;
+	}
+
+	/**
+	 * Check whether the segment length matches the default segment length of the
+	 * current model at the current source sample rate. If not, show a warning with a
+	 * button to set the correct segment length and hop. A mismatch usually happens
+	 * when the source is changed to one with a different sample rate because the
+	 * segment length is stored in samples.
+	 */
+	private void checkSegmentLength() {
+		if (segWarningIcon==null) return;
+
+		boolean show = false;
+		Double segLen = getModelDefaultSegLen();
+		@SuppressWarnings("rawtypes")
+		PamDataBlock source = sourcePane.getSource();
+		if (segLen!=null && source!=null && source.getSampleRate()>0 && !segmenterGridPane.isDisabled()) {
+			float sR = source.getSampleRate();
+			int defaultSamples = (int) (segLen*sR/1000.);
+			int currentSamples = windowLength.getValue()==null ? 0 : windowLength.getValue();
+			//allow a sample of leeway for rounding errors
+			if (defaultSamples>0 && Math.abs(currentSamples-defaultSamples)>1) {
+				show = true;
+				String warnText = String.format("The segment length (%d samples, %.1f ms) does not match the model's "
+						+ "default segment length of %.1f ms which is %d samples at %.0f Hz. "
+						+ "This often happens if the source has a different sample rate.",
+						currentSamples, 1000.*currentSamples/sR, segLen, defaultSamples, sR);
+				segWarningPopLabel.setText(warnText);
+			}
+		}
+
+		if (segWarningIcon.isVisible()!=show) {
+			segWarningIcon.setVisible(show);
+			if (show) {
+				//draw attention to the new warning
+				segWarningPulse.playFromStart();
+			}
+			else {
+				segWarningPulse.stop();
+				segWarningRedness.set(0);
+				segWarningPopOver.hide();
+			}
+		}
+	}
+
+	/**
+	 * Set the segment length to the model's default segment length for the current
+	 * source sample rate and set the hop to half the segment length.
+	 */
+	private void setModelDefaultSegment() {
+		Double segLen = getModelDefaultSegLen();
+		if (segLen==null || sourcePane.getSource()==null) return;
+		setSegmentLength(segLen);
+		setHopLength(segLen/2);
 	}
 
 	/**
@@ -408,6 +661,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		segmenterGridPane.setDisable(!segEnable);	
 		infoLabel.setDisable(!segEnable);	
+
+		checkSegmentLength();
 	}
 
 
@@ -460,7 +715,16 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			//For example, if the model requires a specific type of data then set the source list to that type.
 			if (modelSelectPane.currentClassifierModel!=null) {
 				setSourceList(modelSelectPane.currentClassifierModel); //this should be above setParams so that the classifier sets the correct sample rate
-				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+				try {
+					modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+				}
+				catch (Exception e) {
+					//do not fail silently - the model settings (e.g. class names and transforms) may not be shown.
+					e.printStackTrace();
+					PamDialogFX.showError("Deep Learning Model Settings",
+							"The model loaded but there was an error showing its settings so some settings (e.g. the class names and transforms) "
+							+ "may be missing or incorrect.\n\n" + e.getClass().getSimpleName() + (e.getMessage() == null ? "" : ": " + e.getMessage()));
+				}
 			}
 			else {
 				classifierPane.setCenter(null); 
@@ -473,8 +737,32 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			classifierPane.setCenter(null); 
 			setDefaultSourceList();
 		}
+
+		//the model may have a different default segment length.
+		checkSegmentLength();
 	}
 
+
+	/**
+	 * Exclude all data blocks produced by this deep learning module from the
+	 * source list. A module must never use its own output as its input (that
+	 * would be recursive), although output from <i>other</i> deep learning
+	 * modules is still allowed.
+	 */
+	@SuppressWarnings("rawtypes")
+	private void excludeOwnDataBlocks() {
+		if (sourcePane == null || dlControl == null) return;
+		for (int i = 0; i < dlControl.getNumPamProcesses(); i++) {
+			PamProcess process = dlControl.getPamProcess(i);
+			if (process == null) continue;
+			for (int j = 0; j < process.getNumOutputDataBlocks(); j++) {
+				PamDataBlock block = process.getOutputDataBlock(j);
+				if (block != null) {
+					sourcePane.excludeDataBlock(block, true);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Set the allowed sources for this type of model. 
@@ -660,6 +948,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	public void setParams(RawDLParams currParams) {
 				
 		sourcePane.sourceChanged();
+		excludeOwnDataBlocks();
 		sourcePane.setSourceList();
 		sourcePane.setParams(currParams.groupedSourceParams);
 

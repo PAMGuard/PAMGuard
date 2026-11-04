@@ -3,6 +3,7 @@ package PamController.pamWizard;
 import java.util.Set;
 
 import PamController.PamController;
+import PamController.pamWizard.configurations.ConfigApplyContext;
 import PamController.pamWizard.configurations.ConfigSpeciesGroup;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 
@@ -16,6 +17,8 @@ import PamController.soundMedium.GlobalMedium.SoundMedium;
  */
 public class SpectrogramViewerAutoConfig implements PamAutoConfig {
 
+	private SpectrogramOptions spectrogramOptions;
+
 	@Override
 	public boolean isValid(PamFileImport importHandler, int runMode) {
 		return runMode == PamController.RUN_PAMVIEW && importHandler.hasType(PamImportFileType.SOUND);
@@ -23,7 +26,7 @@ public class SpectrogramViewerAutoConfig implements PamAutoConfig {
 
 	@Override
 	public void createConfiguration(PamFileImport importHandler) {
-		new SpectrogramConfigBuilder().build(importHandler, true);
+		new SpectrogramConfigBuilder().build(importHandler, true, spectrogramOptions);
 	}
 
 	@Override
@@ -37,7 +40,8 @@ public class SpectrogramViewerAutoConfig implements PamAutoConfig {
 				+ "Sets up sound acquisition, an FFT (spectrogram) engine, a time-display "
 				+ "spectrogram and a spectrogram annotation module for manual annotation. The "
 				+ "display loads one hour of data at a time, showing 20 seconds, and opens at "
-				+ "the start of the first file.";
+				+ "the start of the first file. The data can optionally be decimated before the FFT, "
+				+ "and the FFT length and hop chosen, on the next pages.";
 	}
 
 	@Override
@@ -61,5 +65,15 @@ public class SpectrogramViewerAutoConfig implements PamAutoConfig {
 	public SoundMedium getGlobalMediumSettings() {
 		// spectrograms don't care whether air or water.
 		return null;
+	}
+
+	@Override
+	public boolean hasSpectrogramOptions() {
+		return true;
+	}
+
+	@Override
+	public void setApplyContext(ConfigApplyContext applyContext) {
+		spectrogramOptions = applyContext.getSpectrogramOptions();
 	}
 }

@@ -1,0 +1,29 @@
+{
+  "framework_info": {"framework": "YOLO"},
+  "model_info": {
+    "yolo_type": "ultralytics",
+    "input_shape": [-1, 3, 480, 640],
+    "channels_first": true,
+    "colour": "grey",
+    "uint8": true,
+    "nms_overlap": 0.7,
+    "agnostic_nms": true,
+    "max_det": 300
+  },
+  "class_info": {
+    "name_class": ["bmabz", "d", "bp"],
+    "num_class": 3
+  },
+  "transforms": [
+    {"name": "load_audio_poly", "params": {"sr": 250}},
+    {"name": "filter_wav", "params": {"filtermethod": 0, "filtertype": 2, "order": 20, "lowcut": 5, "highcut": 124}},
+    {"name": "spectrogram_scipy", "params": {"win_len": 256, "hop": 20, "nfft": 512, "window_type": 2}},
+    {"name": "spec_product", "params": {"multiply": -1}},
+    {"name": "spec_add", "params": {"add": 1}},
+    {"name": "normalize_percentile", "params": {"percentile": 98}},
+    {"name": "spec_flip", "params": {}}
+  ],
+  "description": "BioDCASE 2026 Task 2 baseline (YOLO11s, Ultralytics) for Antarctic blue whale (bmabz), blue/fin whale D/downsweep (d) and fin whale 20 Hz (bp) calls. 30 s segments at 250 Hz, images 257 x 363 letterboxed to 480 x 640. Weights from Zenodo record 20281116 (CC BY 4.0). Run with 15 s hop and a confidence of 0.1 to match the baseline.",
+  "version_info": {"version": 1},
+  "seg_size": {"size_ms": 30000}
+}

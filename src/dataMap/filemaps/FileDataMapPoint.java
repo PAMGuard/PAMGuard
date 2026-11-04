@@ -74,6 +74,7 @@ public class FileDataMapPoint extends OfflineDataMapPoint implements ManagedPara
 	 * waveform one. Code which needs to pick between the two goes through
 	 * {@link SoundFileDatagramManager#getDatagram}.
 	 */
+
 	@Override
 	public Datagram getDatagram() {
 		return datagram;

@@ -1,6 +1,5 @@
 package annotationMark.spectrogram;
 
-import PamguardMVC.PamDataBlock;
 import detectionPlotFX.data.DDDataInfo;
 import detectionPlotFX.data.DDDataProvider;
 import detectionPlotFX.layout.DetectionPlotDisplay;
@@ -14,13 +13,16 @@ import detectionPlotFX.layout.DetectionPlotDisplay;
  */
 public class SpectrogramAnnotationDDPlotProvider extends DDDataProvider {
 
-	public SpectrogramAnnotationDDPlotProvider(PamDataBlock markDataBlock) {
-		super(markDataBlock);
+	private SpectrogramAnnotationModule annotationModule;
+
+	public SpectrogramAnnotationDDPlotProvider(SpectrogramAnnotationModule annotationModule) {
+		super(annotationModule.getAnnotationDataBlock());
+		this.annotationModule = annotationModule;
 	}
 
 	@Override
 	public DDDataInfo createDataInfo(DetectionPlotDisplay tdGraph) {
-		return new SpectrogramAnnotationDDInfo(tdGraph, getDataBlock());
+		return new SpectrogramAnnotationDDInfo(tdGraph, annotationModule);
 	}
 
 }

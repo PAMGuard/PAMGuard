@@ -1,11 +1,7 @@
 package annotationMark.spectrogram;
 
-import java.util.ArrayList;
-
-import PamController.PamController;
 import PamUtils.Coordinate3d;
 import PamUtils.PamUtils;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import annotationMark.MarkDataUnit;
 import detectionPlotFX.layout.DetectionPlotDisplay;
@@ -20,22 +16,26 @@ import javafx.scene.shape.Rectangle;
  * ({@link MarkDataUnit}) and draws the annotated time/frequency box over the top.
  * <p>
  * A {@link MarkDataUnit} does not hold its own raw waveform, so - unlike detections
- * that implement {@code RawDataHolder} - the raw audio has to be loaded from the
- * acquisition data block for the time span of the mark. This only works in viewer
- * mode where the raw sound files are available.
+ * that implement {@code RawDataHolder} - the raw audio has to be loaded for the time
+ * span of the mark. It's loaded from the data feeding the display the mark was made
+ * on (which may be a decimator) so the pop up shows what the user marked out. This
+ * only works in viewer mode where the raw sound files are available.
  *
  * @author Jamie Macaulay
  */
 public class SpectrogramAnnotationFFTPlot extends RawFFTPlot<MarkDataUnit> {
 
-	public SpectrogramAnnotationFFTPlot(DetectionPlotDisplay displayPlot) {
+	private SpectrogramAnnotationModule annotationModule;
+
+	public SpectrogramAnnotationFFTPlot(DetectionPlotDisplay displayPlot, SpectrogramAnnotationModule annotationModule) {
 		super(displayPlot, displayPlot.getDetectionPlotProjector());
+		this.annotationModule = annotationModule;
 	}
 
 	@Override
 	public void loadRawData(MarkDataUnit dataUnit, double padding, int plotChannel) {
 		//the annotation's data block has no raw source (the mark process has a null parent
-		//process) so load raw data directly from the acquisition data block.
+		//process) so load raw data from the source of the display the mark was made on.
 		PamRawDataBlock rawDataBlock = findRawDataBlock(dataUnit);
 		if (rawDataBlock == null) {
 			return;
@@ -87,24 +87,13 @@ public class SpectrogramAnnotationFFTPlot extends RawFFTPlot<MarkDataUnit> {
 	}
 
 	/**
-	 * Find a raw (acquisition) data block to load sound data from. Prefers a block which
-	 * contains the annotation's channel, otherwise falls back to the first raw data block.
+	 * Find the raw data block to load sound data from. This is the source of the display
+	 * the mark was made on, e.g. a decimator, rather than always the sound acquisition.
 	 * @param dataUnit - the annotation data unit.
 	 * @return a raw data block, or null if none are available.
 	 */
 	private PamRawDataBlock findRawDataBlock(MarkDataUnit dataUnit) {
-		ArrayList<PamDataBlock> rawBlocks = PamController.getInstance().getRawDataBlocks();
-		if (rawBlocks == null || rawBlocks.isEmpty()) {
-			return null;
-		}
-		int channelMap = dataUnit.getChannelBitmap();
-		for (PamDataBlock rawBlock : rawBlocks) {
-			if (rawBlock instanceof PamRawDataBlock && (rawBlock.getChannelMap() & channelMap) != 0) {
-				return (PamRawDataBlock) rawBlock;
-			}
-		}
-		//fall back to the first raw data block.
-		return PamController.getInstance().getRawDataBlock(0);
+		return annotationModule.findRawSourceDataBlock(dataUnit);
 	}
 
 }

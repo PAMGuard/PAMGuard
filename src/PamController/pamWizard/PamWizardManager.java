@@ -75,6 +75,7 @@ public class PamWizardManager {
 
 	private void createAutoConfigs() {
 		autoConfigs.add(new SpectrogramViewerAutoConfig());
+		autoConfigs.add(new SpectrogramBearingViewerAutoConfig());
 		autoConfigs.add(new SpectrogramRealTimeAutoConfig());
 		autoConfigs.add(new PODViewerAutoConfig());
 		/* Future: register combined configurations here, e.g. a config that is valid

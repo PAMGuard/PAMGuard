@@ -81,6 +81,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		frequencyInfo = new GenericScaleInfo(0, 1, ParameterType.FREQUENCY, ParameterUnits.HZ);
 		Arrays.fill(frequencyInfo.getPlotChannels(),1); //TODO-manage plot pane channels somehow. 
 		frequencyInfo.setMaxVal(pamDataBlock.getSampleRate()/2);
+		frequencyInfo.setDefaultRange(()->new double[] {0, pamDataBlock.getSampleRate()/2.});
 		genericSettingsPane = new GenericSettingsPane(this);
 
 		addScaleInfo(bearingScaleInfo);

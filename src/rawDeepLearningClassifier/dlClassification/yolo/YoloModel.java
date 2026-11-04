@@ -9,7 +9,9 @@ import java.util.List;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticResultArray;
 import org.jamdev.jdl4pam.deepAcoustics.DeepAcousticsTranslator;
 import org.jamdev.jdl4pam.deepAcoustics.Pred2BoxDJL3.DeepAcousticsNetwork;
+import org.jamdev.jdl4pam.deepAcoustics.YoloV8Translator;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
+import org.jamdev.jdl4pam.utils.InputShapeException;
 import org.jamdev.jpamutils.interpolation.ImResize;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,19 +23,26 @@ import ai.djl.ndarray.types.Shape;
 import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveModel;
 
 /**
- * A YOLO v4 object detection model trained in MATLAB (e.g. a
- * yolov4ObjectDetector or a DeepAcoustics model) and exported as a TensorFlow
- * or PyTorch model. YOLO models detect objects (i.e. calls) within a
- * spectrogram image and so, unlike most other models, return bounding boxes.
+ * A YOLO object detection model. YOLO models detect objects (i.e. calls) within
+ * a spectrogram image and so, unlike most other models, return bounding boxes.
+ * Two types of YOLO model are supported.
+ * <ul>
+ * <li>YOLO v4 models trained in MATLAB (e.g. a yolov4ObjectDetector or a
+ * DeepAcoustics model) and exported as a TensorFlow or PyTorch model.</li>
+ * <li>Anchor free Ultralytics models (YOLOv8, YOLO11 etc.) exported to
+ * TorchScript without NMS. The output is [batch, 4 + nClasses, nAnchors].</li>
+ * </ul>
  * <p>
  * The model is packaged in a zip file with a .pdtf JSON metadata file. As well
  * as the standard metadata the <code>model_info</code> object contains
  * information on how to create the input image and decode the output.
  * <ul>
+ * <li><b>yolo_type</b> - optional. "yolov4" (default) for MATLAB models or
+ * "ultralytics" (or "yolov8", "yolo11") for Ultralytics models.</li>
  * <li><b>input_shape</b> - the input shape e.g. [-1, 288, 288, 3] or [-1, 3,
  * 192, 2368] for a channels first model.</li>
- * <li><b>anchorboxes</b> - the anchor boxes for each detection head as
- * [height, width] in pixels.</li>
+ * <li><b>anchorboxes</b> - YOLO v4 only. The anchor boxes for each detection
+ * head as [height, width] in pixels.</li>
  * <li><b>channels_first</b> - optional. true if the input and outputs are
  * [batch, channels, height, width] (e.g. PyTorch). Default false i.e. [batch,
  * height, width, channels].</li>
@@ -52,10 +61,20 @@ import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveMode
  * <li><b>filter_large_boxes</b> - optional. true to remove bounding boxes which
  * are wider or taller than the image (MATLAB's yolov4ObjectDetector does this
  * by default). Default false.</li>
+ * <li><b>agnostic_nms</b> - optional, Ultralytics only. true to run non maximum
+ * suppression over boxes of all classes (Ultralytics agnostic_nms). Default
+ * false.</li>
+ * <li><b>max_det</b> - optional, Ultralytics only. The maximum number of boxes
+ * per segment. Default 300.</li>
+ * <li><b>uint8</b> - optional, Ultralytics only. true to quantise the image to
+ * 8 bits as Ultralytics does with image files. Default false.</li>
  * </ul>
- * If the transformed spectrogram is not the same size as the input image then
- * the image is resized using the same bicubic interpolation as MATLAB's
- * imresize function. The spectrogram is coloured before it is resized.
+ * For YOLO v4 models, if the transformed spectrogram is not the same size as
+ * the input image then the image is resized using the same bicubic
+ * interpolation as MATLAB's imresize function. The spectrogram is coloured
+ * before it is resized. For Ultralytics models the image is letterboxed in the
+ * same way as Ultralytics, i.e. resized keeping the aspect ratio and padded,
+ * and bounding boxes are returned in pixels of the transformed spectrogram.
  *
  * @author Jamie Macaulay
  */
@@ -79,9 +98,39 @@ public class YoloModel extends SimpleArchiveModel {
 	}
 
 	/**
-	 * The translator for the model
+	 * The type of YOLO model.
+	 */
+	public enum YoloType {
+		/**
+		 * A YOLO v4 model with anchor boxes trained in MATLAB.
+		 */
+		YOLOV4,
+
+		/**
+		 * An anchor free Ultralytics model e.g. YOLOv8 or YOLO11.
+		 */
+		ULTRALYTICS
+	}
+
+	/**
+	 * The type of YOLO model.
+	 */
+	private YoloType yoloType = YoloType.YOLOV4;
+
+	/**
+	 * The translator for YOLO v4 models.
 	 */
 	private DeepAcousticsTranslator deepAcousticsTranslator;
+
+	/**
+	 * The translator for Ultralytics models.
+	 */
+	private YoloV8Translator yoloV8Translator;
+
+	/**
+	 * The model input shape.
+	 */
+	private Shape inputShape;
 
 	/**
 	 * The predictor for the model if using images as input
@@ -124,7 +173,7 @@ public class YoloModel extends SimpleArchiveModel {
 		JSONObject modelObject = mainObject.getJSONObject("model_info");
 
 		// the input shape in the metadata takes precedence because PyTorch models do not specify an input shape
-		Shape inputShape = this.getInputShape();
+		inputShape = this.getInputShape();
 		if (modelObject.has("input_shape")) {
 			JSONArray shapeArray = modelObject.getJSONArray("input_shape");
 			long[] shape = new long[shapeArray.length()];
@@ -134,23 +183,79 @@ public class YoloModel extends SimpleArchiveModel {
 			inputShape = new Shape(shape);
 		}
 
-		// Load the network from the metadata
-		network = loadNetwork(modelObject, inputShape);
-
-		if (network == null) {
-			throw new MalformedModelException("Failed to load YOLO network information from JSON data " + this.getAudioReprFile());
-		}
+		yoloType = parseYoloType(modelObject.optString("yolo_type", "yolov4"));
 
 		if (modelObject.has("colour")) {
 			colourMode = ColourMode.valueOf(modelObject.getString("colour").trim().toUpperCase());
 		}
 		rescale = modelObject.optBoolean("rescale", false);
 
-		// Initialize the translator with the loaded network
-		deepAcousticsTranslator = new DeepAcousticsTranslator(network);
+		if (yoloType == YoloType.ULTRALYTICS) {
+			if (inputShape == null || inputShape.dimension() != 4) {
+				throw new MalformedModelException("An Ultralytics YOLO model needs an input_shape of [batch, channels, height, width] in " + this.getAudioReprFile());
+			}
+			yoloV8Translator = loadYoloV8Translator(modelObject, inputShape);
+		}
+		else {
+			// Load the network from the metadata
+			network = loadNetwork(modelObject, inputShape);
+
+			if (network == null) {
+				throw new MalformedModelException("Failed to load YOLO network information from JSON data " + this.getAudioReprFile());
+			}
+
+			// Initialize the translator with the loaded network
+			deepAcousticsTranslator = new DeepAcousticsTranslator(network);
+		}
 
 		//predictor for the model if using images as input
-		objectPredictor = getModel().newPredictor(deepAcousticsTranslator);
+		objectPredictor = newObjectPredictor();
+	}
+
+	/**
+	 * Get the YOLO type from the yolo_type string in the metadata.
+	 *
+	 * @param yoloTypeString - the YOLO type e.g. "yolov4", "ultralytics", "yolov8" or "yolo11".
+	 * @return the YOLO type.
+	 * @throws MalformedModelException if the type is not recognised.
+	 */
+	public static YoloType parseYoloType(String yoloTypeString) throws MalformedModelException {
+		String type = yoloTypeString.trim().toLowerCase();
+		if (type.equals("yolov4") || type.equals("matlab")) {
+			return YoloType.YOLOV4;
+		}
+		if (type.equals("ultralytics") || type.matches("yolo(v)?(5u|8|9|10|11|12)")) {
+			return YoloType.ULTRALYTICS;
+		}
+		throw new MalformedModelException("Unknown yolo_type " + yoloTypeString + ". Use yolov4 or ultralytics.");
+	}
+
+	/**
+	 * Create the translator for an Ultralytics model from the model_info JSON
+	 * object.
+	 *
+	 * @param modelObject - the model_info JSON object.
+	 * @param inputShape  - the input shape [batch, channels, height, width].
+	 * @return the translator.
+	 */
+	public static YoloV8Translator loadYoloV8Translator(JSONObject modelObject, Shape inputShape) {
+		YoloV8Translator translator = new YoloV8Translator(inputShape);
+		translator.setNmsOverlap(modelObject.optDouble("nms_overlap", 0.7));
+		translator.setAgnosticNMS(modelObject.optBoolean("agnostic_nms", false));
+		translator.setMaxDet(modelObject.optInt("max_det", 300));
+		translator.setUint8(modelObject.optBoolean("uint8", false));
+		return translator;
+	}
+
+	/**
+	 * Create a predictor using the translator for the type of YOLO model.
+	 * @return the predictor.
+	 */
+	private Predictor<float[][][][], List<DeepAcousticResultArray>> newObjectPredictor() {
+		if (yoloType == YoloType.ULTRALYTICS) {
+			return getModel().newPredictor(yoloV8Translator);
+		}
+		return getModel().newPredictor(deepAcousticsTranslator);
 	}
 
 	/**
@@ -221,6 +326,12 @@ public class YoloModel extends SimpleArchiveModel {
 		try {
 			return objectPredictor.predict(specImage);
 		} catch (Throwable e) {
+			//the input images do not fit the model - reloading the model will not help.
+			InputShapeException shapeException = InputShapeException.find(e);
+			if (shapeException != null) {
+				System.err.println("Error running YOLO model: " + shapeException.getMessage());
+				return null;
+			}
 			//if the model failed on the GPU (Apple MPS), reload on the CPU and retry once.
 			if (fallbackToCpu()) {
 				try {
@@ -244,7 +355,7 @@ public class YoloModel extends SimpleArchiveModel {
 	 */
 	@Override
 	protected void onModelReloaded() {
-		objectPredictor = getModel().newPredictor(deepAcousticsTranslator);
+		objectPredictor = newObjectPredictor();
 	}
 
 	/**
@@ -254,11 +365,38 @@ public class YoloModel extends SimpleArchiveModel {
 	 *                  class probability) for a detection.
 	 */
 	public void setThreshold(float threshold) {
-		deepAcousticsTranslator.setThresh(threshold);
+		if (yoloType == YoloType.ULTRALYTICS) {
+			yoloV8Translator.setThresh(threshold);
+		}
+		else {
+			deepAcousticsTranslator.setThresh(threshold);
+		}
 	}
 
 	/**
-	 * Get the network information e.g. anchor boxes and input shape.
+	 * Get the type of YOLO model.
+	 *
+	 * @return the YOLO type.
+	 */
+	public YoloType getYoloType() {
+		return yoloType;
+	}
+
+	/**
+	 * Get the position of the left (or top) edge of the image in the bounding box
+	 * pixel coordinates. YOLO v4 models from MATLAB use MATLAB pixel coordinates
+	 * where the first pixel is centred on 1 and so the image starts at 0.5.
+	 * Ultralytics boxes start at 0.
+	 *
+	 * @return the pixel coordinate of the image edge.
+	 */
+	public double getBoxPixelOffset() {
+		return yoloType == YoloType.ULTRALYTICS ? 0 : 0.5;
+	}
+
+	/**
+	 * Get the network information e.g. anchor boxes and input shape. This is
+	 * null for Ultralytics models.
 	 *
 	 * @return the network information.
 	 */
@@ -272,6 +410,9 @@ public class YoloModel extends SimpleArchiveModel {
 	 * @return the image height (frequency axis).
 	 */
 	public int getImageHeight() {
+		if (yoloType == YoloType.ULTRALYTICS) {
+			return (int) inputShape.get(2);
+		}
 		return network.getImageHeight();
 	}
 
@@ -281,6 +422,9 @@ public class YoloModel extends SimpleArchiveModel {
 	 * @return the image width (time axis).
 	 */
 	public int getImageWidth() {
+		if (yoloType == YoloType.ULTRALYTICS) {
+			return (int) inputShape.get(3);
+		}
 		return network.getImageWidth();
 	}
 
@@ -288,6 +432,11 @@ public class YoloModel extends SimpleArchiveModel {
 	 * Convert a stack of transformed spectrograms into model input images. Each
 	 * spectrogram is coloured, resized to the model input size, optionally
 	 * normalised and arranged in the order expected by the model.
+	 * <p>
+	 * For Ultralytics models the images are not resized because the translator
+	 * letterboxes them. The images are [image][channels][height][width] where
+	 * the height is the number of frequency bins and the width the number of time
+	 * bins.
 	 *
 	 * @param transformedDataStack - the spectrograms [image][time][frequency]. The
 	 *                             first frequency bin is the top of the image.
@@ -310,9 +459,13 @@ public class YoloModel extends SimpleArchiveModel {
 	 */
 	private float[][][] formatImage(float[][] spec) {
 
-		int height = network.getImageHeight();
-		int width = network.getImageWidth();
-		int nChannels = network.getImageChannels();
+		boolean ultralytics = yoloType == YoloType.ULTRALYTICS;
+
+		//Ultralytics images are letterboxed by the translator so keep the size of the spectrogram.
+		int height = ultralytics ? spec[0].length : network.getImageHeight();
+		int width = ultralytics ? spec.length : network.getImageWidth();
+		int nChannels = ultralytics ? (int) inputShape.get(1) : network.getImageChannels();
+		boolean channelsFirst = ultralytics || network.isChannelsFirst();
 
 		//the image channels - each is [time][frequency]
 		double[][][] channels = colourImage(spec, nChannels, colourMode);
@@ -340,7 +493,7 @@ public class YoloModel extends SimpleArchiveModel {
 		}
 
 		float[][][] image;
-		if (network.isChannelsFirst()) {
+		if (channelsFirst) {
 			image = new float[nChannels][height][width];
 			for (int c = 0; c < nChannels; c++) {
 				for (int h = 0; h < height; h++) {

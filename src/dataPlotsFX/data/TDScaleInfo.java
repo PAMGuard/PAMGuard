@@ -1,5 +1,7 @@
 package dataPlotsFX.data;
 
+import java.util.function.Supplier;
+
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import dataPlots.data.TDDataInfo;
@@ -77,6 +79,17 @@ public class TDScaleInfo {
 	 */
 	private boolean reverseAxis = false; 
 	
+	/**
+	 * The default axis range - the min and max values the scale info was created with. 
+	 */
+	private double[] defaultRange; 
+	
+	/**
+	 * Optional supplier of the default range for axes whose default can change e.g. frequency axes 
+	 * which depend on sample rate. If null then the range the scale info was created with is used. 
+	 */
+	private Supplier<double[]> defaultRangeSupplier; 
+	
 //	/**
 //	 * String converter for axis. 
 //	 */
@@ -96,6 +109,7 @@ public class TDScaleInfo {
 		super();
 		this.minVal.setValue(minVal);
 		this.maxVal.setValue(maxVal);
+		this.defaultRange = new double[] {minVal, maxVal}; 
 		this.dataTypeInfo=new DataTypeInfo(dataType, dataUnits); 
 		setAllVisible(true);
 		addDivisorListener();
@@ -200,6 +214,41 @@ public class TDScaleInfo {
 	 */
 	public void setMaxVal(double maxVal) {
 		this.maxVal.setValue(maxVal);
+	}
+
+	/**
+	 * Get the default range of the axis e.g. 0 to Nyquist for a frequency axis.
+	 * @return the default range - two element array of min and max value. 
+	 */
+	public double[] getDefaultRange() {
+		if (defaultRangeSupplier != null) {
+			double[] range = defaultRangeSupplier.get(); 
+			if (range != null) {
+				return range; 
+			}
+		}
+		return defaultRange; 
+	}
+	
+	/**
+	 * Set a supplier for the default range of the axis. Use this for axes whose default range 
+	 * can change after the scale info has been created e.g. 0 to Nyquist for a frequency axis.
+	 * @param defaultRangeSupplier - supplies a two element array of min and max value. 
+	 */
+	public void setDefaultRange(Supplier<double[]> defaultRangeSupplier) {
+		this.defaultRangeSupplier = defaultRangeSupplier; 
+	}
+	
+	/**
+	 * Reset the axis min and max values to the default range. 
+	 */
+	public void resetToDefaultRange() {
+		double[] range = getDefaultRange(); 
+		if (range == null) {
+			return; 
+		}
+		setMinVal(range[0]);
+		setMaxVal(range[1]);
 	}
 
 	/**

@@ -381,6 +381,10 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 				// the super dets dont' actually get subtableData, they get a  SubDetectionInfo!
 				// we do also have to find the correct datablock at this point to include in the 
 				// subdetectioninfo. 
+				if (psd.getLongName() == null) {
+					// row has had its data name cleared, so no way of knowing what the sub detection is.
+					continue;
+				}
 				if (subDetDataBlock == null || !subDetDataBlock.getLongDataName().equals(psd.getLongName())) {
 					subDetDataBlock = findSubDetDataBlock(psd.getLongName());
 				}

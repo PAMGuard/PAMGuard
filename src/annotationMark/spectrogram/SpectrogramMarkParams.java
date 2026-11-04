@@ -45,10 +45,12 @@ public class SpectrogramMarkParams implements Serializable, ManagedParameters {
 	public AnnotationChoices getAnnotationChoices(SpectrogramMarkAnnotationHandler annotationChoiceHandler) {
 		if (annotationChoices == null) {
 			annotationChoices = new AnnotationChoices();
-			// by default, set everything to true
+			// by default, use everything that's listed (i.e. not the sound measurements, which
+			// the user adds to the list themselves).
 			List<DataAnnotationType<?>> totList = annotationChoiceHandler.getAvailableAnnotationTypes();
 			for (DataAnnotationType aType:totList) {
-				annotationChoices.setAnnotionOption(aType.getAnnotationName(), aType.getAnnotationOptions(), true);
+				annotationChoices.setAnnotionOption(aType.getAnnotationName(), aType.getAnnotationOptions(),
+						annotationChoiceHandler.isDefaultListed(aType));
 			}
 		}
 		return annotationChoices;

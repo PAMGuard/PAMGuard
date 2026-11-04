@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import PamController.PamFolders;
+import PamController.pamWizard.SpectrogramOptions;
 
 /**
  * Everything the user chose in the import wizard which affects how a
@@ -31,6 +32,8 @@ public class ConfigApplyContext {
 	private File binaryFolder;
 
 	private File databaseFile;
+
+	private SpectrogramOptions spectrogramOptions = new SpectrogramOptions();
 
 	private final List<String> warnings = new ArrayList<>();
 
@@ -100,6 +103,25 @@ public class ConfigApplyContext {
 
 	public void setDatabaseFile(File databaseFile) {
 		this.databaseFile = databaseFile;
+	}
+
+	/**
+	 * The decimation and FFT choices for configurations which build a spectrogram.
+	 * Ignored by every other configuration.
+	 *
+	 * @return the spectrogram options, never null.
+	 */
+	public SpectrogramOptions getSpectrogramOptions() {
+		return spectrogramOptions;
+	}
+
+	public void setSpectrogramOptions(SpectrogramOptions spectrogramOptions) {
+		if (spectrogramOptions == null) {
+			this.spectrogramOptions = new SpectrogramOptions();
+		}
+		else {
+			this.spectrogramOptions = spectrogramOptions;
+		}
 	}
 
 	/**

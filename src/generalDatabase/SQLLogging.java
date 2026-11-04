@@ -603,7 +603,9 @@ public abstract class SQLLogging {
 					//				return true;
 					boolean ok = transferDataFromResult(con.getSqlTypes(), result);
 					result.close();
-					beforeNafter[i] = createDataUnit(sqlTypes, lastTime, lastLoadIndex);
+					if (ok) {
+						beforeNafter[i] = createDataUnit(sqlTypes, lastTime, lastLoadIndex);
+					}
 				}
 			} catch (SQLException ex) {
 				ex.printStackTrace();
@@ -813,8 +815,10 @@ public abstract class SQLLogging {
 		try {
 			
 			while (resultSet.next()) {
-				
-				transferDataFromResult(sqlTypes, resultSet);
+
+				if (!transferDataFromResult(sqlTypes, resultSet)) {
+					continue;
+				}
 				newDataUnit = createDataUnit(sqlTypes, lastTime, lastLoadIndex);
 				if (newDataUnit != null) {
 					/**
@@ -934,7 +938,9 @@ public abstract class SQLLogging {
 		SQLTypes sqlTypes = con.getSqlTypes();
 		try {
 			while (resultSet.next()) {
-				transferDataFromResult(sqlTypes, resultSet);
+				if (!transferDataFromResult(sqlTypes, resultSet)) {
+					continue;
+				}
 				newDataUnit = createDataUnit(sqlTypes, lastTime, lastLoadIndex);
 				if (newDataUnit != null) {
 					newDataUnit.setDatabaseIndex(lastLoadIndex);
@@ -1173,7 +1179,17 @@ public abstract class SQLLogging {
 			lastLoadIndex = getTableDefinition().getIndexItem().getIntegerValue();
 			if (tableDef instanceof PamTableDefinition) {
 				PamTableDefinition pamTableDef = (PamTableDefinition) tableDef;
-				lastTime = SQLTypes.millisFromTimeStamp(pamTableDef.getTimeStampItem().getValue());
+				Long utc = SQLTypes.millisFromTimeStamp(pamTableDef.getTimeStampItem().getValue());
+				if (utc == null) {
+					/*
+					 * Can happen if a row has been cleared by hand rather than deleted. Without a time
+					 * the row can't become a data unit, so tell the caller to skip it.
+					 */
+					System.out.println(String.format("Null UTC reading %s at Index %d - item cannot be loaded.  Table should be manually corrected.",
+							tableDef.getTableName(), lastLoadIndex));
+					return false;
+				}
+				lastTime = utc;
 				if (lastTime%1000 == 0) {
 					// some databases may have stored the milliseconds, in which 
 					// case this next bit is redundant. 
@@ -1310,7 +1326,10 @@ public abstract class SQLLogging {
 					break;
 				}
 
-				transferDataFromResult(sqlTypes, mixedModeResult);
+				if (!transferDataFromResult(sqlTypes, mixedModeResult)) {
+					mixedDataWaiting = false;
+					continue;
+				}
 				mixedDataWaiting = true;
 				//				System.out.println("last time, time to, " + PamCalendar.formatDateTime(lastTime) + " : " +
 				//				PamCalendar.formatDateTime(timeTo));
@@ -2101,8 +2120,14 @@ public abstract class SQLLogging {
 							subtableTableDef.getIndexItem().getValue()));
 					continue;
 				}
+				Long utcObj = SQLTypes.millisFromTimeStamp(subtableTableDef.getTimeStampItem().getValue());
+				if (utcObj == null) {
+					System.out.println(String.format("Null UTC reading %s at Index %d - item cannot be loaded.  Table should be manually corrected.", subtableTableDef.getTableName(),
+							subtableTableDef.getIndexItem().getValue()));
+					continue;
+				}
 				PamSubtableData subtableData = new PamSubtableData();
-				long utc = SQLTypes.millisFromTimeStamp(subtableTableDef.getTimeStampItem().getValue());
+				long utc = utcObj;
 				if (utc % 1000 == 0) {
 					int millis = subtableTableDef.getTimeStampMillis().getIntegerValue();
 					utc += millis;

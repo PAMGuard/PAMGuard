@@ -13,9 +13,10 @@ import PamView.wizard.PamWizardCard;
  * The Swing import wizard: takes the user from a set of dropped files to a
  * working PAMGuard configuration.
  * <p>
- * Four pages - what was imported, which configuration to use, where to put the
- * data, and a summary of what will be built. The storage page is skipped for
- * configurations which have nothing to store.
+ * Five pages - what was imported, which configuration to use, where to put the
+ * data, how to calculate the spectrogram, and a summary of what will be built.
+ * The storage page is skipped for configurations which have nothing to store, and
+ * the spectrogram page for configurations which do not build a spectrogram.
  * <p>
  * Nothing is changed until Finish is pressed, so the user can back out at any
  * point.
@@ -31,6 +32,7 @@ public class ConfigImportWizard extends PamWizard {
 	private final ScanSummaryCard scanCard;
 	private final ConfigSelectionCard selectionCard;
 	private final StoragePathsCard storageCard;
+	private final SpectrogramOptionsCard spectrogramCard;
 	private final ConfigSummaryCard summaryCard;
 
 	private boolean finished = false;
@@ -42,11 +44,13 @@ public class ConfigImportWizard extends PamWizard {
 		scanCard = new ScanSummaryCard(this);
 		selectionCard = new ConfigSelectionCard(this);
 		storageCard = new StoragePathsCard(this);
+		spectrogramCard = new SpectrogramOptionsCard(this);
 		summaryCard = new ConfigSummaryCard(this);
 
 		addCard(scanCard);
 		addCard(selectionCard);
 		addCard(storageCard);
+		addCard(spectrogramCard);
 		addCard(summaryCard);
 
 		setParams();
@@ -103,12 +107,15 @@ public class ConfigImportWizard extends PamWizard {
 
 	/**
 	 * The storage page is only of use to a configuration which has a binary store or
-	 * a database.
+	 * a database, and the spectrogram page to one which builds a spectrogram.
 	 */
 	@Override
 	public boolean isCardEnabled(PamWizardCard wizardCard) {
 		if (wizardCard == storageCard) {
 			return wizardData.needsStoragePaths();
+		}
+		if (wizardCard == spectrogramCard) {
+			return wizardData.needsSpectrogramOptions();
 		}
 		return true;
 	}
@@ -172,6 +179,8 @@ public class ConfigImportWizard extends PamWizard {
 		case 2:
 			return storageCard;
 		case 3:
+			return spectrogramCard;
+		case 4:
 			return summaryCard;
 		default:
 			return null;

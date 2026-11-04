@@ -22,6 +22,8 @@ import PamView.dialog.PamTextDisplay;
 import PamguardMVC.PamDataBlock;
 import annotation.AnnotationDialogPanel;
 import annotation.DataAnnotationType;
+import annotation.calcs.measurement.SoundMeasurementAnnotationType;
+import annotation.calcs.measurement.SoundMeasurementSummaryPanel;
 import annotation.handler.AnnotationHandler;
 
 
@@ -75,8 +77,14 @@ public class MarkAnnotationDialog extends PamDialog {
 		AnnotationHandler annotationHandler = annotationDataBlock.getAnnotationHandler();
 		if (annotationHandler != null) {
 			annotationTypes = annotationHandler.getUsedAnnotationTypes();
+			// sound measurements are read only, so show them together in one panel.
+			ArrayList<SoundMeasurementAnnotationType> measurementTypes = new ArrayList<>();
 			for (int i = 0; i < annotationTypes.size(); i++) {
 				DataAnnotationType anType = annotationTypes.get(i);
+				if (anType instanceof SoundMeasurementAnnotationType) {
+					measurementTypes.add((SoundMeasurementAnnotationType) anType);
+					continue;
+				}
 				AnnotationDialogPanel anPanel = anType.getDialogPanel();
 				if (anPanel == null) {
 					continue;
@@ -85,6 +93,14 @@ public class MarkAnnotationDialog extends PamDialog {
 				border.setBorder(new TitledBorder(anType.getAnnotationName()));
 				border.add(BorderLayout.CENTER, anPanel.getDialogComponent());
 				dialogPanels.add(anPanel);
+				mainPanel.add(border);
+			}
+			if (measurementTypes.size() > 0) {
+				SoundMeasurementSummaryPanel measurePanel = new SoundMeasurementSummaryPanel(measurementTypes);
+				JPanel border = new JPanel(new BorderLayout());
+				border.setBorder(new TitledBorder("Measurements"));
+				border.add(BorderLayout.CENTER, measurePanel.getDialogComponent());
+				dialogPanels.add(measurePanel);
 				mainPanel.add(border);
 			}
 		}

@@ -3,6 +3,7 @@ package dataPlotsFX.layout;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -40,6 +41,8 @@ import pamViewFX.symbol.FXSymbolLegendFactory;
 import soundPlayback.PlaybackProgressMonitor;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import detectiongrouplocaliser.DetectionGroupSummary;
+import PamguardMVC.PamRawDataBlock;
 import dataPlotsFX.TDControl;
 import dataPlotsFX.TDGraphParametersFX;
 import dataPlotsFX.TDSymbolChooserFX;
@@ -1052,7 +1055,41 @@ public class TDGraphFX extends PamBorderPane {
 		}
 		return source;
 	}
-	
+
+	/**
+	 * Find the raw data block which feeds what this graph is showing. A spectrogram
+	 * is preferred since that is what users mark out on, and its source may well be a
+	 * decimator rather than the sound acquisition. If no spectrogram is shown, the
+	 * first raw source of any other displayed data block is returned.
+	 *
+	 * @param channelMap channels the raw data must contain, or 0 for any channel.
+	 * @return the raw data block, or null if none of the displayed data has a raw source.
+	 */
+	public PamRawDataBlock findRawSourceDataBlock(int channelMap) {
+		PamRawDataBlock fallback = null;
+		for (TDDataInfoFX dataInfo : dataList) {
+			if (dataInfo == null || dataInfo.getDataBlock() == null) {
+				continue;
+			}
+			PamDataBlock dataBlock = dataInfo.getDataBlock();
+			PamRawDataBlock rawBlock = dataBlock instanceof PamRawDataBlock ? (PamRawDataBlock) dataBlock
+					: dataBlock.getFirstRawSourceDataBlock();
+			if (rawBlock == null) {
+				continue;
+			}
+			if (channelMap != 0 && (rawBlock.getChannelMap() & channelMap) == 0) {
+				continue;
+			}
+			if (dataBlock instanceof FFTDataBlock) {
+				return rawBlock;
+			}
+			if (fallback == null) {
+				fallback = rawBlock;
+			}
+		}
+		return fallback;
+	}
+
 
 	/**
 	 * Get the axis for this tdGraph;
@@ -1965,6 +2002,21 @@ public class TDGraphFX extends PamBorderPane {
 			n++;
 			// System.out.println("Hoverdata N mark = " +
 			// graphProjector.getHoverDataList().size());
+		}
+	}
+
+	/**
+	 * Remove data units, e.g. ones which have been deleted, from the display's current
+	 * selection so they are no longer drawn highlighted. Call on the FX thread.
+	 * @param units data units to remove.
+	 */
+	public void removeFromSelection(Collection<? extends PamDataUnit> units) {
+		if (getOverlayMarkerManager() == null || getOverlayMarkerManager().getCurrentMarker() == null) {
+			return;
+		}
+		DetectionGroupSummary selected = getOverlayMarkerManager().getCurrentMarker().getSelectedDetectionGroup();
+		if (selected != null) {
+			selected.removeDataUnits(units);
 		}
 	}
 

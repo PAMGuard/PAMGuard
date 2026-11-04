@@ -108,6 +108,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 
 		//set correct frequency range based on nyquist. 
 		frequencyInfo.setMaxVal(pamDataBlock.getSampleRate()/2.);
+		frequencyInfo.setDefaultRange(()->new double[] {0, pamDataBlock.getSampleRate()/2.});
 
 	}
 

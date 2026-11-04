@@ -6,6 +6,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 
+import java.awt.Dimension;
+
+import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
@@ -19,7 +22,12 @@ import PamView.panel.PamPanel;
  *
  */
 public class BasicSidebarLayout {
-	
+
+	/**
+	 * Width of the quick action buttons at the top right of a slider.
+	 */
+	private static final int ACTION_BUTTON_WIDTH = 44;
+
 	private PamPanel mainPanel;
 	
 	private JLabel textLabel;
@@ -51,7 +59,18 @@ public class BasicSidebarLayout {
 		bsl.mainPanel.add(sliderComponent.getSlider(), c);
 		return bsl;
 	}
-		
+
+	/**
+	 * Set a button to the standard width for quick action buttons,
+	 * so that they line up from one slider to the next.
+	 * @param button button to size
+	 */
+	public static void setActionButtonWidth(AbstractButton button) {
+		Dimension d = button.getPreferredSize();
+		d.width = ACTION_BUTTON_WIDTH;
+		button.setPreferredSize(d);
+	}
+
 	public JComponent getComponent() {
 		return mainPanel;
 	}

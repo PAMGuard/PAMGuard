@@ -25,7 +25,7 @@ public class ColourArray implements Cloneable, Serializable{
 
 	}
 
-	public static enum ColourArrayType{GREY, REVERSEGREY, INFERNO, HOT, HSV, FIRE, PARULA, BLUE,  GREEN, RED, PATRIOTIC, MATLAB,}
+	public static enum ColourArrayType{GREY, REVERSEGREY, INFERNO, HOT, HSV, FIRE, PARULA, BLUE,  GREEN, RED, PATRIOTIC, MATLAB, COPPER}
 
 	public static String getName(ColourArrayType type) {
 		switch (type){
@@ -53,6 +53,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return "Inferno (multicoloured)";
 		case MATLAB:
 			return "Pastel (multicoloured)";
+		case COPPER:
+			return "Copper";
 		default:
 			return "Unknown";
 		}
@@ -90,6 +92,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return ColourArrayType.PARULA;
 		case "Pastel (multicoloured)":
 			return ColourArrayType.MATLAB;
+		case "Copper":
+			return ColourArrayType.COPPER;
 		default:
 			return ColourArrayType.GREY;
 		}
@@ -139,6 +143,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return createParulaArray(nPoints);
 		case MATLAB:
 			return createMATLABArray(nPoints);
+		case COPPER:
+			return createCopperArray(nPoints);
 		default:
 			return createMergedArray(nPoints, Color.GREEN, Color.RED);
 		}
@@ -177,6 +183,8 @@ public class ColourArray implements Cloneable, Serializable{
 			return "  linear-gradient(#3e26a8 0%, #4367fd 20%, #1caadf 40%, #48cb86 %, #eaba30 80%, #f9fb15 100%)";
 		case MATLAB:
 			return "  linear-gradient(#0072bd 0%, #da5319 17%, #edb120 33%,  #7e2f8e 50%, #77ac30 67%,  #4dbeee 83%, #a2142f 100% )";
+		case COPPER:
+			return "  linear-gradient(black 0%, #ff9f65 80%, #ffc77f 100%)";
 		default:
 			return "  linear-gradient(black 0%, blue 20%, cyan 40%, green 60%, orange 80%, red 100%)";
 		}
@@ -270,6 +278,17 @@ public class ColourArray implements Cloneable, Serializable{
 			colors[4]= Color.color(0.918400, 0.73080,  0.18900);
 			colors[5]= Color.color(0.9769,   0.98390,  0.0805000);
 			return colors; 
+		case COPPER:
+			// MATLAB copper reversed (light copper to black). Red saturates at 0.8 of the
+			// MATLAB range so evenly spaced stops reproduce the gradient exactly.
+			colors=new Color[6];
+			colors[0]= Color.color(1.0,  0.7812,  0.4975);
+			colors[1]= Color.color(1.0,  0.62496, 0.398);
+			colors[2]= Color.color(0.75, 0.46872, 0.2985);
+			colors[3]= Color.color(0.5,  0.31248, 0.199);
+			colors[4]= Color.color(0.25, 0.15624, 0.0995);
+			colors[5]= Color.color(0,    0,       0);
+			return colors; 
 		case INFERNO:
 			return InfernoColorMap.getInfernoColourMap();
 		default :
@@ -296,6 +315,22 @@ public class ColourArray implements Cloneable, Serializable{
 	private static ColourArray createMATLABArray(int nPoints) {
 		Color[] matlab=getColorList(ColourArrayType.MATLAB); 
 		return createMultiColouredArray(nPoints, matlab);
+	}
+
+	/**
+	 * Create the reversed MATLAB copper colour array (light copper to black). Uses
+	 * the MATLAB formula, r = min(1, 1.25x), g = 0.7812x, b = 0.4975x. 
+	 * @param nPoints - the size of the colour map
+	 * @return the colourmap.
+	 */
+	private static ColourArray createCopperArray(int nPoints) {
+		ColourArray ca = new ColourArray();
+		ca.colours = new Color[nPoints];
+		for (int i = 0; i < nPoints; i++) {
+			double x = nPoints > 1 ? 1. - (double) i / (nPoints-1) : 1.;
+			ca.colours[i] = new Color(Math.min(1, 1.25*x), 0.7812*x, 0.4975*x, 1);
+		}
+		return ca;
 	}
 
 	private static ColourArray createParulaArray(int nPoints) {

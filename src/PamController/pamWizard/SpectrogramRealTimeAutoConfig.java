@@ -3,6 +3,7 @@ package PamController.pamWizard;
 import java.util.Set;
 
 import PamController.PamController;
+import PamController.pamWizard.configurations.ConfigApplyContext;
 import PamController.pamWizard.configurations.ConfigSpeciesGroup;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 
@@ -15,6 +16,8 @@ import PamController.soundMedium.GlobalMedium.SoundMedium;
  */
 public class SpectrogramRealTimeAutoConfig implements PamAutoConfig {
 
+	private SpectrogramOptions spectrogramOptions;
+
 	@Override
 	public boolean isValid(PamFileImport importHandler, int runMode) {
 		return runMode == PamController.RUN_NORMAL && importHandler.hasType(PamImportFileType.SOUND);
@@ -22,7 +25,7 @@ public class SpectrogramRealTimeAutoConfig implements PamAutoConfig {
 
 	@Override
 	public void createConfiguration(PamFileImport importHandler) {
-		new SpectrogramConfigBuilder().build(importHandler, false);
+		new SpectrogramConfigBuilder().build(importHandler, false, spectrogramOptions);
 	}
 
 	@Override
@@ -57,5 +60,15 @@ public class SpectrogramRealTimeAutoConfig implements PamAutoConfig {
 	@Override
 	public SoundMedium getGlobalMediumSettings() {
 		return null;
+	}
+
+	@Override
+	public boolean hasSpectrogramOptions() {
+		return true;
+	}
+
+	@Override
+	public void setApplyContext(ConfigApplyContext applyContext) {
+		spectrogramOptions = applyContext.getSpectrogramOptions();
 	}
 }

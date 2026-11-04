@@ -2,6 +2,8 @@ package dataPlotsFX.spectrogramPlotFX;
 
 import java.io.Serializable;
 
+import javafx.beans.value.ChangeListener;
+
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.GeneralProjector.ParameterType;
@@ -76,32 +78,62 @@ public class FFTPlotInfo extends Scrolling2DPlotInfo {
 	}
 
 	boolean stopLoop=false; 
+	
+	/**
+	 * True once listeners have been added to the frequency scale info. Note: no field initialiser
+	 * because bindPlotParams() is first called from the super class constructor. 
+	 */
+	private boolean scaleListenersAdded; 
+	
+	/**
+	 * The spectrogram params whose frequency limits are currently linked to the frequency axis. 
+	 */
+	private SpectrogramParamsFX boundParams; 
+	
+	private ChangeListener<Number> minFreqListener; 
+	
+	private ChangeListener<Number> maxFreqListener; 
+	
 	public void bindPlotParams(){
-		if (freqScaleInfo == null) {
+		if (freqScaleInfo == null || specParams == null) {
 			return;
 		}
 		
 		//don;t use binding here to allow params to be changed for zooming etc. 
-		freqScaleInfo.minValProperty().addListener((obsVal, oldVal, newVal)->{
-			stopLoop=true; 
-			if (spectrogramControlPane!=null) spectrogramControlPane.setMinFrequency(newVal.doubleValue());
-			stopLoop=false; 
-		}); 
-		
-		freqScaleInfo.maxValProperty().addListener((obsVal, oldVal, newVal)->{
-			stopLoop=true;
-			if (spectrogramControlPane!=null)  spectrogramControlPane.setMaxFrequency(newVal.doubleValue());
-			stopLoop=false; 
-		}); 
+		if (!scaleListenersAdded) {
+			freqScaleInfo.minValProperty().addListener((obsVal, oldVal, newVal)->{
+				stopLoop=true; 
+				if (spectrogramControlPane!=null) spectrogramControlPane.setMinFrequency(newVal.doubleValue());
+				stopLoop=false; 
+			}); 
 
+			freqScaleInfo.maxValProperty().addListener((obsVal, oldVal, newVal)->{
+				stopLoop=true;
+				if (spectrogramControlPane!=null)  spectrogramControlPane.setMaxFrequency(newVal.doubleValue());
+				stopLoop=false; 
+			}); 
+			scaleListenersAdded = true; 
+		}
+
+		if (minFreqListener == null) {
+			minFreqListener = (obsVal, oldVal, newVal)->{
+				if (!stopLoop) freqScaleInfo.minValProperty().setValue(newVal.doubleValue());
+			};
+			maxFreqListener = (obsVal, oldVal, newVal)->{
+				if (!stopLoop) freqScaleInfo.maxValProperty().setValue(newVal.doubleValue());
+			};
+		}
 		
-		specParams.getFrequencyLimit(0).addListener((obsVal, oldVal, newVal)->{
-			if (!stopLoop) freqScaleInfo.minValProperty().setValue(newVal.doubleValue());
-		});
-		
-		specParams.getFrequencyLimit(1).addListener((obsVal, oldVal, newVal)->{
-			if (!stopLoop) freqScaleInfo.maxValProperty().setValue(newVal.doubleValue());
-		});
+		//the params object is replaced when settings are loaded - make sure the axis follows the current one. 
+		if (boundParams != specParams) {
+			if (boundParams != null) {
+				boundParams.getFrequencyLimit(0).removeListener(minFreqListener);
+				boundParams.getFrequencyLimit(1).removeListener(maxFreqListener);
+			}
+			specParams.getFrequencyLimit(0).addListener(minFreqListener);
+			specParams.getFrequencyLimit(1).addListener(maxFreqListener);
+			boundParams = specParams; 
+		}
 		
 //		freqScaleInfo.minValProperty().bind(specParams.getFrequencyLimit(0));
 //		freqScaleInfo.maxValProperty().bind(specParams.getFrequencyLimit(1));
@@ -126,6 +158,9 @@ public class FFTPlotInfo extends Scrolling2DPlotInfo {
 			return false;
 		}
 		specParams = (SpectrogramParamsFX) storedSettings;
+		
+		//the super class binds before specParams is replaced so re-bind the frequency axis to the new params. 
+		bindPlotParams(); 
 		
 		//setup bindings and listeners. 
 		spectrogramControlPane.setFrequencyProperties(specParams.getFrequencyLimits());
@@ -156,28 +191,33 @@ public class FFTPlotInfo extends Scrolling2DPlotInfo {
 	 * @param min
 	 */
 	private void setFrequencyRange(float sampleRate){
-		if (spectrogramControlPane == null) {
+		if (spectrogramControlPane == null || specParams == null) {
 			return;
 		}
+		double nyquist = sampleRate/2.; 
 		// will set the max frequency to niquist only if it was at the old niquist or above the new one. 
 		double currentMax = specParams.getFrequencyLimit(1).doubleValue();
 		double currentRange = spectrogramControlPane.getMaxFrequencyRange();
-		boolean setNiquist = (currentMax == currentRange || currentMax > sampleRate/2.); 
-//		DoubleProperty[] frequencyLimits = new doublep
+		boolean setNiquist = (currentMax >= currentRange || currentMax > nyquist); 
+		
+		//change the slider range first so new values are not clamped to the old Nyquist
+		spectrogramControlPane.setFrequencyRange(specParams.getFrequencyLimits());
+		
 		spectrogramControlPane.setMinFrequency(0);
 		
 		if (setNiquist) {
-			spectrogramControlPane.setMaxFrequency(sampleRate/2.);
 			//change so that the high limit covers the whole display. 
 			specParams.getFrequencyLimit(1).unbind(); 
-			specParams.getFrequencyLimit(1).set(sampleRate/2);
+			spectrogramControlPane.setMaxFrequency(nyquist);
+			specParams.getFrequencyLimit(1).set(nyquist);
 		}
 
-		//now change the control pane.
-		if (spectrogramControlPane!=null){
-			spectrogramControlPane.setFrequencyRange(specParams.getFrequencyLimits());
-			spectrogramControlPane.setFrequencyProperties(specParams.getFrequencyLimits());
-		}
+		//make sure the frequency axis matches the new limits. 
+		freqScaleInfo.setMinVal(specParams.getFrequencyLimit(0).get());
+		freqScaleInfo.setMaxVal(specParams.getFrequencyLimit(1).get());
+		
+		calcFrequencyRangeDisplay(); 
+		getTDGraph().repaint(0);
 	}
 	
 	@Override

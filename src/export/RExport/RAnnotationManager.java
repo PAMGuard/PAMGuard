@@ -15,6 +15,8 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
+import annotation.calcs.measurement.SoundMeasurementAnnotation;
+import annotation.calcs.wav.WavAnnotation;
 import annotation.calcs.snr.SNRAnnotation;
 import annotation.calcs.spl.SPLAnnotation;
 import annotation.string.StringAnnotation;
@@ -133,7 +135,8 @@ public class RAnnotationManager {
 	/**
 	 * Convert the annotation types which are not tied to one sort of detection, and
 	 * so have no name constant to switch on: the note and label of a spectrogram
-	 * annotation (strings), the SPL and SNR measurements, and logger form data.
+	 * annotation (strings), the SPL, SNR and sound measurements, the wav clip of a quick
+	 * spectrogram annotation and logger form data.
 	 *
 	 * @param dataAnnotation - the annotation to convert.
 	 * @param rData          - the list to add the annotation fields to.
@@ -158,6 +161,20 @@ public class RAnnotationManager {
 			rData.add("zeroPeak", spl.getZeroPeak());
 			rData.add("peakPeak", spl.getPeakPeak());
 			rData.add("sel", spl.getIntegratedSEL());
+			return true;
+		}
+
+		if (dataAnnotation instanceof SoundMeasurementAnnotation) {
+			rData.add("value", ((SoundMeasurementAnnotation) dataAnnotation).getValue());
+			return true;
+		}
+
+		if (dataAnnotation instanceof WavAnnotation) {
+			//the clip exported for the annotation (quick spectrogram annotation).
+			WavAnnotation wav = (WavAnnotation) dataAnnotation;
+			rData.add("folder", wav.getWavFolderName() == null ? "" : wav.getWavFolderName());
+			rData.add("prefix", wav.getWavPrefix() == null ? "" : wav.getWavPrefix());
+			rData.add("file", wav.getExportedWavFileName() == null ? "" : wav.getExportedWavFileName());
 			return true;
 		}
 

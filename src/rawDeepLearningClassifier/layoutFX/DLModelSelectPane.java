@@ -481,68 +481,35 @@ public class DLModelSelectPane extends PamBorderPane {
 
 		DLProcessorInfo procInfo = DLProcessorInfo.getCurrentProcessorInfo();
 
-		PamVBox content = new PamVBox();
-		content.setSpacing(4);
-		content.setPadding(new Insets(8));
-		content.setMaxWidth(360);
-		//self contained dark panel so the tooltip looks the same in light and dark themes.
-		content.setStyle("-fx-background-color: #2b2b2b; -fx-background-radius: 6;");
-
-		//header: processor icon + friendly processor name.
-		Node icon = PamGlyphDude.createPamIcon(procInfo.getIconString(), procInfo.getAccentColor(), 24);
-		Label procLabel = new Label("Runs on: " + procInfo.getFriendlyName());
-		procLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
-		procLabel.setTextFill(Color.WHITE);
-		PamHBox header = new PamHBox();
-		header.setSpacing(8);
-		header.setAlignment(Pos.CENTER_LEFT);
-		header.getChildren().addAll(icon, procLabel);
-		content.getChildren().add(header);
+		//friendly processor name.
+		StringBuilder text = new StringBuilder("Runs on: " + procInfo.getFriendlyName());
 
 		//longer description of what the processor is doing.
 		if (procInfo.getDetail() != null && !procInfo.getDetail().isEmpty()) {
-			content.getChildren().add(tooltipDetailLabel(procInfo.getDetail(), Color.web("#E0E0E0")));
+			text.append("\n").append(procInfo.getDetail());
 		}
 
 		//deep learning engine, version and raw device.
-		String engineText = "Engine: " + procInfo.getEngineDescription();
+		text.append("\nEngine: ").append(procInfo.getEngineDescription());
 		if (procInfo.getDeviceString() != null && !procInfo.getDeviceString().isEmpty()) {
-			engineText += "   Device: " + procInfo.getDeviceString();
+			text.append("   Device: ").append(procInfo.getDeviceString());
 		}
-		content.getChildren().add(tooltipDetailLabel(engineText, Color.web("#9E9E9E")));
 
 		//the model file path.
-		content.getChildren().add(tooltipDetailLabel("Model: " + this.currentSelectedFile.getPath(),
-				Color.web("#9E9E9E")));
+		text.append("\nModel: ").append(this.currentSelectedFile.getPath());
 
 		//any warning from the load status.
 		if (status != null && status.isWarning()) {
-			content.getChildren().add(tooltipDetailLabel("Warning: " + status.getDescription(),
-					Color.web("#FFB74D")));
+			text.append("\nWarning: ").append(status.getDescription());
 		}
 
-		Tooltip tooltip = new Tooltip();
-		//let the content pane draw the background so styling is consistent across themes.
-		tooltip.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-		tooltip.setGraphic(content);
+		//use the tooltip's own text rather than child labels so the theme's default
+		//tooltip colours apply - theme .label rules would override any colours set on labels.
+		Tooltip tooltip = new Tooltip(text.toString());
+		tooltip.setGraphic(PamGlyphDude.createPamIcon(procInfo.getIconString(), procInfo.getAccentColor(), 24));
 		tooltip.setMaxWidth(380);
 		tooltip.setWrapText(true);
 		return tooltip;
-	}
-
-	/**
-	 * Create a small wrapped label for a line of tooltip detail text.
-	 *
-	 * @param text  the text to show.
-	 * @param color the text colour.
-	 * @return a wrapped label.
-	 */
-	private Label tooltipDetailLabel(String text, Color color) {
-		Label label = new Label(text);
-		label.setWrapText(true);
-		label.setTextFill(color);
-		label.setMaxWidth(344);
-		return label;
 	}
 
 	/**

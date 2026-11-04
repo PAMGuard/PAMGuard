@@ -472,7 +472,8 @@ public class TDMenuPane extends PamBorderPane {
 				//				int column=n%nColumns; 
 				final OverlayMenuItem overlayItem=menuNodes.get(i); 
 				//				System.out.println("Overlay Items: " +overlayItme.getNodeToolTip().getText());
-				menuButton=overlayItem.menuAction(detectionSummary, detectionSummary.getDataList().indexOf(currentDataUnit), overlayMarker.getCurrentMark() );
+				menuButton=overlayItem.menuAction(detectionSummary, detectionSummary.getDataList().indexOf(currentDataUnit), 
+						overlayMarker==null ? null : overlayMarker.getCurrentMark());
 				if (menuButton==null) continue; 
 				styleButton(menuButton, OverlayMenuItem.buttonWidthStandard);
 				vBox.getChildren().add(menuButton);
@@ -499,7 +500,8 @@ public class TDMenuPane extends PamBorderPane {
 				//				int column=n%nColumns; 
 				final OverlayMenuItem overlayItme=menuNodes.get(i); 
 				//				System.out.println("Overlay Items: " +overlayItme.getNodeToolTip().getText());
-				menuButton=overlayItme.menuAction(detectionSummary, detectionSummary.getDataList().indexOf(currentDataUnit), overlayMarker.getCurrentMark() );
+				menuButton=overlayItme.menuAction(detectionSummary, detectionSummary.getDataList().indexOf(currentDataUnit), 
+						overlayMarker==null ? null : overlayMarker.getCurrentMark());
 				if (menuButton==null) continue;
 				tilePane.getChildren().add(menuButton);
 				/*
@@ -625,16 +627,13 @@ public class TDMenuPane extends PamBorderPane {
 
 
 	/**
-	 * Get the first raw data block in the list. 
-	 * @return the first raw data block. Null if there is no raw data 
+	 * Get the raw data block behind what the graph is showing. The spectrogram's source
+	 * is preferred, so if it is fed from a decimator the pop up shows the decimated data
+	 * the user marked on rather than the raw sound acquisition data.
+	 * @return the raw data block. Null if there is no raw data
 	 */
 	private PamRawDataBlock findRawSourceBlock() {
-		PamRawDataBlock rawDataBlock; 
-		for (int i=0; i<tdGraphFX.getDataList().size(); i++) {
-			rawDataBlock = tdGraphFX.getDataList().get(i).getDataBlock().getFirstRawSourceDataBlock(); 
-			if (rawDataBlock!=null) return rawDataBlock; 
-		}
-		return null; 
+		return tdGraphFX.findRawSourceDataBlock(0);
 	}
 
 	/**

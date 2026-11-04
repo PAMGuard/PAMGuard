@@ -2,6 +2,7 @@ package annotation.handler;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -26,7 +27,42 @@ public class AnnotationChoices implements Serializable, ManagedParameters {
 	private Hashtable<String, AnnotationOptions> annotationOptions = new Hashtable<>();
 	
 	private boolean allowMany = true;
-	
+
+	/**
+	 * Names of the annotation types shown in the list the user selects from, for handlers
+	 * which let the user add types to the list (see
+	 * {@link AnnotationChoiceHandler#isEditableList()}). Null until the user first edits the
+	 * list, in which case the handler's defaults are listed.
+	 */
+	private ArrayList<String> listedAnnotations;
+
+	/**
+	 * Is an annotation type shown in the list the user selects from ?
+	 * @param annotationName annotation type name.
+	 * @param defaultListed true if the type is listed when the user hasn't edited the list.
+	 * @return true if listed.
+	 */
+	public boolean isListed(String annotationName, boolean defaultListed) {
+		if (listedAnnotations == null) {
+			return defaultListed;
+		}
+		return listedAnnotations.contains(annotationName);
+	}
+
+	/**
+	 * @return names of the listed annotation types, or null if the list has never been edited.
+	 */
+	public ArrayList<String> getListedAnnotations() {
+		return listedAnnotations;
+	}
+
+	/**
+	 * @param listedAnnotations names of the annotation types to show in the list.
+	 */
+	public void setListedAnnotations(Collection<String> listedAnnotations) {
+		this.listedAnnotations = listedAnnotations == null ? null : new ArrayList<>(listedAnnotations);
+	}
+
 	/**
 	 * Set the options for an annotation type
 	 * @param annotationName annotation type name

@@ -248,7 +248,23 @@ public class SoundOutputManager {
 	}
 
 	/**
-	 * Get the start of the display in millis. 
+	 * Check whether the selected data units cover a period of time which sound could be
+	 * played over.
+	 * @param detGroup - the DetectionGroupSummary to test.
+	 * @return true if at least one data unit has a duration.
+	 */
+	private boolean hasDuration(DetectionGroupSummary detGroup) {
+		if (detGroup == null || detGroup.getDataList() == null) return false;
+		for (PamDataUnit dataUnit : detGroup.getDataList()) {
+			if (dataUnit.getEndTimeInMilliseconds() > dataUnit.getTimeMilliseconds()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Get the start of the display in millis.
 	 * @return the start of the display in millis. 
 	 */
 	private long getDisplayStart() {
@@ -364,7 +380,18 @@ public class SoundOutputManager {
 			menuItem.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", Color.WHITE, PamGuiManagerFX.iconSize));
 			menuItem.setOnAction((action)->{
 				playButtonPressed(null, null, detGroup);
-			});			
+			});
+			items.add(menuItem);
+		}
+		else if (canPlayRawViewerSound() && hasDuration(detGroup)) {
+			//selected data units which don't hold their own sound (e.g. spectrogram annotations)
+			//but cover a period of time - play the raw sound over that period.
+			long[] minMax = getMinMaxMillis(detGroup.getDataList());
+			menuItem = new MenuItem(detGroup.getDataList().size() > 1 ? "Play sound of detections" : "Play sound of detection");
+			menuItem.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", Color.WHITE, PamGuiManagerFX.iconSize));
+			menuItem.setOnAction((action)->{
+				playButtonPressed(minMax[0], minMax[1], detGroup);
+			});
 			items.add(menuItem);
 		}
 		else {

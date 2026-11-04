@@ -24,6 +24,7 @@ import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.dataOffline.OfflineDataLoading;
 import dataPlotsFX.TDSymbolChooserFX;
+import fftManager.FFTDataBlock;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDScaleInfo;
@@ -808,8 +809,37 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		// load-state (getRequiredLoadIntervals), so we must not let the data block's own
 		// 'same request' de-dup suppress a reload - e.g. after a resolution change that
 		// cleared and needs to refill the same time range.
-		dataBlock2D.orderOfflineData(this.fftObserver, new TiledLoadObserver(next[0], next[1], gen), next[0], next[1],
-				0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT, true);
+		// The order itself is padded either side (see orderPadMillis()) but only the
+		// tile-aligned chunk is marked as loaded.
+		long pad = orderPadMillis();
+		dataBlock2D.orderOfflineData(this.fftObserver, new TiledLoadObserver(next[0], next[1], gen), next[0] - pad,
+				next[1] + pad, 0, OfflineDataLoading.OFFLINE_DATA_INTERRUPT, true);
+	}
+
+	/**
+	 * Extra time either side of each tiled order, in millis. FFT data are re-made from
+	 * raw audio when ordered, and raw data are loaded from the order start to the order
+	 * end, so the FFTs that start within one FFT length of the end of an order are never
+	 * computed - the last few slices before the chunk boundary are missing. When the next
+	 * order follows straight on, the FFT process carries its buffer across and fills
+	 * them, but when it doesn't (e.g. after scrolling the other way, a chunk ends against
+	 * a tile loaded earlier) the missing slices show as a black line at the boundary.
+	 * Padding each order by an FFT length or so means the boundary FFTs always get made;
+	 * the tiled renderer does not let the padding overwrite columns already loaded.
+	 *
+	 * @return padding to add to each end of a tiled order, in millis.
+	 */
+	private long orderPadMillis() {
+		float sr = dataBlock2D.getSampleRate();
+		if (sr <= 0) {
+			return 0;
+		}
+		int hop = Math.max(dataBlock2D.getHopSamples(), 0);
+		int len = hop;
+		if (dataBlock2D instanceof FFTDataBlock) {
+			len = Math.max(((FFTDataBlock) dataBlock2D).getFftLength(), hop);
+		}
+		return (long) Math.ceil((len + 2. * hop) * 1000. / sr) + 1;
 	}
 
 	/**

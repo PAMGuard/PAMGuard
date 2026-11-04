@@ -24,6 +24,22 @@ public class YoloPrediction extends StandardPrediction {
 	 * The segment ID associated with this prediction.Usually the UID of the segment. 
 	 */
 	private long segmentID;
+
+	/**
+	 * The width of the image the bounding box is referenced to in pixels.
+	 */
+	private int imageWidth;
+
+	/**
+	 * The height of the image the bounding box is referenced to in pixels.
+	 */
+	private int imageHeight;
+
+	/**
+	 * The pixel coordinate of the left and top edges of the image. 0.5 for MATLAB
+	 * pixel coordinates and 0 for Ultralytics models.
+	 */
+	private double pixelOffset = 0.5;
 	
 	/**
 	 * Constructor that takes a DeepAcousticsResult and converts it to a standard prediction.
@@ -123,5 +139,47 @@ public class YoloPrediction extends StandardPrediction {
 
 	public long getParentSegmentID() {
 		return segmentID;
+	}
+
+	/**
+	 * Set the image the bounding box is referenced to.
+	 *
+	 * @param imageWidth  - the width of the image in pixels (time axis).
+	 * @param imageHeight - the height of the image in pixels (frequency axis).
+	 * @param pixelOffset - the pixel coordinate of the left and top edges of the
+	 *                    image, 0.5 for MATLAB pixel coordinates and 0 for
+	 *                    Ultralytics models.
+	 */
+	public void setImage(int imageWidth, int imageHeight, double pixelOffset) {
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
+		this.pixelOffset = pixelOffset;
+	}
+
+	/**
+	 * Get the width of the image the bounding box is referenced to.
+	 *
+	 * @return the width in pixels or 0 if not set.
+	 */
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	/**
+	 * Get the height of the image the bounding box is referenced to.
+	 *
+	 * @return the height in pixels or 0 if not set.
+	 */
+	public int getImageHeight() {
+		return imageHeight;
+	}
+
+	/**
+	 * Get the pixel coordinate of the left and top edges of the image.
+	 *
+	 * @return 0.5 for MATLAB pixel coordinates and 0 for Ultralytics models.
+	 */
+	public double getPixelOffset() {
+		return pixelOffset;
 	}
 }

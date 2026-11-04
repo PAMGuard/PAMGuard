@@ -15,6 +15,12 @@ public class PlaybackGain implements PlaybackPreprocess {
 	private double gainFactor;
 
 	/**
+	 * Silence the output without changing the gain. Deliberately not
+	 * stored in the playback parameters so playback is never muted at startup.
+	 */
+	private boolean muted;
+
+	/**
 	 * The play gain side pane. 
 	 */
 	private PlayGainSidePane playGainSidePane;
@@ -45,8 +51,9 @@ public class PlaybackGain implements PlaybackPreprocess {
 			retUnit = inputDataUnit;
 			scaleData = inputDataUnit.getRawData();
 		}
+		double scaleFactor = muted ? 0. : gainFactor;
 		for (int i = 0; i < scaleData.length; i++) {
-			scaleData[i] *= gainFactor;
+			scaleData[i] *= scaleFactor;
 		}
 		retUnit.setRawData(scaleData, true);
 		return retUnit;
@@ -69,6 +76,21 @@ public class PlaybackGain implements PlaybackPreprocess {
 		return playbackControl.getPlaybackParameters().playbackGain;
 	}
 
+	/**
+	 * Mute or unmute the output. The gain setting is left unchanged.
+	 * @param muted true to silence the output.
+	 */
+	public void setMuted(boolean muted) {
+		this.muted = muted;
+	}
+
+	/**
+	 * @return true if the output is muted.
+	 */
+	public boolean isMuted() {
+		return muted;
+	}
+
 	@Override
 	public PreprocessSwingComponent getSideParComponent() {
 		playGainSideBar.getComponent().setVisible(playbackControl.getPlaybackParameters().isSideBarShow(PlaybackParameters.SIDEBAR_SHOW_GAIN));
@@ -77,7 +99,7 @@ public class PlaybackGain implements PlaybackPreprocess {
 
 	@Override
 	public boolean isActive() {
-		return gainFactor != 1.;
+		return muted || gainFactor != 1.;
 	}
 
 	public String getTextValue() {

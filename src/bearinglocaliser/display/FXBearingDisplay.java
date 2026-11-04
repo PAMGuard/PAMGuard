@@ -17,6 +17,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.SplitPane.Divider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import userDisplay.UserDisplayControl;
 
 public class FXBearingDisplay implements SimpleObserver<PamDataUnit> {
@@ -37,6 +38,13 @@ public class FXBearingDisplay implements SimpleObserver<PamDataUnit> {
 		this.uniqueDisplayName = uniqueDisplayName;
 
 		mainScene = new Scene(new BorderPane());
+		/*
+		 * The display sits in a JFXPanel in a Swing user display, so nothing else gives
+		 * it the PAMGuard style sheets. Register the scene with the style manager so it
+		 * picks up the current colour scheme and is restyled when the user changes it
+		 * (e.g. to the dark or night schemes).
+		 */
+		PamStylesManagerFX.getPamStylesManagerFX().styleScene(mainScene, PamStylesManagerFX.STYLE_GUI);
 
 		createDisplays();
 	}

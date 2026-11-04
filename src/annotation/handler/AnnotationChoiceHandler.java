@@ -43,6 +43,48 @@ public abstract class AnnotationChoiceHandler extends AnnotationHandler {
 		return new AnnotationsSelectionPanel(this);
 	}
 
+	/**
+	 * Can the user add annotation types to (and remove them from) the list they select
+	 * from ? If so, the selection panel gets a + button which opens a dialog of all the
+	 * available types, and only the listed types are shown in the panel. Use this when
+	 * there are too many available types (e.g. one per sound measurement) to show them all.
+	 * @return true if the list can be edited. Default false - all types are listed.
+	 */
+	public boolean isEditableList() {
+		return false;
+	}
+
+	/**
+	 * Is an annotation type in the list before the user has edited it ?
+	 * @param annotationType annotation type.
+	 * @return true if listed by default. Default true.
+	 */
+	public boolean isDefaultListed(DataAnnotationType<?> annotationType) {
+		return true;
+	}
+
+	/**
+	 * Get the annotation types to show in the list the user selects from. For handlers
+	 * without an editable list this is all available types. Selected types are always listed.
+	 * @return listed annotation types, in the order they are available.
+	 */
+	public List<DataAnnotationType<?>> getListedAnnotationTypes() {
+		List<DataAnnotationType<?>> availableTypes = getAvailableAnnotationTypes();
+		if (!isEditableList()) {
+			return availableTypes;
+		}
+		ArrayList<DataAnnotationType<?>> listed = new ArrayList<>();
+		AnnotationChoices choices = getAnnotationChoices();
+		for (DataAnnotationType<?> anType : availableTypes) {
+			AnnotationOptions choice = choices.getAnnotationOptions(anType.getAnnotationName());
+			boolean selected = choice != null && choice.isIsSelected();
+			if (selected || choices.isListed(anType.getAnnotationName(), isDefaultListed(anType))) {
+				listed.add(anType);
+			}
+		}
+		return listed;
+	}
+
 	@Override
 	public int getNumUsedAnnotationTypes() {
 		int n = 0;

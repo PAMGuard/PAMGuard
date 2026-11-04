@@ -1,6 +1,5 @@
 package bearinglocaliser;
 
-import PamController.PamController;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamguardMVC.PamDataBlock;
@@ -15,10 +14,13 @@ public class DetectionMonitor extends PamInstantProcess {
 
 	private CPUMonitor cpuMonitor = new CPUMonitor();
 
+	private BearingUpdateScheduler updateScheduler;
+
 	public DetectionMonitor(BearingLocaliserControl bearingLocaliserControl) {
 		super(bearingLocaliserControl);
 		this.bearingLocaliserControl = bearingLocaliserControl;
 		setProcessName("Detection Monitor");
+		updateScheduler = new BearingUpdateScheduler(bearingLocaliserControl);
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class DetectionMonitor extends PamInstantProcess {
 	@Override
 	public void newData(PamObservable o, PamDataUnit triggerData) {
 		cpuMonitor.start();
-		bearingLocaliserControl.estimateBearings(triggerData);
+		updateScheduler.newDataUnit(triggerData);
 		cpuMonitor.stop();
 	}
 
@@ -71,12 +73,20 @@ public class DetectionMonitor extends PamInstantProcess {
 	@Override
 	public void updateData(PamObservable o, PamDataUnit triggerData) {
 		/*
-		 * 		Mustn't have this or when a unit has come in newData it comes in here again after and goes into 
-		 *      an infinite loop.  
+		 * Adding the bearing annotation updates the unit, which brings it straight back
+		 * here, so this used to be left out to avoid an infinite loop. The scheduler
+		 * only recalculates if the unit's time / frequency geometry has changed since
+		 * its bearing was calculated (e.g. a spectrogram annotation that's been moved
+		 * or resized), which breaks the loop, and does the work off the GUI threads.
 		 */
-		//		cpuMonitor.start();
-		//		bearingLocaliserControl.estimateBearings(triggerData);
-		//		cpuMonitor.stop();
+		updateScheduler.updatedDataUnit(triggerData);
+	}
+
+	/**
+	 * @return the scheduler which recalculates bearings when units change.
+	 */
+	public BearingUpdateScheduler getUpdateScheduler() {
+		return updateScheduler;
 	}
 
 

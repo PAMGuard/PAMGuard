@@ -95,6 +95,7 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	@Override
 	public boolean removeUnit() {
 		UserDisplayControl.removeDisplayProvider(bearingDisplayProvider);
+		detectionMonitor.getUpdateScheduler().shutdown();
 		return super.removeUnit();
 	}
 
@@ -213,6 +214,17 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	 */
 	public BearingLocaliserParams getBearingLocaliserParams() {
 		return bearingLocaliserParams;
+	}
+
+	/**
+	 * Set new parameters and set up the processes to use them, for example when a
+	 * configuration is built in code rather than through the settings dialog.
+	 * @param bearingLocaliserParams the new parameters.
+	 */
+	public void setBearingLocaliserParams(BearingLocaliserParams bearingLocaliserParams) {
+		this.bearingLocaliserParams = bearingLocaliserParams;
+		detectionMonitor.prepareProcess();
+		bearingProcess.prepareBearingGroups();
 	}
 
 	public void estimateBearings(PamDataUnit triggerData) {
