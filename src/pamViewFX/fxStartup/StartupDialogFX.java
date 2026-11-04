@@ -397,7 +397,15 @@ public class StartupDialogFX {
 			ContextMenu menu = new ContextMenu();
 			row.contextMenuProperty().bind(javafx.beans.binding.Bindings.when(row.emptyProperty())
 					.then((ContextMenu) null).otherwise(menu));
-			menu.setOnShowing(e -> fillContextMenu(menu, row.getItem()));
+			/*
+			 * JavaFX won't show a context menu with no items, so the items must be in
+			 * place before the right click - filling them in onShowing is too late. Fill
+			 * when the row gets a file and again just before the menu is requested, so
+			 * the favourite item is up to date. 
+			 */
+			row.itemProperty().addListener((obs, o, item) -> fillContextMenu(menu, item));
+			row.addEventFilter(javafx.scene.input.ContextMenuEvent.CONTEXT_MENU_REQUESTED, 
+					e -> fillContextMenu(menu, row.getItem()));
 			return row;
 		});
 
@@ -438,7 +446,7 @@ public class StartupDialogFX {
 		fav.setGraphic(new FontIcon(entry.isFavourite() ? "mdi2s-star-off-outline" : "mdi2s-star-outline"));
 		fav.setOnAction(e -> toggleFavourite(entry));
 
-		MenuItem remove = new MenuItem("Remove from list");
+		MenuItem remove = new MenuItem("Remove from list (keeps the file)");
 		remove.setGraphic(new FontIcon("mdi2c-close"));
 		remove.setOnAction(e -> removeEntry(entry));
 
