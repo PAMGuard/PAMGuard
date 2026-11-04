@@ -25,5 +25,6 @@
   ],
   "description": "BioDCASE 2026 Task 2 baseline (YOLO11s, Ultralytics) for Antarctic blue whale (bmabz), blue/fin whale D/downsweep (d) and fin whale 20 Hz (bp) calls. 30 s segments at 250 Hz, images 257 x 363 letterboxed to 480 x 640. Weights from Zenodo record 20281116 (CC BY 4.0). Run with 15 s hop and a confidence of 0.1 to match the baseline.",
   "version_info": {"version": 1},
-  "seg_size": {"size_ms": 30000}
+  "seg_size": {"size_ms": 30000},
+  "example_sound": "BLUE_WHALE"
 }

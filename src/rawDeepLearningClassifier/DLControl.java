@@ -337,7 +337,7 @@ public class DLControl extends PamControlledUnit implements PamSettings, ClipDis
 		dlClassifyProcess.getDLGroupDetectionDataBlock().setPamSymbolManager(new DLGroupSymbolManager(dlClassifyProcess.getDLGroupDetectionDataBlock()));
 
 		dlClassifyProcess.getDLPredictionDataBlock()
-				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
+				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLPredictionDataBlock()));
 		
 	
 		/***** Add new deep learning models here ****/

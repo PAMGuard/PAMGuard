@@ -887,6 +887,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			return null;
 		}
 
+		if (hopLength.getValue() > windowLength.getValue()){
+			Platform.runLater(()->{
+				dlWarningDialog.showWarning("The hop length cannot be greater than the segment length"); 
+			});
+			return null;
+		}
+
 		currParams.rawSampleSize = windowLength.getValue(); 
 		currParams.sampleHop = hopLength.getValue(); 
 		currParams.maxMergeHops = reMergeSeg.getValue(); 

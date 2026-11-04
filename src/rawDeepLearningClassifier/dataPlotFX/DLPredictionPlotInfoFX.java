@@ -231,7 +231,14 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 
 	@Override
 	public TDSymbolChooserFX getSymbolChooser() {
-		if (managedSymbolChooser == null) {
+		//the symbol manager can clear and recreate its choosers (e.g. PamSymbolManager.globalClear()) so
+		//make sure the current one is used, otherwise changes in the symbol settings are not shown.
+		PamSymbolManager symbolManager = getDataBlock().getPamSymbolManager();
+		PamSymbolChooser currentChooser = symbolManager == null ? null :
+			symbolManager.getSymbolChooser(getTDGraph().getUniqueName(), getTDGraph().getGraphProjector());
+		if (managedSymbolChooser == null || (currentChooser != null &&
+				managedSymbolChooser instanceof TDManagedSymbolChooserFX &&
+				((TDManagedSymbolChooserFX) managedSymbolChooser).getPamSymbolChooser() != currentChooser)) {
 			managedSymbolChooser = createSymbolChooser();
 		}
 		return managedSymbolChooser;

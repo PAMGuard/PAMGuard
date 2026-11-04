@@ -24,6 +24,9 @@ import rawDeepLearningClassifier.dlClassification.yolo.YoloModel.YoloType;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloParams;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloPrediction;
 import rawDeepLearningClassifier.dlClassification.yolo.YoloWorker;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSound;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
@@ -81,6 +84,78 @@ public class BioDCASEYoloTest {
 	@Test
 	public void finWhaleAprilTest() throws Exception {
 		testFile("20150420_070000");
+	}
+
+	/**
+	 * The blue whale example sound (shown with the model transforms) is the 30 s
+	 * segment from 450 s of the March file. It is one model segment and the model
+	 * finds the same blue whale calls as in the Python reference for that segment.
+	 */
+	@Test
+	public void blueWhaleExampleSoundTest() throws Exception {
+		File modelFile = getModelFile();
+		assertNotNull(modelFile, "Unable to download the BioDCASE model from " + MODEL_URL);
+
+		YoloWorker yoloWorker = new YoloWorker();
+		YoloParams params = new YoloParams();
+		params.modelPath = modelFile.getAbsolutePath();
+		assertEquals(DLStatus.MODEL_LOAD_SUCCESS, yoloWorker.prepModel(params, null));
+
+		//the model metadata selects the blue whale example sound
+		assertEquals(ExampleSoundType.BLUE_WHALE.ordinal(), params.exampleSoundIndex);
+
+		params.minConfidence = 0.1;
+		params.mergeOverlap = false;
+		YoloClassifier.setWorkerParams(yoloWorker, params);
+
+		ExampleSound exampleSound = new ExampleSoundFactory().getExampleSound(ExampleSoundType.BLUE_WHALE);
+		assertEquals(1000, exampleSound.getSampleRate(), 1e-6);
+		double[] wave = exampleSound.getWave();
+		int segSamples = (int) Math.round(SEG_LEN * exampleSound.getSampleRate());
+		assertEquals(segSamples, wave.length);
+
+		GroupedRawData segment = new GroupedRawData(0, 1, 0, segSamples, segSamples);
+		segment.setUID(0);
+		segment.setDurationInMilliseconds(SEG_LEN*1000);
+		System.arraycopy(wave, 0, segment.getRawData()[0], 0, segSamples);
+		ArrayList<GroupedRawData> segments = new ArrayList<GroupedRawData>();
+		segments.add(segment);
+
+		ArrayList<StandardPrediction> predictions = yoloWorker.runModel(segments, exampleSound.getSampleRate(), 0);
+		assertNotNull(predictions);
+		double[] freqLims = yoloWorker.getImageFreqLimits();
+		yoloWorker.closeModel();
+
+		//the Python boxes for the segment at 450 s, with times relative to the start of the segment
+		List<RefBox> refBoxes = new ArrayList<RefBox>();
+		for (RefBox box : readReference(Paths.get(RESOURCE_FOLDER + "boxes_20150328_090000.csv").toAbsolutePath().normalize().toString())) {
+			if (Math.abs(box.segStart - 450) > 1e-6) continue;
+			box.tStart -= 450;
+			box.tEnd -= 450;
+			refBoxes.add(box);
+		}
+		assertTrue(refBoxes.size() >= 2);
+
+		int nMatch = 0;
+		for (RefBox ref : refBoxes) {
+			for (StandardPrediction prediction : predictions) {
+				YoloPrediction yoloPrediction = (YoloPrediction) prediction;
+				YoloClassifier.setBoxLimits(yoloPrediction, segment, freqLims);
+				RefBox box = new RefBox();
+				box.classIndex = argMax(yoloPrediction.getPredicitions());
+				box.tStart = yoloPrediction.getStartSample() / 1000.;
+				box.tEnd = (yoloPrediction.getStartSample() + yoloPrediction.getSampleDuration()) / 1000.;
+				box.fLow = yoloPrediction.getFreqLimits()[0];
+				box.fHigh = yoloPrediction.getFreqLimits()[1];
+				if (box.classIndex == ref.classIndex && ref.iou(box) >= MIN_IOU && Math.abs(yoloPrediction.getConfidence() - ref.confidence) < 0.01) {
+					nMatch++;
+					break;
+				}
+			}
+		}
+		System.out.println(String.format("Blue whale example sound: %d PAMGuard boxes, %d of %d Python boxes matched", predictions.size(), nMatch, refBoxes.size()));
+		assertEquals(refBoxes.size(), nMatch);
+		assertEquals(refBoxes.size(), predictions.size());
 	}
 
 	/**

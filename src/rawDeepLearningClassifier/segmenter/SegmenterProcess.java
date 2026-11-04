@@ -19,6 +19,8 @@ import PamguardMVC.PamProcess;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 
 
@@ -148,9 +150,23 @@ public class SegmenterProcess extends PamProcess {
 	}
 
 	/**
+	 * Warning shown if the segment hop is longer than the segment length.
+	 */
+	private PamWarning hopWarning = new PamWarning("Deep Learning Segmenter", "", 2);
+
+	/**
+	 * True if the hop warning has been shown since the segmenter was set up.
+	 */
+	private boolean hopWarningShown = false;
+
+	/**
 	 * Set up the DL process. 
 	 */
 	public void setupSegmenter() {
+
+		//clear any warning about the hop length - it is shown again if the hop is still too long.
+		hopWarningShown = false;
+		WarningSystem.getWarningSystem().removeWarning(hopWarning);
 
 		if (dlControl.getDLParams()==null) {
 			System.err.println("SegmenterProcess.setupSegmenter: The DLParams are null???"); 
@@ -597,6 +613,19 @@ public class SegmenterProcess extends PamProcess {
 	 *                     segments saved.
 	 */
 	public synchronized void newRawData(PamDataUnit unit, double[] rawDataChunk, int iChan, int rawSampleSize, int rawSampleHop, boolean forcesave) {
+
+		//a hop longer than the segment (e.g. a hop left over from a model with a shorter segment or higher sample rate)
+		//would leave gaps between segments which the segmenter cannot handle. Use a hop of one segment and warn the user.
+		if (rawSampleHop > rawSampleSize) {
+			if (!hopWarningShown) {
+				hopWarning.setWarningMessage(String.format("The segment hop (%d samples) is longer than the segment length (%d samples). "
+						+ "A hop of %d samples is being used. Change the hop in the Deep Learning settings.", rawSampleHop, rawSampleSize, rawSampleSize));
+				WarningSystem.getWarningSystem().addWarning(hopWarning);
+				System.err.println("SegmenterProcess: " + hopWarning.getWarningMessage());
+				hopWarningShown = true;
+			}
+			rawSampleHop = rawSampleSize;
+		}
 
 		long timeMilliseconds = unit.getTimeMilliseconds();
 		long startSampleTime = unit.getStartSample(); 

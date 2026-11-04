@@ -189,6 +189,12 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 			delphinUIClassifier.getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue(defaultsamples);
 			//			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 
+			//the hop cannot be longer than the segment
+			Integer hop = delphinUIClassifier.getDLControl().getSettingsPane().getHopLenSpinner().getValue();
+			if (hop==null || hop>defaultsamples) {
+				delphinUIClassifier.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue(Math.max(1, defaultsamples/2));
+			}
+
 			delphinUIClassifier.getDLControl().getSettingsPane().getSegmentLenSpinner().setDisable(true); 
 		}
 		else {
