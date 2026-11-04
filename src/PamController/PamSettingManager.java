@@ -510,7 +510,12 @@ public class PamSettingManager {
 	 * @return true if settings saved successfully.
 	 */
 	public boolean saveFinalSettings() {
-		int runMode = PamController.getInstance().getRunMode();
+		/*
+		 * The controller doesn't exist yet when the start up dialog (-c option) reads
+		 * the list, which is always for normal mode. 
+		 */
+		PamController pamController = PamController.getInstance();
+		int runMode = pamController == null ? PamController.RUN_NORMAL : pamController.getRunMode();
 		switch (runMode) {
 		case PamController.RUN_NORMAL:
 		case PamController.RUN_NETWORKRECEIVER:
@@ -1686,13 +1691,26 @@ public class PamSettingManager {
 	 * @return list of recent settings files, most recent first.
 	 */
 	public List<File> getRecentSettingsFiles() {
-		if (settingsFileData == null) {
-			loadSettingsFileData();
+		/*
+		 * Read the list into a local object. This is called before the normal start up
+		 * sequence, which must still load (and later save) the list itself.
+		 */
+		SettingsFileData fileData = settingsFileData;
+		if (fileData == null) {
+			File slFile = getSettingsListFile();
+			if (slFile.exists()) {
+				try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(slFile))) {
+					fileData = (SettingsFileData) is.readObject();
+				}
+				catch (Exception e) {
+					System.out.println("Unable to read recent settings files from " + slFile + ": " + e.getMessage());
+				}
+			}
 		}
-		if (settingsFileData == null || settingsFileData.recentFiles == null) {
+		if (fileData == null || fileData.recentFiles == null) {
 			return new ArrayList<File>();
 		}
-		return new ArrayList<File>(settingsFileData.recentFiles);
+		return new ArrayList<File>(fileData.recentFiles);
 	}
 
 	/**
