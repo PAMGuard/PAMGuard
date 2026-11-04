@@ -1,0 +1,9 @@
+/*
+ * Dark mode colours for the PAMGuard start up dialog with the Swing GUI. Loaded
+ * after startupDialogFlatLaf.css, on top of pamFlatLafDark.css.
+ */
+.startup-root {
+    -sd-accent-subtle: #2f4a66;
+    -sd-on-accent:     #ffffff;
+    -sd-fav:           #f0b429;
+}

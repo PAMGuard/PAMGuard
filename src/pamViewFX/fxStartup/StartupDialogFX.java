@@ -56,8 +56,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import pamViewFX.fxStyles.PamAtlantaStyle;
-import pamViewFX.fxStyles.PamDefaultStyle;
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
 
 /**
  * Start up dialog which brings together the choice of run mode (normal or viewer)
@@ -80,6 +80,16 @@ public class StartupDialogFX {
 	private static final String CSS = "/Resources/css/startupDialog.css";
 	private static final String CSS_ATLANTA = "/Resources/css/startupDialogAtlanta.css";
 	private static final String CSS_FLATLAF = "/Resources/css/startupDialogFlatLaf.css";
+	private static final String CSS_FLATLAF_DARK = "/Resources/css/startupDialogFlatLafDark.css";
+
+	/*
+	 * Theme sheets for dark mode. These are the same sheets PAMGuard uses for the 
+	 * dark colour scheme (see PamAtlantaStyle and PamDefaultStyle).
+	 */
+	private static final String FLATLAF_LIGHT = "/Resources/css/pamFlatLafLight.css";
+	private static final String FLATLAF_DARK = "/Resources/css/pamFlatLafDark.css";
+	private static final String PRIMER_PAMGUARD = "/Resources/css/primer-pamguard.css";
+	private static final String PRIMER_PAMGUARD_DARK = "/Resources/css/primer-pamguard-dark.css";
 
 	private static final String[] PSF_ENDS = {"*.psfx", "*.psf"};
 	private static final String[] DB_ENDS = {"*.sqlite3", "*.sqlite", "*.db", "*.db3"};
@@ -178,7 +188,23 @@ public class StartupDialogFX {
 		title.getStyleClass().add("startup-title");
 		Label subtitle = new Label("Choose how to run PAMGuard, then pick a configuration to open.");
 		subtitle.getStyleClass().add("startup-subtitle");
-		VBox header = new VBox(2, title, subtitle);
+		VBox headerText = new VBox(2, title, subtitle);
+		HBox.setHgrow(headerText, Priority.ALWAYS);
+
+		// dark mode switch, remembered between runs.
+		ToggleButton darkButton = new ToggleButton();
+		darkButton.getStyleClass().add("startup-plain");
+		darkButton.setSelected(history.isDarkMode());
+		updateDarkButton(darkButton);
+		darkButton.selectedProperty().addListener((obs, o, dark) -> {
+			history.setDarkMode(dark);
+			history.save();
+			updateDarkButton(darkButton);
+			applyStyle(stage.getScene());
+			table.refresh();
+		});
+		HBox header = new HBox(10, headerText, darkButton);
+		header.setAlignment(Pos.TOP_LEFT);
 		header.getStyleClass().add("startup-header");
 
 		// mode cards
@@ -453,16 +479,42 @@ public class StartupDialogFX {
 		menu.getItems().addAll(open, duplicate, show, new SeparatorMenuItem(), fav, remove);
 	}
 
+	private void updateDarkButton(ToggleButton button) {
+		boolean dark = button.isSelected();
+		button.setGraphic(new FontIcon(dark ? "mdi2w-white-balance-sunny" : "mdi2w-weather-night"));
+		button.setText(dark ? "Light" : "Dark");
+		button.setTooltip(new Tooltip(dark ? "Switch to light mode" : "Switch to dark mode"));
+	}
+
+	/**
+	 * Set the style sheets for the GUI type (Atlanta for JavaFX, FlatLaf for Swing)
+	 * and light or dark mode.
+	 */
 	private void applyStyle(Scene scene) {
-		ArrayList<String> sheets;
-		try {
-			sheets = fxGUI ? new PamAtlantaStyle().getGUICSS() : new PamDefaultStyle().getGUICSS();
+		boolean dark = history.isDarkMode();
+		scene.getStylesheets().clear();
+		if (fxGUI) {
+			if (dark) {
+				scene.getStylesheets().add(new PrimerDark().getUserAgentStylesheet());
+				addSheet(scene, PRIMER_PAMGUARD);
+				addSheet(scene, PRIMER_PAMGUARD_DARK);
+			}
+			else {
+				scene.getStylesheets().add(new PrimerLight().getUserAgentStylesheet());
+				addSheet(scene, PRIMER_PAMGUARD);
+			}
+			addSheet(scene, CSS_ATLANTA);
 		}
-		catch (Exception e) {
-			sheets = new ArrayList<>();
+		else {
+			addSheet(scene, FLATLAF_LIGHT);
+			if (dark) {
+				addSheet(scene, FLATLAF_DARK);
+			}
+			addSheet(scene, CSS_FLATLAF);
+			if (dark) {
+				addSheet(scene, CSS_FLATLAF_DARK);
+			}
 		}
-		scene.getStylesheets().addAll(sheets);
-		addSheet(scene, fxGUI ? CSS_ATLANTA : CSS_FLATLAF);
 		addSheet(scene, CSS);
 	}
 

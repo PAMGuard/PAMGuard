@@ -130,7 +130,13 @@
     -fx-padding: 4 13 4 13;
 }
 
-.startup-plain:hover {
+.startup-plain:selected, .startup-plain:selected:focused {
+    -fx-background-color: -sd-card;
+    -fx-border-color: -sd-border;
+    -fx-text-fill: -sd-fg;
+}
+
+.startup-plain:hover, .startup-plain:selected:hover {
     -fx-background-color: -sd-subtle;
     -fx-border-color: -sd-accent;
 }
