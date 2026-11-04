@@ -96,6 +96,30 @@ PamSettingsSource {
 	
 	static public final String GlobalDatabaseNameArg = "-databasefile";
 
+	/**
+	 * Sqlite database chosen in the start up dialog (-c start up option). While
+	 * this is set the database is used without showing the database dialog. It's
+	 * cleared once PAMGuard has started, after which the database is simply at the
+	 * top of the Sqlite recent database list.
+	 */
+	static private volatile String startupDatabase = null;
+
+	/**
+	 * Set a Sqlite database to open at start up without showing the database
+	 * dialog. Used by the start up dialog (-c option).
+	 * @param databaseFile path of the database, or null to clear.
+	 */
+	public static void setStartupDatabase(String databaseFile) {
+		startupDatabase = databaseFile;
+	}
+
+	/**
+	 * @return the Sqlite database chosen in the start up dialog, or null.
+	 */
+	public static String getStartupDatabase() {
+		return startupDatabase;
+	}
+
 	private DBControl THIS;
 
 	private JMenuItem openDatabaseMenu;
@@ -870,6 +894,23 @@ PamSettingsSource {
 	 */
 	DBParameters checkPassedDatabase() {
 		String passedDatabase = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
+		if (passedDatabase == null && startupDatabase != null) {
+			/*
+			 * Database chosen in the start up dialog. Always Sqlite, but the file end
+			 * may be any of the Sqlite ones, so don't check it here. 
+			 */
+			int sqliteIndex = 0;
+			for (int i = 0; i < databaseSystems.size(); i++) {
+				if (databaseSystems.get(i) instanceof SqliteSystem) {
+					sqliteIndex = i;
+					break;
+				}
+			}
+			DBParameters newParams = dbParameters;
+			newParams.setDatabaseName(startupDatabase);
+			newParams.setDatabaseSystem(sqliteIndex);
+			return newParams;
+		}
 		if (passedDatabase != null) {
 			/*
 			 * assume it's a file based database. Anything else is going to get more complicated and will require

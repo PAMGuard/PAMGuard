@@ -81,6 +81,8 @@ import binaryFileStorage.BinaryStore;
 import export.ExportOptions;
 import fftManager.FFTDataUnit;
 import generalDatabase.DBControlUnit;
+import generalDatabase.sqlite.SqliteSystem;
+import PamController.startup.StartupHistory;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import metadata.MetaDataContol;
@@ -831,9 +833,46 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public void pamClose() {
 
+		recordStartupHistory();
+
 		getUidManager().runShutDownOps();
 
 		pamConfiguration.pamClose();
+	}
+
+	/**
+	 * Add the settings file and the database in use to the lists shown in the start
+	 * up dialog (-c start up option). In normal mode, the database goes into the
+	 * viewer mode list so it's ready to view next time PAMGuard starts.
+	 */
+	private void recordStartupHistory() {
+		try {
+			int mode = getRunMode();
+			if (mode != RUN_NORMAL && mode != RUN_PAMVIEW) {
+				return;
+			}
+			if (GlobalArguments.isBatch()) {
+				return;
+			}
+			StartupHistory history = StartupHistory.getInstance();
+			if (mode == RUN_NORMAL) {
+				String psf = PamSettingManager.getInstance().getSettingsFileName();
+				if (psf != null && new File(psf).exists()) {
+					history.recordOpened(new File(psf), StartupHistory.MODE_NORMAL);
+				}
+			}
+			DBControlUnit dbControl = DBControlUnit.findDatabaseControl();
+			if (dbControl != null && dbControl.getDatabaseSystem() instanceof SqliteSystem) {
+				String dbName = dbControl.getLongDatabaseName();
+				if (dbName != null && new File(dbName).exists()) {
+					history.recordOpened(new File(dbName), StartupHistory.MODE_VIEWER);
+				}
+			}
+			history.save();
+		}
+		catch (Exception e) {
+			System.out.println("Unable to update the start up file lists: " + e.getMessage());
+		}
 	}
 
 	/**
