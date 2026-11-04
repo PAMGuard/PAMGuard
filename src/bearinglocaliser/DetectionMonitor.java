@@ -1,6 +1,5 @@
 package bearinglocaliser;
 
-import PamController.PamController;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamguardMVC.PamDataBlock;

@@ -4,6 +4,7 @@ import java.awt.Window;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import PamController.PamGUIManager;
@@ -23,7 +24,7 @@ public class PamWorker<T> {
 	/**
 	 * Swing dialog which shows progress
 	 */
-	private PamWorkDialog pamWorkDialog;
+	private volatile PamWorkDialog pamWorkDialog;
 	
 	/**
 	 * Progress properties. 
@@ -56,12 +57,23 @@ public class PamWorker<T> {
 			//TODO - make a node that can be extracted here. 
 			pamWorkProgress = new PamWorkerProgressFX(); 
 		}
-		else {
+		else if (SwingUtilities.isEventDispatchThread()) {
 			pamWorkDialog = new PamWorkDialog(parentFrame, nTextRows, title);
+		}
+		else {
+			/*
+			 * Swing components must be built and shown on the AWT thread (e.g. when a sud
+			 * file is mapped from a file list worker). Queue this before the worker starts
+			 * so that done(), which is also posted to the AWT thread, always runs after it.
+			 */
+			SwingUtilities.invokeLater(() -> {
+				pamWorkDialog = new PamWorkDialog(parentFrame, nTextRows, title);
+				pamWorkDialog.setVisible(true);
+			});
 		}
 		backgroundWorker = new BackgroundWorker();
 		backgroundWorker.execute();
-		if (pamWorkDialog!=null) pamWorkDialog.setVisible(true);
+		if (pamWorkDialog!=null && SwingUtilities.isEventDispatchThread()) pamWorkDialog.setVisible(true);
 	}
 	
 	

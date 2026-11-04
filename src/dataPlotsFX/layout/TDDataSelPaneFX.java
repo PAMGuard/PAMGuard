@@ -244,13 +244,36 @@ public class TDDataSelPaneFX extends PamVBox {
 		});
 
 
+		//reset the axis to its default range e.g. 0 to Nyquist for a spectrogram. 
+		PamButton resetButton = new PamButton(); 
+		resetButton.getStyleClass().add("icon-button");
+		resetButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize));
+		resetButton.setTooltip(new Tooltip("Reset the axis to its default range"));
+		resetButton.setOnAction((action)->{
+			resetAxisRange(); 
+		});
+
 		//TODO- cleverly add units to labels. 
 		gridPane.add(new Label("Min"), 0, 0); 
 		gridPane.add(textFieldMin, 0, 1); 
 		gridPane.add(new Label("Max"), 1, 0); 
 		gridPane.add(textFieldMax, 1, 1); 
+		gridPane.add(resetButton, 2, 1); 
 
 		return gridPane;
+	}
+
+	/**
+	 * Reset the current axis to its default range. 
+	 */
+	private void resetAxisRange() {
+		TDScaleInfo scaleInfo = tdGraph.getCurrentScaleInfo(); 
+		if (scaleInfo == null) {
+			return; 
+		}
+		scaleInfo.resetToDefaultRange();
+		setTextFieldBinding(); 
+		tdGraph.repaint(0);
 	}
 
 	/**

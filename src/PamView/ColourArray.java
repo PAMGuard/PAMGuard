@@ -6,6 +6,7 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import pamViewFX.fxNodes.utilsFX.InfernoColorMap;
 
 /**
  * A series of functions for creating arrays of colours
@@ -37,7 +38,7 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 //	public static final int GREEN = 4;
 //	public static final int HOT = 5;
 	
-	public static enum ColourArrayType{GREY, REVERSEGREY, BLUE,  GREEN, RED, HOT, HSV, FIRE, PATRIOTIC, COPPER}
+	public static enum ColourArrayType{GREY, REVERSEGREY, BLUE,  GREEN, RED, HOT, HSV, FIRE, PATRIOTIC, COPPER, INFERNO, PARULA, MATLAB}
 	
 	public static String getName(ColourArrayType type) {
 		switch (type){
@@ -61,6 +62,12 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 			return "Red-White-Blue";
 		case COPPER:
 			return "Copper";
+		case INFERNO:
+			return "Inferno (multicoloured)";
+		case PARULA:
+			return "Parula (multicoloured)";
+		case MATLAB:
+			return "Pastel (multicoloured)";
 		default:
 			return "Unknown";
 		}
@@ -91,6 +98,12 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 			return createPatrioticArray(nPoints);
 		case COPPER:
 			return createCopperArray(nPoints);
+		case INFERNO:
+			return createInfernoArray(nPoints);
+		case PARULA:
+			return createParulaArray(nPoints);
+		case MATLAB:
+			return createMATLABArray(nPoints);
 		default:
 			return createMergedArray(nPoints, Color.GREEN, Color.RED);
 		}
@@ -159,16 +172,65 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 		return createMultiColouredArray(nPoints, Color.RED, Color.WHITE, Color.BLUE);
 	}
 	/**
-	 * MATLAB copper colour array (black to light copper). Red saturates at 0.8 of
-	 * the range so evenly spaced stops every 0.2 reproduce it exactly. 
+	 * Reversed MATLAB copper colour array (light copper to black). Uses the
+	 * MATLAB formula, r = min(1, 1.25x), g = 0.7812x, b = 0.4975x. 
 	 * @param nPoints
 	 * @return
 	 */
 	public static ColourArray createCopperArray(int nPoints) {
-		return createMultiColouredArray(nPoints, new Color(0f, 0f, 0f),
-				new Color(0.25f, 0.15624f, 0.0995f), new Color(0.5f, 0.31248f, 0.199f),
-				new Color(0.75f, 0.46872f, 0.2985f), new Color(1.0f, 0.62496f, 0.398f),
-				new Color(1.0f, 0.7812f, 0.4975f));
+		ColourArray ca = new ColourArray();
+		ca.colours = new Color[nPoints];
+		for (int i = 0; i < nPoints; i++) {
+			double x = nPoints > 1 ? 1. - (double) i / (nPoints-1) : 1.;
+			ca.colours[i] = new Color((float) Math.min(1, 1.25*x), (float) (0.7812*x), (float) (0.4975*x));
+		}
+		return ca;
+	}
+	
+	/**
+	 * Inferno colour array, interpolated from the map shared with the FX colour array. 
+	 * createMultiColouredArray can't be used here since there are nearly as many
+	 * stops in the map as colour points. 
+	 * @param nPoints
+	 * @return
+	 */
+	public static ColourArray createInfernoArray(int nPoints) {
+		double[][] map = InfernoColorMap.infernoMap;
+		ColourArray ca = new ColourArray();
+		ca.colours = new Color[nPoints];
+		for (int i = 0; i < nPoints; i++) {
+			double pos = nPoints > 1 ? (double) i * (map.length-1) / (nPoints-1) : 0;
+			int i0 = Math.min((int) pos, map.length-2);
+			double f = pos - i0;
+			ca.colours[i] = new Color((float) (map[i0][0] + f*(map[i0+1][0]-map[i0][0])),
+					(float) (map[i0][1] + f*(map[i0+1][1]-map[i0][1])),
+					(float) (map[i0][2] + f*(map[i0+1][2]-map[i0][2])));
+		}
+		return ca;
+	}
+	
+	/**
+	 * Parula colour array, the default colour map in MATLAB r2014b+
+	 * @param nPoints
+	 * @return
+	 */
+	public static ColourArray createParulaArray(int nPoints) {
+		return createMultiColouredArray(nPoints, new Color(0.2422f, 0.1504f, 0.6603f),
+				new Color(0.2647f, 0.403f, 0.9935f), new Color(0.1085f, 0.6669f, 0.8734f),
+				new Color(0.2809f, 0.7964f, 0.5266f), new Color(0.9184f, 0.7308f, 0.189f),
+				new Color(0.9769f, 0.9839f, 0.0805f));
+	}
+	
+	/**
+	 * Pastel colour array made from the default MATLAB r2014b+ line colours
+	 * @param nPoints
+	 * @return
+	 */
+	public static ColourArray createMATLABArray(int nPoints) {
+		return createMultiColouredArray(nPoints, new Color(0f, 0.447f, 0.741f),
+				new Color(0.85f, 0.325f, 0.098f), new Color(0.929f, 0.694f, 0.125f),
+				new Color(0.494f, 0.184f, 0.556f), new Color(0.466f, 0.674f, 0.188f),
+				new Color(0.301f, 0.745f, 0.933f), new Color(0.635f, 0.078f, 0.184f));
 	}
 	
 	/**

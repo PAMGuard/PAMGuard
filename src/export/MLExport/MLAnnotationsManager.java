@@ -9,6 +9,9 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
+import annotation.calcs.measurement.SoundMeasurementAnnotation;
+import annotation.calcs.measurement.SoundMeasurementAnnotationType;
+import annotation.calcs.wav.WavAnnotation;
 import annotation.calcs.snr.SNRAnnotation;
 import annotation.calcs.spl.SPLAnnotation;
 import annotation.string.StringAnnotation;
@@ -120,6 +123,12 @@ public class MLAnnotationsManager {
 			break;
 
 		default:
+			if (annotationType instanceof SoundMeasurementAnnotationType) {
+				// sound measurements use their database column name, e.g. PeakFreq, so the
+				// exported fields match the database (and are valid field names).
+				name = ((SoundMeasurementAnnotationType) annotationType).getMeasurement().getColumnName();
+				break;
+			}
 			/*
 			 * Annotation types whose name is chosen by the user rather than fixed by the
 			 * annotation class - the note and label of a spectrogram annotation are both
@@ -220,7 +229,8 @@ public class MLAnnotationsManager {
 	/**
 	 * Convert the annotation types which are not tied to one sort of detection, and
 	 * so have no name constant to switch on: the note and label of a spectrogram
-	 * annotation (strings), the SPL and SNR measurements, and logger form data.
+	 * annotation (strings), the SPL, SNR and sound measurements, the wav clip of a quick
+	 * spectrogram annotation and logger form data.
 	 *
 	 * @param dataAnnotation - the annotation to convert.
 	 * @return the MATLAB array for the annotation, or null if it isn't one of these.
@@ -246,6 +256,20 @@ public class MLAnnotationsManager {
 			return splStruct;
 		}
 
+		if (dataAnnotation instanceof SoundMeasurementAnnotation) {
+			return Mat5.newScalar(((SoundMeasurementAnnotation) dataAnnotation).getValue());
+		}
+
+		if (dataAnnotation instanceof WavAnnotation) {
+			//the clip exported for the annotation (quick spectrogram annotation).
+			WavAnnotation wav = (WavAnnotation) dataAnnotation;
+			Struct wavStruct = Mat5.newStruct();
+			wavStruct.set("folder", Mat5.newString(nonNull(wav.getWavFolderName())));
+			wavStruct.set("prefix", Mat5.newString(nonNull(wav.getWavPrefix())));
+			wavStruct.set("file", Mat5.newString(nonNull(wav.getExportedWavFileName())));
+			return wavStruct;
+		}
+
 		if (dataAnnotation instanceof UserFormAnnotation) {
 			Object[] formData = ((UserFormAnnotation<?>) dataAnnotation).getLoggerFormData();
 			if (formData == null) {
@@ -260,6 +284,11 @@ public class MLAnnotationsManager {
 		}
 
 		return null;
+	}
+
+
+	private static String nonNull(String str) {
+		return str == null ? "" : str;
 	}
 
 

@@ -48,6 +48,7 @@ public class RWEDataPlotinfoFX extends GenericDataPlotInfo {
 
 		//set correct frequency range based on nyquist. 
 		frequencyInfo.setMaxVal(rweDataBlock.getSampleRate()/2.);
+		frequencyInfo.setDefaultRange(()->new double[] {0, rweDataBlock.getSampleRate()/2.});
 		
 
 		settingsPane = new GenericSettingsPane(this);

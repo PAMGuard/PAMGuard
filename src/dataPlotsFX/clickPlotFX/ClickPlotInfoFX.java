@@ -187,6 +187,7 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 		Arrays.fill(rawScaleInfo.getPlotChannels(),1);
 
 		frequencyInfo.setMaxVal(pamDataBlock.getSampleRate()/2);
+		frequencyInfo.setDefaultRange(()->new double[] {0, pamDataBlock.getSampleRate()/2.});
 
 		getScaleInfos().add(bearingScaleInfo);
 		getScaleInfos().add(slantScaleInfo);

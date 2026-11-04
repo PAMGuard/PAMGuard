@@ -279,15 +279,15 @@ public class ColourArray implements Cloneable, Serializable{
 			colors[5]= Color.color(0.9769,   0.98390,  0.0805000);
 			return colors; 
 		case COPPER:
-			// MATLAB copper: r = min(1, 1.25x), g = 0.7812x, b = 0.4975x. Red saturates at x=0.8
-			// so evenly spaced stops every 0.2 reproduce it exactly.
+			// MATLAB copper reversed (light copper to black). Red saturates at 0.8 of the
+			// MATLAB range so evenly spaced stops reproduce the gradient exactly.
 			colors=new Color[6];
-			colors[0]= Color.color(0,    0,       0);
-			colors[1]= Color.color(0.25, 0.15624, 0.0995);
-			colors[2]= Color.color(0.5,  0.31248, 0.199);
-			colors[3]= Color.color(0.75, 0.46872, 0.2985);
-			colors[4]= Color.color(1.0,  0.62496, 0.398);
-			colors[5]= Color.color(1.0,  0.7812,  0.4975);
+			colors[0]= Color.color(1.0,  0.7812,  0.4975);
+			colors[1]= Color.color(1.0,  0.62496, 0.398);
+			colors[2]= Color.color(0.75, 0.46872, 0.2985);
+			colors[3]= Color.color(0.5,  0.31248, 0.199);
+			colors[4]= Color.color(0.25, 0.15624, 0.0995);
+			colors[5]= Color.color(0,    0,       0);
 			return colors; 
 		case INFERNO:
 			return InfernoColorMap.getInfernoColourMap();
@@ -318,13 +318,19 @@ public class ColourArray implements Cloneable, Serializable{
 	}
 
 	/**
-	 * Create the MATLAB copper colour array (black to light copper). 
+	 * Create the reversed MATLAB copper colour array (light copper to black). Uses
+	 * the MATLAB formula, r = min(1, 1.25x), g = 0.7812x, b = 0.4975x. 
 	 * @param nPoints - the size of the colour map
 	 * @return the colourmap.
 	 */
 	private static ColourArray createCopperArray(int nPoints) {
-		Color[] copper=getColorList(ColourArrayType.COPPER); 
-		return createMultiColouredArray(nPoints, copper);
+		ColourArray ca = new ColourArray();
+		ca.colours = new Color[nPoints];
+		for (int i = 0; i < nPoints; i++) {
+			double x = nPoints > 1 ? 1. - (double) i / (nPoints-1) : 1.;
+			ca.colours[i] = new Color(Math.min(1, 1.25*x), 0.7812*x, 0.4975*x, 1);
+		}
+		return ca;
 	}
 
 	private static ColourArray createParulaArray(int nPoints) {

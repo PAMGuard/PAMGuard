@@ -62,7 +62,7 @@ public class AcousticDataGramGraphics implements AcousticScrollerGraphics {
 
 	public AcousticDataGramGraphics(AcousticScrollerFX acousticScroller, PamDataBlock<PamDataUnit> dataBlock){
 		
-		System.out.println("Create AcousticDataGramGraphics:  " + dataBlock.getDataName());
+		//System.out.println("Create AcousticDataGramGraphics:  " + dataBlock.getDataName());
 		this.acousticScroller=acousticScroller; 
 		this.dataBlock=dataBlock;
 		this.standardSpecColours= new StandardPlot2DColours(); 

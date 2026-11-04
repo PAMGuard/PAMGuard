@@ -163,6 +163,23 @@ public abstract class DataAnnotationType<TDataAnnotation extends DataAnnotation<
 	}
 
 	/**
+	 * Group the annotation type belongs to, used to lay out lists of annotation types
+	 * the user can choose from, e.g. "Spectrogram measurements".
+	 * @return group name, or null for general annotation types.
+	 */
+	public String getAnnotationGroup() {
+		return null;
+	}
+
+	/**
+	 * A short description of the annotation type for tool tips.
+	 * @return description, or null.
+	 */
+	public String getAnnotationDescription() {
+		return null;
+	}
+
+	/**
 	 * A short identifying code which MUST be unique to the data annotation and MUST
 	 * be four characters long. Classes can override this with something even more cryptic 
 	 * so long as it remains unique.

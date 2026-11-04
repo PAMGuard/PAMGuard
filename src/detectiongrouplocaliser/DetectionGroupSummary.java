@@ -1,6 +1,7 @@
 package detectiongrouplocaliser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -204,6 +205,28 @@ public class DetectionGroupSummary {
 	 */
 	public int getFocusedIndex() {
 		return focusedUnitIndex;
+	}
+
+	/**
+	 * Remove data units from the group, e.g. once they have been deleted, keeping the
+	 * focus on the same unit if it's still there.
+	 * @param units data units to remove.
+	 * @return true if any were removed.
+	 */
+	public synchronized boolean removeDataUnits(Collection<? extends PamDataUnit> units) {
+		if (dataList == null || units == null || units.isEmpty()) {
+			return false;
+		}
+		PamDataUnit focused = focusedUnitIndex >= 0 && focusedUnitIndex < dataList.size() ? dataList.get(focusedUnitIndex) : null;
+		ArrayList<PamDataUnit> newList = new ArrayList<>(dataList);
+		if (!newList.removeAll(units)) {
+			return false;
+		}
+		// may have been given an unmodifiable list, so replace it.
+		dataList = newList;
+		int index = focused == null ? -1 : newList.indexOf(focused);
+		focusedUnitIndex = index >= 0 ? index : Math.min(focusedUnitIndex, newList.size() - 1);
+		return true;
 	}
 	
 

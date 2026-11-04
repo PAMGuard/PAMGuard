@@ -7,6 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -36,6 +40,8 @@ import Spectrogram.SpectrogramDisplay;
 import Spectrogram.SpectrogramMarkObserver;
 import annotation.AnnotationDialog;
 import annotation.DataAnnotationType;
+import annotation.calcs.measurement.SoundMeasurementAnnotationType;
+import annotation.calcs.measurement.SoundMeasurementGroup;
 import annotation.calcs.snr.SNRAnnotationType;
 import annotation.calcs.spl.SPLAnnotationType;
 import annotation.handler.AnnotationChoices;
@@ -54,6 +60,8 @@ import generalDatabase.DBControlUnit;
 import detectionPlotFX.data.DDPlotRegister;
 import javafx.application.Platform;
 import javafx.scene.input.MouseButton;
+import soundPlayback.PlaybackControl;
+import userDisplay.UserDisplayControl;
 
 public class SpectrogramAnnotationModule extends MarkModule implements PamSettings {
 
@@ -68,6 +76,20 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 	protected SpectrogramMarkAnnotationHandler annotationHandler;
 	protected DisplayObserver displayObserver;
 	private SpectrogramAnnotationDDPlotProvider ddPlotProvider;
+	protected SoundMeasurementGroup measurementGroup;
+	private SpectrogramAnnotationTableProvider tableProvider;
+
+	/**
+	 * Raw data feeding the display most recently marked on. Used for marks whose
+	 * own display isn't known (see {@link #findRawSourceDataBlock(MarkDataUnit)}).
+	 */
+	private PamRawDataBlock lastDisplayRawSource;
+
+	/**
+	 * FX displays the user has marked on. They don't repaint when a data unit is removed,
+	 * so are repainted after a delete or edit. Weak so closed displays can go.
+	 */
+	private Set<TDGraphFX> markedGraphs = Collections.newSetFromMap(new WeakHashMap<>());
 
 	public SpectrogramAnnotationModule(String unitName) {
 		super(unitName);
@@ -78,6 +100,13 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		annotationHandler.addAnnotationType(stringAnnotationType = new StringAnnotationType("Note", 50));
 		annotationHandler.addAnnotationType(labelAnnotationType = new StringAnnotationType("Label", 50));
 		annotationHandler.addAnnotationType(new UserFormAnnotationType(getAnnotationProcess().getMarkDataBlock()));
+		// sound measurements, one annotation type each, made from the data under the mark on
+		// the display it was drawn on. They aren't listed until the user adds them with the
+		// + button in the settings.
+		measurementGroup = new SoundMeasurementGroup(this::findMarkRawSource);
+		for (SoundMeasurementAnnotationType measureType : measurementGroup.getAnnotationTypes()) {
+			annotationHandler.addAnnotationType(measureType);
+		}
 		//		spectrogramMarkObserver = new SpecMarkObserver();
 		//		SpectrogramMarkObservers.addSpectrogramMarkObserver(spectrogramMarkObserver);
 
@@ -87,7 +116,10 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		//register a detection display provider so the advanced overlay mark pop up menu can
 		//show a spectrogram of the raw data underneath the annotation.
 		DDPlotRegister.getInstance().registerDataInfo(
-				ddPlotProvider = new SpectrogramAnnotationDDPlotProvider(getAnnotationDataBlock()));
+				ddPlotProvider = new SpectrogramAnnotationDDPlotProvider(this));
+
+		//a table of all the annotations and their measurements.
+		UserDisplayControl.addUserDisplayProvider(tableProvider = new SpectrogramAnnotationTableProvider(this));
 
 		annotationHandler.loadAnnotationChoices();
 		sortSQLLogging();
@@ -126,6 +158,9 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		OverlayMarkObservers.singleInstance().removeObserver(displayObserver);
 		if (ddPlotProvider != null) {
 			DDPlotRegister.getInstance().unRegisterDataInfo(ddPlotProvider);
+		}
+		if (tableProvider != null) {
+			UserDisplayControl.removeDisplayProvider(tableProvider);
 		}
 		return super.removeUnit();
 	}
@@ -235,6 +270,110 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		}
 	}
 
+	/**
+	 * Remember the raw data block feeding the display a mark is made on (or touched on),
+	 * both in the mark itself and as the default for marks whose display isn't known,
+	 * e.g. marks loaded from the database.
+	 *
+	 * @param unit          the mark data unit (may be null).
+	 * @param overlayMarker the marker of the display the user is working on.
+	 */
+	/**
+	 * Remember the FX display a marker belongs to, so it can be repainted after a delete or edit.
+	 */
+	private void noteMarkedGraph(OverlayMarker overlayMarker) {
+		if (!(overlayMarker instanceof StandardOverlayMarker)) {
+			return;
+		}
+		TDGraphFX graph = ((StandardOverlayMarker) overlayMarker).getTdGraphFX();
+		if (graph != null) {
+			synchronized (markedGraphs) {
+				markedGraphs.add(graph);
+			}
+		}
+	}
+
+	private void noteDisplayRawSource(MarkDataUnit unit, OverlayMarker overlayMarker) {
+		if (!(overlayMarker instanceof StandardOverlayMarker)) {
+			return;
+		}
+		TDGraphFX graph = ((StandardOverlayMarker) overlayMarker).getTdGraphFX();
+		if (graph == null) {
+			return;
+		}
+		int channelMap = unit == null ? 0 : unit.getChannelBitmap();
+		PamRawDataBlock rawBlock = graph.findRawSourceDataBlock(channelMap);
+		if (rawBlock == null) {
+			return;
+		}
+		lastDisplayRawSource = rawBlock;
+		if (unit != null) {
+			unit.setRawSourceDataBlock(rawBlock);
+		}
+	}
+
+	/**
+	 * Raw source finder handed to annotation types which measure the data under a mark.
+	 */
+	private PamRawDataBlock findMarkRawSource(PamDataUnit unit) {
+		return unit instanceof MarkDataUnit ? findRawSourceDataBlock((MarkDataUnit) unit) : null;
+	}
+
+	/**
+	 * Find the raw data to use for a mark (pop up spectrogram, playback and measurements).
+	 * This is the data feeding the display the mark was made on, which may be decimated,
+	 * so that what's measured and shown matches what the user marked out. If that isn't
+	 * known, the source of the display last used is tried, and then the sound acquisition.
+	 *
+	 * @param unit the mark data unit.
+	 * @return a raw data block, or null if there is no raw data.
+	 */
+	public PamRawDataBlock findRawSourceDataBlock(MarkDataUnit unit) {
+		int channelMap = unit.getChannelBitmap();
+		PamRawDataBlock rawBlock = unit.getRawSourceDataBlock();
+		if (rawBlock != null) {
+			return rawBlock;
+		}
+		if (lastDisplayRawSource != null && (lastDisplayRawSource.getChannelMap() & channelMap) != 0) {
+			return lastDisplayRawSource;
+		}
+		java.util.ArrayList<PamDataBlock> rawBlocks = PamController.getInstance().getRawDataBlocks();
+		if (rawBlocks == null || rawBlocks.isEmpty()) {
+			return null;
+		}
+		for (PamDataBlock block : rawBlocks) {
+			if (block instanceof PamRawDataBlock && (block.getChannelMap() & channelMap) != 0) {
+				return (PamRawDataBlock) block;
+			}
+		}
+		return PamController.getInstance().getRawDataBlock(0);
+	}
+
+	/**
+	 * Re-run the automatic measurements on a mark, e.g. after it's been moved or resized.
+	 * Annotations which write files (e.g. wav clips) are not re-run.
+	 *
+	 * @param unit the mark data unit.
+	 */
+	public void reMeasure(MarkDataUnit unit) {
+		snrAnnotationType.autoAnnotate(unit);
+		splAnnotationType.autoAnnotate(unit);
+		// the measurements are cached, so make sure they're made afresh.
+		measurementGroup.invalidate();
+		for (DataAnnotationType<?> anType : annotationHandler.getUsedAnnotationTypes()) {
+			if (anType instanceof SoundMeasurementAnnotationType) {
+				anType.autoAnnotate(unit);
+			}
+		}
+	}
+
+	/**
+	 * @return the group of sound measurement annotation types.
+	 */
+	public SoundMeasurementGroup getMeasurementGroup() {
+		return measurementGroup;
+	}
+
 	public class DisplayObserver implements OverlayMarkObserver {
 
 		private final ParameterType[] parameterTypes = {ParameterType.TIME, ParameterType.FREQUENCY};
@@ -256,6 +395,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		@Override
 		public boolean markUpdate(int markStatus, javafx.scene.input.MouseEvent mouseEvent, OverlayMarker overlayMarker,
 				OverlayMark overlayMark) {
+			noteMarkedGraph(overlayMarker);
 			if (markStatus == MARK_CANCELLED) {
 				// mark abandoned (overlayMark may be null) - clear any live measurement text.
 				if (isGrabbing()) {
@@ -295,6 +435,8 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 					// the press may be on a resize handle that sits just outside the box outline.
 					existingUnit = findAnnotationUnitNear(markChannel, t0, f0, overlayMarker);
 				}
+				// remember which (possibly decimated) data the user is looking at for this mark.
+				noteDisplayRawSource(existingUnit, overlayMarker);
 				if (existingUnit != null && mouseButton == MouseButton.PRIMARY){
 					determineGrab(existingUnit, t0, f0, overlayMarker);
 					if (isGrabbing()) {
@@ -323,8 +465,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 			else if (markStatus == MARK_END) {
 				if (isGrabbing() && existingUnit != null) {
 					// recompute measurements now the box is in its final position.
-					snrAnnotationType.autoAnnotate(existingUnit);
-					splAnnotationType.autoAnnotate(existingUnit);
+					reMeasure(existingUnit);
 					getAnnotationDataBlock().updatePamData(existingUnit, System.currentTimeMillis());
 					// drag finished - remove the live measurement text.
 					AnnotationHandleState.clearEditing();
@@ -343,6 +484,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 				double[] fRange = new double[] {Math.min(f0, f2), Math.max(f0,  f2)};
 				adu.setFrequency(fRange);
 				adu.setChannelBitmap(1<<markChannel);
+				noteDisplayRawSource(adu, overlayMarker);
 				List<DataAnnotationType<?>> anTypes = annotationHandler.getUsedAnnotationTypes();
 				boolean manualAnnotationNeeded = false;
 				Point locOnScreen = null;
@@ -524,7 +666,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		 */
 		private double[] measureRawData(MarkDataUnit unit) {
 			try {
-				PamRawDataBlock raw = getRawDataBlock();
+				PamRawDataBlock raw = findRawSourceDataBlock(unit);
 				if (raw == null) {
 					return null;
 				}
@@ -551,18 +693,6 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 			}
 		}
 
-		/**
-		 * @return the first raw (acquisition) data block, or null.
-		 */
-		private PamRawDataBlock getRawDataBlock() {
-			java.util.ArrayList<PamDataBlock> raws = PamController.getInstance().getRawDataBlocks();
-			if (raws == null || raws.isEmpty()) {
-				return null;
-			}
-			PamDataBlock block = raws.get(0);
-			return (block instanceof PamRawDataBlock) ? (PamRawDataBlock) block : null;
-		}
-
 		@Override
 		public JPopupMenu getPopupMenuItems(DetectionGroupSummary markSummaryData) {
 			MarkDataUnit markDataUnit = getMarkDataUnit(markSummaryData);
@@ -570,6 +700,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 				return null;
 			}
 			else {
+				noteMarkedGraph(markSummaryData.getOverlayMarker());
 				MouseEvent swingMouse = ExtMouseAdapter.swingMouse(markSummaryData.getMouseEvent());
 				return getPopupMenu(swingMouse, markDataUnit);
 			}
@@ -753,14 +884,81 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		menuItem = new JMenuItem("Edit Annotation");
 		menuItem.addActionListener(new EditUnit(mouseEvent ,markDataUnit));
 		pop.add(menuItem);
-		menuItem = new JMenuItem("Delete");
+		menuItem = new JMenuItem("Recalculate measurements");
+		menuItem.setToolTipText("Re-measure SNR, SPL and sound measurements from the data under the annotation");
+		menuItem.addActionListener((e) -> {
+			reMeasure(markDataUnit);
+			getAnnotationDataBlock().updatePamData(markDataUnit, System.currentTimeMillis());
+		});
+		pop.add(menuItem);
+		menuItem = new JMenuItem("Delete ...");
 		menuItem.addActionListener(new DeleteUnit(mouseEvent, markDataUnit));
 		pop.add(menuItem);
 		return pop;
 	}
 
+	/**
+	 * Can sound be played for an annotation ? This needs viewer mode, a Sound Output
+	 * module and raw sound files.
+	 * @return true if sound can be played.
+	 */
+	public boolean canPlaySound() {
+		PlaybackControl player = PlaybackControl.getViewerPlayback();
+		return isViewer && player != null && player.hasPlayDataSource();
+	}
+
+	/**
+	 * Play the sound under an annotation through the Sound Output module.
+	 * @param markDataUnit the annotation.
+	 * @return true if playback started.
+	 */
+	public boolean playSound(MarkDataUnit markDataUnit) {
+		if (!canPlaySound()) {
+			return false;
+		}
+		return PlaybackControl.getViewerPlayback().playViewerData(markDataUnit.getTimeMilliseconds(),
+				markDataUnit.getEndTimeInMilliseconds(), null);
+	}
+
+	/**
+	 * Create a menu item to play the sound under an annotation. It's disabled, with a
+	 * tool tip saying why, if sound can't be played.
+	 * @param markDataUnit the annotation.
+	 * @return menu item.
+	 */
+	public JMenuItem createPlayMenuItem(MarkDataUnit markDataUnit) {
+		JMenuItem menuItem = new JMenuItem("Play sound");
+		if (canPlaySound()) {
+			menuItem.addActionListener((e) -> playSound(markDataUnit));
+		}
+		else {
+			menuItem.setEnabled(false);
+			menuItem.setToolTipText("Sound can only be played in viewer mode with a Sound Output module and the raw sound files");
+		}
+		return menuItem;
+	}
+
 	public String getMarkType() {
 		return null;
+	}
+
+	@Override
+	protected void annotationsChanged(List<MarkDataUnit> deleted) {
+		ArrayList<TDGraphFX> graphs;
+		synchronized (markedGraphs) {
+			graphs = new ArrayList<>(markedGraphs);
+		}
+		if (!graphs.isEmpty()) {
+			Platform.runLater(() -> {
+				for (TDGraphFX graph : graphs) {
+					if (deleted != null) {
+						// otherwise the display still draws them as the selected units.
+						graph.removeFromSelection(deleted);
+					}
+					graph.repaint(0);
+				}
+			});
+		}
 	}
 
 	class DeleteUnit implements ActionListener {
@@ -773,12 +971,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			String msg = dataUnit.getSummaryString();
-			int ans = JOptionPane.showConfirmDialog(mouseEvent.getComponent(), 
-					msg, "Confirm Delete", JOptionPane.YES_NO_OPTION);
-			if (ans == JOptionPane.YES_OPTION) {
-				getAnnotationDataBlock().remove(dataUnit, true);
-			}
+			deleteAnnotations(SwingUtilities.getWindowAncestor(mouseEvent.getComponent()), List.of(dataUnit));
 			mouseEvent.getComponent().repaint();
 		}
 	}	
@@ -792,11 +985,7 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			boolean ans = MarkAnnotationDialog.showDialog(SwingUtilities.getWindowAncestor(mouseEvent.getComponent()), 
-					SpectrogramAnnotationModule.this, dataUnit, null);
-			if (ans) {
-				getAnnotationDataBlock().updatePamData(dataUnit, System.currentTimeMillis());
-			}
+			editAnnotation(SwingUtilities.getWindowAncestor(mouseEvent.getComponent()), dataUnit);
 			mouseEvent.getComponent().repaint();
 		}
 	}	
@@ -823,6 +1012,9 @@ public class SpectrogramAnnotationModule extends MarkModule implements PamSettin
 			annotationHandler.loadAnnotationChoices();
 			sortSQLLogging();
 			subscribeMarkObserver();
+			if (tableProvider != null) {
+				tableProvider.settingsChanged();
+			}
 		}
 	}
 

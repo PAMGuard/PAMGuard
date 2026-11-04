@@ -425,7 +425,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private Label createSegWarningIcon() {
 		segWarningGlyph = FontIcon.of(MaterialDesignA.ALERT, PamGuiManagerFX.iconSize, SEG_WARN_ORANGE);
-		setSegWarningColour(SEG_WARN_ORANGE);
+		//the theme sets the colour of this style class, which would override the warning colours.
+		segWarningGlyph.getStyleClass().remove("ikonli-font-icon");
 
 		segWarningIcon = new Label();
 		segWarningIcon.setGraphic(segWarningGlyph);
@@ -501,13 +502,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	}
 
 	/**
-	 * Set the colour of the warning sign. Only the colour and size are set in the
-	 * style so the icon code (set when the icon was created) is not re-parsed.
+	 * Set the colour of the warning sign. Do not use setStyle here - changing the
+	 * inline style of a FontIcon whose icon code is already set resets its font to the
+	 * system font, and the icon then draws as a stack of horizontal lines.
 	 * @param colour - the colour.
 	 */
 	private void setSegWarningColour(Color colour) {
-		segWarningGlyph.setStyle("-fx-icon-color: " + PamGlyphDude.colourToHex(colour)
-				+ "; -fx-icon-size: " + PamGuiManagerFX.iconSize + ";");
+		segWarningGlyph.setIconColor(colour);
 	}
 
 	/**

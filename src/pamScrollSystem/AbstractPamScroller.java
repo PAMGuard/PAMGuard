@@ -1,9 +1,11 @@
 package pamScrollSystem;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
+import javax.swing.JComponent;
 import javax.swing.Timer;
 
 import PamController.PamController;
@@ -290,6 +292,23 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 		setValueMillis(setValue);
 		notifyCoupledScrollers();
 		scrollManager.moveOuterScroller(this, getMinimumMillis(), getMaximumMillis());
+	}
+
+	/**
+	 * Show the dialog of load options (start time, duration, page step, etc.) and apply
+	 * them, which moves the other scrollers and loads the data.
+	 * @param parentFrame parent window, can be null.
+	 * @param parentComponent component to position the dialog by, can be null.
+	 * @return true if the options were changed.
+	 */
+	public boolean showLoadOptionsDialog(Window parentFrame, JComponent parentComponent) {
+		PamScrollerData newData = LoadOptionsDialog.showDialog(parentFrame, this, parentComponent);
+		if (newData == null) {
+			return false;
+		}
+		scrollerData = newData;
+		rangesChangedF(getValueMillis());
+		return true;
 	}
 
 	/**

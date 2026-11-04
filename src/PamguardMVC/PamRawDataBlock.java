@@ -229,11 +229,21 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	 * @return One RawDataUnit per channel.
 	 * @throws RawDataUnavailableException
 	 */
-	synchronized public RawDataUnit[] getAvailableSamples(long startMillis, long durationMillis, int channelMap, boolean offlineLoad) throws RawDataUnavailableException {
-		if (!hasDataSamples(startMillis, durationMillis)) {
-			if (offlineLoad && 
+	public RawDataUnit[] getAvailableSamples(long startMillis, long durationMillis, int channelMap, boolean offlineLoad) throws RawDataUnavailableException {
+		boolean haveData;
+		synchronized (this) {
+			haveData = hasDataSamples(startMillis, durationMillis);
+		}
+		if (!haveData) {
+			if (offlineLoad &&
 					PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 				// try to load some data !
+				/*
+				 * Must NOT hold this block's lock while loading. The load goes up the chain
+				 * (e.g. decimator -> acquisition) and takes the upstream loader's lock, while
+				 * another load already holding that lock (e.g. a pop up spectrogram) pushes
+				 * data back down into this block, which needs this block's lock - deadlock.
+				 */
 				if (parentProcess != null) {
 					this.clearAll();
 					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 20);

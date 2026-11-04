@@ -621,6 +621,16 @@ public class Scrolling2DPlotDataFX2 extends Scrolling2DPlotDataFX {
 			return;
 		}
 
+		// Offline orders are padded either side of the tiles they are for (see
+		// Scrolling2DPlotInfo.orderPadMillis()), so FFTs can arrive for a tile which an
+		// earlier order has already completed. Only let them fill columns which that
+		// order left blank - partial averages (or start-up FFTs) must not overwrite good
+		// columns.
+		if (tile.state == STATE_LOADED && tile.colWritten[col]
+				&& !(pendingTile == tile && tile.accumCol == col && tile.accumCount > 0)) {
+			return;
+		}
+
 		// flush the previous (different) column/tile before starting a new one.
 		if (pendingTile != tile || (pendingTile != null && pendingTile.accumCol != col)) {
 			SpecTile prevTile = pendingTile;

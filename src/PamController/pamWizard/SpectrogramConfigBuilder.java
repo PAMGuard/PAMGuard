@@ -12,6 +12,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
+import PamUtils.PamUtils;
 import PamguardMVC.PamRawDataBlock;
 import decimator.DecimatorControl;
 import decimator.DecimatorParams;
@@ -30,6 +31,9 @@ import PamView.paneloverlay.overlaymark.OverlayMarker;
 import dataPlotsFX.TDDisplayController;
 import dataPlotsFX.layout.TDDisplayFX;
 import dataPlotsFX.layout.TDGraphFX;
+import soundPlayback.PlaybackControl;
+import soundPlayback.PlaybackParameters;
+import soundPlayback.PlaybackSystem;
 
 /**
  * Builds a "view a spectrogram of sound files" PAMGuard configuration: Sound
@@ -46,6 +50,10 @@ public class SpectrogramConfigBuilder {
 	public static final String ACQUISITION_CLASS = "Acquisition.AcquisitionControl";
 	public static final String FFT_CLASS = "fftManager.PamFFTControl";
 	public static final String SPECTROGRAM_ANNOTATION_CLASS = "annotationMark.spectrogram.SpectrogramAnnotationModule";
+	public static final String SOUND_OUTPUT_CLASS = "soundPlayback.PlaybackControl";
+
+	/** Maximum number of channels played back if the playback device can't say. */
+	private static final int DEFAULT_PLAYBACK_CHANNELS = 2;
 
 	/** Unit name of the decimator added when the user asks for decimation. */
 	public static final String DECIMATOR_NAME = "Decimator";
@@ -60,6 +68,7 @@ public class SpectrogramConfigBuilder {
 	private DecimatorControl decimatorControl;
 	private PamControlledUnit fftControl;
 	private PamControlledUnit annotationControl;
+	private PlaybackControl playbackControl;
 
 	/**
 	 * Build the spectrogram configuration.
@@ -96,6 +105,7 @@ public class SpectrogramConfigBuilder {
 		}
 		fftControl = PamAutoConfigUtils.addModule(FFT_CLASS, "FFT Engine");
 		Supplier<TDDisplayFX> displaySupplier = PamAutoConfigUtils.addTimeDisplay("Spectrogram");
+		playbackControl = findOrAddSoundOutput();
 		if (viewer) {
 			// Spectrogram Annotation module provides manual annotation marks over the
 			// spectrogram.
@@ -109,6 +119,10 @@ public class SpectrogramConfigBuilder {
 		//     Must follow configureAcquisition, which sets the sample rate and channels.
 		configureDecimator(options);
 		configureFFT(options);
+
+		// 2c. Sound output plays the acquisition data, with channels selected - a new
+		//     Sound Output module has no channels selected so would play nothing.
+		configureSoundOutput();
 
 		// 3. Rebuild the data model so connections form and displays appear.
 		PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_PROCESS_SETTINGS);
@@ -229,6 +243,54 @@ public class SpectrogramConfigBuilder {
 		params.channelMap = sourceData.getChannelMap();
 		pamFFTControl.setFFTParameters(params);
 		pamFFTControl.setupControlledUnit();
+	}
+
+	/**
+	 * Use the existing Sound Output module if there is one, otherwise add one so that
+	 * sound can be played from the spectrogram.
+	 */
+	private PlaybackControl findOrAddSoundOutput() {
+		PamControlledUnit unit = PamController.getInstance().findControlledUnit(PlaybackControl.PLAYBACK_TYPE_STRING);
+		if (unit == null) {
+			unit = PamAutoConfigUtils.addModule(SOUND_OUTPUT_CLASS, "Sound Output");
+		}
+		return unit instanceof PlaybackControl ? (PlaybackControl) unit : null;
+	}
+
+	/**
+	 * Point the Sound Output module at the acquisition raw data and select the first
+	 * channels (up to the number the playback device supports). Playback decimates
+	 * the data itself, so the full rate acquisition data are used even when there is
+	 * a decimator.
+	 */
+	private void configureSoundOutput() {
+		if (playbackControl == null) {
+			System.err.println("SpectrogramConfigBuilder: sound output module could not be added - no sound playback");
+			return;
+		}
+		PamRawDataBlock acquisitionData = acquisitionControl.getAcquisitionProcess().getRawDataBlock();
+		int sourceIndex = PamController.getInstance().getRawDataBlocks().indexOf(acquisitionData);
+		if (sourceIndex < 0) {
+			return;
+		}
+
+		PlaybackParameters params = playbackControl.getPlaybackParameters().clone();
+		params.dataSource = sourceIndex;
+
+		PlaybackSystem playbackSystem = playbackControl.findPlaybackSystem(acquisitionData);
+		int maxChannels = playbackControl.getMaxPlaybackChannels(playbackSystem);
+		if (maxChannels <= 0) {
+			maxChannels = DEFAULT_PLAYBACK_CHANNELS;
+		}
+		int[] channels = PamUtils.getChannelArray(acquisitionData.getChannelMap());
+		int channelBitmap = 0;
+		for (int i = 0; channels != null && i < Math.min(maxChannels, channels.length); i++) {
+			channelBitmap |= 1 << channels[i];
+		}
+		params.channelBitmap = channelBitmap;
+
+		playbackControl.setPlayBackParamters(params);
+		playbackControl.newSettings();
 	}
 
 	/**
