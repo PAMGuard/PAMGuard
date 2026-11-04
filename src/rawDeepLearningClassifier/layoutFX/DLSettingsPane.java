@@ -49,6 +49,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.validator.PamValidator;
+import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
@@ -714,7 +715,16 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			//For example, if the model requires a specific type of data then set the source list to that type.
 			if (modelSelectPane.currentClassifierModel!=null) {
 				setSourceList(modelSelectPane.currentClassifierModel); //this should be above setParams so that the classifier sets the correct sample rate
-				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+				try {
+					modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+				}
+				catch (Exception e) {
+					//do not fail silently - the model settings (e.g. class names and transforms) may not be shown.
+					e.printStackTrace();
+					PamDialogFX.showError("Deep Learning Model Settings",
+							"The model loaded but there was an error showing its settings so some settings (e.g. the class names and transforms) "
+							+ "may be missing or incorrect.\n\n" + e.getClass().getSimpleName() + (e.getMessage() == null ? "" : ": " + e.getMessage()));
+				}
 			}
 			else {
 				classifierPane.setCenter(null); 

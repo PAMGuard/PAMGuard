@@ -224,7 +224,12 @@ public class SimpleTransformPane extends DLTransformPane {
 		for (int i=0; i<spinners.size(); i++) {
 			//spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i] ); 
 			//System.out.println("Set params: " + input.getDLTransformType() + " param val: " + simpleTransform.getParams()[i] + "  " + (simpleTransform.getParams()[i] instanceof Float)); 
-			if (simpleTransform.getParams()[i] instanceof Float || simpleTransform.getParams()[i] instanceof Double) {
+			//the value must be the type of the spinner, not the parameter e.g. a default 0 for a double spinner.
+			Object valueFactory = spinners.get(i).getValueFactory();
+			boolean doubleValue = valueFactory instanceof SpinnerValueFactory.DoubleSpinnerValueFactory
+					|| (!(valueFactory instanceof SpinnerValueFactory.IntegerSpinnerValueFactory)
+							&& (simpleTransform.getParams()[i] instanceof Float || simpleTransform.getParams()[i] instanceof Double));
+			if (doubleValue) {
 				//System.out.println("Double: simpleTransform.getParams()[i]: " + simpleTransform.getParams()[i] + "  " +spinners.get(i).getValueFactory());
 				spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i].doubleValue());
 				spinners.get(i).increment(0); //this is needed to commit values that are not multiples of 2, i.e. in the list

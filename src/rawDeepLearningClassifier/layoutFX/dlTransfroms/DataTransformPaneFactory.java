@@ -114,6 +114,12 @@ public class DataTransformPaneFactory {
 //			((SimpleTransformPane) settingsPane).getSpinners().get(0).getValueFactory().setValue(4);
 //			((SimpleTransformPane) settingsPane).getSpinners().get(1).setValueFactory(new SpinnerValueFactory.ListSpinnerValueFactory<>(createStepList()));
 			break;
+		case SPECTROGRAM_SCIPY:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Window ", "Hop ", "FFT Length "},  new String[]{"samples", "samples", "samples"});
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 4, Integer.MAX_VALUE,   4);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 1, Integer.MAX_VALUE,   1);
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(2, 4, Integer.MAX_VALUE,   4);
+			break;
 		case SPECTROGRAMKETOS:
 			
 			settingsPane = new FFTTransformPane((SimpleTransform) dlTransfrom, new String[]{"FFT Length ", "FFT Hop", "Window_Length"},  new String[]{"", "", "s"}); 
@@ -167,6 +173,18 @@ public class DataTransformPaneFactory {
 		case SPECNORMALISE_MINIMAX:
 			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.SPECNORMALISE_MINIMAX.toString()); 
 			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
+		case SPECNORMALISE_PERCENTILE:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Percentile "},  new String[]{"%"});
+			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 100.0,   1.0);
+			break;
+		case SPEC_ADD:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Add "});
+			setNumberSpinner((SimpleTransformPane) settingsPane, (SimpleTransform) dlTransfrom, 0, -1000000, 1000000, 1);
+			break;
+		case SPEC_PRODUCT:
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Multiply by "});
+			setNumberSpinner((SimpleTransformPane) settingsPane, (SimpleTransform) dlTransfrom, 0, -1000000, 1000000, 1);
 			break;
 		case CLAHE:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Block size ", "Bins ", "Slope "},  new String[]{"pixels", "", ""}, 2); 
@@ -233,6 +251,14 @@ public class DataTransformPaneFactory {
 
 	
 		}
+
+		if (settingsPane == null) {
+			//there is no settings pane for this transform - show its name so that the transform still appears
+			//in the list and loading the model does not fail.
+			System.err.println("DataTransformPaneFactory: there is no settings pane for the transform " + dlTransfrom.getDLTransformType());
+			settingsPane = new LabelTransfromPane(dlTransfrom, dlTransfrom.getDLTransformType().toString());
+			settingsPane.setPadding(new Insets(0,0,0,20));
+		}
 		
 //		System.out.println("Get transform pane for 2: " + settingsPane);
 
@@ -240,7 +266,19 @@ public class DataTransformPaneFactory {
 
 	}
 
-	
+	/**
+	 * Set an integer or a double spinner depending on the type of the current
+	 * parameter value (e.g. spec_add can be 1 or 2.1).
+	 */
+	private static void setNumberSpinner(SimpleTransformPane pane, SimpleTransform transform, int index, int min, int max, int step) {
+		Number[] params = transform.getParams();
+		if (params != null && params.length > index && params[index] instanceof Integer) {
+			pane.setSpinnerMinMaxValues(index, min, max, step);
+		}
+		else {
+			pane.setSpinnerMinMaxValues(index, (double) min, (double) max, 0.1);
+		}
+	}
 
 
 }
