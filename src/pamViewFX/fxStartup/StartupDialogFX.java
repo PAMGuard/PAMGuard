@@ -213,7 +213,13 @@ public class StartupDialogFX {
 
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
+		// let both buttons fill the bar height so Browse and New always match.
+		browseButton.setMaxHeight(Double.MAX_VALUE);
+		newButton.setMaxHeight(Double.MAX_VALUE);
+		browseButton.minHeightProperty().bind(newButton.heightProperty());
+		browseButton.getStyleClass().add("startup-plain");
 		HBox listBar = new HBox(6, recentTab, favouritesTab, spacer, browseButton, newButton);
+		listBar.setFillHeight(true);
 		listBar.setAlignment(Pos.CENTER_LEFT);
 		listBar.setPadding(new Insets(4, 20, 8, 20));
 

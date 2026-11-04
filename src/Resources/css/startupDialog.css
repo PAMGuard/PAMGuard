@@ -118,6 +118,23 @@
 }
 
 
+/* plain buttons next to the accent buttons, given the same shape and padding */
+.startup-plain, .startup-plain:focused {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-background-color: -sd-card;
+    -fx-background-insets: 0;
+    -fx-border-color: -sd-border;
+    -fx-border-width: 1;
+    -fx-text-fill: -sd-fg;
+    -fx-padding: 4 13 4 13;
+}
+
+.startup-plain:hover {
+    -fx-background-color: -sd-subtle;
+    -fx-border-color: -sd-accent;
+}
+
 /* ---- file table ---- */
 .startup-table {
     -fx-background-color: -sd-card;
