@@ -712,17 +712,35 @@ public class StartupDialogFX {
 		stage.close();
 	}
 
+	/*
+	 * Starring and removing change the rows in place rather than refilling the
+	 * table, so the list doesn't scroll back to the selected row.
+	 */
 	private void toggleFavourite(StartupEntry entry) {
 		history.setFavourite(entry, !entry.isFavourite());
 		history.save();
-		fillTable();
-		table.refresh();
+		if (isFavourites() && !entry.isFavourite()) {
+			removeRow(entry);
+		}
+		else {
+			table.refresh();
+		}
 	}
 
 	private void removeEntry(StartupEntry entry) {
 		history.remove(entry);
 		history.save();
-		fillTable();
+		removeRow(entry);
+	}
+
+	private void removeRow(StartupEntry entry) {
+		for (int i = 0; i < table.getItems().size(); i++) {
+			if (table.getItems().get(i).matches(entry.getFile(), entry.getMode())) {
+				table.getItems().remove(i);
+				break;
+			}
+		}
+		table.refresh();
 	}
 
 	private FileChooser createChooser(String title, File startFile) {
