@@ -18,6 +18,11 @@
     -fx-text-fill: -sd-fg;
 }
 
+.startup-version {
+    -fx-text-fill: -sd-muted;
+    -fx-font-size: 1.05em;
+}
+
 .startup-subtitle, .startup-hint, .startup-placeholder {
     -fx-text-fill: -sd-muted;
 }

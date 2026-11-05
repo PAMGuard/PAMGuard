@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import PamController.PamSettingManager;
+import PamController.PamguardVersionInfo;
 import PamController.startup.StartupEntry;
 import PamController.startup.StartupHistory;
 import PamController.startup.StartupSelection;
@@ -184,7 +185,7 @@ public class StartupDialogFX {
 
 	private void createStage() {
 		stage = new Stage();
-		stage.setTitle("PAMGuard");
+		stage.setTitle("PAMGuard " + PamguardVersionInfo.version);
 		Image icon = loadIcon(PamIcon.LARGE);
 		if (icon != null) {
 			stage.getIcons().add(icon);
@@ -195,7 +196,11 @@ public class StartupDialogFX {
 		title.getStyleClass().add("startup-title");
 		Label subtitle = new Label("Choose how to run PAMGuard, then pick a configuration to open.");
 		subtitle.getStyleClass().add("startup-subtitle");
-		VBox headerText = new VBox(2, title, subtitle);
+		Label version = new Label("Version " + PamguardVersionInfo.version);
+		version.getStyleClass().add("startup-version");
+		HBox titleRow = new HBox(10, title, version);
+		titleRow.setAlignment(Pos.BASELINE_LEFT);
+		VBox headerText = new VBox(2, titleRow, subtitle);
 		HBox.setHgrow(headerText, Priority.ALWAYS);
 
 		// dark mode switch, remembered between runs.
