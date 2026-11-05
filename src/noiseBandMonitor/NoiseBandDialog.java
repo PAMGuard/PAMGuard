@@ -451,7 +451,7 @@ public class NoiseBandDialog extends PamDialog {
 			showGrid.addActionListener(new DisplayOptionListener());
 			northPanel.add(showDecimators = new JCheckBox("Show Decimators"));
 			showDecimators.addActionListener(new DisplayOptionListener());
-			northPanel.add(new JLabel("    Show ANSI standards:"));
+			northPanel.add(new JLabel("    Show standards:"));
 			for (int i = 0; i < 3; i++) {
 				northPanel.add(showStandard[i] = new JCheckBox(String.format("Class %d", i)));
 				showStandard[i].addActionListener(new DisplayOptionListener());
@@ -674,8 +674,11 @@ public class NoiseBandDialog extends PamDialog {
 				if (!showStandard[i].isSelected()) {
 					continue;
 				}
-				minAtten = ANSIStandard.getMinAttenuation(i);
-				maxAtten = ANSIStandard.getMaxAttenuation(i);
+				minAtten = ANSIStandard.getMinAttenuation(noiseBandSettings.bandType, i);
+				maxAtten = ANSIStandard.getMaxAttenuation(noiseBandSettings.bandType, i);
+				if (minAtten == null || maxAtten == null) {
+					continue;
+				}
 				for (int f = 1; f < relFreq.length; f++) {
 					x1 = (int) (xAxis.getPosition(centerFrequency * relFreq[f-1]));
 					x2 = (int) (xAxis.getPosition(centerFrequency * relFreq[f]));
@@ -808,11 +811,38 @@ public class NoiseBandDialog extends PamDialog {
 		public void actionPerformed(ActionEvent arg0) {
 			findDataSource();
 			repaintAll();
+			enableControls();
 		}
 	}
 
 	private void enableControls() {
 		filterGamma.setEnabled(getFilterType() == FilterType.FIRWINDOW);
+		enableStandardBoxes();
+	}
+
+	/**
+	 * Only enable the class check boxes which the standard for the current band 
+	 * type defines (e.g. IEC 61260-1:2014 for deci decades has no class 0). 
+	 */
+	private void enableStandardBoxes() {
+		BandType type = (BandType) bandType.getSelectedItem();
+		String stdName = type == null ? null : ANSIStandard.getStandardName(type);
+		for (int i = 0; i < showStandard.length; i++) {
+			if (showStandard[i] == null) {
+				continue;
+			}
+			boolean defined = type != null && ANSIStandard.getMinAttenuation(type, i) != null;
+			showStandard[i].setEnabled(defined);
+			if (stdName == null) {
+				showStandard[i].setToolTipText("No standard for " + type + " bands");
+			}
+			else if (defined) {
+				showStandard[i].setToolTipText(String.format("Show %s class %d limits", stdName, i));
+			}
+			else {
+				showStandard[i].setToolTipText(String.format("%s does not define class %d", stdName, i));
+			}
+		}
 	}
 
 	public void setDefaultRefFrequency() {

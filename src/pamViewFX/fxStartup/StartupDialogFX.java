@@ -231,13 +231,13 @@ public class StartupDialogFX {
 				"Normal mode is for working with raw sound. Use it for real time operations, e.g. "
 				+ "monitoring from a vessel or a fixed station, or to build an acoustic analysis "
 				+ "workflow of detectors and classifiers and then process an acoustic dataset with it.\n\n"
-				+ "Rule of thumb: if you want to use an algorithm that needs raw sound data, use Normal mode."));
+				+ "Rule of thumb: if you want to use an automated detection/classification algorithm that requires raw sound data, use Normal mode."));
 		viewerCard.setTooltip(createCardTooltip(
-				"Viewer mode is for working with the results of processing. Use it to view and annotate "
-				+ "detections and spectrograms, and to run further algorithms on existing detections, "
+				"Viewer mode is for working with the results of processing and/or viewing raw sound data. Use it to view and annotate "
+				+ "detections and spectrograms, and to run further algorithms on existing detections,"
 				+ "such as click train detection or click classification.\n\n"
-				+ "Rule of thumb: if you want to load CPOD clicks, view processed data or reprocess "
-				+ "existing detections, e.g. by running a species classifier on them, use Viewer mode."));
+				+ "Rule of thumb: if you want to load CPOD/FPOD clicks, view processed data, reprocess "
+				+ "existing detections, or view and annotate raw sounds files use Viewer mode."));
 		HBox cards = new HBox(14, normalCard, viewerCard);
 		HBox.setHgrow(normalCard, Priority.ALWAYS);
 		HBox.setHgrow(viewerCard, Priority.ALWAYS);

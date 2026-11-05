@@ -59,7 +59,7 @@ public enum BandType {
 		case THIRDOCTAVE:
 			return "ANSI S1.11 Third Octave Bands";
 		case DECIDECADE:
-			return "Deci Decade: Very similar to Third Octave Bands, but aligned on decadal frequencies";
+			return "IEC 61260-1:2014 (ANSI/ASA S1.11-2014) base-10 Third Octave (Deci Decade) Bands";
 		case DECADE:
 			return "Decadal (x10) frequency bands";
 		case TENTHOCTAVE:

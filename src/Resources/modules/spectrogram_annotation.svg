@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Spectrogram annotation icon: an annotation box with corner handles drawn
+     around a tonal contour. Same design as MarkDataPlotInfo.createIcon(). -->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" viewBox="0 0 100 100">
+  <!-- the tonal sound being annotated -->
+  <path d="M22.5,65 C35,65 40,40 52.5,42.5 C60,44 62.5,55 67.5,55" fill="none" stroke="#999999" stroke-width="7.5" stroke-linecap="round"/>
+  <!-- the annotation box -->
+  <rect x="10" y="25" width="70" height="60" fill="rgba(0,255,255,0.25)" stroke="none"/>
+  <rect x="10" y="25" width="70" height="60" fill="none" stroke="#00ffff" stroke-width="7.5"/>
+  <!-- corner handles -->
+  <rect x="2.5" y="17.5" width="15" height="15" fill="#00ffff" stroke="none"/>
+  <rect x="72.5" y="17.5" width="15" height="15" fill="#00ffff" stroke="none"/>
+  <rect x="2.5" y="77.5" width="15" height="15" fill="#00ffff" stroke="none"/>
+  <rect x="72.5" y="77.5" width="15" height="15" fill="#00ffff" stroke="none"/>
+</svg>

@@ -1,5 +1,6 @@
 package export.swing;
 
+import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -51,7 +52,47 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public String getName() {
-		return this.getDataBlock().getDataName();
+		return getExportName(getDataBlock(), getDataBlock().getDataName());
+	}
+
+	/**
+	 * Get the module that owns the exported data block.
+	 * @return the owning module, or null if there isn't one.
+	 */
+	protected PamControlledUnit getDataModule() {
+		PamDataBlock dataBlock = getDataBlock();
+		if (dataBlock == null || dataBlock.getParentProcess() == null) {
+			return null;
+		}
+		return dataBlock.getParentProcess().getPamControlledUnit();
+	}
+
+	/**
+	 * Create a short but unambiguous name for a data stream in the exporter, e.g.
+	 * "Click Detector: Clicks" or "Quick Spectrogram Annotation: Mark". The module
+	 * name is included so that streams from two instances of the same module (e.g.
+	 * two click detectors) can be told apart, but is dropped if the data name
+	 * already contains it so names don't become long and repetitive.
+	 * @param dataBlock - the data block being exported.
+	 * @param dataName - the name of the data within the module.
+	 * @return name to display for the data stream.
+	 */
+	public static String getExportName(PamDataBlock dataBlock, String dataName) {
+		if (dataBlock == null || dataBlock.getParentProcess() == null
+				|| dataBlock.getParentProcess().getPamControlledUnit() == null) {
+			return dataName;
+		}
+		String unitName = dataBlock.getParentProcess().getPamControlledUnit().getUnitName();
+		if (unitName == null || unitName.isBlank()) {
+			return dataName;
+		}
+		if (dataName == null || dataName.isBlank()) {
+			return unitName;
+		}
+		if (dataName.toLowerCase().contains(unitName.toLowerCase())) {
+			return dataName;
+		}
+		return unitName + ": " + dataName;
 	}
 
 	@Override
@@ -100,7 +141,21 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	
 	@Override
 	public String getDescription() {
-		return this.getDataBlock().getLongDataName();
+		return "<html>" + getDetailText().replace("\n", "<br>") + "</html>";
+	}
+
+	/**
+	 * Get plain text details of the data stream, one item per line, for use in tooltips.
+	 * @return the module name and type and the data name and type.
+	 */
+	public String getDetailText() {
+		PamControlledUnit module = getDataModule();
+		String data = "Data: " + getDataBlock().getDataName()
+				+ "\nData type: " + getDataBlock().getUnitClass().getSimpleName();
+		if (module == null) {
+			return data;
+		}
+		return String.format("Module: %s (%s)\n%s", module.getUnitName(), module.getUnitType(), data);
 	}
 	
 

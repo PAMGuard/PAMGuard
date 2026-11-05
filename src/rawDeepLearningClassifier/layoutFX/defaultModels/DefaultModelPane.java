@@ -35,7 +35,9 @@ import rawDeepLearningClassifier.defaultModels.DLModel;
  */
 public class DefaultModelPane extends PamBorderPane{
 	
-	private static final double PREF_WIDTH = 200;
+	private static final double PREF_WIDTH = 320;
+
+	private static final double PREF_HEIGHT = 260;
 
 
 	/**
@@ -103,7 +105,7 @@ public class DefaultModelPane extends PamBorderPane{
 			vBox.getChildren().add(button); 
 		}
 				
-		hidingPane.setStyle("-fx-background-color: -fx-base");
+		hidingPane.setStyle("-fx-background-color: -fx-base; -fx-background-radius: 5");
 		hidingPane.setPrefWidth(PREF_WIDTH);
 //		this.setStyle("-fx-background-color: -fx-base");
 
@@ -112,6 +114,8 @@ public class DefaultModelPane extends PamBorderPane{
 		StackPane.setAlignment(hidingPane, Pos.TOP_RIGHT);
 		
 		mainHolder.setPrefWidth(PREF_WIDTH);
+		mainHolder.setPrefHeight(PREF_HEIGHT);
+		mainHolder.setMinHeight(PREF_HEIGHT);
 		
 		return mainHolder;
 		
@@ -160,7 +164,8 @@ public class DefaultModelPane extends PamBorderPane{
 		
 		
 		vBox.getChildren().addAll(titleLabel, descriptionLabel, link, buttonHolder);
-		vBox.setPrefHeight(200);
+		vBox.setPrefHeight(PREF_HEIGHT);
+		vBox.setPadding(new Insets(0,5,5,5));
 		
 		return vBox;
 	}
