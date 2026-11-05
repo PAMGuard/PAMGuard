@@ -227,6 +227,17 @@ public class StartupDialogFX {
 		viewerCard = createModeCard("Viewer", "Review, reprocess and annotate processed data, and annotate raw sound files");
 		normalCard.setUserData(StartupHistory.MODE_NORMAL);
 		viewerCard.setUserData(StartupHistory.MODE_VIEWER);
+		normalCard.setTooltip(createCardTooltip(
+				"Normal mode is for working with raw sound. Use it for real time operations, e.g. "
+				+ "monitoring from a vessel or a fixed station, or to build an acoustic analysis "
+				+ "workflow of detectors and classifiers and then process an acoustic dataset with it.\n\n"
+				+ "Rule of thumb: if you want to use an algorithm that needs raw sound data, use Normal mode."));
+		viewerCard.setTooltip(createCardTooltip(
+				"Viewer mode is for working with the results of processing. Use it to view and annotate "
+				+ "detections and spectrograms, and to run further algorithms on existing detections, "
+				+ "such as click train detection or click classification.\n\n"
+				+ "Rule of thumb: if you want to load CPOD clicks, view processed data or reprocess "
+				+ "existing detections, e.g. by running a species classifier on them, use Viewer mode."));
 		HBox cards = new HBox(14, normalCard, viewerCard);
 		HBox.setHgrow(normalCard, Priority.ALWAYS);
 		HBox.setHgrow(viewerCard, Priority.ALWAYS);
@@ -360,6 +371,14 @@ public class StartupDialogFX {
 		// the graphic must follow the button width so that the description wraps.
 		graphic.prefWidthProperty().bind(card.widthProperty().subtract(40));
 		return card;
+	}
+
+	private static Tooltip createCardTooltip(String text) {
+		Tooltip tip = new Tooltip(text);
+		tip.setWrapText(true);
+		tip.setMaxWidth(380);
+		tip.setShowDuration(javafx.util.Duration.seconds(30));
+		return tip;
 	}
 
 	private ToggleButton createListTab(String name) {
