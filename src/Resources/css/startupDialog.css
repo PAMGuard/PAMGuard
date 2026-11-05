@@ -1,0 +1,230 @@
+/*
+ * Layout and decoration of the PAMGuard start up dialog
+ * (pamViewFX.fxStartup.StartupDialogFX). The colours (-sd-*) are declared by
+ * startupDialogAtlanta.css (JavaFX GUI) or startupDialogFlatLaf.css (Swing GUI),
+ * which map them onto the current theme.
+ */
+.startup-root {
+    -fx-background-color: -sd-bg;
+}
+
+.startup-header {
+    -fx-padding: 18 20 4 20;
+}
+
+.startup-title {
+    -fx-font-size: 1.6em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -sd-fg;
+}
+
+.startup-version {
+    -fx-text-fill: -sd-muted;
+    -fx-font-size: 1.05em;
+}
+
+.startup-subtitle, .startup-hint, .startup-placeholder {
+    -fx-text-fill: -sd-muted;
+}
+
+.startup-section-label {
+    -fx-text-fill: -sd-muted;
+    -fx-font-weight: bold;
+}
+
+/* icons follow the theme text colour unless set below */
+.startup-root .ikonli-font-icon {
+    -fx-icon-color: -sd-fg;
+    -fx-fill: -sd-fg;
+}
+
+/* ---- Normal / Viewer cards ---- */
+.mode-card, .mode-card:focused, .mode-card:hover {
+    -fx-background-color: -sd-card;
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-border-color: -sd-border;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 14 18 14 18;
+    -fx-effect: null;
+    -fx-cursor: hand;
+}
+
+.mode-card:hover {
+    -fx-border-color: -sd-accent;
+}
+
+.mode-card:selected, .mode-card:selected:hover, .mode-card:selected:focused {
+    -fx-background-color: -sd-accent-subtle;
+    -fx-border-color: -sd-accent;
+    -fx-border-width: 2;
+    -fx-padding: 13 17 13 17;
+}
+
+.mode-card .card-title {
+    -fx-font-size: 1.4em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -sd-fg;
+}
+
+.mode-card .card-desc {
+    -fx-text-fill: -sd-muted;
+}
+
+/* ---- Recent / Favourites pills ---- */
+.list-tab, .list-tab:focused {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 4 14 4 14;
+    -fx-text-fill: -sd-muted;
+    -fx-effect: null;
+    -fx-cursor: hand;
+}
+
+.list-tab:hover {
+    -fx-text-fill: -sd-fg;
+    -fx-background-color: -sd-subtle;
+}
+
+.list-tab:selected, .list-tab:selected:hover, .list-tab:selected:focused {
+    -fx-background-color: -sd-accent-subtle;
+    -fx-border-color: -sd-accent;
+    -fx-text-fill: -sd-fg;
+    -fx-font-weight: bold;
+}
+
+/* ---- accent buttons (+ New, Open) ---- */
+.startup-accent, .startup-accent:focused {
+    -fx-background-color: -sd-accent;
+    -fx-background-radius: 6;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-text-fill: -sd-on-accent;
+    -fx-font-weight: bold;
+    -fx-padding: 5 14 5 14;
+}
+
+.startup-accent:hover {
+    -fx-background-color: derive(-sd-accent, -12%);
+}
+
+.startup-accent:disabled {
+    -fx-opacity: 0.45;
+}
+
+.startup-accent .ikonli-font-icon {
+    -fx-icon-color: -sd-on-accent;
+    -fx-fill: -sd-on-accent;
+}
+
+
+/* plain buttons next to the accent buttons, given the same shape and padding */
+.startup-plain, .startup-plain:focused {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-background-color: -sd-card;
+    -fx-background-insets: 0;
+    -fx-border-color: -sd-border;
+    -fx-border-width: 1;
+    -fx-text-fill: -sd-fg;
+    -fx-padding: 4 13 4 13;
+}
+
+.startup-plain:selected, .startup-plain:selected:focused {
+    -fx-background-color: -sd-card;
+    -fx-border-color: -sd-border;
+    -fx-text-fill: -sd-fg;
+}
+
+.startup-plain:hover, .startup-plain:selected:hover {
+    -fx-background-color: -sd-subtle;
+    -fx-border-color: -sd-accent;
+}
+
+/* ---- file table ---- */
+.startup-table {
+    -fx-background-color: -sd-card;
+    -fx-background-radius: 6;
+    -fx-border-color: -sd-border;
+    -fx-border-radius: 6;
+    -fx-background-insets: 0;
+}
+
+.startup-table .table-row-cell {
+    -fx-background-color: -sd-card;
+    -fx-border-color: transparent transparent -sd-border transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-insets: 0;
+}
+
+.startup-table .table-row-cell:empty,
+.startup-table .table-row-cell:empty:odd,
+.startup-table .table-row-cell:empty:even {
+    -fx-background-color: -sd-card;
+    -fx-border-color: transparent;
+}
+
+.startup-table .table-row-cell:hover {
+    -fx-background-color: -sd-subtle;
+}
+
+.startup-table .table-row-cell:selected,
+.startup-table .table-row-cell:selected:hover,
+.startup-table .table-row-cell:filled:selected,
+.startup-table:focused .table-row-cell:filled:selected,
+.startup-table:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: -sd-accent-subtle;
+}
+
+.startup-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-alignment: center-left;
+}
+
+.startup-table .file-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: -sd-fg;
+}
+
+.startup-table .file-path {
+    -fx-text-fill: -sd-muted;
+    -fx-font-size: 0.9em;
+}
+
+.startup-table .file-date {
+    -fx-text-fill: -sd-fg;
+}
+
+.startup-table .file-missing .file-name,
+.startup-table .file-missing .file-path,
+.startup-table .table-cell .file-missing .label {
+    -fx-text-fill: -sd-muted;
+    -fx-font-style: italic;
+}
+
+.startup-table .fav-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: null;
+}
+
+.startup-table .fav-button .ikonli-font-icon {
+    -fx-icon-color: -sd-muted;
+    -fx-fill: -sd-muted;
+}
+
+.startup-table .fav-button.fav-on .ikonli-font-icon {
+    -fx-icon-color: -sd-fav;
+    -fx-fill: -sd-fav;
+}
+
+.startup-footer {
+    -fx-padding: 10 20 16 20;
+}

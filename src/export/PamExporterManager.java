@@ -9,6 +9,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import export.MLExport.MLDetectionsManager;
 import export.RExport.RExportManager;
+import export.swing.ExportTask;
 import export.wavExport.WavDetExportManager;
 
 /**
@@ -86,7 +87,7 @@ public class PamExporterManager {
 		if (currentFile == null || isNeedsNewFile(currentFile, pamExporters.get(exportParams.exportChoice))) {
 			Date date = new Date(dataUnit.getTimeMilliseconds());
 			
-			String newFileName = "PAM_" + dataFormat.format(date) + "_" + dataUnit.getParentDataBlock().getDataName().replace(" ", "_");
+			String newFileName = "PAM_" + dataFormat.format(date) + "_" + getFileDataName(dataUnit.getParentDataBlock());
 			
 			//create a new file - note each exporter is responsible for closing the file after writing
 			//so previous files should already be closed
@@ -110,6 +111,20 @@ public class PamExporterManager {
 
 	}
 	
+	/**
+	 * Get the part of an export file name which identifies the data stream. This
+	 * includes the module name so that data from two instances of the same module
+	 * (e.g. two click detectors) are written to different files.
+	 * @param dataBlock - the data block being exported.
+	 * @return a file name safe string, e.g. "Click_Detector_2_Clicks".
+	 */
+	public static String getFileDataName(PamDataBlock dataBlock) {
+		String name = ExportTask.getExportName(dataBlock, dataBlock.getDataName());
+		name = name.replaceAll("[^A-Za-z0-9\\-]+", "_");
+		name = name.replaceAll("^_+|_+$", "");
+		return name.isEmpty() ? "data" : name;
+	}
+
 	public void close() {
 		pamExporters.get(exportParams.exportChoice).close();
 		

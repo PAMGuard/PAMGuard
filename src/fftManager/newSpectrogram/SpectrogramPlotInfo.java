@@ -388,7 +388,7 @@ public class SpectrogramPlotInfo extends TDDataInfo implements SpectrogramParame
 		/**
 		 * First cancel the last order and reset pointers in the output images. 
 		 */
-		fftDataBlock.cancelDataOrder();
+		fftDataBlock.cancelDataOrder(fftObserver);
 		
 		for (int i = 0; i < specChannelData.length; i++) {
 			if (specChannelData[i] != null) {

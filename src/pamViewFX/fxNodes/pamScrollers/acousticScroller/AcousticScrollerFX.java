@@ -273,7 +273,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	protected void cancelDataLoadTasks() {
 		for (int i =0; i<acousticScrollerGraphics.size(); i++){
 			try {
-				acousticScrollerGraphics.get(i).getDataBlock().cancelDataOrder(true);
+				acousticScrollerGraphics.get(i).getDataBlock().cancelDataOrder(acousticScrollerGraphics.get(i), true);
 			} catch (NullPointerException e) {
 				System.out.println("AcousticScrolllerFX.cancelDataLoadTasks: " + e.getMessage());
 			}
@@ -431,7 +431,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 		@Override
 		public boolean cancel(boolean cancel) {
 			//make sure to stop the data load gracefully!
-			acousticScrollerGraphics.getDataBlock().cancelDataOrder();
+			acousticScrollerGraphics.getDataBlock().cancelDataOrder(acousticScrollerGraphics);
 			return super.cancel(cancel);
 		}
 
@@ -579,6 +579,9 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 				OfflineDataLoadInfo offlineDataInfo = new OfflineDataLoadInfo(new LoadOfflineDataObserver(acousticScrollerGraphics), new DataFinished(),
 						chunk[0], chunk[1], 0, OfflineDataLoading.OFFLINE_DATA_WAIT, false);
 				offlineDataInfo.setPriority(OfflineDataLoadInfo.PRIORITY_CANCEL_RESTART);
+				//each chunk has its own observer, so tie the orders to the graphics so they
+				//can be cancelled without cancelling other displays' orders on the same block.
+				offlineDataInfo.setOrderOwner(acousticScrollerGraphics);
 
 				//NOTE: set the flag BEFORE placing the order, otherwise the DataFinished observer
 				//(which fires on the load thread) can set dataLoading=false before we set it true here.
@@ -611,7 +614,7 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 
 				if (stalled) {
 					//cancel the abandoned order so it does not linger on the block, then give up.
-					acousticScrollerGraphics.getDataBlock().cancelDataOrder();
+					acousticScrollerGraphics.getDataBlock().cancelDataOrder(acousticScrollerGraphics);
 					break;
 				}
 

@@ -430,14 +430,17 @@ public class PamSVGIcon {
 	}
 
 
+	/*
+	 * The whole sprite is scaled, not each path, so icons made of several shapes
+	 * keep their layout. Scaling each path about its own centre moves shapes with
+	 * different bounds apart (or together).
+	 */
 	public void setFitWidth(double width)  {
-		for (SVGPath path : svgParts)
-			path.setScaleX(width / originWidth);
+		sprite.setScaleX(width / originWidth);
 	}
 
 	public void setFitHeight(double height){
-		for (SVGPath path : svgParts)
-			path.setScaleY(height / originHeight);
+		sprite.setScaleY(height / originHeight);
 	}
 
 	protected static Insets getMarginFromFile(Document document){

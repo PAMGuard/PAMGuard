@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import PamController.PamController;
 import PamView.HoverData;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.PamSymbolManager;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamguardMVC.PamDataBlock;
@@ -248,6 +250,17 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 	 * @return the click symbol chooser. 
 	 */
 	public RawClipSymbolChooser getSymbolChooser() {
+		//the symbol manager can clear and recreate its choosers (e.g. PamSymbolManager.globalClear() once
+		//all modules are loaded) and the symbol settings pane always edits the current one. Keeping the chooser
+		//from construction meant the plot used stale options e.g. a default black symbol after the user
+		//had chosen a different colour.
+		PamSymbolManager<?> symbolManager = getDataBlock().getPamSymbolManager();
+		if (symbolManager != null) {
+			PamSymbolChooser currentChooser = symbolManager.getSymbolChooser(getTDGraph().getUniqueName(), getTDGraph().getGraphProjector());
+			if (rawSymbolChoosr == null || rawSymbolChoosr.getPamSymbolChooser() != currentChooser) {
+				rawSymbolChoosr = new RawClipSymbolChooser(this, currentChooser, TDSymbolChooserFX.DRAW_SYMBOLS);
+			}
+		}
 		return this.rawSymbolChoosr;
 	}
 

@@ -31,6 +31,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -46,6 +47,7 @@ import PamUtils.PamFileFilter;
 import PamView.dialog.warn.WarnOnce;
 import generalDatabase.DBControl;
 import generalDatabase.DBControlSettings;
+import generalDatabase.sqlite.SQLiteParameters;
 import javafx.scene.control.Alert.AlertType;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxSettingsPanes.SettingsFileDialogFX;
@@ -221,6 +223,26 @@ public class PamSettingManager {
 	 */
 	static public boolean RUN_REMOTE = false;
 	static public String  remote_psf = null;
+
+	/**
+	 * Settings file chosen in the start up dialog (-c start up option). If set,
+	 * it's opened without showing the original settings file dialog.
+	 */
+	static private File startupSettingsFile = null;
+
+	/**
+	 * True if PAMGuard was started through the start up dialog (-c option).
+	 */
+	static private boolean startupDialogUsed = false;
+
+	/**
+	 * Say that PAMGuard was started through the start up dialog (-c option), which
+	 * stops the tip of the day appearing as well.
+	 * @param used true if the start up dialog was used.
+	 */
+	public static void setStartupDialogUsed(boolean used) {
+		startupDialogUsed = used;
+	}
 	static public String  external_wav = null;
 
 	private boolean loadingLocalSettings;
@@ -502,7 +524,12 @@ public class PamSettingManager {
 	 * @return true if settings saved successfully.
 	 */
 	public boolean saveFinalSettings() {
-		int runMode = PamController.getInstance().getRunMode();
+		/*
+		 * The controller doesn't exist yet when the start up dialog (-c option) reads
+		 * the list, which is always for normal mode. 
+		 */
+		PamController pamController = PamController.getInstance();
+		int runMode = pamController == null ? PamController.RUN_NORMAL : pamController.getRunMode();
 		switch (runMode) {
 		case PamController.RUN_NORMAL:
 		case PamController.RUN_NETWORKRECEIVER:
@@ -959,7 +986,16 @@ public class PamSettingManager {
 				loadLocalSettings();
 			}
 			if (loadingLocalSettings) return LOAD_SETTINGS_OK;
-			if (
+			if (programStart && startupSettingsFile != null) {
+				/*
+				 * The file was already chosen in the start up dialog, so put it at the
+				 * top of the recent list and use it without asking again.
+				 */
+				settingsFileData.setFirstFile(startupSettingsFile);
+				saveSettingsFileData();
+				programStart = false;
+			}
+			else if (
 					//					settingsFileData.showFileList &&
 					programStart) {
 				SettingsFileData newData = showSettingsDailog(settingsFileData);
@@ -1061,7 +1097,11 @@ public class PamSettingManager {
 				
 				
 				TipOfTheDayManager.getInstance().setShowAtStart(settingsFileData.showTipAtStartup);
-				if (settingsFileData.showTipAtStartup) {
+				/*
+				 * No tip of the day after the start up dialog (-c option) - the user has
+				 * just been through one dialog and goes straight into PAMGuard.
+				 */
+				if (settingsFileData.showTipAtStartup && !startupDialogUsed) {
 					if (PamGUIManager.isSwing()) {
 						TipOfTheDayManager.getInstance().showTip(null, null);
 					}
@@ -1651,6 +1691,89 @@ public class PamSettingManager {
 	private File getGlobalSettingsFile() {
 		String fileName = pamguard.Pamguard.getSettingsFolder() + File.separator + gloablListfileName + settingsListFileEnd;
 		return new File(fileName);
+	}
+
+	/**
+	 * Set a settings file to open at start up without showing the original
+	 * settings file dialog. Used by the start up dialog (-c option).
+	 * @param file the psfx file. If it doesn't exist a new configuration is started
+	 * which will be saved to this file.
+	 */
+	public static void setStartupSettingsFile(File file) {
+		startupSettingsFile = file;
+	}
+
+	/**
+	 * Get the list of recently used settings files from the original recent file
+	 * list, without any of the other start up actions.
+	 * @return list of recent settings files, most recent first.
+	 */
+	public List<File> getRecentSettingsFiles() {
+		/*
+		 * Read the list into a local object. This is called before the normal start up
+		 * sequence, which must still load (and later save) the list itself.
+		 */
+		SettingsFileData fileData = settingsFileData;
+		if (fileData == null) {
+			File slFile = getSettingsListFile();
+			if (slFile.exists()) {
+				try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(slFile))) {
+					fileData = (SettingsFileData) is.readObject();
+				}
+				catch (Exception e) {
+					System.out.println("Unable to read recent settings files from " + slFile + ": " + e.getMessage());
+				}
+			}
+		}
+		if (fileData == null || fileData.recentFiles == null) {
+			return new ArrayList<File>();
+		}
+		return new ArrayList<File>(fileData.recentFiles);
+	}
+
+	/**
+	 * Get the Sqlite databases listed by the original viewer mode database dialog.
+	 * @return list of recent viewer databases, most recent first.
+	 */
+	public List<File> getRecentViewerDatabases() {
+		ArrayList<File> dbFiles = new ArrayList<File>();
+		File listFile = getDatabaseListFile();
+		if (!listFile.exists()) {
+			return dbFiles;
+		}
+		try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(listFile))) {
+			while (true) {
+				Object obj;
+				try {
+					obj = is.readObject();
+				}
+				catch (ClassNotFoundException e) {
+					continue;
+				}
+				if (obj instanceof PamControlledUnitSettings) {
+					Object set = null;
+					try {
+						set = ((PamControlledUnitSettings) obj).getSettings();
+					}
+					catch (Exception e) {
+						continue;
+					}
+					if (set instanceof SQLiteParameters) {
+						ArrayList<File> recent = ((SQLiteParameters) set).getRecentDatabases();
+						if (recent != null) {
+							dbFiles.addAll(recent);
+						}
+					}
+				}
+			}
+		}
+		catch (EOFException e) {
+			// end of file
+		}
+		catch (Exception e) {
+			System.out.println("Unable to read recent databases from " + listFile + ": " + e.getMessage());
+		}
+		return dbFiles;
 	}
 
 	/**

@@ -3,6 +3,8 @@ package noiseBandMonitor.layoutFX;
 import java.util.ArrayList;
 
 import Filters.ANSIStandard;
+import noiseBandMonitor.BandType;
+import javafx.scene.control.Tooltip;
 import Filters.FilterMethod;
 import noiseBandMonitor.BandAnalyser;
 import noiseBandMonitor.BandPerformance;
@@ -186,7 +188,7 @@ public class BodePlotPaneFX2 extends PamBorderPane {
 
 		bar.getChildren().addAll(logFreqScale, showGrid, showDecimators);
 
-		bar.getChildren().add(new Label("   ANSI standards:"));
+		bar.getChildren().add(new Label("   Standards:"));
 		for (int i = 0; i < 3; i++) {
 			showStandard[i] = new CheckBox("Class " + i);
 			showStandard[i].setOnAction(e -> { if (!updatingControls) repaint(); });
@@ -221,12 +223,36 @@ public class BodePlotPaneFX2 extends PamBorderPane {
 			for (int i = 0; i < 3; i++) {
 				showStandard[i].setSelected(settings.getShowStandard(i));
 			}
+			enableStandardBoxes(settings.bandType);
 		} finally {
 			updatingControls = false;
 		}
 		gainToggleState = settings.scaleToggleState;
 
 		repaint();
+	}
+
+	/**
+	 * Only enable the class check boxes which the standard for the current band 
+	 * type defines (e.g. IEC 61260-1:2014 for deci decades has no class 0). 
+	 */
+	private void enableStandardBoxes(BandType type) {
+		String stdName = type == null ? null : ANSIStandard.getStandardName(type);
+		for (int i = 0; i < showStandard.length; i++) {
+			boolean defined = type != null && ANSIStandard.getMinAttenuation(type, i) != null;
+			showStandard[i].setDisable(!defined);
+			String tip;
+			if (stdName == null) {
+				tip = "No standard for " + type + " bands";
+			}
+			else if (defined) {
+				tip = String.format("Show %s class %d limits", stdName, i);
+			}
+			else {
+				tip = String.format("%s does not define class %d", stdName, i);
+			}
+			showStandard[i].setTooltip(new Tooltip(tip));
+		}
 	}
 
 	public void writeDisplayOptions(NoiseBandSettings settings) {
@@ -505,8 +531,8 @@ public class BodePlotPaneFX2 extends PamBorderPane {
 			double centre = fm.getFilterParams().getCenterFreq();
 			for (int cls = 0; cls < 3; cls++) {
 				if (!showStandard[cls].isSelected()) continue;
-				double[] minAtt = ANSIStandard.getMinAttenuation(cls);
-				double[] maxAtt = ANSIStandard.getMaxAttenuation(cls);
+				double[] minAtt = ANSIStandard.getMinAttenuation(workingSettings.bandType, cls);
+				double[] maxAtt = ANSIStandard.getMaxAttenuation(workingSettings.bandType, cls);
 				if (minAtt == null || maxAtt == null) continue;
 
 				gc.setStroke(ANSI_COLORS[cls]);

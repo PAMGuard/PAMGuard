@@ -16,7 +16,12 @@
 	These measurements are compatible with the ANSI Standard 
 	<a href = "https://webstore.ansi.org/standards/asa/ansiasas1112004r2009">
 	ANSI S1.11-2004 American National Standard Specification for
-Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
+Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a> (Octave and Third Octave bands).
+	Deci-Decade bands are compatible with 
+	<a href = "https://webstore.iec.ch/en/publication/5063">
+	IEC 61260-1:2014 Electroacoustics - Octave-band and fractional-octave-band filters - Part 1: Specifications</a>
+	(adopted in the US as ANSI/ASA S1.11-2014 Part 1). This standard only specifies base-10 filters, so its
+	one-third octave bands are exactly deci-decade bands.
 	</p>
 	<p>The method works by first measuring noise noise bands the highest octave 
 	of the available data using a bank of band pass filters. The data are then decimated
@@ -73,8 +78,11 @@ Octave-Band and Fractional-Octave-Band Analog and Digital Filters</a>.
 <br>
 	<h4>Bode Plots</h4>
 	<p>The filter responses and the responses of the decimators are shown in the Bode plot on the right
-	hand side of the dialog. It is also possible to overlay the various ANSI standards. The scale of the 
-	amplitude axis can be altered by double clicking on it. 
+	hand side of the dialog. It is also possible to overlay the acceptance limits for the different filter 
+	classes of the relevant standard: ANSI S1.11-2004 classes 0, 1 and 2 for Octave and Third Octave bands, 
+	and IEC 61260-1:2014 classes 1 and 2 for Deci-Decade bands (IEC 61260-1:2014 has no class 0, so that 
+	option is disabled). There is no standard for the other band types, so the class options are disabled 
+	for those. The scale of the amplitude axis can be altered by double clicking on it. 
 	</p>
 
 	<br>

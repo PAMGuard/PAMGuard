@@ -101,6 +101,14 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 		 */
 		String commandName = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
 		if (commandName == null) {
+			/*
+			 * A database chosen in the start up dialog goes to the top of the list
+			 * as it is, without changing the file end. 
+			 */
+			String startupName = DBControl.getStartupDatabase();
+			if (startupName != null) {
+				setDatabaseName(new File(startupName).getAbsolutePath());
+			}
 			return;
 		}
 		File commandFile = new File(commandName);
@@ -347,6 +355,10 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 			commandName = dbFile.getAbsolutePath();
 			return commandName;
 		}
+		String startupName = DBControl.getStartupDatabase();
+		if (startupName != null) {
+			return new File(startupName).getAbsolutePath();
+		}
 		
 		if (getRecentDatabases() == null) return null;
 		if (getRecentDatabases().size() < 1) return null;
@@ -355,6 +367,10 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 	
 	@Override
 	public String getShortDatabaseName() {
+		String startupName = DBControl.getStartupDatabase();
+		if (startupName != null && GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg) == null) {
+			return new File(startupName).getName();
+		}
 		if (getRecentDatabases() == null) return null;
 		if (getRecentDatabases().size() < 1) return null;
 		return getRecentDatabases().get(0).getName();

@@ -1,0 +1,17 @@
+/*
+ * Colours for the PAMGuard start up dialog (pamViewFX.fxStartup.StartupDialogFX)
+ * when PAMGuard runs with the JavaFX GUI. Maps the dialog's palette onto the
+ * AtlantaFX (Primer) theme colours. Loaded after the Primer sheets.
+ */
+.startup-root {
+    -sd-bg:            -color-bg-default;
+    -sd-subtle:        -color-bg-subtle;
+    -sd-card:          -color-bg-default;
+    -sd-border:        -color-border-default;
+    -sd-fg:            -color-fg-default;
+    -sd-muted:         -color-fg-muted;
+    -sd-accent:        -color-accent-emphasis;
+    -sd-accent-subtle: -color-accent-subtle;
+    -sd-on-accent:     -color-fg-emphasis;
+    -sd-fav:           -color-warning-emphasis;
+}

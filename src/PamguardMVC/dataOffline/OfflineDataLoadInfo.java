@@ -13,13 +13,13 @@ public class OfflineDataLoadInfo implements Cloneable {
 	/**
 	 * If cancelled the thread will SIMPLY STOP
 	 */
-	public static int  PRIORITY_CANCEL_DESTROY=-1; 
+	public static final int  PRIORITY_CANCEL_DESTROY=-1; 
 	
 
 	/**
 	 * If cancelled the thread will automatically restart
 	 */
-	public static int  PRIORITY_CANCEL_RESTART=-1; 
+	public static final int  PRIORITY_CANCEL_RESTART=-2; 
 	
 	
 	
@@ -95,6 +95,12 @@ public class OfflineDataLoadInfo implements Cloneable {
 	 */
 	private LoadPositionInfo lastLoadInfo;
 	
+	/**
+	 * Optional owner of the order, used by {@link OfflineDataLoading} to decide which
+	 * earlier order a new one replaces. If null the original data observer is used.
+	 */
+	private Object orderOwner;
+
 	/**
 	 * Changed by threads to cancel an order. 
 	 */
@@ -337,6 +343,32 @@ public class OfflineDataLoadInfo implements Cloneable {
 	 */
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	/**
+	 * Get the owner of this order. Orders with the same owner replace or wait for each
+	 * other; orders with different owners are independent and never cancel each other.
+	 * @return the explicit owner if one was set, otherwise the original data observer,
+	 * otherwise this object.
+	 */
+	public Object getOrderOwner() {
+		if (orderOwner != null) {
+			return orderOwner;
+		}
+		if (startObserver != null) {
+			return startObserver;
+		}
+		return this;
+	}
+
+	/**
+	 * Set an explicit owner for the order. Use this when the same logical consumer orders
+	 * data with a different observer object each time, so that its orders are still
+	 * recognised as belonging to one consumer.
+	 * @param orderOwner the owner, or null to use the data observer.
+	 */
+	public void setOrderOwner(Object orderOwner) {
+		this.orderOwner = orderOwner;
 	}
 
 	@Override

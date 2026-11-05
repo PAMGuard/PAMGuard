@@ -29,6 +29,7 @@ public class DLDefaultModelManager {
 		defaultModels.add(new RightWhaleModel1());
 		defaultModels.add(new HumpbackWhaleGoogle());
 		defaultModels.add(new HumpbackWhaleAtlantic());
+		defaultModels.add(new BlueWhaleDCallMiller());
 		if (SMRUEnable.isDevEnable()) {
 			defaultModels.add(new MultiSpeciesGoogle());
 		}

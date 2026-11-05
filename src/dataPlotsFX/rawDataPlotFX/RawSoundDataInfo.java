@@ -621,7 +621,7 @@ public class RawSoundDataInfo extends TDDataInfoFX {
 		 * and carries on being displayed while the new data load. Data arriving at a new
 		 * resolution replace the old data for the same time as they arrive.
 		 */
-		rawDataBlock.cancelDataOrder();
+		rawDataBlock.cancelDataOrder(this.rawObserver);
 
 		//Need to know that it's THIS class that is ordering.
 		//Otherwise the observer can accept FFTData from the FFTDataBlock if another process is ordering.

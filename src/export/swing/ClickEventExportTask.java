@@ -22,7 +22,7 @@ public class ClickEventExportTask extends ExportTask {
 	@Override
 	public String getName() {
 		//"Tracked Events is not a good name"
-		return "Marked Click Events_" + this.getUnitName();
+		return getExportName(getDataBlock(), "Marked Click Events");
 	}
 
 }

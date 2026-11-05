@@ -58,7 +58,9 @@ import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
 import PamUtils.PamExceptionHandler;
 import PamUtils.Splash;
+import PamView.ColourScheme;
 import PamView.FullScreen;
+import PamView.PamColors;
 import PamView.PamLookAndFeel;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
@@ -67,6 +69,8 @@ import SoundRecorder.RecorderControl;
 import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import generalDatabase.DBControl;
+import pamViewFX.fxStartup.StartupDialogFX;
+import PamController.startup.StartupSelection;
 import networkTransfer.send.NetworkSender;
 import offlineProcessing.OfflineTaskManager;
 import rocca.RoccaDev;
@@ -202,6 +206,7 @@ public class Pamguard {
 			e.printStackTrace();
 		}
 		boolean showSplash = true;
+		boolean showStartupDialog = false;
 		if (args != null) {
 			int nArgs = args.length;
 			int iArg = 0;
@@ -210,16 +215,13 @@ public class Pamguard {
 				anArg = args[iArg++];
 				
 				if (anArg.equalsIgnoreCase("-c")) {
-					//the user chooses which run mode
-					PamRunModeParams runbModeParams = PamRunModeDialog.showDialog(null, true);
-					if (runbModeParams==null || runbModeParams.runMode<0) {
-						//use cancelled
-						System.exit(0);
-					}
-					else {
-						//set anArg to whatever the user chose
-						anArg = runbModeParams.getRunString();
-					}
+					/*
+					 * The user chooses the run mode and the settings file or database
+					 * in the start up dialog. It's shown once all the other arguments
+					 * have been read, so that it knows which GUI is being used. 
+					 */
+					showStartupDialog = true;
+					continue;
 				}
 				
 				if (anArg.equalsIgnoreCase("-v")) {
@@ -424,6 +426,9 @@ public class Pamguard {
 				}
 			}
 		}
+		if (showStartupDialog) {
+			runMode = runStartupDialog(runMode);
+		}
 		//going to need the run mode inside a Runnable later 
 		final int chosenRunMode = runMode;
 		if(runMode != PamController.RUN_REMOTE && PamGUIManager.getGUIType() != PamGUIManager.NOGUI) {
@@ -528,9 +533,59 @@ public class Pamguard {
 			PamController.create(chosenRunMode);
 		}		
 		
+		
 
 	}
 
+
+	/**
+	 * Show the start up dialog (-c option) in which the user chooses the run mode
+	 * and the settings file (normal mode) or database (viewer mode). Exits if the
+	 * user cancels.
+	 * @param runMode - the run mode from the other command line arguments.
+	 * @return the run mode to use.
+	 */
+	private static int runStartupDialog(int runMode) {
+		if (runMode == PamController.RUN_REMOTE || PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			// no GUI, so no dialog.
+			return runMode;
+		}
+		StartupSelection selection = null;
+		try {
+			selection = StartupDialogFX.showDialog(PamGUIManager.isFX());
+		}
+		catch (Throwable e) {
+			/*
+			 * If JavaFX isn't working for any reason, fall back to the original run
+			 * mode dialog. The original settings dialogs then follow as normal.
+			 */
+			System.out.println("Unable to show the start up dialog: " + e.getMessage());
+			PamRunModeParams runModeParams = PamRunModeDialog.showDialog(null, true);
+			if (runModeParams == null || runModeParams.runMode < 0) {
+				System.exit(0);
+			}
+			return runModeParams.runMode;
+		}
+		if (selection == null) {
+			// user cancelled
+			System.exit(0);
+		}
+		PamSettingManager.setStartupDialogUsed(true);
+		if (selection.getDarkMode() != null) {
+			// light or dark mode chosen in the dialog, otherwise keep the saved scheme.
+			PamColors.setStartupScheme(selection.getDarkMode() ? ColourScheme.DARKSCHEME : ColourScheme.DAYSCHEME);
+		}
+		File file = selection.getFile();
+		if (selection.getRunMode() == PamController.RUN_PAMVIEW) {
+			System.out.println("PAMGUARD Viewer: database " + file.getAbsolutePath());
+			DBControl.setStartupDatabase(file.getAbsolutePath());
+		}
+		else {
+			System.out.println("PAMGUARD normal mode: settings " + file.getAbsolutePath());
+			PamSettingManager.setStartupSettingsFile(file);
+		}
+		return selection.getRunMode();
+	}
 
 	static private String writePropertyString(String key) {
 		String property = System.getProperty(key);

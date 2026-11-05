@@ -409,7 +409,9 @@
 }
 
 .popover > .content {
-    -fx-background-color: -flat-background;
+    /* transparent so the rounded border path shows through - a filled content
+       region draws square corners inside the rounded ones */
+    -fx-background-color: transparent;
     -fx-padding: 8;
 }
 

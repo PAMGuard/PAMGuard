@@ -1,0 +1,18 @@
+/*
+ * Colours for the PAMGuard start up dialog (pamViewFX.fxStartup.StartupDialogFX)
+ * when PAMGuard runs with the Swing GUI. Maps the dialog's palette onto the
+ * FlatLaf colours declared in pamFlatLafLight.css / pamFlatLafDark.css so that the
+ * dialog matches the FlatLaf look of the rest of the Swing GUI.
+ */
+.startup-root {
+    -sd-bg:            -flat-background;
+    -sd-subtle:        -flat-background;
+    -sd-card:          -flat-component-background;
+    -sd-border:        -flat-border;
+    -sd-fg:            -flat-foreground;
+    -sd-muted:         -flat-disabled-foreground;
+    -sd-accent:        -flat-accent;
+    -sd-accent-subtle: #dbe8f6;
+    -sd-on-accent:     #ffffff;
+    -sd-fav:           #e0a100;
+}

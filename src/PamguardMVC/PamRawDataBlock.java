@@ -39,6 +39,7 @@ import PamController.PamController;
 import PamController.command.SummaryCommand;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import effort.EffortProvider;
 
 /**
@@ -244,14 +245,45 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 				 * another load already holding that lock (e.g. a pop up spectrogram) pushes
 				 * data back down into this block, which needs this block's lock - deadlock.
 				 */
-				if (parentProcess != null) {
-					this.clearAll();
-					parentProcess.getOfflineData(this, null, startMillis, startMillis+durationMillis, 20);
-				}
+				loadOfflineRawData(startMillis, startMillis+durationMillis);
 			}
 		}
 		// can callback into this for a second go so long as offlineLoad is false.
 		return getAvailableSamples(startMillis, durationMillis, channelMap);
+	}
+
+	/**
+	 * Observer used for loads made by {@link #loadOfflineRawData(long, long)}. The data only need 
+	 * to end up in this block, so it does nothing with them. 
+	 */
+	private static final PamObserver rawMeasurementLoader = new PamObserverAdapter() {
+		@Override
+		public String getObserverName() {
+			return "Raw data measurement load";
+		}
+	};
+
+	/**
+	 * Load raw data for a time window into this block in viewer mode, for calculations which 
+	 * need the samples themselves, e.g. annotation measurements made when a mark is drawn. 
+	 * <p>
+	 * The load goes through this block's offline loader, so it waits for any load already 
+	 * running on this block (e.g. a spectrogram filling in) instead of running alongside it, 
+	 * and the loaded data go only to this block, not to downstream observers such as 
+	 * decimators which happened to be part of another load. Calling the parent process 
+	 * directly does neither. 
+	 * <p>
+	 * Must NOT be called while holding this block's lock: data loaded by another load which 
+	 * is already running are added to this block, which needs that lock - deadlock.
+	 * @param startMillis start time in milliseconds
+	 * @param endMillis end time in milliseconds
+	 * @return the answer from the load, e.g. {@link PamDataBlock#REQUEST_DATA_LOADED}
+	 */
+	public int loadOfflineRawData(long startMillis, long endMillis) {
+		if (getParentProcess() == null) {
+			return REQUEST_NO_DATA;
+		}
+		return getOfflineData(new OfflineDataLoadInfo(rawMeasurementLoader, null, startMillis, endMillis, 1, true));
 	}
 
 	/**

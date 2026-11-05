@@ -12,7 +12,9 @@ import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import dataPlotsFX.projector.TDProjectorFX;
 import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -65,6 +67,55 @@ public class MarkDataPlotInfo extends GenericDataPlotInfo {
 
 	public MarkDataPlotInfo(MarkPlotProviderFX tdDataProvider, TDGraphFX tdGraph, PamDataBlock pamDataBlock) {
 		super(tdDataProvider, tdGraph, pamDataBlock);
+		getGenericSettingsPane().setIcon(createIcon());
+	}
+
+	/**
+	 * @return the settings pane, so its tab icon can be set.
+	 */
+	private dataPlotsFX.data.generic.GenericSettingsPane getGenericSettingsPane() {
+		return (dataPlotsFX.data.generic.GenericSettingsPane) getGraphSettingsPane();
+	}
+
+	/**
+	 * Create the 20x20 icon shown on the settings tab of the time display: an
+	 * annotation box (in the default annotation colour) drawn around a short tonal
+	 * contour, as it would appear on a spectrogram. The same design is in
+	 * /Resources/modules/spectrogram_annotation.svg for use as a module icon.
+	 *
+	 * @return the icon.
+	 */
+	public static Canvas createIcon() {
+		double size = 20;
+		Canvas canvas = new Canvas(size, size);
+		GraphicsContext g = canvas.getGraphicsContext2D();
+
+		// the tonal sound being annotated
+		g.setStroke(Color.gray(0.6));
+		g.setLineWidth(1.5);
+		g.setLineCap(StrokeLineCap.ROUND);
+		g.beginPath();
+		g.moveTo(4.5, 13);
+		g.bezierCurveTo(7, 13, 8, 8, 10.5, 8.5);
+		g.bezierCurveTo(12, 8.8, 12.5, 11, 13.5, 11);
+		g.stroke();
+
+		// the annotation box around it
+		g.setFill(Color.rgb(0, 255, 255, 0.25));
+		g.fillRect(2, 5, 14, 12);
+		g.setStroke(Color.CYAN);
+		g.setLineWidth(1.5);
+		g.strokeRect(2, 5, 14, 12);
+
+		// small corner handles, as drawn on annotation boxes on the display
+		g.setFill(Color.CYAN);
+		g.fillRect(0.5, 15.5, 3, 3);
+		g.fillRect(14.5, 15.5, 3, 3);
+		g.fillRect(0.5, 3.5, 3, 3);
+
+		g.fillRect(14.5, 3.5, 3, 3);
+
+		return canvas;
 	}
 
 	public Double getBearingValue(PamDataUnit pamDataUnit) {

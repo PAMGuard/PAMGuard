@@ -79,7 +79,7 @@ public class DecimatorWorker {
 	/**
 	 * Reset all counters and output buffers. 
 	 */
-	public void reset() {
+	public synchronized void reset() {
 		createFilters();
 	}
 	
@@ -138,7 +138,7 @@ public class DecimatorWorker {
 	 * @param inputData
 	 * @return a new data unit or null
 	 */
-	public RawDataUnit process(RawDataUnit inputData) {
+	public synchronized RawDataUnit process(RawDataUnit inputData) {
 		if (totalPutSamples == null) {
 			/**
 			 * Have to do this here, since the sample number of the first data unit may be 
@@ -191,6 +191,15 @@ public class DecimatorWorker {
 		}
 		Interpolator interpolator = interpolators[chan];
 		interpolator.setInputData(filteredData[chan]);
+		/*
+		 * pickSample should always be in the range -0.5 to the decimation step. If it isn't 
+		 * (e.g. after an earlier failure) every following block would read from a negative 
+		 * index and fail too, with the error growing by a block length each time, so start 
+		 * again from the first sample of this block. 
+		 */
+		if (!(pickSample[chan] >= -0.5) || pickSample[chan] > inputRate / outputRate + 1) {
+			pickSample[chan] = 0;
+		}
 		try {
 			while (pickSample[chan] < (nInputSamps-.5)) {
 //				outputData[chan][putSample[chan]++] = filteredData[chan][(int) Math.round(pickSample[chan])];
@@ -213,6 +222,12 @@ public class DecimatorWorker {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			/*
+			 * Drop the rest of this block and the partly filled output so that the 
+			 * next block starts cleanly rather than inheriting a broken read position. 
+			 */
+			pickSample[chan] = nInputSamps;
+			putSample[chan] = 0;
 		}
 		pickSample[chan] -= nInputSamps; // ready for the next one - should be > 0. 
 

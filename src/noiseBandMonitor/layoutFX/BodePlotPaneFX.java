@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Filters.ANSIStandard;
+import noiseBandMonitor.BandType;
+import javafx.scene.control.Tooltip;
 import Filters.FilterMethod;
 import noiseBandMonitor.BandAnalyser;
 import noiseBandMonitor.BandPerformance;
@@ -153,7 +155,7 @@ public class BodePlotPaneFX extends PamBorderPane {
 
 		bar.getChildren().addAll(logFreqScale, showGrid, showDecimators);
 
-		Label ansiLabel = new Label("   ANSI standards:");
+		Label ansiLabel = new Label("   Standards:");
 		bar.getChildren().add(ansiLabel);
 		for (int i = 0; i < 3; i++) {
 			showStandard[i] = new CheckBox("Class " + i);
@@ -235,6 +237,7 @@ public class BodePlotPaneFX extends PamBorderPane {
 			for (int i = 0; i < 3; i++) {
 				showStandard[i].setSelected(settings.getShowStandard(i));
 			}
+			enableStandardBoxes(settings.bandType);
 		} finally {
 			updatingControls = false;
 		}
@@ -243,6 +246,29 @@ public class BodePlotPaneFX extends PamBorderPane {
 		swapChart();
 		updateAxes();
 		rebuildChart();
+	}
+
+	/**
+	 * Only enable the class check boxes which the standard for the current band 
+	 * type defines (e.g. IEC 61260-1:2014 for deci decades has no class 0). 
+	 */
+	private void enableStandardBoxes(BandType type) {
+		String stdName = type == null ? null : ANSIStandard.getStandardName(type);
+		for (int i = 0; i < showStandard.length; i++) {
+			boolean defined = type != null && ANSIStandard.getMinAttenuation(type, i) != null;
+			showStandard[i].setDisable(!defined);
+			String tip;
+			if (stdName == null) {
+				tip = "No standard for " + type + " bands";
+			}
+			else if (defined) {
+				tip = String.format("Show %s class %d limits", stdName, i);
+			}
+			else {
+				tip = String.format("%s does not define class %d", stdName, i);
+			}
+			showStandard[i].setTooltip(new Tooltip(tip));
+		}
 	}
 
 	public void writeDisplayOptions(NoiseBandSettings settings) {
@@ -483,8 +509,8 @@ public class BodePlotPaneFX extends PamBorderPane {
 
 	private void addAnsiSeries(List<Series<Number, Number>> seriesList,
 			double centreFreq, double[] relFreq, int cls) {
-		double[] minAtt = ANSIStandard.getMinAttenuation(cls);
-		double[] maxAtt = ANSIStandard.getMaxAttenuation(cls);
+		double[] minAtt = ANSIStandard.getMinAttenuation(workingSettings.bandType, cls);
+		double[] maxAtt = ANSIStandard.getMaxAttenuation(workingSettings.bandType, cls);
 		if (minAtt == null || maxAtt == null) return;
 
 		seriesList.add(makeAnsiCurve(centreFreq, relFreq, minAtt, true));
@@ -535,13 +561,22 @@ public class BodePlotPaneFX extends PamBorderPane {
 	}
 
 	/**
+	 * A class is drawn if it's selected and the standard for the current band
+	 * type defines it (e.g. IEC 61260-1:2014 has no class 0).
+	 */
+	private boolean isClassDrawn(int cls) {
+		return showStandard[cls].isSelected() && workingSettings != null
+				&& ANSIStandard.getMinAttenuation(workingSettings.bandType, cls) != null;
+	}
+
+	/**
 	 * Determine the ANSI class index (0, 1, 2) for a non-band, non-decimator series.
 	 */
 	private int getAnsiClassForSeries(int seriesIdx) {
 		if (bandFilters == null || workingSettings == null) return 0;
 		int nBands = bandFilters.size();
 		int enabledClasses = 0;
-		for (int c = 0; c < 3; c++) if (showStandard[c].isSelected()) enabledClasses++;
+		for (int c = 0; c < 3; c++) if (isClassDrawn(c)) enabledClasses++;
 		if (enabledClasses == 0 || nBands == 0) return 0;
 
 		// ANSI series start after band + decimator series
@@ -553,7 +588,7 @@ public class BodePlotPaneFX extends PamBorderPane {
 		// map back to actual class index
 		int actual = 0, count = 0;
 		for (int c = 0; c < 3; c++) {
-			if (showStandard[c].isSelected()) {
+			if (isClassDrawn(c)) {
 				if (count == clsOrder) { actual = c; break; }
 				count++;
 			}

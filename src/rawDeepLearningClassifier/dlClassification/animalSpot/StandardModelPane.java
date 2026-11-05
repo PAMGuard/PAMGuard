@@ -295,6 +295,13 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue(defaultsamples);
 //			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 
+			//the hop is not reset so that the user's hop is kept when PAMGuard restarts. But the hop cannot be longer
+			//than the segment e.g. a hop left over from a model with a shorter segment or a higher sample rate.
+			Integer hop = dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValue();
+			if (hop==null || hop>defaultsamples) {
+				dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue(Math.max(1, defaultsamples/2));
+			}
+
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().setDisable(true); 
 		}
 		else {

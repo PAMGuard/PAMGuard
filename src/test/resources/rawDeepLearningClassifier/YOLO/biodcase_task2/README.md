@@ -20,3 +20,12 @@ The PAMGuard transforms are `load_audio_poly` (scipy resample_poly), `filter_wav
 pass, order 20, 5-124 Hz), `spectrogram_scipy` (hann, 256 window, 20 hop, 512 FFT), `spec_product` -1
 and `spec_add` 1 (1 - S), `normalize_percentile` 98 and `spec_flip`. The model is letterboxed from
 257 x 363 to 480 x 640 as Ultralytics does, with 8 bit quantisation (`"uint8": true`).
+
+## Example sound
+
+The model metadata sets `"example_sound": "BLUE_WHALE"`, which is shown with the model transforms in the
+settings. `src/Resources/exampleSounds/Blue_whale.wav` is the 30 s from 450 s of `20150328_090000.wav`
+(16 bit, 1 kHz, unchanged samples), i.e. exactly one model segment. It has a D call and Antarctic blue
+whale A/B/Z calls; `blue_whale_example.png` shows the model input image with the Python boxes for that
+segment. `BioDCASEYoloTest.blueWhaleExampleSoundTest` checks PAMGuard finds the same boxes.
+`biodcase_task2_yolo11s.pdtf` is a copy of the metadata in the model zip.

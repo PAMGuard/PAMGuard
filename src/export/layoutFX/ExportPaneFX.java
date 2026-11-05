@@ -460,7 +460,8 @@ public class ExportPaneFX {
 				cb.setTooltip(new Tooltip(
 						why != null ? why : "Cannot export this data block"));
 			} else {
-				cb.setTooltip(new Tooltip(task.getLongName()));
+				cb.setTooltip(new Tooltip(task instanceof ExportTask ?
+						((ExportTask) task).getDetailText() : task.getLongName()));
 			}
 
 			cb.selectedProperty().addListener((obs, oldVal, newVal) -> {
