@@ -58,7 +58,9 @@ import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
 import PamUtils.PamExceptionHandler;
 import PamUtils.Splash;
+import PamView.ColourScheme;
 import PamView.FullScreen;
+import PamView.PamColors;
 import PamView.PamLookAndFeel;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
@@ -580,6 +582,10 @@ public class Pamguard {
 		if (selection == null) {
 			// user cancelled
 			System.exit(0);
+		}
+		if (selection.getDarkMode() != null) {
+			// light or dark mode chosen in the dialog, otherwise keep the saved scheme.
+			PamColors.setStartupScheme(selection.getDarkMode() ? ColourScheme.DARKSCHEME : ColourScheme.DAYSCHEME);
 		}
 		File file = selection.getFile();
 		if (selection.getRunMode() == PamController.RUN_PAMVIEW) {

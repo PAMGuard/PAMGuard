@@ -102,9 +102,31 @@ public class PamColors implements PamSettings {
 	private int colourSchemeVersion;
 
 	
+	/**
+	 * Colour scheme chosen in the start up dialog (-c option), which replaces the
+	 * scheme PAMGuard was last closed with. Null to keep the saved scheme.
+	 */
+	private static String startupSchemeName = null;
+
+	/**
+	 * Set a colour scheme to use in place of the saved one when PAMGuard starts.
+	 * Must be called before the colour settings are loaded.
+	 * @param schemeName - e.g. ColourScheme.DAYSCHEME or ColourScheme.DARKSCHEME, or null to keep the saved scheme.
+	 */
+	public static void setStartupScheme(String schemeName) {
+		startupSchemeName = schemeName;
+	}
+
 	private PamColors() {
 			
 		colourScheme = colorSettings.getScheme(0);
+		if (startupSchemeName != null) {
+			// in case there are no saved colour settings to restore.
+			ColourScheme scheme = colorSettings.selectScheme(startupSchemeName);
+			if (scheme != null) {
+				colourScheme = scheme;
+			}
+		}
 		
 		PamSettingManager.getInstance().registerSettings(this, PamSettingManager.LIST_SYSTEMGLOBAL);
 	}
@@ -656,6 +678,14 @@ public class PamColors implements PamSettings {
 		colorSettings.checkSchemes();
 		PamLookAndFeel.setWindowsLookAndFeel(colorSettings.isWindowsLookAndFeel());
 		colourScheme = colorSettings.selectScheme(colorSettings.getCurrentScheme());
+		if (startupSchemeName != null) {
+			// light or dark chosen in the start up dialog replaces the saved scheme.
+			ColourScheme scheme = colorSettings.selectScheme(startupSchemeName);
+			if (scheme != null) {
+				colourScheme = scheme;
+			}
+			startupSchemeName = null;
+		}
 		if (PamLookAndFeel.isWindowsLookAndFeel() && colourScheme != null && colourScheme.isDark()) {
 			// the Windows look and feel has no dark mode, so a saved dark scheme can't be honoured.
 			colourScheme = colorSettings.selectScheme(ColourScheme.DAYSCHEME);

@@ -117,6 +117,13 @@ public class StartupDialogFX {
 	private StartupSelection result;
 
 	/**
+	 * True once the user has used the light / dark switch, in which case PAMGuard
+	 * opens with the same scheme. Otherwise PAMGuard keeps the colour scheme it was
+	 * last closed with.
+	 */
+	private boolean colourSchemeChosen = false;
+
+	/**
 	 * Create the dialog.
 	 * @param fxGUI - true if PAMGuard will run the JavaFX GUI, false for Swing.
 	 */
@@ -197,6 +204,8 @@ public class StartupDialogFX {
 		darkButton.setSelected(history.isDarkMode());
 		updateDarkButton(darkButton);
 		darkButton.selectedProperty().addListener((obs, o, dark) -> {
+			// the user chose light or dark, so PAMGuard opens with that scheme too.
+			colourSchemeChosen = true;
 			history.setDarkMode(dark);
 			history.save();
 			updateDarkButton(darkButton);
@@ -483,7 +492,13 @@ public class StartupDialogFX {
 		boolean dark = button.isSelected();
 		button.setGraphic(new FontIcon(dark ? "mdi2w-white-balance-sunny" : "mdi2w-weather-night"));
 		button.setText(dark ? "Light" : "Dark");
-		button.setTooltip(new Tooltip(dark ? "Switch to light mode" : "Switch to dark mode"));
+		Tooltip tip = new Tooltip((dark ? "Switch to light mode." : "Switch to dark mode.")
+				+ " Choosing light or dark here also opens PAMGuard in that mode."
+				+ " If you don't use this switch, PAMGuard opens with the light or dark"
+				+ " colour scheme it was last closed with.");
+		tip.setWrapText(true);
+		tip.setMaxWidth(320);
+		button.setTooltip(tip);
 	}
 
 	/**
@@ -768,7 +783,8 @@ public class StartupDialogFX {
 		history.recordOpened(file, mode);
 		history.setLastMode(mode);
 		history.save();
-		result = new StartupSelection(mode, file);
+		Boolean dark = colourSchemeChosen ? history.isDarkMode() : null;
+		result = new StartupSelection(mode, file, dark);
 		stage.close();
 	}
 

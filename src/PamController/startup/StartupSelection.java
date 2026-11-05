@@ -16,9 +16,30 @@ public class StartupSelection {
 
 	private final File file;
 
+	private final Boolean darkMode;
+
 	public StartupSelection(int mode, File file) {
+		this(mode, file, null);
+	}
+
+	/**
+	 * @param mode - the mode.
+	 * @param file - the settings file or database.
+	 * @param darkMode - true or false if the user chose dark or light mode in the
+	 * dialog, null if they didn't use the switch.
+	 */
+	public StartupSelection(int mode, File file, Boolean darkMode) {
 		this.mode = mode;
 		this.file = file;
+		this.darkMode = darkMode;
+	}
+
+	/**
+	 * @return true or false if the user chose dark or light mode, or null if they
+	 * didn't, in which case PAMGuard keeps the colour scheme it was last closed with.
+	 */
+	public Boolean getDarkMode() {
+		return darkMode;
 	}
 
 	/**
