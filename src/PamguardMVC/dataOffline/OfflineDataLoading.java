@@ -1,10 +1,13 @@
 package PamguardMVC.dataOffline;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.SwingWorker;
 
@@ -85,9 +88,22 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	private Vector<PamObserver> requestingObservers;
 
 	/**
-	 * Threads which have been cancelled are set to load again.
+	 * Orders placed with OFFLINE_DATA_WAIT while their owner already had an order
+	 * running. Guarded by orderLock. 
 	 */
-	private ArrayList<OfflineDataLoadInfo> waitingDataLoads; 
+	private final ArrayList<OfflineDataLoadInfo> waitingDataLoads = new ArrayList<OfflineDataLoadInfo>(); 
+
+	/**
+	 * Orders with restart priority which were cancelled by someone other than their
+	 * owner and should be loaded again. Guarded by orderLock. 
+	 */
+	private final ArrayList<OfflineDataLoadInfo> restartDataLoads = new ArrayList<OfflineDataLoadInfo>(); 
+
+	/**
+	 * Number of calls to getOfflineData currently running in this block, i.e. whether
+	 * this block is part of a load in progress, including loads ordered further downstream. 
+	 */
+	private final AtomicInteger loadDepth = new AtomicInteger(); 
 
 	/**
 	 * Constructor for the offline data loader. 
@@ -95,7 +111,6 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	 */
 	public OfflineDataLoading(PamDataBlock<T> pamDataBlock){
 		this.pamDataBlock=pamDataBlock; 
-		waitingDataLoads=new  ArrayList<OfflineDataLoadInfo>(); 
 	}
 
 
@@ -133,19 +148,45 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 
 	/**
-	 * Clears all raw and FFT data blocks prior to a new load. 
+	 * Clears the raw and FFT data blocks which are not currently being loaded, prior to
+	 * a new load. Blocks which have an order of their own running, or which are part of
+	 * the upstream chain of a load in progress, are left alone so that one display's
+	 * load does not wipe data another display is in the middle of loading.
 	 */
-	private void clearAllFFTBlocks() {
-		ArrayList<PamDataBlock> datablocks = PamController.getInstance().getFFTDataBlocks();
-		for (int i=0; i<datablocks.size(); i++) {
-			datablocks.get(i).clearAll();
-			datablocks.get(i).clearDeletedList();
+	private void clearIdleFFTBlocks() {
+		PamController pamController = PamController.getInstance();
+		if (pamController == null) {
+			return;
 		}
+		clearIdleBlocks(pamController.getFFTDataBlocks());
+		clearIdleBlocks(pamController.getRawDataBlocks());
+	}
 
-		datablocks = PamController.getInstance().getRawDataBlocks();
+	private void clearIdleBlocks(ArrayList<PamDataBlock> datablocks) {
+		if (datablocks == null) {
+			return;
+		}
 		for (int i=0; i<datablocks.size(); i++) {
-			datablocks.get(i).clearAll();
-			datablocks.get(i).clearDeletedList();
+			PamDataBlock db = datablocks.get(i);
+			OfflineDataLoading dl = db.getOfflineDataLoading();
+			if (dl != null && !dl.isIdle()) {
+				continue;
+			}
+			db.clearAll();
+			db.clearDeletedList();
+		}
+	}
+
+	/**
+	 * @return true if this data block has no orders running and is not part of the chain
+	 * of a load in progress.
+	 */
+	public boolean isIdle() {
+		if (loadDepth.get() > 0) {
+			return false;
+		}
+		synchronized (orderLock) {
+			return activeOrders.isEmpty();
 		}
 	}
 
@@ -156,104 +197,79 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	 * getOfflineData will probably (if not overridden) be sending data to the update member function of the
 	 * observer, but from the worker thread. Once it's complete, it will send a message to say that data are
 	 * loaded. <p>
-	 * It's possible that the user will do something which causes this to be called again before the previous
-	 * thread completed execution, in which case there are three options:
-	 * <p>OFFLINE_DATA_INTERRUPT - previous thread will be terminated
-	 * <p>OFFLINE_DATA_WAIT - wait for previous thread to terminate, then start this load
+	 * Each order belongs to an owner ({@link OfflineDataLoadInfo#getOrderOwner()}, by default the
+	 * observer the data are for). Orders from different owners are independent: they never cancel
+	 * each other and are run one after another where they meet at a common upstream source. 
+	 * If the same owner orders again before its previous order has completed, there are three options:
+	 * <p>OFFLINE_DATA_INTERRUPT - the owner's previous order will be cancelled
+	 * <p>OFFLINE_DATA_WAIT - wait for the owner's previous order to finish, then start this load
 	 * <p>OFFLINE_DATA_CANCEL - give up and return
-	 * 	<p>OFFLINE_DATA_CANCEL - give up and return
 
 	 * @param offlineDataInfo the OfflineDataLoadInfo object which stores all parameters for the data load. 
 
 	 */
 	public void orderOfflineData(OfflineDataLoadInfo offlineDataInfo) {
-		//		System.out.println("Start order lock");
 		synchronized (orderLock) {
-			//			System.out.println("Past order lock");
-			long t1 = System.currentTimeMillis();
-			long t2 = System.currentTimeMillis();
-			long t3 = t2;
-			long t4 = t2;
-			//			String orderDates = String.format(" %s to %s", 
-			//					PamCalendar.formatDateTime(startMillis), PamCalendar.formatDateTime(endMillis));
-			//			System.out.printf("Offline data order in %s %s from %s to %s\n", pamDataBlock.getDataName(), offlineDataInfo.toString(),
-			//					PamCalendar.formatDBDateTime(offlineDataInfo.getStartMillis()), 
-			//					PamCalendar.formatDBDateTime(offlineDataInfo.getEndMillis()));
-			//			if (offlineDataInfo.getEndMillis()-offlineDataInfo.getStartMillis() > 3600000L) {
-			//				System.out.printf("Stupid long load time !");
-			//				return;
-			//			}
-			try {
-				if (orderData != null) {
-					//				System.out.println("order Data is not null");
-					if (orderData.isDone() == false) {
-						switch (offlineDataInfo.getInterrupt()) {
-						case OFFLINE_DATA_INTERRUPT:
-							//						System.out.println("Request order cancelling");
-							int giveUp = 0;
-
-							if (orderData.cancelOrder()) {			
-
-								while ((orderData!=null || !orderData.isDone()) & giveUp++ < 300) {
-									try {
-										Thread.sleep(10);
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-										return;
-									}
-								}
-							}
-							else {
-								//							System.out.println("Old order could not be cancelled");
-							}
-							break;
-						case OFFLINE_DATA_CANCEL:
-							//						System.out.println("Don't order new data " + orderDates);
-							return;
-						case OFFLINE_DATA_WAIT:
-							int waitCount = 0;
-							t3 = System.currentTimeMillis();
-							waitingDataLoads.add(offlineDataInfo);
-							return;
-							//						//						System.out.println("Wait for old lot to complete " + orderDates);
-							//						while (true) {
-							//							if (orderData==null || orderData.isDone() || orderData.isCancelled()) {
-							//								break;
-							//							}
-							//							waitCount++;
-							//							try {
-							//								Thread.sleep(10, 0);
-							//							} catch (InterruptedException e) {
-							//								e.printStackTrace();
-							//							}
-							//						}
-						}
-						t4 = System.currentTimeMillis() - t3;
-					}
+			Object owner = offlineDataInfo.getOrderOwner();
+			OrderData current = activeOrders.get(owner);
+			if (current != null && !current.isDone()) {
+				switch (offlineDataInfo.getInterrupt()) {
+				case OFFLINE_DATA_INTERRUPT:
+					/*
+					 * Don't wait for the old order to stop. It will see its cancel flag and
+					 * stop, and the new order can't overlap it in this block since 
+					 * getOfflineData is synchronized. 
+					 */
+					current.cancelOrder(false);
+					removeQueued(waitingDataLoads, owner);
+					removeQueued(restartDataLoads, owner);
+					break;
+				case OFFLINE_DATA_CANCEL:
+					return;
+				case OFFLINE_DATA_WAIT:
+					// only the newest waiting order from an owner is worth keeping. 
+					removeQueued(waitingDataLoads, owner);
+					waitingDataLoads.add(offlineDataInfo);
+					return;
 				}
 			}
-			catch (NullPointerException e) {
-				// happens when orderData is set null in a different thread. 
-			}
-			//System.out.println(String.format("%s waited %d, %d, %d, %d during ordering load", 
-			//		getDataName(), t2-t1, t3-t2, t4-t3, t5-t4));
+			startOrder(offlineDataInfo);
+		}
+	}
 
-			try {
-				orderData = new OrderData(offlineDataInfo);
-				orderData.execute();
-			}
-			catch (Exception e) {
-				// can throw if orderData gets set to null in a different thread .
-				// too complicated to try to understand threading right now and don't want to create a lock
-			}
+	/**
+	 * Start a worker for an order. Must be called holding orderLock. 
+	 * @param offlineDataInfo the order. 
+	 */
+	private void startOrder(OfflineDataLoadInfo offlineDataInfo) {
+		try {
+			OrderData orderData = new OrderData(offlineDataInfo);
+			activeOrders.put(orderData.owner, orderData);
+			orderData.execute();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-			//t = new Timer(1000, new StartOrderOnTimer(orderData));
-		} // end of order lock
+	/**
+	 * Remove all orders from an owner from a queue. 
+	 */
+	private void removeQueued(List<OfflineDataLoadInfo> queue, Object owner) {
+		for (int i = queue.size()-1; i >= 0; i--) {
+			if (queue.get(i).getOrderOwner() == owner) {
+				queue.remove(i);
+			}
+		}
 	}
 
 
 	/**
-	 * Cancels the current order. 
+	 * Cancels all current orders on this data block, whoever placed them. Orders with
+	 * priority {@link OfflineDataLoadInfo#PRIORITY_CANCEL_RESTART} will be restarted
+	 * once a later order completes. 
+	 * <p>Consumers cancelling their own order should use {@link #cancelDataOrder(Object)}
+	 * so that they don't cancel loads placed by other displays. 
 	 */
 	public void cancelDataOrder() {
 		cancelDataOrder(false);
@@ -261,34 +277,63 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 
 	/**
-	 * 
-	 * @param que
+	 * Cancels all current orders on this data block, whoever placed them. 
+	 * @param que true to also clear all queued orders. 
 	 */
 	public void cancelDataOrder(boolean que) {
-//		threadMessage("Calling cancelDataOrder");
 		synchronized (orderLock) {
-//			threadMessage("cancelDataOrder is in synchronized oderLock");
-			if (orderData != null) {
-				try {
-					boolean isCancelled = orderData.cancelOrder();
-//					threadMessage("candelDataOrder returned: isCancelled = " + isCancelled);
-				}
-				catch (NullPointerException e) {
-					System.err.println("Null pointer in Cancel data order " + e.getMessage());
-				}
+			for (OrderData orderData : new ArrayList<OrderData>(activeOrders.values())) {
+				orderData.cancelOrder(true);
+			}
+			if (que) {
+				waitingDataLoads.clear(); 
+				restartDataLoads.clear();
 			}
 		}
-		if (que) this.waitingDataLoads.clear(); 
 	}
+
+	/**
+	 * Cancel the current order from one owner, leaving orders from other owners running. 
+	 * @param owner the owner of the order (normally the observer which ordered the data,
+	 * see {@link OfflineDataLoadInfo#getOrderOwner()}). 
+	 */
+	public void cancelDataOrder(Object owner) {
+		cancelDataOrder(owner, false);
+	}
+
+	/**
+	 * Cancel the current order from one owner, leaving orders from other owners running. 
+	 * @param owner the owner of the order (normally the observer which ordered the data,
+	 * see {@link OfflineDataLoadInfo#getOrderOwner()}). 
+	 * @param que true to also remove that owner's queued orders. 
+	 */
+	public void cancelDataOrder(Object owner, boolean que) {
+		synchronized (orderLock) {
+			OrderData orderData = activeOrders.get(owner);
+			if (orderData != null) {
+				orderData.cancelOrder(false);
+			}
+			if (que) {
+				removeQueued(waitingDataLoads, owner);
+				removeQueued(restartDataLoads, owner);
+			}
+		}
+	}
+
 	/**
 	 * 
 	 * @return true if an order for data is currently still being processed. 
 	 */
 	public boolean getOrderStatus() {
-		return (orderData != null);
+		synchronized (orderLock) {
+			return !activeOrders.isEmpty();
+		}
 	}
 
-	volatile private OrderData orderData;
+	/**
+	 * Current orders, one per owner. Guarded by orderLock. 
+	 */
+	private final Map<Object, OrderData> activeOrders = new IdentityHashMap<Object, OrderData>();
 
 	public Object orderLock = new Object();
 
@@ -299,6 +344,17 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 		 * The current offline data info 
 		 */
 		OfflineDataLoadInfo offlineDataInfo;
+
+		/**
+		 * The owner of the order, fixed when the order is placed. 
+		 */
+		final Object owner;
+
+		/**
+		 * True if the order should be re-queued if it has restart priority and 
+		 * gets cancelled. 
+		 */
+		private volatile boolean restartIfCancelled = false;
 
 		public OfflineDataLoadInfo getOfflineDataInfo() {
 			return offlineDataInfo;
@@ -311,11 +367,19 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 		OrderData(OfflineDataLoadInfo offlineDataInfo) {
 			this.offlineDataInfo=offlineDataInfo; 
+			this.owner = offlineDataInfo.getOrderOwner();
 			dateStr = String.format(" %s to %s", 
 					PamCalendar.formatDateTime(offlineDataInfo.getStartMillis()), PamCalendar.formatDateTime(offlineDataInfo.getEndMillis()));
 		}
 
-		public boolean cancelOrder() {
+		/**
+		 * Cancel the order. 
+		 * @param restart true if the order may be restarted later if it has
+		 * restart priority (i.e. it was cancelled by someone other than its owner). 
+		 * @return true if the worker was cancelled. 
+		 */
+		public boolean cancelOrder(boolean restart) {
+			restartIfCancelled = restart;
 			offlineDataInfo.cancel = true;
 			return cancel(false); 
 			/*
@@ -328,26 +392,15 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 		@Override
 		protected Integer doInBackground()  {
-//			threadMessage("Start background");
 			try {
-				//								System.out.println("Enter get offline data " + pamDataBlock.getDataName() + " Thread " + Thread.currentThread().getName());
-
-				clearAllFFTBlocks();
-//				threadMessage("Called clearAllFTBlocks");
-				int ans = getOfflineData(offlineDataInfo);
-				//								System.out.println("Leave get offline data " + pamDataBlock.getDataName());
-
-				if (this == orderData) {
-					orderData = null;
+				clearIdleFFTBlocks();
+				if (offlineDataInfo.cancel) {
+					return REQUEST_INTERRUPTED;
 				}
-//				threadMessage("End background exit code " + ans);
-				return ans;
+				return getOfflineData(offlineDataInfo);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				if (this == orderData) {
-					orderData = null;
-				}
 				return 0;
 			}
 		}
@@ -355,23 +408,22 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 		@Override
 		protected void done() {
-			if (this == orderData) {
-				orderData = null;
-			}
-			else {
-				//				System.out.println("Data order ending which wasn't the latest created");
+			synchronized (orderLock) {
+				if (activeOrders.get(owner) == this) {
+					activeOrders.remove(owner);
+				}
 			}
 			Integer status = 0;
 			try {
 				if (isCancelled()) {
 					status = REQUEST_INTERRUPTED;
-					//check whether the cancelled thread should be saved for later loading. 
-					//					System.out.println("The load has been cancelled: " + offlineDataInfo.getCurrentObserver().getObserverName());
-					checkDataReloadQue(offlineDataInfo);
+					//check whether the cancelled order should be saved for later loading. 
+					if (restartIfCancelled) {
+						checkDataReloadQue(offlineDataInfo);
+					}
 				}
 				else {
 					status = get();
-					//					System.out.println(getDataName() + " Order done - not cancelled " + dateStr + " status " + status);
 				}
 			} catch (InterruptedException e1) {
 				status = REQUEST_INTERRUPTED;
@@ -387,61 +439,62 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 				offlineDataInfo.getLoadObserver().setLoadStatus(status);
 			}
 
-
-			//			System.out.println("WAITING DATA LOAD");
-			for (int i=0; i<waitingDataLoads.size(); i++){
-				//				System.out.println("OfflineDataLoading.Done(): " + waitingDataLoads.get(i).getCurrentObserver().getObserverName());
-			}
-			//			System.out.println("WAITING DATA END");
-
-			if (!isCancelled()) launchQuedReloadThread();
-
+			launchQuedReloadThreads(!isCancelled());
 		}
 
 		@Override
 		protected void process(List<Integer> chunks) {
-			// TODO Auto-generated method stub
 			super.process(chunks);
 		}
 
 	}
 
-//	private void threadMessage(String message) {
-//		String name = Thread.currentThread().getName();
-//		String now = PamCalendar.formatDBDateTime(System.currentTimeMillis(), true);
-//		System.out.printf("Thread %s load for %s at %s: %s\n", name, pamDataBlock.getDataName(), now, message);
-//	}
+	/**
+	 * Start queued orders whose owner no longer has an order running. 
+	 * @param includeRestarts true to also restart orders which were cancelled
+	 * with restart priority. These only restart after an order completes 
+	 * normally, so that cancelling everything doesn't immediately restart them. 
+	 */
+	private void launchQuedReloadThreads(boolean includeRestarts) {
+		synchronized (orderLock) {
+			launchQueued(waitingDataLoads);
+			if (includeRestarts) {
+				launchQueued(restartDataLoads);
+			}
+		}
+	}
 
-	private void launchQuedReloadThread(){
-		//		System.out.println(" launchQuedReloadThread(): ");
-		if (waitingDataLoads.size()>=1){
-			OfflineDataLoadInfo offlineDataInfo=waitingDataLoads.get(0);
-			//			System.out.println("Removing: " + offlineDataInfo.getCurrentObserver().getObserverName());
-			waitingDataLoads.remove(0);
-			this.orderOfflineData(offlineDataInfo);
+	private void launchQueued(List<OfflineDataLoadInfo> queue) {
+		for (int i = 0; i < queue.size(); i++) {
+			OfflineDataLoadInfo info = queue.get(i);
+			if (activeOrders.containsKey(info.getOrderOwner())) {
+				continue;
+			}
+			queue.remove(i--);
+			info.cancel = false;
+			startOrder(info);
 		}
 	}
 
 	/**
-	 * Check whether a a
-	 * @param offlineDataInfo
+	 * Check whether a cancelled order should be restarted later and if so
+	 * add it to the restart queue, replacing any earlier one from the same owner. 
+	 * @param offlineDataInfo the cancelled order. 
 	 */
 	private void checkDataReloadQue(OfflineDataLoadInfo offlineDataInfo){
 		if (offlineDataInfo.getPriority()==OfflineDataLoadInfo.PRIORITY_CANCEL_RESTART){
-			//check that there is not a something in the que with the same dataLoading observer. If there is remove it and replace with current
-			for (int i=0; i< this.waitingDataLoads.size(); i++){
-				if (offlineDataInfo.getCurrentObserver().getObserverName().equals(
-						waitingDataLoads.get(i).getCurrentObserver().getObserverName())){
-					this.waitingDataLoads.remove(i);
-					i=i-1;
+			synchronized (orderLock) {
+				Object owner = offlineDataInfo.getOrderOwner();
+				// a newer order from the same owner supersedes this one. 
+				if (activeOrders.containsKey(owner)) {
+					return;
 				}
+				removeQueued(waitingDataLoads, owner);
+				removeQueued(restartDataLoads, owner);
+				restartDataLoads.add(offlineDataInfo);
 			}
-			//the thread should be saved for loading later. 
-			this.waitingDataLoads.add(offlineDataInfo);
 		}
 	}
-
-
 	private int lastRequestAnswer;
 	private long lastRequestStart = 0;
 	private long lastRequestEnd = 0;
@@ -470,6 +523,23 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	 * @return answer: . 
 	 */
 	synchronized public int getOfflineData(OfflineDataLoadInfo offlineDataInfo) {
+		/*
+		 * Several orders can queue on this lock. One which was cancelled while
+		 * waiting shouldn't then go and load all its data. 
+		 */
+		if (offlineDataInfo.cancel) {
+			return REQUEST_INTERRUPTED;
+		}
+		loadDepth.incrementAndGet();
+		try {
+			return getOfflineDataLocked(offlineDataInfo);
+		}
+		finally {
+			loadDepth.decrementAndGet();
+		}
+	}
+
+	private int getOfflineDataLocked(OfflineDataLoadInfo offlineDataInfo) {
 		//prevent a load of exactly the same data.
 		if (offlineDataInfo.getAllowRepeats() == false &&
 				lastRequestStart == offlineDataInfo.getStartMillis() &&

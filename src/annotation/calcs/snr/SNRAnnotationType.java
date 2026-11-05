@@ -196,7 +196,8 @@ public class SNRAnnotationType extends DataAnnotationType<SNRAnnotation> {
 
 	private void loadRawData(AcquisitionProcess daqProcess, long dataStart,
 			long dataEnd) {
-		daqProcess.getOfflineData(daqProcess.getRawDataBlock(), null, dataStart, dataEnd, 1);		
+		// queue behind any other load on the raw data block, rather than running alongside it. 
+		daqProcess.getRawDataBlock().loadOfflineRawData(dataStart, dataEnd);
 	}
 
 	private boolean haveRawData(PamRawDataBlock rawDataBlock, long dataStart,

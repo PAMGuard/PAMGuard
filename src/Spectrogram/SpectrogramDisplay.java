@@ -1534,9 +1534,10 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 
 		/**
 		 * Need to call this before locking the innnerPanelSynchObject 
-		 * or it will lock up. 
+		 * or it will lock up. Only cancel this display's own order - other
+		 * displays may be loading from the same FFT data block. 
 		 */
-		sourceFFTDataBlock.cancelDataOrder();
+		sourceFFTDataBlock.cancelDataOrder(this);
 
 		//		synchronized (innerPanelSynchObject) {
 

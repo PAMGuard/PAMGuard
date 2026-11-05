@@ -40,16 +40,6 @@ import wavFiles.ByteConverter;
 public class WavAudioFile implements PamAudioFileLoader {
 
 	/**
-	 * The audio input stream of the last loaded file. 
-	 */
-	private AudioInputStream audioInputStream;
-
-	/**
-	 * The audioformat of the last laoded file. 
-	 */
-	private AudioFormat audioFormat;
-
-	/**
 	 * Get the file extensions associated with loading these data. 
 	 */
 	protected ArrayList<String> fileExtensions; 
@@ -83,190 +73,206 @@ public class WavAudioFile implements PamAudioFileLoader {
 				
 		//System.out.println("WavAudioFile: mapPoint: " +  mapPoint.getSoundFile().getName() + "   " + PamCalendar.formatDateTime2(mapPoint.getStartTime()) + "  " +  PamCalendar.formatDateTime2(mapPoint.getEndTime())); 
 
-		if (openSoundFile(mapPoint.getSoundFile()) == false) {
+		/*
+		 * The stream and format must be local to this call. There is only one instance of each 
+		 * loader (see PamAudioFileManager), and loads can run at the same time on different 
+		 * threads (e.g. a display load on a worker thread and an annotation calculation on the 
+		 * FX thread). Held in fields, one load would swap the stream out from under the other. 
+		 */
+		AudioInputStream audioInputStream = getAudioStream(mapPoint.getSoundFile(), null);
+		if (audioInputStream == null) {
 			System.out.println("Could not open sound file " + mapPoint.getSoundFile().getAbsolutePath());
 			return false;
 		}
-		if (offlineDataLoadInfo.cancel) {
-			return false;
-		}
-		
-		File soundFile;
-
-		ByteConverter byteConverter = ByteConverter.createByteConverter(audioFormat);
-		long currentTime = mapPoint.getStartTime();
-		long prevFileEnd = mapPoint.getEndTime();
-		boolean fileGap = false;
-		int newSamples; 
-		double[][] doubleData;
-		int nChannels = audioFormat.getChannels();
-		int blockSamples = Math.max((int) audioFormat.getSampleRate() / 10, 1000);
-		int frameSize = audioFormat.getFrameSize();
-		
-		//System.out.println("loadAudioData.frameSize: " + frameSize);
-		
-		if (frameSize < 0) {
-			frameSize = audioFormat.getChannels()*audioFormat.getSampleSizeInBits()/8;
-		}
-		if (frameSize <= 0) {
-			System.out.println("The frame size is less than zero " + mapPoint.getSoundFile().getAbsolutePath());
-			return false;
-		}
-		byte[] inputBuffer = new byte[blockSamples * frameSize];
-		int bytesRead = 0;
-		long totalSamples = 0;
-		//		long fileSamples = 0;
-		long millisecondsGaps = 0;
-		long ms;
-
-		RawDataUnit newDataUnit;
-		long skipped = 0; 
-		long samplePosition = 0;
-		long maxReadBytes = (long) Integer.MAX_VALUE * 2L; 
-		long maxSamples = maxReadBytes / audioFormat.getFrameSize();
-		if (currentTime < offlineDataLoadInfo.getStartMillis()) {
-			// need to fast forward in current file. 
-			samplePosition = (long) (((offlineDataLoadInfo.getStartMillis()-currentTime)*audioFormat.getSampleRate())/1000.);
-			long skipBytes = samplePosition*audioFormat.getFrameSize();
-			if (mapPoint.getSoundFile() instanceof WavFileType) {
-				WavFileType wavFile = (WavFileType) mapPoint.getSoundFile();
-				// for HARP data, may need to skip the start of the file. 
-				// and also limit how far we can read without going into the next section. 
-				//this doesn't add to the samples count. 
-				skipBytes += wavFile.getSamplesOffset() * audioFormat.getFrameSize();
-				maxSamples = wavFile.getMaxSamples();
-				maxReadBytes = maxSamples * audioFormat.getFrameSize();
-			}
-			try {
-
-//				CPUMonitor cpuMonitor = new CPUMonitor();
-//				cpuMonitor.start();
-				skipped = audioInputStream.skip(skipBytes);
-				
-//				cpuMonitor.stop();
-//				System.out.println(cpuMonitor.getSummary("Sound skip: " + skipBytes + " bytes "));
-				//System.out.println("Offline " + (offlineDataLoadInfo.getStartMillis()-currentTime) + " ms : frame size: " + audioFormat.getFrameSize());
-
-			} catch (IOException e) {
-				/**
-				 * The datamap point may be longer than the actual file here ? In any case, with the 
-				 * NEMO data which is 5 mins per hour, this get's hit for the file before the 
-				 * file we want every time !
-				 */
-				//				System.out.println("End of audio file " + mapPoint.getSoundFile().getName());
-				e.printStackTrace();
-			}
-			currentTime = offlineDataLoadInfo.getStartMillis();
-		}
-		ms = currentTime;
-		int readSamples = inputBuffer.length;
-		while (ms < offlineDataLoadInfo.getEndMillis() && currentTime < offlineDataLoadInfo.getEndMillis()) {
-			
+		try {
+			AudioFormat audioFormat = audioInputStream.getFormat();
 			if (offlineDataLoadInfo.cancel) {
-				//add the position we got to 
-				offlineDataLoadInfo.setLastLoadInfo(new AquisitionLoadPoint(ms, bytesRead)); 
-				break;
+				return false;
 			}
-			try {
-				// check how far we can read into this file. 
-				long maxRead = (maxSamples - samplePosition)*audioFormat.getFrameSize(); // stupid large unless it's HARP data
-				maxRead = Math.min(maxRead, inputBuffer.length);
-				maxRead = Math.min(maxRead, audioInputStream.available());
-//				if (inputBuffer.length<audioInputStream.available()) {
-//					bytesRead = audioInputStream.read(inputBuffer);
-//				}
-				if (maxRead > 0) {
-					bytesRead = audioInputStream.read(inputBuffer, 0, (int) maxRead);
+		
+			File soundFile;
+
+			ByteConverter byteConverter = ByteConverter.createByteConverter(audioFormat);
+			long currentTime = mapPoint.getStartTime();
+			long prevFileEnd = mapPoint.getEndTime();
+			boolean fileGap = false;
+			int newSamples; 
+			double[][] doubleData;
+			int nChannels = audioFormat.getChannels();
+			int blockSamples = Math.max((int) audioFormat.getSampleRate() / 10, 1000);
+			int frameSize = audioFormat.getFrameSize();
+		
+			//System.out.println("loadAudioData.frameSize: " + frameSize);
+		
+			if (frameSize < 0) {
+				frameSize = audioFormat.getChannels()*audioFormat.getSampleSizeInBits()/8;
+			}
+			if (frameSize <= 0) {
+				System.out.println("The frame size is less than zero " + mapPoint.getSoundFile().getAbsolutePath());
+				return false;
+			}
+			byte[] inputBuffer = new byte[blockSamples * frameSize];
+			int bytesRead = 0;
+			long totalSamples = 0;
+			//		long fileSamples = 0;
+			long millisecondsGaps = 0;
+			long ms;
+
+			RawDataUnit newDataUnit;
+			long skipped = 0; 
+			long samplePosition = 0;
+			long maxReadBytes = (long) Integer.MAX_VALUE * 2L; 
+			long maxSamples = maxReadBytes / audioFormat.getFrameSize();
+			if (currentTime < offlineDataLoadInfo.getStartMillis()) {
+				// need to fast forward in current file. 
+				samplePosition = (long) (((offlineDataLoadInfo.getStartMillis()-currentTime)*audioFormat.getSampleRate())/1000.);
+				long skipBytes = samplePosition*audioFormat.getFrameSize();
+				if (mapPoint.getSoundFile() instanceof WavFileType) {
+					WavFileType wavFile = (WavFileType) mapPoint.getSoundFile();
+					// for HARP data, may need to skip the start of the file. 
+					// and also limit how far we can read without going into the next section. 
+					//this doesn't add to the samples count. 
+					skipBytes += wavFile.getSamplesOffset() * audioFormat.getFrameSize();
+					maxSamples = wavFile.getMaxSamples();
+					maxReadBytes = maxSamples * audioFormat.getFrameSize();
 				}
-				else {
-					bytesRead = 0; //force new file to load. 
+				try {
+
+	//				CPUMonitor cpuMonitor = new CPUMonitor();
+	//				cpuMonitor.start();
+					skipped = audioInputStream.skip(skipBytes);
+				
+	//				cpuMonitor.stop();
+	//				System.out.println(cpuMonitor.getSummary("Sound skip: " + skipBytes + " bytes "));
+					//System.out.println("Offline " + (offlineDataLoadInfo.getStartMillis()-currentTime) + " ms : frame size: " + audioFormat.getFrameSize());
+
+				} catch (IOException e) {
+					/**
+					 * The datamap point may be longer than the actual file here ? In any case, with the 
+					 * NEMO data which is 5 mins per hour, this get's hit for the file before the 
+					 * file we want every time !
+					 */
+					//				System.out.println("End of audio file " + mapPoint.getSoundFile().getName());
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}			
-			if (bytesRead <= 0) {
-				skipped = 0 ; //reset to zero because were not skipping any bytes here. 
-				/*
-				 *  that's the end of that file, so get the next one if there
-				 *  is one, if not then break.
-				 */
-				if (mapIt.hasNext() == false) {
-					//System.out.println("WavAudioFile: no map next: " + mapPoint.getSoundFile().getName());
+				currentTime = offlineDataLoadInfo.getStartMillis();
+			}
+			ms = currentTime;
+			int readSamples = inputBuffer.length;
+			while (ms < offlineDataLoadInfo.getEndMillis() && currentTime < offlineDataLoadInfo.getEndMillis()) {
+			
+				if (offlineDataLoadInfo.cancel) {
+					//add the position we got to 
+					offlineDataLoadInfo.setLastLoadInfo(new AquisitionLoadPoint(ms, bytesRead)); 
 					break;
 				}
-				mapPoint = mapIt.next();
-				fileGap = (mapPoint.getStartTime() - prevFileEnd) > 1000;
-				//				if (fileGap) {
-				//					System.out.println(String.format("Sound file gap %3.3fs from %s to %s", 
-				//							(double) (mapPoint.getStartTime()-prevFileEnd) / 1000.,
-				//							PamCalendar.formatTime(prevFileEnd), PamCalendar.formatTime(mapPoint.getStartTime())));
-				//				}
-				prevFileEnd = mapPoint.getEndTime();
-				if (!fileGap) { // don't carry on if there is a file gap
-					if (openSoundFile(mapPoint.getSoundFile()) == false) {
-						//System.out.println("WavAudioFile: file gap" );
+				try {
+					// check how far we can read into this file. 
+					long maxRead = (maxSamples - samplePosition)*audioFormat.getFrameSize(); // stupid large unless it's HARP data
+					maxRead = Math.min(maxRead, inputBuffer.length);
+					maxRead = Math.min(maxRead, audioInputStream.available());
+	//				if (inputBuffer.length<audioInputStream.available()) {
+	//					bytesRead = audioInputStream.read(inputBuffer);
+	//				}
+					if (maxRead > 0) {
+						bytesRead = audioInputStream.read(inputBuffer, 0, (int) maxRead);
+					}
+					else {
+						bytesRead = 0; //force new file to load. 
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}			
+				if (bytesRead <= 0) {
+					skipped = 0 ; //reset to zero because were not skipping any bytes here. 
+					/*
+					 *  that's the end of that file, so get the next one if there
+					 *  is one, if not then break.
+					 */
+					if (mapIt.hasNext() == false) {
+						//System.out.println("WavAudioFile: no map next: " + mapPoint.getSoundFile().getName());
 						break;
 					}
-					samplePosition = 0;
-					long skipBytes = 0;
-					if (mapPoint.getSoundFile() instanceof WavFileType) {
-						WavFileType wavFile = (WavFileType) mapPoint.getSoundFile();
-						// for HARP data, may need to skip the start of the file. 
-						// and also limit how far we can read without going into the next section. 
-						//this doesn't add to the samples count. 
-						skipBytes += wavFile.getSamplesOffset() * audioFormat.getFrameSize();
-						maxSamples = wavFile.getMaxSamples();
-						maxReadBytes = maxSamples * audioFormat.getFrameSize();
-					}
-					// try again to read data. 
-					try {
-						if (skipBytes>0) {
-							audioInputStream.skip(skipBytes);
+					mapPoint = mapIt.next();
+					fileGap = (mapPoint.getStartTime() - prevFileEnd) > 1000;
+					//				if (fileGap) {
+					//					System.out.println(String.format("Sound file gap %3.3fs from %s to %s", 
+					//							(double) (mapPoint.getStartTime()-prevFileEnd) / 1000.,
+					//							PamCalendar.formatTime(prevFileEnd), PamCalendar.formatTime(mapPoint.getStartTime())));
+					//				}
+					prevFileEnd = mapPoint.getEndTime();
+					if (!fileGap) { // don't carry on if there is a file gap
+						closeQuietly(audioInputStream);
+						audioInputStream = getAudioStream(mapPoint.getSoundFile(), null);
+						if (audioInputStream == null) {
+							//System.out.println("WavAudioFile: file gap" );
+							break;
 						}
-						bytesRead = audioInputStream.read(inputBuffer);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}		
-					if (bytesRead <= 0) {
-						//System.out.println("WavAudioFile: no bytes read" );
-						break;
+						audioFormat = audioInputStream.getFormat();
+						samplePosition = 0;
+						long skipBytes = 0;
+						if (mapPoint.getSoundFile() instanceof WavFileType) {
+							WavFileType wavFile = (WavFileType) mapPoint.getSoundFile();
+							// for HARP data, may need to skip the start of the file. 
+							// and also limit how far we can read without going into the next section. 
+							//this doesn't add to the samples count. 
+							skipBytes += wavFile.getSamplesOffset() * audioFormat.getFrameSize();
+							maxSamples = wavFile.getMaxSamples();
+							maxReadBytes = maxSamples * audioFormat.getFrameSize();
+						}
+						// try again to read data. 
+						try {
+							if (skipBytes>0) {
+								audioInputStream.skip(skipBytes);
+							}
+							bytesRead = audioInputStream.read(inputBuffer);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}		
+						if (bytesRead <= 0) {
+							//System.out.println("WavAudioFile: no bytes read" );
+							break;
+						}
 					}
 				}
-			}
 			
 			
-			newSamples = bytesRead / frameSize;
-			samplePosition += newSamples;
-			doubleData = new double[nChannels][newSamples];
-			int convertedSamples = byteConverter.bytesToDouble(inputBuffer, doubleData, bytesRead);
-			ms = offlineFileServer.getOfflineRawDataStore().getParentProcess().absSamplesToMilliseconds(totalSamples);
-			ms = currentTime + (long)(totalSamples * 1000 / (double) audioFormat.getSampleRate());
+				newSamples = bytesRead / frameSize;
+				samplePosition += newSamples;
+				doubleData = new double[nChannels][newSamples];
+				int convertedSamples = byteConverter.bytesToDouble(inputBuffer, doubleData, bytesRead);
+				ms = offlineFileServer.getOfflineRawDataStore().getParentProcess().absSamplesToMilliseconds(totalSamples);
+				ms = currentTime + (long)(totalSamples * 1000 / (double) audioFormat.getSampleRate());
 
-			for (int ichan = 0; ichan < nChannels; ichan++) {
+				for (int ichan = 0; ichan < nChannels; ichan++) {
 
-				newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
-				newDataUnit.setFileSamples(totalSamples + skipped / frameSize); //set the number samples into the wav file. 
+					newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
+					newDataUnit.setFileSamples(totalSamples + skipped / frameSize); //set the number samples into the wav file. 
 				
-				removeDCComponent(doubleData[ichan], ichan, audioFormat);
+					removeDCComponent(doubleData[ichan], ichan, audioFormat);
 				
-				newDataUnit.setRawData(doubleData[ichan], true);
+					newDataUnit.setRawData(doubleData[ichan], true);
 
-				//System.out.println("New wav data: " + PamCalendar.formatDateTime(newDataUnit.getTimeMilliseconds()));
-				offlineFileServer.getRawDataBlock().addPamData(newDataUnit);
-			}
-			if (fileGap) {
-				currentTime = mapPoint.getStartTime();
-				totalSamples = 0;
-				//				fileSamples = 0;
+					//System.out.println("New wav data: " + PamCalendar.formatDateTime(newDataUnit.getTimeMilliseconds()));
+					offlineFileServer.getRawDataBlock().addPamData(newDataUnit);
+				}
+				if (fileGap) {
+					currentTime = mapPoint.getStartTime();
+					totalSamples = 0;
+					//				fileSamples = 0;
+				}
+
+				totalSamples += newSamples;
+				//			fileSamples += newSamples;
 			}
 
-			totalSamples += newSamples;
-			//			fileSamples += newSamples;
+			//		System.out.println("Finished loading wav: " + offlineDataLoadInfo.getCurrentObserver().getObserverName() );
+
+			return false;
 		}
-
-		//		System.out.println("Finished loading wav: " + offlineDataLoadInfo.getCurrentObserver().getObserverName() );
-
-		return false;
+		finally {
+			closeQuietly(audioInputStream);
+		}
 	}
 
 
@@ -290,18 +296,15 @@ public class WavAudioFile implements PamAudioFileLoader {
 		}
 	}
 
-	/**
-	 * Open a sound file. 
-	 * @param soundFile
-	 * @return
-	 */
-	private boolean openSoundFile(File soundFile) {
-
-		audioInputStream = getAudioStream(soundFile, null);
-		if (audioInputStream == null) return false;
-		audioFormat = audioInputStream.getFormat();
-
-		return true;
+	private static void closeQuietly(AudioInputStream stream) {
+		if (stream == null) {
+			return;
+		}
+		try {
+			stream.close();
+		} catch (IOException e) {
+			// nothing useful to do here. 
+		}
 	}
 
 

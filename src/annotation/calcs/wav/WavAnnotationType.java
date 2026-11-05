@@ -115,7 +115,6 @@ public class WavAnnotationType extends DataAnnotationType<WavAnnotation> {
 		long dataStart = acousticDataUnit.getTimeMilliseconds()-1000;
 		long dataEnd = acousticDataUnit.getEndTimeInMilliseconds()+1000;
 		if (haveRawData(daqProcess.getRawDataBlock(), dataStart-1000, dataEnd+1000) == false) {
-			daqProcess.getRawDataBlock().clearAll();
 			loadRawData(daqProcess, dataStart-1000, dataEnd+1000);
 //			System.out.println("Load Wav raw data from " + PamCalendar.formatTime(dataStart, true) + " to " +
 //					PamCalendar.formatTime(dataEnd, true));
@@ -182,7 +181,8 @@ public class WavAnnotationType extends DataAnnotationType<WavAnnotation> {
 
 	private void loadRawData(AcquisitionProcess daqProcess, long dataStart,
 			long dataEnd) {
-		daqProcess.getOfflineData(daqProcess.getRawDataBlock(), null, dataStart, dataEnd, 1);		
+		// queue behind any other load on the raw data block, rather than running alongside it. 
+		daqProcess.getRawDataBlock().loadOfflineRawData(dataStart, dataEnd);
 	}
 
 	private boolean haveRawData(PamRawDataBlock rawDataBlock, long dataStart,

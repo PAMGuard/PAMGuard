@@ -3752,7 +3752,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	}
 
 	/**
-	 * Cancel the current offline data order
+	 * Cancel all current offline data orders on this block, whoever placed them. A
+	 * display cancelling its own order should use {@link #cancelDataOrder(Object)}.
 	 */
 	public void cancelDataOrder() {
 		offlineDataLoading.cancelDataOrder();
@@ -3765,6 +3766,29 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void cancelDataOrder(boolean quedItems) {
 		offlineDataLoading.cancelDataOrder(quedItems);
+	}
+
+	/**
+	 * Cancel the current offline data order placed by one owner, leaving orders from
+	 * other owners (e.g. other displays) running.
+	 * 
+	 * @param owner the owner of the order. By default this is the observer passed when
+	 *              the data were ordered (see
+	 *              {@link PamguardMVC.dataOffline.OfflineDataLoadInfo#getOrderOwner()}).
+	 */
+	public void cancelDataOrder(Object owner) {
+		offlineDataLoading.cancelDataOrder(owner);
+	}
+
+	/**
+	 * Cancel the current offline data order placed by one owner, leaving orders from
+	 * other owners (e.g. other displays) running.
+	 * 
+	 * @param owner     the owner of the order.
+	 * @param quedItems true to also remove that owner's queued orders.
+	 */
+	public void cancelDataOrder(Object owner, boolean quedItems) {
+		offlineDataLoading.cancelDataOrder(owner, quedItems);
 	}
 
 	public void clearDeletedList() {

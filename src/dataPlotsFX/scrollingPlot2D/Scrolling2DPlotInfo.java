@@ -603,7 +603,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 		/**
 		 * First cancel the last order and reset pointers in the output images.
 		 */
-		dataBlock2D.cancelDataOrder(true);
+		dataBlock2D.cancelDataOrder(this.fftObserver, true);
 		//don't know why, but some weird order quue stuff going on sometimes and this seems to 
 		//help prevent extra data, outwith the order still being ordered...
 		Thread.sleep(100);		
@@ -802,7 +802,7 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 			return;
 		}
 		isOrderring = true;
-		dataBlock2D.cancelDataOrder(true);
+		dataBlock2D.cancelDataOrder(this.fftObserver, true);
 		lastReqStart = next[0];
 		lastReqEnd = next[1];
 		// allowRepeats = true: the tiled renderer does its own de-duplication via tile

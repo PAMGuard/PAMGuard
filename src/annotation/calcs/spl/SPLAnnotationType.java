@@ -112,7 +112,6 @@ public class SPLAnnotationType extends DataAnnotationType<SPLAnnotation> {
 		long dataStart = acousticDataUnit.getTimeMilliseconds();
 		long dataEnd = acousticDataUnit.getEndTimeInMilliseconds();
 		if (haveRawData(daqProcess.getRawDataBlock(), dataStart, dataEnd) == false) {
-			daqProcess.getRawDataBlock().clearAll();
 			loadRawData(daqProcess, dataStart, dataEnd);
 //			System.out.println("Load SPL raw data from " + PamCalendar.formatTime(dataStart, true) + " to " +
 //					PamCalendar.formatTime(dataEnd, true));
@@ -253,7 +252,8 @@ public class SPLAnnotationType extends DataAnnotationType<SPLAnnotation> {
 
 	private void loadRawData(AcquisitionProcess daqProcess, long dataStart,
 			long dataEnd) {
-		daqProcess.getOfflineData(daqProcess.getRawDataBlock(), null, dataStart, dataEnd, 1);		
+		// queue behind any other load on the raw data block, rather than running alongside it. 
+		daqProcess.getRawDataBlock().loadOfflineRawData(dataStart, dataEnd);
 	}
 
 	private boolean haveRawData(PamRawDataBlock rawDataBlock, long dataStart,

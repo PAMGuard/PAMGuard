@@ -479,7 +479,7 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 		if (dataBlock == null) {
 			return;
 		}		
-		dataBlock.cancelDataOrder();
+		dataBlock.cancelDataOrder(playbackProcess);
 		
 		if (loadWorker != null) {
 			loadWorker.cancelLoad();

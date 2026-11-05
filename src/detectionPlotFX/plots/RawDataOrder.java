@@ -97,7 +97,7 @@ public abstract class RawDataOrder {
 		//				" pamDetection.getDurationInMilliseconds() " + pamDetection.getDurationInMilliseconds() ); 
 		//reset the observer for a load. 
 
-		rawDataBlock.cancelDataOrder();
+		rawDataBlock.cancelDataOrder(this.rawObserver);
 
 		rawObserver.resetForLoad(dataStart, dataEnd, rawDataBlock.getSampleRate(), channel);
 
