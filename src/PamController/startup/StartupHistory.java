@@ -46,6 +46,7 @@ public class StartupHistory {
 	private static final String HISTORY_FILE = "startupHistory.txt";
 
 	private static final String LINE_MODE = "MODE";
+	private static final String LINE_DARK = "DARK";
 	private static final String LINE_ENTRY = "E";
 	private static final String LINE_HIDDEN = "H";
 
@@ -60,6 +61,11 @@ public class StartupHistory {
 	private final ArrayList<StartupEntry> hidden = new ArrayList<>();
 
 	private int lastMode = MODE_NORMAL;
+
+	/**
+	 * True if the start up dialog is shown in dark mode.
+	 */
+	private boolean darkMode = false;
 
 	private boolean loaded = false;
 
@@ -116,6 +122,9 @@ public class StartupHistory {
 			return;
 		}
 		switch (bits[0]) {
+		case LINE_DARK:
+			darkMode = "1".equals(bits[1].trim());
+			break;
 		case LINE_MODE:
 			lastMode = Integer.parseInt(bits[1].trim()) == MODE_VIEWER ? MODE_VIEWER : MODE_NORMAL;
 			break;
@@ -145,6 +154,8 @@ public class StartupHistory {
 		File tmp = new File(f.getAbsolutePath() + ".tmp");
 		try (BufferedWriter writer = Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8)) {
 			writer.write(LINE_MODE + "\t" + lastMode);
+			writer.newLine();
+			writer.write(LINE_DARK + "\t" + (darkMode ? "1" : "0"));
 			writer.newLine();
 			for (StartupEntry e : entries) {
 				writer.write(String.format("%s\t%d\t%s\t%d\t%s", LINE_ENTRY, e.getMode(), e.isFavourite() ? "1" : "0",
@@ -297,6 +308,18 @@ public class StartupHistory {
 	public synchronized int getLastMode() {
 		load();
 		return lastMode;
+	}
+
+	/**
+	 * @return true if the start up dialog was last shown in dark mode.
+	 */
+	public synchronized boolean isDarkMode() {
+		load();
+		return darkMode;
+	}
+
+	public synchronized void setDarkMode(boolean darkMode) {
+		this.darkMode = darkMode;
 	}
 
 	public synchronized void setLastMode(int lastMode) {
