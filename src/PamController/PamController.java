@@ -80,6 +80,7 @@ import PamguardMVC.uid.UIDViewerManager;
 import binaryFileStorage.BinaryStore;
 import export.ExportOptions;
 import fftManager.FFTDataUnit;
+import generalDatabase.DBControl;
 import generalDatabase.DBControlUnit;
 import generalDatabase.sqlite.SqliteSystem;
 import PamController.startup.StartupHistory;
@@ -397,6 +398,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	private void creationComplete() {
 		
+		/*
+		 * The database chosen in the start up dialog (-c option) has been opened and
+		 * is now at the top of the database list, so clear it so that the database
+		 * dialog works normally if the user wants to change database. This must wait
+		 * until now: clearing it any earlier (e.g. from a queued Swing task) can run
+		 * while a modal dialog is open during start up, before the database is used.
+		 */
+		DBControl.setStartupDatabase(null);
+
 		MarkRelationships.getInstance().subscribeAllMarkers();
 		
 		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {

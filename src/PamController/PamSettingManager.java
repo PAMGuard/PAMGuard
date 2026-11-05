@@ -229,6 +229,20 @@ public class PamSettingManager {
 	 * it's opened without showing the original settings file dialog.
 	 */
 	static private File startupSettingsFile = null;
+
+	/**
+	 * True if PAMGuard was started through the start up dialog (-c option).
+	 */
+	static private boolean startupDialogUsed = false;
+
+	/**
+	 * Say that PAMGuard was started through the start up dialog (-c option), which
+	 * stops the tip of the day appearing as well.
+	 * @param used true if the start up dialog was used.
+	 */
+	public static void setStartupDialogUsed(boolean used) {
+		startupDialogUsed = used;
+	}
 	static public String  external_wav = null;
 
 	private boolean loadingLocalSettings;
@@ -1083,7 +1097,11 @@ public class PamSettingManager {
 				
 				
 				TipOfTheDayManager.getInstance().setShowAtStart(settingsFileData.showTipAtStartup);
-				if (settingsFileData.showTipAtStartup) {
+				/*
+				 * No tip of the day after the start up dialog (-c option) - the user has
+				 * just been through one dialog and goes straight into PAMGuard.
+				 */
+				if (settingsFileData.showTipAtStartup && !startupDialogUsed) {
 					if (PamGUIManager.isSwing()) {
 						TipOfTheDayManager.getInstance().showTip(null, null);
 					}

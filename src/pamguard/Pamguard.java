@@ -533,19 +533,6 @@ public class Pamguard {
 			PamController.create(chosenRunMode);
 		}		
 		
-		if (DBControl.getStartupDatabase() != null) {
-			/*
-			 * PAMGuard has opened the database chosen in the start up dialog, so it's now
-			 * at the top of the database list. Clear it so that the database dialog works 
-			 * as normal if the user wants to change database. 
-			 */
-			if (PamGUIManager.isSwing()) {
-				SwingUtilities.invokeLater(() -> DBControl.setStartupDatabase(null));
-			}
-			else {
-				DBControl.setStartupDatabase(null);
-			}
-		}
 		
 
 	}
@@ -583,6 +570,7 @@ public class Pamguard {
 			// user cancelled
 			System.exit(0);
 		}
+		PamSettingManager.setStartupDialogUsed(true);
 		if (selection.getDarkMode() != null) {
 			// light or dark mode chosen in the dialog, otherwise keep the saved scheme.
 			PamColors.setStartupScheme(selection.getDarkMode() ? ColourScheme.DARKSCHEME : ColourScheme.DAYSCHEME);
