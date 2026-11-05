@@ -707,9 +707,14 @@ public class BinaryOutputStream {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		storedObjects++;
-		
+
+		/*
+		 * Don't increment storedObjects here. The public storeData(int, ...) wrapper
+		 * counts main and noise stream objects separately. Incrementing here as well
+		 * doubled nObjects in file footers (V2.02.19 onwards) and added noise
+		 * objects to the main file count.
+		 */
+
 		return true;
 	}
 

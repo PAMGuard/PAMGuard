@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,6 +27,7 @@ import PamguardMVC.DataBlock2D;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import cepstrum.CepstrumProcess;
+import dataPlotsFX.data.DataTypeInfo;
 import deepWhistle.MaskedFFTProcess;
 import fftManager.FFTDataUnit;
 import spectrogramNoiseReduction.SpectrogramNoiseDialogPanel;
@@ -41,6 +44,12 @@ public class WhistleToneDialog extends PamDialog {
 	private GroupedSourcePanel sourcePanel;
 	
 	private JTextField minFreq, maxFreq;
+	
+	/**
+	 * Unit labels for the min and max search values. These are Hz for a normal
+	 * spectrogram but seconds (quefrency) for a cepstrum source.
+	 */
+	private JLabel minFreqUnits, maxFreqUnits;
 	
 	private JComboBox connectType;
 	
@@ -74,14 +83,14 @@ public class WhistleToneDialog extends PamDialog {
 		c.gridx++;
 		addComponent(d, minFreq = new JTextField(5), c);
 		c.gridx++;
-		addComponent(d, new JLabel(" Hz"), c);
+		addComponent(d, minFreqUnits = new JLabel(" Hz"), c);
 		c.gridy++;
 		c.gridx = 0;
 		addComponent(d, new JLabel("Max Frequency "), c);
 		c.gridx++;
 		addComponent(d, maxFreq = new JTextField(5), c);
 		c.gridx++;
-		addComponent(d, new JLabel(" Hz"), c);
+		addComponent(d, maxFreqUnits = new JLabel(" Hz"), c);
 		c.gridy++;
 		c.gridx = 0;
 		addComponent(d, new JLabel("Connection Type "), c);
@@ -187,8 +196,8 @@ public class WhistleToneDialog extends PamDialog {
 //		sourcePanel.setSource(whistleToneParameters.dataSource);
 //		sourcePanel.setChannelList(whistleToneParameters.channelList);
 		sourcePanel.setParams(whistleToneParameters);
-		minFreq.setText(String.format("%.1f", whistleToneParameters.getMinFrequency()));
-		maxFreq.setText(String.format("%.1f", whistleToneParameters.
+		minFreq.setText(formatRangeValue(whistleToneParameters.getMinFrequency()));
+		maxFreq.setText(formatRangeValue(whistleToneParameters.
 				getMaxFrequency(whistleMoanControl.getWhistleToneProcess().getSampleRate())));
 		if (whistleToneParameters.getConnectType() == 8) {
 			connectType.setSelectedIndex(1);
@@ -219,6 +228,17 @@ public class WhistleToneDialog extends PamDialog {
 		DataBlock2D db2d = (DataBlock2D) dataBlock;
 		double minF = db2d.getMinDataValue();
 		double maxF = db2d.getMaxDataValue();
+		/*
+		 * The range is in the units of the source data, which is Hz for a 
+		 * spectrogram but seconds for a cepstrum, so label it accordingly. 
+		 */
+		String units = " Hz";
+		DataTypeInfo scaleInfo = db2d.getScaleInfo();
+		if (scaleInfo != null && scaleInfo.dataUnits != null) {
+			units = " " + scaleInfo.dataUnits.toString();
+		}
+		minFreqUnits.setText(units);
+		maxFreqUnits.setText(units);
 		double minV = 0, maxV = 0;
 		try {
 			 minV = Double.valueOf(minFreq.getText());
@@ -227,12 +247,33 @@ public class WhistleToneDialog extends PamDialog {
 			 maxV = Double.valueOf(maxFreq.getText());
 		}
 		catch (NumberFormatException ex) {}
-		if (minV < minF) {
-			minFreq.setText(String.format("%3.1f", minF));
-		}
 		if (maxV > maxF || maxV <= 0) {
-			maxFreq.setText(String.format("%3.1f", maxF));
+			maxV = maxF;
+			maxFreq.setText(formatRangeValue(maxF));
 		}
+		/*
+		 * Also reset the minimum if it's out of range, e.g. a value in Hz left over from 
+		 * a spectrogram source when the source is now a cepstrum in seconds. Otherwise 
+		 * min and max both clamp to the top bin and nothing is ever detected. 
+		 */
+		if (minV < minF || minV >= maxV) {
+			minFreq.setText(formatRangeValue(minF));
+		}
+	}
+	
+	/**
+	 * Format a min or max search value. Cepstrum data are in seconds with a typical
+	 * maximum of around 0.01s, so a fixed number of decimal places would round
+	 * these to 0. Use significant figures instead, and a locale independent format 
+	 * so that the value can be read back with Double.valueOf. 
+	 * @param value value to format
+	 * @return formatted string
+	 */
+	private static String formatRangeValue(double value) {
+		if (Double.isNaN(value) || Double.isInfinite(value)) {
+			return "0";
+		}
+		return new BigDecimal(value).round(new MathContext(6)).stripTrailingZeros().toPlainString();
 	}
 	
 	@Override

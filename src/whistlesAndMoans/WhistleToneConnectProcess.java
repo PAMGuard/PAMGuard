@@ -515,6 +515,22 @@ public class WhistleToneConnectProcess extends PamProcess {
 			searchBin2 = (int) trueSourceData.value2bin(whistleParams.getMaxFrequency(getSampleRate()), firstChannel);
 			searchBin1 = Math.max(0, Math.min(trueSourceData.getDataWidth(firstChannel)-1, searchBin1));
 			searchBin2 = Math.max(0, Math.min(trueSourceData.getDataWidth(firstChannel)-1, searchBin2));
+			/*
+			 * The range is in the units of the source data, e.g. seconds for a cepstrum. A range
+			 * saved in different units (such as Hz from a spectrogram source) can put the minimum
+			 * above the top of the data, so both ends clamp to the same bin and nothing would
+			 * ever be detected. Search
+			 * the full range of the data instead.
+			 */
+			if (whistleParams.getMinFrequency() >= trueSourceData.getMaxDataValue()) {
+				int nBins = trueSourceData.getDataWidth(firstChannel);
+				System.out.printf("Whistle and Moan Detector: search range %s to %s is outside the source data range " +
+						"%s to %s. Searching the full data range. Open the detector settings to correct this.\n",
+						whistleParams.getMinFrequency(), whistleParams.getMaxFrequency(getSampleRate()),
+						trueSourceData.getMinDataValue(), trueSourceData.getMaxDataValue());
+				searchBin1 = 0;
+				searchBin2 = Math.max(0, nBins-1);
+			}
 		}
 
 		/**
