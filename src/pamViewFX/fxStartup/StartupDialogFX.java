@@ -223,8 +223,8 @@ public class StartupDialogFX {
 
 		// mode cards
 		modeGroup = new ToggleGroup();
-		normalCard = createModeCard("Normal", "Process sound in real time or analyse recordings using automated detection and classification algorithms");
-		viewerCard = createModeCard("Viewer", "Review, reprocess and annotate data processed in normal mode and/or annotate raw sound files");
+		normalCard = createModeCard("Normal", "Process sound in real time or analyse recordings with automated detectors and classifiers");
+		viewerCard = createModeCard("Viewer", "Review, reprocess and annotate processed data, and annotate raw sound files");
 		normalCard.setUserData(StartupHistory.MODE_NORMAL);
 		viewerCard.setUserData(StartupHistory.MODE_VIEWER);
 		HBox cards = new HBox(14, normalCard, viewerCard);
