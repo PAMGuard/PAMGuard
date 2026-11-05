@@ -328,8 +328,8 @@ public class StartupDialogFX {
 		if (img != null) {
 			imageView.setImage(img);
 		}
-		imageView.setFitWidth(56);
-		imageView.setFitHeight(56);
+		imageView.setFitWidth(48);
+		imageView.setFitHeight(48);
 		imageView.setPreserveRatio(true);
 		imageView.setSmooth(true);
 
@@ -343,7 +343,7 @@ public class StartupDialogFX {
 		text.setAlignment(Pos.CENTER_LEFT);
 		HBox.setHgrow(text, Priority.ALWAYS);
 
-		HBox graphic = new HBox(14, imageView, text);
+		HBox graphic = new HBox(12, imageView, text);
 		graphic.setAlignment(Pos.CENTER_LEFT);
 
 		ToggleButton card = new ToggleButton();
@@ -353,8 +353,8 @@ public class StartupDialogFX {
 		card.setMaxWidth(Double.MAX_VALUE);
 		card.setPrefWidth(300);
 		// fixed height - the file list gets any extra space.
-		card.setMinHeight(116);
-		card.setPrefHeight(116);
+		card.setMinHeight(104);
+		card.setPrefHeight(104);
 		card.setMaxHeight(Region.USE_PREF_SIZE);
 		card.setAlignment(Pos.CENTER_LEFT);
 		// the graphic must follow the button width so that the description wraps.
