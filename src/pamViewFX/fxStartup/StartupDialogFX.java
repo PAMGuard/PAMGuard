@@ -223,8 +223,8 @@ public class StartupDialogFX {
 
 		// mode cards
 		modeGroup = new ToggleGroup();
-		normalCard = createModeCard("Normal", "Process sound in real time or analyse recordings using a settings (.psfx) file");
-		viewerCard = createModeCard("Viewer", "Review and reprocess data previously processed in normal mode using its database");
+		normalCard = createModeCard("Normal", "Process sound in real time or analyse recordings using automated detection and classification algorithms");
+		viewerCard = createModeCard("Viewer", "Review, reprocess and annotate data processed in normal mode and/or annotate raw sound files");
 		normalCard.setUserData(StartupHistory.MODE_NORMAL);
 		viewerCard.setUserData(StartupHistory.MODE_VIEWER);
 		HBox cards = new HBox(14, normalCard, viewerCard);
@@ -353,8 +353,8 @@ public class StartupDialogFX {
 		card.setMaxWidth(Double.MAX_VALUE);
 		card.setPrefWidth(300);
 		// fixed height - the file list gets any extra space.
-		card.setMinHeight(96);
-		card.setPrefHeight(96);
+		card.setMinHeight(116);
+		card.setPrefHeight(116);
 		card.setMaxHeight(Region.USE_PREF_SIZE);
 		card.setAlignment(Pos.CENTER_LEFT);
 		// the graphic must follow the button width so that the description wraps.
