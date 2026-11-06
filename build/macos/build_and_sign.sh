@@ -33,22 +33,10 @@ echo "Starting Signing Process for: $APP_NAME"
 echo "Certificate: $CERT_NAME"
 echo "=========================================="
 
-# 0. CONFIGURE APP FOR MULTIPLE INSTANCES
+# 0. CONFIGURE INFO.PLIST (multiple instances and file associations)
 echo ""
-echo "--- Configuring app to allow multiple instances ---"
-INFO_PLIST="$APP_PATH/Contents/Info.plist"
-
-if [ -f "$INFO_PLIST" ]; then
-    # Add LSMultipleInstancesProhibited key set to false
-    # This allows right-click > "New Instance" in Finder
-    /usr/libexec/PlistBuddy -c "Add :LSMultipleInstancesProhibited bool false" "$INFO_PLIST" 2>/dev/null || \
-    /usr/libexec/PlistBuddy -c "Set :LSMultipleInstancesProhibited false" "$INFO_PLIST" 2>/dev/null
-    
-    echo "✅ Multiple instances enabled"
-    echo "   Users can now right-click PAMGuard icon and select 'New Instance'"
-else
-    echo "⚠️  Warning: Info.plist not found at $INFO_PLIST"
-fi
+echo "--- Configuring Info.plist (multiple instances, .psfx and .sqlite3 file types) ---"
+bash "$(dirname "$0")/configure_info_plist.sh" "$APP_PATH"
 
 echo ""
 
