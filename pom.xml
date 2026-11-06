@@ -199,15 +199,19 @@
 								<CFBundleIconFile>
 									src/Resources/PamguardIcon2.icns</CFBundleIconFile>
 								<CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+								<CFBundleIdentifier>org.pamguard.PAMGuard</CFBundleIdentifier>
 								<CFBundleName>${project.build.finalName}</CFBundleName>
 								<CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
 								<CFBundleURLTypes>
 									<string>msa</string>
 								</CFBundleURLTypes>
 								<JVMVersion>21+</JVMVersion>
+								<!-- JVMOptions go to the JVM, JVMArguments to PAMGuard's main method -->
+								<JVMOptions>
+									<string>-Xmx8192m</string>
+								</JVMOptions>
 								<JVMArguments>
 									<string>-c</string>
-									<string>-Xmx8192m</string>
 								</JVMArguments>
 								<NSAppSleepDisabled>true</NSAppSleepDisabled>
 								<NSMicrophoneUsageDescription>"PAMGuard requires

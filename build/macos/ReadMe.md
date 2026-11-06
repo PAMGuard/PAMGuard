@@ -40,14 +40,13 @@ That's it! The script will:
 
 ## What the Script Does
 
-### Phase 0: Configure Multiple Instances
-Modifies the `Info.plist` to allow users to launch multiple instances of PAMGuard:
+### Phase 0: Configure Info.plist
+Runs `configure_info_plist.sh` on the app before signing:
 
-- Sets `LSMultipleInstancesProhibited` to `false`
-- Enables "New Instance" option in right-click menu
-- Applied before signing
+- Sets `LSMultipleInstancesProhibited` to `false`. A second instance is opened from the Dock icon's menu ("Open additional instance of PAMGuard").
+- Associates `.psfx` files with PAMGuard (normal mode) and lists PAMGuard under "Open With" for `.sqlite3` databases (viewer mode) without becoming their default app.
 
-**Why:** Allows users to run multiple PAMGuard instances simultaneously for monitoring different audio streams or comparing configurations.
+See `docs/MULTIPLE_INSTANCES.md` for details.
 
 ### Phase 1: JAR Processing
 Recursively finds all JAR files and processes those containing native libraries:
@@ -121,6 +120,7 @@ Final Gatekeeper check to ensure the DMG will be accepted by user systems.
 macos/
 ├── README.md                   # This file - start here! ⭐
 ├── build_and_sign.sh           # Signing & notarization script ⭐
+├── configure_info_plist.sh     # Info.plist: multiple instances & file types
 ├── apple_creds.sh              # Your credentials (configure this)
 ├── entitlements.plist          # Required entitlements for JVM
 ├── utils/                      # Utility scripts
