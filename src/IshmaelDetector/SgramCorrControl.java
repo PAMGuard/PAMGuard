@@ -21,15 +21,9 @@ import PamController.PamController;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
-import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 
 public class SgramCorrControl extends IshDetControl implements PamSettings 
 {
-	
-	/**
-	 * JavaFX based seettings dialog (Should be in a swing GUI class but here for now)
-	 */
-	private PamDialogFX2AWT settingsDialog;
 	
 	/**
 	 * Settings pane for the Ishamel Correlation (should be in a Swing GUI class but here for now). 
@@ -80,18 +74,11 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 
 	@Override
 	public void showParamsDialog1(Frame parentFrame) {
-//		SgramCorrParams newParams =
-//			SgramCorrParamsDialog.showDialog2(parentFrame, (SgramCorrParams)ishDetParams);
+		SgramCorrParams newParams =
+			SgramCorrParamsDialog.showDialog2(parentFrame, (SgramCorrParams)ishDetParams);
 		
-		//the FX GUI is new and shiny but a little complicated to get working with Swing. 
-		if (settingsDialog == null || parentFrame != settingsDialog.getOwner()) {
-			IshSpecCorrPaneFX setPane = getSettingsPane();
-			settingsDialog = new PamDialogFX2AWT<IshDetParams>(parentFrame, setPane, false);
-			settingsDialog.setResizable(false);
-		}
-//		
-		SgramCorrParams newParams = (SgramCorrParams) settingsDialog.showDialog(ishDetParams);
-//		
+		//the FX GUI (IshSpecCorrPaneFX in a PamDialogFX2AWT) is available via getSettingsPane() 
+		//but the Swing dialog is used in the Swing GUI. 
 		installNewParams(parentFrame, newParams);
 	}
 	
