@@ -207,6 +207,7 @@ public class Pamguard {
 		}
 		boolean showSplash = true;
 		boolean showStartupDialog = false;
+		File openFile = null;
 		if (args != null) {
 			int nArgs = args.length;
 			int iArg = 0;
@@ -224,6 +225,17 @@ public class Pamguard {
 					continue;
 				}
 				
+				if (anArg.equalsIgnoreCase(MacOSIntegration.OPENFILE)) {
+					/*
+					 * Open a settings file (normal mode) or database (viewer mode), e.g.
+					 * when a new instance is launched for a file opened in the macOS Finder.
+					 */
+					if (iArg < nArgs) {
+						openFile = new File(args[iArg++]);
+					}
+					continue;
+				}
+
 				if (anArg.equalsIgnoreCase("-v")) {
 					runMode = PamController.RUN_PAMVIEW;
 					System.out.println("PAMGUARD Viewer");
@@ -426,9 +438,35 @@ public class Pamguard {
 				}
 			}
 		}
+		boolean guiStartup = runMode != PamController.RUN_REMOTE && PamGUIManager.getGUIType() != PamGUIManager.NOGUI;
+		if (guiStartup && MacOSIntegration.isMac()) {
+			/*
+			 * On macOS a file double clicked in the Finder arrives as an event, not as a
+			 * command line argument. Install the handler (and the Dock menu for opening
+			 * another instance), then give the event a moment to arrive.
+			 */
+			MacOSIntegration.install();
+			if (openFile == null && MacOSIntegration.getAppBundle() != null) {
+				openFile = MacOSIntegration.waitForLaunchFile(1000);
+			}
+		}
+		if (openFile != null) {
+			int fileMode = MacOSIntegration.getFileRunMode(openFile);
+			if (fileMode < 0) {
+				System.out.println("Unable to open " + openFile.getAbsolutePath() + ": not a PAMGuard settings file or database");
+			}
+			else {
+				runMode = applyStartupFile(fileMode, openFile);
+				// the file decides the run mode, so the start up dialog isn't needed.
+				showStartupDialog = false;
+				PamSettingManager.setStartupDialogUsed(true);
+			}
+		}
 		if (showStartupDialog) {
 			runMode = runStartupDialog(runMode);
 		}
+		// any file opened from now on goes to a new instance of PAMGuard.
+		MacOSIntegration.setStartupComplete();
 		//going to need the run mode inside a Runnable later 
 		final int chosenRunMode = runMode;
 		if(runMode != PamController.RUN_REMOTE && PamGUIManager.getGUIType() != PamGUIManager.NOGUI) {
@@ -575,8 +613,18 @@ public class Pamguard {
 			// light or dark mode chosen in the dialog, otherwise keep the saved scheme.
 			PamColors.setStartupScheme(selection.getDarkMode() ? ColourScheme.DARKSCHEME : ColourScheme.DAYSCHEME);
 		}
-		File file = selection.getFile();
-		if (selection.getRunMode() == PamController.RUN_PAMVIEW) {
+		return applyStartupFile(selection.getRunMode(), selection.getFile());
+	}
+
+	/**
+	 * Use a settings file (normal mode) or database (viewer mode) at start up
+	 * without showing the normal settings or database dialogs.
+	 * @param runMode run mode, PamController.RUN_PAMVIEW for a database.
+	 * @param file psfx file or Sqlite database.
+	 * @return the run mode.
+	 */
+	private static int applyStartupFile(int runMode, File file) {
+		if (runMode == PamController.RUN_PAMVIEW) {
 			System.out.println("PAMGUARD Viewer: database " + file.getAbsolutePath());
 			DBControl.setStartupDatabase(file.getAbsolutePath());
 		}
@@ -584,7 +632,7 @@ public class Pamguard {
 			System.out.println("PAMGUARD normal mode: settings " + file.getAbsolutePath());
 			PamSettingManager.setStartupSettingsFile(file);
 		}
-		return selection.getRunMode();
+		return runMode;
 	}
 
 	static private String writePropertyString(String key) {

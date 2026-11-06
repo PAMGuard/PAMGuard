@@ -1,163 +1,59 @@
-# Multiple Instances Feature
+# Multiple Instances and File Associations (macOS)
 
-## What This Does
+## Opening another instance of PAMGuard
 
-Enables users to launch multiple instances of PAMGuard from the Finder by right-clicking on the app icon.
+macOS only ever brings the running copy of an app to the front when its icon is
+double clicked in the Finder or Applications folder, and the Finder has no "New
+Instance" menu item. `LSMultipleInstancesProhibited = false` allows a second copy to
+run, but something still has to ask for one. PAMGuard does this from the Dock:
 
-## How It Works
+- Right click (or hold) the PAMGuard icon in the Dock and choose
+  **Open additional instance of PAMGuard**.
 
-The script modifies the `Info.plist` file in the app bundle to set:
-```xml
-<key>LSMultipleInstancesProhibited</key>
-<false/>
-```
+This runs `open -n PAMGuard.app`, so the new copy starts with the normal start up
+dialog. Each instance gets its own Dock icon. From Terminal the same thing is:
 
-This tells macOS that the application **allows** multiple instances to run simultaneously.
-
-## User Experience
-
-### Before (Default macOS Behavior)
-When you have PAMGuard already running and try to open it again:
-- Double-clicking the icon brings the existing window to front
-- No way to launch a second instance from Finder
-- Must use command line: `open -n PAMGuard.app`
-
-### After (With This Feature)
-When you right-click the PAMGuard icon in Finder:
-```
-PAMGuard
-├── Open
-├── Show Package Contents
-├── New Instance          ← NEW OPTION!
-├── Move to Trash
-└── Get Info
-```
-
-Selecting "New Instance" launches a completely separate instance of PAMGuard.
-
-## Technical Details
-
-### What Gets Modified
-- **File:** `PAMGuard.app/Contents/Info.plist`
-- **Key:** `LSMultipleInstancesProhibited`
-- **Value:** `false`
-
-### When It Happens
-- **Step 0** of the build_and_sign.sh script
-- Before any signing occurs
-- Applied to the .app bundle
-
-### Implementation
-Uses macOS built-in `PlistBuddy` utility:
 ```bash
-/usr/libexec/PlistBuddy -c "Add :LSMultipleInstancesProhibited bool false" Info.plist
-```
-
-If the key already exists, it updates it:
-```bash
-/usr/libexec/PlistBuddy -c "Set :LSMultipleInstancesProhibited false" Info.plist
-```
-
-## Use Cases for PAMGuard
-
-This is particularly useful for PAMGuard users who need to:
-- Monitor multiple audio streams simultaneously
-- Run different configurations side-by-side
-- Compare live and recorded data
-- Test different settings in parallel
-- Run viewer mode while recording
-
-## Testing
-
-After running `build_and_sign.sh`:
-
-1. **Install the signed DMG**
-2. **Launch PAMGuard** normally (double-click)
-3. **Right-click the PAMGuard icon** in Finder (not the Dock!)
-4. **Look for "New Instance"** in the context menu
-5. **Click "New Instance"** to launch a second PAMGuard
-
-Both instances will run independently with separate windows and configurations.
-
-## Verifying the Setting
-
-Check if it's enabled in the signed app:
-```bash
-/usr/libexec/PlistBuddy -c "Print :LSMultipleInstancesProhibited" \
-    /Applications/PAMGuard.app/Contents/Info.plist
-```
-
-Should print: `false`
-
-If the key doesn't exist, macOS defaults to allowing multiple instances, but setting it explicitly to `false` ensures the context menu item appears.
-
-## Alternative: Command Line
-
-Users can also launch multiple instances from Terminal:
-```bash
-# Launch a new instance (works even without this feature)
 open -n /Applications/PAMGuard.app
-
-# Launch with arguments
-open -n /Applications/PAMGuard.app --args -v
 ```
 
-But the right-click menu option is much more user-friendly!
+The Dock menu is added in `src/pamguard/MacOSIntegration.java`.
 
-## Disabling This Feature
+## File associations
 
-If you want to go back to single-instance behavior, edit `build_and_sign.sh` and comment out the plist modification:
+`configure_info_plist.sh` (run by `build_and_sign.sh` before signing) adds these to
+`Info.plist`, because the macosappbundler plugin can't write them:
+
+| File | LSHandlerRank | What happens |
+|------|---------------|--------------|
+| `.psfx` | Owner | Double click opens PAMGuard in **normal mode** with that configuration |
+| `.sqlite3`, `.sqlite` | Alternate | PAMGuard is listed under **Open With** but is not made the default. Opening one with PAMGuard starts **viewer mode** on that database |
+
+It also exports the `org.pamguard.psfx` file type and sets
+`LSMultipleInstancesProhibited` to false. `CFBundleIdentifier` (`org.pamguard.PAMGuard`)
+is set in the pom.
+
+Note: Alternate means PAMGuard never replaces another app's claim on `.sqlite3`. On a
+Mac with no other SQLite app installed, macOS may still use PAMGuard for a double
+click because it is the only app that can open the file.
+
+### How a file reaches PAMGuard
+
+macOS doesn't put the file on the command line. It sends an "open file" event,
+which `MacOSIntegration` handles:
+
+- **PAMGuard not running:** the file that launched it is picked up at start up
+  (PAMGuard waits up to a second for the event), the start up dialog is skipped and
+  the run mode comes from the file type.
+- **PAMGuard already running:** a new instance is launched for the file with
+  `open -n PAMGuard.app --args -openfile <file>`, so the running session is left alone.
+
+The `-openfile <file>` option also works on the command line on any platform.
+
+## Checking a build
 
 ```bash
-# /usr/libexec/PlistBuddy -c "Add :LSMultipleInstancesProhibited bool false" "$INFO_PLIST"
+/usr/libexec/PlistBuddy -c "Print :CFBundleDocumentTypes" /Applications/PAMGuard.app/Contents/Info.plist
+# After installing, re-register with Launch Services if Open With looks stale:
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/PAMGuard.app
 ```
-
-Or set it to `true`:
-```bash
-/usr/libexec/PlistBuddy -c "Set :LSMultipleInstancesProhibited true" "$INFO_PLIST"
-```
-
-## Integration with Signing
-
-This modification happens **before** signing, so:
-- ✅ The Info.plist is modified first
-- ✅ Then the entire app bundle is signed
-- ✅ The signature includes the modified plist
-- ✅ Apple's notarization sees the modified plist
-
-This ensures the feature works correctly in the distributed, notarized app.
-
-## Output
-
-When running the script, you'll see:
-```
---- Configuring app to allow multiple instances ---
-✅ Multiple instances enabled
-   Users can now right-click PAMGuard icon and select 'New Instance'
-```
-
-## Compatibility
-
-- **macOS Version:** All supported macOS versions
-- **Dock Behavior:** The Dock icon still shows one running app (but with multiple windows)
-- **Resource Usage:** Each instance uses separate memory and resources
-- **Data Files:** Each instance can open different data files
-- **Settings:** Each instance has independent settings (unless using shared config files)
-
-## Best Practices for Users
-
-When running multiple instances:
-- Each instance should use different sound cards (if recording)
-- Monitor system resources (CPU, memory)
-- Use different configuration files to avoid conflicts
-- Be aware that both instances access the same PAMGuard settings directory
-
-## Summary
-
-✅ **Simple:** Just 3 lines added to the script
-✅ **User-Friendly:** Adds right-click menu option
-✅ **Safe:** Applied before signing
-✅ **Compatible:** Works with all macOS versions
-✅ **Useful:** Enables parallel PAMGuard workflows
-
-The feature is now enabled by default in all builds! 🎉
