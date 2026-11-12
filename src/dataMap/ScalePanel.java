@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -32,7 +34,7 @@ public class ScalePanel extends HidingDialogComponent {
 	
 	private JSlider hScrollBar;
 	private JLabel hScaleText;
-	private JComboBox vDropDown;
+	private JComboBox<String> vDropDown;
 	private JCheckBox vLogScale;
 	private double[] hScaleChoices = DataMapParameters.hScaleChoices;
 	private PamBorderPanel borderPanel;
@@ -46,14 +48,14 @@ public class ScalePanel extends HidingDialogComponent {
 		GridBagConstraints c = new PamGridBagContraints();
 		PamDialog.addComponent(borderPanel, new PamLabel("Horizontal ", SwingConstants.RIGHT), c);
 		c.gridx++;
-		PamDialog.addComponent(borderPanel, hScrollBar = new JSlider(0, hScaleChoices.length-1), c);
+		PamDialog.addComponent(borderPanel, hScrollBar = new MapSlider(0, hScaleChoices.length-1), c);
 		c.gridx++;
 		PamDialog.addComponent(borderPanel, hScaleText = new PamLabel(""), c);
 		c.gridx = 0;
 		c.gridy++;
 		PamDialog.addComponent(borderPanel, new PamLabel("Vertical ", SwingConstants.RIGHT), c);
 		c.gridx++;
-		PamDialog.addComponent(borderPanel, vDropDown = new JComboBox(), c);
+		PamDialog.addComponent(borderPanel, vDropDown = new JComboBox<String>(), c);
 		c.gridx++;
 		PamDialog.addComponent(borderPanel, vLogScale = new PamCheckBox("Log Scale"), c);
 		
@@ -64,6 +66,7 @@ public class ScalePanel extends HidingDialogComponent {
 		
 //		hScrollBar.addAdjustmentListener(new HScrollListener());
 		hScrollBar.addChangeListener(new HScrollListener());
+//		hScrollBar.add
 		
 		vDropDown.addActionListener(new VerticalListener());
 		vDropDown.setToolTipText("Change vertical scaling");
@@ -103,7 +106,46 @@ public class ScalePanel extends HidingDialogComponent {
 
 	private void sayHScale() {
 		int hChoice = hScrollBar.getValue();
-		hScaleText.setText(String.format("%s pixs/hour", new Double(hScaleChoices[hChoice]).toString()));
+		hScaleText.setText(String.format("%s pixs/hour", Double.valueOf(hScaleChoices[hChoice]).toString()));
+	}
+	
+	private class MapSlider extends JSlider {
+
+		private static final long serialVersionUID = 1L;
+
+		public MapSlider(int min, int max) {
+			super(min, max);
+			setMinorTickSpacing(1);
+			setMajorTickSpacing(1);
+			setExtent(1);
+//			ActionMap actionMap = getActionMap();
+//			Object[] keys = actionMap.allKeys();
+//			System.out.println(keys.toString());
+//			for (int i = 0; i < keys.length; i++) {
+//				System.out.println(keys[i]);
+//			}
+//			Action a;
+//			try {
+//				 a = actionMap.get("positiveBlockIncrement");
+//				 System.out.println(a.getValue("scrollIncrement"));
+////				 a.
+//				a.putValue("scrollIncrement", 1);
+//				actionMap.get("negativeBlockIncrement").putValue("scrollIncrement", 1);
+//			}
+//			catch (Exception e) {
+//				
+//			}
+		}
+//	    @Override
+//	    public void scrollByBlock(int direction) {
+//	        // Define your custom block increment value
+//	        int blockIncrement = 15; 
+//	        
+//	        int oldValue = getValue();
+//	        int newValue = oldValue + (direction * blockIncrement);
+//	        setValue(newValue);
+//	    }
+		
 	}
 	
 	class HScrollListener implements AdjustmentListener, ChangeListener {
@@ -116,6 +158,8 @@ public class ScalePanel extends HidingDialogComponent {
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
 			sayHScale();
+			hScrollBar.setExtent(1);
+			//this is the one that gets called, not adjustmentValueChanged!?
 			dataMapPanel.scaleChanged();
 		}
 	}

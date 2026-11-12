@@ -1156,6 +1156,12 @@ public class Nidaq {
 			int majV = getMajorVersion();
 			int minV = getMinorVersion();
 			System.out.println(String.format("National Instruments software loaded version %d.%d", majV, minV));
+			if (majV > 21) {
+				// issue a warning on the terminal. 
+				System.out.println("************************************************************************");	
+				System.out.println("* NI library versions > 21.x may not work with this verion of PAMGuard *");
+				System.out.println("************************************************************************");	
+			}
 			versionShown = true;
 		}
 	}
