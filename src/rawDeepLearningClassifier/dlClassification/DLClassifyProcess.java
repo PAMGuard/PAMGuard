@@ -160,6 +160,7 @@ public class DLClassifyProcess extends PamProcess {
 		}
 
 		//important for downstream processes such as the bearing localiser.
+		int outputChanMap = dlControl.getDLParams().groupedSourceParams.getChannelBitmap();
 		dlModelResultDataBlock.setChannelMap(dlControl.getDLParams().groupedSourceParams.getChannelBitmap());
 		dlDetectionDataBlock.setChannelMap(dlControl.getDLParams().groupedSourceParams.getChannelBitmap());
 

@@ -381,6 +381,11 @@ public class GroupedChannelPaneFX {
 		params.setGroupingType(getGrouping());
 		params.setChannelGroups(getChannelGroups());
 		params.setChanOrSeqBitmap(getChannelList());
+		// and mask off unused channels that couldn't possibly be in a map. 
+		if (sourceDataBlock != null) {
+			int mask = sourceDataBlock.getChannelMap();
+			
+		}
 		
 		return true;
 	}
@@ -410,7 +415,11 @@ public class GroupedChannelPaneFX {
 			gsp.setDataSource(currentDataSource.getLongDataName());
 		}
 		gsp.setChannelGroups(getChannelGroups());
-		gsp.setChanOrSeqBitmap(getChannelList());
+		int chanList = getChannelList();
+		if (currentDataSource != null) {
+			chanList &= currentDataSource.getChannelMap();
+		}
+		gsp.setChanOrSeqBitmap(chanList);
 		getObservableProperty().setValue(gsp);
 	}
 	

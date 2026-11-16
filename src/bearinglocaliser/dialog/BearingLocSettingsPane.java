@@ -24,6 +24,13 @@ public class BearingLocSettingsPane extends SettingsPane<BearingLocaliserParams>
 	private BearingLocaliserControl bearingLocaliserControl;
 	private BearingLocaliserParams currentParams;
 	private BearLocSourcePane sourcePane;
+	/**
+	 * @return the sourcePane
+	 */
+	public BearLocSourcePane getSourcePane() {
+		return sourcePane;
+	}
+
 	private BearLocGroupPane groupPane;
 	private BearLocAlgorithmPane algoPane;
 	

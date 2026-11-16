@@ -90,8 +90,12 @@ public class BearLocAlgorithmPane extends SettingsPane<BearingLocaliserParams> {
 		int n = Math.min(nGroup, algoSelection.length);
 		int groupMap = GroupedSourcePaneFX.getGroupMap(params.getChannelBitmap(), params.getChannelGroups());
 		int[] groupList = PamUtils.getChannelArray(groupMap);
+		int sourceChannels = bfLocSettingsPane.getSourcePane().getSourceChannelMap();
+		int channelMap = params.getChannelBitmap();
+		channelMap &= sourceChannels;
+		params.setChannelBitmap(channelMap);
 		for (int i = 0; i < n; i++) {
-			int groupChanMap = GroupedSourcePaneFX.getGroupChannels(groupList[i], params.getChannelBitmap(), params.getChannelGroups());
+			int groupChanMap = GroupedSourcePaneFX.getGroupChannels(groupList[i], channelMap, params.getChannelGroups());
 			String algoName = params.getAlgorithmName(i);
 			if (algoName != null) {
 				algoSelection[i].getSelectionModel().select(algoName);

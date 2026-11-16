@@ -81,6 +81,7 @@ public class BearLocSourcePane extends SettingsPane<BearingLocaliserParams> {
 			return null;
 		}
 		RawOrFFTParamsInterface nextparams = rawOrFFTPane.getParams(params);
+		int sourceChannels = getSourceChannelMap();
 		
 		return params;
 	}
@@ -98,6 +99,14 @@ public class BearLocSourcePane extends SettingsPane<BearingLocaliserParams> {
 				
 		enableControls();
 		
+	}
+	
+	/**
+	 * Get the source channel map and use to mask other channel maps. 
+	 * @return
+	 */
+	public int getSourceChannelMap() {
+		return detSourcePane.getSourceChannelMap();
 	}
 	
 	

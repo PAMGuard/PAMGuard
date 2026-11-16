@@ -372,6 +372,20 @@ public class SourcePaneFX extends PamBorderPane {
 		rePackOwner(channels);
 	}
 	
+	/**
+	 * Get the source channel map. This is needed in several places to mask the channel groups. 
+	 * @return source channel map, or 0 if no source set. 
+	 */
+	public int getSourceChannelMap() {
+		PamDataBlock<?> sb = getSource();
+		if (sb != null) {
+			return sb.getSequenceMap();
+		}
+		else {
+			return 0;
+		}
+	}
+	
 	private int currentNShown = 0;
 	private Class requiredClassType;
 	

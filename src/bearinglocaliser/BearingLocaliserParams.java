@@ -135,6 +135,18 @@ public class BearingLocaliserParams implements Serializable, Cloneable, RawOrFFT
 		}
 		return this.rawOrFFTSourceParameters.getChanOrSeqBitmap();
 	}
+	
+	/**
+	 * Set the underlaying channel map
+	 * @param channelMap
+	 * 
+	 */
+	public void setChannelBitmap(int channelMap) {
+		if (rawOrFFTSourceParameters == null) {
+			return;
+		}
+		rawOrFFTSourceParameters.setChanOrSeqBitmap(channelMap);
+	}
 
 	public int[] getChannelGroups() {
 		if (rawOrFFTSourceParameters == null) {

@@ -177,7 +177,7 @@ public class SegmenterProcess extends PamProcess {
 			dlControl.getDLParams().groupedSourceParams = new GroupedSourceParameters(); 
 			System.err.println("Raw Deep Learning Classifier: The grouped source parameters were null. A new instance has been created: Possible de-serialization error.");
 		}
-
+//		int segmenterMap = dlControl.getDLParams().groupedSourceParams.getChannelBitmap();
 		int[] chanGroups = dlControl.getDLParams().groupedSourceParams.getChannelGroups();
 
 		//initialise an array of nulls. 
