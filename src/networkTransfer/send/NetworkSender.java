@@ -71,6 +71,8 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	
 	public static final String UNIT_TYPE = "Network Sender";
 	
+	private Object clientSynch = new Object();
+	
 	public NetworkSender(String unitName) {
 		super(UNIT_TYPE, unitName);
 
@@ -227,22 +229,51 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 //		networkSendParams.setSendingFormat(sendFmt);		
 	}
 
+	/**
+	 * Create the correct type of client - TCP or MQTT. 
+	 */
 	public void initializeClient() {
-		if(client!=null && !client.requireReconnect) {
-			return;
-		}
-		if(this.networkSendParams.mqtt) {
-			client = new PamMqttClient(this.networkSendParams);
-		}else {
-			client = new TCPSendClient(this.networkSendParams);
+		synchronized(clientSynch) {
+			if (changeClient()) {
+				closeClient();
+			}
+			if(client!=null && !client.requireReconnect) {
+				return;
+			}
+			if(this.networkSendParams.mqtt) {
+				client = new PamMqttClient(this.networkSendParams);
+			}else {
+				client = new TCPSendClient(this.networkSendParams);
+			}
 		}
 	}
 	
+	/**
+	 * Return true if the client should be changed to a different type 
+	 * @return
+	 */
+	private boolean changeClient() {
+		synchronized(clientSynch) {
+			if (client == null) {
+				return true;
+			}
+			if (client instanceof PamMqttClient && this.networkSendParams.mqtt) {
+				return false;
+			}
+			if (client instanceof TCPSendClient && !this.networkSendParams.mqtt) {
+				return false;
+			}
+		}
+		return true;
+	}
 	public void closeClient() {
 		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client.
 		//Client may have never been initialized
-		if(client!=null) {
-			this.client.close();
+		synchronized(clientSynch) {
+			if(client != null) {
+				this.client.close();
+				this.client = null;
+			}
 		}
 	}
 
@@ -293,17 +324,20 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		NetworkSendParams p = NetworkSendDialog.showDialog(parentFrame, this, networkSendParams);
 		if (p != null) {
 			networkSendParams = (NetworkSendParams) p.clone();
-			if (client != null) {
-				boolean isMqtt = (client instanceof PamMqttClient);
-				if (isMqtt != networkSendParams.mqtt) {
-					client.close();
-					client = null;
-					initializeClient();
-				} else {
-					client.configureClient(networkSendParams);
-				}
-			}
-			sortDataSources();
+			// always do a full restart after settings have been opened. 
+			closeClient(); 
+			runClient();
+//			if (client != null) {
+//				boolean isMqtt = (client instanceof PamMqttClient);
+//				if (isMqtt != networkSendParams.mqtt) {
+//					client.close();
+//					client = null;
+//					initializeClient();
+//				} else {
+//					client.configureClient(networkSendParams);
+//				}
+//			}
+//			sortDataSources();
 		}
 	}
 
@@ -381,6 +415,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 				client.notifyModelChanged(changeType);
 			}
 			initialisationComplete  = true;
+			runClient(); // start client immediately so that messages can send before PAMGuard actually starts running. 
 			break;
 		case PamController.REMOVE_CONTROLLEDUNIT:
 		case PamController.ADD_CONTROLLEDUNIT:
@@ -522,13 +557,13 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		super.pamToStart();
 		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
 		//If net sending is enabled then let this run, but otherwise just skip past it.. 
-		if(this.networkSendParams.isModuleActivated()) {
-			if (this.client == null) {
-				initializeClient();
-			}
-			this.client.configureClient(this.networkSendParams);
-			runClient();
-		}
+//		if(this.networkSendParams.isModuleActivated()) {
+//			if (this.client == null) {
+//				initializeClient();
+//			}
+//			this.client.configureClient(this.networkSendParams);
+//			runClient();
+//		}
 	}
 	
 	public long lastTransmitErrorPrint = 0;
@@ -567,23 +602,28 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		return client.getStatus();
 	}
 
+	/**
+	 * Main function for starting / restarting client. 
+	 */
 	public void runClient() {
 		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
 		//Dont do anything if the sender is disabled
 		if(this.networkSendParams.isModuleActivated() != true) {
+			closeClient();
 			return;
 		}
-		if(client==null) {
-			this.initializeClient();
+
+		this.initializeClient();
+
+		if(client.isConnected() == false) {
+			try {
+				client.configureClient(networkSendParams);
+				client.connect();
+			} catch (ClientConnectFailedException e) {
+				System.out.println("Could not connect client to server. Data will exist in buffer until connection is obtained");
+			}
 		}
-		if(client.isConnected()) {
-			return;
-		}
-		try {
-			client.connect();
-		} catch (ClientConnectFailedException e) {
-			System.out.println("Could not connect client to server. Data will exist in buffer until connection is obtained");
-		}
+		sortDataSources();
 	}
 
 	public String executeExternalCommand(String command) {
