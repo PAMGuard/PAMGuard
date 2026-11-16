@@ -38,7 +38,7 @@ public class PamguardVersionInfo {
 	/**
 	 * Release date
 	 */
-	static public final String date = "December 2026";
+	static public final String date = "November 2026";
 
 
 //	/**
