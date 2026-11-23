@@ -59,7 +59,8 @@ public class NetworkSendProcess extends PamProcess {
 		if (commandProcess && outputFormat==NetworkSendParams.NETWORKSEND_BYTEARRAY) {
 			sendPamCommand(NetworkReceiver.NET_PAM_COMMAND_STOP);
 		}
-		this.networkSender.closeClient();
+		// don't close the client until PAMGuard exits. Do this in the controlled unit, not here. 
+//		this.networkSender.closeClient();
 	}
 
 	private void sendPamCommand(int command) {
@@ -141,6 +142,7 @@ public class NetworkSendProcess extends PamProcess {
 				//System.out.println("Error creating json string from " + dataBlock.getClass());
 			} else {
 				qo = new  NetworkQueuedObject(jsonString,((PamDataBlock)dataBlock).getDataName());
+				qo.setBespokeTopic(jsonSource.getMQTTTopic(dataUnit));
 				networkSender.transmitData(qo);
 			}
 //			System.out.print("***" + jsonString);

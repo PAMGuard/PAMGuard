@@ -33,6 +33,11 @@ public class NetworkQueuedObject {
 	
 	public String streamName;
 	
+	/**
+	 * Bespoke MQTT topic. Normall null, but allows modules to override the topic name from the default. 
+	 */
+	public String mqttTopic;
+	
 	
 	/**
 	 * Constructor for a byte-array message, to send to a remote PAMGuard installation
@@ -85,6 +90,22 @@ public class NetworkQueuedObject {
 		}
 		
 		return str;
+	}
+
+	/**
+	 * Set a bespoke MQTT topic, to override the default. 
+	 * @param mqttTopic
+	 */
+	public void setBespokeTopic(String mqttTopic) {
+		this.mqttTopic = mqttTopic;
+	}
+
+	/**
+	 * Set a bespoke MQTT topic, to override the default. 
+	 * @return bespoke MQTT topic. 
+	 */
+	public String getBespokeTopic() {
+		return mqttTopic;
 	}
 	
 	

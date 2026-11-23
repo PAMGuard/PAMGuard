@@ -187,6 +187,16 @@ public abstract class JSONObjectDataSource<DataSource extends JSONObjectData> {
 	 * @param pamDataUnit
 	 */
 	abstract protected void setObjectType(PamDataUnit pamDataUnit);
-	
+
+	/**
+	 * Function allowing override of MQTT topic. Previously this has been set entirely
+	 * within the Network manager based on network settings and the data block name. This 
+	 * allows bespoke functions to override that functionality. 
+	 * @param dataUnit 
+	 * @return a bespoke topic name, or null to use old default method. 
+	 */
+	public String getMQTTTopic(PamDataUnit dataUnit) {
+		return null;
+	}
 
 }

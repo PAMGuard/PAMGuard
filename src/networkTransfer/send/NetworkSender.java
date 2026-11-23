@@ -92,9 +92,10 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		
 		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client. 
 		//If net sending is enabled then let this run, but otherwise just skip past it.. 
-		if(this.networkSendParams.isModuleActivated()) {
-			initializeClient();
-		}
+		// this should happen in the callback from initialisation complete. 
+//		if(this.networkSendParams.isModuleActivated()) {
+//			initializeClient();
+//		}
 		
 	}
 	
@@ -266,6 +267,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		}
 		return true;
 	}
+	
 	public void closeClient() {
 		//ST added 8/13/2026 -- allow configuration to effectively turn off the net send client.
 		//Client may have never been initialized
@@ -426,6 +428,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		case PamController.CHANGED_PROCESS_SETTINGS:
 			//this.client.updateParams(this.getNetworkSendParams());
 			//this.client.configureClient();
+			break;
 		}
 		
 	}
@@ -534,20 +537,18 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	@Override
 	public void pamClose() {
 		super.pamClose();
-		if(client!=null) {
-			client.close();
-		}
+		closeClient();
 	}
 
-	/* (non-Javadoc)
-	 * @see PamController.PamControlledUnit#pamHasStopped()
-	 */
-	@Override
-	public void pamHasStopped() {
-		if(client!=null) {
-			client.disconnect();
-		}
-	}
+//	/* (non-Javadoc)
+//	 * @see PamController.PamControlledUnit#pamHasStopped()
+//	 */
+//	@Override
+//	public void pamHasStopped() {
+//		if(client!=null) {
+//			client.disconnect();
+//		}
+//	}
 
 	/* (non-Javadoc)
 	 * @see PamController.PamControlledUnit#pamToStart()

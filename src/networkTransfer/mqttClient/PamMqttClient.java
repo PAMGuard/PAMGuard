@@ -278,7 +278,12 @@ public class PamMqttClient extends NetworkClient  implements MqttCallbackExtende
 //		if (qo.format == NetworkSendParams.NETWORKSEND_JSON) {
 //			System.out.println(qo.jsonString);
 //		}
-		this.sendMqttMessage(type, message, getTopicExtensin(qo.format));
+		if (qo.getBespokeTopic() != null) {
+			this.publishMQTTMessage(qo.getBespokeTopic(), message);
+		}
+		else {
+			this.sendMqttMessage(type, message, getTopicExtensin(qo.format));
+		}
 
 	}
 	
@@ -413,7 +418,22 @@ public class PamMqttClient extends NetworkClient  implements MqttCallbackExtende
 	}
 	
 	public void sendMqttMessage(String topicExtension, MqttMessage message, String topicType) throws NetTransmitException {
-				
+
+		// need to work out here if it's a binary message or a JSON message. 
+		String fullTopic = getBaseTransmitTopic(topicType)+topicExtension;
+		publishMQTTMessage(fullTopic, message);
+		
+		
+	}
+	
+	/**
+	 * Separate this out from the above function so that it can be called more directly 
+	 * with a full topic name, rather than letting PAMGuard make it up. 
+	 * @param fullTopic
+	 * @param message
+	 * @throws NetTransmitException
+	 */
+	public void publishMQTTMessage(String fullTopic, MqttMessage message)  throws NetTransmitException {
 		if(this.mqttClient==null) {
 			throw new NetTransmitException("Mqtt client is not initialized",new NullPointerException());
 		}
@@ -433,11 +453,9 @@ public class PamMqttClient extends NetworkClient  implements MqttCallbackExtende
 				this.setWarning("Client is not connected to broker. Messages will buffer until it is.", 1);
 			}
 		}
-		// need to work out here if it's a binary message or a JSON message. 
-		String topic = getBaseTransmitTopic(topicType)+topicExtension;
 		
 		try {
-			mqttClient.publish(topic,message.getPayload(),1,false);
+			mqttClient.publish(fullTopic,message.getPayload(),1,false);
 		}catch (MqttPersistenceException e) {
 			System.out.println("Persistance exception on mqtt publish. "+e.getMessage());
 		}catch (MqttException e) {
